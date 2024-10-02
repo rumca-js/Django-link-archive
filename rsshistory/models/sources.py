@@ -6,6 +6,79 @@ from ..webtools import DomainAwarePage
 from ..apps import LinkDatabase
 
 
+class SourceCategories(models.Model):
+    name = models.CharField(max_length=1000, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def ensure(category_name):
+        category = SourceCategories.get(category_name)
+        if category:
+            return category
+
+        else:
+            return SourceCategories.add(category_name)
+
+    def add(category_name):
+        if category_name and category_name != "":
+            objs = SourceCategories.objects.filter(name=category_name)
+            if objs.count() == 0:
+                return SourceCategories.objects.create(name=category_name)
+
+    def get(category_name):
+        objs = SourceCategories.objects.filter(name=category_name)
+        if objs.count() != 0:
+            return objs[0]
+
+
+
+class SourceSubCategories(models.Model):
+    category_name = models.CharField(max_length=1000, default="")
+    name = models.CharField(max_length=1000)
+
+    category = models.ForeignKey(
+        SourceCategories,
+        on_delete=models.CASCADE,
+        related_name="subcategories",
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        ordering = ["category_name", "name"]
+
+    def ensure(category_name, subcategory_name):
+        subcategory = SourceSubCategories.get(category_name, subcategory_name)
+        if subcategory:
+            return subcategory
+
+        else:
+            return SourceSubCategories.add(category_name, subcategory_name)
+
+    def add(category_name, subcategory_name):
+        if category_name and category_name != "" and subcategory_name and subcategory_name != "":
+
+            category = SourceCategories.ensure(category_name)
+            if not category:
+                return
+
+            objs = SourceSubCategories.objects.filter(
+                category_name=category_name, name=subcategory_name
+            )
+            if objs.count() == 0:
+                return SourceSubCategories.objects.create(
+                    category_name=category_name, name=subcategory_name, category = category
+                )
+
+    def get(category_name, subcategory_name):
+        objs = SourceSubCategories.objects.filter(
+            category_name=category_name, name=subcategory_name
+        )
+        if objs.count() != 0:
+            return objs[0]
+
+
 class SourceDataModel(models.Model):
     SOURCE_TYPE_RSS = "BaseRssPlugin"
     SOURCE_TYPE_JSON = "BaseSourceJsonPlugin"
@@ -16,9 +89,9 @@ class SourceDataModel(models.Model):
     title = models.CharField(max_length=1000)
     enabled = models.BooleanField(default=True)
     # main category
-    category = models.CharField(max_length=1000, blank=True)
+    category_name = models.CharField(max_length=1000, blank=True)
     # main subcategory
-    subcategory = models.CharField(max_length=1000, blank=True)
+    subcategory_name = models.CharField(max_length=1000, blank=True)
     export_to_cms = models.BooleanField(
         default=True, help_text="Entries from this source are eligible to export to CMS"
     )
@@ -42,6 +115,21 @@ class SourceDataModel(models.Model):
         help_text="Proxy location for the source. Proxy location will be used instead of normal processing.",
     )
 
+    category = models.ForeignKey(
+        SourceCategories,
+        on_delete=models.SET_NULL,
+        related_name="sources",
+        blank=True,
+        null=True,
+    )
+    subcategory = models.ForeignKey(
+        SourceSubCategories,
+        on_delete=models.SET_NULL,
+        related_name="sources",
+        blank=True,
+        null=True,
+    )
+
     class Meta:
         ordering = ["-enabled", "title"]
 
@@ -59,8 +147,8 @@ class SourceDataModel(models.Model):
 
         sources = SourceDataModel.objects.all()
         for source in sources:
-            SourceCategories.add(source.category)
-            SourceSubCategories.add(source.category, source.subcategory)
+            SourceCategories.add(source.category_name)
+            SourceSubCategories.add(source.category_name, source.subcategory_name)
 
     def get_favicon(self):
         if self.favicon:
@@ -69,6 +157,11 @@ class SourceDataModel(models.Model):
         # returning real favicon from HTML is too long
 
         return DomainAwarePage(self.url).get_domain() + "/favicon.ico"
+
+    def save(self, *args, **kwargs):
+        self.category = SourceCategories.ensure(self.category_name)
+        self.subcategory = SourceSubCategories.ensure(self.category_name, self.subcategory_name)
+        super().save(*args, **kwargs)
 
 
 class SourceOperationalData(models.Model):
@@ -88,46 +181,3 @@ class SourceOperationalData(models.Model):
         null=True,
         blank=True,
     )
-
-
-class SourceCategories(models.Model):
-    category = models.CharField(max_length=1000, unique=True)
-
-    class Meta:
-        ordering = ["category"]
-
-    def add(category):
-        if category and category != "":
-            objs = SourceCategories.objects.filter(category=category)
-            if objs.count() == 0:
-                SourceCategories.objects.create(category=category)
-
-    def get(category):
-        objs = SourceCategories.objects.filter(category=category)
-        if objs.count() != 0:
-            return objs[0]
-
-
-class SourceSubCategories(models.Model):
-    category = models.CharField(max_length=1000, default="")
-    subcategory = models.CharField(max_length=1000)
-
-    class Meta:
-        ordering = ["category", "subcategory"]
-
-    def add(category, subcategory):
-        if category and category != "" and subcategory and subcategory != "":
-            objs = SourceSubCategories.objects.filter(
-                category=category, subcategory=subcategory
-            )
-            if objs.count() == 0:
-                SourceSubCategories.objects.create(
-                    category=category, subcategory=subcategory
-                )
-
-    def get(category, subcategory):
-        objs = SourceSubCategories.objects.filter(
-            category=category, subcategory=subcategory
-        )
-        if objs.count() != 0:
-            return objs[0]

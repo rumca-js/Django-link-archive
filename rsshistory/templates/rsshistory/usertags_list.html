@@ -1,0 +1,44 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div class="dropdown">
+   <button class="btn btn-primary" type="button" id="#filtersDrop" data-bs-toggle="dropdown" aria-expanded="false">
+     Actions
+   </button>
+
+   <ul class="dropdown-menu">
+      <li>
+        <a href="{% url 'rsshistory:entries-untagged' %}" class="dropdown-item" title="Shows untagged bookmarks">Untagged bookmarks</a>
+      </li>
+      {% if user.is_staff %}
+      <li>
+        <a href="{% url 'rsshistory:tags-show-actual' %}" class="dropdown-item" title="Shows actual tags">Actual tags</a>
+      </li>
+      <li>
+        <a href="{% url 'rsshistory:tag-many' %}" class="dropdown-item" title="Tags many links">Tag many links</a>
+      </li>
+      <li>
+        <a href="{% url 'rsshistory:tag-rename' %}" class="dropdown-item" title="Renames tag">Rename tag</a>
+      </li>
+      <li>
+         <a href="{% url 'rsshistory:tag-remove-form' %}" class="dropdown-item" title="Removes tag">Remove tag</a>
+      </li>
+      {% endif %}
+   </ul>
+</div>
+
+<h1>{{tags_title}}</h1>
+
+<div class="container">
+ {% if content_list %}
+     {% for tag in content_list %}
+        <a href='{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+"{{tag.tag}}"' title="#{{tag.tag}} {{tag.count}}">
+        #{{tag.tag}}</a>,
+     {% endfor %}
+ {% else %}
+   No tags
+ {% endif %}
+</div>
+
+{% endblock %} 

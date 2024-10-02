@@ -13,8 +13,8 @@ class FiltersTest(FakeInternetTestCase):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
+            category_name="No",
+            subcategory_name="No",
             export_to_cms=True,
         )
         LinkDataController.objects.create(
@@ -39,16 +39,16 @@ class FiltersTest(FakeInternetTestCase):
         SourceDataController.objects.create(
             url="https://linkedin.com",
             title="LinkedIn",
-            category="No",
-            subcategory="No",
+            category_name="No",
+            subcategory_name="No",
             export_to_cms=False,
         )
 
     def test_source_arg_conditions(self):
         args = {
             "title": "link",
-            "category": "none",
-            "subcategory": "none",
+            "category_name": "none",
+            "subcategory_name": "none",
             "notsupported": "none",
         }
 
@@ -57,16 +57,16 @@ class FiltersTest(FakeInternetTestCase):
         filter_args = thefilter.get_filter_args_map()
 
         self.assertTrue("title" in filter_args)
-        self.assertTrue("category" in filter_args)
-        self.assertTrue("subcategory" in filter_args)
+        self.assertTrue("category_name" in filter_args)
+        self.assertTrue("subcategory_name" in filter_args)
 
         self.assertTrue("unsupported" not in filter_args)
 
     def test_source_arg_conditions_translate(self):
         args = {
             "title": "link",
-            "category": "none",
-            "subcategory": "none",
+            "category_name": "none",
+            "subcategory_name": "none",
             "notsupported": "none",
         }
 
@@ -75,8 +75,8 @@ class FiltersTest(FakeInternetTestCase):
         filter_args = thefilter.get_filter_args_map()
 
         self.assertTrue("title" in filter_args)
-        self.assertTrue("category" in filter_args)
-        self.assertTrue("subcategory" in filter_args)
+        self.assertTrue("category_name" in filter_args)
+        self.assertTrue("subcategory_name" in filter_args)
 
         self.assertTrue("unsupported" not in filter_args)
 
@@ -89,8 +89,8 @@ class FiltersTest(FakeInternetTestCase):
             "vote": "none",
             "source_title": "none",
             "bookmarked": "none",
-            "category": "none",
-            "subcategory": "none",
+            "category_name": "none",
+            "subcategory_name": "none",
             "artist": "none",
             "album": "none",
             "date_from": "none",
@@ -110,8 +110,8 @@ class FiltersTest(FakeInternetTestCase):
         self.assertTrue("vote" in filter_args)
         self.assertTrue("source_title" in filter_args)
         self.assertTrue("bookmarked" in filter_args)
-        self.assertTrue("category" in filter_args)
-        self.assertTrue("subcategory" in filter_args)
+        self.assertTrue("category_name" in filter_args)
+        self.assertTrue("subcategory_name" in filter_args)
         self.assertTrue("artist" in filter_args)
         self.assertTrue("album" in filter_args)
         self.assertTrue("date_from" in filter_args)
@@ -127,8 +127,8 @@ class FiltersTest(FakeInternetTestCase):
             "user": "none",
             "tag": "none",
             "vote": "none",
-            "category": "none",
-            "subcategory": "none",
+            "category_name": "none",
+            "subcategory_name": "none",
             "source_id": "none",
             "source_title": "none",
             "bookmarked": "none",
@@ -151,8 +151,8 @@ class FiltersTest(FakeInternetTestCase):
         self.assertTrue("votes__vote__gt" in filter_args)
         self.assertTrue("source__id" in filter_args)
         self.assertTrue("source__title" in filter_args)
-        self.assertTrue("source__category" in filter_args)
-        self.assertTrue("source__subcategory" in filter_args)
+        self.assertTrue("source__category_name" in filter_args)
+        self.assertTrue("source__subcategory_name" in filter_args)
         self.assertTrue("bookmarked" in filter_args)
         self.assertTrue("artist__icontains" in filter_args)
         self.assertTrue("album__icontains" in filter_args)
@@ -165,8 +165,8 @@ class FiltersTest(FakeInternetTestCase):
 
     def test_entry_source_filters(self):
         args = {
-            "category": "none",
-            "subcategory": "none",
+            "category_name": "none",
+            "subcategory_name": "none",
             "source_title": "none",
             "unsupported": "none",
         }
@@ -175,8 +175,8 @@ class FiltersTest(FakeInternetTestCase):
 
         filter_args = thefilter.get_arg_conditions()
 
-        self.assertTrue("category" in filter_args)
-        self.assertTrue("subcategory" in filter_args)
+        self.assertTrue("category_name" in filter_args)
+        self.assertTrue("subcategory_name" in filter_args)
         self.assertTrue("source_title" in filter_args)
 
         self.assertTrue("unsupported" not in filter_args)
@@ -184,8 +184,8 @@ class FiltersTest(FakeInternetTestCase):
     def test_source_filter_limit(self):
         args = {
             "title": "link",
-            "category": "none",
-            "subcategory": "none",
+            "category_name": "none",
+            "subcategory_name": "none",
             "notsupported": "none",
             "page": "1",
         }
@@ -198,8 +198,8 @@ class FiltersTest(FakeInternetTestCase):
 
         args = {
             "title": "link",
-            "category": "none",
-            "subcategory": "none",
+            "category_name": "none",
+            "subcategory_name": "none",
             "notsupported": "none",
             "page": "2",
         }
@@ -213,8 +213,8 @@ class FiltersTest(FakeInternetTestCase):
     def test_entry_filter_limit(self):
         args = {
             "title": "link",
-            "category": "none",
-            "subcategory": "none",
+            "category_name": "none",
+            "subcategory_name": "none",
             "notsupported": "none",
             "page": "1",
         }
@@ -227,8 +227,8 @@ class FiltersTest(FakeInternetTestCase):
 
         args = {
             "title": "link",
-            "category": "none",
-            "subcategory": "none",
+            "category_name": "none",
+            "subcategory_name": "none",
             "notsupported": "none",
             "page": "2",
         }

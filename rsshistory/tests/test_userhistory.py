@@ -226,7 +226,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         c.save()
 
         ob = SourceDataController.objects.create(
-            url="https://youtube.com", title="YouTube", category="No", subcategory="No"
+            url="https://youtube.com", title="YouTube",
         )
 
         self.youtube_object = LinkDataController.objects.create(

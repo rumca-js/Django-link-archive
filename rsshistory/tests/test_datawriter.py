@@ -22,8 +22,6 @@ class DataWriterTest(FakeInternetTestCase):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
         LinkDataController.objects.create(
@@ -67,8 +65,6 @@ class DataWriterTest(FakeInternetTestCase):
         SourceDataController.objects.create(
             url="https://linkedin.com",
             title="LinkedIn",
-            category="No",
-            subcategory="No",
             export_to_cms=False,
         )
 
@@ -251,8 +247,6 @@ class DataWriterTest(FakeInternetTestCase):
             SourceDataController.objects.create(
                 url="https://linkedin.com/{}".format(source_idx),
                 title="LinkedIn{}".format(source_idx),
-                category="No",
-                subcategory="No",
                 export_to_cms=True,
             )
 

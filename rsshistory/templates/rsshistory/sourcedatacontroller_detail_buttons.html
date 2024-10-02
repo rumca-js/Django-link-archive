@@ -95,4 +95,16 @@
         </li>
       </ul>
    </div>
+
+   <div class="dropdown">
+       <button class="btn btn-primary" type="button" id="#viewsDrop" data-bs-toggle="dropdown" aria-expanded="false">
+         View
+       </button>
+       <ul class="dropdown-menu">
+          <li>
+             <a href="{% url 'rsshistory:categories-view' %}" class="dropdown-item" title="Shows source categories">
+              Source categories</a>
+          </li>
+       </ul>
+   </div>
 </div>

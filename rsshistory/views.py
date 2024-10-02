@@ -28,6 +28,12 @@ def get_search_term_request(request):
         search_term = request.GET["search_history"]
     elif "search" in request.GET and request.GET["search"] != "":
         search_term = request.GET["search"]
+        if search_term[0] == "'":
+            search_term = search_term[1:-1]
+        if search_term[0] == '"':
+            search_term = search_term[1:-1]
+
+    return search_term
 
     return search_term
 

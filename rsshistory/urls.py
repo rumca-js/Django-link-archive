@@ -97,6 +97,8 @@ urlpatterns = [
     path("sources-enable-all/", sources.enable_all_sources, name="sources-enable-all"),
     path("sources-disable-all/", sources.disable_all_sources, name="sources-disable-all"),
     path("sources-manual-refresh/", sources.sources_manual_refresh, name="sources-manual-refresh"),
+    path("categories-view", sources.categories_view, name="categories-view"),
+    path("categories-reset", sources.categories_reset, name="categories-reset"),
     # tags
     path("entry-tag/<int:pk>/", useractions.tag_entry, name="entry-tag"),
     path("tag-remove/<int:pk>/", useractions.tag_remove, name="tag-remove"),

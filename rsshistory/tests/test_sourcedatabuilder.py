@@ -1,3 +1,4 @@
+from ..models import SourceCategories, SourceSubCategories
 from ..controllers import (
     SourceDataController,
     SourceDataBuilder,
@@ -20,8 +21,8 @@ class SourceDataBuilderTest(FakeInternetTestCase):
             link_data={
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
-                "category": "No",
-                "subcategory": "No",
+                "category_name": "No",
+                "subcategory_name": "No",
                 "export_to_cms": False,
                 "enabled": True,
             },
@@ -39,8 +40,8 @@ class SourceDataBuilderTest(FakeInternetTestCase):
             link_data={
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
-                "category": "No",
-                "subcategory": "No",
+                "category_name": "No",
+                "subcategory_name": "No",
                 "export_to_cms": False,
             },
             manual_entry=True,
@@ -63,8 +64,8 @@ class SourceDataBuilderTest(FakeInternetTestCase):
             link_data={
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
-                "category": "No",
-                "subcategory": "No",
+                "category_name": "No",
+                "subcategory_name": "No",
                 "export_to_cms": False,
                 "enabled": False,
             },
@@ -86,8 +87,8 @@ class SourceDataBuilderTest(FakeInternetTestCase):
             link_data={
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
-                "category": "No",
-                "subcategory": "No",
+                "category_name": "No",
+                "subcategory_name": "No",
                 "export_to_cms": False,
                 "enabled": True,
             },
@@ -111,8 +112,8 @@ class SourceDataBuilderTest(FakeInternetTestCase):
             link_data={
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
-                "category": "No",
-                "subcategory": "No",
+                "category_name": "No",
+                "subcategory_name": "No",
                 "export_to_cms": False,
             }
         )
@@ -123,8 +124,8 @@ class SourceDataBuilderTest(FakeInternetTestCase):
         b.link_data = {
             "url": "https://linkedin.com",
             "title": "LinkedIn",
-            "category": "No",
-            "subcategory": "No",
+            "category_name": "No",
+            "subcategory_name": "No",
             "export_to_cms": False,
         }
 
@@ -141,8 +142,8 @@ class SourceDataBuilderTest(FakeInternetTestCase):
         b.link_data = {
             "url": "https://linkedin.com",
             "title": "LinkedIn",
-            "category": "No",
-            "subcategory": "No",
+            "category_name": "No",
+            "subcategory_name": "No",
             "export_to_cms": False,
             "favicon": "https://linkedin.com/images/favicon.ico",
         }
@@ -174,3 +175,75 @@ class SourceDataBuilderTest(FakeInternetTestCase):
 
         self.assertTrue(props != None)
         self.assertTrue(len(props) > 0)
+
+    def test_build_from_props__creates_category__manual(self):
+        SourceDataController.objects.all().delete()
+        SourceCategories.objects.all().delete()
+        SourceSubCategories.objects.all().delete()
+
+        link_data={
+            "url": "https://linkedin.com",
+            "title": "LinkedIn",
+            "category_name": "categoryName",
+            "subcategory_name": "subcategoryName",
+            "export_to_cms": False,
+        }
+
+        b = SourceDataBuilder(manual_entry=True)
+
+        # call tested function
+        b.build_from_props(link_data = link_data)
+
+        sources = SourceDataController.objects.all()
+        categories = SourceCategories.objects.all()
+        subcategories = SourceSubCategories.objects.all()
+
+        for category in categories:
+            print("Category:{}".format(category.name))
+
+        self.assertEqual(sources.count(), 1)
+        self.assertEqual(categories.count(), 1)
+        self.assertEqual(subcategories.count(), 1)
+
+        source = sources[0]
+        self.assertEqual(source.category, categories[0])
+        self.assertEqual(source.subcategory, subcategories[0])
+
+        self.assertEqual(source.category_name, "categoryName")
+        self.assertEqual(source.subcategory_name, "subcategoryName")
+
+    def test_build_from_props__creates_category__auto(self):
+        SourceDataController.objects.all().delete()
+        SourceCategories.objects.all().delete()
+        SourceSubCategories.objects.all().delete()
+
+        link_data={
+            "url": "https://linkedin.com",
+            "title": "LinkedIn",
+            "category_name": "categoryName",
+            "subcategory_name": "subcategoryName",
+            "export_to_cms": False,
+        }
+
+        b = SourceDataBuilder(manual_entry = False)
+
+        # call tested function
+        b.build_from_props(link_data = link_data)
+
+        sources = SourceDataController.objects.all()
+        categories = SourceCategories.objects.all()
+        subcategories = SourceSubCategories.objects.all()
+
+        for category in categories:
+            print("Category:{}".format(category.name))
+
+        self.assertEqual(sources.count(), 1)
+        self.assertEqual(categories.count(), 1)
+        self.assertEqual(subcategories.count(), 1)
+
+        source = sources[0]
+        self.assertEqual(source.category, categories[0])
+        self.assertEqual(source.subcategory, subcategories[0])
+
+        self.assertEqual(source.category_name, "New")
+        self.assertEqual(source.subcategory_name, "New")

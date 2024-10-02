@@ -68,8 +68,6 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 
@@ -193,8 +191,6 @@ class UpdateManagerLocTest(FakeInternetTestCase):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 

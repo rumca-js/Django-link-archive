@@ -38,8 +38,6 @@ class EntryWrapperTest(FakeInternetTestCase):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 
@@ -63,8 +61,6 @@ class EntryWrapperTest(FakeInternetTestCase):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
             remove_after_days=1,
         )

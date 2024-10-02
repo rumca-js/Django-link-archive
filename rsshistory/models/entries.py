@@ -336,8 +336,10 @@ class BaseLinkDataController(BaseLinkDataModel):
         names.add("source__id")
         names.add("source__url")
         names.add("source__title")
-        names.add("source__category")
-        names.add("source__subcategory")
+        names.add("source__category_name")
+        names.add("source__subcategory_name")
+        names.add("source__category_id")
+        names.add("source__subcategory_id")
         names.add("tags__tag")
         names.add("votes__vote")
 

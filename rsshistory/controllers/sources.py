@@ -46,8 +46,8 @@ class SourceDataController(SourceDataModel):
 
     def get_long_description(self):
         return "Category:{} Subcategory:{} Export:{} Enabled:{} Type:{}".format(
-            self.category,
-            self.subcategory,
+            self.category_name,
+            self.subcategory_name,
             self.export_to_cms,
             self.enabled,
             self.source_type,
@@ -190,8 +190,10 @@ class SourceDataController(SourceDataModel):
             "id",
             "url",
             "title",
-            "category",
-            "subcategory",
+            "category__category_id",
+            "subcategory__subcategory_id",
+            "category_name",
+            "subcategory_name",
             "export_to_cms",
             "remove_after_days",
             "language",
@@ -208,8 +210,10 @@ class SourceDataController(SourceDataModel):
             "id",
             "url",
             "title",
-            "category",
-            "subcategory",
+            "category__category_id",
+            "subcategory__subcategory_id",
+            "category_name",
+            "subcategory_name",
             "export_to_cms",
             "remove_after_days",
             "language",
@@ -401,7 +405,10 @@ class SourceDataBuilder(object):
 
         return self.build_from_props()
 
-    def build_from_props(self):
+    def build_from_props(self, link_data=None):
+        if link_data:
+            self.link_data = link_data
+
         if "link" in self.link_data and "url" not in self.link_data:
             self.link_data["url"] = self.link_data["link"]
 
@@ -412,8 +419,6 @@ class SourceDataBuilder(object):
         if sources.count() > 0:
             return None
 
-        self.add_categories()
-
         conf = Configuration.get_object().config_entry
 
         if not self.manual_entry:
@@ -423,8 +428,8 @@ class SourceDataBuilder(object):
             self.link_data["enabled"] = conf.new_source_enabled_state
             self.link_data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
             self.link_data["remove_after_days"] = 2
-            self.link_data["category"] = "New"
-            self.link_data["subcategory"] = "New"
+            self.link_data["category_name"] = "New"
+            self.link_data["subcategory_name"] = "New"
 
         self.get_clean_data()
 
@@ -476,25 +481,6 @@ class SourceDataBuilder(object):
         self.link_data = result
 
         return result
-
-    def add_categories(self):
-        category_name = None
-        subcategory_name = None
-
-        if "category" in self.link_data:
-            category_name = self.link_data["category"]
-        if "subcategory" in self.link_data:
-            subcategory_name = self.link_data["subcategory"]
-
-        if category_name:
-            category_object = SourceCategories.add(category_name)
-        if category_name and subcategory_name:
-            subcategory_object = SourceSubCategories.add(
-                category_name, subcategory_name
-            )
-
-        # self.link_data["category_object"] = category_object
-        # self.link_data["subcategory_object"] = subcategory_object
 
     def add_to_download(self, source):
         if source.enabled:

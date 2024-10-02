@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 from ..webtools import Url, DomainAwarePage, HttpPageHandler
 
 from ..apps import LinkDatabase
-from ..models import ConfigurationEntry, UserConfig, AppLogging
+from ..models import ConfigurationEntry, UserConfig, AppLogging, SourceCategories
 from ..controllers import (
     SourceDataController,
     SourceDataBuilder,
@@ -52,7 +52,7 @@ def get_request_page_num(request):
 
 class SourceListView(generic.ListView):
     model = SourceDataController
-    context_object_name = "content_list"
+    context_object_name = "source_list"
     paginate_by = 100
 
     def get(self, *args, **kwargs):
@@ -184,7 +184,7 @@ def add_source(request):
             if sources.count() > 0:
                 return HttpResponseRedirect(source.get_absolute_url())
 
-            b = SourceDataBuilder()
+            b = SourceDataBuilder(manual_entry=True)
             b.link_data = form.cleaned_data
             b.manual_entry = True
             source = b.build_from_props()
@@ -763,3 +763,29 @@ def sources_json(request):
 
         # JsonResponse
         return JsonResponse(json_obj)
+
+
+def categories_view(request):
+    p = ViewPage(request)
+    p.set_title("Source categories")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    categories = SourceCategories.objects.all()
+
+    p.context["categories"] = categories
+
+    return p.render("categories_list.html")
+
+
+def categories_reset(request):
+    p = ViewPage(request)
+    p.set_title("Reset Source categories")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    SourceDataController.reset_dynamic_data()
+
+    return redirect("{}:sources".format(LinkDatabase.name))

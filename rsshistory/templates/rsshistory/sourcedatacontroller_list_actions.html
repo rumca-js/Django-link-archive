@@ -1,18 +1,20 @@
 {% load static %}
 
 <div class="d-flex">
+   {% if user.is_staff %}
    <div class="dropdown">
        <button class="btn btn-primary" type="button" id="#actionsDrop" data-bs-toggle="dropdown" aria-expanded="false">
          Actions
        </button>
    
        <ul class="dropdown-menu">
-          {% if user.is_staff %}
           <li>
              <a href="{% url 'rsshistory:source-add-simple' %}" class="dropdown-item" title="Opens add source wizard">
               <img src="{% static 'rsshistory/icons/icons8-broadcast-add-100.png' %}" class="content-icon" />
               Add source</a>
           </li>
+
+          {% if source_list %}
           <li>
              <a href="{% url 'rsshistory:sources-enable-all' %}" class="dropdown-item" title="Enable all sources">
                  <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
@@ -26,7 +28,9 @@
           {% endif %}
        </ul>
    </div>
+   {% endif %}
    
+   {% if source_list %}
    <div class="dropdown">
        <button class="btn btn-primary" type="button" id="#filtersDrop" data-bs-toggle="dropdown" aria-expanded="false">
          Filters
@@ -44,6 +48,19 @@
           <li>
              <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="dropdown-item" title="Shows new sources only">
               New sources</a>
+          </li>
+       </ul>
+   </div>
+   {% endif %}
+
+   <div class="dropdown">
+       <button class="btn btn-primary" type="button" id="#viewsDrop" data-bs-toggle="dropdown" aria-expanded="false">
+         View
+       </button>
+       <ul class="dropdown-menu">
+          <li>
+             <a href="{% url 'rsshistory:categories-view' %}" class="dropdown-item" title="Shows source categories">
+              Source categories</a>
           </li>
        </ul>
    </div>

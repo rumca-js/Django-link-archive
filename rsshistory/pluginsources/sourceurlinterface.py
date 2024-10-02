@@ -33,6 +33,10 @@ class SourceUrlInterface(object):
             props["status_code"] = self.u.get_status_code()
         if "language" not in props or props["language"] is None:
             props["language"] = ""
+        if "category_name" not in props or props["category_name"] is None:
+            props["category_name"] = "New"
+        if "subcategory_name" not in props or props["subcategory_name"] is None:
+            props["subcategory_name"] = "New"
 
         return props
 
@@ -124,10 +128,10 @@ class SourceUrlInterface(object):
             input_props["title"] = source_obj["title"] + " - Proxy"
         if "description" in source_obj:
             input_props["description"] = source_obj["description"]
-        if "category" in source_obj:
-            input_props["category"] = source_obj["category"]
-        if "subcategory" in source_obj:
-            input_props["subcategory"] = source_obj["subcategory"]
+        if "category_name" in source_obj:
+            input_props["category_name"] = source_obj["category_name"]
+        if "subcategory_name" in source_obj:
+            input_props["subcategory_name"] = source_obj["subcategory_name"]
         if "language" in source_obj:
             input_props["language"] = source_obj["language"]
         if "favicon" in source_obj:

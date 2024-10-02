@@ -37,8 +37,6 @@ class ReadMarkerTests(FakeInternetTestCase):
         source = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 

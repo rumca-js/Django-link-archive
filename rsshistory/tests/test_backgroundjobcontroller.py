@@ -15,7 +15,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         BackgroundJobController.objects.all().delete()
 
         ob = SourceDataController.objects.create(
-            url="https://youtube.com", title="YouTube", category="No", subcategory="No"
+            url="https://youtube.com", title="YouTube", 
         )
         LinkDataController.objects.create(
             source_url="https://youtube.com",

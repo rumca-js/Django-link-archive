@@ -3,6 +3,25 @@
 {% block content %}
 
 {% if user.is_staff %}
+
+<a href="{% url 'rsshistory:data-export-edit' object.id %}" class="dropdown-item" title="Edit">
+   <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+</a>
+
+{% if object.enabled %}
+   <a href="{% url 'rsshistory:data-export-disable' object.id %}" class="btn btn-primary" title="Disables data export">
+       <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
+   </a>
+{% else %}
+   <a href="{% url 'rsshistory:data-export-enable' object.id %}" class="btn btn-primary" title="Enables data export">
+       <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
+   </a>
+{% endif %}
+
+<a href="{% url 'rsshistory:data-export-remove' object.id %}" class="btn btn-primary" title="Remove">
+   <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+</a>
+
 <div class="dropdown">
    <button class="btn btn-primary" type="button" id="#actionsDrop" data-bs-toggle="dropdown" aria-expanded="false">
      Actions
@@ -12,34 +31,10 @@
        <li>
            <a href="{% url 'rsshistory:data-export-job-add' object.id %}" title="Shows categories" class="dropdown-item">Add to job</a>
        </li>
-
-       {% if object.enabled %}
-       <li>
-           <a href="{% url 'rsshistory:data-export-disable' object.id %}" class="dropdown-item" title="Disables data export">
-               <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
-               Disable
-           </a>
-       </li>
-       {% else %}
-       <li>
-           <a href="{% url 'rsshistory:data-export-enable' object.id %}" class="dropdown-item" title="Enables data export">
-               <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
-               Enable
-           </a>
-       </li>
-       {% endif %}
    </ul>
 </div>
 {% endif %}
 
-<div class="contentbuttonmenu">
-    <a href="{% url 'rsshistory:data-export-edit' object.id %}" class="btn btn-primary" role="button">
-       <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
-    </a>
-    <a href="{% url 'rsshistory:data-export-remove' object.id %}" class="btn btn-primary" role="button">
-       <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
-    </a>
-</div>
 
 <h1>Data Export</h1>
 

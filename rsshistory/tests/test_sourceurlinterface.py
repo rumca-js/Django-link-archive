@@ -29,6 +29,11 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue("title" in props)
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
+        self.assertTrue("category_name" in props)
+        self.assertEqual(props["category_name"], "New")
+        self.assertTrue("subcategory_name" in props)
+        self.assertEqual(props["subcategory_name"], "New")
+
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_youtube_channel(self):

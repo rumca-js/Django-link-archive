@@ -144,16 +144,16 @@ class SourceDetailTest(FakeInternetTestCase):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
+            category_name="No",
+            subcategory_name="No",
             export_to_cms=True,
         )
 
         self.source_linkedin = SourceDataController.objects.create(
             url="https://linkedin.com",
             title="LinkedIn",
-            category="No",
-            subcategory="No",
+            category_name="No",
+            subcategory_name="No",
             export_to_cms=False,
         )
 
@@ -266,16 +266,16 @@ class SourceDetailTestCreatesEntries(FakeInternetTestCase):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
+            category_name="No",
+            subcategory_name="No",
             export_to_cms=True,
         )
 
         self.source_linkedin = SourceDataController.objects.create(
             url="https://linkedin.com",
             title="LinkedIn",
-            category="No",
-            subcategory="No",
+            category_name="No",
+            subcategory_name="No",
             export_to_cms=False,
         )
 

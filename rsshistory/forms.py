@@ -606,8 +606,8 @@ class SourceForm(forms.ModelForm):
             "title",
             "source_type",
             "auto_tag",
-            "category",
-            "subcategory",
+            "category_name",
+            "subcategory_name",
             "language",
             "age",
             "fetch_period",
@@ -781,8 +781,8 @@ class SourcesChoiceForm(forms.Form):
     """
 
     search = forms.CharField(label="Search", max_length=500, required=False)
-    category = forms.CharField(widget=forms.Select(choices=()), required=False)
-    subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
+    category_name = forms.CharField(widget=forms.Select(choices=()), required=False)
+    subcategory_name = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
@@ -798,8 +798,8 @@ class SourcesChoiceForm(forms.Form):
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
         attr = {"onchange": "this.form.submit()"}
 
-        self.fields["category"].widget = forms.Select(choices=categories, attrs=attr)
-        self.fields["subcategory"].widget = forms.Select(
+        self.fields["category_name"].widget = forms.Select(choices=categories, attrs=attr)
+        self.fields["subcategory_name"].widget = forms.Select(
             choices=subcategories, attrs=attr
         )
 
@@ -808,7 +808,7 @@ class SourcesChoiceForm(forms.Form):
         result.append(["", ""])
 
         for category in SourceCategories.objects.all():
-            result.append([category.category, category.category])
+            result.append([category.name, category.name])
 
         return result
 
@@ -817,7 +817,7 @@ class SourcesChoiceForm(forms.Form):
         result.append(["", ""])
 
         for subcategory in SourceSubCategories.objects.all():
-            result.append([subcategory.subcategory, subcategory.subcategory])
+            result.append([subcategory.name, subcategory.name])
 
         return result
 

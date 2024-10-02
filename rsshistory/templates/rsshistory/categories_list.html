@@ -1,0 +1,42 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+{% if categories %}
+  <div>
+      {% for category in categories %}
+         <h3>
+             <a href="{% url 'rsshistory:entries-omni-search'%}?search=source__category_name+%3D%3D+{{category.name}}">{{category.name}}</a>
+         </h3>
+  
+         {% for subcategory in category.subcategories.all %}
+           <span>
+             <a href="{% url 'rsshistory:entries-omni-search'%}?search=source__category_name+%3D%3D+{{category.name}}+%26+source__subcategory_name+%3D%3D+{{subcategory.name}}">{{subcategory.name}}</a>
+           </span>
+         {% endfor %}
+         <hr/>
+      {% endfor %}
+  </div>
+
+  <h3>Sources</h3>
+  <div>
+      {% for category in categories %}
+         <h3>
+             <a href="{% url 'rsshistory:sources'%}?search=category_name+%3D%3D+{{category.name}}">{{category.name}}</a>
+         </h3>
+  
+         {% for subcategory in category.subcategories.all %}
+           <span>
+               <a href="{% url 'rsshistory:sources'%}?search=category_name+%3D%3D+{{category.name}}+%26+subcategory_name+%3D%3D+{{subcategory.name}}">{{subcategory.name}}, </a>
+           </span>
+         {% endfor %}
+         <hr/>
+      {% endfor %}
+  </div>
+
+
+{% else %}
+    No categories yet
+{% endif %}
+
+{% endblock %}

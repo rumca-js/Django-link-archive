@@ -17,8 +17,8 @@ class UrlHandler(Url):
     The controller job is to provide usefull information about link.
     """
 
-    def __init__(self, url=None, page_options=None):
-        super().__init__(url, page_options=page_options)
+    def __init__(self, url=None, page_options=None, handler_class=None):
+        super().__init__(url, page_options=page_options, handler_class=handler_class)
         self.url_builder = UrlHandler
 
         if not url or url == "":

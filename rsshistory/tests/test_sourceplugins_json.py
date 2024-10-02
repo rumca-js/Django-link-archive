@@ -25,8 +25,6 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         self.source_obj = SourceDataController.objects.create(
             url="https://instance.com/apps/rsshistory/source-json/100",
             title="RSS history instance",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 
@@ -49,8 +47,6 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         self.source_obj = SourceDataController.objects.create(
             url="https://instance.com/apps/rsshistory/entries-json/?query_type=recent",
             title="RSS history instance",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 
@@ -82,8 +78,6 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         self.source_obj = SourceDataController.objects.create(
             url="https://instance.com/apps/rsshistory/sources-json",
             title="RSS history instance",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 

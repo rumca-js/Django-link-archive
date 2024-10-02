@@ -610,8 +610,6 @@ class EntriesDetailViews(FakeInternetTestCase):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
         self.entry_youtube = LinkDataController.objects.create(
@@ -654,8 +652,6 @@ class EntriesDetailViews(FakeInternetTestCase):
         SourceDataController.objects.create(
             url="https://linkedin.com",
             title="LinkedIn",
-            category="No",
-            subcategory="No",
             export_to_cms=False,
         )
 

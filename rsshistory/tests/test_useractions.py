@@ -20,8 +20,6 @@ class UserTagsTest(TestCase):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
             remove_after_days=1,
         )
@@ -340,8 +338,6 @@ class CompactedTagsTest(TestCase):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
             remove_after_days=1,
         )
@@ -417,8 +413,6 @@ class UserCompactedTagsTest(TestCase):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
             remove_after_days=1,
         )

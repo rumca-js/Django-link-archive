@@ -13,8 +13,6 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.source_rss = SourceDataController.objects.create(
             url="https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
             title="SAMTIME",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 
@@ -115,8 +113,6 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.source_rss = SourceDataController.objects.create(
             url="https://warhammer-community.com/feed",
             title="Warhammer community",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 

@@ -4,15 +4,17 @@
 
   {% include "rsshistory/sourcedatacontroller_list_actions.html" %}
 
+  {% if source_list %}
   {% include "rsshistory/form_filter_element.html" %}
+  {% endif %}
 
   {% if query_filter.is_error %}
     <p class="error-text">There errors with your query</p>
   {% endif %}
 
-  {% if content_list %}
+  {% if source_list %}
      <div class="container list-group">
-       {% for source in content_list %}
+       {% for source in source_list %}
              {% if user_config.display_type == "clickable-tags" %}
                  {% include "rsshistory/sourcedatacontroller_list__standard.html" %}
              {% else %}
@@ -31,7 +33,7 @@
      </div>
 
   {% else %}
-    <p>There are no sources.</p>
+    <div>There are no sources.</div>
   {% endif %}
 
 {% endblock %}

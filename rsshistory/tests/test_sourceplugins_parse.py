@@ -21,8 +21,6 @@ class SourceParsePluginTest(FakeInternetTestCase):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
         self.disable_web_pages()
@@ -68,8 +66,6 @@ class SourceParseInternalLinksPluginTest(FakeInternetTestCase):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
         self.disable_web_pages()
@@ -114,8 +110,6 @@ class DomainParsePluginTest(FakeInternetTestCase):
         self.source_youtube = SourceDataController.objects.create(
             url="https://page-with-two-links.com",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 
@@ -155,8 +149,6 @@ class RssParserPluginTest(FakeInternetTestCase):
         self.source_youtube = SourceDataController.objects.create(
             url="https://hnrss.org/frontpage",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 
@@ -190,8 +182,6 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
         self.source_youtube = SourceDataController.objects.create(
             url="https://hnrss.org/frontpage",
             title="YouTube",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 
@@ -223,8 +213,6 @@ class BaseParsePluginTest(FakeInternetTestCase):
         self.source_linkedin = SourceDataController.objects.create(
             url="https://page-with-two-links.com",
             title="linkedin",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 
