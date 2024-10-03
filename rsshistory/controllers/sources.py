@@ -432,7 +432,7 @@ class SourceDataBuilder(object):
         if source:
             SourceDataController.add_entry(source)
 
-            conf = Configuration.get_object().config_entry
+            config = Configuration.get_object().config_entry
             if config.auto_store_thumbnails:
                 BackgroundJobController.download_file(source.favicon)
 
