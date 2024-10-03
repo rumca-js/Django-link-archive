@@ -386,10 +386,14 @@ class SourceDataBuilder(object):
             # maybe for thumbnail
             self.link_data["export_to_cms"] = True
             self.link_data["enabled"] = conf.new_source_enabled_state
-            self.link_data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
-            self.link_data["remove_after_days"] = 2
-            self.link_data["category_name"] = "New"
-            self.link_data["subcategory_name"] = "New"
+            if "source_type" not in self.link_data:
+                self.link_data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+            if "remove_after_days" not in self.link_data:
+                self.link_data["remove_after_days"] = 2
+            if "category_name" not in self.link_data:
+                self.link_data["category_name"] = "New"
+            if "subcategory_name" not in self.link_data:
+                self.link_data["subcategory_name"] = "New"
 
         self.get_clean_data()
 
@@ -427,7 +431,10 @@ class SourceDataBuilder(object):
 
         if source:
             SourceDataController.add_entry(source)
-            BackgroundJobController.download_file(source.favicon)
+
+            conf = Configuration.get_object().config_entry
+            if config.auto_store_thumbnails:
+                BackgroundJobController.download_file(source.favicon)
 
     def get_clean_data(self):
         result = {}
