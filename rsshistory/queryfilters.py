@@ -154,7 +154,7 @@ class SourceFilter(BaseQueryFilter):
         if q2:
             q &= q2
 
-        #if q is None or q == Q():
+        # if q is None or q == Q():
         #    q &= Q(enabled=True)
 
         return q

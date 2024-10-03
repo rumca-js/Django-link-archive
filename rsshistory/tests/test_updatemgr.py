@@ -82,9 +82,7 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         )
 
         date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
-        UserBookmarks.objects.create(
-            date_bookmarked=date, user=self.user, entry=entry
-        )
+        UserBookmarks.objects.create(date_bookmarked=date, user=self.user, entry=entry)
 
         LinkDataController.objects.create(
             source_url="https://youtube.com",
@@ -205,9 +203,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
         )
 
         date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
-        UserBookmarks.objects.create(
-            date_bookmarked=date, user=self.user, entry=entry
-        )
+        UserBookmarks.objects.create(date_bookmarked=date, user=self.user, entry=entry)
 
         LinkDataController.objects.create(
             source_url="https://youtube.com",

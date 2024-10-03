@@ -32,7 +32,6 @@ class SourceCategories(models.Model):
             return objs[0]
 
 
-
 class SourceSubCategories(models.Model):
     category_name = models.CharField(max_length=1000, default="")
     name = models.CharField(max_length=1000)
@@ -57,8 +56,12 @@ class SourceSubCategories(models.Model):
             return SourceSubCategories.add(category_name, subcategory_name)
 
     def add(category_name, subcategory_name):
-        if category_name and category_name != "" and subcategory_name and subcategory_name != "":
-
+        if (
+            category_name
+            and category_name != ""
+            and subcategory_name
+            and subcategory_name != ""
+        ):
             category = SourceCategories.ensure(category_name)
             if not category:
                 return
@@ -68,7 +71,9 @@ class SourceSubCategories(models.Model):
             )
             if objs.count() == 0:
                 return SourceSubCategories.objects.create(
-                    category_name=category_name, name=subcategory_name, category = category
+                    category_name=category_name,
+                    name=subcategory_name,
+                    category=category,
                 )
 
     def get(category_name, subcategory_name):
@@ -160,7 +165,9 @@ class SourceDataModel(models.Model):
 
     def save(self, *args, **kwargs):
         self.category = SourceCategories.ensure(self.category_name)
-        self.subcategory = SourceSubCategories.ensure(self.category_name, self.subcategory_name)
+        self.subcategory = SourceSubCategories.ensure(
+            self.category_name, self.subcategory_name
+        )
         super().save(*args, **kwargs)
 
     def get_export_names():

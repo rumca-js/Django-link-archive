@@ -75,12 +75,6 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_entries_search_init(self):
-        url = reverse("{}:entries-search-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
     def test_entries_archived_init(self):
         url = reverse("{}:entries-archived-init".format(LinkDatabase.name))
         response = self.client.get(url)

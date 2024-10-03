@@ -19,8 +19,8 @@ class EntryDataBuilder(object):
         link_data=None,
         manual_entry=False,
         allow_recursion=True,
-        ignore_errors=False):
-
+        ignore_errors=False,
+    ):
         self.conn = conn
         self.link = link
         self.link_data = link_data
@@ -28,13 +28,14 @@ class EntryDataBuilder(object):
     def get_session(self):
         return self.conn.get_session()
 
-    def build(self,
+    def build(
+        self,
         link=None,
         link_data=None,
         manual_entry=False,
         allow_recursion=True,
-        ignore_errors=False):
-
+        ignore_errors=False,
+    ):
         if link:
             self.link = link
         if link_data:

@@ -54,13 +54,13 @@ def add(request):
             return p.render("summary_present.html")
 
     def random_string(length):
-       return ''.join(random.choice(string.ascii_letters) for x in range(length))
+        return "".join(random.choice(string.ascii_letters) for x in range(length))
 
-    initial={
+    initial = {
         "key": random_string(20),
     }
 
-    form = ApiKeysForm(initial= initial)
+    form = ApiKeysForm(initial=initial)
     form.method = "POST"
     form.action_url = reverse("{}:api-key-add".format(LinkDatabase.name))
 

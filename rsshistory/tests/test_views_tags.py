@@ -84,9 +84,7 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(
-            tag="personal", user=self.user, entry=entry
-        )
+        tag = UserTags.objects.create(tag="personal", user=self.user, entry=entry)
 
         url = reverse("{}:tag-remove".format(LinkDatabase.name), args=[tag.id])
         response = self.client.get(url)
@@ -107,9 +105,7 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(
-            tag="personal", user=self.user, entry=entry
-        )
+        tag = UserTags.objects.create(tag="personal", user=self.user, entry=entry)
 
         url = reverse("{}:tags-entry-remove".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
@@ -133,9 +129,7 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(
-            tag="personal", user=self.user, entry=entry
-        )
+        tag = UserTags.objects.create(tag="personal", user=self.user, entry=entry)
 
         url = reverse("{}:tags-entry-show".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
@@ -156,9 +150,7 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(
-            tag="personal", user=self.user, entry=entry
-        )
+        tag = UserTags.objects.create(tag="personal", user=self.user, entry=entry)
 
         url = reverse("{}:tag-rename".format(LinkDatabase.name))
         response = self.client.get(url)
@@ -177,9 +169,7 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(
-            tag="personal", user=self.user, entry=entry
-        )
+        tag = UserTags.objects.create(tag="personal", user=self.user, entry=entry)
 
         url = reverse("{}:tags-show-all".format(LinkDatabase.name))
         response = self.client.get(url)
@@ -198,9 +188,7 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(
-            tag="personal", user=self.user, entry=entry
-        )
+        tag = UserTags.objects.create(tag="personal", user=self.user, entry=entry)
 
         url = reverse("{}:tags-show-actual".format(LinkDatabase.name))
         response = self.client.get(url)
@@ -219,9 +207,7 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(
-            tag="personal", user=self.user, entry=entry
-        )
+        tag = UserTags.objects.create(tag="personal", user=self.user, entry=entry)
 
         url = reverse("{}:user-tags-show".format(LinkDatabase.name))
         response = self.client.get(url)

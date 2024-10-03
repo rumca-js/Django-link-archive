@@ -189,7 +189,14 @@ class DataWriterTest(FakeInternetTestCase):
         links = LinkDataController.objects.filter(bookmarked=True)
         self.assertEqual(links.count(), 2)
 
-        json_file = Path("./data") / "test" / "notime" / "permanent" / "00000" / "permanent_entries.json"
+        json_file = (
+            Path("./data")
+            / "test"
+            / "notime"
+            / "permanent"
+            / "00000"
+            / "permanent_entries.json"
+        )
         self.assertEqual(json_file.exists(), True)
         json_obj = json.loads(json_file.read_text())
 
@@ -268,7 +275,14 @@ class DataWriterTest(FakeInternetTestCase):
         links = LinkDataController.objects.filter(bookmarked=True)
         self.assertEqual(links.count(), 2)
 
-        json_file = Path("./data") / "test" / "notime" / "permanent" / "00000" / "permanent_entries.json"
+        json_file = (
+            Path("./data")
+            / "test"
+            / "notime"
+            / "permanent"
+            / "00000"
+            / "permanent_entries.json"
+        )
         self.assertEqual(json_file.exists(), True)
         json_obj = json.loads(json_file.read_text())
         self.assertEqual(len(json_obj), 1)
@@ -333,7 +347,14 @@ class DataWriterTest(FakeInternetTestCase):
         links = LinkDataController.objects.filter(bookmarked=True)
         self.assertEqual(links.count(), 2)
 
-        md_file = Path("./data") / "test" / "notime" / "permanent" / "00000" / "permanent_entries.md"
+        md_file = (
+            Path("./data")
+            / "test"
+            / "notime"
+            / "permanent"
+            / "00000"
+            / "permanent_entries.md"
+        )
         self.assertEqual(md_file.exists(), True)
 
     def test_write__daily_data__md(self):
@@ -444,13 +465,6 @@ class DataWriterTest(FakeInternetTestCase):
         # call tested function
         writer.write()
 
-        html_dir = (
-            Path("./data")
-            / "test"
-            / "daily_data"
-            / "2023"
-            / "03"
-            / "html"
-        )
+        html_dir = Path("./data") / "test" / "daily_data" / "2023" / "03" / "html"
 
         self.assertTrue(html_dir.exists())

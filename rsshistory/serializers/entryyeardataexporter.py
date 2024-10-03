@@ -71,7 +71,9 @@ class EntryYearDataMainExporter(MainExporter):
             # do not differenciate export on language.
             # some entries could have not language at all, or some other foreign languages
             converter = EntryYearDataExporter(self.data_writer_config, year_entries)
-            converter.export_entries(export_file_name = "bookmarks", export_path = entries_dir / str(year))
+            converter.export_entries(
+                export_file_name="bookmarks", export_path=entries_dir / str(year)
+            )
 
     def get_entries(self, year):
         start_date = datetime.date(year, 1, 1)
@@ -84,8 +86,12 @@ class EntryYearDataMainExporter(MainExporter):
         if self.user:
             user = self.user
 
-            result_entries = LinkDataController.objects.filter(bookmarks__user__id=user.id)
-            result_entries = result_entries.filter(filters & Q(date_published__range=therange))
+            result_entries = LinkDataController.objects.filter(
+                bookmarks__user__id=user.id
+            )
+            result_entries = result_entries.filter(
+                filters & Q(date_published__range=therange)
+            )
         else:
             result_entries = LinkDataController.objects.filter(
                 filters & Q(date_published__range=therange)
@@ -108,7 +114,9 @@ class EntryYearTopicExporter(object):
         result_entries = self.get_entries()
 
         converter = EntryYearDataExporter(self.data_writer_config, result_entries)
-        converter.export_entries(export_file_name = "topic_{}".format(topic), export_path=directory)
+        converter.export_entries(
+            export_file_name="topic_{}".format(topic), export_path=directory
+        )
 
     def get_entries(self):
         filters = self.get_configuration_filters()

@@ -31,7 +31,7 @@ class SingleSymbolEvaluator(object):
             return self.evaluate_simple_symbol(symbol)
 
     def evaluate_complex_symbol(self, symbol, condition_data):
-        #print("Condition data {}".format(condition_data))
+        # print("Condition data {}".format(condition_data))
 
         if self.is_translatable(condition_data):
             self.enhance_condition_data(condition_data)

@@ -3,7 +3,13 @@ from sqlalchemy import (
 )
 from pathlib import Path
 
-from ..webtools import RssPage, HtmlPage, YouTubeVideoHandler, FeedClient, UrlAgeModerator
+from ..webtools import (
+    RssPage,
+    HtmlPage,
+    YouTubeVideoHandler,
+    FeedClient,
+    UrlAgeModerator,
+)
 from utils.sqlmodel import SqlModel, EntriesTable, SourcesTable
 from utils.alchemysearch import AlchemySearch
 

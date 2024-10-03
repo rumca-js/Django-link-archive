@@ -1,5 +1,6 @@
 from rsshistory.webtools import DomainAwarePage, HttpPageHandler, RssPage, Url
 
+
 class OpenRss(object):
     def __init__(self, url):
         self.url = url

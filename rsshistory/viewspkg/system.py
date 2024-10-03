@@ -35,6 +35,7 @@ from ..models import (
     SystemOperation,
     DataExport,
     SourceExportHistory,
+    SourceOperationalData,
     ModelFiles,
 )
 from ..controllers import (
@@ -250,6 +251,7 @@ def system_status(request):
     p.context["SystemOperation"] = SystemOperation.objects.count()
 
     p.context["SourceDataModel"] = SourceDataController.objects.count()
+    p.context["SourceOperationalData"] = SourceOperationalData.objects.count()
     p.context["LinkDataModel"] = LinkDataController.objects.count()
     p.context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
     p.context["KeyWords"] = KeyWords.objects.count()
@@ -266,7 +268,7 @@ def system_status(request):
     p.context["CompactedTags"] = CompactedTags.objects.count()
     p.context["UserVotes"] = UserVotes.objects.count()
     p.context["UserBookmarks"] = UserBookmarks.objects.count()
-    p.context["UserCommentsController"] = UserCommentsController.objects.count()
+    p.context["UserComments"] = UserCommentsController.objects.count()
     p.context["UserSearchHistory"] = UserSearchHistory.objects.count()
     p.context["UserEntryVisitHistory"] = UserEntryVisitHistory.objects.count()
     p.context["UserEntryTransitionHistory"] = UserEntryTransitionHistory.objects.count()
@@ -400,6 +402,14 @@ Other
 """
 
 
+def init_sources(request):
+    if "noinitialize" not in request.GET:
+        path = Path("init_sources.json")
+        if path.exists():
+            i = JsonImporter(path)
+            i.import_all()
+
+
 def wizard_setup(request):
     p = ViewPage(request)
     p.set_title("Select setup")
@@ -448,7 +458,9 @@ def wizard_setup_news(request):
 
     c.save()
 
-    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITALIZE)
+    init_sources(request)
+
+    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
 
     p.context["summary_text"] = "Set configuration for news"
 
@@ -493,7 +505,9 @@ def wizard_setup_gallery(request):
 
     c.save()
 
-    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITALIZE)
+    init_sources(request)
+
+    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
 
     p.context["summary_text"] = "Set configuration for gallery"
 
@@ -540,7 +554,9 @@ def wizard_setup_search_engine(request):
 
     c.save()
 
-    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITALIZE)
+    init_sources(request)
+
+    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
 
     p.context["summary_text"] = "Set configuration for search engine"
 

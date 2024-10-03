@@ -325,6 +325,7 @@ class SearchEnginePresearch(SearchEngine):
 
 # ------ Archive libraries
 
+
 class SearchEngineArchiveOrg(SearchEngine):
     def get_name(self):
         return "Archive.org"
@@ -504,7 +505,6 @@ class SearchEngineQuora(SearchEngine):
         return "https://www.quora.com/search"
 
 
-
 class SearchEngineSubstack(SearchEngine):
     def get_name(self):
         return "Substack"
@@ -546,7 +546,7 @@ class SearchEngineHnAlgolia(SearchEngine):
         return "query"
 
 
-#-- AI chat bots
+# -- AI chat bots
 
 
 class SearchEngineChatOpenAI(SearchEngine):
@@ -573,8 +573,6 @@ class SearchEngineBard(SearchEngine):
         if not search_term:
             search_term = self.query_term
         return "https://bard.google.com/"
-
-
 
 
 class SearchEngines(object):
@@ -611,13 +609,13 @@ class SearchEngines(object):
 
         # TODO add to containers
         # https://lobste.rs/
-        #result.append("https://news.ycombinator.com")
-        #result.append("https://medium.com")
-        #result.append("https://mastodon.social/explore")
-        #result.append("https://join-lemmy.org/instances")
-        #result.append("https://joinpeertube.org")
-        #result.append("https://facebook.com")
-        #result.append("https://amazon.com")
+        # result.append("https://news.ycombinator.com")
+        # result.append("https://medium.com")
+        # result.append("https://mastodon.social/explore")
+        # result.append("https://join-lemmy.org/instances")
+        # result.append("https://joinpeertube.org")
+        # result.append("https://facebook.com")
+        # result.append("https://amazon.com")
 
         return result
 
@@ -694,4 +692,3 @@ class SearchEngines(object):
             SearchEngineAnnasArchive,
         ]
         # fmt: on
-

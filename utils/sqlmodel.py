@@ -168,7 +168,9 @@ class EntriesTableController(object):
         with Session() as session:
             entries = session.query
 
-            query = delete(EntriesTable).where(EntriesTable.date_published < limit, EntriesTable.bookmarked == False)
+            query = delete(EntriesTable).where(
+                EntriesTable.date_published < limit, EntriesTable.bookmarked == False
+            )
             session.execute(query)
             session.commit()
 
@@ -355,11 +357,11 @@ class ReadMarkers(Base):
     read_date = mapped_column(DateTime)
     source_object: Mapped[Optional[int]]
 
-    def set(session, source = None):
+    def set(session, source=None):
         if not source:
             markers = session.query(ReadMarkers)
             if markers.count() == 0:
-                m = ReadMarkers(read_date = DateUtils.get_datetime_now_utc())
+                m = ReadMarkers(read_date=DateUtils.get_datetime_now_utc())
                 session.add(m)
                 session.commit()
             else:
@@ -369,7 +371,9 @@ class ReadMarkers(Base):
         else:
             markers = session.query(ReadMarkers, source_object == source.id)
             if markers.count() == 0:
-                m = ReadMarkers(read_date = DateUtils.get_datetime_now_utc(), source_object = source.id)
+                m = ReadMarkers(
+                    read_date=DateUtils.get_datetime_now_utc(), source_object=source.id
+                )
                 session.add(m)
                 session.commit()
             else:

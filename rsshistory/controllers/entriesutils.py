@@ -472,7 +472,6 @@ class EntryUpdater(object):
         return True
 
     def update_entry(self, url_handler):
-
         entry = self.entry
 
         response = url_handler.get_response()
@@ -1174,6 +1173,7 @@ class EntryWrapper(object):
         @returns new object, or None object has not been changed
         """
         from ..pluginurl import UrlHandler
+
         if not self.entry:
             return
 
@@ -1220,6 +1220,7 @@ class EntryWrapper(object):
         @returns new object, or None if object has not been changed
         """
         from ..pluginurl import UrlHandler
+
         if not self.entry:
             return
 
@@ -1335,13 +1336,14 @@ class EntryDataBuilder(object):
         if self.link_data:
             self.build_from_props(ignore_errors=self.ignore_errors)
 
-    def build(self,
+    def build(
+        self,
         link=None,
         link_data=None,
         source_is_auto=True,
         allow_recursion=True,
-        ignore_errors=False):
-
+        ignore_errors=False,
+    ):
         self.link = link
         self.link_data = link_data
 
@@ -1576,7 +1578,9 @@ class EntryDataBuilder(object):
         AppLogging.debug("Adding link: {}".format(new_link_data["link"]))
 
         wrapper = EntryWrapper(
-            link=new_link_data["link"], date=new_link_data["date_published"], user=self.user
+            link=new_link_data["link"],
+            date=new_link_data["date_published"],
+            user=self.user,
         )
 
         return wrapper.create(new_link_data)

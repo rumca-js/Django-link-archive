@@ -77,9 +77,7 @@ class CommentsViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        UserComments.objects.create(
-            entry=entry, user=self.user, comment="comment"
-        )
+        UserComments.objects.create(entry=entry, user=self.user, comment="comment")
 
         url = reverse(
             "{}:entry-comment-edit".format(LinkDatabase.name), args=[entry.id]
@@ -122,9 +120,7 @@ class CommentsViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        UserComments.objects.create(
-            entry=entry, user=self.user, comment="comment"
-        )
+        UserComments.objects.create(entry=entry, user=self.user, comment="comment")
 
         url = reverse(
             "{}:entry-comment-remove".format(LinkDatabase.name), args=[entry.id]

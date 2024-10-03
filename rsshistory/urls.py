@@ -254,6 +254,7 @@ urlpatterns = [
     path("block-entries", blockentry.BlockEntryListView.as_view(), name="block-entries",),
     path("block-lists-update", blockentry.block_lists_update, name="block-lists-update",),
     path("block-list-remove/<int:pk>/", blockentry.block_list_remove, name="block-list-remove",),
+    path("block-lists-clear", blockentry.block_lists_clear, name="block-lists-clear",),
     # other
     path("data-errors", custom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", custom.fix_entry_tags, name="fix-entry-tags",),

@@ -31,7 +31,7 @@ def set_source_read_marker(request, pk):
     if data is not None:
         return data
 
-    source = SourceDataController.objects.get(id = pk)
+    source = SourceDataController.objects.get(id=pk)
 
     ReadMarkers.set_source(request.user, source)
 

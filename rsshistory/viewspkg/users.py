@@ -5,11 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..models import (
-   ConfigurationEntry,
-   UserSearchHistory,
-   UserEntryVisitHistory
-)
+from ..models import ConfigurationEntry, UserSearchHistory, UserEntryVisitHistory
 from ..controllers import UserCommentsController
 from ..views import ViewPage, UserGenericListView, GenericListView
 

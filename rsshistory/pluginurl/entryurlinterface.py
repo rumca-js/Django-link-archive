@@ -212,7 +212,9 @@ class EntryUrlInterface(object):
             if len(feeds) > 0:
                 input_props["source"] = feeds[0]
             else:
-                AppLogging.error("Could not obtain channel feed url:{}".format(self.url))
+                AppLogging.error(
+                    "Could not obtain channel feed url:{}".format(self.url)
+                )
 
         input_props["live"] = p.is_live()
 

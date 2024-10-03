@@ -89,8 +89,8 @@ class FiltersTest(FakeInternetTestCase):
             "vote": "none",
             "source_title": "none",
             "bookmarked": "none",
-            "category_name": "none",
-            "subcategory_name": "none",
+            "source__category_name": "none",
+            "source__subcategory_name": "none",
             "artist": "none",
             "album": "none",
             "date_from": "none",
@@ -110,8 +110,8 @@ class FiltersTest(FakeInternetTestCase):
         self.assertTrue("vote" in filter_args)
         self.assertTrue("source_title" in filter_args)
         self.assertTrue("bookmarked" in filter_args)
-        self.assertTrue("category_name" in filter_args)
-        self.assertTrue("subcategory_name" in filter_args)
+        self.assertTrue("source_category_name" in filter_args)
+        self.assertTrue("source_subcategory_name" in filter_args)
         self.assertTrue("artist" in filter_args)
         self.assertTrue("album" in filter_args)
         self.assertTrue("date_from" in filter_args)
@@ -127,8 +127,8 @@ class FiltersTest(FakeInternetTestCase):
             "user": "none",
             "tag": "none",
             "vote": "none",
-            "category_name": "none",
-            "subcategory_name": "none",
+            "source__category_name": "none",
+            "source__subcategory_name": "none",
             "source_id": "none",
             "source_title": "none",
             "bookmarked": "none",

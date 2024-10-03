@@ -240,7 +240,7 @@ def handle_connection_inner(c, address, port):
         # Other commands handling
         elif command[0] == "commands.debug":
             print("Requests:{}".format(len(requests)))
-            
+
             c.send_command_string("debug.__init__", "OK")
             c.send_command_string("debug.requests", str(len(requests)))
             c.send_command_string("debug.__del__", "OK")
@@ -317,7 +317,6 @@ def handle_connection(conn, address, port):
 
 class ScrapingServer(object):
     def __init__(self, host=None, port=None):
-
         p = Path("server_errors.txt")
         if p.exists():
             p.unlink()

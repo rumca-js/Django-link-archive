@@ -25,7 +25,9 @@ class SourceEntriesDataExporter(object):
     def get_entries(self, day_iso):
         date_range = DateUtils.get_range4day(day_iso)
         entries = LinkDataController.objects.filter(
-            Q(source_url=self.source_url) & Q(date_published__range=date_range) & self.filters
+            Q(source_url=self.source_url)
+            & Q(date_published__range=date_range)
+            & self.filters
         )
         return entries
 
@@ -49,7 +51,9 @@ class EntryDailyDataMainExporter(MainExporter):
                 continue
 
             filters = super().get_configuration_filters()
-            writer = SourceEntriesDataExporter(self.data_writer_config, source_url, filters)
+            writer = SourceEntriesDataExporter(
+                self.data_writer_config, source_url, filters
+            )
             writer.write_for_day(input_path, day_iso)
 
     def get_entries(self, day_iso):
@@ -61,6 +65,8 @@ class EntryDailyDataMainExporter(MainExporter):
 
         filters = super().get_configuration_filters()
 
-        entries = LinkDataController.objects.filter(filters & Q(date_published__range=date_range))
+        entries = LinkDataController.objects.filter(
+            filters & Q(date_published__range=date_range)
+        )
 
         return entries.order_by(*self.get_order_columns())

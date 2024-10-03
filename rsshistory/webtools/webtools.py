@@ -695,12 +695,14 @@ class PageOptions(object):
     def __init__(self):
         self.ssl_verify = True
         self.ping = False
-        self.use_browser_promotions = True  # tries headles if normal processing does not work
+        self.use_browser_promotions = (
+            True  # tries headles if normal processing does not work
+        )
 
         self.mode = "standard"
         self.mode_mapping = {}
 
-        self.user_agent = None # passed if you wish certain user agent to be used
+        self.user_agent = None  # passed if you wish certain user agent to be used
 
     def use_basic_crawler(self):
         return not self.is_advanced_processing_required()
@@ -716,7 +718,6 @@ class PageOptions(object):
         return self.mode
 
     def get_timeout(self, timeout_s):
-
         mode = self.get_mode()
 
         if mode == "standard":
@@ -855,14 +856,18 @@ class PageResponseObject(object):
             try:
                 self.text = self.binary.decode(self.encoding)
             except Exception as E:
-                WebLogger.exc(E, "Cannot properly decode ansower from {}".format(self.url))
+                WebLogger.exc(
+                    E, "Cannot properly decode ansower from {}".format(self.url)
+                )
                 self.text = self.binary.decode(self.encoding, errors="ignore")
 
         if self.text and not self.binary:
             try:
                 self.binary = self.text.encode(self.encoding)
             except Exception as E:
-                WebLogger.exc(E, "Cannot properly encode ansower from {}".format(self.url))
+                WebLogger.exc(
+                    E, "Cannot properly encode ansower from {}".format(self.url)
+                )
                 self.binary = self.text.encode(self.encoding, errors="ignore")
 
     def is_headers_empty(self):

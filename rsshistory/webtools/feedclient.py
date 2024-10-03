@@ -257,7 +257,7 @@ class FeedClientParser(object):
             "--unbookmark", action="store_true", help="unbookmarks entry"
         )
         self.parser.add_argument(
-            "-m" ,"--mark-read", action="store_true", help="Marks entries as read"
+            "-m", "--mark-read", action="store_true", help="Marks entries as read"
         )
         self.parser.add_argument("--entry", help="Select entry by ID")
         self.parser.add_argument("--source", help="Select source by ID")
@@ -276,11 +276,17 @@ class FeedClientParser(object):
         )
         self.parser.add_argument("--follow", help="Follows specific source")
         self.parser.add_argument("--unfollow", help="Unfollows specific source")
-        self.parser.add_argument("--unfollow-all", action="store_true", help="Unfollows all sources")
+        self.parser.add_argument(
+            "--unfollow-all", action="store_true", help="Unfollows all sources"
+        )
         self.parser.add_argument("--enable", help="Enables specific source")
         self.parser.add_argument("--disable", help="Disables specific source")
-        self.parser.add_argument("--enable-all", action="store_true", help="Enables all sources")
-        self.parser.add_argument("--disable-all", action="store_true", help="Disables all sources")
+        self.parser.add_argument(
+            "--enable-all", action="store_true", help="Enables all sources"
+        )
+        self.parser.add_argument(
+            "--disable-all", action="store_true", help="Disables all sources"
+        )
         self.parser.add_argument(
             "--list-bookmarks", action="store_true", help="Prints bookmarks to stdout"
         )
@@ -318,8 +324,7 @@ class SearchResultHandler(AlchemyRowHandler):
         print_entry(row)
 
 
-def get_entries(db, source_id=None, ascending = True):
-
+def get_entries(db, source_id=None, ascending=True):
     Session = db.get_session()
 
     with Session() as session:
@@ -443,7 +448,11 @@ class FeedClient(object):
             date_limit = None
             Session = db.get_session()
             with Session() as session:
-                read_marker = session.query(ReadMarkers).filter(ReadMarkers.source_object == None).first()
+                read_marker = (
+                    session.query(ReadMarkers)
+                    .filter(ReadMarkers.source_object == None)
+                    .first()
+                )
                 if read_marker:
                     date_limit = read_marker.read_date
 
@@ -454,9 +463,7 @@ class FeedClient(object):
         Session = db.get_session()
 
         with Session() as session:
-            sources = (
-                session.query(SourcesTable).all()
-            )
+            sources = session.query(SourcesTable).all()
             for source in sources:
                 source.enabled = True
                 session.commit()
@@ -471,9 +478,7 @@ class FeedClient(object):
         Session = db.get_session()
 
         with Session() as session:
-            sources = (
-                session.query(SourcesTable).all()
-            )
+            sources = session.query(SourcesTable).all()
             for source in sources:
                 source.enabled = False
                 session.commit()

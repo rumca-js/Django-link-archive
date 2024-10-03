@@ -56,6 +56,7 @@ class UrlHandler(Url):
 
         # TODO this is reading overhead. We might cache something?
         from ..models import Browser
+
         o.mode_mapping = Browser.get_browser_setup()
 
         config = Configuration.get_object().config_entry

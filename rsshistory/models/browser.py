@@ -38,9 +38,11 @@ class Browser(models.Model):
         related_name="browsers",
     )
 
-    crawler = models.CharField(choices = get_browser_choices(), max_length=2000)
+    crawler = models.CharField(choices=get_browser_choices(), max_length=2000)
 
-    settings = models.CharField(max_length=2000, blank=True) # json map inside. script path, port etc
+    settings = models.CharField(
+        max_length=2000, blank=True
+    )  # json map inside. script path, port etc
 
     class Meta:
         ordering = ["-enabled", "mode"]
@@ -61,11 +63,11 @@ class Browser(models.Model):
 
         mapping = WebConfig.get_init_crawler_config()
         for mode_name in mapping:
-            mode_browser_config = mapping[mode_name] 
+            mode_browser_config = mapping[mode_name]
 
-            modes = BrowserMode.objects.filter(mode = mode_name)
+            modes = BrowserMode.objects.filter(mode=mode_name)
             if not modes.exists():
-                mode = BrowserMode.objects.create(mode = mode_name)
+                mode = BrowserMode.objects.create(mode=mode_name)
 
             index = 0
             for browser_config in mode_browser_config:
@@ -77,7 +79,12 @@ class Browser(models.Model):
 
                 enabled = browser_config["enabled"]
 
-                conf = Browser.objects.create(enabled=enabled, mode = mode, crawler = browser_config["crawler"], settings=settings)
+                conf = Browser.objects.create(
+                    enabled=enabled,
+                    mode=mode,
+                    crawler=browser_config["crawler"],
+                    settings=settings,
+                )
                 index += 1
 
     def get_browser_setup():
@@ -101,11 +108,10 @@ class Browser(models.Model):
                     AppLogging.exc("Cannot load browser settings")
 
             browser_config = {
-                "crawler" : browser.crawler,
-                "settings" : settings,
+                "crawler": browser.crawler,
+                "settings": settings,
             }
 
             browser_mapping[mode].append(browser_config)
 
         return browser_mapping
-

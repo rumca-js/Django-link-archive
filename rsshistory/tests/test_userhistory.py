@@ -226,7 +226,8 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         c.save()
 
         ob = SourceDataController.objects.create(
-            url="https://youtube.com", title="YouTube",
+            url="https://youtube.com",
+            title="YouTube",
         )
 
         self.youtube_object = LinkDataController.objects.create(
@@ -357,9 +358,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         # call tested function
         UserEntryVisitHistory.move_entry(self.youtube_object, self.youtube_object_new)
 
-        rows = UserEntryVisitHistory.objects.filter(
-            entry=self.youtube_object_new
-        )
+        rows = UserEntryVisitHistory.objects.filter(entry=self.youtube_object_new)
 
         self.assertTrue(rows.count() > 0)
         self.assertEqual(rows[0].entry, self.youtube_object_new)

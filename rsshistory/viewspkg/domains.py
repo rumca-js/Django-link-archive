@@ -138,7 +138,6 @@ class DomainsByNameDetailView(generic.DetailView):
         return view
 
     def get_object(self):
-
         domain_name = self.request.GET["domain_name"]
         self.objects = DomainsController.objects.filter(domain=domain_name)
         if self.objects.count() > 0:

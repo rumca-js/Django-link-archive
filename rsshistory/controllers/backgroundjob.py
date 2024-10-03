@@ -88,10 +88,10 @@ class BackgroundJobController(BackgroundJob):
         condition = Q()
         if job_name is not None:
             condition = condition & Q(job=job_name)
-            
+
         if only_enabled:
             condition = condition & Q(enabled=True)
-            
+
         return BackgroundJob.objects.filter(condition).count()
 
     def get_job_priority(job_name):
@@ -512,9 +512,7 @@ class BackgroundJobController(BackgroundJob):
         elif self.job == BackgroundJob.JOB_EXPORT_DATA:
             id = self.subject
             if id and id != "":
-                return reverse(
-                    "{}:data-export".format(LinkDatabase.name), args=[id]
-                )
+                return reverse("{}:data-export".format(LinkDatabase.name), args=[id])
 
         if self.args and self.args != "":
             p = DomainAwarePage(self.args)
@@ -560,4 +558,3 @@ class BackgroundJobController(BackgroundJob):
         entries = LinkDataModel.objects.filter(id=entry_id)
         if entries.exists():
             return entries[0]
-

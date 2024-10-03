@@ -602,4 +602,7 @@ class HtmlPageTest(FakeInternetTestCase):
         # call tested function
         thumbnail = page.get_thumbnail()
 
-        self.assertEqual(thumbnail, "https://google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png")
+        self.assertEqual(
+            thumbnail,
+            "https://google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png",
+        )

@@ -84,10 +84,12 @@ class CrawlerInterface(object):
         all_bytes.extend(bytes1)
         bytes2 = string_to_command("PageResponseObject.url", self.response.url)
         all_bytes.extend(bytes2)
-        
+
         if self.response and self.response.request_url:
-           thebytes = string_to_command("PageResponseObject.request_url", self.response.request_url)
-           all_bytes.extend(thebytes)
+            thebytes = string_to_command(
+                "PageResponseObject.request_url", self.response.request_url
+            )
+            all_bytes.extend(thebytes)
 
         bytes4 = string_to_command(
             "PageResponseObject.status_code", str(self.response.status_code)
@@ -98,9 +100,11 @@ class CrawlerInterface(object):
             bytes5 = string_to_command("PageResponseObject.text", self.response.text)
             all_bytes.extend(bytes5)
 
-        bytes6 = string_to_command("PageResponseObject.headers", json.dumps(self.response.headers))
+        bytes6 = string_to_command(
+            "PageResponseObject.headers", json.dumps(self.response.headers)
+        )
         all_bytes.extend(bytes6)
-        
+
         bytes7 = string_to_command("PageResponseObject.__del__", "OK")
         all_bytes.extend(bytes7)
 
@@ -112,7 +116,9 @@ class CrawlerInterface(object):
     def save_response(self):
         if not self.response:
             if self.request:
-                WebLogger.error("Url:{} Have not received response".format(self.request.url))
+                WebLogger.error(
+                    "Url:{} Have not received response".format(self.request.url)
+                )
             else:
                 WebLogger.error("Have not received response")
             return False
@@ -306,6 +312,7 @@ class RequestsCrawler(CrawlerInterface):
     def is_valid(self):
         try:
             import requests
+
             return True
         except Exception as E:
             print(str(E))
@@ -343,6 +350,7 @@ class StealthRequestsCrawler(CrawlerInterface):
     def is_valid(self):
         try:
             import stealth_requests as requests
+
             return True
         except Exception as E:
             return False
@@ -352,12 +360,27 @@ class SeleniumDriver(CrawlerInterface):
     """
     Everybody uses selenium
     """
-    def __init__(self, request, response_file=None, response_port=None, driver_executable = None, settings=None):
-        if settings and "driver_executable" in settings and settings["driver_executable"]:
+
+    def __init__(
+        self,
+        request,
+        response_file=None,
+        response_port=None,
+        driver_executable=None,
+        settings=None,
+    ):
+        if (
+            settings
+            and "driver_executable" in settings
+            and settings["driver_executable"]
+        ):
             driver_executable = settings["driver_executable"]
 
         super().__init__(
-            request, response_file=response_file, response_port=response_port, settings=settings
+            request,
+            response_file=response_file,
+            response_port=response_port,
+            settings=settings,
         )
         self.driver = None
         self.driver_executable = driver_executable
@@ -365,11 +388,11 @@ class SeleniumDriver(CrawlerInterface):
         try:
             self.display = None
             # requires xvfb
-            #import os
-            #os.environ["DISPLAY"] = ":10.0"
-            #from pyvirtualdisplay import Display
-            #self.display = Display(visible=0, size=(800, 600))
-            #self.display.start()
+            # import os
+            # os.environ["DISPLAY"] = ":10.0"
+            # from pyvirtualdisplay import Display
+            # self.display = Display(visible=0, size=(800, 600))
+            # self.display.start()
         except Exception as E:
             print("Str: {}".format(E))
 
@@ -472,21 +495,21 @@ class SeleniumDriver(CrawlerInterface):
             if self.driver:
                 self.driver.close()
         except Exception as E:
-            WebLogger.error(str(E)) # TODO
+            WebLogger.error(str(E))  # TODO
             WebLogger.debug(str(E))
 
         try:
             if self.driver:
                 self.driver.quit()
         except Exception as E:
-            WebLogger.error(str(E)) # TODO
+            WebLogger.error(str(E))  # TODO
             WebLogger.debug(str(E))
 
         try:
             if self.display:
                 self.display.stop()
         except Exception as E:
-            WebLogger.error(str(E)) # TODO
+            WebLogger.error(str(E))  # TODO
             WebLogger.debug(str(E))
 
 
@@ -497,7 +520,7 @@ class SeleniumChromeHeadless(SeleniumDriver):
 
     def get_driver(self):
         try:
-            #if not self.driver_executable:
+            # if not self.driver_executable:
             #    self.driver_executable = "/usr/bin/chromedriver"
 
             if self.driver_executable:
@@ -521,7 +544,9 @@ class SeleniumChromeHeadless(SeleniumDriver):
         except Exception as E:
             print(str(E))
             error_text = traceback.format_exc()
-            WebLogger.debug("Cannot obtain driver:{}\n{}".format(self.request.url, error_text))
+            WebLogger.debug(
+                "Cannot obtain driver:{}\n{}".format(self.request.url, error_text)
+            )
 
     def run(self):
         """
@@ -619,8 +644,10 @@ class SeleniumChromeFull(SeleniumDriver):
             try:
                 # requires xvfb
                 import os
+
                 os.environ["DISPLAY"] = ":10.0"
                 from pyvirtualdisplay import Display
+
                 self.display = Display(visible=0, size=(800, 600))
                 self.display.start()
             except Exception as E:
@@ -629,7 +656,7 @@ class SeleniumChromeFull(SeleniumDriver):
             options = webdriver.ChromeOptions()
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
-            #options.add_argument("--headless")
+            # options.add_argument("--headless")
             options.add_argument("--lang={}".format("en-US"))
 
             options.add_argument("start-maximized")
@@ -734,7 +761,9 @@ class SeleniumUndetected(SeleniumDriver):
         except Exception as E:
             print(str(E))
             error_text = traceback.format_exc()
-            WebLogger.debug("Cannot obtain driver:{}\n{}".format(self.request.url, error_text))
+            WebLogger.debug(
+                "Cannot obtain driver:{}\n{}".format(self.request.url, error_text)
+            )
             return
 
     def run(self):
@@ -799,6 +828,7 @@ class SeleniumUndetected(SeleniumDriver):
     def is_valid(self):
         try:
             import undetected_chromedriver as uc
+
             return True
         except Exception as E:
             return False
@@ -812,11 +842,25 @@ class ScriptCrawler(CrawlerInterface):
     Note:
      If we have multiple instances/workspaces each can write their own output file
     """
-    def __init__(self, request, response_file=None, response_port=None, cwd=None, script=None, settings=None):
+
+    def __init__(
+        self,
+        request,
+        response_file=None,
+        response_port=None,
+        cwd=None,
+        script=None,
+        settings=None,
+    ):
         if settings and "script" in settings and settings["script"]:
             script = settings["script"]
 
-        super().__init__(request = request, response_file = response_file, response_port = response_port, settings=settings)
+        super().__init__(
+            request=request,
+            response_file=response_file,
+            response_port=response_port,
+            settings=settings,
+        )
         self.cwd = cwd
         self.script = script
 
@@ -825,12 +869,15 @@ class ScriptCrawler(CrawlerInterface):
 
         if not self.response_file:
             from .webconfig import WebConfig
+
             if WebConfig.script_responses_directory is not None:
                 response_dir = Path(WebConfig.script_responses_directory)
             else:
                 response_dir = Path("storage")
 
-            self.response_file = self.get_main_path() / response_dir / self.get_response_file_name()
+            self.response_file = (
+                self.get_main_path() / response_dir / self.get_response_file_name()
+            )
 
     def get_main_path(self):
         file_path = os.path.realpath(__file__)
@@ -863,10 +910,10 @@ class ScriptCrawler(CrawlerInterface):
             self.request.url, self.response_file, self.request.timeout_s
         )
 
-        #WebLogger.error("Response:{}".format(self.response_file))
-        #WebLogger.error("CWD:{}".format(self.cwd))
-        #WebLogger.error("maintl:{}".format(self.get_main_path()))
-        #WebLogger.error("script:{}".format(script))
+        # WebLogger.error("Response:{}".format(self.response_file))
+        # WebLogger.error("CWD:{}".format(self.cwd))
+        # WebLogger.error("maintl:{}".format(self.get_main_path()))
+        # WebLogger.error("script:{}".format(script))
 
         try:
             p = subprocess.run(
@@ -874,7 +921,8 @@ class ScriptCrawler(CrawlerInterface):
                 shell=True,
                 capture_output=True,
                 cwd=self.cwd,
-                timeout=self.request.timeout_s + 10, # add more time for closing browser, etc
+                timeout=self.request.timeout_s
+                + 10,  # add more time for closing browser, etc
             )
         except subprocess.TimeoutExpired as E:
             WebLogger.exc(E, "Cannot run sucessfully script, or timeout")
@@ -892,11 +940,13 @@ class ScriptCrawler(CrawlerInterface):
                     WebLogger.error("Url:{}. {}".format(self.request.url, stderr_str))
 
             WebLogger.error(
-                "Url:{}. Script:'{}'. Return code invalid:{}. Path:{}".format(self.request.url, script, p.returncode, operating_path)
+                "Url:{}. Script:'{}'. Return code invalid:{}. Path:{}".format(
+                    self.request.url, script, p.returncode, operating_path
+                )
             )
 
         if file_abs.exists():
-            response = None 
+            response = None
 
             with open(str(file_abs), "rb") as fh:
                 all_bytes = fh.read()
@@ -967,13 +1017,26 @@ class ServerCrawler(CrawlerInterface):
     Used to ask crawling server for URL.
     Sends request to server, and receives reply
     """
-    def __init__(self, request, response_file=None, response_port=None, settings=None, script=None):
+
+    def __init__(
+        self,
+        request,
+        response_file=None,
+        response_port=None,
+        settings=None,
+        script=None,
+    ):
         if settings and "script" in settings and settings["script"]:
             script = settings["script"]
         if settings and "port" in settings and settings["port"]:
             response_port = settings["port"]
 
-        super().__init__(request = request, response_file = response_file, response_port = response_port, settings=settings)
+        super().__init__(
+            request=request,
+            response_file=response_file,
+            response_port=response_port,
+            settings=settings,
+        )
         self.script = script
         self.connection = None
 
@@ -992,7 +1055,9 @@ class ServerCrawler(CrawlerInterface):
 
         self.connection = SocketConnection()
         try:
-            if not self.connection.connect(SocketConnection.gethostname(), self.response_port):
+            if not self.connection.connect(
+                SocketConnection.gethostname(), self.response_port
+            ):
                 WebLogger.error("Cannot connect to port{}".format(self.response_port))
 
                 self.response = PageResponseObject(
@@ -1091,4 +1156,3 @@ class ServerCrawler(CrawlerInterface):
             return False
 
         return True
-

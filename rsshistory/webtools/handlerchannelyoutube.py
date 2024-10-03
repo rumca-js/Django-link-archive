@@ -182,9 +182,7 @@ class YouTubeChannelHandler(DefaultChannelHandler):
 
         feed = feeds[0]
 
-        self.rss_url = Url(
-            feed, handler_class=HttpPageHandler
-        )
+        self.rss_url = Url(feed, handler_class=HttpPageHandler)
         return self.rss_url
 
     def get_html_url(self):

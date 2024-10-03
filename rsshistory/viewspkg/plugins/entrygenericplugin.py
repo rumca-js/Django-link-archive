@@ -330,7 +330,7 @@ class EntryGenericPlugin(object):
         config = Configuration.get_object().config_entry
         buttons = []
 
-        read_laters = ReadLater.objects.filter(entry = self.entry)
+        read_laters = ReadLater.objects.filter(entry=self.entry)
         if read_laters.count() == 0:
             buttons.append(
                 EntryButton(
@@ -338,7 +338,7 @@ class EntryGenericPlugin(object):
                     "Read later",
                     reverse(
                         "{}:read-later-add".format(LinkDatabase.name),
-                            args=[self.entry.id],
+                        args=[self.entry.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Adds to read later list",
@@ -354,7 +354,7 @@ class EntryGenericPlugin(object):
                     "Do not read later",
                     reverse(
                         "{}:read-later-remove".format(LinkDatabase.name),
-                            args=[read_laters[0].id],
+                        args=[read_laters[0].id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Removes from read later list",
@@ -483,9 +483,7 @@ class EntryGenericPlugin(object):
                 translate_url,
                 ConfigurationEntry.ACCESS_TYPE_ALL,
                 "Translate Page",
-                static(
-                    "{}/icons/icons8-translate-128.png".format(LinkDatabase.name)
-                ),
+                static("{}/icons/icons8-translate-128.png".format(LinkDatabase.name)),
             ),
         )
 

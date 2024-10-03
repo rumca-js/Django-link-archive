@@ -57,13 +57,12 @@ from .fake.warhammercommunity import (
 from .fake.thehill import (
     thehill_rss,
 )
-from .fake.reddit import (
-    reddit_rss_text
-)
+from .fake.reddit import reddit_rss_text
 from .fake.firebog import (
     firebog_adguard_list,
     firebog_w3kbl_list,
     firebog_tick_lists,
+    firebog_malware,
 )
 from .fake.instance import (
     instance_entries_json,
@@ -442,6 +441,9 @@ class TestResponseObject(PageResponseObject):
 
         elif url == "https://v.firebog.net/hosts/lists.php?type=tick":
             return firebog_tick_lists
+
+        elif url == "https://v.firebog.net/hosts/RPiList-Malware.txt":
+            return firebog_malware
 
         elif url == "https://robots-txt.com/robots.txt":
             return robots_txt_example_com_robots

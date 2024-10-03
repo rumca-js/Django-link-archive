@@ -15,7 +15,8 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         BackgroundJobController.objects.all().delete()
 
         ob = SourceDataController.objects.create(
-            url="https://youtube.com", title="YouTube", 
+            url="https://youtube.com",
+            title="YouTube",
         )
         LinkDataController.objects.create(
             source_url="https://youtube.com",
@@ -71,13 +72,13 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         # call tested function
         self.assertEqual(
             BackgroundJobController.get_job_priority(BackgroundJob.JOB_PROCESS_SOURCE),
-            10,
+            12,
         )
 
         # call tested function
         self.assertEqual(
             BackgroundJobController.get_job_priority(BackgroundJob.JOB_LINK_ADD),
-            13,
+            15,
         )
 
     def test_truncate_invalid_jobs(self):

@@ -44,7 +44,9 @@ class ReadMarkerTests(FakeInternetTestCase):
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:set-source-read-marker".format(LinkDatabase.name), args=[source.id])
+        url = reverse(
+            "{}:set-source-read-marker".format(LinkDatabase.name), args=[source.id]
+        )
 
         # call user action
         response = self.client.get(url)

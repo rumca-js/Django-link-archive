@@ -41,7 +41,9 @@ class HttpRequestBuilder(object):
     """
 
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
-    get_contents_function = None # TODO remove this, in tests provide own WebConfig crawler mapping
+    get_contents_function = (
+        None  # TODO remove this, in tests provide own WebConfig crawler mapping
+    )
 
     def __init__(self, url=None, options=None, page_object=None, request=None):
         """
@@ -158,10 +160,16 @@ class HttpRequestBuilder(object):
             for crawler_data in mode_mapping[mode]:
                 crawler = WebConfig.get_crawler_from_mapping(request, crawler_data)
                 if not crawler:
-                    WebLogger.debug("Cannot find crawler in WebConfig:{}".format(crawler_data["crawler"]))
+                    WebLogger.debug(
+                        "Cannot find crawler in WebConfig:{}".format(
+                            crawler_data["crawler"]
+                        )
+                    )
                     continue
 
-                WebLogger.debug("Url:{}: Running crawler {}".format(request.url, type(crawler)))
+                WebLogger.debug(
+                    "Url:{}: Running crawler {}".format(request.url, type(crawler))
+                )
                 crawler.run()
                 response = crawler.get_response()
                 crawler.close()
@@ -170,7 +178,9 @@ class HttpRequestBuilder(object):
 
         else:
             self.dead = True
-            WebLogger.error("Url:{} Could not identify method of page capture".format(request.url))
+            WebLogger.error(
+                "Url:{} Could not identify method of page capture".format(request.url)
+            )
             raise NotImplementedError("Could not identify method of page capture")
 
     def ping(self, timeout_s=5, options=None):
@@ -347,7 +357,9 @@ class HttpPageHandler(ContentInterface):
             # we warn, because if that happens too often, it is easy just to
             # define EntryRule for that domain
             WebLogger.error(
-                "Url:{}. Trying to promote to other mode from {} mode".format(self.url, self.options.mode)
+                "Url:{}. Trying to promote to other mode from {} mode".format(
+                    self.url, self.options.mode
+                )
             )
             if self.options.mode == "standard":
                 self.options.mode = "headless"
@@ -625,6 +637,7 @@ class HttpPageHandler(ContentInterface):
     def get_feeds(self):
         # TODO ugly import
         from .handlers import RedditChannelHandler
+
         result = []
         url = self.url
 

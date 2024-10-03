@@ -278,9 +278,7 @@ class LinkDownloadJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             url = obj.subject
-            AppLogging.notify(
-                "Downloading page:".format(url)
-            )
+            AppLogging.notify("Downloading page:".format(url))
 
             Url.download_all(url)
 
@@ -1046,11 +1044,6 @@ class InitializeJobHandler(BaseJobHandler):
     def process(self, obj=None):
         # TODO read year from string
         try:
-            path = Path("init_sources.json")
-            if path.exists():
-                i = JsonImporter(path)
-                i.import_all()
-
             BlockEntryList.initialize()
             return True
         except Exception as E:
@@ -1072,7 +1065,7 @@ class InitializeBlockListJobHandler(BaseJobHandler):
         try:
             list = obj.subject
 
-            lists = BlockEntryList.objects.filter(url = list)
+            lists = BlockEntryList.objects.filter(url=list)
 
             if lists.exists():
                 BlockEntryList.update_block_entries(lists[0])
@@ -1589,6 +1582,7 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
     There can be many queues handling jobs.
     This processor handles jobs that are not handled by other queues
     """
+
     def __init__(self):
         super().__init__()
 
@@ -1626,6 +1620,7 @@ class OneTaskProcessor(GenericJobsProcessor):
 
     def run(self):
         from .tasks import get_processors
+
         for processor in get_processors():
             processor_object = processor()
             processor_object.run()

@@ -7,11 +7,7 @@ from django.contrib.auth.models import User
 
 from .webtools import HtmlPage, RssPage, HttpPageHandler
 
-from .models import(
-   UserConfig, ConfigurationEntry, AppLogging,
-   ApiKeys,
-   ReadLater
-)
+from .models import UserConfig, ConfigurationEntry, AppLogging, ApiKeys, ReadLater
 from .configuration import Configuration
 from .apps import LinkDatabase
 from .configuration import Configuration
@@ -85,7 +81,9 @@ class ViewPage(object):
         context["user_config"] = UserConfig.get(self.request.user)
         context["is_mobile"] = self.is_mobile()
         if self.request.user.is_authenticated:
-            context["is_read_later"] = ReadLater.objects.filter(user = self.request.user).count() != 0
+            context["is_read_later"] = (
+                ReadLater.objects.filter(user=self.request.user).count() != 0
+            )
         else:
             context["is_read_later"] = False
 
@@ -136,7 +134,7 @@ class ViewPage(object):
         if not key:
             return False
 
-        keys = ApiKeys.objects.filter(key = key)
+        keys = ApiKeys.objects.filter(key=key)
         if keys.exists():
             return True
 
@@ -267,7 +265,7 @@ class UserGenericListView(GenericListView):
             self.search_user_id = self.request.user.id
 
         if self.search_user_id:
-            users = User.objects.filter(id = self.search_user_id)
+            users = User.objects.filter(id=self.search_user_id)
             if users.count() > 0:
                 self.search_user = users[0]
 
@@ -287,6 +285,6 @@ class UserGenericListView(GenericListView):
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
         if self.search_user:
-            return super().get_queryset().filter(user = self.search_user)
+            return super().get_queryset().filter(user=self.search_user)
         else:
             return super().get_queryset()

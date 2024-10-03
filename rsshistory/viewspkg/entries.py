@@ -48,7 +48,12 @@ from ..forms import (
     OmniSearchWithArchiveForm,
     LinkInputForm,
 )
-from ..views import ViewPage, get_search_term_request, get_request_order_by, get_request_page_num
+from ..views import (
+    ViewPage,
+    get_search_term_request,
+    get_request_order_by,
+    get_request_page_num,
+)
 from ..queryfilters import EntryFilter, OmniSearchFilter
 from ..configuration import Configuration
 from ..pluginurl import UrlHandler
@@ -493,7 +498,7 @@ class UserEntriesBookmarkedListView(EntriesOmniListView):
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
         user = self.request.user
-        return query_set.filter(bookmarks__user__id = user.id)
+        return query_set.filter(bookmarks__user__id=user.id)
 
     def has_more_results(self):
         return False
@@ -1190,7 +1195,9 @@ def user_entries_bookmarked_init(request):
     else:
         filter_form = InitSearchForm(request=request)
     filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
+    filter_form.action_url = reverse(
+        "{}:user-entries-bookmarked".format(LinkDatabase.name)
+    )
 
     p.context["form"] = filter_form
 

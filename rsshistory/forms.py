@@ -421,15 +421,17 @@ from django.utils.safestring import mark_safe
 import json
 import html
 
+
 class DatalistTextInput(TextInput):
     def __init__(self, attrs=None):
-        super().__init__( attrs)
-        if 'list' not in self.attrs or 'datalist' not in self.attrs:
+        super().__init__(attrs)
+        if "list" not in self.attrs or "datalist" not in self.attrs:
             raise ValueError(
-              'DatalistTextInput widget is missing required attrs "list" or "datalist"')
-        self.datalist_name = self.attrs['list']
+                'DatalistTextInput widget is missing required attrs "list" or "datalist"'
+            )
+        self.datalist_name = self.attrs["list"]
 
-        text = self.attrs.pop('datalist')
+        text = self.attrs.pop("datalist")
         self.datalist = text
 
     def render(self, **kwargs):
@@ -437,12 +439,10 @@ class DatalistTextInput(TextInput):
 
         print("render kwargs:{}".format(kwargs))
 
-        #DEBUG( self, kwargs)
-        original_part = super().render( **kwargs)
+        # DEBUG( self, kwargs)
+        original_part = super().render(**kwargs)
 
-        opts = ' '.join(
-            [ f'<option>{x}</option>' for x in datalist]
-        )
+        opts = " ".join([f"<option>{x}</option>" for x in datalist])
 
         part2 = f'<datalist id="{self.datalist_name}">{opts}</datalist>'
 
@@ -454,13 +454,14 @@ class OmniSearchForm(forms.Form):
     Omni search form
     """
 
-    search = forms.CharField(label="Search", max_length=500, required=False,
-        widget = DatalistTextInput( attrs={
-                    'list':'',
-                    'datalist': [],
-                    'placeholder' : "Type to search..."
-                    }
-            ))
+    search = forms.CharField(
+        label="Search",
+        max_length=500,
+        required=False,
+        widget=DatalistTextInput(
+            attrs={"list": "", "datalist": [], "placeholder": "Type to search..."}
+        ),
+    )
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
@@ -475,12 +476,13 @@ class OmniSearchForm(forms.Form):
 
         attr = {"onchange": "this.form.submit()"}
 
-        self.fields["search"].widget = DatalistTextInput( attrs={
-                        'list':'foolist',
-                        'datalist': search_history,
-                        'placeholder' : "Type to search..."
-                        }
-                )
+        self.fields["search"].widget = DatalistTextInput(
+            attrs={
+                "list": "foolist",
+                "datalist": search_history,
+                "placeholder": "Type to search...",
+            }
+        )
         self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["search"].widget.attrs["autofocus"] = True
 
@@ -798,7 +800,9 @@ class SourcesChoiceForm(forms.Form):
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
         attr = {"onchange": "this.form.submit()"}
 
-        self.fields["category_name"].widget = forms.Select(choices=categories, attrs=attr)
+        self.fields["category_name"].widget = forms.Select(
+            choices=categories, attrs=attr
+        )
         self.fields["subcategory_name"].widget = forms.Select(
             choices=subcategories, attrs=attr
         )

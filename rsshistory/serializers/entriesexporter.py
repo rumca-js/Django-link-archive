@@ -4,15 +4,15 @@ from string import Template
 from django.db.models import Q
 
 from utils.serializers.converters import (
-   ModelCollectionConverter,
-   JsonConverter,
-   MarkDownConverter,
-   MarkDownSourceConverter,
-   RssConverter,
-   MarkDownDynamicConverter,
+    ModelCollectionConverter,
+    JsonConverter,
+    MarkDownConverter,
+    MarkDownSourceConverter,
+    RssConverter,
+    MarkDownDynamicConverter,
 )
 from utils.serializers import (
-   HtmlExporter,
+    HtmlExporter,
 )
 from ..controllers import SourceDataController, LinkDataController
 
@@ -28,6 +28,7 @@ class EntriesExporter(object):
      - if format is HTML, we would print differently
      - if format is SQLite, we would insert there only
     """
+
     def __init__(self, data_writer_config, entries):
         self._entries = entries
         self.data_writer_config = data_writer_config
@@ -71,7 +72,7 @@ class EntriesExporter(object):
             file_name.write_text(json_text)
 
         if export_config.format_md:
-            md_text = self.items2mdtext(items=items, source_url = source_url)
+            md_text = self.items2mdtext(items=items, source_url=source_url)
             file_name = export_path / (export_file_name + "_entries.md")
             file_name.write_text(md_text)
 
@@ -103,7 +104,6 @@ class EntriesExporter(object):
         if source_url:
             sources = SourceDataController.objects.filter(url=source_url)
             if sources.exists():
-
                 msc = MarkDownSourceConverter(sources[0], self.source_template)
                 msc_text = msc.export()
                 md_text = msc_text + "\n\n" + md_text
@@ -114,7 +114,7 @@ class EntriesExporter(object):
         rss_conv = RssConverter(items)
         rss_text = rss_conv.export()
 
-        return self.use_rss_wrapper(rss_text, rss_file_name =str(file_name))
+        return self.use_rss_wrapper(rss_text, rss_file_name=str(file_name))
 
     def items2sqlite(self, items, export_path, export_file_name):
         from utils.sqlmodel import SqlModel
@@ -123,7 +123,7 @@ class EntriesExporter(object):
         connection = SqlModel(export_path / export_file_name)
         builder = EntryDataBuilder(connection)
         for item in items:
-            builder.build(link_data = item)
+            builder.build(link_data=item)
 
     def export_all_entries(self, with_description=True):
         if self._entries.count() == 0:
@@ -157,7 +157,7 @@ class EntriesExporter(object):
             file_name = export_path / ("all_entries.rss")
             file_name.write_text(rss_text)
 
-    def use_rss_wrapper(self, text, language="en", rss_file_name = None):
+    def use_rss_wrapper(self, text, language="en", rss_file_name=None):
         template = self.get_rss_template()
 
         link = self._cfg.instance_internet_location
@@ -200,7 +200,6 @@ $channel_text
         return text
 
     def use_template(self, template_text, map_data):
-
         try:
             t = Template(template_text)
             return t.safe_substitute(map_data)
@@ -216,7 +215,7 @@ $channel_text
 
 
 class MainExporter(object):
-    def __init__(self, data_writer_config, user = None):
+    def __init__(self, data_writer_config, user=None):
         """
         @user if specified, then entries need to be written down according to 'user'
         """
@@ -229,10 +228,10 @@ class MainExporter(object):
 
         filters = Q()
         if export_config.export_entries_bookmarks:
-            filters = filters & Q(bookmarked = True)
+            filters = filters & Q(bookmarked=True)
 
         if export_config.export_entries_permanents:
-            filters = filters & Q(permanent = True)
+            filters = filters & Q(permanent=True)
 
         return filters
 

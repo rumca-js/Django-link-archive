@@ -10,6 +10,7 @@ class ReadMarkers(models.Model):
     """
     Used to indicate what has been read, and what has not
     """
+
     read_date = models.DateTimeField(null=True)
 
     source = models.OneToOneField(
@@ -27,14 +28,14 @@ class ReadMarkers(models.Model):
         null=True,
     )
 
-    def get(user, source = None):
+    def get(user, source=None):
         if source is None:
             return ReadMarkers.get_general(user)
         else:
             return ReadMarkers.get_source(user, source)
 
     def get_general(user):
-        read_markers = ReadMarkers.objects.filter(user = user, source__isnull = True)
+        read_markers = ReadMarkers.objects.filter(user=user, source__isnull=True)
         if read_markers.exists():
             if read_markers.count() > 0:
                 for read_marker in read_markers:
@@ -43,7 +44,7 @@ class ReadMarkers(models.Model):
 
     def get_source(user, source):
         if hasattr(source, "marker"):
-            read_markers = source.marker.filter(user = user)
+            read_markers = source.marker.filter(user=user)
             if read_markers.count() > 0:
                 for read_marker in read_markers:
                     read_marker.delete()
@@ -51,7 +52,7 @@ class ReadMarkers(models.Model):
             if read_markers.exists():
                 return read_markers[0]
 
-    def set(user, source = None):
+    def set(user, source=None):
         if source:
             ReadMarkers.set_source(user, source)
         else:
@@ -60,7 +61,7 @@ class ReadMarkers(models.Model):
     def set_general(user):
         marker = ReadMarkers.get_general(user)
         if not marker:
-            m = ReadMarkers(user = user, read_date = DateUtils.get_datetime_now_utc())
+            m = ReadMarkers(user=user, read_date=DateUtils.get_datetime_now_utc())
             m.save()
         else:
             general.read_date = DateUtils.get_datetime_utc()
@@ -69,7 +70,9 @@ class ReadMarkers(models.Model):
     def set_source(user, source):
         marker = ReadMarkers.get_source(user, source)
         if not marker:
-            m = ReadMarkers(user = user, read_date = DateUtils.get_datetime_now_utc(), source = source)
+            m = ReadMarkers(
+                user=user, read_date=DateUtils.get_datetime_now_utc(), source=source
+            )
             m.save()
         else:
             general.read_date = DateUtils.get_datetime_now_utc()

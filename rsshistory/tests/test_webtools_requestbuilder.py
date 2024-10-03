@@ -72,12 +72,12 @@ class PageOptionsTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_use_browser__full(self):
+    def test_use_browser__standard(self):
         o = PageOptions()
         o.mode = "standard"
 
         # call tested function
-        self.assertTrue(o.is_advanced_processing_required())
+        self.assertFalse(o.is_advanced_processing_required())
 
     def test_use_browser__headless(self):
         o = PageOptions()

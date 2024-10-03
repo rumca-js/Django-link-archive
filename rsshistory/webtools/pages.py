@@ -7,10 +7,10 @@ from dateutil import parser
 import html
 
 from .webtools import (
-  DomainAwarePage,
-  calculate_hash,
-  WebLogger,
-  date_str_to_date,
+    DomainAwarePage,
+    calculate_hash,
+    WebLogger,
+    date_str_to_date,
 )
 from utils.dateutils import DateUtils
 from .feedreader import FeedReader
@@ -259,7 +259,6 @@ class ContentInterface(object):
         return date_object
 
     def format_date(self, year, month, day):
-
         month_number = None
 
         try:
@@ -654,7 +653,7 @@ class RssPage(ContentInterface):
 
         try:
             self.feed = FeedReader.parse(contents)
-            #if not self.feed.entries or len(self.feed.entries) == 0:
+            # if not self.feed.entries or len(self.feed.entries) == 0:
             #    WebLogger.error("Feed does not have any entries {}".format(self.url))
 
             return self.feed
@@ -1431,7 +1430,7 @@ class HtmlPage(ContentInterface):
             "application/atom+xml"
         )
 
-        #if not rss_links:
+        # if not rss_links:
         #    links = self.get_links_inner()
         #    rss_links.extend(
         #        link

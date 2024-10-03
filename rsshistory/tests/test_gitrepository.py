@@ -88,7 +88,7 @@ class GitRepositoryTest(FakeInternetTestCase):
     def test_get_repo_name(self):
         export_config = DataExport.objects.filter(
             export_data=DataExport.EXPORT_DAILY_DATA,
-            remote_path="https://github.com/rumca-js/RSS-Link-Database-DAILY.git"
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-DAILY.git",
         )[0]
 
         git = GitRepository(export_config)
@@ -99,7 +99,7 @@ class GitRepositoryTest(FakeInternetTestCase):
     def test_get_repo_name__nogit(self):
         export_config = DataExport.objects.filter(
             export_data=DataExport.EXPORT_NOTIME_DATA,
-            remote_path="https://github.com/rumca-js/RSS-Link-Database-NOTIME"
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-NOTIME",
         )[0]
 
         git = GitRepository(export_config)

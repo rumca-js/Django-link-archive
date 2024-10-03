@@ -306,7 +306,7 @@ class FeedReader(object):
                     return True
 
     def process_html_raw(self, tag):
-        wh = self.contents.find("<"+tag)
+        wh = self.contents.find("<" + tag)
         if wh == -1:
             return False
 

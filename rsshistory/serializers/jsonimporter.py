@@ -138,8 +138,11 @@ class MapImporter(object):
                 # accepted and not. Let the builder deal with it
                 LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
 
-                b = self.entry_builder.build(link_data=clean_data, source_is_auto=True)
-                entry = b.result
+                entry = self.entry_builder.build(
+                    link_data=clean_data, source_is_auto=True
+                )
+                if not entry:
+                    AppLogging.error("Cannot build entry")
 
                 if entry and entry.is_archive_entry():
                     entry = EntryWrapper.move_from_archive(entry)
@@ -303,6 +306,10 @@ class JsonImporter(object):
             entry_builder = EntryDataBuilder()
             source_builder = SourceDataBuilder()
 
-            return MapImporter(user = self.user, entry_builder = entry_builder, source_builder=source_builder).import_from_data(data)
+            return MapImporter(
+                user=self.user,
+                entry_builder=entry_builder,
+                source_builder=source_builder,
+            ).import_from_data(data)
 
         return False

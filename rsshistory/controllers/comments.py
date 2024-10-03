@@ -35,9 +35,7 @@ class UserCommentsController(UserComments):
         criterion1 = Q(date_published__range=[time_start, time_stop])
         criterion2 = Q(date_edited__range=[time_start, time_stop])
 
-        comments = UserComments.objects.filter(
-            criterion0 & (criterion1 | criterion2)
-        )
+        comments = UserComments.objects.filter(criterion0 & (criterion1 | criterion2))
 
         conf = Configuration.get_object().config_entry
 

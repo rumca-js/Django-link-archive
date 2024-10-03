@@ -630,7 +630,6 @@ class LinkDataModel(BaseLinkDataController):
         blank=True,
     )
 
-
     def cleanup_http_duplicate(self):
         """
         If this is http entry, and we have https entry -> remove this
@@ -665,7 +664,6 @@ class ArchiveLinkDataModel(BaseLinkDataController):
         related_name=str(LinkDatabase.name) + "_aentries",
         null=True,
     )
-
 
     def is_archive_entry(self):
         return True

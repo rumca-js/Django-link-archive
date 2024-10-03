@@ -161,18 +161,23 @@ class Url(ContentInterface):
 
             return self.response
 
-    def ping(self, timeout_s = 5):
+    def ping(self, timeout_s=5):
         builder = HttpRequestBuilder(self.url)
         builder.ping(timeout_s=timeout_s, options=self.options)
 
     def get_init_page_options(self, url, initial_options=None):
         from .webconfig import WebConfig
+
         options = PageOptions()
         options.mode_mapping = WebConfig.get_init_crawler_config()
 
         if initial_options and initial_options.mode:
             options.mode = initial_options.mode
-        if initial_options and initial_options.mode_mapping and len(initial_options.mode_mapping) > 0:
+        if (
+            initial_options
+            and initial_options.mode_mapping
+            and len(initial_options.mode_mapping) > 0
+        ):
             options.mode_mapping = initial_options.mode_mapping
 
         if Url.is_full_browser_required(url):
@@ -252,7 +257,7 @@ class Url(ContentInterface):
             return
 
         domain = p.get_domain()
-        
+
         url = self.url_builder(domain)
         url.set_config(self.options)
 
@@ -483,7 +488,9 @@ class DomainCacheInfo(object):
     is_access_valid
     """
 
-    def __init__(self, url, respect_robots_txt=True, page_options = None, url_builder = None):
+    def __init__(
+        self, url, respect_robots_txt=True, page_options=None, url_builder=None
+    ):
         p = DomainAwarePage(url)
 
         self.respect_robots_txt = respect_robots_txt
@@ -645,12 +652,20 @@ class DomainCache(object):
     def get_object(domain_url, page_options=None, url_builder=None):
         if DomainCache.object is None:
             DomainCache.object = DomainCache(
-                DomainCache.default_cache_size, page_options = page_options, url_builder = url_builder
+                DomainCache.default_cache_size,
+                page_options=page_options,
+                url_builder=url_builder,
             )
 
         return DomainCache.object.get_domain_info(domain_url)
 
-    def __init__(self, cache_size=400, respect_robots_txt=True, page_options=None, url_builder = None):
+    def __init__(
+        self,
+        cache_size=400,
+        respect_robots_txt=True,
+        page_options=None,
+        url_builder=None,
+    ):
         """
         @note Not public
         """
@@ -673,7 +688,12 @@ class DomainCache(object):
         return self.cache[domain_url]["domain"]
 
     def read_info(self, domain_url):
-        return DomainCacheInfo(domain_url, self.respect_robots_txt, page_options = self.options, url_builder = self.url_builder)
+        return DomainCacheInfo(
+            domain_url,
+            self.respect_robots_txt,
+            page_options=self.options,
+            url_builder=self.url_builder,
+        )
 
     def remove_from_cache(self):
         if len(self.cache) < self.cache_size:
@@ -697,13 +717,15 @@ def fetch_url(link, page_options=None, url_builder=None):
     if url_builder:
         u = url_builder(url=link, page_options=page_options, url_builder=url_builder)
     else:
-        u = Url(url=link, page_options=page_options, url_builder = url_builder)
+        u = Url(url=link, page_options=page_options, url_builder=url_builder)
 
     u.get_response()
     return u
 
 
-async def fetch_all_urls(links, page_options=None, url_builder=None, max_concurrency=10):
+async def fetch_all_urls(
+    links, page_options=None, url_builder=None, max_concurrency=10
+):
     num_pages = int(len(links) / max_concurrency)
     num_pages_mod = len(links) % max_concurrency
 

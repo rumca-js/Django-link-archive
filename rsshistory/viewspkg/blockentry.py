@@ -10,6 +10,7 @@ from ..models import (
 )
 from ..views import ViewPage, GenericListView
 
+
 def initialize_block_lists(request):
     p = ViewPage(request)
     p.set_title("Initializes block lists")
@@ -45,8 +46,21 @@ def block_list_remove(request, pk):
     if data is not None:
         return data
 
-    thelist = BlockEntryList.objects.filter(id = pk)
+    thelist = BlockEntryList.objects.filter(id=pk)
     thelist.delete()
+
+    return redirect("{}:block-lists".format(LinkDatabase.name))
+
+
+def block_lists_clear(request):
+    p = ViewPage(request)
+    p.set_title("block lists clear")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    BlockEntryList.objects.all().delete()
+    BlockEntry.objects.all().delete()
 
     return redirect("{}:block-lists".format(LinkDatabase.name))
 
@@ -63,4 +77,3 @@ class BlockEntryListView(GenericListView):
     context_object_name = "blockentries"
     paginate_by = 100
     template_name = str(ViewPage.get_full_template("blockentry_list.html"))
-

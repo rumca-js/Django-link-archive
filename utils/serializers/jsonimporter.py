@@ -263,7 +263,6 @@ class MapImporter(object):
         pass
 
 
-
 def get_list_files(directory):
     file_list = []
     for root, dirs, files in os.walk(directory):
@@ -281,7 +280,7 @@ def read_file_contents(file_path):
 
 
 class JsonImporter(object):
-    def __init__(self, conn, path=None, user=None, verbose = False):
+    def __init__(self, conn, path=None, user=None, verbose=False):
         logger = get_logger("utils")
         logger.info("Importing from a file")
         self.user = user
@@ -317,8 +316,13 @@ class JsonImporter(object):
             data = json.loads(contents)
 
             settings = {"verbose": False}
-            source_builder = SourceDataBuilder(conn = self.conn)
+            source_builder = SourceDataBuilder(conn=self.conn)
             entry_builder = EntryDataBuilder(conn=self.conn)
-            return MapImporter(source_builder=source_builder, entry_builder=entry_builder, user = self.user, import_settings = settings).import_from_data(data)
+            return MapImporter(
+                source_builder=source_builder,
+                entry_builder=entry_builder,
+                user=self.user,
+                import_settings=settings,
+            ).import_from_data(data)
 
         return False

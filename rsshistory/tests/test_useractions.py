@@ -4,7 +4,13 @@ from django.test import TestCase
 
 from ..controllers import LinkDataController, SourceDataController, DomainsController
 from ..configuration import Configuration
-from ..models import UserTags, UserVotes, UserBookmarks, CompactedTags, UserCompactedTags
+from ..models import (
+    UserTags,
+    UserVotes,
+    UserBookmarks,
+    CompactedTags,
+    UserCompactedTags,
+)
 from utils.dateutils import DateUtils
 
 

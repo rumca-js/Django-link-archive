@@ -13,12 +13,12 @@ from .models import KeyWords
 from .controllers import DomainsController
 
 from .serializers import (
-   SourceSerializerWrapper,
-   DomainJsonExporter,
-   KeywordExporter,
-   EntryYearDataMainExporter,
-   EntryNoTimeDataMainExporter,
-   EntryDailyDataMainExporter,
+    SourceSerializerWrapper,
+    DomainJsonExporter,
+    KeywordExporter,
+    EntryYearDataMainExporter,
+    EntryNoTimeDataMainExporter,
+    EntryDailyDataMainExporter,
 )
 
 
@@ -45,14 +45,12 @@ class BaseDataWriter(object):
         return self.directory
 
     def get_domains_json(self):
-
         domains = DomainsController.objects.all()
 
         exp = DomainJsonExporter()
         return exp.get_text(domains)
 
     def get_keywords_json(self, day_iso):
-
         keywords = KeyWords.get_keyword_data()
         if len(keywords) > 0:
             exp = KeywordExporter()
@@ -60,7 +58,7 @@ class BaseDataWriter(object):
 
     def get_export_user(self):
         name = self.export_config.db_user
-        user_objects = User.objects.filter(username = name)
+        user_objects = User.objects.filter(username=name)
         if user_objects.count() > 0:
             return user_objects[0]
 

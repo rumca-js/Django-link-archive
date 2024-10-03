@@ -35,6 +35,8 @@ class ReadLaterViewsTest(FakeInternetTestCase):
             language="en",
         )
 
+        self.client.login(username="testuser", password="testpassword")
+
         url = reverse("{}:read-later-entries".format(LinkDatabase.name))
         response = self.client.get(url)
 
@@ -51,6 +53,8 @@ class ReadLaterViewsTest(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+
+        self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:read-later-add".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
@@ -69,9 +73,13 @@ class ReadLaterViewsTest(FakeInternetTestCase):
             language="en",
         )
 
-        read_later = ReadLater.objects.create(entry = entry, user = self.user)
+        read_later = ReadLater.objects.create(entry=entry, user=self.user)
 
-        url = reverse("{}:read-later-remove".format(LinkDatabase.name), args=[read_later.id])
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse(
+            "{}:read-later-remove".format(LinkDatabase.name), args=[read_later.id]
+        )
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -87,6 +95,8 @@ class ReadLaterViewsTest(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+
+        self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:read-later-clear".format(LinkDatabase.name))
         response = self.client.get(url)

@@ -8,11 +8,11 @@ from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
 from ..models import (
-   UserTags,
-   CompactedTags,
-   UserCompactedTags,
-   ConfigurationEntry,
-   UserVotes,
+    UserTags,
+    CompactedTags,
+    UserCompactedTags,
+    ConfigurationEntry,
+    UserVotes,
 )
 from ..controllers import LinkDataController, EntryWrapper
 from ..forms import TagForm, TagEntryForm, TagRenameForm, ScannerForm

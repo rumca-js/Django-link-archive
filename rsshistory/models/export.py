@@ -39,7 +39,9 @@ class DataExport(models.Model):
         help_text="Local path is relative to main configuration export path. This path will be appended with app name and type of export",
     )
     remote_path = models.CharField(
-        max_length=1000, blank=True, help_text="Example: https://github.com/rumca-js/Django-link-archive.git. Can be empty"
+        max_length=1000,
+        blank=True,
+        help_text="Example: https://github.com/rumca-js/Django-link-archive.git. Can be empty",
     )
     user = models.CharField(
         default="",
@@ -48,8 +50,10 @@ class DataExport(models.Model):
         help_text="Repo user name. Can be empty",
     )
     password = models.CharField(
-        default="", max_length=2000, blank=True,
-        help_text="Repo password, or token. Can be empty"
+        default="",
+        max_length=2000,
+        blank=True,
+        help_text="Repo password, or token. Can be empty",
     )
 
     db_user = models.CharField(
@@ -75,16 +79,24 @@ class DataExport(models.Model):
         default=time(0, 0), help_text="Time at which export is performed"
     )
 
-    format_json = models.BooleanField(default=True, help_text="If set JSON files will be created")
+    format_json = models.BooleanField(
+        default=True, help_text="If set JSON files will be created"
+    )
     format_md = models.BooleanField(default=True)
     format_rss = models.BooleanField(default=False)
     format_html = models.BooleanField(default=False)
 
-    format_sources_opml = models.BooleanField(default=False, help_text="If enabled sources will be written in OPML format also")
+    format_sources_opml = models.BooleanField(
+        default=False,
+        help_text="If enabled sources will be written in OPML format also",
+    )
 
-    output_zip = models.BooleanField(default=False, help_text="If enabled, output will be zipped")
-    output_sqlite = models.BooleanField(default=False, help_text="If enabled, output will be inserted into SQLite")
-
+    output_zip = models.BooleanField(
+        default=False, help_text="If enabled, output will be zipped"
+    )
+    output_sqlite = models.BooleanField(
+        default=False, help_text="If enabled, output will be inserted into SQLite"
+    )
 
     class Meta:
         ordering = ["-enabled"]
@@ -160,9 +172,7 @@ class SourceExportHistory(models.Model):
         try:
             yesterday = DateUtils.get_date_yesterday()
 
-            history = SourceExportHistory.objects.filter(
-                date=yesterday, export=export
-            )
+            history = SourceExportHistory.objects.filter(date=yesterday, export=export)
 
             if history.count() != 0:
                 return False
@@ -189,9 +199,7 @@ class SourceExportHistory(models.Model):
             process_date = input_date
 
         if (
-            SourceExportHistory.objects.filter(
-                date=process_date, export=export
-            ).count()
+            SourceExportHistory.objects.filter(date=process_date, export=export).count()
             == 0
         ):
             SourceExportHistory.objects.create(date=process_date, export=export)

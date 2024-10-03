@@ -15,16 +15,16 @@ class ReadLaterListView(UserGenericListView):
 def read_later_add(request, pk):
     p = ViewPage(request)
     p.set_title("Adds to read later")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
     if data is not None:
         return data
 
-    entries = LinkDataController.objects.filter(id = pk)
+    entries = LinkDataController.objects.filter(id=pk)
     if entries.exists():
         entry = entries[0]
 
-        if ReadLater.objects.filter(entry = entry, user=request.user).count() == 0:
-            read_later = ReadLater.objects.create(entry = entry, user=request.user)
+        if ReadLater.objects.filter(entry=entry, user=request.user).count() == 0:
+            read_later = ReadLater.objects.create(entry=entry, user=request.user)
 
             p.context["summary_text"] = "Added successfully to read later queue"
             return p.render("go_back.html")
@@ -39,11 +39,11 @@ def read_later_add(request, pk):
 def read_later_remove(request, pk):
     p = ViewPage(request)
     p.set_title("Removes entry from read later list")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
     if data is not None:
         return data
 
-    read_laters = ReadLater.objects.filter(id = pk, user = request.user)
+    read_laters = ReadLater.objects.filter(id=pk, user=request.user)
     if read_laters.exists():
         read_laters.delete()
 
@@ -57,7 +57,7 @@ def read_later_remove(request, pk):
 def read_later_clear(request):
     p = ViewPage(request)
     p.set_title("Clear entire later list")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
     if data is not None:
         return data
 

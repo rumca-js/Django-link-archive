@@ -623,7 +623,8 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         self.setup_configuration()
 
         ob = SourceDataController.objects.create(
-            url="https://youtube.com", title="YouTube", 
+            url="https://youtube.com",
+            title="YouTube",
         )
         LinkDataController.objects.create(
             source_url="https://youtube.com",
@@ -990,7 +991,8 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
         self.setup_configuration()
 
         ob = SourceDataController.objects.create(
-            url="https://youtube.com", title="YouTube", 
+            url="https://youtube.com",
+            title="YouTube",
         )
         LinkDataController.objects.create(
             source_url="https://youtube.com",
@@ -1034,7 +1036,8 @@ class LeftOverJobsProcessorTest(FakeInternetTestCase):
         self.setup_configuration()
 
         ob = SourceDataController.objects.create(
-            url="https://youtube.com", title="YouTube", 
+            url="https://youtube.com",
+            title="YouTube",
         )
         LinkDataController.objects.create(
             source_url="https://youtube.com",

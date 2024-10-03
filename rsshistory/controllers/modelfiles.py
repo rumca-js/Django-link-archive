@@ -10,6 +10,7 @@ class ModelFilesBuilder(object):
 
     def build(self, file_name=None):
         from ..pluginurl import UrlHandler
+
         if file_name is None:
             return
         if file_name == "":

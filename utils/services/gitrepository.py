@@ -6,9 +6,15 @@ from utils.logger import get_logger
 
 
 class GitRepository(RepositoryInterface):
-
-    def __init__(self, export_data, timeout_s=60 * 60, operating_dir=None, data_source_dir=None):
-        super().__init__(export_data, timeout_s, operating_dir=operating_dir, data_source_dir=data_source_dir)
+    def __init__(
+        self, export_data, timeout_s=60 * 60, operating_dir=None, data_source_dir=None
+    ):
+        super().__init__(
+            export_data,
+            timeout_s,
+            operating_dir=operating_dir,
+            data_source_dir=data_source_dir,
+        )
 
         self.git_repo = self.export_data.remote_path
         self.is_different_flag = None

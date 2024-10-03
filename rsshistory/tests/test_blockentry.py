@@ -1,9 +1,7 @@
 from datetime import timedelta
 from django.contrib.auth.models import User
 
-from ..models import (
-        BlockEntry, BlockEntryList, BlockListReader
-)
+from ..models import BlockEntry, BlockEntryList, BlockListReader
 from ..controllers import BackgroundJobController
 from ..configuration import Configuration
 
@@ -84,15 +82,15 @@ class BlockEntryListTest(FakeInternetTestCase):
         self.setup_configuration()
 
     def test_initialize(self):
-
         # call tested function
         BlockEntryList.initialize()
 
-        self.assertEqual(BlockEntryList.objects.all().count(), 2)
+        block_lists = BlockEntryList.objects.all()
+
+        self.assertEqual(block_lists.count(), 2)
         self.assertEqual(BackgroundJobController.objects.all().count(), 2)
 
     def test_reset(self):
-
         # call tested function
         BlockEntryList.reset()
 
@@ -100,9 +98,36 @@ class BlockEntryListTest(FakeInternetTestCase):
         self.assertEqual(BackgroundJobController.objects.all().count(), 2)
 
     def test_update_block_entries(self):
-        test_list = BlockEntryList.objects.create(url = "https://v.firebog.net/hosts/static/w3kbl.txt")
+        test_list = BlockEntryList.objects.create(
+            url="https://v.firebog.net/hosts/static/w3kbl.txt"
+        )
 
         # call tested function
         BlockEntryList.update_block_entries(test_list)
 
         self.assertEqual(BlockEntry.objects.all().count(), 3)
+
+        self.assertEqual(test_list.processed, True)
+
+    def test_update_block_entries(self):
+        test_list = BlockEntryList.objects.create(
+            url="https://v.firebog.net/hosts/RPiList-Malware.txt"
+        )
+
+        # call tested function
+        BlockEntryList.update_block_entries(test_list)
+
+        block_entries = BlockEntry.objects.all()
+
+        for entry in block_entries:
+            print(entry.url)
+
+        self.assertEqual(block_entries.count(), 7)
+
+        urls = block_entries.values_list("url", flat=True)
+        self.assertTrue(
+            "0-00d10140000motieas-990auyn11w0wpnuy4.dcsportal.0-astrologie.net.daraz.com"
+            in urls
+        )
+
+        self.assertEqual(test_list.processed, True)

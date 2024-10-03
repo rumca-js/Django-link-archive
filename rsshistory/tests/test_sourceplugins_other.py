@@ -291,8 +291,6 @@ class CodeProjectPluginTest(FakeInternetTestCase):
         self.source_codeproject = SourceDataController.objects.create(
             url="https://www.codeproject.com/WebServices/NewsRSS.aspx",
             title="CodeProject",
-            category="No",
-            subcategory="No",
             export_to_cms=True,
         )
 

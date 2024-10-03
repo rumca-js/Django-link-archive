@@ -316,7 +316,8 @@ class ConfigurationEntry(models.Model):
     )
 
     display_style = models.CharField(
-        max_length=500, null=True, 
+        max_length=500,
+        null=True,
         default="style-light",
         choices=STYLE_TYPES,
         help_text="Applies to not logged users",
@@ -328,29 +329,41 @@ class ConfigurationEntry(models.Model):
         choices=DISPLAY_TYPE_CHOICES,
         help_text="Applies to not logged users",
     )
-    show_icons = models.BooleanField(default=True,
+    show_icons = models.BooleanField(
+        default=True,
         help_text="Applies to not logged users",
-        )
-    thumbnails_as_icons = models.BooleanField(
-        default=True, help_text="If false, source favicons are used as thumbnails. Applies to not logged users",
     )
-    small_icons = models.BooleanField(default=True,
+    thumbnails_as_icons = models.BooleanField(
+        default=True,
+        help_text="If false, source favicons are used as thumbnails. Applies to not logged users",
+    )
+    small_icons = models.BooleanField(
+        default=True,
         help_text="Applies to not logged users",
     )
     local_icons = models.BooleanField(
-        default=False, help_text="If true, only locally stored icons are displayed. Applies to not logged users",
+        default=False,
+        help_text="If true, only locally stored icons are displayed. Applies to not logged users",
     )
 
     links_per_page = models.IntegerField(
-        default=100, help_text="Number of links per page. Applies to not logged users",
+        default=100,
+        help_text="Number of links per page. Applies to not logged users",
     )
     sources_per_page = models.IntegerField(
         default=100, help_text="Number of sources per page. Applies to not logged users"
     )
 
-    max_links_per_page = models.IntegerField(default=100, help_text="Maximum number of links per page")
-    max_sources_per_page = models.IntegerField(default=100, help_text="Maximum number of sources per page")
-    max_number_of_related_links = models.IntegerField(default=30, help_text="Maximum number of entries displayed in 'entry detail related' view")
+    max_links_per_page = models.IntegerField(
+        default=100, help_text="Maximum number of links per page"
+    )
+    max_sources_per_page = models.IntegerField(
+        default=100, help_text="Maximum number of sources per page"
+    )
+    max_number_of_related_links = models.IntegerField(
+        default=30,
+        help_text="Maximum number of entries displayed in 'entry detail related' view",
+    )
 
     debug_mode = models.BooleanField(
         default=False,
@@ -605,7 +618,9 @@ class UserConfig(models.Model):
 
         users = UserConfig.objects.filter(user=input_user)
         if not users.exists():
-            user = UserConfig.objects.create(username=input_user.username, user=input_user)
+            user = UserConfig.objects.create(
+                username=input_user.username, user=input_user
+            )
             return user
         return users[0]
 
@@ -853,7 +868,9 @@ class BackgroundJob(models.Model):
     JOB_CHECK_DOMAINS = "check-domains"
     JOB_RUN_RULE = "run-rule"
     JOB_INITIALIZE = "initialize"
-    JOB_INITIALIZE_BLOCK_LIST = "initialize-block-list" # initializes one specific block list
+    JOB_INITIALIZE_BLOCK_LIST = (
+        "initialize-block-list"  # initializes one specific block list
+    )
 
     # fmt: off
     JOB_CHOICES = (
@@ -912,7 +929,7 @@ class BackgroundJob(models.Model):
             "pk",
             "subject",
             "errors",
-            ]
+        ]
 
 
 class AppLoggingController(object):
@@ -933,7 +950,7 @@ class AppLoggingController(object):
         AppLogging.error(info_text, detail_text, user, stack)
 
     def notify(self, info_text, detail_text="", user=None):
-        AppLogging.notify(info_text, detail_text, user )
+        AppLogging.notify(info_text, detail_text, user)
 
     def exc(self, exception_object, info_text=None, user=None):
         AppLogging.exc(exception_object, info_text, user)

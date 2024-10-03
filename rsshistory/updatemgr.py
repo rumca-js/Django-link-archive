@@ -15,6 +15,7 @@ class UpdateExportManager(object):
     """
     This class is a middleman between data writer & repositories
     """
+
     def __init__(self, config, repo_builder, export_data, date=None):
         self._cfg = config
         self.export_data = export_data
@@ -82,7 +83,11 @@ class UpdateExportManager(object):
 
         repo_class = self.repo_builder.get(export_data)
 
-        repo = repo_class(export_data, operating_dir=self.get_repo_operating_dir(), data_source_dir= self.get_write_directory())
+        repo = repo_class(
+            export_data,
+            operating_dir=self.get_repo_operating_dir(),
+            data_source_dir=self.get_write_directory(),
+        )
 
         AppLogging.info("Pushing repo")
         repo.push_to_repo(message)

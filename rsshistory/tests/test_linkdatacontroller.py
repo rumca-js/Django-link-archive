@@ -334,9 +334,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
             thumbnail="thumbnail",
         )
 
-        UserTags.objects.create(
-            tag="test tag", user=self.user, entry=entry
-        )
+        UserTags.objects.create(tag="test tag", user=self.user, entry=entry)
 
         tag_vec = entry.get_tag_map()
         self.assertEqual(len(tag_vec), 1)
@@ -359,9 +357,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
             page_rating_contents=-100,
         )
 
-        UserTags.objects.create(
-            tag="test tag", user=self.user, entry=entry
-        )
+        UserTags.objects.create(tag="test tag", user=self.user, entry=entry)
 
         tag_vec = entry.get_tag_map()
         self.assertEqual(len(tag_vec), 1)

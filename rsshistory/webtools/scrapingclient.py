@@ -96,7 +96,6 @@ class ScrapingClient(object):
                 if command_data[0] == "debug.__del__":
                     return
 
-
     def send_request(self, request):
         response = PageResponseObject()
         time_start = datetime.now()

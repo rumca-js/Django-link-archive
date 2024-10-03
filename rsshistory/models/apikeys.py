@@ -3,6 +3,7 @@ from django.db import models
 
 from ..apps import LinkDatabase
 
+
 class ApiKeys(models.Model):
     key = models.CharField(max_length=1000, null=False)
 

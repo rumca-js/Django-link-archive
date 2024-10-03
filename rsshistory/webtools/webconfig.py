@@ -31,20 +31,16 @@ class WebConfig(object):
         pass
 
     def get_modes():
-        return [
-           "standard",
-           "headless",
-           "full"
-        ]
+        return ["standard", "headless", "full"]
 
     def get_browsers():
         return [
             "RequestsCrawler",
-            "SeleniumChromeHeadless", # requires driver location
-            "SeleniumChromeFull", # requires driver location
-            "SeleniumUndetected", # requires driver location
-            "ScriptCrawler", # requires script
-            "ServerCrawler", # requires script & port
+            "SeleniumChromeHeadless",  # requires driver location
+            "SeleniumChromeFull",  # requires driver location
+            "SeleniumUndetected",  # requires driver location
+            "ScriptCrawler",  # requires script
+            "ServerCrawler",  # requires script & port
         ]
 
     def get_crawler_from_string(input_string):
@@ -75,7 +71,7 @@ class WebConfig(object):
         if c.is_valid():
             return c
 
-    def get_init_crawler_config(headless_script = None, full_script = None, port=None):
+    def get_init_crawler_config(headless_script=None, full_script=None, port=None):
         """
         Caller may provide scripts
         """
@@ -88,7 +84,7 @@ class WebConfig(object):
             port = DEFAULT_PORT
 
             c = SocketConnection()
-            if not c.connect(host = SocketConnection.gethostname(), port = port):
+            if not c.connect(host=SocketConnection.gethostname(), port=port):
                 port = None
                 c.close()
 
@@ -103,7 +99,9 @@ class WebConfig(object):
             if full_script is None:
                 full_script = poetry_path + "poetry run python crawleebeautifulsoup.py"
             if headless_script is None:
-                headless_script = poetry_path + "poetry run python crawleebeautifulsoup.py"
+                headless_script = (
+                    poetry_path + "poetry run python crawleebeautifulsoup.py"
+                )
         except:
             pass
 
@@ -124,7 +122,9 @@ class WebConfig(object):
 
         headless_preference_table = []
 
-        headless_preference_table.append(WebConfig.get_servercralwer(port, headless_script))
+        headless_preference_table.append(
+            WebConfig.get_servercralwer(port, headless_script)
+        )
         headless_preference_table.append(WebConfig.get_scriptcralwer(headless_script))
         headless_preference_table.append(WebConfig.get_seleniumheadless())
         headless_preference_table.append(WebConfig.get_servercralwer(port, full_script))
@@ -136,7 +136,6 @@ class WebConfig(object):
         mapping["headless"] = headless_preference_table
 
         # one of the methods should be available
-
 
         full_preference_table = []
 
@@ -154,47 +153,88 @@ class WebConfig(object):
         return mapping
 
     def get_requests():
-        return {"enabled" : True, "crawler" : "RequestsCrawler", "settings":{}}
+        return {"enabled": True, "crawler": "RequestsCrawler", "settings": {}}
 
     def get_servercralwer(port, script):
         if port and script:
-            return {"enabled" : True, "crawler" : "ServerCrawler", "settings":{"port": port, "script" : script }}
+            return {
+                "enabled": True,
+                "crawler": "ServerCrawler",
+                "settings": {"port": port, "script": script},
+            }
         else:
-            return {"enabled" : False, "crawler" : "ServerCrawler", "settings":{"port": port, "script" : script }}
+            return {
+                "enabled": False,
+                "crawler": "ServerCrawler",
+                "settings": {"port": port, "script": script},
+            }
 
     def get_scriptcralwer(script):
         if script:
-            return {"enabled" : True, "crawler" : "ScriptCrawler", "settings":{"script" : script}}
+            return {
+                "enabled": True,
+                "crawler": "ScriptCrawler",
+                "settings": {"script": script},
+            }
         else:
-            return {"enabled" : False, "crawler" : "ScriptCrawler", "settings":{"script" : script}}
+            return {
+                "enabled": False,
+                "crawler": "ScriptCrawler",
+                "settings": {"script": script},
+            }
 
     def get_seleniumheadless():
         chromedriver_path = Path("/usr/bin/chromedriver")
 
         if chromedriver_path.exists():
-            return {"enabled" : True, "crawler" : "SeleniumChromeHeadless", "settings":{"driver_executable" : str(chromedriver_path)}}
+            return {
+                "enabled": True,
+                "crawler": "SeleniumChromeHeadless",
+                "settings": {"driver_executable": str(chromedriver_path)},
+            }
         else:
-            return {"enabled" : True, "crawler" : "SeleniumChromeHeadless", "settings":{"driver_executable" : None}}
+            return {
+                "enabled": True,
+                "crawler": "SeleniumChromeHeadless",
+                "settings": {"driver_executable": None},
+            }
 
     def get_seleniumfull():
         chromedriver_path = Path("/usr/bin/chromedriver")
 
         if chromedriver_path.exists():
-            return {"enabled" : True, "crawler" : "SeleniumChromeFull", "settings":{"driver_executable" : str(chromedriver_path)}}
+            return {
+                "enabled": True,
+                "crawler": "SeleniumChromeFull",
+                "settings": {"driver_executable": str(chromedriver_path)},
+            }
         else:
-            return {"enabled" : True, "crawler" : "SeleniumChromeFull", "settings":{"driver_executable" : None}}
+            return {
+                "enabled": True,
+                "crawler": "SeleniumChromeFull",
+                "settings": {"driver_executable": None},
+            }
 
     def get_seleniumundetected():
         chromedriver_path = Path("/usr/bin/chromedriver")
 
         if chromedriver_path.exists():
-            return {"enabled" : True, "crawler" : "SeleniumUndetected", "settings":{"driver_executable" : str(chromedriver_path)}}
+            return {
+                "enabled": True,
+                "crawler": "SeleniumUndetected",
+                "settings": {"driver_executable": str(chromedriver_path)},
+            }
         else:
-            return {"enabled" : True, "crawler" : "SeleniumUndetected", "settings":{"driver_executable" : None}}
+            return {
+                "enabled": True,
+                "crawler": "SeleniumUndetected",
+                "settings": {"driver_executable": None},
+            }
 
     def use_logger(Logger):
         WebLogger.web_logger = Logger
 
     def use_print_logging():
         from utils.logger import PrintLogger
+
         WebLogger.web_logger = PrintLogger

@@ -60,9 +60,7 @@ class UserTags(models.Model):
         return tag_string
 
     def get_user_tag_string(user, entry):
-        current_tags_objs = UserTags.objects.filter(
-            entry=entry, user=user
-        )
+        current_tags_objs = UserTags.objects.filter(entry=entry, user=user)
 
         if current_tags_objs.exists():
             return UserTags.join_elements(current_tags_objs)
@@ -95,9 +93,7 @@ class UserTags(models.Model):
 
         user_name = user.username
 
-        objs = UserTags.objects.filter(
-            entry=entry, user=user, tag=tag_name
-        )
+        objs = UserTags.objects.filter(entry=entry, user=user, tag=tag_name)
 
         if objs.count() == 0:
             UserTags.objects.create(entry=entry, user=user, tag=tag_name)
@@ -398,9 +394,7 @@ class UserComments(models.Model):
     )
 
     def add(user, entry, comment):
-        return UserComments.objects.create(
-            user=user, entry=entry, comment=comment
-        )
+        return UserComments.objects.create(user=user, entry=entry, comment=comment)
 
     def get_comment(self):
         return InputContent(self.comment).htmlify()

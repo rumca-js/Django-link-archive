@@ -53,9 +53,9 @@ def page_show_properties(request):
         p.context["page_url"] = page_url
         p.context["page_handler"] = page_handler
         p.context["page_handler_type"] = str(type(page_handler))
-        p.context["is_link_allowed"] = DomainCache.get_object(page_link, url_builder = UrlHandler).is_allowed(
-            page_link
-        )
+        p.context["is_link_allowed"] = DomainCache.get_object(
+            page_link, url_builder=UrlHandler
+        ).is_allowed(page_link)
         p.context["method"] = options.mode
         p.context["modes"] = BrowserMode.get_modes()
 

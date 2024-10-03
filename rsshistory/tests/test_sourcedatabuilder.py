@@ -181,7 +181,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
         SourceCategories.objects.all().delete()
         SourceSubCategories.objects.all().delete()
 
-        link_data={
+        link_data = {
             "url": "https://linkedin.com",
             "title": "LinkedIn",
             "category_name": "categoryName",
@@ -192,7 +192,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
         b = SourceDataBuilder(manual_entry=True)
 
         # call tested function
-        b.build_from_props(link_data = link_data)
+        b.build_from_props(link_data=link_data)
 
         sources = SourceDataController.objects.all()
         categories = SourceCategories.objects.all()
@@ -217,7 +217,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
         SourceCategories.objects.all().delete()
         SourceSubCategories.objects.all().delete()
 
-        link_data={
+        link_data = {
             "url": "https://linkedin.com",
             "title": "LinkedIn",
             "category_name": "categoryName",
@@ -225,10 +225,10 @@ class SourceDataBuilderTest(FakeInternetTestCase):
             "export_to_cms": False,
         }
 
-        b = SourceDataBuilder(manual_entry = False)
+        b = SourceDataBuilder(manual_entry=False)
 
         # call tested function
-        b.build_from_props(link_data = link_data)
+        b.build_from_props(link_data=link_data)
 
         sources = SourceDataController.objects.all()
         categories = SourceCategories.objects.all()

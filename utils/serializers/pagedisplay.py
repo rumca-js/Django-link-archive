@@ -119,6 +119,11 @@ class PageDisplayParser(object):
         )
         self.parser.add_argument("--method", help="method. Choices: full, headless")
         self.parser.add_argument("--url", help="Url to fetch")
-        self.parser.add_argument("-v", "--verbose", action="store_true", help="Verbose. For example: displays full contents")
+        self.parser.add_argument(
+            "-v",
+            "--verbose",
+            action="store_true",
+            help="Verbose. For example: displays full contents",
+        )
 
         self.args = self.parser.parse_args()

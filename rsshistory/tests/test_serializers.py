@@ -92,9 +92,7 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
             thumbnail="thumbnail",
         )
 
-        dw_conf = DataWriterConfiguration(
-            config, self.export, Path("./data/test/year")
-        )
+        dw_conf = DataWriterConfiguration(config, self.export, Path("./data/test/year"))
 
         # call tested function
         exporter = EntryYearDataMainExporter(dw_conf, self.user)
@@ -123,9 +121,7 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
             date_bookmarked=date, user=self.user, entry=entry
         )
 
-        dw_conf = DataWriterConfiguration(
-            config, self.export, Path("./data/test/year")
-        )
+        dw_conf = DataWriterConfiguration(config, self.export, Path("./data/test/year"))
 
         exporter = EntryYearDataMainExporter(dw_conf, self.user)
 
@@ -154,9 +150,7 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
             date_bookmarked=date, user=self.user, entry=entry
         )
 
-        dw_conf = DataWriterConfiguration(
-            config, self.export, Path("./data/test/year")
-        )
+        dw_conf = DataWriterConfiguration(config, self.export, Path("./data/test/year"))
 
         exporter = EntryYearDataMainExporter(dw_conf, user=None)
 

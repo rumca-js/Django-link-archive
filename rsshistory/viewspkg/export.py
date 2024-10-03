@@ -38,8 +38,15 @@ def data_export_add(request):
                 reverse("{}:data-exports".format(LinkDatabase.name))
             )
         else:
-            p.context["form"] = form
-            return p.render("form_basic.html")
+            error_message = "\n".join(
+                [
+                    "{}: {}".format(field, ", ".join(errors))
+                    for field, errors in form.errors.items()
+                ]
+            )
+
+            p.context["summary_text"] = "Form is invalid: {}".format(error_message)
+            return p.render("summary_present.html")
 
     form = DataExportForm()
     form.method = "POST"
@@ -618,5 +625,3 @@ def push_daily_data_form(request):
     p.context["form"] = form
 
     return p.render("form_basic.html")
-
-

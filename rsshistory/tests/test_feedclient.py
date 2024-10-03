@@ -3,7 +3,13 @@ from sqlalchemy import (
 )
 from pathlib import Path
 
-from ..webtools import RssPage, HtmlPage, YouTubeVideoHandler, FeedClient, UrlAgeModerator
+from ..webtools import (
+    RssPage,
+    HtmlPage,
+    YouTubeVideoHandler,
+    FeedClient,
+    UrlAgeModerator,
+)
 from utils.sqlmodel import SqlModel, EntriesTable, SourcesTable
 
 from ..pluginurl.urlhandler import UrlHandler
@@ -168,9 +174,7 @@ class FeedClientTest(FakeInternetTestCase):
 
         Session = db.get_session()
         with Session() as session:
-            number_of_source = (
-                session.query(SourcesTable).count()
-            )
+            number_of_source = session.query(SourcesTable).count()
             self.assertEqual(number_of_source, 0)
 
         self.teardown()

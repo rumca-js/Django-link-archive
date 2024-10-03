@@ -128,7 +128,8 @@ def edit(request, pk):
         form = BrowserEditForm(instance=browser)
 
         form.method = "POST"
-        form.action_url = reverse("{}:browser-edit".format(LinkDatabase.name), args=[pk])
+        form.action_url = reverse(
+            "{}:browser-edit".format(LinkDatabase.name), args=[pk]
+        )
         p.context["form"] = form
         return p.render("form_basic.html")
-

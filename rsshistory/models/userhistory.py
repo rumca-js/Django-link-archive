@@ -110,9 +110,7 @@ class UserSearchHistory(models.Model):
                 entry.delete()
 
     def delete_old_user_entries(user, search_query):
-        entries = UserSearchHistory.objects.filter(
-            search_query=search_query, user=user
-        )
+        entries = UserSearchHistory.objects.filter(search_query=search_query, user=user)
         if entries.exists():
             entries.delete()
 
@@ -156,8 +154,7 @@ class UserEntryTransitionHistory(models.Model):
         ordering = ["-counter"]
 
     def get_related_list(user, navigated_to_entry):
-        """
-        """
+        """ """
         result = []
 
         if not user.is_authenticated:
@@ -330,9 +327,7 @@ class UserEntryVisitHistory(models.Model):
         if not previous_entry:
             previous_entry = UserEntryVisitHistory.get_last_user_entry(user)
 
-        visits = UserEntryVisitHistory.objects.filter(
-            user=user, entry=entry
-        )
+        visits = UserEntryVisitHistory.objects.filter(user=user, entry=entry)
 
         if visits.count() == 0:
             visit = UserEntryVisitHistory.objects.create(
@@ -362,9 +357,7 @@ class UserEntryVisitHistory(models.Model):
         if last_entry != entry:
             return False
 
-        visits = UserEntryVisitHistory.objects.filter(
-            user=user, entry=entry
-        )
+        visits = UserEntryVisitHistory.objects.filter(user=user, entry=entry)
 
         if (
             visits.count() > 0
