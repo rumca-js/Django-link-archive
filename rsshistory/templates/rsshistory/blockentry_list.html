@@ -1,0 +1,24 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+   <a href="{% url 'rsshistory:block-lists-update' %}" title="Update block lists" class="btn btn-primary" role="button">
+       Update
+   </a>
+</div>
+
+<h1>Block entries, domains</h1>
+  {% if blockentries %}
+     <div class="list-group">
+         {% for blockentry in blockentries %}
+             {{ blockentry.url }},
+         {% endfor %}
+     </div>
+
+     {% include "rsshistory/pagination.html" %}
+  {% else %}
+    No URLs yet
+  {% endif %}
+
+{% endblock %} 

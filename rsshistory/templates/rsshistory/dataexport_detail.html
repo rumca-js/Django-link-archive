@@ -4,7 +4,7 @@
 
 {% if user.is_staff %}
 
-<a href="{% url 'rsshistory:data-export-edit' object.id %}" class="dropdown-item" title="Edit">
+<a href="{% url 'rsshistory:data-export-edit' object.id %}" class="btn btn-primary" title="Edit">
    <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
 </a>
 
@@ -22,7 +22,7 @@
    <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
 </a>
 
-<div class="dropdown">
+<span class="dropdown">
    <button class="btn btn-primary" type="button" id="#actionsDrop" data-bs-toggle="dropdown" aria-expanded="false">
      Actions
    </button>
@@ -32,7 +32,7 @@
            <a href="{% url 'rsshistory:data-export-job-add' object.id %}" title="Shows categories" class="dropdown-item">Add to job</a>
        </li>
    </ul>
-</div>
+</span>
 {% endif %}
 
 

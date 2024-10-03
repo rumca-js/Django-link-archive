@@ -654,8 +654,8 @@ class RssPage(ContentInterface):
 
         try:
             self.feed = FeedReader.parse(contents)
-            if not self.feed.entries or len(self.feed.entries) == 0:
-                WebLogger.error("Feed does not have any entries {}".format(self.url))
+            #if not self.feed.entries or len(self.feed.entries) == 0:
+            #    WebLogger.error("Feed does not have any entries {}".format(self.url))
 
             return self.feed
 

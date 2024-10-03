@@ -95,11 +95,7 @@ class SourceGenericPlugin(object):
 
                 continue
 
-            if source:
-                link_data["source_url"] = source.url
-                link_data["source"] = source
-                if source.age > 0:
-                    link_data["age"] = source.age
+            link_data = self.enhance_properties(link_data)
 
             if "page_rating" in link_data:
                 link_data["page_rating_contents"] = link_data["page_rating"]
@@ -114,6 +110,8 @@ class SourceGenericPlugin(object):
 
             # AppLogging.debug("Url:{} Title:{}. Generic plugin add:{} DONE".format(source.url, source.title, link_data["link"]))
 
+            # TODO should below be in data builder?
+
             if entry and entry.date_published > start_time:
                 if source.auto_tag:
                     user = Configuration.get_object().get_superuser()
@@ -125,6 +123,27 @@ class SourceGenericPlugin(object):
             # LinkDatabase.info("Generic plugin item stop:{}".format(link_data["link"]))
 
         return num_entries
+
+    def is_property_set(self, input_props, property):
+        return property in input_props and input_props[property]
+
+    def enhance_properties(self, properties):
+        source = self.get_source()
+
+        if source:
+            if (
+                self.is_property_set(properties, "language")
+                and source.language != None
+                and source.language != ""
+            ):
+                properties["language"] = source.language
+
+            properties["source_url"] = source.url
+            properties["source"] = source
+            if source.age > 0:
+                properties["age"] = source.age
+
+        return properties
 
     def is_page_ok_to_read(self):
         source = self.get_source()

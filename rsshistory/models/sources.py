@@ -163,6 +163,53 @@ class SourceDataModel(models.Model):
         self.subcategory = SourceSubCategories.ensure(self.category_name, self.subcategory_name)
         super().save(*args, **kwargs)
 
+    def get_export_names():
+        return [
+            "id",
+            "url",
+            "title",
+            "category_name",
+            "subcategory_name",
+            "export_to_cms",
+            "remove_after_days",
+            "language",
+            "age",
+            "favicon",
+            "enabled",
+            "fetch_period",
+            "source_type",
+            "proxy_location",
+        ]
+
+    def get_all_export_names():
+        """
+        Provides object export names with dependencies from other objects
+        """
+        names = set(BaseLinkDataController.get_export_names())
+        names.add("category__category_id")
+        names.add("subcategory__subcategory_id")
+        return list(names)
+
+    def get_query_names():
+        return [
+            "id",
+            "url",
+            "title",
+            "category__category_id",
+            "subcategory__subcategory_id",
+            "category_name",
+            "subcategory_name",
+            "export_to_cms",
+            "remove_after_days",
+            "language",
+            "age",
+            "favicon",
+            "enabled",
+            "fetch_period",
+            "source_type",
+            "proxy_location",
+        ]
+
 
 class SourceOperationalData(models.Model):
     date_fetched = models.DateTimeField(null=True)

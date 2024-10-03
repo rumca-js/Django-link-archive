@@ -850,8 +850,10 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_FROM_FILES = "import-from-files"
     JOB_EXPORT_DATA = "export-data"
     JOB_CLEANUP = "cleanup"
-    JOB_RUN_RULE = "run-rule"
     JOB_CHECK_DOMAINS = "check-domains"
+    JOB_RUN_RULE = "run-rule"
+    JOB_INITIALIZE = "initialize"
+    JOB_INITIALIZE_BLOCK_LIST = "initialize-block-list" # initializes one specific block list
 
     # fmt: off
     JOB_CHOICES = (
@@ -879,6 +881,8 @@ class BackgroundJob(models.Model):
         (JOB_EXPORT_DATA, JOB_EXPORT_DATA),
         (JOB_CLEANUP, JOB_CLEANUP),
         (JOB_CHECK_DOMAINS, JOB_CHECK_DOMAINS),
+        (JOB_INITIALIZE, JOB_INITIALIZE),
+        (JOB_INITIALIZE_BLOCK_LIST, JOB_INITIALIZE_BLOCK_LIST),
         (JOB_RUN_RULE, JOB_RUN_RULE),
     )
     # fmt: on

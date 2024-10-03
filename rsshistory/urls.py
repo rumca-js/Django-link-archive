@@ -26,6 +26,7 @@ from .viewspkg import (
     users,
     useractions,
     userhistory,
+    blockentry,
 )
 
 # register app namespace
@@ -248,6 +249,11 @@ urlpatterns = [
     path("gateways", tools.gateways, name="gateways",),
     path("search-engines", tools.search_engines, name="search-engines",),
     path("cleanup-link", tools.cleanup_link, name="cleanup-link",),
+    path("initialize-block-lists", blockentry.initialize_block_lists, name="initialize-block-lists",),
+    path("block-lists", blockentry.BlockEntryListListView.as_view(), name="block-lists",),
+    path("block-entries", blockentry.BlockEntryListView.as_view(), name="block-entries",),
+    path("block-lists-update", blockentry.block_lists_update, name="block-lists-update",),
+    path("block-list-remove/<int:pk>/", blockentry.block_list_remove, name="block-list-remove",),
     # other
     path("data-errors", custom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", custom.fix_entry_tags, name="fix-entry-tags",),

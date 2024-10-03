@@ -100,6 +100,3 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         reader = RssPage(self.get_address(), contents)
         return reader.get_contents_body_hash()
-
-    def is_property_set(self, input_props, property):
-        return property in input_props and input_props[property]

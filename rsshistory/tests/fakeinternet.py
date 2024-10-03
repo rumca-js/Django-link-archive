@@ -60,6 +60,11 @@ from .fake.thehill import (
 from .fake.reddit import (
     reddit_rss_text
 )
+from .fake.firebog import (
+    firebog_adguard_list,
+    firebog_w3kbl_list,
+    firebog_tick_lists,
+)
 from .fake.instance import (
     instance_entries_json,
     instance_sources_json_empty,
@@ -428,6 +433,15 @@ class TestResponseObject(PageResponseObject):
 
         elif url == "https://page-with-last-modified-header.com":
             return webpage_html_favicon
+
+        elif url == "https://v.firebog.net/hosts/AdguardDNS.txt":
+            return firebog_adguard_list
+
+        elif url == "https://v.firebog.net/hosts/static/w3kbl.txt":
+            return firebog_w3kbl_list
+
+        elif url == "https://v.firebog.net/hosts/lists.php?type=tick":
+            return firebog_tick_lists
 
         elif url == "https://robots-txt.com/robots.txt":
             return robots_txt_example_com_robots

@@ -10,6 +10,12 @@ class PageSystem(object):
     https://nextlinklabs.com/resources/insights/django-big-data-iteration
 
     paginator resides in django. We do not want to be dependent on django.
+
+    @note objects need to be fetched and sliced inside of iteration, because
+    otherwise queryset will fetch all of the data!
+
+    There is also other solution - to keep, and use IDs only
+    https://stackoverflow.com/questions/44206636/how-to-bulk-fetch-model-objects-from-database-handled-by-django-sqlalchemy
     """
 
     def __init__(self, no_entries, no_entries_per_page):

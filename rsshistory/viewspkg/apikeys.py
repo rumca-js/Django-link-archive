@@ -1,5 +1,6 @@
 from django.views import generic
 from django.urls import reverse
+from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.forms.models import model_to_dict

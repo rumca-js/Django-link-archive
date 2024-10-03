@@ -29,13 +29,16 @@ class EntryNoTimeDataMainExporter(MainExporter):
         super().__init__(data_writer_config)
 
     def export(self, export_file_name="permanents", export_path="default"):
-        all_entries = self.get_entries()
-
         page_system = PageSystem(
             all_entries.count(), self.get_number_of_entries_for_page()
         )
 
         for page in range(page_system.no_pages):
+            # we cannot reuse all_entries, as more and more data are fetched from it
+            # https://stackoverflow.com/questions/44206636/how-to-bulk-fetch-model-objects-from-database-handled-by-django-sqlalchemy
+            # we could try using in bulk
+            all_entries = self.get_entries()
+
             slice_limits = page_system.get_slice_limits(page)
             entries = all_entries[slice_limits[0] : slice_limits[1]]
 

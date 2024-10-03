@@ -23,33 +23,36 @@ from ..apps import LinkDatabase
 class BackgroundJobController(BackgroundJob):
     # fmt: off
     PRIORITY_JOB_CHOICES = [
-        (BackgroundJob.JOB_EXPORT_DATA, BackgroundJob.JOB_EXPORT_DATA), # 0
+        (BackgroundJob.JOB_INITIALIZE, BackgroundJob.JOB_INITIALIZE),
+        (BackgroundJob.JOB_INITIALIZE_BLOCK_LIST, BackgroundJob.JOB_INITIALIZE_BLOCK_LIST),
 
-        (BackgroundJob.JOB_WRITE_DAILY_DATA, BackgroundJob.JOB_WRITE_DAILY_DATA), # 1
-        (BackgroundJob.JOB_WRITE_TOPIC_DATA, BackgroundJob.JOB_WRITE_TOPIC_DATA), # 2
-        (BackgroundJob.JOB_WRITE_YEAR_DATA, BackgroundJob.JOB_WRITE_YEAR_DATA), # 3
-        (BackgroundJob.JOB_WRITE_NOTIME_DATA, BackgroundJob.JOB_WRITE_NOTIME_DATA), # 4
+        (BackgroundJob.JOB_EXPORT_DATA, BackgroundJob.JOB_EXPORT_DATA),
 
-        (BackgroundJob.JOB_IMPORT_DAILY_DATA, BackgroundJob.JOB_IMPORT_DAILY_DATA), # 5
-        (BackgroundJob.JOB_IMPORT_BOOKMARKS, BackgroundJob.JOB_IMPORT_BOOKMARKS), # 6
-        (BackgroundJob.JOB_IMPORT_SOURCES, BackgroundJob.JOB_IMPORT_SOURCES), # 7
-        (BackgroundJob.JOB_IMPORT_INSTANCE, BackgroundJob.JOB_IMPORT_INSTANCE), # 8
-        (BackgroundJob.JOB_IMPORT_FROM_FILES, BackgroundJob.JOB_IMPORT_FROM_FILES), # 9
+        (BackgroundJob.JOB_WRITE_DAILY_DATA, BackgroundJob.JOB_WRITE_DAILY_DATA),
+        (BackgroundJob.JOB_WRITE_TOPIC_DATA, BackgroundJob.JOB_WRITE_TOPIC_DATA),
+        (BackgroundJob.JOB_WRITE_YEAR_DATA, BackgroundJob.JOB_WRITE_YEAR_DATA),
+        (BackgroundJob.JOB_WRITE_NOTIME_DATA, BackgroundJob.JOB_WRITE_NOTIME_DATA),
+
+        (BackgroundJob.JOB_IMPORT_DAILY_DATA, BackgroundJob.JOB_IMPORT_DAILY_DATA),
+        (BackgroundJob.JOB_IMPORT_BOOKMARKS, BackgroundJob.JOB_IMPORT_BOOKMARKS),
+        (BackgroundJob.JOB_IMPORT_SOURCES, BackgroundJob.JOB_IMPORT_SOURCES),
+        (BackgroundJob.JOB_IMPORT_INSTANCE, BackgroundJob.JOB_IMPORT_INSTANCE),
+        (BackgroundJob.JOB_IMPORT_FROM_FILES, BackgroundJob.JOB_IMPORT_FROM_FILES),
 
         # Since cleanup, moving to archives can take forever, we still want to process
         # source in between
-        (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,), # 10
-        (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP), # 11
-        (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE), # 12
-        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,), # 13                         # adds link using default properties, may contain link map properties in the map
-        (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),           # update data, recalculate
+        (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,),
+        (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP),
+        (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE),
+        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),
+        (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),
         (BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, BackgroundJob.JOB_LINK_RESET_LOCAL_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
-        (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
+        (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),
         (BackgroundJob.JOB_LINK_SCAN, BackgroundJob.JOB_LINK_SCAN,),
-        (BackgroundJob.JOB_LINK_DOWNLOAD, BackgroundJob.JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
-        (BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC),     #
-        (BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO),     #
+        (BackgroundJob.JOB_LINK_DOWNLOAD, BackgroundJob.JOB_LINK_DOWNLOAD),
+        (BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC),
+        (BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO),
         (BackgroundJob.JOB_DOWNLOAD_FILE, BackgroundJob.JOB_DOWNLOAD_FILE,),
         (BackgroundJob.JOB_CHECK_DOMAINS, BackgroundJob.JOB_CHECK_DOMAINS),
         (BackgroundJob.JOB_RUN_RULE, BackgroundJob.JOB_RUN_RULE),
@@ -58,94 +61,6 @@ class BackgroundJobController(BackgroundJob):
 
     class Meta:
         proxy = True
-
-    def truncate():
-        BackgroundJob.objects.all().delete()
-
-    def on_error(self):
-        self.errors += 1
-
-        if self.errors > 5:
-            self.enabled = False
-
-            AppLogging.error(
-                "Job:{}. Disabling job due to errors {} {}".format(
-                    self.job, self.subject, self.args
-                )
-            )
-
-        # TODO Add notification
-
-        self.save()
-
-    def get_link(self):
-        if self.job == BackgroundJob.JOB_PROCESS_SOURCE:
-            source = self.get_text_to_source(self.subject)
-            if source:
-                return source.get_absolute_url()
-        elif self.job == BackgroundJob.JOB_LINK_UPDATE_DATA:
-            entry = self.get_text_to_entry(self.subject)
-            if entry:
-                return entry.get_absolute_url()
-        elif self.job == BackgroundJob.JOB_LINK_RESET_DATA:
-            entry = self.get_text_to_entry(self.subject)
-            if entry:
-                return entry.get_absolute_url()
-        elif self.job == BackgroundJob.JOB_LINK_RESET_LOCAL_DATA:
-            entry = self.get_text_to_entry(self.subject)
-            if entry:
-                return entry.get_absolute_url()
-        elif self.job == BackgroundJob.JOB_EXPORT_DATA:
-            id = self.subject
-            if id and id != "":
-                return reverse(
-                    "{}:data-export".format(LinkDatabase.name), args=[id]
-                )
-
-        if self.args and self.args != "":
-            p = DomainAwarePage(self.args)
-            if p.is_web_link():
-                return self.args
-
-            try:
-                cfg = json.loads(self.args)
-
-                if "entry_id" in cfg:
-                    entry = self.get_text_to_entry(cfg["entry_id"])
-                    if entry:
-                        return entry.get_absolute_url()
-                elif "source_id" in cfg:
-                    source = self.get_text_to_source(cfg["source_id"])
-                    if source:
-                        return source.get_absolute_url()
-            except Exception as E:
-                AppLogging.debug(E, "Error when loading JSON: {}".format(self.args))
-                return
-
-    def is_subject_link(self):
-        p = DomainAwarePage(self.subject)
-        if p.is_web_link():
-            return True
-
-    def get_text_to_source(self, text):
-        try:
-            source_id = int(text)
-        except Exception as e:
-            return
-
-        sources = SourceDataModel.objects.filter(id=source_id)
-        if sources.exists():
-            return sources[0]
-
-    def get_text_to_entry(self, text):
-        try:
-            entry_id = int(text)
-        except Exception as e:
-            return
-
-        entries = LinkDataModel.objects.filter(id=entry_id)
-        if entries.exists():
-            return entries[0]
 
     def enable(self):
         self.errors = 0
@@ -557,3 +472,92 @@ class BackgroundJobController(BackgroundJob):
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_RUN_RULE, str(rule.id)
         )
+
+    def truncate():
+        BackgroundJob.objects.all().delete()
+
+    def on_error(self):
+        self.errors += 1
+
+        if self.errors > 5:
+            self.enabled = False
+
+            AppLogging.error(
+                "Job:{}. Disabling job due to errors {} {}".format(
+                    self.job, self.subject, self.args
+                )
+            )
+
+        # TODO Add notification
+
+        self.save()
+
+    def get_link(self):
+        if self.job == BackgroundJob.JOB_PROCESS_SOURCE:
+            source = self.get_text_to_source(self.subject)
+            if source:
+                return source.get_absolute_url()
+        elif self.job == BackgroundJob.JOB_LINK_UPDATE_DATA:
+            entry = self.get_text_to_entry(self.subject)
+            if entry:
+                return entry.get_absolute_url()
+        elif self.job == BackgroundJob.JOB_LINK_RESET_DATA:
+            entry = self.get_text_to_entry(self.subject)
+            if entry:
+                return entry.get_absolute_url()
+        elif self.job == BackgroundJob.JOB_LINK_RESET_LOCAL_DATA:
+            entry = self.get_text_to_entry(self.subject)
+            if entry:
+                return entry.get_absolute_url()
+        elif self.job == BackgroundJob.JOB_EXPORT_DATA:
+            id = self.subject
+            if id and id != "":
+                return reverse(
+                    "{}:data-export".format(LinkDatabase.name), args=[id]
+                )
+
+        if self.args and self.args != "":
+            p = DomainAwarePage(self.args)
+            if p.is_web_link():
+                return self.args
+
+            try:
+                cfg = json.loads(self.args)
+
+                if "entry_id" in cfg:
+                    entry = self.get_text_to_entry(cfg["entry_id"])
+                    if entry:
+                        return entry.get_absolute_url()
+                elif "source_id" in cfg:
+                    source = self.get_text_to_source(cfg["source_id"])
+                    if source:
+                        return source.get_absolute_url()
+            except Exception as E:
+                AppLogging.debug(E, "Error when loading JSON: {}".format(self.args))
+                return
+
+    def is_subject_link(self):
+        p = DomainAwarePage(self.subject)
+        if p.is_web_link():
+            return True
+
+    def get_text_to_source(self, text):
+        try:
+            source_id = int(text)
+        except Exception as e:
+            return
+
+        sources = SourceDataModel.objects.filter(id=source_id)
+        if sources.exists():
+            return sources[0]
+
+    def get_text_to_entry(self, text):
+        try:
+            entry_id = int(text)
+        except Exception as e:
+            return
+
+        entries = LinkDataModel.objects.filter(id=entry_id)
+        if entries.exists():
+            return entries[0]
+

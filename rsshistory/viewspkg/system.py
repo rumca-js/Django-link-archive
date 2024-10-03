@@ -30,6 +30,8 @@ from ..models import (
     UserEntryVisitHistory,
     UserEntryTransitionHistory,
     KeyWords,
+    BlockEntry,
+    BlockEntryList,
     SystemOperation,
     DataExport,
     SourceExportHistory,
@@ -251,6 +253,8 @@ def system_status(request):
     p.context["LinkDataModel"] = LinkDataController.objects.count()
     p.context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
     p.context["KeyWords"] = KeyWords.objects.count()
+    p.context["BlockEntry"] = BlockEntry.objects.count()
+    p.context["BlockEntryList"] = BlockEntryList.objects.count()
 
     # u = EntriesUpdater()
     # entries = u.get_entries_to_update()
@@ -406,14 +410,6 @@ def wizard_setup(request):
     return p.render("wizard_setup.html")
 
 
-def init_sources(request):
-    if "noinitialize" not in request.GET:
-        path = Path("init_sources.json")
-        if path.exists():
-            i = JsonImporter(path)
-            i.import_all()
-
-
 def wizard_setup_news(request):
     """
     Displays form, or textarea of available links.
@@ -452,7 +448,7 @@ def wizard_setup_news(request):
 
     c.save()
 
-    init_sources(request)
+    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITALIZE)
 
     p.context["summary_text"] = "Set configuration for news"
 
@@ -497,7 +493,7 @@ def wizard_setup_gallery(request):
 
     c.save()
 
-    init_sources(request)
+    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITALIZE)
 
     p.context["summary_text"] = "Set configuration for gallery"
 
@@ -544,7 +540,7 @@ def wizard_setup_search_engine(request):
 
     c.save()
 
-    init_sources(request)
+    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITALIZE)
 
     p.context["summary_text"] = "Set configuration for search engine"
 

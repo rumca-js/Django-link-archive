@@ -1,0 +1,35 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+   <a href="{% url 'rsshistory:block-lists-update' %}" title="Update block lists" class="btn btn-primary" role="button">
+       Update
+   </a>
+</div>
+
+<h1>Block lists</h1>
+  {% if blocklists %}
+     <div>
+         {% for blocklist in blocklists %}
+             <div>
+                {% if not blocklists.processed %}
+                [NOT PROCESSED]
+                {% endif %}
+
+                {% include "rsshistory/icon_external.html" %}
+                <a href="{{blocklist.url}}">{{blocklist.url}}</a>
+
+                <a href="{% url 'rsshistory:block-list-remove' blocklist.id %}" title="Remove block list">
+                   {% include "rsshistory/icon_remove.html" %}
+                </a>
+             </div>
+         {% endfor %}
+
+         {% include "rsshistory/pagination.html" %}
+     </div>
+  {% else %}
+    No URLs yet
+  {% endif %}
+
+{% endblock %} 

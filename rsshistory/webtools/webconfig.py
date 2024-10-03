@@ -116,6 +116,7 @@ class WebConfig(object):
         std_preference_table.append(WebConfig.get_servercralwer(port, full_script))
         std_preference_table.append(WebConfig.get_scriptcralwer(full_script))
         std_preference_table.append(WebConfig.get_seleniumfull())
+        std_preference_table.append(WebConfig.get_seleniumundetected())
 
         mapping["standard"] = std_preference_table
 
@@ -130,6 +131,7 @@ class WebConfig(object):
         headless_preference_table.append(WebConfig.get_scriptcralwer(full_script))
         headless_preference_table.append(WebConfig.get_seleniumfull())
         headless_preference_table.append(WebConfig.get_requests())
+        headless_preference_table.append(WebConfig.get_seleniumundetected())
 
         mapping["headless"] = headless_preference_table
 
@@ -145,6 +147,7 @@ class WebConfig(object):
         full_preference_table.append(WebConfig.get_scriptcralwer(headless_script))
         full_preference_table.append(WebConfig.get_seleniumheadless())
         full_preference_table.append(WebConfig.get_requests())
+        full_preference_table.append(WebConfig.get_seleniumundetected())
 
         mapping["full"] = full_preference_table
 

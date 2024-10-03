@@ -185,46 +185,6 @@ class SourceDataController(SourceDataModel):
         else:
             return self.url
 
-    def get_export_names():
-        return [
-            "id",
-            "url",
-            "title",
-            "category__category_id",
-            "subcategory__subcategory_id",
-            "category_name",
-            "subcategory_name",
-            "export_to_cms",
-            "remove_after_days",
-            "language",
-            "age",
-            "favicon",
-            "enabled",
-            "fetch_period",
-            "source_type",
-            "proxy_location",
-        ]
-
-    def get_query_names():
-        return [
-            "id",
-            "url",
-            "title",
-            "category__category_id",
-            "subcategory__subcategory_id",
-            "category_name",
-            "subcategory_name",
-            "export_to_cms",
-            "remove_after_days",
-            "language",
-            "age",
-            "favicon",
-            "enabled",
-            "fetch_period",
-            "source_type",
-            "proxy_location",
-        ]
-
     def get_map(self):
         output_data = {}
 

@@ -44,6 +44,7 @@ from .models import (
     UserEntryVisitHistory,
     ModelFiles,
     SystemOperation,
+    BlockEntryList,
 )
 
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -62,6 +63,7 @@ from .controllers import (
 )
 from .configuration import Configuration
 from .pluginurl import UrlHandler
+from .serializers import JsonImporter
 
 
 class BaseJobHandler(object):
@@ -764,8 +766,6 @@ class ImportFromFilesJobHandler(BaseJobHandler):
             if users.count() > 0:
                 user = users[0]
 
-        from .serializers import JsonImporter
-
         JsonImporter(path=path, user=user)
 
         return True
@@ -1035,6 +1035,55 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
             )
 
 
+class InitializeJobHandler(BaseJobHandler):
+    """!
+    Pushes data to repo
+    """
+
+    def get_job():
+        return BackgroundJob.JOB_INITIALIZE
+
+    def process(self, obj=None):
+        # TODO read year from string
+        try:
+            path = Path("init_sources.json")
+            if path.exists():
+                i = JsonImporter(path)
+                i.import_all()
+
+            BlockEntryList.initialize()
+            return True
+        except Exception as E:
+            AppLogging.exc(
+                exception_object=E,
+            )
+
+
+class InitializeBlockListJobHandler(BaseJobHandler):
+    """!
+    Pushes data to repo
+    """
+
+    def get_job():
+        return BackgroundJob.JOB_INITIALIZE_BLOCK_LIST
+
+    def process(self, obj=None):
+        # TODO read year from string
+        try:
+            list = obj.subject
+
+            lists = BlockEntryList.objects.filter(url = list)
+
+            if lists.exists():
+                BlockEntryList.update_block_entries(lists[0])
+            return True
+
+        except Exception as E:
+            AppLogging.exc(
+                exception_object=E,
+            )
+
+
 class CleanupJobHandler(BaseJobHandler):
     """!
     Pushes data to repo
@@ -1064,6 +1113,7 @@ class CleanupJobHandler(BaseJobHandler):
                 SourceExportHistory.cleanup()
                 ModelFiles.cleanup()
                 SystemOperation.cleanup()
+                BlockEntryList.update()
 
                 self.user_tables_cleanup()
 
@@ -1304,6 +1354,8 @@ class GenericJobsProcessor(CeleryTaskInterface):
         """
         return [
             # fmt: off
+            InitializeJobHandler,
+            InitializeBlockListJobHandler,
             ExportDataJobHandler,
 
             WriteDailyDataJobHandler,
