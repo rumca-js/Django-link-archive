@@ -25,9 +25,17 @@
         {% load static %}
         <!--date is added to stylesheet name, to force it to be reloaded-->
         {% if is_mobile %}
-        <link rel="stylesheet" href="{% static 'rsshistory/css/styles-mobile.css' %}_{{user_config.display_style}}.css?{% now "U" %}">
+          {% if user_config.display_style %}
+             <link rel="stylesheet" href="{% static 'rsshistory/css/styles-mobile.css' %}_{{user_config.display_style}}.css?{% now "U" %}">
+          {% else %}
+             <link rel="stylesheet" href="{% static 'rsshistory/css/styles-mobile.css' %}_style-light.css?{% now "U" %}">
+          {% endif %}
         {% else %}
-        <link rel="stylesheet" href="{% static 'rsshistory/css/styles.css' %}_{{user_config.display_style}}.css?{% now "U" %}">
+          {% if user_config.display_style %}
+             <link rel="stylesheet" href="{% static 'rsshistory/css/styles.css' %}_{{user_config.display_style}}.css?{% now "U" %}">
+          {% else %}
+             <link rel="stylesheet" href="{% static 'rsshistory/css/styles.css' %}_style-light.css?{% now "U" %}">
+          {% endif %}
         {% endif %}
 
 	<!-- Third party things below -->

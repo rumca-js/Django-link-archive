@@ -124,6 +124,9 @@ def disable(request, pk):
     ob.enabled = False
     ob.save()
 
+    jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_EXPORT_DATA, subject = str(pk))
+    jobs.delete()
+
     return redirect("{}:data-exports".format(LinkDatabase.name))
 
 

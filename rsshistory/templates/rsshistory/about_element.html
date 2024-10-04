@@ -1,57 +1,75 @@
   {% load static %}
 
-  {% if config.instance_title %}
-  <h1>{{config.instance_title}} [{{app_name}}]</h1>
-  {% else %}
-  <h1>Personal Link Database [{{app_name}}]</h1>
-  {% endif %}
+  <h1>
+      {% if config.instance_title %}
+      {{config.instance_title}} [{{app_name}}]
+      {% else %}
+      Personal Link Database [{{app_name}}]
+      {% endif %}
+  </h1>
 
-  {% if config.instance_description %}
-  <p>{{config.instance_description}}
-  </p>
-  {% else %}
-  <p>This is a Personal Link Database.</p>
-  {% endif %}
+  <div>
+      {% if config.instance_description %}
+      {{config.instance_description}}
+      {% else %}
+      This is a Personal Link Database.
+      {% endif %}
+  </div>
+
+  <div>
+      Version: {{app_version}}
+  </div>
 
   {% if not is_user_allowed %}
-  <p class="font-weight-bold">
-  You do not have permissions to access this site. Contact administrator.
-  </p>
+  <div class="font-weight-bold text-danger">
+      You do not have permissions to access this site. Contact administrator.
+  </div>
   {% endif %}
+
+  <!-- public info -->
 
   {% if public_exports %}
   <div>
-    You can access exported data in the following locations:
-    <ul>
-  {% for public_export in public_exports %}
-     <li><a href="{{public_export}}">{{public_export}}</a></li>
-  {% endfor %}
-    </ul>
+      You can access exported data in the following locations:
+      <ul>
+          {% for public_export in public_exports %}
+          <li><a href="{{public_export}}">{{public_export}}</a></li>
+          {% endfor %}
+      </ul>
   </div>
   {% endif %}
+
+  <!-- logged users info -->
 
   {% if is_user_allowed %}
   <div>
     Notes:
     <ul>
-        <li>Do you know that this app can be used as search engine? Example for <a href="https://support.mozilla.org/en-US/kb/add-or-remove-search-engine-firefox">
-            {% include "rsshistory/icon_external.html" %}
-            Firefox</a>
+       <li>Be concious when using Internet, it is full of malware, bad actors</li>
+    </ul>
+  </div>
+
+  <div>
+    Features:
+    <ul>
+       <li>Display styles: news, gallery, search engine. Each has it's own unique spin, features. Gallery view can be used to provide YouTube-like experience.</li>
+       <li>Sources - add some RSS feeds to know what is happening on the Internet</li>
+       <li>Browser support - support for automated mechanisms like selenium, chrome-undetected, stealth-requests, etc</li>
+       <li>Block lists. These use DNS filter files, just as pie hole does. This allows to protect you from malware and ads</li>
+       <li>Entry rules. Admins can decide additional rules to be applied to block sites</li>
+       <li>Exports. These can serve as a backup for your project</li>
+       <li>Do you know that this app can be used as a search engine? Example for <a href="https://support.mozilla.org/en-US/kb/add-or-remove-search-engine-firefox">
+           {% include "rsshistory/icon_external.html" %}
+           Firefox</a>
        </li>
-        <li>This project does not include any protection agains malware or viruses, Internet is a dangerous space</li>
+       <li>Supports many users, where bookmarks are both global, and personal. Global is sum of all personal bookmarks.</li>
+       <li>Voting mechanisms. You can mark how important a link is assigning it a numeric value</li>
+       <li>Tagging mechanisms - you can tag links</li>
+       <li>Comments, obviously</li>
+       <li>Keywords. Words for all links are captured to estabilish which words are currently popular.</li>
     </ul>
   </div>
   {% endif %}
-
-  <div>
-      Project at github:
-      <ul>
-          <li>
-               <a href="https://github.com/rumca-js/Django-link-archive">
-                  {% include "rsshistory/icon_external.html" %}
-               https://github.com/rumca-js/Django-link-archive</a></li>
-      </ul>
-  </div>
 
   <!-- 
   _______   ______     ______     _______  __       _______     __       _______.    ___________    ____  __   __      

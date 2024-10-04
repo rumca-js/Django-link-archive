@@ -22,23 +22,14 @@ class BlockListReader(object):
             if not line:
                 continue
 
-            forbidden_starts = [
-                "#",
-                ":",
-                ";",
-                "!",
-            ]
-
-            found_forbidden = False
-            for forbidden_start in forbidden_starts:
-                if line.startswith(forbidden_start):
-                    found_forbidden = True
-                    break
-
-            if found_forbidden:
+            if not self.is_line_valid(line):
                 continue
 
             domain = None
+
+            line = self.strip_comments(line)
+
+            # read various lines
 
             if line.startswith("||"):
                 domain = self.read_custom_line(line)
@@ -49,6 +40,43 @@ class BlockListReader(object):
 
             if domain and domain != "":
                 yield domain
+
+    def is_line_valid(self, line):
+        line = line.strip()
+
+        if not line:
+            return False
+        if line is None:
+            return False
+        if line == "":
+            return False
+
+        # skip comments
+        forbidden_starts = [
+            "#",
+            ":",
+            ";",
+            "!",
+        ]
+
+        found_forbidden = False
+        for forbidden_start in forbidden_starts:
+            if line.startswith(forbidden_start):
+                found_forbidden = True
+                break
+
+        if found_forbidden:
+            return False
+
+        return True
+
+    def strip_comments(self, line):
+        # example 'adsunflower.com #Android Trojan - Malware'
+        wh = line.find("#")
+        if wh >= 0:
+            return line[:wh].strip()
+
+        return line
 
     def read_custom_line(self, line):
         return line[2:-1]

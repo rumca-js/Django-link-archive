@@ -1,29 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  {% block title %}<title>{{ page_title }}</title>{% endblock %}
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Add additional CSS in static file -->
-  {% load static %}
-  <!--date is added to stylesheet name, to force it to be reloaded-->
-  {% if is_mobile %}
-  <link rel="stylesheet" href="{% static 'rsshistory/css/styles-mobile.css' %}?{% now "U" %}">
-  {% else %}
-  <link rel="stylesheet" href="{% static 'rsshistory/css/styles.css' %}?{% now "U" %}">
-  {% endif %}
-  <link rel="stylesheet" href="{% static 'rsshistory/css/bootstrap5.1.3.min.css' %}">
-  <link rel="shortcut icon" type="image/png" href="{% static 'rsshistory/icons/rss.gif' %}"/>
-</head>
-<body>
-	<!-- templates/registration/login.htmlx -->
-	<h2>Log In</h2>
-	
-	<form method="post" action="?next=/{{ request.resolver_match.app_name }}">
-	  {% csrf_token %}
-	  {{ form.as_p }}
-	  <button type="submit">Log In</button>
-	</form> 
-	
-	Register by making e-mail request on <a href="mailto:{{admin_email}}">{{admin_email}}</a>
-</body>
+{% extends 'rsshistory/base_generic.html' %}
+{% load static %}
+{% block content %}
+
+<h2>Log In</h2>
+
+<form method="post" action="?next=/{{ request.resolver_match.app_name }}">
+    {% csrf_token %}
+    {% for field in form %}
+       <div class="form-group">
+           <label for="{{field.id_for_label}}" class="col-sm-1 col-form-label">{{field.label}}</label> 
+           {{field }}
+       </div>
+       {% if field.help_text %}
+       <small id="{{field.id_for_label}}_help" class="form-text text-muted">
+           {{field.help_text | safe }}
+       </small>
+       {% endif %}
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Login</button>
+</form> 
+
+{% if form.errors.items %}
+<ul>
+  {% for field, errors in form.errors.items %}
+    {% for error in errors %}
+      <li>{{ field|title }}: {{ error }}</li>
+    {% endfor %}
+  {% endfor %}
+</ul>
+{% endif %} 
+
+Register by making e-mail request.
+
+{% endblock %}

@@ -6,6 +6,9 @@
    <a href="{% url 'rsshistory:block-lists-update' %}" title="Update block lists" class="btn btn-primary" role="button">
        Update
    </a>
+   <a href="{% url 'rsshistory:block-entries' %}" title="View block entries" class="btn btn-primary" role="button">
+       Block entries
+   </a>
 </div>
 
 <h1>Block lists</h1>
@@ -13,7 +16,7 @@
      <div>
          {% for blocklist in blocklists %}
              <div>
-                {% if not blocklists.processed %}
+                {% if not blocklist.processed %}
                 [NOT PROCESSED]
                 {% endif %}
 

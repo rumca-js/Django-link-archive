@@ -20,7 +20,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.88.2"
+__version__ = "0.88.3"
 
 
 class Configuration(object):
@@ -211,8 +211,8 @@ class Configuration(object):
         return result
 
     def refresh(self, thread_id):
-        if thread_id == 0:
-            if self.is_it_time_to_ping:
+        if thread_id == 'RefreshProcessor':
+            if self.is_it_time_to_ping():
                 if self.ping_internet(thread_id):
                     SystemOperation.add_by_thread(
                         thread_id, internet_status_checked=True, internet_status_ok=True

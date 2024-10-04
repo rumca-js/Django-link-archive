@@ -42,21 +42,6 @@ class BlockListReaderTest(FakeInternetTestCase):
     def test_read__hosts_file(self):
         contents = """
 # AdAway default blocklist
-# Blocking mobile ad providers and some analytics providers
-#
-# Project home page:
-# https://github.com/AdAway/adaway.github.io/
-#
-# Fetch the latest version of this file:
-# https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt
-#
-# License:
-# CC Attribution 3.0 (http://creativecommons.org/licenses/by/3.0/)
-#
-# Contributions by:
-# Kicelo, Dominik Schuermann.
-# Further changes and contributors maintained in the commit history at
-# https://github.com/AdAway/adaway.github.io/commits/master
 #
 # Contribute:
 # Create an issue at https://github.com/AdAway/adaway.github.io/issues
@@ -68,6 +53,27 @@ class BlockListReaderTest(FakeInternetTestCase):
 # [163.com]
 127.0.0.1 analytics.163.com
 127.0.0.1 crash.163.com
+127.0.0.1 iad.g.163.com
+"""
+        reader = BlockListReader(contents)
+
+        items = list(reader.read())
+        self.assertEqual(len(items), 4)
+
+    def test_read__hosts_file__with_comments(self):
+        contents = """
+# AdAway default blocklist
+#
+# Contribute:
+# Create an issue at https://github.com/AdAway/adaway.github.io/issues
+#
+
+127.0.0.1  localhost
+::1  localhost
+
+# [163.com]
+127.0.0.1 analytics.163.com
+127.0.0.1 crash.163.com  # this is a comment
 127.0.0.1 iad.g.163.com
 """
         reader = BlockListReader(contents)

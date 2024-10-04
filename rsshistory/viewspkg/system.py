@@ -410,6 +410,12 @@ def init_sources(request):
             i.import_all()
 
 
+def get_sources_text():
+    sources_link = reverse("{}:sources".format(LinkDatabase.name))
+    link_string = """<a href="{}" class="btn btn-secondary">Sources</a>""".format(sources_link)
+    return "You can navigate to sources to enable some of them: {}".format(link_string)
+
+
 def wizard_setup(request):
     p = ViewPage(request)
     p.set_title("Select setup")
@@ -460,9 +466,8 @@ def wizard_setup_news(request):
 
     init_sources(request)
 
-    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
-
-    p.context["summary_text"] = "Set configuration for news"
+    p.context["summary_text"] = "Set configuration for news."
+    p.context["summary_text"] += get_sources_text()
 
     return p.render("summary_present.html")
 
@@ -507,9 +512,8 @@ def wizard_setup_gallery(request):
 
     init_sources(request)
 
-    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
-
     p.context["summary_text"] = "Set configuration for gallery"
+    p.context["summary_text"] += get_sources_text()
 
     return p.render("summary_present.html")
 
@@ -556,9 +560,11 @@ def wizard_setup_search_engine(request):
 
     init_sources(request)
 
+    # we want blocklist to be enabled for search engine
     BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
 
     p.context["summary_text"] = "Set configuration for search engine"
+    p.context["summary_text"] += get_sources_text()
 
     return p.render("summary_present.html")
 

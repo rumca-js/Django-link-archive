@@ -30,10 +30,10 @@ class EntryNoTimeDataMainExporter(MainExporter):
 
     def export(self, export_file_name="permanents", export_path="default"):
         # we could try using in bulk
-        all_entries = self.get_entries()
+        number_of_all_entries = self.get_entries().count()
 
         page_system = PageSystem(
-            all_entries.count(), self.get_number_of_entries_for_page()
+            number_of_all_entries, self.get_number_of_entries_for_page()
         )
 
         for page in range(page_system.no_pages):
@@ -47,7 +47,7 @@ class EntryNoTimeDataMainExporter(MainExporter):
             e = EntryNoTimeDataExporter(self.data_writer_config, entries)
             e.export_entries(
                 export_file_name="permanent",
-                export_path=self.get_page_dir(export_path, page),
+                export_path=self.get_page_dir(export_path, number_of_all_entries, page),
             )
 
     def get_order_columns(self):
@@ -60,8 +60,16 @@ class EntryNoTimeDataMainExporter(MainExporter):
             "link",
         ]
 
-    def get_page_dir(self, export_path, page):
-        return export_path / Path("permanent") / "{page:05d}".format(page=page)
+    def get_page_dir(self, export_path, number_of_all_entries, page):
+        number_of_all_entries_str = str(number_of_all_entries_str)
+        char_len = len(number_of_all_entries_str)
+
+        if char_len > 5:
+            page_dir = str(page).zfill(char_len)
+        else:
+            page_dir = "{page:05d}".format(page=page)
+
+        return export_path / Path("permanent") / page_dir
 
     def get_number_of_entries_for_page(self):
         return 1000

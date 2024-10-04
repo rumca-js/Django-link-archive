@@ -49,7 +49,27 @@
 <div>Absolute local path: {{absolute_local_path}}</div>
 <div>Export type: {{object.export_type}}</div>
 <div>Export data: {{object.export_data}}</div>
+<div>User: {{object.user}}. User used for repository access</div>
+<div>DB user: {{object.db_user}}. User used to filter entries</div>
+<div>Export time: {{object.export_time}}</div>
 <div>ID: {{object.id}}</div>
+
+<div>Export entries: {{object.export_entries}}</div>
+<div>Export bookmarks: {{object.export_entries_bookmarks}}</div>
+<div>Export permanent: {{object.export_entries_permanent}}</div>
+<div>Export sources: {{object.export_sources}}</div>
+<div>Export keywords: {{object.export_keywords}}</div>
+
+<div>Format JSON: {{object.format_json}}</div>
+<div>Format markdown: {{object.format_md}}</div>
+<div>Format RSS: {{object.format_rss}}</div>
+<div>Format HTML: {{object.format_html}}</div>
+
+<div>Format sources opml: {{object.format_sources_opml}}</div>
+
+<div>Output zip: {{object.output_zip}}</div>
+<div>Output sqlite: {{object.output_sqlite}}</div>
+
 </p>
 
 {% endblock %}

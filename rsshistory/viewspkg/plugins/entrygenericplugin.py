@@ -642,7 +642,13 @@ class EntryGenericPlugin(object):
         parameters.append(EntryParameter("Update date", update_date))
 
         modified_date = c.get_local_time(self.entry.date_last_modified)
-        parameters.append(EntryParameter("Modified date", modified_date))
+        if modified_date:
+            parameters.append(EntryParameter("Modified date", modified_date))
+
+        if self.entry.artist:
+            parameters.append(EntryParameter("Artist", self.entry.artist))
+        if self.entry.album:
+            parameters.append(EntryParameter("Album", self.entry.album))
 
         parameters.append(EntryParameter("Status code", self.entry.status_code))
 
