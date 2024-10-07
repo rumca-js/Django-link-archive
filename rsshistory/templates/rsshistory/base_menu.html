@@ -22,17 +22,17 @@
                </a>
                <ul class="dropdown-menu">
                    <li>
-                       <a href="{% url 'rsshistory:search-engines' %}" class="dropdown-item" href="#" title="Shows search engines">
+                       <a href="{% url 'rsshistory:search-engines' %}" class="dropdown-item" title="Shows search engines">
                            <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
                            Search engines</a>
                    </li>
                    <li>
-                       <a href="{% url 'rsshistory:gateways' %}" class="dropdown-item" href="#" title="Shows popular places">
+                       <a href="{% url 'rsshistory:gateways' %}" class="dropdown-item" title="Shows popular places">
                            <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
                            Gateways</a>
                    </li>
                    <li>
-                       <a href="{% url 'rsshistory:entries-recent' %}" class="dropdown-item" href="#" title="Shows new entries">
+                       <a href="{% url 'rsshistory:entries-recent' %}" class="dropdown-item" title="Shows new entries">
                            <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
                            What's new</a>
                    </li>
@@ -45,31 +45,31 @@
                </a>
                <ul class="dropdown-menu">
                    <li>
-                       <a href="{% url 'rsshistory:entries-bookmarked' %}" class="dropdown-item" href="#" title="Shows bookmarked links. By default shows all users bookmarks.">
+                       <a href="{% url 'rsshistory:entries-bookmarked' %}" class="dropdown-item" title="Shows bookmarked links. By default shows all users bookmarks.">
                            <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
                            Bookmarks</a>
                    </li>
                    <li>
-                       <a href="{% url 'rsshistory:tags-show-all' %}" class="dropdown-item" href="#" title="Tags. By default shows all users tags">
+                       <a href="{% url 'rsshistory:tags-show-all' %}" class="dropdown-item" title="Tags. By default shows all users tags">
                            <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
                            Tags</a>
                    </li>
                    {% if config.enable_domain_support %}
                    <li>
-                       <a href="{% url 'rsshistory:domains' %}" class="dropdown-item" href="#" title="Captured domains">
+                       <a href="{% url 'rsshistory:domains' %}" class="dropdown-item" title="Captured domains">
                            <img src="{% static 'rsshistory/icons/icons8-www-64.png' %}" class="mainbutton-icon" />
                            Domains</a>
                    </li>
                    {% endif %}
                    <li>
                        {% if config.enable_keyword_support %}
-                       <a href="{% url 'rsshistory:keywords' %}" class="dropdown-item" href="#" title="Shows keywords used by links">
+                       <a href="{% url 'rsshistory:keywords' %}" class="dropdown-item" title="Shows keywords used by links">
                            <img src="{% static 'rsshistory/icons/icons8-letters-96.png' %}" class="mainbutton-icon" />
                            Keywords</a>
                        {% endif %}
                    </li>
                    <li>
-                       <a href="{% url 'rsshistory:sources' %}" class="dropdown-item" href="#" title="Sources">
+                       <a href="{% url 'rsshistory:sources' %}" class="dropdown-item" title="Sources">
                            <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
                            Sources</a>
                    </li>
@@ -84,22 +84,22 @@
                <ul class="dropdown-menu">
                    {% if is_read_later %}
                    <li class="nav-item">
-                       <a href="{% url 'rsshistory:read-later-entries' %}" class="dropdown-item" href="#" title="Shows entries marked as later to read">
+                       <a href="{% url 'rsshistory:read-later-entries' %}" class="dropdown-item" title="Shows entries marked as later to read">
                            <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
                            Read later</a>
                    </li>
                    {% endif %}
                    <li>
-                       <a href="{% url 'rsshistory:user-entries-bookmarked' %}" class="dropdown-item" href="#" title="Shows bookmarked links. By default shows all users bookmarks.">
+                       <a href="{% url 'rsshistory:user-entries-bookmarked' %}" class="dropdown-item" title="Shows bookmarked links. By default shows all users bookmarks.">
                            <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
                            Bookmarks</a>
                    </li>
                    <li>
-                       <a href="{% url 'rsshistory:user-tags-show' %}" class="dropdown-item" href="#" title="Tags. By default shows all users tags">
+                       <a href="{% url 'rsshistory:user-tags-show' %}" class="dropdown-item" title="Tags. By default shows all users tags">
                            <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
                            Tags</a>
                    </li>
-                   <!--li><a class="dropdown-item" href="#" title="Allows to define source folders like 'music', 'movies'">Folders</a></li-->
+                   <!--li><a class="dropdown-item" title="Allows to define source folders like 'music', 'movies'">Folders</a></li-->
                </ul>
            </li>
           {% endif %}
@@ -199,7 +199,7 @@
                   </li>
 
                   <li class="nav-item">
-                      <a href="{% url 'rsshistory:logout' %}" class="btn btn-primary">
+                      <a href="{% url 'rsshistory:logout' %}?next={% url 'rsshistory:index' %}" class="btn btn-primary">
                           <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
                           Logout
                       </a>

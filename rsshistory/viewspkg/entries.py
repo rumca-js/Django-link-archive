@@ -152,6 +152,7 @@ class EntriesSearchListView(generic.ListView):
 
         context["search_engines"] = SearchEngines(search_term)
         context["query"] = self.query
+        context["form_submit_button_name"] = "Search"
 
         search_term = self.get_search_link(search_term)
 
@@ -1093,6 +1094,20 @@ def entry_show_dislikes(request, pk):
     return p.render("summary_present.html")
 
 
+def get_generic_search_init_context(request, form, user_choices):
+    context = {}
+    context["form"] = form
+
+    search_term = get_search_term_request(request)
+    context["search_term"] = search_term
+    context["search_engines"] = SearchEngines(search_term)
+    context["search_history"] = user_choices
+    context["view_link"] = form.action_url
+    context["form_submit_button_name"] = "Search"
+
+    return context
+
+
 def entries_search_init(request):
     p = ViewPage(request)
     p.set_title("Search entries")
@@ -1109,14 +1124,9 @@ def entries_search_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
 
-    p.context["form"] = filter_form
+    context = get_generic_search_init_context(request, filter_form, user_choices)
 
-    search_term = get_search_term_request(request)
-    p.context["search_term"] = search_term
-    p.context["search_engines"] = SearchEngines(search_term)
-    p.context["search_history"] = user_choices
-    p.context["view_link"] = filter_form.action_url
-    p.context["form_submit_button"] = "Search"
+    p.context.update(context)
 
     return p.render("form_search_init.html")
 
@@ -1137,16 +1147,8 @@ def entries_omni_search_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
-    p.context["form"] = filter_form
-
-    search_term = get_search_term_request(request)
-    p.context["search_term"] = search_term
-    p.context["entry_query_names"] = LinkDataController.get_query_names()
-    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
-    p.context["search_engines"] = SearchEngines(search_term)
-    p.context["search_history"] = user_choices
-    p.context["view_link"] = filter_form.action_url
-    p.context["form_submit_button"] = "Search"
+    context = get_generic_search_init_context(request, filter_form, user_choices)
+    p.context.update(context)
 
     return p.render("form_search_init.html")
 
@@ -1167,16 +1169,8 @@ def entries_bookmarked_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
-    p.context["form"] = filter_form
-
-    search_term = get_search_term_request(request)
-    p.context["search_term"] = search_term
-    p.context["entry_query_names"] = LinkDataController.get_query_names()
-    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
-    p.context["search_engines"] = SearchEngines(search_term)
-    p.context["search_history"] = user_choices
-    p.context["view_link"] = filter_form.action_url
-    p.context["form_submit_button"] = "Search"
+    context = get_generic_search_init_context(request, filter_form, user_choices)
+    p.context.update(context)
 
     return p.render("form_search_init.html")
 
@@ -1199,16 +1193,8 @@ def user_entries_bookmarked_init(request):
         "{}:user-entries-bookmarked".format(LinkDatabase.name)
     )
 
-    p.context["form"] = filter_form
-
-    search_term = get_search_term_request(request)
-    p.context["search_term"] = search_term
-    p.context["entry_query_names"] = LinkDataController.get_query_names()
-    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
-    p.context["search_engines"] = SearchEngines(search_term)
-    p.context["search_history"] = user_choices
-    p.context["view_link"] = filter_form.action_url
-    p.context["form_submit_button"] = "Search"
+    context = get_generic_search_init_context(request, filter_form, user_choices)
+    p.context.update(context)
 
     return p.render("form_search_init.html")
 
@@ -1229,15 +1215,8 @@ def entries_recent_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))
 
-    p.context["form"] = filter_form
-
-    search_term = get_search_term_request(request)
-    p.context["search_term"] = search_term
-    p.context["entry_query_names"] = LinkDataController.get_query_names()
-    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
-    p.context["search_engines"] = SearchEngines(search_term)
-    p.context["search_history"] = user_choices
-    p.context["form_submit_button"] = "Search"
+    context = get_generic_search_init_context(request, filter_form, user_choices)
+    p.context.update(context)
 
     return p.render("form_search_init.html")
 
@@ -1258,15 +1237,8 @@ def entries_archived_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-archived".format(LinkDatabase.name))
 
-    search_term = get_search_term_request(request)
-
-    p.context["form"] = filter_form
-    p.context["search_term"] = search_term
-    p.context["entry_query_names"] = LinkDataController.get_query_names()
-    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
-    p.context["search_engines"] = SearchEngines(search_term)
-    p.context["search_history"] = user_choices
-    p.context["form_submit_button"] = "Search"
+    context = get_generic_search_init_context(request, filter_form, user_choices)
+    p.context.update(context)
 
     return p.render("form_search_init.html")
 

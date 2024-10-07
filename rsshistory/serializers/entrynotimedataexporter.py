@@ -61,7 +61,7 @@ class EntryNoTimeDataMainExporter(MainExporter):
         ]
 
     def get_page_dir(self, export_path, number_of_all_entries, page):
-        number_of_all_entries_str = str(number_of_all_entries_str)
+        number_of_all_entries_str = str(number_of_all_entries)
         char_len = len(number_of_all_entries_str)
 
         if char_len > 5:

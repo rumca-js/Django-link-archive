@@ -3,16 +3,5 @@
 {% block content %}
 
 <div style="margin-top: 20vh;">
- 
-   <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchSyntaxCollapse" role="button" aria-expanded="false" aria-controls="searchSyntaxCollapse">
-     Search syntax
-   </a>
-
    {% include "rsshistory/form_filter_oneliner_element.html" %} 
-
-   <div class="collapse" id="searchSyntaxCollapse">
-       {% include "rsshistory/form_search_syntax_element.html" %} 
-   </div> 
-
-
 {% endblock %}

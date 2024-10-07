@@ -7,96 +7,97 @@
 
 <h1>Status</h1>
 
-<ul>
-    <li>Version: {{app_version}}</li>
-    <li>Current time: {{DateTime_Current}}</li>
+<ul class="list-group">
+    <li class="list-group-item">Version: {{app_version}}</li>
 
-    <li>Last internet connection check: {{last_internet_check}}</li>
-    <li>Last internet connection status: {{last_internet_status}}</li>
-
-    {% for thread_info in c.get_thread_info %}
-    <li>Thread: {{thread_info.0}} {{thread_info.1}}</li>
-    {% endfor %}
-
-    {% if days_to_move_to_archive %}
-      <li>Move to archive date: {{days_to_move_to_archive}}</li>
-    {%endif%}
-    {% if days_to_remove_links %}
-      <li>Remove entries by date: {{days_to_remove_links}}</li>
-    {%endif%}
-    {% if days_to_check_std_entries %}
-      <li>Normal entries are checked if older than: {{days_to_check_std_entries}}</li>
-    {%endif%}
-    {% if days_to_check_stale_entries %}
-      <li>Dead entries are checked if older than: {{days_to_check_stale_entries}}</li>
-    {%endif%}
-    {% if days_to_remove_stale_entries %}
-      <li>Remove dead links before date: {{days_to_remove_stale_entries}}</li>
-    {%endif%}
+    <li class="list-group-item">Last internet connection check: {{last_internet_check}}</li>
+    <li class="list-group-item">Last internet connection status: {{last_internet_status}}</li>
 </ul>
 
 <h1>Number of rows</h1>
-<ul>
-    <li>ConfigurationEntry: {{ConfigurationEntry}}</li>
-    <li>UserConfig: {{UserConfig}}</li>
-    <li>SystemOperation: {{SystemOperation}}</li>
 
-    <li>SourceDataModel: {{SourceDataModel}}</li>
-    <li>LinkDataModel: {{LinkDataModel}}</li>
+<ul class="list-group">
+    <li class="list-group-item">ConfigurationEntry: {{ConfigurationEntry}}</li>
+    <li class="list-group-item">UserConfig: {{UserConfig}}</li>
+    <li class="list-group-item">SystemOperation: {{SystemOperation}}</li>
+
+    <li class="list-group-item">SourceDataModel: {{SourceDataModel}}</li>
+    <li class="list-group-item">LinkDataModel: {{LinkDataModel}}</li>
     {% if LinkDataModel_toupdate %}
-    <li>LinkDataModel to update: {{LinkDataModel_toupdate}}</li>
+    <li class="list-group-item">LinkDataModel to update: {{LinkDataModel_toupdate}}</li>
     {% endif %}
-    <li>ArchiveLinkDataModel: {{ArchiveLinkDataModel}}</li>
-    <li>Keywords: {{KeyWords}}</li>
-    <li>BlockEntry: {{BlockEntry}}</li>
-    <li>BlockEntryList: {{BlockEntryList}}</li>
+    <li class="list-group-item">ArchiveLinkDataModel: {{ArchiveLinkDataModel}}</li>
+    <li class="list-group-item">Keywords: {{KeyWords}}</li>
+    <li class="list-group-item">BlockEntry: {{BlockEntry}}</li>
+    <li class="list-group-item">BlockEntryList: {{BlockEntryList}}</li>
 
-    <li>UserTags: {{UserTags}}</li>
-    <li>UserCompactedTags: {{UserCompactedTags}}</li>
-    <li>CompactedTags: {{CompactedTags}}</li>
-    <li>UserVotes: {{UserVotes}}</li>
-    <li>UserBookmarks: {{UserBookmarks}}</li>
-    <li>UserComments: {{UserComments}}</li>
-    <li>UserSearchHistory: {{UserSearchHistory}}</li>
-    <li>UserEntryVisitHistory: {{UserEntryVisitHistory}}</li>
-    <li>UserEntryTransitionHistory: {{UserEntryTransitionHistory}}</li>
-    <li>ModelFiles: {{ModelFiles}}
-        <div>
-        <a href="{% url 'rsshistory:model-files' %}" title="View background jobs" class="btn btn-secondary btn-sm" role="button">View</a>
-        </div>
-    </li>
+    <li class="list-group-item">UserTags: {{UserTags}}</li>
+    <li class="list-group-item">UserCompactedTags: {{UserCompactedTags}}</li>
+    <li class="list-group-item">CompactedTags: {{CompactedTags}}</li>
+    <li class="list-group-item">UserVotes: {{UserVotes}}</li>
+    <li class="list-group-item">UserBookmarks: {{UserBookmarks}}</li>
+    <li class="list-group-item">UserComments: {{UserComments}}</li>
+    <li class="list-group-item">UserSearchHistory: {{UserSearchHistory}}</li>
+    <li class="list-group-item">UserEntryVisitHistory: {{UserEntryVisitHistory}}</li>
+    <li class="list-group-item">UserEntryTransitionHistory: {{UserEntryTransitionHistory}}</li>
 
-    <li>DataExport: {{DataExport}}</li>
-    <li>SourceExportHistory: {{SourceExportHistory}}</li>
+    <li class="list-group-item">DataExport: {{DataExport}}</li>
+    <li class="list-group-item">SourceExportHistory: {{SourceExportHistory}}</li>
 
-    <li>BackgroundJob: {{BackgroundJob}}
-        <div>
+    <li class="list-group-item">BackgroundJob: {{BackgroundJob}}
         <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="btn btn-secondary btn-sm" role="button">View</a>
-        </div>
     </li>
 
-    <li>AppLogging: {{AppLogging}} 
-        <div>
-        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="btn btn-secondary" role="button">View</a>
-        </div>
+    <li class="list-group-item">AppLogging: {{AppLogging}} 
+        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="btn btn-secondary btn-sm" role="button">View</a>
     </li>
 
-    <li>Domains: {{Domains}}
-        <div>
-        <a href="{% url 'rsshistory:domains' %}" title="Domains" class="btn btn-secondary" role="button">View</a>
-        </div>
+    <li class="list-group-item">Domains: {{Domains}}
+        <a href="{% url 'rsshistory:domains' %}" title="Domains" class="btn btn-secondary btn-sm" role="button">View</a>
+    </li>
+
+    <li class="list-group-item">ModelFiles: {{ModelFiles}}
+        <a href="{% url 'rsshistory:model-files' %}" title="View background jobs" class="btn btn-secondary btn-sm" role="button">View</a>
     </li>
 </ul>
 
+<h1>Threads</h1>
+<ul class="list-group">
+    {% for thread_info in c.get_thread_info %}
+    <li class="list-group-item">{{thread_info.0}}: {{thread_info.1}}</li>
+    {% endfor %}
+</ul>
+
+<h1>Time</h1>
+<ul class="list-group">
+    <li class="list-group-item">Current time: {{DateTime_Current}}</li>
+
+    {% if days_to_move_to_archive %}
+      <li class="list-group-item">Move to archive date: {{days_to_move_to_archive}}</li>
+    {%endif%}
+    {% if days_to_remove_links %}
+      <li class="list-group-item">Remove entries by date: {{days_to_remove_links}}</li>
+    {%endif%}
+    {% if days_to_check_std_entries %}
+      <li class="list-group-item">Normal entries are checked if older than: {{days_to_check_std_entries}}</li>
+    {%endif%}
+    {% if days_to_check_stale_entries %}
+      <li class="list-group-item">Dead entries are checked if older than: {{days_to_check_stale_entries}}</li>
+    {%endif%}
+    {% if days_to_remove_stale_entries %}
+      <li class="list-group-item">Remove dead links before date: {{days_to_remove_stale_entries}}</li>
+    {%endif%}
+</ul>
+
 <h1>Export history</h1>
-<p>
+<ul class="list-group">
      {% for history_entry in export_history_list %}
-     <div>{{history_entry.date}}, 
-        {% if history_entry.export_obj %}
-           {{history_entry.export_obj.remote_path}}, {{history_entry.export_obj.export_type}}, {{history_entry.export_obj.export_data}}
+     <li class="list-group-item">{{history_entry.date}}, 
+        {% if history_entry.export %}
+            <a href="{% url 'rsshistory:data-export' history_entry.export.id %}">{{history_entry.export.remote_path}}, {{history_entry.export.export_type}}, {{history_entry.export.export_data}}</a>
         {% endif %}
-     </div>
+     </li>
      {% endfor %}
-</p>
+</ul>
 
 {% endblock %}

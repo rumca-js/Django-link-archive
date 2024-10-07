@@ -2,30 +2,30 @@
 
 {% if object.is_commentable %}
   <hr/>
+  {% if object.comments.all %}
   <h2>Comments</h2>
   <div class="container">
-  {% for comment in object.comments.all %}
+      {% for comment in object.comments.all %}
       <div>{{comment.get_comment | safe | linebreaks}}</div>
       <div class="container">
-	  {{comment.date_published}} {{comment.user_object}}
+          {{comment.date_published}} {{comment.user_object}}
           {% if comment.user_object.username == user.get_username %}
-            <div class="btn-group">
+          <div class="btn-group">
               <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="btn btn-secondary" role="button" title="Edit comment">
-                 <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+                  <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
               </a>
               <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="btn btn-secondary" role="button" title="Remove comment">
-                 <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+                  <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
               </a>
-	    </div>
+          </div>
           {% endif %}
       </div>
       <hr/>
-  {% endfor %}
+      {% endfor %}
   </div>
-
-  <div class="container">
-  {% if user.is_authenticated %}
-    <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="btn btn-secondary" role="button">Add comment</a>
   {% endif %}
-  </div>
+
+  {% if user.is_authenticated %}
+  <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="btn btn-secondary" role="button">Add comment</a>
+  {% endif %}
 {% endif %}

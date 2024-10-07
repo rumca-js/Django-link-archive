@@ -20,11 +20,22 @@ class UserTagsTest(FakeInternetTestCase):
 
         uc = UserConfig.objects.create(user=self.user)
 
-        # user is 20 years old
         current_date = datetime.now().date()
         date_20_years_ago = current_date - timedelta(days=365 * 21)
 
         uc.birth_date = date_20_years_ago
         uc.save()
 
+        # user is 20 years old
+        # call tested function
         self.assertEqual(uc.get_age(), 20)
+
+    def test_get_or_create(self):
+        self.user = User.objects.create_user(
+            username="testuser2",
+            password="testpassword2",
+            is_staff=True,
+        )
+
+        uc = UserConfig.get_or_create(self.user)
+        self.assertTrue(uc)

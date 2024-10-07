@@ -4,7 +4,7 @@
 
 <h2>Log In</h2>
 
-<form method="post" action="?next=/{{ request.resolver_match.app_name }}">
+<form method="post" action="?next={% url 'rsshistory:index' %}">
     {% csrf_token %}
     {% for field in form %}
        <div class="form-group">

@@ -580,6 +580,17 @@ class UserConfig(models.Model):
         null=True,
     )
 
+    def get_config_user():
+        config = ConfigurationEntry.get()
+        return UserConfig(
+            display_style=config.display_style,
+            display_type=config.display_type,
+            show_icons=config.show_icons,
+            thumbnails_as_icons=config.thumbnails_as_icons,
+            links_per_page=config.links_per_page,
+            sources_per_page=config.sources_per_page,
+        )
+
     def get(user=None):
         """
         This is used if no request is specified. Use configured by admin setup.
@@ -591,37 +602,26 @@ class UserConfig(models.Model):
 
         # create some user from settings
 
-        config = ConfigurationEntry.get()
-        return UserConfig(
-            display_style=config.display_style,
-            display_type=config.display_type,
-            show_icons=config.show_icons,
-            thumbnails_as_icons=config.thumbnails_as_icons,
-            links_per_page=config.links_per_page,
-            sources_per_page=config.sources_per_page,
-        )
+        return UserConfig.get_config_user()
 
     def get_or_create(input_user):
         """
+        @param input_user User Object
+
         This is used if no request is specified. Use configured by admin setup.
         """
         if not input_user.is_authenticated:
-            config = ConfigurationEntry.get()
-            return UserConfig(
-                display_style=config.display_style,
-                display_type=config.display_type,
-                show_icons=config.show_icons,
-                thumbnails_as_icons=config.thumbnails_as_icons,
-                links_per_page=config.links_per_page,
-                sources_per_page=config.sources_per_page,
-            )
+            return UserConfig.get_config_user()
 
         users = UserConfig.objects.filter(user=input_user)
         if not users.exists():
-            user = UserConfig.objects.create(
-                username=input_user.username, user=input_user
-            )
-            return user
+            user_config = UserConfig.get_config_user()
+            user_config.username = input_user.username
+            user_config.user = input_user
+
+            user_config.save()
+
+            return user_config
         return users[0]
 
     def save(self, *args, **kwargs):

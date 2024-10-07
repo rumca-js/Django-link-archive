@@ -20,10 +20,14 @@
     {% endif %}
 
     {% if search_history %}
-        <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchHistoryCollapse" role="button" aria-expanded="false" aria-controls="searchHistoryCollapse">
-          Search history
+        <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchHistoryCollapse" role="button" aria-expanded="false" aria-controls="searchHistoryCollapse" title="Search history">
+          History
         </a>
     {% endif %}
+
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchSyntaxCollapse" role="button" aria-expanded="false" aria-controls="searchSyntaxCollapse" title="Search syntax">
+      ?
+    </a>
 </form>
 
 {% if search_history %}
@@ -31,6 +35,10 @@
        {% include "rsshistory/search_history_element.html" %} 
    </div> 
 {% endif %}
+
+<div class="collapse" id="searchSyntaxCollapse">
+   {% include "rsshistory/form_search_syntax_element.html" %} 
+</div> 
 
 {% if form.errors.items %}
 <ul>

@@ -2,9 +2,9 @@
 
   <h1>
       {% if config.instance_title %}
-      {{config.instance_title}} [{{app_name}}]
+      {{config.instance_title}} [{{app_name}}@{{app_version}}]
       {% else %}
-      Personal Link Database [{{app_name}}]
+      Personal Link Database [{{app_name}}@{{app_version}}]
       {% endif %}
   </h1>
 
@@ -14,10 +14,6 @@
       {% else %}
       This is a Personal Link Database.
       {% endif %}
-  </div>
-
-  <div>
-      Version: {{app_version}}
   </div>
 
   {% if not is_user_allowed %}
@@ -45,7 +41,7 @@
   <div>
     Notes:
     <ul>
-       <li>Be concious when using Internet, it is full of malware, bad actors</li>
+       <li>Be conscious when using Internet, it is full of malware, bad actors</li>
     </ul>
   </div>
 
@@ -70,6 +66,10 @@
     </ul>
   </div>
   {% endif %}
+
+  <div>
+     Maintained at <a href="https://github.com/rumca-js/Django-link-archive">GitHub</a>
+  </div>
 
   <!-- 
   _______   ______     ______     _______  __       _______     __       _______.    ___________    ____  __   __      

@@ -20,7 +20,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.88.3"
+__version__ = "0.88.4"
 
 
 class Configuration(object):
@@ -244,7 +244,9 @@ class Configuration(object):
         test_page_url = self.config_entry.internet_test_page
 
         p = UrlHandler(url=test_page_url)
-        return p.ping()
+        # TODO fix this
+        #return p.ping()
+        return p.get_response().is_valid()
 
     def encrypt(self, message):
         from django.conf import settings
