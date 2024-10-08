@@ -89,6 +89,7 @@
     {%endif%}
 </ul>
 
+{% if export_history_list %}
 <h1>Export history</h1>
 <ul class="list-group">
      {% for history_entry in export_history_list %}
@@ -99,5 +100,6 @@
      </li>
      {% endfor %}
 </ul>
+{% endif %}
 
 {% endblock %}

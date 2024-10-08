@@ -171,7 +171,7 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, url
         )
 
-    def download_video_url(entry):
+    def download_video_url(url):
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, url
         )

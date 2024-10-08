@@ -129,6 +129,8 @@ class EntriesSearchListView(generic.ListView):
         # Create any data and add it to the context
         self.init_display_type(context)
 
+        self.search_term = get_search_term_request(self.request)
+
         context["page_title"] += self.get_title()
 
         queue_size = BackgroundJobController.get_number_of_jobs(
@@ -148,16 +150,12 @@ class EntriesSearchListView(generic.ListView):
         self.filter_form = self.get_form()
         context["form"] = self.filter_form
 
-        search_term = get_search_term_request(self.request)
-
-        context["search_engines"] = SearchEngines(search_term)
+        context["search_engines"] = SearchEngines(self.search_term)
         context["query"] = self.query
         context["form_submit_button_name"] = "Search"
 
-        search_term = self.get_search_link(search_term)
-
-        if Url.is_web_link(search_term):
-            context["search_query_add"] = search_term
+        if Url.is_web_link(self.search_term):
+            context["search_query_add"] = self.search_term
 
         print(
             "EntriesSearchListView:get_context_data done. View time delta:{}".format(
@@ -226,7 +224,7 @@ class EntriesSearchListView(generic.ListView):
         return filter_form
 
     def get_title(self):
-        return " - Links"
+        return " - entries {}".format(self.search_term)
 
     def get_query_type(self):
         return "standard"

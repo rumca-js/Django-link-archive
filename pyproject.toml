@@ -12,28 +12,28 @@ Django = "^4.2.16"
 feedparser = "^6.0.10"
 django-user-agents = "^0.4.0"
 python-dateutil = "^2.8.2"
-yt-dlp = "^2024.8.6"
+yt-dlp = "^2024.10.7"
 waybackpy = "^3.0.6"
-pytz = "^2021.1"
+pytz = "^2024.2"
 pymemcache = "^4.0.0"
-celery = "^5.3.6"
+celery = "^5.4.0"
 django-celery-results = "^2.5.1"
 sqlalchemy = "^2.0.34"
 tldextract = "^5.1.2"
 sympy = "^1.13.2"
-beautifulsoup4 = "^4.12.2"
+beautifulsoup4 = "^4.12.3"
 spacy = "3.7.5"
 
 # [optional] - at least one of methods need to be running
 # example: crawlerrequests.py
-requests = "^2.25.1"
+requests = "^2.32.3"
 
 # [optional]
 # stealth_requests = "*"
 
 # [optional] use things below if you want to use selenium
 # example: crawlerseleniumfull.py, crawlerseleniumheadless.py
-selenium="^4.24.0"
+selenium="^4.25.0"
 chardet = "^5.2.0"
 psycopg2 = "*"
 pyvirtualdisplay = "^3.0"
@@ -45,7 +45,7 @@ undetected-chromedriver = "^3.5.5"
 
 # [optional] use things below if you want to use crawlee
 # example: crawleebeautifulsoup.py, crawleeplaywright.py
-crawlee="^0.3.7"
+crawlee="^0.3.8"
 playwright="*"
 lxml="^5.2.2"
 
@@ -64,7 +64,7 @@ botasaurus-driver="*"
 # scrapy="*"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
+black = "^24.10.0"
 
 [build-system]
 requires = ["poetry-core"]

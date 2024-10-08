@@ -532,7 +532,7 @@ class EntryUpdater(object):
         props = url.get_props()
 
         if url.u:
-            if url.u.is_blocked():
+            if not entry.bookmarked and not entry.permament and url.u.is_blocked():
                 entry.delete()
                 return
 

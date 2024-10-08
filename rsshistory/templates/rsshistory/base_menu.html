@@ -80,6 +80,12 @@
            <li class="nav-item dropdown">
                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                    Personal
+                   {% if is_read_later %}
+                   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                       !
+                       <span class="visually-hidden">read later</span>
+                   </span>
+                   {% endif %}
                </a>
                <ul class="dropdown-menu">
                    {% if is_read_later %}

@@ -3,6 +3,7 @@ from django import forms
 from django.db.models import Q
 from django.db.models import IntegerField, Model
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.forms.widgets import TextInput
 
 
 from utils.dateutils import DateUtils
@@ -416,37 +417,38 @@ class InitSearchForm(forms.Form):
         self.fields["search"].widget.attrs["autofocus"] = True
 
 
-from django.forms.widgets import TextInput
-from django.utils.safestring import mark_safe
-import json
-import html
+# TODO support for datalist in form....
 
-
-class DatalistTextInput(TextInput):
-    def __init__(self, attrs=None):
-        super().__init__(attrs)
-        if "list" not in self.attrs or "datalist" not in self.attrs:
-            raise ValueError(
-                'DatalistTextInput widget is missing required attrs "list" or "datalist"'
-            )
-        self.datalist_name = self.attrs["list"]
-
-        text = self.attrs.pop("datalist")
-        self.datalist = text
-
-    def render(self, **kwargs):
-        datalist = self.datalist
-
-        print("render kwargs:{}".format(kwargs))
-
-        # DEBUG( self, kwargs)
-        original_part = super().render(**kwargs)
-
-        opts = " ".join([f"<option>{x}</option>" for x in datalist])
-
-        part2 = f'<datalist id="{self.datalist_name}">{opts}</datalist>'
-
-        return original_part + part2
+#from django.utils.safestring import mark_safe
+#import json
+#import html
+#
+#
+#class DatalistTextInput(TextInput):
+#    def __init__(self, attrs=None):
+#        super().__init__(attrs)
+#        if "list" not in self.attrs or "datalist" not in self.attrs:
+#            raise ValueError(
+#                'DatalistTextInput widget is missing required attrs "list" or "datalist"'
+#            )
+#        self.datalist_name = self.attrs["list"]
+#
+#        text = self.attrs.pop("datalist")
+#        self.datalist = text
+#
+#    def render(self, **kwargs):
+#        datalist = self.datalist
+#
+#        print("render kwargs:{}".format(kwargs))
+#
+#        # DEBUG( self, kwargs)
+#        original_part = super().render(**kwargs)
+#
+#        opts = " ".join([f"<option>{x}</option>" for x in datalist])
+#
+#        part2 = f'<datalist id="{self.datalist_name}">{opts}</datalist>'
+#
+#        return original_part + part2
 
 
 class OmniSearchForm(forms.Form):
@@ -458,7 +460,7 @@ class OmniSearchForm(forms.Form):
         label="Search",
         max_length=500,
         required=False,
-        widget=DatalistTextInput(
+        widget=TextInput(
             attrs={"list": "", "datalist": [], "placeholder": "Type to search..."}
         ),
     )
@@ -476,7 +478,7 @@ class OmniSearchForm(forms.Form):
 
         attr = {"onchange": "this.form.submit()"}
 
-        self.fields["search"].widget = DatalistTextInput(
+        self.fields["search"].widget = TextInput(
             attrs={
                 "list": "foolist",
                 "datalist": search_history,
