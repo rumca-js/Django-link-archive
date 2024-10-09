@@ -25,13 +25,6 @@ class CompactedTagsListView(GenericListView):
     paginate_by = 9200
     template_name = str(ViewPage.get_full_template("tags_list.html"))
 
-    def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super().get(*args, **kwargs)
-
     def get_tags_objects(self):
         return CompactedTags.objects.all()
 
@@ -47,10 +40,13 @@ class CompactedTagsListView(GenericListView):
         context = super().get_context_data(**kwargs)
         context = ViewPage(self.request).init_context(context)
 
-        context["page_title"] += " Tags"
+        context["page_title"] += " " + self.get_title()
         context["tags_title"] = "Tags"
 
         return context
+
+    def get_title(self):
+        return "Tags"
 
 
 class UserCompactedTagsListView(UserGenericListView):
@@ -58,6 +54,9 @@ class UserCompactedTagsListView(UserGenericListView):
     context_object_name = "content_list"
     paginate_by = 9200
     template_name = str(ViewPage.get_full_template("tags_list.html"))
+
+    def get_title(self):
+        return "Tags"
 
 
 class ActualTags(UserGenericListView):
@@ -107,6 +106,9 @@ class ActualTags(UserGenericListView):
         )
 
         return context
+
+    def get_title(self):
+        return "Tags"
 
 
 def tag_entry(request, pk):

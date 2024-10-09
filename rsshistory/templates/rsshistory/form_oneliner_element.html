@@ -10,9 +10,9 @@
    {% endfor %}
 
     {% if form_submit_button_name %}
-       <button type="submit" value="{{form_submit_button_name}}" class="btn btn-primary" role="button">{{form_submit_button_name}}</button>
+       <button type="submit" id="btnFetch" value="{{form_submit_button_name}}" class="btn btn-primary" role="button">{{form_submit_button_name}}</button>
     {% else %}
-       <button type="submit" value="Submit" class="btn btn-primary" role="button">Submit</button>
+       <button type="submit" id="btnFetch" value="Submit" class="btn btn-primary" role="button">Submit</button>
     {% endif %}
 </form>
 

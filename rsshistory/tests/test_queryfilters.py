@@ -89,8 +89,6 @@ class FiltersTest(FakeInternetTestCase):
             "vote": "none",
             "source_title": "none",
             "bookmarked": "none",
-            "source__category_name": "none",
-            "source__subcategory_name": "none",
             "artist": "none",
             "album": "none",
             "date_from": "none",
@@ -110,8 +108,6 @@ class FiltersTest(FakeInternetTestCase):
         self.assertTrue("vote" in filter_args)
         self.assertTrue("source_title" in filter_args)
         self.assertTrue("bookmarked" in filter_args)
-        self.assertTrue("source_category_name" in filter_args)
-        self.assertTrue("source_subcategory_name" in filter_args)
         self.assertTrue("artist" in filter_args)
         self.assertTrue("album" in filter_args)
         self.assertTrue("date_from" in filter_args)
@@ -127,8 +123,6 @@ class FiltersTest(FakeInternetTestCase):
             "user": "none",
             "tag": "none",
             "vote": "none",
-            "source__category_name": "none",
-            "source__subcategory_name": "none",
             "source_id": "none",
             "source_title": "none",
             "bookmarked": "none",
@@ -151,8 +145,6 @@ class FiltersTest(FakeInternetTestCase):
         self.assertTrue("votes__vote__gt" in filter_args)
         self.assertTrue("source__id" in filter_args)
         self.assertTrue("source__title" in filter_args)
-        self.assertTrue("source__category_name" in filter_args)
-        self.assertTrue("source__subcategory_name" in filter_args)
         self.assertTrue("bookmarked" in filter_args)
         self.assertTrue("artist__icontains" in filter_args)
         self.assertTrue("album__icontains" in filter_args)
@@ -165,8 +157,6 @@ class FiltersTest(FakeInternetTestCase):
 
     def test_entry_source_filters(self):
         args = {
-            "category_name": "none",
-            "subcategory_name": "none",
             "source_title": "none",
             "unsupported": "none",
         }
@@ -175,8 +165,6 @@ class FiltersTest(FakeInternetTestCase):
 
         filter_args = thefilter.get_arg_conditions()
 
-        self.assertTrue("category_name" in filter_args)
-        self.assertTrue("subcategory_name" in filter_args)
         self.assertTrue("source_title" in filter_args)
 
         self.assertTrue("unsupported" not in filter_args)

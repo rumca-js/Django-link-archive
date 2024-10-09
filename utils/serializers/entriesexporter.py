@@ -158,7 +158,7 @@ class YearlyExporter(object):
                 str_date = entry.date_published.strftime("%Y")
                 try:
                     return int(str_date)
-                except Exception as E:
+                except ValueError as E:
                     LinkDatabase.info("Error: {}".format(str(E)))
 
         return self.get_current_year()

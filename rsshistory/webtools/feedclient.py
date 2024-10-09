@@ -492,10 +492,16 @@ class FeedClient(object):
     def enable_source(self, db, source_id):
         Session = db.get_session()
 
+        try:
+            source_id_int = int(source_id)
+        except ValueError:
+            print("Cannot find such source:{}".format(source_id))
+            return False
+
         with Session() as session:
             source = (
                 session.query(SourcesTable)
-                .filter(SourcesTable.id == int(source_id))
+                .filter(SourcesTable.id == source_id_int)
                 .first()
             )
             if source:
@@ -513,10 +519,16 @@ class FeedClient(object):
     def disable_source(self, db, source_id):
         Session = db.get_session()
 
+        try:
+            source_id_int = int(source_id)
+        except ValueError:
+            print("Cannot find such source:{}".format(source_id))
+            return False
+
         with Session() as session:
             source = (
                 session.query(SourcesTable)
-                .filter(SourcesTable.id == int(source_id))
+                .filter(SourcesTable.id == source_id_int)
                 .first()
             )
 
@@ -686,10 +698,16 @@ class FeedClient(object):
         return True
 
     def make_bookmarked(self, db, entry_id):
+        try:
+            entry_id_int = int(entry_id)
+        except ValueError:
+            print("Cannot bookmark")
+            return False
+
         Session = db.get_session()
         with Session() as session:
             entries = session.query(EntriesTable).filter(
-                EntriesTable.id == int(entry_id)
+                EntriesTable.id == entry_id_int
             )
 
             if entries.count() == 0:
@@ -705,10 +723,16 @@ class FeedClient(object):
         return True
 
     def make_not_bookmarked(self, db, entry_id):
+        try:
+            entry_id_int = int(entry_id)
+        except ValueError:
+            print("Cannot bookmark")
+            return False
+
         Session = db.get_session()
         with Session() as session:
             entries = session.query(EntriesTable).filter(
-                EntriesTable.id == int(entry_id)
+                EntriesTable.id == entry_id_int
             )
 
             if entries.count() == 0:

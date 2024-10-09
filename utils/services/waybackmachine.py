@@ -78,7 +78,7 @@ class WaybackMachine(object):
         try:
             val = save_api.save()
             return val
-        except Exception as E:
+        except waybackpy.WaybackError as E:
             logger.exc("WaybackMachine: save url: {0}".format(url))
             time.sleep(5)  # wait 5 seconds. Ain't nobody got time for that
 

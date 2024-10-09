@@ -154,6 +154,9 @@ class EntriesSearchListView(generic.ListView):
         context["query"] = self.query
         context["form_submit_button_name"] = "Search"
 
+        context["entry_query_names"] = LinkDataController.get_query_names()
+        context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
+
         if Url.is_web_link(self.search_term):
             context["search_query_add"] = self.search_term
 
@@ -386,9 +389,6 @@ class EntriesOmniListView(EntriesSearchListView):
 
         return filter_form
 
-    def get_title(self):
-        return " - Links"
-
     def get_query_type(self):
         return "omni"
 
@@ -421,7 +421,7 @@ class EntriesRecentListView(EntriesOmniListView):
         return reverse("{}:entries-recent".format(LinkDatabase.name))
 
     def get_title(self):
-        return " - Recent"
+        return " - entries {}".format(self.search_term)
 
     def get_query_type(self):
         return "recent"
@@ -455,7 +455,7 @@ class EntriesNotTaggedView(EntriesOmniListView):
         return reverse("{}:entries-untagged".format(LinkDatabase.name))
 
     def get_title(self):
-        return " - UnTagged"
+        return " - entries {}".format(self.search_term)
 
     def get_query_type(self):
         return "not-tagged"
@@ -483,7 +483,7 @@ class EntriesBookmarkedListView(EntriesOmniListView):
         return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
     def get_title(self):
-        return " - Bookmarked"
+        return " - entries {}".format(self.search_term)
 
     def get_query_type(self):
         return "bookmarked"
@@ -512,7 +512,7 @@ class UserEntriesBookmarkedListView(EntriesOmniListView):
         return reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
 
     def get_title(self):
-        return " - Bookmarked"
+        return " - entries {}".format(self.search_term)
 
     def get_query_type(self):
         return "bookmarked"
@@ -542,7 +542,7 @@ class EntriesArchiveListView(EntriesOmniListView):
         return reverse("{}:entries-archived".format(LinkDatabase.name))
 
     def get_title(self):
-        return " - Archived"
+        return " - entries {}".format(self.search_term)
 
     def get_query_type(self):
         return "archived"
@@ -1102,6 +1102,9 @@ def get_generic_search_init_context(request, form, user_choices):
     context["search_history"] = user_choices
     context["view_link"] = form.action_url
     context["form_submit_button_name"] = "Search"
+
+    context["entry_query_names"] = LinkDataController.get_query_names()
+    context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
 
     return context
 

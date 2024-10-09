@@ -12,9 +12,9 @@ class YouTubeDownloader(object):
     https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
     """
 
-    def __init__(self, url, path=None, timeout_s=60 * 60):
+    def __init__(self, url, cwd=None, timeout_s=60 * 60):
         self._url = url
-        self._path = path
+        self._cwd = cwd
         self.timeout_s = timeout_s
 
     def get_video_ext(self):
@@ -40,7 +40,7 @@ class YouTubeDownloader(object):
         ]
         logging.info("Downloading: " + " ".join(cmds))
         proc = subprocess.run(
-            cmds, cwd=self._path, stdout=subprocess.PIPE, timeout=self.timeout_s
+            cmds, cwd=self._cwd, stdout=subprocess.PIPE, timeout=self.timeout_s
         )
 
         out = self.get_output_ignore(proc)
@@ -54,7 +54,7 @@ class YouTubeDownloader(object):
         cmds = ["youtube-dl", "-o", file_name, self._url]
         logging.info("Downloading: " + " ".join(cmds))
         proc = subprocess.run(
-            cmds, cwd=self._path, stdout=subprocess.PIPE, timeout=self.timeout_s
+            cmds, cwd=self._cwd, stdout=subprocess.PIPE, timeout=self.timeout_s
         )
 
         out = self.get_output_ignore(proc)
@@ -142,7 +142,7 @@ class YouTubeDownloader(object):
                 ["youtube-dl"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                timeout=self.timeout_s,
+                timeout=10,
             )
         except:
             return False

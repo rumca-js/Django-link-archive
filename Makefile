@@ -74,6 +74,7 @@ run-script-server:
 	poetry run python script_server.py &
 
 run-celery:
+	rm -rf storage
 	rm -rf celerybeat-schedule.db
 	poetry run celery -A linklibrary worker -l INFO -B
 

@@ -18,7 +18,7 @@ from ..controllers import (
     LinkDataController,
 )
 from ..configuration import Configuration
-from ..views import ViewPage
+from ..views import ViewPage, GenericListView
 from ..forms import DataExportForm
 from ..pluginsources import BaseRssPlugin
 
@@ -151,24 +151,10 @@ def enable(request, pk):
     return redirect("{}:data-exports".format(LinkDatabase.name))
 
 
-class DataExportListView(generic.ListView):
+class DataExportListView(GenericListView):
     model = DataExport
     context_object_name = "content_list"
     paginate_by = 100
-
-    def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super().get(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super().get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
-
-        return context
 
 
 class DataExportDetailsView(generic.DetailView):

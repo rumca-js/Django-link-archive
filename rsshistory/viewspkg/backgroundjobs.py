@@ -14,10 +14,10 @@ from ..controllers import (
 from ..forms import (
     BackgroundJobForm,
 )
-from ..views import ViewPage
+from ..views import ViewPage, GenericListView
 
 
-class BackgroundJobsView(generic.ListView):
+class BackgroundJobsView(GenericListView):
     model = BackgroundJobController
     context_object_name = "content_list"
     paginate_by = 500
@@ -36,9 +36,12 @@ class BackgroundJobsView(generic.ListView):
         context = ViewPage(self.request).init_context(context)
 
         context["BackgroundJob"] = BackgroundJob.objects.count()
-        context["page_title"] += " Jobs"
+        context["page_title"] += " " + self.get_title()
 
         return context
+
+    def get_title(self):
+        return "Jobs"
 
 
 def backgroundjob_add(request):

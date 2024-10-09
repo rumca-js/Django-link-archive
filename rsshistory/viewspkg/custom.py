@@ -227,12 +227,10 @@ def data_errors_page(request):
     # fix_tags_links()
 
     summary_text = "Done"
-    try:
-        p.context["links_with_incorrect_language"] = get_links_with_incorrect_language()
-        p.context["incorrect_youtube_links"] = get_incorrect_youtube_links()
-        p.context["tags_for_missing_links"] = get_tags_for_missing_links()
-    except Exception as e:
-        traceback.print_exc(file=sys.stdout)
+
+    p.context["links_with_incorrect_language"] = get_links_with_incorrect_language()
+    p.context["incorrect_youtube_links"] = get_incorrect_youtube_links()
+    p.context["tags_for_missing_links"] = get_tags_for_missing_links()
 
     # find links without source
 

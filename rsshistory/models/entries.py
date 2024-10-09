@@ -188,10 +188,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         return "{} {}".format(self.date_published, self.get_source_name())
 
     def has_tags(self):
-        try:
-            if not getattr(self, "tags"):
-                return 0
-        except Exception as E:
+        if not getattr(self, "tags"):
             return 0
 
         return len(self.tags.all()) > 0
@@ -216,12 +213,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         return c.get_local_time(self.date_published)
 
     def get_tag_string(self):
-        try:
-            from .models import LinkTagsDataModel
+        from .models import LinkTagsDataModel
 
-            return LinkTagsDataModel.join_elements(self.tags.all())
-        except Exception as e:
-            return ""
+        return LinkTagsDataModel.join_elements(self.tags.all())
 
     def get_vote(self):
         return self.page_rating_votes

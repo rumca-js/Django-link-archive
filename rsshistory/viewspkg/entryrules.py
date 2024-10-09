@@ -7,28 +7,14 @@ from django.forms.models import model_to_dict
 from ..apps import LinkDatabase
 from ..models import EntryRules
 from ..models import ConfigurationEntry
-from ..views import ViewPage
+from ..views import ViewPage, GenericListView
 from ..forms import EntryRulesForm
 
 
-class EntryRulesListView(generic.ListView):
+class EntryRulesListView(GenericListView):
     model = EntryRules
     context_object_name = "content_list"
     paginate_by = 100
-
-    def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super().get(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super().get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
-
-        return context
 
 
 class EntryRulesDetailView(generic.DetailView):

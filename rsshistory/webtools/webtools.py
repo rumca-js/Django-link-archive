@@ -1137,12 +1137,12 @@ def get_response_from_bytes(all_bytes):
         elif command_data[0] == "PageResponseObject.headers":
             try:
                 response.headers = json.loads(command_data[1].decode())
-            except Exception as E:
+            except ValueError as E:
                 WebLogger.exc(E, "Exception when loading headers")
         elif command_data[0] == "PageResponseObject.status_code":
             try:
                 response.status_code = int(command_data[1])
-            except Exception as E:
+            except ValueError as E:
                 WebLogger.exc(E, "Exception when loading headers")
         elif command_data[0] == "PageResponseObject.text":
             response.set_text(command_data[1].decode())

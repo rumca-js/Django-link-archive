@@ -205,7 +205,7 @@ class HttpRequestBuilder(object):
         try:
             response = self.get_contents_function(request=o)
 
-            return response is not None and response.is_valid()
+            return response and response.is_valid()
 
         except Exception as E:
             WebLogger.exc(E, "Url:{}. Ping error\n".format(url))

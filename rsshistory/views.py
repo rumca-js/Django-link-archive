@@ -48,7 +48,7 @@ def get_request_page_num(request):
         page = request.GET["page"]
         try:
             page = int(page)
-        except Exception as e:
+        except ValueError:
             page = 1
 
         return page
@@ -234,6 +234,7 @@ class GenericListView(generic.ListView):
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
         context = ViewPage(self.request).init_context(context)
+        context["page_title"] += " - {}".format(self.get_title())
 
         return context
 
@@ -244,6 +245,9 @@ class GenericListView(generic.ListView):
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
         return super().get_queryset()
+
+    def get_title(self):
+        return ""
 
 
 class UserGenericListView(GenericListView):

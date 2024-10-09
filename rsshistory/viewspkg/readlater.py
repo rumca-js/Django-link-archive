@@ -11,6 +11,9 @@ class ReadLaterListView(UserGenericListView):
     context_object_name = "content_list"
     paginate_by = 100
 
+    def get_title(self):
+        return "Read list"
+
 
 def read_later_add(request, pk):
     p = ViewPage(request)

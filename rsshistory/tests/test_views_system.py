@@ -89,6 +89,14 @@ class SystemViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_wizard_init(self):
+        url = reverse("{}:wizard-init".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
     def test_wizard_setup_news(self):
         url = reverse("{}:wizard-setup-news".format(LinkDatabase.name))
         url = url + "?noinitialize=True"

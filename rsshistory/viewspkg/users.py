@@ -15,11 +15,17 @@ class UserListView(GenericListView):
     context_object_name = "content_list"
     paginate_by = 100
 
+    def get_title(self):
+        return "User list"
+
 
 class UserEntryVisitHistoryListView(UserGenericListView):
     model = UserEntryVisitHistory
     context_object_name = "content_list"
     paginate_by = 100
+
+    def get_title(self):
+        return "User entry visit"
 
 
 class UserCommentsListView(UserGenericListView):
@@ -27,11 +33,17 @@ class UserCommentsListView(UserGenericListView):
     context_object_name = "content_list"
     paginate_by = 100
 
+    def get_title(self):
+        return "User comments"
+
 
 class UserSearchHistoryListView(UserGenericListView):
     model = UserSearchHistory
     context_object_name = "content_list"
     paginate_by = 100
+
+    def get_title(self):
+        return "User search history"
 
 
 def appuser_history(request, username):

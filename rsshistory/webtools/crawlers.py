@@ -925,7 +925,10 @@ class ScriptCrawler(CrawlerInterface):
                 + 10,  # add more time for closing browser, etc
             )
         except subprocess.TimeoutExpired as E:
-            WebLogger.exc(E, "Cannot run sucessfully script, or timeout")
+            WebLogger.exc(E, "Timeout on running script")
+            return self.response
+        except subprocess.ValueError as E:
+            WebLogger.exc(E, "Incorrect script call {}".format(script))
             return self.response
 
         if p.returncode != 0:
@@ -1091,7 +1094,7 @@ class ServerCrawler(CrawlerInterface):
                 elif command_data[0] == "PageResponseObject.headers":
                     try:
                         response.headers = json.loads(command_data[1].decode())
-                    except Exception as E:
+                    except ValueError as E:
                         WebLogger.exc(
                             E, "Cannot load response headers from crawling server"
                         )
@@ -1099,7 +1102,7 @@ class ServerCrawler(CrawlerInterface):
                 elif command_data[0] == "PageResponseObject.status_code":
                     try:
                         response.status_code = int(command_data[1].decode())
-                    except Exception as E:
+                    except ValueError as E:
                         WebLogger.exc(E, "Cannot load status_code from crawling server")
 
                 elif command_data[0] == "PageResponseObject.text":

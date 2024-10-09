@@ -312,12 +312,6 @@ class Url(ContentInterface):
     def get_domain_info(self):
         return DomainCache.get_object(self.url)
 
-    def download_all(url):
-        from .programwrappers.wget import Wget
-
-        wget = Wget(url)
-        wget.download_all()
-
     def __str__(self):
         return "{}".format(self.options)
 

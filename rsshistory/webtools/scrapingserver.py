@@ -65,11 +65,14 @@ def run_script(script, request, port):
 
     try:
         p = subprocess.run(script, shell=True, timeout=request.timeout_s + 3)
+    except TimeoutExpired:
+        print(str(E))
+        print("Could not finish command")
+        return
     except Exception as E:
         print(str(E))
         print("Could not finish command")
         return
-
 
 def delete_connection(c):
     for index, request_data in enumerate(requests):
@@ -140,9 +143,12 @@ def handle_connection_inner(c, address, port):
             request = PageRequestObject(url=url)
 
         elif command[0] == "PageRequestObject.timeout":
-            timeout_s = int(command[1].decode())
-            print("Set timeout:{}".format(timeout_s))
-            request.timeout_s = timeout_s
+            try:
+                timeout_s = int(command[1].decode())
+                print("Set timeout:{}".format(timeout_s))
+                request.timeout_s = timeout_s
+            except ValueError:
+                pass
 
         elif command[0] == "PageRequestObject.script":
             script = command[1].decode()
@@ -150,7 +156,10 @@ def handle_connection_inner(c, address, port):
 
         elif command[0] == "PageRequestObject.headers":
             print("{} is not yet supported".format(command[0]))
-            request.headers = json.loads(command[1].decode())
+            try:
+                request.headers = json.loads(command[1].decode())
+            except ValueError:
+                pass
 
         elif command[0] == "PageRequestObject.user_agent":
             print("{} is not yet supported".format(command[0]))
@@ -196,15 +205,22 @@ def handle_connection_inner(c, address, port):
             print("Received response url")
 
         elif command[0] == "PageResponseObject.status_code":
-            response.status_code = int(command[1].decode())
-            print("Received response status_code")
+            try:
+                response.status_code = int(command[1].decode())
+                print("Received response status_code")
+            except ValueError:
+                pass
 
         elif command[0] == "PageResponseObject.text":
             response.text = command[1].decode()
             print("Received response text")
 
         elif command[0] == "PageResponseObject.headers":
-            response.headers = json.loads(command[1].decode())
+            try:
+                response.headers = json.loads(command[1].decode())
+            except ValueError:
+                pass
+            
             print("Received response headers")
 
         elif command[0] == "PageResponseObject.request_url":

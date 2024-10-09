@@ -189,7 +189,7 @@ class MarkDownConverter(ItemConverterFabric):
         try:
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
-        except Exception as E:
+        except KeyError:
             logger = get_logger("utils")
             logger.exc(
                 "Template exception {0} {1}".format(
@@ -249,7 +249,7 @@ class MarkDownConverter(ItemConverterFabric):
         try:
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
-        except Exception as E:
+        except KeyError:
             logger = get_logger("utils")
 
             logger.exc(
@@ -286,7 +286,7 @@ class MarkDownSourceConverter(object):
         try:
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
-        except Exception as E:
+        except KeyError:
             logger = get_logger("utils")
             logger.exc(
                 E,

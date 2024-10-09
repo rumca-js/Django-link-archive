@@ -203,7 +203,7 @@ $channel_text
         try:
             t = Template(template_text)
             return t.safe_substitute(map_data)
-        except Exception as E:
+        except KeyError as E:
             AppLogging.exc(
                 E,
                 "Template exception {0} {1}".format(

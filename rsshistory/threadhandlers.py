@@ -21,7 +21,8 @@ from utils.dateutils import DateUtils
 from .webtools import DomainAwarePage, Url
 
 from utils.basictypes import fix_path_for_os
-from utils.programwrappers import ytdlp, id3v2
+from utils.programwrappers import ytdlp, id3v2, wget
+
 from utils.services.waybackmachine import WaybackMachine
 
 from .apps import LinkDatabase
@@ -98,7 +99,7 @@ class BaseJobHandler(object):
         if in_object.args and len(in_object.args) > 0:
             try:
                 cfg = json.loads(in_object.args)
-            except Exception as E:
+            except ValueError as E:
                 AppLogging.exc(
                     exception_object=E,
                     info_text="Exception when adding link {0}".format(
@@ -118,10 +119,9 @@ class ProcessSourceJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_PROCESS_SOURCE
 
     def process(self, obj=None):
-        try:
             try:
                 source_id = int(obj.subject)
-            except Exception as E:
+            except ValueError as E:
                 AppLogging.exc(
                     exception_object=E,
                     info_text="Incorrect source ID:{}".format(obj.subject),
@@ -155,14 +155,6 @@ class ProcessSourceJobHandler(BaseJobHandler):
             )
             return False
 
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-                info_text="Source:{}. Exception during parsing page contents".format(
-                    obj.subject
-                ),
-            )
-
 
 class EntryUpdateData(BaseJobHandler):
     """!
@@ -173,38 +165,32 @@ class EntryUpdateData(BaseJobHandler):
         return BackgroundJob.JOB_LINK_UPDATE_DATA
 
     def process(self, obj=None):
+        link_id = None
+
         try:
-            link_id = None
-
-            try:
-                link_id = int(obj.subject)
-            except Exception as E:
-                AppLogging.exc(
-                    exception_object=E,
-                    info_text="Incorrect link ID:{}".format(obj.subject),
-                )
-                # consume job
-                return True
-
-            entries = LinkDataController.objects.filter(id=link_id)
-            if len(entries) > 0:
-                entry = entries[0]
-
-                u = EntryUpdater(entry)
-                u.update_data()
-            else:
-                LinkDatabase.info(
-                    "Cannot update data. Missing entry {0}".format(
-                        obj.subject,
-                    )
-                )
-
-            return True
-        except Exception as E:
+            link_id = int(obj.subject)
+        except ValueError as E:
             AppLogging.exc(
                 exception_object=E,
-                info_text="Exception when updating link data {}".format(obj.subject),
+                info_text="Incorrect link ID:{}".format(obj.subject),
             )
+            # consume job
+            return True
+
+        entries = LinkDataController.objects.filter(id=link_id)
+        if len(entries) > 0:
+            entry = entries[0]
+
+            u = EntryUpdater(entry)
+            u.update_data()
+        else:
+            LinkDatabase.info(
+                "Cannot update data. Missing entry {0}".format(
+                    obj.subject,
+                )
+            )
+
+        return True
 
 
 class LinkResetDataJobHandler(BaseJobHandler):
@@ -213,28 +199,23 @@ class LinkResetDataJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            try:
-                link_id = int(obj.subject)
-            except Exception as E:
-                AppLogging.exc(
-                    exception_object=E,
-                    info_text="Incorrect link ID:{}".format(obj.subject),
-                )
-                # consume job
-                return True
-
-            entries = LinkDataController.objects.filter(id=link_id)
-            if len(entries) > 0:
-                entry = entries[0]
-
-                u = EntryUpdater(entry)
-                u.reset_data()
-
-            return True
-        except Exception as E:
+            link_id = int(obj.subject)
+        except ValueError as E:
             AppLogging.exc(
                 exception_object=E,
+                info_text="Incorrect link ID:{}".format(obj.subject),
             )
+            # consume job
+            return True
+
+        entries = LinkDataController.objects.filter(id=link_id)
+        if len(entries) > 0:
+            entry = entries[0]
+
+            u = EntryUpdater(entry)
+            u.reset_data()
+
+        return True
 
 
 class LinkResetLocalDataJobHandler(BaseJobHandler):
@@ -243,28 +224,23 @@ class LinkResetLocalDataJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            try:
-                link_id = int(obj.subject)
-            except Exception as E:
-                AppLogging.exc(
-                    exception_object=E,
-                    info_text="Incorrect link ID:{}".format(obj.subject),
-                )
-                # consume job
-                return True
-
-            entries = LinkDataController.objects.filter(id=link_id)
-            if len(entries) > 0:
-                entry = entries[0]
-
-                u = EntryUpdater(entry)
-                u.reset_local_data()
-
-            return True
-        except Exception as E:
+            link_id = int(obj.subject)
+        except ValueError as E:
             AppLogging.exc(
                 exception_object=E,
+                info_text="Incorrect link ID:{}".format(obj.subject),
             )
+            # consume job
+            return True
+
+        entries = LinkDataController.objects.filter(id=link_id)
+        if len(entries) > 0:
+            entry = entries[0]
+
+            u = EntryUpdater(entry)
+            u.reset_local_data()
+
+        return True
 
 
 class LinkDownloadJobHandler(BaseJobHandler):
@@ -276,22 +252,19 @@ class LinkDownloadJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_LINK_DOWNLOAD
 
     def process(self, obj=None):
-        try:
-            url = obj.subject
-            AppLogging.notify("Downloading page:".format(url))
+        c = Configuration.get_object()
 
-            Url.download_all(url)
+        url = obj.subject
+        AppLogging.notify("Downloading page:".format(url))
 
-            AppLogging.notify(
-                "Page has been downloaded:{} Time:{}".format(url, self.get_time_diff())
-            )
+        wget = wget.Wget(url, cwd = c.get_export_path())
+        wget.download_all()
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-                info_text="Exception downloading web page {0}".format(obj.subject),
-            )
+        AppLogging.notify(
+            "Page has been downloaded:{} Time:{}".format(url, self.get_time_diff())
+        )
+
+        return True
 
 
 class LinkMusicDownloadJobHandler(BaseJobHandler):
@@ -303,43 +276,37 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC
 
     def process(self, obj=None):
-        try:
-            data = self.get_data(obj)
+        c = Configuration.get_object()
+        data = self.get_data(obj)
 
-            url = data["url"]
-            title = data["title"]
-            artist = data["artist"]
-            album = data["album"]
+        url = data["url"]
+        title = data["title"]
+        artist = data["artist"]
+        album = data["album"]
 
-            AppLogging.notify("Downloading music: " + url + " " + title)
+        AppLogging.notify("Downloading music: " + url + " " + title)
 
-            if not DomainAwarePage(url).is_youtube():
-                AppLogging.error("Unsupported download operation URL:{}".format(url))
-                return True
-
-            file_name = self.get_file_name(data)
-
-            yt = ytdlp.YTDLP(url)
-            if not yt.download_audio(file_name):
-                AppLogging.error("Could not download music: " + url + " " + title)
-                return
-
-            id3 = id3v2.Id3v2(file_name, data)
-            id3.tag()
-
-            elapsed_sec = self.get_time_diff()
-
-            AppLogging.notify(
-                "Downloading music done: {} {}. Time:{}".format(url, title, elapsed_sec)
-            )
-
+        if not DomainAwarePage(url).is_youtube():
+            AppLogging.error("Unsupported download operation URL:{}".format(url))
             return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-                info_text="Exception downloading music {0}".format(obj.subject),
-            )
-            return True
+
+        file_name = self.get_file_name(data)
+
+        yt = ytdlp.YTDLP(url, cwd = c.get_export_path())
+        if not yt.download_audio(file_name):
+            AppLogging.error("Could not download music: " + url + " " + title)
+            return
+
+        id3 = id3v2.Id3v2(file_name, data=data, cwd=c.get_export_path())
+        id3.tag()
+
+        elapsed_sec = self.get_time_diff()
+
+        AppLogging.notify(
+            "Downloading music done: {} {}. Time:{}".format(url, title, elapsed_sec)
+        )
+
+        return True
 
     def get_data(self, obj):
         title = ""
@@ -386,39 +353,34 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO
 
     def process(self, obj=None):
-        try:
-            data = self.get_data(obj)
+        c = Configuration.get_object()
 
-            url = data["url"]
-            title = data["title"]
-            artist = data["artist"]
-            album = data["album"]
+        data = self.get_data(obj)
 
-            if not DomainAwarePage(url).is_youtube():
-                AppLogging.error("Unsupported download operation URL:{}".format(url))
-                return True
+        url = data["url"]
+        title = data["title"]
+        artist = data["artist"]
+        album = data["album"]
 
-            AppLogging.info("Downloading music: " + url + " " + title)
-
-            file_name = self.get_file_name(data)
-
-            yt = ytdlp.YTDLP(url)
-            if not yt.download_video("file.mp4"):
-                AppLogging.error("Could not download video: " + url + " " + title)
-                return
-
-            elapsed_sec = self.get_time_diff()
-            AppLogging.notify(
-                "Downloading video done: {} {}. Time:{}".format(url, title, elapsed_sec)
-            )
-
+        if not DomainAwarePage(url).is_youtube():
+            AppLogging.error("Unsupported download operation URL:{}".format(url))
             return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-                info_text="Exception downloading video {0}".format(obj.subject),
-            )
-            return True
+
+        AppLogging.info("Downloading music: " + url + " " + title)
+
+        file_name = self.get_file_name(data)
+
+        yt = ytdlp.YTDLP(url, cwd = c.get_export_path())
+        if not yt.download_video("file.mp4"):
+            AppLogging.error("Could not download video: " + url + " " + title)
+            return
+
+        elapsed_sec = self.get_time_diff()
+        AppLogging.notify(
+            "Downloading video done: {} {}. Time:{}".format(url, title, elapsed_sec)
+        )
+
+        return True
 
     def get_data(self, obj):
         title = ""
@@ -465,27 +427,20 @@ class DownloadModelFileJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_DOWNLOAD_FILE
 
     def process(self, obj=None):
-        try:
-            c = Configuration.get_object()
-            if not c.config_entry.enable_file_support:
-                # consume
-                return True
-
-            file_name = obj.subject
-            p = DomainAwarePage(file_name)
-            if not p.is_web_link():
-                # consume
-                return True
-
-            ModelFilesBuilder().build(file_name)
-
+        c = Configuration.get_object()
+        if not c.config_entry.enable_file_support:
+            # consume
             return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-                info_text="Exception downloading file {0} {1} {2}".format(obj.subject),
-            )
+
+        file_name = obj.subject
+        p = DomainAwarePage(file_name)
+        if not p.is_web_link():
+            # consume
             return True
+
+        ModelFilesBuilder().build(file_name)
+
+        return True
 
 
 class LinkAddJobHandler(BaseJobHandler):
@@ -500,19 +455,10 @@ class LinkAddJobHandler(BaseJobHandler):
         """
         Object is obligatory
         """
-        try:
-            data = self.get_data_for_add(obj)
-            self.add_link(data)
+        data = self.get_data_for_add(obj)
+        self.add_link(data)
 
-            return True
-
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-                info_text="Exception when adding link {0}".format(obj.subject),
-            )
-            # remove object from queue if it cannot be added
-            return True
+        return True
 
     def add_link(self, data):
         # Unpack if link service
@@ -598,18 +544,13 @@ class LinkSaveJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_LINK_SAVE
 
     def process(self, obj=None):
-        try:
-            item = obj.subject
+        item = obj.subject
 
-            wb = WaybackMachine()
-            if wb.is_saved(item):
-                wb.save(item)
+        wb = WaybackMachine()
+        if wb.is_saved(item):
+            wb.save(item)
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class ImportDailyDataJobHandler(BaseJobHandler):
@@ -748,7 +689,10 @@ class ImportFromFilesJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         data = obj.subject
-        data = json.loads(data)
+        try:
+            data = json.loads(data)
+        except ValueError:
+            return True
 
         path = data["path"]
         import_title = data["import_title"]
@@ -778,26 +722,21 @@ class WriteDailyDataJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_WRITE_DAILY_DATA
 
     def process(self, obj=None):
-        try:
-            from .updatemgr import UpdateManager
-            from .datawriter import DataWriter
+        from .updatemgr import UpdateManager
+        from .datawriter import DataWriter
 
-            date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
+        date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
 
-            mgr = UpdateManager(self._config)
+        mgr = UpdateManager(self._config)
 
-            all_export_data = DataExport.objects.filter(
-                export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
-            )
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
+        )
 
-            for export_data in all_export_data:
-                mgr.write(export_data, date_input.isoformat())
+        for export_data in all_export_data:
+            mgr.write(export_data, date_input.isoformat())
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class WriteYearDataJobHandler(BaseJobHandler):
@@ -809,24 +748,19 @@ class WriteYearDataJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_WRITE_YEAR_DATA
 
     def process(self, obj=None):
-        try:
-            from .updatemgr import UpdateManager
+        from .updatemgr import UpdateManager
 
-            c = Configuration.get_object()
-            mgr = UpdateManager(c)
+        c = Configuration.get_object()
+        mgr = UpdateManager(c)
 
-            all_export_data = DataExport.objects.filter(
-                export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
-            )
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
+        )
 
-            for export_data in all_export_data:
-                mgr.write(export_data)
+        for export_data in all_export_data:
+            mgr.write(export_data)
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class WriteNoTimeDataJobHandler(BaseJobHandler):
@@ -838,24 +772,19 @@ class WriteNoTimeDataJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_WRITE_NOTIME_DATA
 
     def process(self, obj=None):
-        try:
-            from .updatemgr import UpdateManager
+        from .updatemgr import UpdateManager
 
-            c = Configuration.get_object()
-            mgr = UpdateManager(c)
+        c = Configuration.get_object()
+        mgr = UpdateManager(c)
 
-            all_export_data = DataExport.objects.filter(
-                export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
-            )
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
+        )
 
-            for export_data in all_export_data:
-                mgr.write(export_data)
+        for export_data in all_export_data:
+            mgr.write(export_data)
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class WriteTopicJobHandler(BaseJobHandler):
@@ -867,20 +796,15 @@ class WriteTopicJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_WRITE_TOPIC_DATA
 
     def process(self, obj=None):
-        try:
-            from ..serializers.bookmarksexporter import BookmarksTopicExporter
+        from ..serializers.bookmarksexporter import BookmarksTopicExporter
 
-            topic = obj.subject
+        topic = obj.subject
 
-            c = Configuration.get_object()
-            exporter = BookmarksTopicExporter(c)
-            exporter.export(topic)
+        c = Configuration.get_object()
+        exporter = BookmarksTopicExporter(c)
+        exporter.export(topic)
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class ExportDataJobHandler(BaseJobHandler):
@@ -894,30 +818,25 @@ class ExportDataJobHandler(BaseJobHandler):
     def process(self, obj=None):
         from .updatemgr import UpdateManager
 
-        try:
-            export = self.get_export(obj)
-            if not export:
-                AppLogging.error("Export {} does not exist".format(obj.subject))
-                return
+        export = self.get_export(obj)
+        if not export:
+            AppLogging.error("Export {} does not exist".format(obj.subject))
+            return
 
-            AppLogging.notify("Exporting data. Export:{}".format(obj.subject))
+        AppLogging.notify("Exporting data. Export:{}".format(obj.subject))
 
-            update_mgr = UpdateManager(self._config)
+        update_mgr = UpdateManager(self._config)
 
-            update_mgr.write_and_push(export)
+        update_mgr.write_and_push(export)
 
-            elapsed_sec = self.get_time_diff()
-            AppLogging.notify(
-                "Successfully pushed data to git. Export:{} Time:{}".format(
-                    obj.subject, elapsed_sec
-                )
+        elapsed_sec = self.get_time_diff()
+        AppLogging.notify(
+            "Successfully pushed data to git. Export:{} Time:{}".format(
+                obj.subject, elapsed_sec
             )
+        )
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
     def get_export(self, obj):
         exports = DataExport.objects.filter(id=int(obj.subject))
@@ -935,28 +854,23 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         # TODO read year from string
-        try:
-            from .updatemgr import UpdateManager
+        from .updatemgr import UpdateManager
 
-            update_mgr = UpdateManager(self._config)
+        update_mgr = UpdateManager(self._config)
 
-            all_export_data = DataExport.objects.filter(
-                export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
-            )
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
+        )
 
-            for export_data in all_export_data:
-                update_mgr.write_and_push(export_data)
+        for export_data in all_export_data:
+            update_mgr.write_and_push(export_data)
 
-            elapsed_sec = self.get_time_diff()
-            AppLogging.notify(
-                "Successfully pushed data to git. Time:{}".format(elapsed_sec)
-            )
+        elapsed_sec = self.get_time_diff()
+        AppLogging.notify(
+            "Successfully pushed data to git. Time:{}".format(elapsed_sec)
+        )
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
@@ -968,28 +882,23 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO
 
     def process(self, obj=None):
-        try:
-            from .updatemgr import UpdateManager
+        from .updatemgr import UpdateManager
 
-            update_mgr = UpdateManager(self._config)
+        update_mgr = UpdateManager(self._config)
 
-            all_export_data = DataExport.objects.filter(
-                export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
-            )
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
+        )
 
-            for export_data in all_export_data:
-                update_mgr.write_and_push(export_data)
+        for export_data in all_export_data:
+            update_mgr.write_and_push(export_data)
 
-            elapsed_sec = self.get_time_diff()
-            AppLogging.notify(
-                "Successfully pushed data to git. Time:{}".format(elapsed_sec)
-            )
+        elapsed_sec = self.get_time_diff()
+        AppLogging.notify(
+            "Successfully pushed data to git. Time:{}".format(elapsed_sec)
+        )
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class PushDailyDataToRepoJobHandler(BaseJobHandler):
@@ -1002,35 +911,30 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         # TODO read date from string
-        try:
-            from .updatemgr import UpdateManager
+        from .updatemgr import UpdateManager
 
-            date_input = obj.subject
+        date_input = obj.subject
 
-            if date_input == "":
-                date_input = DateUtils.get_date_yesterday()
-            else:
-                date_input = datetime.strptime(date_input, "%Y-%m-%d").date()
+        if date_input == "":
+            date_input = DateUtils.get_date_yesterday()
+        else:
+            date_input = datetime.strptime(date_input, "%Y-%m-%d").date()
 
-            update_mgr = UpdateManager(self._config)
+        update_mgr = UpdateManager(self._config)
 
-            all_export_data = DataExport.objects.filter(
-                export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
-            )
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
+        )
 
-            for export_data in all_export_data:
-                update_mgr.write_and_push(export_data, date_input)
+        for export_data in all_export_data:
+            update_mgr.write_and_push(export_data, date_input)
 
-            elapsed_sec = self.get_time_diff()
-            AppLogging.notify(
-                "Successfully pushed data to git. Time:{}".format(elapsed_sec)
-            )
+        elapsed_sec = self.get_time_diff()
+        AppLogging.notify(
+            "Successfully pushed data to git. Time:{}".format(elapsed_sec)
+        )
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class InitializeJobHandler(BaseJobHandler):
@@ -1043,13 +947,8 @@ class InitializeJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         # TODO read year from string
-        try:
-            BlockEntryList.initialize()
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        BlockEntryList.initialize()
+        return True
 
 
 class InitializeBlockListJobHandler(BaseJobHandler):
@@ -1062,7 +961,6 @@ class InitializeBlockListJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         # TODO read year from string
-        try:
             list = obj.subject
 
             lists = BlockEntryList.objects.filter(url=list)
@@ -1070,11 +968,6 @@ class InitializeBlockListJobHandler(BaseJobHandler):
             if lists.exists():
                 BlockEntryList.update_block_entries(lists[0])
             return True
-
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
 
 
 class CleanupJobHandler(BaseJobHandler):
@@ -1086,43 +979,37 @@ class CleanupJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_CLEANUP
 
     def process(self, obj=None):
+        limit_s = 0
         try:
-            limit_s = 0
-            try:
-                if obj is not None:
-                    limit_s = int(obj.subject)
-            except Exception as E:
-                AppLogging.debug("Cleanup, cannot read limit value:{}".format(str(E)))
+            if obj is not None:
+                limit_s = int(obj.subject)
+        except ValueError as E:
+            AppLogging.debug("Cleanup, cannot read limit value:{}".format(str(E)))
 
-            status = EntriesCleanupAndUpdate().cleanup(limit_s)
+        status = EntriesCleanupAndUpdate().cleanup(limit_s)
 
-            if limit_s == 0:
-                SourceDataController.cleanup()
+        if limit_s == 0:
+            SourceDataController.cleanup()
 
-                AppLogging.cleanup()
-                DomainsController.cleanup()
-                KeyWords.cleanup()
-                UserConfig.cleanup()
-                SourceExportHistory.cleanup()
-                ModelFiles.cleanup()
-                SystemOperation.cleanup()
-                BlockEntryList.update()
+            AppLogging.cleanup()
+            DomainsController.cleanup()
+            KeyWords.cleanup()
+            UserConfig.cleanup()
+            SourceExportHistory.cleanup()
+            ModelFiles.cleanup()
+            SystemOperation.cleanup()
+            BlockEntryList.update()
 
-                self.user_tables_cleanup()
+            self.user_tables_cleanup()
 
-            # if status is True, everything has been cleared correctly
-            # we can remove the cleanup background job
+        # if status is True, everything has been cleared correctly
+        # we can remove the cleanup background job
 
-            elapsed_sec = self.get_time_diff()
-            AppLogging.notify(
-                "Successfully cleaned database. Time:{}".format(elapsed_sec)
-            )
-            return status
-
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        elapsed_sec = self.get_time_diff()
+        AppLogging.notify(
+            "Successfully cleaned database. Time:{}".format(elapsed_sec)
+        )
+        return status
 
     def user_tables_cleanup(self):
         UserTags.cleanup()
@@ -1141,14 +1028,9 @@ class CheckDomainsJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_CHECK_DOMAINS
 
     def process(self, obj=None):
-        try:
-            DomainsController.update_all()
+        DomainsController.update_all()
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class LinkScanJobHandler(BaseJobHandler):
@@ -1156,52 +1038,47 @@ class LinkScanJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_LINK_SCAN
 
     def process(self, obj=None):
-        try:
-            link = obj.subject
+        link = obj.subject
 
-            cfg = self.get_input_cfg(obj)
-            source = None
-            entry = None
+        cfg = self.get_input_cfg(obj)
+        source = None
+        entry = None
 
-            if "source_id" in cfg:
-                source_id = cfg["source_id"]
-                source_objs = SourceDataController.objects.filter(id=int(source_id))
-                if source_objs.count() > 0:
-                    source = source_objs[0]
+        if "source_id" in cfg:
+            source_id = cfg["source_id"]
+            source_objs = SourceDataController.objects.filter(id=int(source_id))
+            if source_objs.count() > 0:
+                source = source_objs[0]
 
-            if "entry_id" in cfg:
-                entry_id = cfg["entry_id"]
-                entries = LinkDataController.objects.filter(id=int(entry_id))
-                if entries.count() > 0:
-                    entry = entries[0]
+        if "entry_id" in cfg:
+            entry_id = cfg["entry_id"]
+            entries = LinkDataController.objects.filter(id=int(entry_id))
+            if entries.count() > 0:
+                entry = entries[0]
 
-            if "source" in cfg:
-                source_id = cfg["source"]
-                source_objs = SourceDataController.objects.filter(id=int(source_id))
-                if source_objs.count() > 0:
-                    source = source_objs[0]
+        if "source" in cfg:
+            source_id = cfg["source"]
+            source_objs = SourceDataController.objects.filter(id=int(source_id))
+            if source_objs.count() > 0:
+                source = source_objs[0]
 
-            if "entry" in cfg:
-                entry_id = cfg["entry"]
-                entries = LinkDataController.objects.filter(id=int(entry_id))
-                if entries.count() > 0:
-                    entry = entries[0]
+        if "entry" in cfg:
+            entry_id = cfg["entry"]
+            entries = LinkDataController.objects.filter(id=int(entry_id))
+            if entries.count() > 0:
+                entry = entries[0]
 
-            p = UrlHandler(link)
-            contents = p.get_contents()
+        p = UrlHandler(link)
+        contents = p.get_contents()
 
-            if entry:
-                scanner = EntryScanner(entry=entry, contents=contents)
-                scanner.run()
-            else:
-                scanner = EntryScanner(url=link, contents=contents)
-                scanner.run()
+        if entry:
+            scanner = EntryScanner(entry=entry, contents=contents)
+            scanner.run()
+        else:
+            scanner = EntryScanner(url=link, contents=contents)
+            scanner.run()
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class MoveToArchiveJobHandler(BaseJobHandler):
@@ -1209,14 +1086,9 @@ class MoveToArchiveJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_MOVE_TO_ARCHIVE
 
     def process(self, obj=None):
-        try:
-            LinkDataController.move_old_links_to_archive()
+        LinkDataController.move_old_links_to_archive()
 
-            return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+        return True
 
 
 class RunRuleJobHandler(BaseJobHandler):
@@ -1226,24 +1098,23 @@ class RunRuleJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             rule_id = int(obj.subject)
-
-            rules = EntryRules.objects.filter(id=rule_id)
-
-            entries_all = LinkDataController.objects.all()
-            p = Paginator(entries_all, 1000)
-            for page in p.num_pages:
-                page_obj = p.get_page(page_num)
-                entries = entries_all[page_obj.start_index() - 1 : page_obj.end_index()]
-
-                for rule in rules:
-                    if rule.is_blocked_by_rule(entry.link):
-                        entry.delete()
-
+        except ValueError:
+            AppLogging.error("Such rule does not exist")
             return True
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
+
+        rules = EntryRules.objects.filter(id=rule_id)
+
+        entries_all = LinkDataController.objects.all()
+        p = Paginator(entries_all, 1000)
+        for page in p.num_pages:
+            page_obj = p.get_page(page_num)
+            entries = entries_all[page_obj.start_index() - 1 : page_obj.end_index()]
+
+            for rule in rules:
+                if rule.is_blocked_by_rule(entry.link):
+                    entry.delete()
+
+        return True
 
 
 class CeleryTaskInterface(object):

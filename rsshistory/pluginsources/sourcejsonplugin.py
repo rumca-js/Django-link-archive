@@ -62,7 +62,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             j = json.loads(contents)
             return j
 
-        except Exception as E:
+        except ValueError as E:
             AppLogging.exc(E, "Could not load JSON {}".format(address))
 
     def get_links_from_source(self, source_json):
@@ -188,7 +188,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         recent_entries_json = None
         try:
             recent_entries_json = json.loads(recent_entries_list_contents)
-        except Exception as E:
+        except ValueError as E:
             AppLogging.exc(
                 E,
                 "Could not read recent entries JSON {}".format(

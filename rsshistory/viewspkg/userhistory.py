@@ -14,6 +14,9 @@ class UserEntryVisitHistoryListView(UserGenericListView):
     context_object_name = "content_list"
     paginate_by = 100
 
+    def get_title(self):
+        return "User entry visits"
+
 
 def search_history_remove(request, pk):
     p = ViewPage(request)

@@ -63,7 +63,7 @@ def index(request):
     if p.is_user_allowed(ConfigurationEntry.ACCESS_TYPE_ALL):
         entry = ConfigurationEntry.get()
         if not entry.initialized:
-            return redirect("{}:wizard".format(LinkDatabase.name))
+            return redirect("{}:wizard-init".format(LinkDatabase.name))
         else:
             return redirect("{}:entries-omni-search-init".format(LinkDatabase.name))
     else:
@@ -138,7 +138,7 @@ def configuration_advanced_page(request):
 
     if (
         configuration_entry.data_export_path != ""
-        and not Path(configuration_entry.data_export_path).exists()
+        and not Path(configuration_entry.get_export_path_abs()).exists()
     ):
         errors.append(
             f"Data export directory does not exist:{configuration_entry.data_export_path}"
@@ -146,7 +146,7 @@ def configuration_advanced_page(request):
 
     if (
         configuration_entry.data_import_path != ""
-        and not Path(configuration_entry.data_import_path).exists()
+        and not Path(configuration_entry.get_import_path_abs()).exists()
     ):
         errors.append(
             f"Data import directory does not exist:{configuration_entry.data_import_path}"
@@ -424,6 +424,16 @@ def wizard_setup(request):
         return data
 
     return p.render("wizard_setup.html")
+
+
+def wizard_setup_init(request):
+    p = ViewPage(request)
+    p.set_title("Select setup")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    return p.render("wizard_setup_init.html")
 
 
 def wizard_setup_news(request):

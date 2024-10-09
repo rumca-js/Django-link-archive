@@ -66,7 +66,10 @@ class ContentInterface(object):
 
         page_rating = (float(page_rating) * 100.0) / float(max_page_rating)
 
-        return int(page_rating)
+        try:
+            return int(page_rating)
+        except ValueError:
+            return 0
 
     def get_page_rating_vector(self):
         """
@@ -157,7 +160,11 @@ class ContentInterface(object):
         content = content.lower()
 
         # Get the current year
-        current_year = int(datetime.now().year)
+        try:
+            current_year = int(datetime.now().year)
+        except ValueError:
+            # TODO fix this
+            current_year = 2024
 
         # Define regular expressions
         current_year_pattern = re.compile(rf"\b{current_year}\b")
@@ -170,7 +177,12 @@ class ContentInterface(object):
         scope = None
 
         if match_current_year:
-            year = int(current_year)
+            try:
+                year = int(current_year)
+            except ValueError:
+                # TODO fix this
+                year = 2024
+
             # Limit the scope to a specific portion before and after year
             scope = content[
                 max(0, match_current_year.start() - 15) : match_current_year.start()
@@ -179,14 +191,19 @@ class ContentInterface(object):
         else:
             match_four_digit_number = four_digit_number_pattern.search(content)
             if match_four_digit_number:
-                year = int(match_four_digit_number.group(0))
-                # Limit the scope to a specific portion before and after year
-                scope = content[
-                    max(
-                        0, match_four_digit_number.start() - 15
-                    ) : match_four_digit_number.start()
-                    + 20
-                ]
+
+                try:
+                    year = int(match_four_digit_number.group(0))
+
+                    # Limit the scope to a specific portion before and after year
+                    scope = content[
+                        max(
+                            0, match_four_digit_number.start() - 15
+                        ) : match_four_digit_number.start()
+                        + 20
+                    ]
+                except ValueError:
+                    return
 
         if scope:
             return self.guess_by_scope(scope, year)
@@ -264,7 +281,7 @@ class ContentInterface(object):
         try:
             month_number = int(month)
             month_number = month
-        except Exception as E:
+        except ValueError as E:
             WebLogger.debug("Error:{}".format(str(E)))
 
         if not month_number:
@@ -414,7 +431,7 @@ class JsonPage(ContentInterface):
         try:
             contents = self.get_contents()
             self.json_obj = json.loads(contents)
-        except Exception as e:
+        except ValueError:
             # to be expected
             WebLogger.debug("Invalid json:{}".format(contents))
 
@@ -597,13 +614,13 @@ class RssPageEntry(ContentInterface):
                     utc = DateUtils.to_utc_date(dt)
                     return utc
 
-                except Exception as e:
+                except Exception as E:
                     WebLogger.error(
                         "RSS parser {} datetime invalid feed datetime:{};\nFeed DateTime:{};\nExc:{}\n".format(
                             self.url,
                             self.feed_entry.published,
                             self.feed_entry.published,
-                            str(e),
+                            str(E),
                         )
                     )
                 return DateUtils.get_datetime_now_utc()

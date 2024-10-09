@@ -1,5 +1,6 @@
 from ..models import ConfigurationEntry
 from ..controllers import LinkDataController, DomainsController
+from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -7,8 +8,13 @@ from .fakeinternet import FakeInternetTestCase
 class DomainTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        config = Configuration.get_object().config_entry
+        config.accept_domains = True
+        config.save()
+        Configuration.get_object().config_entry = config
 
     def test_domain_add(self):
+
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 

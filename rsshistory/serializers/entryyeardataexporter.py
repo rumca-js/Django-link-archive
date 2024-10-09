@@ -47,15 +47,19 @@ class EntryYearDataMainExporter(MainExporter):
                 str_date = entry.date_published.strftime("%Y")
                 try:
                     return int(str_date)
-                except Exception as E:
+                except ValueError as E:
                     LinkDatabase.info("Error: {}".format(str(E)))
 
         return self.get_current_year()
 
     def get_current_year(self):
         today = DateUtils.get_date_today()
-        year = int(DateUtils.get_datetime_year(today))
-        return year
+        try:
+            year = int(DateUtils.get_datetime_year(today))
+            return year
+        except ValueError:
+            # TODO fix this
+            return 2024
 
     def export(self, directory):
         entries_dir = directory

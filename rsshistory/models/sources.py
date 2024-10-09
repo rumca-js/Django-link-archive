@@ -204,6 +204,8 @@ class SourceDataModel(models.Model):
             "title",
             "category__category_id",
             "subcategory__subcategory_id",
+            "category__category_name",
+            "subcategory__subcategory_name",
             "category_name",
             "subcategory_name",
             "export_to_cms",

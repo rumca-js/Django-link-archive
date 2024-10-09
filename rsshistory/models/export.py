@@ -169,26 +169,22 @@ class SourceExportHistory(models.Model):
     def is_update_required(export):
         from ..configuration import Configuration
 
-        try:
-            yesterday = DateUtils.get_date_yesterday()
+        yesterday = DateUtils.get_date_yesterday()
 
-            history = SourceExportHistory.objects.filter(date=yesterday, export=export)
+        history = SourceExportHistory.objects.filter(date=yesterday, export=export)
 
-            if history.count() != 0:
-                return False
+        if history.count() != 0:
+            return False
 
-            c = Configuration.get_object()
+        c = Configuration.get_object()
 
-            now = DateUtils.get_datetime_now_utc()
-            local = c.get_local_time_object(now)
+        now = DateUtils.get_datetime_now_utc()
+        local = c.get_local_time_object(now)
 
-            if local.time() < export.export_time:
-                return False
+        if local.time() < export.export_time:
+            return False
 
-            return True
-
-        except Exception as E:
-            AppLogging.exc(E, "Exception for update")
+        return True
 
     def get_safe():
         return SourceExportHistory.objects.all()[:7]

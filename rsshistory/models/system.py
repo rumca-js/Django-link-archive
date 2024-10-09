@@ -1,6 +1,7 @@
 import logging
 import traceback
 from pathlib import Path
+import os
 
 from pytz import timezone
 from datetime import datetime, date, timedelta
@@ -380,8 +381,19 @@ class ConfigurationEntry(models.Model):
         else:
             return confs[0]
 
-    def get_data_export_path(self):
-        return self.data_export_path
+    def get_main_directory(self):
+        file_path = os.path.realpath(__file__)
+        full_path = Path(file_path)
+        main_directory = full_path.parents[2]
+        return main_directory
+
+    def get_export_path_abs(self):
+        main_directory = self.get_main_directory()
+        return main_directory / self.data_export_path
+
+    def get_import_path_abs(self):
+        main_directory = self.get_main_directory()
+        return main_directory / self.data_import_path
 
     def get_entries_order_by(self):
         """
@@ -401,6 +413,21 @@ class ConfigurationEntry(models.Model):
         users = User.objects.filter(username=self.admin_user)
         if users.count() == 0:
             self.admin_user = ""
+
+        main_directory = self.get_main_directory()
+        export_path = main_directory / self.data_export_path
+        if not export_path.exists():
+            try:
+                export_path.mkdir(parents=True, exist_ok=True)
+            except OSError:
+                self.data_export_path = None
+
+        import_path = main_directory / self.data_import_path
+        if not import_path.exists():
+            try:
+                import_path.mkdir(parents=True, exist_ok=True)
+            except OSError:
+                self.data_import_path = None
 
         try:
             tzn = timezone(self.time_zone)
@@ -812,18 +839,15 @@ class AppLogging(models.Model):
         return AppLogging.objects.all()[0:100]
 
     def remove_old_infos():
-        try:
-            date_range = DateUtils.get_days_range(3)
-            while True:
-                objs = AppLogging.objects.filter(date__lt=date_range[0])
+        date_range = DateUtils.get_days_range(3)
+        while True:
+            objs = AppLogging.objects.filter(date__lt=date_range[0])
 
-                if not objs.exists():
-                    break
+            if not objs.exists():
+                break
 
-                obj = objs[0]
-                obj.delete()
-        except Exception as e:
-            LinkDatabase.info("Could not remove old persistant infos {}".format(e))
+            obj = objs[0]
+            obj.delete()
 
     def is_info(self):
         return self.level == AppLogging.INFO

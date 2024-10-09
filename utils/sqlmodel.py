@@ -56,17 +56,19 @@ class SqlConnection(object):
     def create_database(self):
         file_name = self.get_database_file()
 
-        try:
-            # self.engine = create_engine('sqlite:///'+file_name, echo=True)
-            self.engine = create_engine("sqlite:///" + file_name)
-            return True
-        except Exception as e:
-            print(
-                "Could not create sqlite3 database file:{}. Exception:{}".format(
-                    file_name, str(e)
-                )
-            )
-            return False
+        #try:
+
+        # self.engine = create_engine('sqlite:///'+file_name, echo=True)
+        self.engine = create_engine("sqlite:///" + file_name)
+        return True
+
+        #except Exception as e:
+        #    print(
+        #        "Could not create sqlite3 database file:{}. Exception:{}".format(
+        #            file_name, str(e)
+        #        )
+        #    )
+        #    return False
 
     def close(self):
         self.engine.dispose()

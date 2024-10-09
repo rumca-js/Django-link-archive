@@ -6,20 +6,13 @@ from django.http import HttpResponseRedirect, HttpResponse
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry
 from ..models import ModelFiles
-from ..views import ViewPage
+from ..views import ViewPage, GenericListView
 
 
-class ModelFilesListView(generic.ListView):
+class ModelFilesListView(GenericListView):
     model = ModelFiles
     context_object_name = "content_list"
     paginate_by = 100
-
-    def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super().get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -35,8 +28,12 @@ class ModelFilesListView(generic.ListView):
         context["sum_size_bytes"] = sum_size_bytes
         context["sum_size_kilobytes"] = sum_size_bytes / 1000.0
         context["sum_size_megabytes"] = sum_size_bytes / 1000000.0
+        context["page_title"] += " " + self.get_title()
 
         return context
+
+    def get_title(self):
+        return "Model files"
 
 
 def model_file(request, pk):

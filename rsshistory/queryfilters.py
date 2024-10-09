@@ -61,13 +61,7 @@ class BaseQueryFilter(object):
         objects = self.get_objects()
 
         if conditions is not None:
-            try:
-                return objects.filter(conditions)
-            except Exception as E:
-                error_text = "{}\n{}".format(str(E), traceback.format_exc())
-
-                self.errors.append(error_text)
-                return objects.none()
+            return objects.filter(conditions)
         else:
             return objects.none()
 
@@ -86,7 +80,10 @@ class BaseQueryFilter(object):
 
     def get_limit(self):
         if "page" in self.args:
-            page = int(self.args["page"])
+            try:
+               page = int(self.args["page"])
+            except ValueError:
+                page = 1
         else:
             page = 1
 
@@ -183,12 +180,15 @@ class SourceFilter(BaseQueryFilter):
         return Q(**args)
 
     def get_filter_args_map_keys(self):
-        return ["category", "subcategory", "title", "url"]
+        return ["category_name", "subcategory_name", "title", "url"]
 
     def get_model_pagination(self):
         from .viewspkg.sources import SourceListView
 
-        return int(SourceListView.paginate_by)
+        try:
+            return int(SourceListView.paginate_by)
+        except ValueError:
+            return 100
 
 
 class EntryFilter(BaseQueryFilter):
@@ -202,7 +202,10 @@ class EntryFilter(BaseQueryFilter):
     def get_model_pagination(self):
         from .viewspkg.entries import EntriesSearchListView
 
-        return int(EntriesSearchListView.paginate_by)
+        try:
+            return int(EntriesSearchListView.paginate_by)
+        except ValueError:
+            return 100
 
     def get_objects(self):
         if not self.use_archive_source:
@@ -307,8 +310,6 @@ class EntryFilter(BaseQueryFilter):
             # not related to entry/link
             "source_id",
             "source_title",
-            "category",
-            "subcategory",
             "archive",
         ]
 

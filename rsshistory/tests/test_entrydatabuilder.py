@@ -67,7 +67,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs.count(), 1)
         self.assertEqual(objs[0].link, link_name)
         self.assertEqual(objs[0].date_published, creation_date)
-        self.assertEqual(objs[0].user_object, self.user)
+        self.assertEqual(objs[0].user, self.user)
 
         self.assertEqual(objs[0].page_rating_contents, 23)
         # votes are reset

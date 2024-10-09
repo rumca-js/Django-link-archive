@@ -65,10 +65,10 @@ class InstanceImporter(object):
 
         try:
             json_data = json.loads(instance_text)
-        except Exception as E:
-            exc_string = traceback.format_exc()
-            AppLogging.info(
-                "Cannot load JSON:{}\nExc:{}".format(instance_text, exc_string)
+        except ValueError as E:
+            AppLogging.exc(
+                E,
+                "Cannot load JSON:{}".format(instance_text)
             )
             return
 

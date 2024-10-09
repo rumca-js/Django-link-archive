@@ -13,22 +13,15 @@ from ..controllers import (
     LinkDataController,
     DomainsController,
 )
-from ..views import ViewPage
+from ..views import ViewPage, GenericListView
 from ..forms import DomainsChoiceForm, DomainEditForm, LinkInputForm
 from ..queryfilters import DomainFilter
 
 
-class DomainsListView(generic.ListView):
+class DomainsListView(GenericListView):
     model = DomainsController
     context_object_name = "content_list"
     paginate_by = 100
-
-    def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super().get(*args, **kwargs)
 
     def get_queryset(self):
         self.sort = "normal"
@@ -61,6 +54,7 @@ class DomainsListView(generic.ListView):
         context["form"] = self.filter_form
         context["query_filter"] = self.query_filter
         context["reset_link"] = self.get_reset_link()
+        context["page_title"] += " " + self.get_title()
 
         return context
 
@@ -89,6 +83,9 @@ class DomainsListView(generic.ListView):
                 arg_data[arg] = self.request.GET[arg]
 
         return "&" + urlencode(arg_data)
+
+    def get_title(self):
+        return "Domains"
 
 
 class DomainsDetailView(generic.DetailView):

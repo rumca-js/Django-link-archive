@@ -21,46 +21,17 @@ from ..controllers import (
 )
 from ..forms import SourceForm, ContentsForm, SourcesChoiceForm, SourceInputForm
 from ..queryfilters import SourceFilter
-from ..views import ViewPage
+from ..views import ViewPage, GenericListView, get_request_order_by, get_request_page_num
 from ..configuration import Configuration
 from ..pluginurl import UrlHandler
 from ..pluginsources import SourceControllerBuilder
 from ..serializers.instanceimporter import InstanceExporter
 
 
-def get_request_order_by(request):
-    if "order" in request.GET:
-        order = request.GET["order"]
-        return [order]
-    else:
-        config = Configuration.get_object().config_entry
-        return config.get_entries_order_by()
-
-
-def get_request_page_num(request):
-    if "page" in request.GET:
-        page = request.GET["page"]
-        try:
-            page = int(page)
-        except Exception as e:
-            page = 1
-
-        return page
-    else:
-        return 1
-
-
-class SourceListView(generic.ListView):
+class SourceListView(GenericListView):
     model = SourceDataController
     context_object_name = "source_list"
     paginate_by = 100
-
-    def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super().get(*args, **kwargs)
 
     def get_queryset(self):
         self.query_filter = SourceFilter(self.request.GET, self.request.user)
@@ -90,7 +61,7 @@ class SourceListView(generic.ListView):
         context["query_filter"] = self.query_filter
 
         context["form"] = self.filter_form
-        context["page_title"] += " - news source list"
+        context["page_title"] += " " + self.get_title()
 
         return context
 
@@ -110,6 +81,9 @@ class SourceListView(generic.ListView):
                 arg_data[arg] = self.request.GET[arg]
 
         return "&" + urlencode(arg_data)
+
+    def get_title(self):
+        return "Sources"
 
 
 class SourceDetailView(generic.DetailView):

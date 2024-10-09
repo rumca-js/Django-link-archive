@@ -127,22 +127,14 @@ class BackgroundJobController(BackgroundJob):
         return objs.count() > 0
 
     def create_single_job(job_name, subject="", args=""):
-        try:
-            items = BackgroundJob.objects.filter(job=job_name, subject=subject)
-            if items.count() == 0:
-                return BackgroundJob.objects.create(
-                    job=job_name,
-                    task=None,
-                    subject=subject,
-                    args=args,
-                    priority=BackgroundJobController.get_job_priority(job_name),
-                )
-        except Exception as E:
-            AppLogging.exc(
-                E,
-                "Creating single job_name:{}, subject:{}, args:{}".format(
-                    job_name, subject, args
-                ),
+        items = BackgroundJob.objects.filter(job=job_name, subject=subject)
+        if items.count() == 0:
+            return BackgroundJob.objects.create(
+                job=job_name,
+                task=None,
+                subject=subject,
+                args=args,
+                priority=BackgroundJobController.get_job_priority(job_name),
             )
 
     # job functions are defined below
@@ -313,29 +305,24 @@ class BackgroundJobController(BackgroundJob):
             )
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
-        try:
-            if date_stop < date_start:
-                AppLogging.error(
-                    "Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(
-                        date_start, date_stop
-                    )
+        if date_stop < date_start:
+            AppLogging.error(
+                "Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(
+                    date_start, date_stop
                 )
-                return False
-
-            sent = False
-            current_date = date_start
-            while current_date <= date_stop:
-                str_date = current_date.isoformat()
-                current_date += timedelta(days=1)
-
-                BackgroundJobController.write_daily_data(str_date)
-                sent = True
-
-            return sent
-        except Exception as E:
-            AppLogging.exc(
-                E, "write_daily_data_range: {} {}".format(date_start, date_stop)
             )
+            return False
+
+        sent = False
+        current_date = date_start
+        while current_date <= date_stop:
+            str_date = current_date.isoformat()
+            current_date += timedelta(days=1)
+
+            BackgroundJobController.write_daily_data(str_date)
+            sent = True
+
+        return sent
 
     def write_daily_data(input_date):
         return BackgroundJobController.create_single_job(
@@ -343,15 +330,10 @@ class BackgroundJobController(BackgroundJob):
         )
 
     def write_daily_data_str(start="2022-01-01", stop="2022-12-31"):
-        try:
-            date_start = datetime.strptime(start, "%Y-%m-%d").date()
-            date_stop = datetime.strptime(stop, "%Y-%m-%d").date()
+        date_start = datetime.strptime(start, "%Y-%m-%d").date()
+        date_stop = datetime.strptime(stop, "%Y-%m-%d").date()
 
-            BackgroundJobController.write_daily_data_range(date_start, date_stop)
-        except Exception as e:
-            AppLogging.exc(
-                E, "write_daily_data_str: {} {}".format(date_start, date_stop)
-            )
+        BackgroundJobController.write_daily_data_range(date_start, date_stop)
 
     def write_tag_data(tag):
         return BackgroundJobController.create_single_job(
@@ -384,26 +366,23 @@ class BackgroundJobController(BackgroundJob):
         )
 
     def link_save(link_url):
-        try:
-            archive_items = BackgroundJob.objects.filter(
-                job=BackgroundJob.JOB_LINK_SAVE
+        archive_items = BackgroundJob.objects.filter(
+            job=BackgroundJob.JOB_LINK_SAVE
+        )
+        if archive_items.count() < 100:
+            return BackgroundJob.objects.create(
+                job=BackgroundJob.JOB_LINK_SAVE,
+                task=None,
+                subject=link_url,
+                args="",
+                priority=BackgroundJobController.get_job_priority(
+                    BackgroundJob.JOB_LINK_SAVE
+                ),
             )
-            if archive_items.count() < 100:
-                return BackgroundJob.objects.create(
-                    job=BackgroundJob.JOB_LINK_SAVE,
-                    task=None,
-                    subject=link_url,
-                    args="",
-                    priority=BackgroundJobController.get_job_priority(
-                        BackgroundJob.JOB_LINK_SAVE
-                    ),
-                )
-            else:
-                for key, obj in enumerate(archive_items):
-                    if key > 100:
-                        obj.delete()
-        except Exception as E:
-            AppLogging.exc("link_save. Link URL:{}".format(link_url))
+        else:
+            for key, obj in enumerate(archive_items):
+                if key > 100:
+                    obj.delete()
 
     def link_download(link_url):
         return BackgroundJobController.create_single_job(
@@ -477,9 +456,12 @@ class BackgroundJobController(BackgroundJob):
         BackgroundJob.objects.all().delete()
 
     def on_error(self):
+        """
+        Disabling background jobs at the second attempt.
+        """
         self.errors += 1
 
-        if self.errors > 5:
+        if self.errors > 1:
             self.enabled = False
 
             AppLogging.error(
@@ -530,7 +512,7 @@ class BackgroundJobController(BackgroundJob):
                     source = self.get_text_to_source(cfg["source_id"])
                     if source:
                         return source.get_absolute_url()
-            except Exception as E:
+            except ValueError as E:
                 AppLogging.debug(E, "Error when loading JSON: {}".format(self.args))
                 return
 
@@ -542,7 +524,7 @@ class BackgroundJobController(BackgroundJob):
     def get_text_to_source(self, text):
         try:
             source_id = int(text)
-        except Exception as e:
+        except ValueError:
             return
 
         sources = SourceDataModel.objects.filter(id=source_id)
@@ -552,7 +534,7 @@ class BackgroundJobController(BackgroundJob):
     def get_text_to_entry(self, text):
         try:
             entry_id = int(text)
-        except Exception as e:
+        except ValueError as E:
             return
 
         entries = LinkDataModel.objects.filter(id=entry_id)

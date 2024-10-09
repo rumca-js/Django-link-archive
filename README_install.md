@@ -5,14 +5,16 @@ Docker image is available at [hub.docker.com](https://hub.docker.com/r/rozbujnik
 
 Notes:
 
- - the image uses 'admin' user, with 'admin' password. Django can be accessed locally with 127.0.0.1:8000, via browser.
+ - the image uses 'admin' user, with 'admin' password by default
+ - configure docker-compose.yml according to your own setup
+ - django can be accessed locally with 127.0.0.1:8000, via browser
 
 # Overview
 
 This project uses the following technologies:
  - django
  - celery - background task processing
- - Postgresql - use of SQLite is discouraged
+ - postgresql - use of SQLite is discouraged
  - spacy - for text/keyword analysis
  - selenium / crawlee
  - rabbitmq-server

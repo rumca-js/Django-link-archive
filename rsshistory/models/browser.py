@@ -74,8 +74,8 @@ class Browser(models.Model):
                 settings = {}
                 try:
                     settings = json.dumps(browser_config["settings"])
-                except Exception as E:
-                    AppLogging.exc("Cannot dumps browser settings")
+                except ValueError as E:
+                    AppLogging.exc(E, "Cannot dumps browser settings")
 
                 enabled = browser_config["enabled"]
 
@@ -104,8 +104,8 @@ class Browser(models.Model):
             if browser.settings != None and browser.settings != "":
                 try:
                     settings = json.loads(browser.settings)
-                except Exception as E:
-                    AppLogging.exc("Cannot load browser settings")
+                except ValueError as E:
+                    AppLogging.exc(E, "Cannot load browser settings")
 
             browser_config = {
                 "crawler": browser.crawler,

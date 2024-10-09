@@ -165,6 +165,7 @@ urlpatterns = [
     path("missing-rights/", system.missing_rights, name="missing-rights"),
     path("reset-config/", system.reset_config, name="reset-config"),
     path("wizard", system.wizard_setup, name="wizard",),
+    path("wizard-init", system.wizard_setup_init, name="wizard-init",),
     path("wizard-setup-news", system.wizard_setup_news, name="wizard-setup-news",),
     path("wizard-setup-gallery", system.wizard_setup_gallery, name="wizard-setup-gallery",),
     path("wizard-setup-search-engine", system.wizard_setup_search_engine, name="wizard-setup-search-engine",),
