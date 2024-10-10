@@ -23,7 +23,6 @@ from ..models import (
     UserConfig,
     Domains,
     UserEntryVisitHistory,
-    UserSearchHistory,
     UserEntryTransitionHistory,
     UserSearchHistory,
     EntryRules,
@@ -50,9 +49,10 @@ from ..forms import (
 )
 from ..views import (
     ViewPage,
-    get_search_term_request,
-    get_request_order_by,
-    get_request_page_num,
+    GenericListView,
+    get_search_term,
+    get_order_by,
+    get_page_num,
 )
 from ..queryfilters import EntryFilter, OmniSearchFilter
 from ..configuration import Configuration
@@ -61,7 +61,7 @@ from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
 
 
-class EntriesSearchListView(generic.ListView):
+class EntriesSearchListView(GenericListView):
     model = LinkDataController
     context_object_name = "entry_list"
     paginate_by = 100
@@ -71,15 +71,15 @@ class EntriesSearchListView(generic.ListView):
         """
         API: Used to redirect if user does not have rights
         """
-        print("EntriesSearchListView:get")
-
-        self.time_start = datetime.now()
-        self.query = None
-
         p = ViewPage(self.request)
         data = p.check_access()
         if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        print("EntriesSearchListView:get")
+
+        self.time_start = datetime.now()
+        self.query = None
 
         print("EntriesSearchListView:get constructor of list view")
         view = super().get(*args, **kwargs)
@@ -129,16 +129,13 @@ class EntriesSearchListView(generic.ListView):
         # Create any data and add it to the context
         self.init_display_type(context)
 
-        self.search_term = get_search_term_request(self.request)
+        self.search_term = get_search_term(self.request.GET)
 
         context["page_title"] += self.get_title()
 
         queue_size = BackgroundJobController.get_number_of_jobs(
             BackgroundJob.JOB_PROCESS_SOURCE
         )
-        context["rss_are_fetched"] = queue_size > 0
-        context["rss_queue_size"] = queue_size
-
         context["query_filter"] = self.query_filter
         context["reset_link"] = self.get_reset_link()
         context["view_link"] = self.get_view_link()
@@ -151,7 +148,6 @@ class EntriesSearchListView(generic.ListView):
         context["form"] = self.filter_form
 
         context["search_engines"] = SearchEngines(self.search_term)
-        context["query"] = self.query
         context["form_submit_button_name"] = "Search"
 
         context["entry_query_names"] = LinkDataController.get_query_names()
@@ -169,7 +165,7 @@ class EntriesSearchListView(generic.ListView):
         return context
 
     def get_order_by(self):
-        return get_request_order_by(self.request)
+        return get_order_by(self.request.GET)
 
     def get_filter(self):
         print("EntriesSearchListView:get_filter")
@@ -198,18 +194,6 @@ class EntriesSearchListView(generic.ListView):
             + "?"
             + self.query_filter.get_filter_string()
         )
-
-    def get_search_link(self, search_term):
-        if search_term.find("link =") >= 0 or search_term.find("link=") >= 0:
-            wh = search_term.find("=")
-            if wh >= 0:
-                wh2 = search_term.find("=", wh + 1)
-                if wh2 >= 0:
-                    wh = wh2
-
-                search_term = search_term[wh + 1 :].strip()
-
-        return search_term
 
     def get_form_action_link(self):
         return reverse("{}:entries".format(LinkDatabase.name))
@@ -299,7 +283,7 @@ class EntriesOmniListView(EntriesSearchListView):
 
     def on_search(self):
         if self.request.user.is_authenticated:
-            search_term = get_search_term_request(self.request)
+            search_term = get_search_term(self.request.GET)
             if search_term:
                 UserSearchHistory.add(self.request.user, search_term)
 
@@ -1096,7 +1080,7 @@ def get_generic_search_init_context(request, form, user_choices):
     context = {}
     context["form"] = form
 
-    search_term = get_search_term_request(request)
+    search_term = get_search_term(request.GET)
     context["search_term"] = search_term
     context["search_engines"] = SearchEngines(search_term)
     context["search_history"] = user_choices
@@ -1370,7 +1354,7 @@ def entries_json(request):
         if query_type == view.get_query_type():
             view_to_use = view
 
-    page_num = get_request_page_num(request)
+    page_num = get_page_num(request.GET)
 
     if view_to_use:
         links = view_to_use.get_queryset()

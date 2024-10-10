@@ -21,7 +21,7 @@ from ..controllers import (
 )
 from ..forms import SourceForm, ContentsForm, SourcesChoiceForm, SourceInputForm
 from ..queryfilters import SourceFilter
-from ..views import ViewPage, GenericListView, get_request_order_by, get_request_page_num
+from ..views import ViewPage, GenericListView, get_page_num
 from ..configuration import Configuration
 from ..pluginurl import UrlHandler
 from ..pluginsources import SourceControllerBuilder
@@ -723,7 +723,7 @@ def sources_json(request):
         view.request = request
         view_to_use = view
 
-    page_num = get_request_page_num(request)
+    page_num = get_page_num(request.GET)
 
     if view_to_use:
         links = view_to_use.get_queryset()

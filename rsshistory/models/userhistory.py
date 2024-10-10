@@ -11,6 +11,7 @@ from datetime import timedelta
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+import urllib.parse
 
 from utils.dateutils import DateUtils
 
@@ -120,6 +121,9 @@ class UserSearchHistory(models.Model):
 
     def get_choices_limit():
         return 60
+
+    def get_encoded_search_query(self):
+        return urllib.parse.quote(self.search_query)
 
 
 class UserEntryTransitionHistory(models.Model):

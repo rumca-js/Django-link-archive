@@ -7,23 +7,32 @@ from django.contrib.auth.models import User
 
 from .webtools import HtmlPage, RssPage, HttpPageHandler
 
-from .models import UserConfig, ConfigurationEntry, AppLogging, ApiKeys, ReadLater
+from .models import (
+   UserConfig,
+   ConfigurationEntry,
+   AppLogging,
+   ApiKeys,
+   ReadLater,
+   SystemOperation,
+   ReadLater
+)
 from .configuration import Configuration
+from .controllers import BackgroundJobController
 from .apps import LinkDatabase
 from .configuration import Configuration
 from .pluginurl.urlhandler import UrlHandler
 
 
-def get_search_term_request(request):
+def get_search_term(themap):
     search_term = ""
-    if "title" in request.GET and request.GET["title"] != "":
-        search_term = request.GET["title"]
-    elif "tag" in request.GET and request.GET["tag"] != "":
-        search_term = request.GET["tag"]
-    elif "search_history" in request.GET and request.GET["search_history"] != "":
-        search_term = request.GET["search_history"]
-    elif "search" in request.GET and request.GET["search"] != "":
-        search_term = request.GET["search"]
+    if "title" in themap and themap["title"] != "":
+        search_term = themap["title"]
+    elif "tag" in themap and themap["tag"] != "":
+        search_term = themap["tag"]
+    elif "search_history" in themap and themap["search_history"] != "":
+        search_term = themap["search_history"]
+    elif "search" in themap and themap["search"] != "":
+        search_term = themap["search"]
         if search_term[0] == "'":
             search_term = search_term[1:-1]
         if search_term[0] == '"':
@@ -31,21 +40,19 @@ def get_search_term_request(request):
 
     return search_term
 
-    return search_term
 
-
-def get_request_order_by(request):
-    if "order" in request.GET:
-        order = request.GET["order"]
+def get_order_by(themap):
+    if "order" in themap:
+        order = themap["order"]
         return [order]
     else:
         config = Configuration.get_object().config_entry
         return config.get_entries_order_by()
 
 
-def get_request_page_num(request):
-    if "page" in request.GET:
-        page = request.GET["page"]
+def get_page_num(themap):
+    if "page" in themap:
+        page = themap["page"]
         try:
             page = int(page)
         except ValueError:
@@ -70,6 +77,19 @@ class ViewPage(object):
             context.update(c.get_context())
 
             context["is_user_allowed"] = True
+
+            queue_size = BackgroundJobController.get_number_of_jobs(
+                BackgroundJobController.JOB_PROCESS_SOURCE
+            )
+            context["rss_are_fetched"] = queue_size > 0
+            context["rss_queue_size"] = queue_size
+
+            context["last_internet_status"] = SystemOperation.get_last_internet_status()
+
+            context["is_read_later"] = (
+                ReadLater.objects.filter(user=self.request.user).count() != 0
+            )
+
         else:
             context.update(Configuration.get_context_minimal())
             context["is_user_allowed"] = False
@@ -80,12 +100,6 @@ class ViewPage(object):
 
         context["user_config"] = UserConfig.get(self.request.user)
         context["is_mobile"] = self.is_mobile()
-        if self.request.user.is_authenticated:
-            context["is_read_later"] = (
-                ReadLater.objects.filter(user=self.request.user).count() != 0
-            )
-        else:
-            context["is_read_later"] = False
 
         return context
 

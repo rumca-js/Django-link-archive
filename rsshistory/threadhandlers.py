@@ -998,7 +998,6 @@ class CleanupJobHandler(BaseJobHandler):
             SourceExportHistory.cleanup()
             ModelFiles.cleanup()
             SystemOperation.cleanup()
-            BlockEntryList.update()
 
             self.user_tables_cleanup()
 

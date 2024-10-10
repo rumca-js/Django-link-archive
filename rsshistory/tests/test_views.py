@@ -6,6 +6,7 @@ from utils.dateutils import DateUtils
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..models import KeyWords, DataExport
+from ..views import get_search_term
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -54,32 +55,6 @@ class ViewsTest(FakeInternetTestCase):
 
         # redirect
         self.assertEqual(response.status_code, 302)
-
-    """ TODO
-    def test_entry_download_music(self):
-        url = reverse("{}:entry-download-music".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entry_download_video(self):
-        url = reverse("{}:entry-download-video".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entry_download(self):
-        url = reverse("{}:entry-download".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entry_save(self):
-        url = reverse("{}:entry-save".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-    """
 
     """
     Other views
@@ -205,3 +180,16 @@ class ViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+
+class GenericViewsTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_get_search_term(self):
+        themap = {"search" : "something1 = else & something2 = else2"}
+
+        # call tested function
+        term = get_search_term(themap)
+
+        self.assertEqual(term, "something1 = else & something2 = else2")

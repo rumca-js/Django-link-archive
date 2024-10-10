@@ -840,6 +840,7 @@ class EntryWrapper(object):
         self.entry = entry
         self.user = user
 
+        self.link=None
         if self.entry:
             self.link = self.entry.link
         if link:

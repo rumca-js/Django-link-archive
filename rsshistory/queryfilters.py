@@ -12,6 +12,7 @@ from .controllers import (
 )
 from .apps import LinkDatabase
 from .models import UserConfig, AppLogging
+from .views import get_search_term
 
 
 class BaseQueryFilter(object):
@@ -567,11 +568,8 @@ class OmniSearchFilter(BaseQueryFilter):
     def __init__(self, args):
         super().__init__(args)
 
-        if "search_history" in self.args and self.args["search_history"] != "":
-            self.search_query = self.args["search_history"]
-        elif "search" in self.args and self.args["search"] != "":
-            self.search_query = self.args["search"]
-        else:
+        self.search_query = get_search_term(args)
+        if not self.search_query:
             self.search_query = ""
 
         self.parser = OmniSearchWithDefault(

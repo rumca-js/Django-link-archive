@@ -13,12 +13,18 @@
         {% endif %}
     </div>
 
-  {% if rss_are_fetched %}
+  {% if rss_are_fetched or last_internet_status is False %}
   <div class="text-center p-1" style="background-color: rgba(0, 0, 0, 0);">
+      {% if last_internet_status is False %}
+      Internet status:{{last_internet_status}}
+      {% endif %}
+
+      {% if rss_are_fetched %}
       <span class="spinner-border spinner-border-sm text-danger" role="status">
           <span class="sr-only"></span>
       </span>
       <span class="error-text">Reading sources. Queue:{{rss_queue_size}}</span>
+      {% endif %}
   </div>
   {% endif %}
 </footer>
