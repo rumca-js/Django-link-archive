@@ -153,20 +153,20 @@ class WebConfig(object):
         return mapping
 
     def get_requests():
-        return {"enabled": True, "crawler": "RequestsCrawler", "settings": {}}
+        return {"enabled": True, "crawler": "RequestsCrawler", "settings": {"timeout_s" : 10}}
 
     def get_servercralwer(port, script):
         if port and script:
             return {
                 "enabled": True,
                 "crawler": "ServerCrawler",
-                "settings": {"port": port, "script": script},
+                "settings": {"port": port, "script": script, "timeout_s" : 20},
             }
         else:
             return {
                 "enabled": False,
                 "crawler": "ServerCrawler",
-                "settings": {"port": port, "script": script},
+                "settings": {"port": port, "script": script, "timeout_s" : 20},
             }
 
     def get_scriptcralwer(script):
@@ -174,13 +174,13 @@ class WebConfig(object):
             return {
                 "enabled": True,
                 "crawler": "ScriptCrawler",
-                "settings": {"script": script},
+                "settings": {"script": script, "timeout_s" : 20},
             }
         else:
             return {
                 "enabled": False,
                 "crawler": "ScriptCrawler",
-                "settings": {"script": script},
+                "settings": {"script": script, "timeout_s" : 20},
             }
 
     def get_seleniumheadless():
@@ -190,13 +190,13 @@ class WebConfig(object):
             return {
                 "enabled": True,
                 "crawler": "SeleniumChromeHeadless",
-                "settings": {"driver_executable": str(chromedriver_path)},
+                "settings": {"driver_executable": str(chromedriver_path), "timeout_s" : 20},
             }
         else:
             return {
                 "enabled": True,
                 "crawler": "SeleniumChromeHeadless",
-                "settings": {"driver_executable": None},
+                "settings": {"driver_executable": None, "timeout_s" : 20},
             }
 
     def get_seleniumfull():
@@ -206,13 +206,13 @@ class WebConfig(object):
             return {
                 "enabled": True,
                 "crawler": "SeleniumChromeFull",
-                "settings": {"driver_executable": str(chromedriver_path)},
+                "settings": {"driver_executable": str(chromedriver_path), "timeout_s" : 20},
             }
         else:
             return {
                 "enabled": True,
                 "crawler": "SeleniumChromeFull",
-                "settings": {"driver_executable": None},
+                "settings": {"driver_executable": None, "timeout_s" : 20},
             }
 
     def get_seleniumundetected():
@@ -222,13 +222,13 @@ class WebConfig(object):
             return {
                 "enabled": True,
                 "crawler": "SeleniumUndetected",
-                "settings": {"driver_executable": str(chromedriver_path)},
+                "settings": {"driver_executable": str(chromedriver_path), "timeout_s" : 20},
             }
         else:
             return {
                 "enabled": True,
                 "crawler": "SeleniumUndetected",
-                "settings": {"driver_executable": None},
+                "settings": {"driver_executable": None, "timeout_s" : 20},
             }
 
     def use_logger(Logger):

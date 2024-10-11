@@ -75,7 +75,6 @@ class Url(ContentInterface):
             self.handler = None
 
         self.response = None
-        self.contents = None
         if not url_builder:
             self.url_builder = Url
 
@@ -130,19 +129,40 @@ class Url(ContentInterface):
             return RssPage(url, "")
 
     def get_contents(self):
-        if self.contents:
-            return self.contents
+        """
+        Returns text
+        """
+        if self.response:
+            return self.response.get_text()
 
         if not self.handler:
             self.handler = self.get_handler_implementation()
 
         if self.handler:
-            self.contents = self.handler.get_contents()
+            self.response = self.handler.get_response()
+            if self.response:
+                return self.response.get_text()
+
+    def get_binary(self):
+        """
+        Returns text
+        """
+        if self.response:
+            return self.response.get_binary()
+
+        if not self.handler:
+            self.handler = self.get_handler_implementation()
+
+        if self.handler:
             self.response = self.handler.get_response()
 
-            return self.contents
+            if self.response:
+                return self.response.get_binary()
 
     def get_response(self):
+        """
+        Returns full response, with page handling object
+        """
         if self.response:
             return self.response
 
@@ -151,7 +171,6 @@ class Url(ContentInterface):
 
         if self.handler:
             self.response = self.handler.get_response()
-            self.contents = self.handler.get_contents()
 
             if self.response:
                 if not self.response.is_valid():

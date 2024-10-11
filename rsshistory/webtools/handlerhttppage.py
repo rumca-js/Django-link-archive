@@ -320,7 +320,7 @@ class HttpPageHandler(ContentInterface):
 
     def __init__(self, url=None, page_options=None):
         super().__init__(url=url, contents=None)
-        self.p = None  # page contents object, HtmlPage, RssPage, or whathver
+        self.p = None
         self.response = None
         self.options = page_options
 
@@ -333,22 +333,33 @@ class HttpPageHandler(ContentInterface):
         return False
 
     def get_contents(self):
+        """
+        Obtains only contents
+        """
         if self.response and self.response.get_text():
             return self.response.get_text()
 
-        return self.get_contents_implementation()
+        self.get_response_implementation()
+
+        if self.response and self.response.get_text():
+            return self.response.get_text()
 
     def get_response(self):
+        """
+        Obtains response, analyzes structure, etc
+        """
         if self.response:
             return self.response
 
-        self.get_contents_implementation()
+        self.get_response_implementation()
+
+        self.p = self.get_page_handler()
 
         if self.response:
             return self.response
 
-    def get_contents_implementation(self):
-        self.p = self.get_page_handler_simple()
+    def get_response_implementation(self):
+        self.get_response_once()
 
         if (
             self.options.use_browser_promotions
@@ -365,26 +376,22 @@ class HttpPageHandler(ContentInterface):
                 self.options.mode = "headless"
             if self.options.mode == "headless":
                 self.options.mode = "full"
-            self.p = self.get_page_handler_simple()
 
-        if self.response:
-            return self.response.get_text()
+            self.get_response_once()
 
-    def get_page_handler_simple(self):
+    def get_response_once(self):
         url = self.url
 
         dap = DomainAwarePage(url)
 
         if url.startswith("https") or url.startswith("http"):
             if not dap.is_media():
-                p = HttpRequestBuilder(url=url, options=self.options)
-                self.response = p.get_response()
+                builder = HttpRequestBuilder(url=url, options=self.options)
+                self.response = builder.get_response()
                 if not self.response:
                     return
 
-                contents = self.response.get_text()
-
-                if not p.is_valid():
+                if not builder.is_valid():
                     return
 
         else:
@@ -392,56 +399,26 @@ class HttpPageHandler(ContentInterface):
             # there is no request, there is no response
             pass
 
-        if contents:
-            """ """
+    def get_page_handler(self):
+        """
+        Note: some servers might return text/html for RSS sources.
+              We must manually check what kind of data it is.
+              For speed - we check first what is suggested by content-type
+        """
+        contents = None
+        if self.response and self.response.get_text():
+            contents = self.response.get_text()
 
-            if self.is_html():
-                p = HtmlPage(url, contents)
-                if p.is_valid():
-                    return p
+        if not contents:
+            return
 
-                # some servers might return text/html for RSS sources
-                # we verify if content type is valid
+        url = self.url
 
-                p = RssPage(url, contents)
-                if p.is_valid():
-                    return p
-
-                p = JsonPage(url, contents)
-                if p.is_valid():
-                    return p
-
-            if self.is_rss():
-                p = RssPage(url, contents)
-                if p.is_valid():
-                    return p
-
-                p = HtmlPage(url, contents)
-                if p.is_valid():
-                    return p
-
-                p = JsonPage(url, contents)
-                if p.is_valid():
-                    return p
-
-            if self.is_json():
-                p = JsonPage(url, contents)
-                if p.is_valid():
-                    return p
-
-                p = RssPage(url, contents)
-                if p.is_valid():
-                    return p
-
-                p = HtmlPage(url, contents)
-                if p.is_valid():
-                    return p
-
-            # we do not know what it is. Guess
-
+        if self.is_html():
             p = HtmlPage(url, contents)
             if p.is_valid():
                 return p
+
 
             p = RssPage(url, contents)
             if p.is_valid():
@@ -451,17 +428,57 @@ class HttpPageHandler(ContentInterface):
             if p.is_valid():
                 return p
 
-            # TODO
-            # p = XmlPage(url, contents)
-            # if p.is_valid():
-            #    return p
+        if self.is_rss():
+            p = RssPage(url, contents)
+            if p.is_valid():
+                return p
 
+            p = HtmlPage(url, contents)
+            if p.is_valid():
+                return p
+
+            p = JsonPage(url, contents)
+            if p.is_valid():
+                return p
+
+        if self.is_json():
+            p = JsonPage(url, contents)
+            if p.is_valid():
+                return p
+
+            p = RssPage(url, contents)
+            if p.is_valid():
+                return p
+
+            p = HtmlPage(url, contents)
+            if p.is_valid():
+                return p
+
+        if self.is_text():
             p = DefaultContentPage(url, contents)
             return p
 
-        if self.response and self.response.is_valid():
-            p = DefaultContentPage(url, contents)
+        # we do not know what it is. Guess
+
+        p = HtmlPage(url, contents)
+        if p.is_valid():
             return p
+
+        p = RssPage(url, contents)
+        if p.is_valid():
+            return p
+
+        p = JsonPage(url, contents)
+        if p.is_valid():
+            return p
+
+        # TODO
+        # p = XmlPage(url, contents)
+        # if p.is_valid():
+        #    return p
+
+        p = DefaultContentPage(url, contents)
+        return p
 
     def is_advanced_processing_possible(self):
         """
@@ -485,12 +502,12 @@ class HttpPageHandler(ContentInterface):
         if status_code < 200 or status_code > 404:
             return True
 
-        if not self.p:
-            return True
+        #if not self.p:
+        #    return True
 
-        if not self.p.is_valid():
-            # if we have response, but it is invalid, we may try obtaining contents with more advanced processing
-            return True
+        #if not self.p.is_valid():
+        #    # if we have response, but it is invalid, we may try obtaining contents with more advanced processing
+        #    return True
 
         text = self.response.get_text()
 
@@ -523,6 +540,14 @@ class HttpPageHandler(ContentInterface):
             self.response
             and self.response.get_content_type() is not None
             and self.response.is_content_json()
+        ):
+            return True
+
+    def is_text(self):
+        if (
+            self.response
+            and self.response.get_content_type() is not None
+            and self.response.get_content_type().find("text") >= 0
         ):
             return True
 

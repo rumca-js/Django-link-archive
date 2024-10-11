@@ -61,6 +61,15 @@ class CrawlerInterface(object):
         self.response_port = response_port
         self.settings = settings
 
+        if self.request.timeout_s and settings and "timeout_s" in settings:
+            self.timeout_s = max(self.request.timeout_s, settings["timeout_s"])
+        elif self.request.timeout_s:
+            self.timeout_s = self.request.timeout_s
+        elif settings and "timeout_s" in settings:
+            self.timeout_s = settings["timeout_s"]
+        else:
+            self.timeout_s = 10
+
     def run(self):
         """
          - does its job
@@ -302,7 +311,7 @@ class RequestsCrawler(CrawlerInterface):
         request_result = requests.get(
             self.request.url,
             headers=self.request.headers,
-            timeout=self.request.timeout_s,
+            timeout=self.timeout_s,
             verify=self.request.ssl_verify,
             stream=True,
         )
@@ -335,7 +344,12 @@ class StealthRequestsCrawler(CrawlerInterface):
             request_url=self.request.url,
         )
 
-        answer = requests.get(self.request.url)
+        import stealth_requests as requests
+        answer = requests.get(self.request.url,
+            timeout=self.timeout_s,
+            verify=self.request.ssl_verify,
+            stream=True,
+        )
 
         if answer and answer.content:
             self.response = PageResponseObject(
@@ -572,7 +586,7 @@ class SeleniumChromeHeadless(SeleniumDriver):
 
         try:
             # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.request.timeout_s
+            selenium_timeout = self.timeout_s
 
             self.driver.set_page_load_timeout(selenium_timeout)
 
@@ -697,7 +711,7 @@ class SeleniumChromeFull(SeleniumDriver):
 
         try:
             # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.request.timeout_s
+            selenium_timeout = self.timeout_s
 
             self.driver.set_page_load_timeout(selenium_timeout)
 
@@ -792,7 +806,7 @@ class SeleniumUndetected(SeleniumDriver):
 
         try:
             # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.request.timeout_s
+            selenium_timeout = self.timeout_s
 
             self.driver.set_page_load_timeout(selenium_timeout)
 
@@ -907,7 +921,7 @@ class ScriptCrawler(CrawlerInterface):
             file_abs.unlink()
 
         script = self.script + ' --url "{}" --output-file="{}" --timeout={}'.format(
-            self.request.url, self.response_file, self.request.timeout_s
+            self.request.url, self.response_file, self.timeout_s
         )
 
         # WebLogger.error("Response:{}".format(self.response_file))
@@ -921,7 +935,7 @@ class ScriptCrawler(CrawlerInterface):
                 shell=True,
                 capture_output=True,
                 cwd=self.cwd,
-                timeout=self.request.timeout_s
+                timeout=self.timeout_s
                 + 10,  # add more time for closing browser, etc
             )
         except subprocess.TimeoutExpired as E:
@@ -944,7 +958,7 @@ class ScriptCrawler(CrawlerInterface):
 
             WebLogger.error(
                 "Url:{}. Script:'{}'. Return code invalid:{}. Path:{}".format(
-                    self.request.url, script, p.returncode, operating_path
+                    self.request.url, script, p.returncode, self.cwd,
                 )
             )
 
@@ -1128,10 +1142,10 @@ class ServerCrawler(CrawlerInterface):
                 break
 
             diff = DateUtils.get_datetime_now_utc() - script_time_start
-            if diff.total_seconds() > self.request.timeout_s + 10:
+            if diff.total_seconds() > self.timeout_s + 10:
                 WebLogger.error(
                     "Url:{} Timeout on socket connection:{}/{}".format(
-                        self.request.url, diff.total_seconds(), self.request.timeout_s
+                        self.request.url, diff.total_seconds(), self.timeout_s
                     )
                 )
 
