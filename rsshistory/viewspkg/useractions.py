@@ -14,6 +14,7 @@ from ..models import (
     ConfigurationEntry,
     UserVotes,
 )
+from ..configuration import Configuration
 from ..controllers import LinkDataController, EntryWrapper
 from ..forms import TagForm, TagEntryForm, TagRenameForm, ScannerForm
 from ..views import ViewPage, GenericListView, UserGenericListView

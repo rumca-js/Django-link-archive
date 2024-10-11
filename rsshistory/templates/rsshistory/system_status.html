@@ -10,7 +10,14 @@
 <ul class="list-group">
     <li class="list-group-item">Version: {{app_version}}</li>
 
-    <li class="list-group-item">Last internet connection check: {{last_internet_check}}</li>
+    <li class="list-group-item">Last internet connection check: {{last_internet_check}}
+       {% if not is_internet_ok %}
+       <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+           !
+           <span class="visually-hidden">Status error</span>
+       </span>
+       {% endif %}
+    </li>
     <li class="list-group-item">Last internet connection status: {{last_internet_status}}</li>
 </ul>
 
@@ -63,6 +70,13 @@
 
 <h1>Threads</h1>
 <ul class="list-group">
+   {% if not is_threading_ok %}
+   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+       !
+       <span class="visually-hidden">Status error</span>
+   </span>
+
+   {% endif %}
     {% for thread_info in c.get_thread_info %}
     <li class="list-group-item">{{thread_info.0}}: {{thread_info.1}}</li>
     {% endfor %}

@@ -15,9 +15,15 @@ class BlockListReader(object):
         self.contents = contents
 
     def read(self):
-        contents = self.contents.replace("\r", "")
-        lines = contents.split("\n")
-        for line in lines:
+        self.contents = self.contents.replace("\r", "")
+        while True:
+            wh = self.contents.find("\n")
+            if wh == -1:
+                return
+
+            line = self.contents[:wh]
+            self.contents = self.contents[wh+1:]
+
             line = line.strip()
             if not line:
                 continue
@@ -25,21 +31,28 @@ class BlockListReader(object):
             if not self.is_line_valid(line):
                 continue
 
-            domain = None
+            line = self.process_line(line)
+            if line:
+                yield line
 
-            line = self.strip_comments(line)
+            wh = self.contents.find("\n")
 
-            # read various lines
+    def process_line(self, line):
+        domain = None
 
-            if line.startswith("||"):
-                domain = self.read_custom_line(line)
-            elif line.find(" ") >= 0 or line.find("\t") >= 0:
-                domain = self.read_host_line(line)
-            else:
-                domain = self.read_normal_line(line)
+        line = self.strip_comments(line)
 
-            if domain and domain != "":
-                yield domain
+        # read various lines
+
+        if line.startswith("||"):
+            domain = self.read_custom_line(line)
+        elif line.find(" ") >= 0 or line.find("\t") >= 0:
+            domain = self.read_host_line(line)
+        else:
+            domain = self.read_normal_line(line)
+
+        if domain and domain != "":
+            return domain
 
     def is_line_valid(self, line):
         line = line.strip()
@@ -104,8 +117,7 @@ class BlockEntryList(models.Model):
             "https://v.firebog.net/hosts/lists.php?type=tick"
         )
 
-    def update():
-        from ..pluginurl import UrlHandler
+    def update_all():
         from ..controllers import BackgroundJobController
 
         # this creates new lists
@@ -115,9 +127,7 @@ class BlockEntryList(models.Model):
 
         # update existing
         for item in BlockEntryList.objects.all():
-            BackgroundJobController.create_single_job(
-                BackgroundJobController.JOB_INITIALIZE_BLOCK_LIST, item.url
-            )
+            item.update()
 
     def reset():
         BlockEntry.objects.all().delete()
@@ -137,34 +147,39 @@ class BlockEntryList(models.Model):
         for item in lists:
             item = item.replace("\r", "")
             if item.strip() != "":
+                wh = item.find("http")
+                item = item[wh:]
+
                 BlockEntryList.add_list(item)
 
     def add_list(thelist):
-        from ..controllers import BackgroundJobController
-
         item = thelist.replace("\r", "")
         blocked_lists = BlockEntryList.objects.filter(url=item)
         if not blocked_lists.exists():
             block_list = BlockEntryList.objects.create(url=item)
+            block_list.update()
 
-            BackgroundJobController.create_single_job(
-                BackgroundJobController.JOB_INITIALIZE_BLOCK_LIST, block_list.url
-            )
-
-    def update_block_entries(block_list):
+    def update_implementation(self):
         from ..pluginurl import UrlHandler
 
-        handler = UrlHandler(block_list.url)
+        handler = UrlHandler(self.url)
         contents = handler.get_contents()
         if contents:
             reader = BlockListReader(contents)
             for domain in reader.read():
                 blocked = BlockEntry.objects.filter(url=domain)
                 if not blocked.exists():
-                    BlockEntry.objects.create(url=domain, block_list=block_list)
+                    BlockEntry.objects.create(url=domain, block_list=self)
 
-        block_list.processed = True
-        block_list.save()
+        self.processed = True
+        self.save()
+
+    def update(self):
+        from ..controllers import BackgroundJobController
+
+        BackgroundJobController.create_single_job(
+            BackgroundJobController.JOB_INITIALIZE_BLOCK_LIST, self.url
+        )
 
 
 class BlockEntry(models.Model):

@@ -16,6 +16,9 @@ class BrowserListView(GenericListView):
     context_object_name = "content_list"
     paginate_by = 100
 
+    def get_title(self):
+        return "Browsers"
+
 
 def apply_browser_setup(request):
     p = ViewPage(request)

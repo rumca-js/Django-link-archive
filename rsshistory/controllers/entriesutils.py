@@ -859,6 +859,9 @@ class EntryWrapper(object):
         return ob
 
     def get_internal(self):
+        if not self.link:
+            return
+
         if self.date:
             is_archive = self.is_archive()
 

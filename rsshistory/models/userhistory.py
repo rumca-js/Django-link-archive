@@ -164,17 +164,21 @@ class UserEntryTransitionHistory(models.Model):
         if not user.is_authenticated:
             return result
 
-        link_transitions = UserEntryTransitionHistory.objects.filter(
-            user=user, entry_from=navigated_to_entry
-        ).order_by("-counter")
-
         config_entry = Configuration.get_object().config_entry
         max_related_links = config_entry.max_number_of_related_links
+
+        link_transitions = UserEntryTransitionHistory.objects.filter(
+            user=user, entry_from=navigated_to_entry, entry_to=navigated_to_entry,
+        ).order_by("-counter")
 
         if link_transitions.exists():
             index = 0
             for link_info in link_transitions:
-                entries = LinkDataModel.objects.filter(id=link_info.entry_to.id)
+                if navigated_to_entry == link_info.entry_to:
+                    entries = LinkDataModel.objects.filter(id=link_info.entry_to.id)
+                else:
+                    entries = LinkDataModel.objects.filter(id=link_info.entry_from.id)
+
                 if entries.exists():
                     entry = entries[0]
                     result.append(entry)

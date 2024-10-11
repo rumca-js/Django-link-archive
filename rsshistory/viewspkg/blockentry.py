@@ -32,9 +32,26 @@ def block_lists_update(request):
     if data is not None:
         return data
 
-    BlockEntryList.update()
+    BlockEntryList.update_all()
 
-    p.context["summary_text"] = "block lists update OK"
+    p.context["summary_text"] = "Added update block lists job"
+
+    return p.render("go_back.html")
+
+
+def block_list_update(request, pk):
+    p = ViewPage(request)
+    p.set_title("Update block lists")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    thelist = BlockEntryList.objects.filter(id=pk)
+    if thelist.exists():
+        thelist.update()
+        p.context["summary_text"] = "Added block list update job"
+    else:
+        p.context["summary_text"] = "Could not update block list"
 
     return p.render("go_back.html")
 

@@ -97,6 +97,7 @@ class ConfigForm(forms.ModelForm):
             "instance_internet_location",
             "admin_user",
             "access_type",
+            "download_access_type",
             "logging_level",
             "background_tasks",
             "data_export_path",
@@ -886,3 +887,7 @@ class BrowserEditForm(forms.ModelForm):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
         self.fields["crawler"].widget.attrs["readonly"] = True
+
+        self.fields["settings"].widget = forms.Textarea(
+            attrs={"rows": 10, "cols": 20}
+        )

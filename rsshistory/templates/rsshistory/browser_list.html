@@ -28,7 +28,7 @@ Browsers are chosen using this list. Order of appearance is important.
 
              <div>
                  <a href="{% url 'rsshistory:browser-edit' browser.id %}" title="Edits browser" class="btn btn-secondary btn-sm" role="button">
-                    <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+                   {% include "rsshistory/icon_edit.html" %}
                  </a>
 
                  {% if browser.enabled %}

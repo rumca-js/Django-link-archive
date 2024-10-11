@@ -103,25 +103,25 @@ class BlockEntryListTest(FakeInternetTestCase):
         self.assertEqual(BlockEntryList.objects.all().count(), 2)
         self.assertEqual(BackgroundJobController.objects.all().count(), 2)
 
-    def test_update_block_entries(self):
+    def test_update__w3kbl(self):
         test_list = BlockEntryList.objects.create(
             url="https://v.firebog.net/hosts/static/w3kbl.txt"
         )
 
         # call tested function
-        BlockEntryList.update_block_entries(test_list)
+        test_list.update_implementation()
 
         self.assertEqual(BlockEntry.objects.all().count(), 3)
 
         self.assertEqual(test_list.processed, True)
 
-    def test_update_block_entries(self):
+    def test_update__rpi(self):
         test_list = BlockEntryList.objects.create(
             url="https://v.firebog.net/hosts/RPiList-Malware.txt"
         )
 
         # call tested function
-        BlockEntryList.update_block_entries(test_list)
+        test_list.update_implementation()
 
         block_entries = BlockEntry.objects.all()
 

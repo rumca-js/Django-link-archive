@@ -11,7 +11,6 @@ from django.shortcuts import redirect
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 
-from ..webtools import selenium_feataure_enabled
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
@@ -240,8 +239,6 @@ def system_status(request):
 
     c = Configuration.get_object()
     p.context["directory"] = c.directory
-
-    p.context["last_internet_status"] = SystemOperation.get_last_internet_status()
 
     last_internet_check = c.get_local_time(SystemOperation.get_last_internet_check())
     p.context["last_internet_check"] = last_internet_check

@@ -163,20 +163,14 @@ class SourceGenericPlugin(object):
 
         return True
 
-    def is_fetch_possible(self):
-        source = self.get_source()
-
-        if not source.is_fetch_possible():
-            return False
-
-        return True
-
     def calculate_plugin_hash(self):
         self.get_contents()
         return self.get_contents_hash()
 
     def get_contents_hash(self):
-        return calculate_hash(self.contents)
+        if self.contents:
+            return calculate_hash(self.contents)
+        return calculate_hash("")
 
     def set_operational_info(
         self, stop_time, num_entries, total_seconds, hash_value, valid=True
@@ -203,8 +197,8 @@ class SourceGenericPlugin(object):
             return
 
         self.content_handler = UrlHandler(self.get_address())
-        self.contents = self.content_handler.get_contents()
-        self.response = self.content_handler.response
+        self.response = self.content_handler.get_response()
+        self.contents = self.response.get_text()
 
         status_code = None
         if self.response:
@@ -212,16 +206,16 @@ class SourceGenericPlugin(object):
 
         source = self.get_source()
 
-        if not self.contents:
+        if not self.response or not self.response.is_valid():
             AppLogging.error(
                 info_text="Url:{} Title:{}; Could not obtain contents.".format(
                     source.url,
                     source.title,
                 ),
-                detail_text="Status code:{}\nOptions:{}\nContents\n{}".format(
+                detail_text="Status code:{}\nOptions:{}\nResponse\n{}".format(
                     status_code,
                     str(self.content_handler.options),
-                    self.contents,
+                    self.response,
                 ),
             )
             self.dead = True
@@ -277,6 +271,8 @@ class SourceGenericPlugin(object):
 
             u = UrlHandler(address)
             contents = u.get_contents()
+            if not contents:
+                return result
 
             parser = ContentLinkParser(address, contents)
 
@@ -292,6 +288,9 @@ class SourceGenericPlugin(object):
 
         u = UrlHandler(address)
         contents = u.get_contents()
+
+        if not contents:
+            return []
 
         parser = ContentLinkParser(address, contents)
 

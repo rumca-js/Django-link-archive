@@ -12,10 +12,10 @@
           {% if comment.user_object.username == user.get_username %}
           <div class="btn-group">
               <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="btn btn-secondary" role="button" title="Edit comment">
-                  <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+                  {% include "rsshistory/icon_edit.html" %}
               </a>
               <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="btn btn-secondary" role="button" title="Remove comment">
-                  <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+                  {% include "rsshistory/icon_remove.html" %}
               </a>
           </div>
           {% endif %}

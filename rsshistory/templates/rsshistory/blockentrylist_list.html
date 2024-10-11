@@ -23,6 +23,10 @@
                 {% include "rsshistory/icon_external.html" %}
                 <a href="{{blocklist.url}}">{{blocklist.url}}</a>
 
+                <a href="{% url 'rsshistory:block-list-update' blocklist.id %}" title="Updates block list">
+                   {% include "rsshistory/icon_update.html" %}
+                </a>
+
                 <a href="{% url 'rsshistory:block-list-remove' blocklist.id %}" title="Remove block list">
                    {% include "rsshistory/icon_remove.html" %}
                 </a>

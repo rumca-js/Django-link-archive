@@ -1,19 +1,7 @@
 {% load static %}
 
 <footer class="text-center text-lg-start bg-body-tertiary text-muted fixed-bottom">
-    <div class="text-center p-1" style="background-color: rgba(0, 0, 0, 0);">
-        {% if app_name %}
-        <a href="{% url 'rsshistory:about' %}">[{{app_name}}/{{app_version}}] - About</a>
-        @
-        <a href="https://github.com/rumca-js/Django-link-archive">GitHub</a>
-        {% else %}
-        <a href="{% url 'rsshistory:about' %}">About</a>
-        @
-        <a href="https://github.com/rumca-js/Django-link-archive">GitHub</a>
-        {% endif %}
-    </div>
-
-  {% if rss_are_fetched or last_internet_status is False %}
+  {% if rss_are_fetched or last_internet_status is False or not is_internet_ok or not is_threading_ok %}
   <div class="text-center p-1" style="background-color: rgba(0, 0, 0, 0);">
       {% if last_internet_status is False %}
       Internet status:{{last_internet_status}}
@@ -25,6 +13,25 @@
       </span>
       <span class="error-text">Reading sources. Queue:{{rss_queue_size}}</span>
       {% endif %}
+
+      {% if not is_internet_ok %}
+      Internet connection error
+      {% endif %}
+      {% if not is_threading_ok %}
+      Threads error
+      {% endif %}
   </div>
   {% endif %}
+
+    <div class="text-center p-1" style="background-color: rgba(0, 0, 0, 0);">
+        {% if app_name %}
+        <a href="{% url 'rsshistory:about' %}">[{{app_name}}/{{app_version}}] - About</a>
+        @
+        <a href="https://github.com/rumca-js/Django-link-archive">GitHub</a>
+        {% else %}
+        <a href="{% url 'rsshistory:about' %}">About</a>
+        @
+        <a href="https://github.com/rumca-js/Django-link-archive">GitHub</a>
+        {% endif %}
+    </div>
 </footer>

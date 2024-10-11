@@ -12,12 +12,8 @@ from .models import (
    ConfigurationEntry,
    AppLogging,
    ApiKeys,
-   ReadLater,
-   SystemOperation,
-   ReadLater
 )
 from .configuration import Configuration
-from .controllers import BackgroundJobController
 from .apps import LinkDatabase
 from .configuration import Configuration
 from .pluginurl.urlhandler import UrlHandler
@@ -72,6 +68,13 @@ class ViewPage(object):
         self.context = self.get_context()
 
     def init_context(self, context):
+        from .models import (
+            ReadLater,
+            SystemOperation,
+            SourceOperationalData,
+        )
+        from .controllers import BackgroundJobController
+
         if self.is_user_allowed(self.access_type):
             c = Configuration.get_object()
             context.update(c.get_context())
@@ -84,11 +87,25 @@ class ViewPage(object):
             context["rss_are_fetched"] = queue_size > 0
             context["rss_queue_size"] = queue_size
 
-            context["last_internet_status"] = SystemOperation.get_last_internet_status()
+            context["is_internet_ok"] = SystemOperation.is_internet_ok()
+            context["is_threading_ok"] = SystemOperation.is_threading_ok()
 
-            context["is_read_later"] = (
-                ReadLater.objects.filter(user=self.request.user).count() != 0
-            )
+            sources = SourceOperationalData.objects.filter(consecutive_errors__gt = 0)
+            context["is_sources_error"] = sources.count() > 0
+
+            context["is_configuration_error"] = False
+
+            jobs = BackgroundJobController.objects.filter(enabled = False)
+            context["is_backgroundjobs_error"] = jobs.count() > 0
+
+            if self.request.user.is_authenticated:
+                context["is_read_later"] = (
+                    ReadLater.objects.filter(user=self.request.user).count() != 0
+                )
+
+            context["is_status_error"] = (context["is_backgroundjobs_error"] or 
+                                          not context["is_internet_ok"] or 
+                                          not context["is_threading_ok"])
 
         else:
             context.update(Configuration.get_context_minimal())

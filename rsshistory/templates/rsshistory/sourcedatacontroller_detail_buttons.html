@@ -10,34 +10,34 @@
       <ul class="dropdown-menu">
          <li>
            <a href="{% url 'rsshistory:source-edit' object.id %}" class="dropdown-item" title="Edit source">
-               <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+               {% include "rsshistory/icon_edit.html" %}
                Edit
            </a>
          </li>
          <li>
            <a href="{% url 'rsshistory:source-refresh' object.id %}" class="dropdown-item" title="Checks if the source has new data">
-               <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
+               {% include "rsshistory/icon_update.html" %}
                Refresh
            </a>
          </li>
          {% if object.enabled %}
          <li>
            <a href="{% url 'rsshistory:source-disable' object.id %}" class="dropdown-item" title="Disables source">
-               <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
+               {% include "rsshistory/icon_disable.html" %}
                Disable
            </a>
          </li>
          {% else %}
          <li>
            <a href="{% url 'rsshistory:source-enable' object.id %}" class="dropdown-item" title="Enables source">
-               <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
+               {% include "rsshistory/icon_enable.html" %}
                Enable
            </a>
          </li>
          {% endif %}
          <li>
             <a href="{% url 'rsshistory:source-remove' object.id %}" class="dropdown-item" title="Remove source">
-                <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+               {% include "rsshistory/icon_remove.html" %}
                 Remove
             </a>
          </li>

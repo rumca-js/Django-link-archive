@@ -4,7 +4,7 @@
 
 <div class="container">
     <a href="{% url 'rsshistory:entry-rule-add' %}" title="Add new entry rule" class="btn btn-primary" role="button">
-        <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
+       {% include "rsshistory/icon_add.html" %}
     </a>
     <a href="{% url 'rsshistory:entry-rules-json' %}" title="Shows JSON for entry rules" class="btn btn-primary" role="button">
         JSON

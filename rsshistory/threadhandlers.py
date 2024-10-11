@@ -966,7 +966,7 @@ class InitializeBlockListJobHandler(BaseJobHandler):
             lists = BlockEntryList.objects.filter(url=list)
 
             if lists.exists():
-                BlockEntryList.update_block_entries(lists[0])
+                lists[0].update_implementation()
             return True
 
 

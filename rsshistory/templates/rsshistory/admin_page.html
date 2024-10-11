@@ -14,7 +14,14 @@
            <li class="list-group-item">
                <a href="{% url 'rsshistory:system-status' %}" title="System status, health monitoring" class="nav-link">
                    <img src="{% static 'rsshistory/icons/icons8-heart-monitor-100.png' %}" class="content-icon" />
-                   Status</a>
+                   Status
+                   {% if not is_internet_ok or not is_threading_ok %}
+                   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                       !
+                       <span class="visually-hidden">Status error</span>
+                   </span>
+                   {% endif %}
+               </a>
            </li>
            <li class="list-group-item">
                <a href="{% url 'rsshistory:logs' %}" title="Application logs" class="nav-link">
@@ -24,12 +31,26 @@
            <li class="list-group-item">
                <a href="{% url 'rsshistory:backgroundjobs' %}" title="Background jobs, queues" class="nav-link">
                    <img src="{% static 'rsshistory/icons/icons8-schedule-100.png' %}" class="content-icon" />
-                   Background Jobs</a>
+                   Background Jobs
+                   {% if is_backgroundjobs_error %}
+                   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                       !
+                       <span class="visually-hidden">Background Jobs error</span>
+                   </span>
+                   {% endif %}
+               </a>
            </li>
            <li class="list-group-item">
                <a href="{% url 'rsshistory:wizard' %}" title="Configuration" class="nav-link">
                    <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="content-icon" />
-                   Configuration</a>
+                   Configuration
+                   {% if is_configuration_error %}
+                   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                       !
+                       <span class="visually-hidden">Configuration error</span>
+                   </span>
+                   {% endif %}
+               </a>
            </li>
            <li class="list-group-item">
                <a href="{% url 'rsshistory:entry-rules' %}" title="Entry Rules allow to define URL based rules. Block domains, etc." class="nav-link">

@@ -301,9 +301,10 @@ def download_url(request):
 
     p = ViewPage(request)
     p.set_title("Download url")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_download():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     if request.method == "GET":
         if "page" not in request.GET:
@@ -340,9 +341,10 @@ def download_music(request):
 
     p = ViewPage(request)
     p.set_title("Download music")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_download():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     if request.method == "GET":
         if "page" not in request.GET:
@@ -379,9 +381,10 @@ def download_video(request):
 
     p = ViewPage(request)
     p.set_title("Download video")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_download():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     if request.method == "GET":
         if "page" not in request.GET:
@@ -411,9 +414,10 @@ def download_video(request):
 def download_music_pk(request, pk):
     p = ViewPage(request)
     p.set_title("Download music")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_download():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     ft = LinkDataController.objects.filter(id=pk)
     if ft.exists():
@@ -429,9 +433,10 @@ def download_music_pk(request, pk):
 def download_video_pk(request, pk):
     p = ViewPage(request)
     p.set_title("Download video")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_download():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     ft = LinkDataController.objects.filter(id=pk)
     if ft.exists():

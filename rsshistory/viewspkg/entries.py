@@ -49,7 +49,6 @@ from ..forms import (
 )
 from ..views import (
     ViewPage,
-    GenericListView,
     get_search_term,
     get_order_by,
     get_page_num,
@@ -61,7 +60,7 @@ from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
 
 
-class EntriesSearchListView(GenericListView):
+class EntriesSearchListView(generic.ListView):
     model = LinkDataController
     context_object_name = "entry_list"
     paginate_by = 100
@@ -71,12 +70,12 @@ class EntriesSearchListView(GenericListView):
         """
         API: Used to redirect if user does not have rights
         """
+        print("EntriesSearchListView:get")
+
         p = ViewPage(self.request)
         data = p.check_access()
         if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
-
-        print("EntriesSearchListView:get")
 
         self.time_start = datetime.now()
         self.query = None
@@ -194,6 +193,18 @@ class EntriesSearchListView(GenericListView):
             + "?"
             + self.query_filter.get_filter_string()
         )
+
+    def get_search_link(self, search_term):
+        if search_term.find("link =") >= 0 or search_term.find("link=") >= 0:
+            wh = search_term.find("=")
+            if wh >= 0:
+                wh2 = search_term.find("=", wh + 1)
+                if wh2 >= 0:
+                    wh = wh2
+
+                search_term = search_term[wh + 1 :].strip()
+
+        return search_term
 
     def get_form_action_link(self):
         return reverse("{}:entries".format(LinkDatabase.name))

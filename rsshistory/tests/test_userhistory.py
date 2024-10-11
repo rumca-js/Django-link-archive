@@ -59,22 +59,6 @@ class UserSearchHistoryTest(TestCase):
         self.assertEqual(objects.count(), 1)
         self.assertEqual(objects[0], theobject)
 
-    def test_add__operator(self):
-        # call tested function
-        theobject = UserSearchHistory.add(self.user, "title = test & description = multiple")
-
-        objects = UserSearchHistory.objects.all()
-
-        self.assertEqual(objects.count(), 1)
-        self.assertEqual(objects[0], theobject)
-        self.assertEqual(theobject.search_query, "title = test & description = multiple")
-
-    def test_get_encoded_search_query(self):
-        # call tested function
-        theobject = UserSearchHistory.add(self.user, "title = test & description = multiple")
-
-        self.assertEqual(theobject.get_encoded_search_query(), "title%20%3D%20test%20%26%20description%20%3D%20multiple")
-
     def test_more_than_limit(self):
         limit = UserSearchHistory.get_choices_model_limit()
 

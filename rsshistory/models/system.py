@@ -92,6 +92,14 @@ class ConfigurationEntry(models.Model):
         help_text='There are three access types available. "All" allows anybody view contents. "Logged" allows only logged users to view contents. "Owner" means application is private, and only owner can view it\'s contents.',
     )
 
+    download_access_type = models.CharField(
+        max_length=100,
+        null=False,
+        choices=ACCESS_TYPES,
+        default=ACCESS_TYPE_LOGGED,
+        help_text='Indication which kind of users can add items to download',
+    )
+
     logging_level = models.IntegerField(default=int(logging.WARNING))
 
     initialized = models.BooleanField(
@@ -459,10 +467,52 @@ class SystemOperation(models.Model):
     class Meta:
         ordering = ["-date_created"]
 
-    def cleanup():
-        all_entries = SystemOperation.objects.filter(date_created__isnull=True)
-        all_entries.delete()
+    def is_system_healthy():
+        c = ConfigurationEntry.get()
+        if c.background_tasks:
+            if not SystemOperation.is_internet_ok():
+                return False
+            if not SystemOperation.is_threading_ok():
+                return False
 
+    def is_threading_ok():
+        hours_limit = 1800
+
+        thread_ids = SystemOperation.get_thread_ids()
+
+        for thread_id in thread_ids:
+            date = SystemOperation.get_last_thread_signal(thread_id)
+            if not date:
+                return False
+
+            delta = DateUtils.get_datetime_now_utc() - date
+
+            if delta.total_seconds() > hours_limit:
+                return False
+
+        return True
+
+    def is_internet_ok():
+        statuses = SystemOperation.objects.filter(is_internet_connection_checked=True)
+        if statuses.exists():
+            status = statuses[0]
+
+            delta = (
+                DateUtils.get_datetime_now_utc()
+                - status.date_created
+            )
+
+            hours_limit = 3600  # TODO hardcoded refresh task should be running more often than 1 hour?
+
+            if delta.total_seconds() > hours_limit:
+                status_is_valid = False
+                return False
+
+            return status.is_internet_connection_ok
+        else:
+            return True
+
+    def cleanup():
         thread_ids = SystemOperation.get_thread_ids()
         for thread_id in thread_ids:
             # leave one entry with time check
@@ -482,13 +532,6 @@ class SystemOperation(models.Model):
                 entries = all_entries[1:]
                 for entry in entries:
                     entry.delete()
-
-    def is_internet_ok():
-        entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
-        if entries.exists():
-            return entries[0].is_internet_connection_ok
-        else:
-            return True
 
     def get_last_thread_signal(thread_id):
         entries = SystemOperation.objects.filter(thread_id=thread_id)
@@ -543,40 +586,6 @@ class SystemOperation(models.Model):
 
         return thread_ids
 
-    def is_system_healthy():
-        status_is_valid = True
-
-        c = ConfigurationEntry.get()
-        if c.background_tasks:
-            # I assume at least one check should be made
-            if SystemOperation.get_last_internet_check():
-                delta = (
-                    DateUtils.get_datetime_now_utc()
-                    - SystemOperation.get_last_internet_check()
-                )
-
-                hours_limit = 3600  # TODO hardcoded refresh task should be running more often than 1 hour?
-
-                if delta.total_seconds() > hours_limit:
-                    status_is_valid = False
-
-            hours_limit = 3 * 3600  # processing task can push things to git
-
-            thread_ids = SystemOperation.get_thread_ids()
-
-            for thread_id in thread_ids:
-                date = SystemOperation.get_last_thread_signal(thread_id)
-                if not date:
-                    status_is_valid = False
-                    break
-
-                delta = DateUtils.get_datetime_now_utc() - date
-
-                if delta.total_seconds() > hours_limit:
-                    status_is_valid = False
-                    break
-
-        return status_is_valid
 
 
 class UserConfig(models.Model):
@@ -674,6 +683,18 @@ class UserConfig(models.Model):
     def get_age(self):
         diff = relativedelta(date.today(), self.birth_date).years
         return diff
+
+    def can_download(self):
+        config = ConfigurationEntry.get()
+        if not self.user or not self.user.is_authenticated:
+            return False
+
+        if self.user.is_authenticated and config.download_access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED:
+            return True
+        if self.user.is_staff and config.download_access_type == ConfigurationEntry.ACCESS_TYPE_STAFF:
+            return True
+
+        return False
 
 
 class AppLogging(models.Model):

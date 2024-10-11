@@ -17,12 +17,12 @@
           {% if source_list %}
           <li>
              <a href="{% url 'rsshistory:sources-enable-all' %}" class="dropdown-item" title="Enable all sources">
-                 <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
+              {% include "rsshistory/icon_enable.html" %}
               Enable all</a>
           </li>
           <li>
              <a href="{% url 'rsshistory:sources-disable-all' %}" class="dropdown-item" title="Disable all sources">
-              <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
+              {% include "rsshistory/icon_disable.html" %}
               Disable all</a>
           </li>
           {% endif %}

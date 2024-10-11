@@ -21,14 +21,12 @@ class ModelFilesBuilder(object):
             return
 
         p = UrlHandler(url=file_name)
-        response = p.get_response()
+        binary_data = p.get_binary()
 
-        if not response:
+        if not binary_data:
             # consume
             return True
 
-        contents = p.get_binary()
-
-        if contents:
+        if binary_data:
             if not ModelFiles.objects.filter(file_name=file_name).exists():
-                ModelFiles.add(file_name, contents)
+                ModelFiles.add(file_name, binary_data)

@@ -6,20 +6,6 @@
 <div class="container list-group">
 {% endif %}
     {% for entry in entry_list %}
-        {% if display_type == "normal" %}
-              {% if user_config.display_type == "clickable-tags" %}
-                  {% include "rsshistory/linkdatacontroller_list__clickable_tags.html" %}
-              {% elif user_config.display_type == "line-and-buttons" %}
-                  {% include "rsshistory/linkdatacontroller_list__line_and_buttons.html" %}
-              {% elif user_config.display_type == "gallery" %}
-                  {% include "rsshistory/linkdatacontroller_list__youtube_thumbnails.html" %}
-              {% elif user_config.display_type == "search-engine" %}
-                  {% include "rsshistory/linkdatacontroller_list__search_engine.html" %}
-              {% else %}
-                  {% include "rsshistory/linkdatacontroller_list__standard.html" %}
-              {% endif %}
-        {% elif display_type == "clear" %}
-                  {% include "rsshistory/linkdatacontroller_list__clean_list.html" %}
-        {% endif %}
+         {% include "rsshistory/linkdatacontroller_list__entry.html" %}
     {% endfor %}
 </div>

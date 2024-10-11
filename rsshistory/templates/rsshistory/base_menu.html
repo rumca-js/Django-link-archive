@@ -42,6 +42,12 @@
            <li class="nav-item dropdown">
                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                    Global
+                   {% if is_source_error %}
+                   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                       !
+                       <span class="visually-hidden">Source error</span>
+                   </span>
+                   {% endif %}
                </a>
                <ul class="dropdown-menu">
                    <li>
@@ -71,7 +77,14 @@
                    <li>
                        <a href="{% url 'rsshistory:sources' %}" class="dropdown-item" title="Sources">
                            <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
-                           Sources</a>
+                           Sources
+                           {% if is_source_error %}
+                           <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                               !
+                               <span class="visually-hidden">Source error</span>
+                           </span>
+                           {% endif %}
+                       </a>
                    </li>
                </ul>
            </li>
@@ -105,7 +118,25 @@
                            <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
                            Tags</a>
                    </li>
-                   <!--li><a class="dropdown-item" title="Allows to define source folders like 'music', 'movies'">Folders</a></li-->
+                   {% if config.track_user_navigation %}
+                   <li>
+                       <a href="{% url 'rsshistory:user-entry-history' %}" class="dropdown-item" title="Shows browsing history">
+                          <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="mainbutton-icon" />
+                          Browse History</a>
+                   </li>
+                   {% endif %}
+                   {% if config.track_user_searches %}
+                   <li>
+                       <a href="{% url 'rsshistory:user-search-history' %}" class="dropdown-item" title="Shows user comments">
+                          <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="mainbutton-icon" />
+                          Search history</a>
+                   </li>
+                   {% endif %}
+                   <li>
+                       <a href="{% url 'rsshistory:user-comments' %}" class="dropdown-item" title="Shows user comments">
+                          <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="mainbutton-icon" />
+                          Comments</a>
+                   </li>
                </ul>
            </li>
           {% endif %}
@@ -121,6 +152,8 @@
                           <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
                           Add entry</a>
                   </li>
+                  {% endif %}
+                  {% if user_config.can_download %}
                   <li>
                       <a href="{% url 'rsshistory:download-url' %}" title="Downloads URL" class="dropdown-item">
                           <img src="{% static 'rsshistory/icons/icons8-download-page-96.png' %}" class="content-icon" />
@@ -181,21 +214,28 @@
           <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   User
+                  {% if is_configuration_error or is_backgroundjobs_error or is_status_error %}
+                  <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                      !
+                      <span class="visually-hidden">Configuration error</span>
+                  </span>
+                  {% endif %}
               </a>
               <ul class="dropdown-menu">
                   {% if user.is_staff %}
                   <li class="nav-item">
                       <a href="{% url 'rsshistory:admin-page' %}" class="nav-link" title="Admin">
                           <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="mainbutton-icon" />
-                          Admin</a>
+                          Admin
+                          {% if is_configuration_error or is_backgroundjobs_error or is_status_error %}
+                          <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                              !
+                              <span class="visually-hidden">Configuration error</span>
+                          </span>
+                          {% endif %}
+                      </a>
                   </li>
                   {% endif %}
-
-                  <li class="nav-item">
-                      <a href="{% url 'rsshistory:user-personal' %}" class="nav-link" title="Personal space">
-                          <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
-                          Personal</a>
-                  </li>
 
                   <li class="nav-item">
                       <a href="{% url 'rsshistory:user-config' %}" class="nav-link" title="User config">
