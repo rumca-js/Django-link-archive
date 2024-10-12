@@ -13,7 +13,6 @@ from .models import (
    AppLogging,
    ApiKeys,
 )
-from .configuration import Configuration
 from .apps import LinkDatabase
 from .configuration import Configuration
 from .pluginurl.urlhandler import UrlHandler

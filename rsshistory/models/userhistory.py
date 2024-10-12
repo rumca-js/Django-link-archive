@@ -11,6 +11,7 @@ from datetime import timedelta
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import Q
 import urllib.parse
 
 from utils.dateutils import DateUtils
@@ -168,20 +169,25 @@ class UserEntryTransitionHistory(models.Model):
         max_related_links = config_entry.max_number_of_related_links
 
         link_transitions = UserEntryTransitionHistory.objects.filter(
-            user=user, entry_from=navigated_to_entry, entry_to=navigated_to_entry,
+            Q(user=user) & (Q(entry_from=navigated_to_entry) | Q(entry_to=navigated_to_entry))
         ).order_by("-counter")
 
         if link_transitions.exists():
             index = 0
             for link_info in link_transitions:
-                if navigated_to_entry == link_info.entry_to:
-                    entries = LinkDataModel.objects.filter(id=link_info.entry_to.id)
-                else:
-                    entries = LinkDataModel.objects.filter(id=link_info.entry_from.id)
+                entries = None
 
-                if entries.exists():
+                if navigated_to_entry == link_info.entry_to:
+                    if link_info.entry_from:
+                        entries = LinkDataModel.objects.filter(id=link_info.entry_from.id)
+                else:
+                    if link_info.entry_to:
+                        entries = LinkDataModel.objects.filter(id=link_info.entry_to.id)
+
+                if entries and entries.exists():
                     entry = entries[0]
-                    result.append(entry)
+                    if entry not in result:
+                        result.append(entry)
                 index += 1
 
                 if index > max_related_links:
