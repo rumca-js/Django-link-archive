@@ -146,7 +146,7 @@
                   Tools
               </a>
               <ul class="dropdown-menu">
-                  {% if user.is_staff %}
+                  {% if user_config.can_add %}
                   <li>
                       <a href="{% url 'rsshistory:entry-add-simple' %}" title="Add entry" class="dropdown-item">
                           <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />

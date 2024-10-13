@@ -20,7 +20,7 @@ class SourceEntriesDataExporter(object):
         clean_url = self._cfg.get_url_clean_name(self.source_url)
 
         ex = EntriesExporter(self.data_writer_config, entries)
-        ex.export_entries(self.source_url, clean_url, input_path)
+        ex.export_entries(source_url = self.source_url, export_file_name = clean_url, export_path = input_path)
 
     def get_entries(self, day_iso):
         date_range = DateUtils.get_range4day(day_iso)
@@ -42,19 +42,24 @@ class EntryDailyDataMainExporter(MainExporter):
         # TODO we first obtain entries to obtain them later again - this could be cleaned up
 
         entries = self.get_entries(day_iso)
+        self.write_source_entries(input_path, day_iso, entries)
+        self.write_sourceless_entries(input_path, day_iso, entries)
 
-        sources_urls = set(entries.values_list("source_url", flat=True).distinct())
+    def write_source_entries(self, input_path, day_iso, entries):
+        sources = set(entries.values_list("source", flat=True).distinct())
 
-        for source_url in sources_urls:
-            source_objs = SourceDataController.objects.filter(url=source_url)
-            if source_objs.exists() and not source_objs[0].export_to_cms:
-                continue
-
+        for source_obj in sources:
             filters = super().get_configuration_filters()
             writer = SourceEntriesDataExporter(
-                self.data_writer_config, source_url, filters
+                self.data_writer_config, source_obj.url, filters
             )
             writer.write_for_day(input_path, day_iso)
+
+    def write_sourceless_entries(self, input_path, day_iso, entries):
+        entries = entries.filter(Q(source_url__isnull = True) | Q(source_url = ""))
+
+        e = EntriesExporter(self.data_writer_config, entries)
+        e.export_entries(source_url = None, export_file_name="sourceless", export_path = input_path)
 
     def get_entries(self, day_iso):
         date_range = DateUtils.get_range4day(day_iso)

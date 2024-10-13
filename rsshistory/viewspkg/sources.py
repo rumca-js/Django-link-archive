@@ -144,9 +144,10 @@ class SourceDetailView(generic.DetailView):
 def add_source(request):
     p = ViewPage(request)
     p.set_title("Add source")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_add():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     if request.method == "POST":
         method = "POST"
@@ -256,9 +257,10 @@ def add_source_simple(request):
 
     p = ViewPage(request)
     p.set_title("Add source")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_add():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     if request.method == "POST":
         form = SourceInputForm(request.POST, request=request)

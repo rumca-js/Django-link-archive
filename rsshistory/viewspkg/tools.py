@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.http import JsonResponse
+from django.shortcuts import redirect
 
 from ..webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
 
@@ -7,6 +8,7 @@ from ..apps import LinkDatabase
 from ..models import (
     ConfigurationEntry,
     BrowserMode,
+    UserConfig,
 )
 from ..controllers import (
     LinkDataController,

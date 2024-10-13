@@ -170,7 +170,7 @@ webpage_youtube_airpano_feed = """
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2010-02-12T07:04:55+00:00</published>
+<published>{}</published>
 <entry>
 <id>yt:video:dWa5hJGpTN4</id>
 <yt:videoId>dWa5hJGpTN4</yt:videoId>
@@ -185,7 +185,7 @@ National Park Moneron Island. 8K 360° virtual travel
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-12-08T05:29:52+00:00</published>
+<published>{}</published>
 <updated>2023-12-16T01:48:32+00:00</updated>
 <media:group>
 <media:title>
@@ -216,7 +216,7 @@ Rio de Janeiro. The Marvelous City. Aerial 360 video in 12K
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-11-24T06:07:40+00:00</published>
+<published>{}</published>
 <updated>2023-11-29T15:03:20+00:00</updated>
 <media:group>
 <media:title>
@@ -247,7 +247,7 @@ Virtual travel to Saint Petersburg, Russia. 360 video in 6K
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-11-10T10:12:18+00:00</published>
+<published>{}</published>
 <updated>2023-11-11T05:58:13+00:00</updated>
 <media:group>
 <media:title>
@@ -278,7 +278,7 @@ Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-11-02T21:23:49+00:00</published>
+<published>{}</published>
 <updated>2023-11-16T22:57:41+00:00</updated>
 <media:group>
 <media:title>
@@ -309,7 +309,7 @@ Elton Lake, the biggest mineral lake in Europe. 8K aerial 360 video
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-10-13T08:33:42+00:00</published>
+<published>{}</published>
 <updated>2023-11-21T03:55:22+00:00</updated>
 <media:group>
 <media:title>
@@ -340,7 +340,7 @@ The Maldives. Underwater Paradise. Relaxing 360 video in 8K.
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-09-29T14:30:26+00:00</published>
+<published>{}</published>
 <updated>2023-11-22T02:35:00+00:00</updated>
 <media:group>
 <media:title>
@@ -371,7 +371,7 @@ Male, Maldives. Scenic flight over the city. Relaxing aerial 360 video in 8K
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-09-15T07:02:40+00:00</published>
+<published>{}</published>
 <updated>2023-11-08T10:02:59+00:00</updated>
 <media:group>
 <media:title>
@@ -400,7 +400,7 @@ Don't forget that this is 360 video: you can change the angle of view. The Repub
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-08-25T08:12:19+00:00</published>
+<published>{}</published>
 <updated>2023-11-16T18:13:14+00:00</updated>
 <media:group>
 <media:title>Taj Mahal, the Perl of India. 360 video in 16K</media:title>
@@ -429,7 +429,7 @@ Tribes of South Sudan. Explore Africa in 360° VR. 4K teaser.
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-08-11T10:40:47+00:00</published>
+<published>{}</published>
 <updated>2023-11-09T17:07:12+00:00</updated>
 <media:group>
 <media:title>
@@ -460,7 +460,7 @@ Teotihuacan, Mexico. Scenic Hot Air Balloon Flight. 360 video in 16K
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-07-28T16:04:02+00:00</published>
+<published>{}</published>
 <updated>2023-11-16T22:54:37+00:00</updated>
 <media:group>
 <media:title>
@@ -489,7 +489,7 @@ We express our gratitude to Jesús P Becerra for the help in organizing the film
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-07-14T18:12:36+00:00</published>
+<published>{}</published>
 <updated>2023-12-19T10:24:50+00:00</updated>
 <media:group>
 <media:title>Red Roofs of Montenegro. 12K 360 aerial video.</media:title>
@@ -516,7 +516,7 @@ Don't forget that this is 360 video: you can change the angle of view. There are
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-06-29T22:36:59+00:00</published>
+<published>{}</published>
 <updated>2023-11-10T09:38:28+00:00</updated>
 <media:group>
 <media:title>Between the Worlds. Relaxing 360 video in 12K</media:title>
@@ -545,7 +545,7 @@ Northern Lights, Teriberka, Kola Peninsula, 12K 360 video
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-06-16T14:10:24+00:00</published>
+<published>{}</published>
 <updated>2023-11-17T10:17:34+00:00</updated>
 <media:group>
 <media:title>
@@ -574,7 +574,7 @@ Don't forget that this is 360 video: you can change the angle of view. In the No
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-06-02T10:09:41+00:00</published>
+<published>{}</published>
 <updated>2023-11-21T19:16:53+00:00</updated>
 <media:group>
 <media:title>Trip to Tokyo, Japan. Aerial 360 video in 8K</media:title>
@@ -601,7 +601,7 @@ In the 12th century, a fort was built on the southeastern side of Honshu island 
 https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
 </uri>
 </author>
-<published>2023-05-19T08:49:03+00:00</published>
+<published>{}</published>
 <updated>2023-11-22T22:31:14+00:00</updated>
 <media:group>
 <media:title>Everest. Aerial 360 video trailer shot in 16K</media:title>
@@ -617,7 +617,9 @@ Don't forget that this is 360 video: you can change the angle of view. Nepal is 
 </media:group>
 </entry>
 </feed>
-"""
+""".replace(
+    "{}", DateUtils.get_datetime_now_iso()
+)
 
 youtube_channel_html_linus_tech_tips = """
 <!DOCTYPE html>

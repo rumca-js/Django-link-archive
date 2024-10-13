@@ -98,6 +98,7 @@ class ConfigForm(forms.ModelForm):
             "admin_user",
             "access_type",
             "download_access_type",
+            "add_access_type",
             "logging_level",
             "background_tasks",
             "data_export_path",

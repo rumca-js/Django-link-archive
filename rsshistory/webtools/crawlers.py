@@ -941,7 +941,7 @@ class ScriptCrawler(CrawlerInterface):
         except subprocess.TimeoutExpired as E:
             WebLogger.exc(E, "Timeout on running script")
             return self.response
-        except subprocess.ValueError as E:
+        except ValueError as E:
             WebLogger.exc(E, "Incorrect script call {}".format(script))
             return self.response
 

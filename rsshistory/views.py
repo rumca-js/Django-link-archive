@@ -108,7 +108,15 @@ class ViewPage(object):
 
         else:
             context.update(Configuration.get_context_minimal())
+            # to not logged users indicate everything is fine and dandy
+
             context["is_user_allowed"] = False
+            context["is_internet_ok"] = True
+            context["is_threading_ok"] = True
+            context["is_status_error"] = False
+            context["is_configuration_error"] = False
+            context["is_backgroundjobs_error"] = False
+            context["rss_are_fetched"] = False
 
         if "page_description" not in context:
             if "app_description" in context:

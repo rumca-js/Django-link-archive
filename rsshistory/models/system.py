@@ -100,6 +100,14 @@ class ConfigurationEntry(models.Model):
         help_text='Indication which kind of users can add items to download',
     )
 
+    add_access_type = models.CharField(
+        max_length=100,
+        null=False,
+        choices=ACCESS_TYPES,
+        default=ACCESS_TYPE_LOGGED,
+        help_text='Access right required to add entries. Not a role - we do not want to edit all users',
+    )
+
     logging_level = models.IntegerField(default=int(logging.WARNING))
 
     initialized = models.BooleanField(
@@ -627,12 +635,12 @@ class UserConfig(models.Model):
             sources_per_page=config.sources_per_page,
         )
 
-    def get(user=None):
+    def get(input_user=None):
         """
         This is used if no request is specified. Use configured by admin setup.
         """
-        if user and user.is_authenticated:
-            confs = UserConfig.objects.filter(user__id=user.id)
+        if input_user and input_user.is_authenticated:
+            confs = UserConfig.objects.filter(user__id=input_user.id)
             if confs.count() != 0:
                 return confs[0]
 
@@ -691,7 +699,19 @@ class UserConfig(models.Model):
 
         if self.user.is_authenticated and config.download_access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED:
             return True
-        if self.user.is_staff and config.download_access_type == ConfigurationEntry.ACCESS_TYPE_STAFF:
+        if self.user.is_staff:
+            return True
+
+        return False
+
+    def can_add(self):
+        config = ConfigurationEntry.get()
+        if not self.user or not self.user.is_authenticated:
+            return False
+
+        if self.user.is_authenticated and config.add_access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED:
+            return True
+        if self.user.is_staff:
             return True
 
         return False

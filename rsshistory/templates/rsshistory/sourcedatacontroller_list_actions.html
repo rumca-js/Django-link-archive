@@ -8,11 +8,13 @@
        </button>
    
        <ul class="dropdown-menu">
+          {% if user_config.can_add %}
           <li>
              <a href="{% url 'rsshistory:source-add-simple' %}" class="dropdown-item" title="Opens add source wizard">
               <img src="{% static 'rsshistory/icons/icons8-broadcast-add-100.png' %}" class="content-icon" />
               Add source</a>
           </li>
+         {% endif %}
 
           {% if source_list %}
           <li>

@@ -11,11 +11,14 @@ from ..controllers import (
     ArchiveLinkDataController,
     EntryDataBuilder,
 )
-from ..models import KeyWords, DataExport, UserBookmarks
 from ..models import (
     UserEntryVisitHistory,
     UserSearchHistory,
     UserEntryTransitionHistory,
+    KeyWords,
+    DataExport,
+    UserBookmarks,
+    UserConfig,
 )
 from ..configuration import Configuration
 
@@ -32,6 +35,7 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
             is_staff=True,
         )
         self.client.login(username="testuser", password="testpassword")
+        UserConfig.get_or_create(self.user)
 
     def test_entries_recent(self):
         url = reverse("{}:entries-recent".format(LinkDatabase.name))
@@ -109,6 +113,7 @@ class EntriesViewsTests(FakeInternetTestCase):
             password="testpassword",
             is_staff=True,
         )
+        UserConfig.get_or_create(self.user)
 
     def get_link_data(self, test_link):
         data = {"link": test_link}
@@ -697,6 +702,8 @@ class EntriesDetailViews(FakeInternetTestCase):
             password="testpassword",
             is_staff=True,
         )
+        UserConfig.get_or_create(self.user)
+
         self.client.login(username="testuser", password="testpassword")
 
     def test_entry_detail_youtube(self):

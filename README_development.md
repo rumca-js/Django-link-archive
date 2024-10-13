@@ -34,6 +34,7 @@ Keep limits on user actions:
  - easy import and exported data. The user need to be able to create a new instance in a matter of minutes
  - default configuration should cover 90% of needs
  - KISS. Do not focus on javascript, and other libraries that make the project bloated, hard to develop for. I know that we already use bootstrap, but we still limit the libraries / frameworks
+ - provide initial data. Add some RSS sources, block lists, or any other things, that help user to start the project
 
 # Conventions
 

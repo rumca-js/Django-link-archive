@@ -690,7 +690,7 @@ def func_display_data_form(request, p, data):
     data["bookmarked"] = True
 
     if "description" in data:
-        data["description"] = LinkDataController.get_description_safe(
+        data["description"] = LinkDataController.get_description_for_add(
             data["description"]
         )
 
@@ -758,9 +758,10 @@ def add_entry(request):
 
     p = ViewPage(request)
     p.set_title("Add entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_add():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     # if this is a POST request we need to process the form data
     if request.method == "POST":
@@ -835,9 +836,10 @@ def add_entry(request):
 def add_simple_entry(request):
     p = ViewPage(request)
     p.set_title("Add entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_add():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     if request.method == "POST":
         form = LinkInputForm(request.POST, request=request)
@@ -951,7 +953,7 @@ def edit_entry(request, pk):
         ob.save()
 
     if ob.description:
-        ob.description = LinkDataController.get_description_safe(ob.description)
+        ob.description = LinkDataController.get_description_for_add(ob.description)
         ob.save()
 
     if request.method == "POST":

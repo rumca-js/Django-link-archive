@@ -563,8 +563,21 @@ class BaseLinkDataController(BaseLinkDataModel):
             return description
 
         length = BaseLinkDataController.get_description_length()
+
         description = description[: length - 1]
 
+        return description
+
+    def get_description_for_add(description):
+        """
+        Forms can add \r, we need to compensate for that
+        """
+        if description.find("\r") > 0:
+            return description
+
+        description = BaseLinkDataController.get_description_safe(description)
+        lines_number = description.count("\n")
+        description = description[: -lines_number]
         return description
 
     def get_description_length():

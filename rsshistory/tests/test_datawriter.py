@@ -413,10 +413,16 @@ class DataWriterTest(FakeInternetTestCase):
         # call tested function
         writer.write()
 
+        thedir = writer.get_directory()
+        self.assertEqual(thedir, Path("./data") / "test" / "year")
+
         links = LinkDataController.objects.filter(bookmarked=True)
         self.assertEqual(links.count(), 2)
 
-        html_directory = Path("./data") / "test" / "year" / "html"
+        today = DateUtils.get_date_today()
+        year = int(DateUtils.get_datetime_year(today))
+
+        html_directory = Path("./data") / "test" / "year" / str(year) / "html"
         self.assertEqual(html_directory.exists(), True)
 
     def test_write__notime__md(self):
@@ -439,10 +445,13 @@ class DataWriterTest(FakeInternetTestCase):
         # call tested function
         writer.write()
 
+        thedir = writer.get_directory()
+        self.assertEqual(thedir, Path("./data") / "test" / "notime")
+
         links = LinkDataController.objects.filter(bookmarked=True)
         self.assertEqual(links.count(), 2)
 
-        html_directory = Path("./data") / "test" / "notime" / "html"
+        html_directory = Path("./data") / "test" / "notime" / "permanent" / "00000"
         self.assertEqual(html_directory.exists(), True)
 
     def test_write__daily_data__md(self):
@@ -465,6 +474,9 @@ class DataWriterTest(FakeInternetTestCase):
         # call tested function
         writer.write()
 
-        html_dir = Path("./data") / "test" / "daily_data" / "2023" / "03" / "html"
+        thedir = writer.get_directory()
+        self.assertEqual(thedir, Path("./data") / "test" / "daily_data")
+
+        html_dir = Path("./data") / "test" / "daily_data" / "2023" / "03"
 
         self.assertTrue(html_dir.exists())

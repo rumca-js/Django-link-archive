@@ -595,9 +595,16 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertLess(rating_2, rating_1)
 
     def test_get_thumbnail__schema_meta_icon(self):
-        web = """<!doctype html><html itemscope="" itemtype="http://schema.org/WebPage" lang="pl"><head><meta charset="UTF-8"><meta content="origin" name="referrer"><meta content="/images/branding/googleg/1x/googleg_standard_color_128dp.png" itemprop="image"><title>Google</title><script nonce="WDUp12mzuYwOMOCAENBRFg">window._hst=Date.now();pe</html>"""
+        web = """<!doctype html><html itemscope="" itemtype="http://schema.org/WebPage" lang="pl"><head><meta charset="UTF-8"><meta content="origin" name="referrer"><meta content="/images/branding/googleg/1x/googleg_standard_color_128dp.png" itemprop="image"><title>Google</title><script nonce="WDUp12mzuYwOMOCAENBRFg">window._hst=Date.now();pe</script></head></html>"""
 
-        page = HtmlPage("https://google.com", webpage_perfect_contents)
+        page = HtmlPage("https://google.com", web)
+
+        schema_image = page.get_schema_field("image")
+
+        self.assertEqual(
+            schema_image,
+            "/images/branding/googleg/1x/googleg_standard_color_128dp.png",
+        )
 
         # call tested function
         thumbnail = page.get_thumbnail()
