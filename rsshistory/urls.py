@@ -154,7 +154,6 @@ urlpatterns = [
     path("domains-remove-all/", domains.domains_remove_all, name="domains-remove-all",),
     # admin views
     path("admin-page/", system.admin_page, name="admin-page"),
-    path("user-config", system.user_config, name="user-config"),
     path("configuration-advanced/", system.configuration_advanced_page, name="configuration-advanced"),
     path("configuration-advanced-json/", system.configuration_advanced_json, name="configuration-advanced-json"),
     path("system-status/", system.system_status, name="system-status"),
@@ -173,6 +172,8 @@ urlpatterns = [
     path("is-system-ok", system.is_system_ok, name="is-system-ok",),
     # users
     path("appusers/", users.UserListView.as_view(), name="appusers",),
+    path("user-config", system.user_config, name="user-config"),
+    path("user-configs", users.UserConfigsListView.as_view(), name="user-configs"),
     path("appuser-history/<int:user_id>/", users.UserEntryVisitHistoryListView.as_view(), name="appuser-history",),
     path("user-personal/", users.user_personal, name="user-personal",),
     path("user-entry-history/", users.UserEntryVisitHistoryListView.as_view(), name="user-entry-history"),

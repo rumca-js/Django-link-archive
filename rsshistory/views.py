@@ -74,8 +74,10 @@ class ViewPage(object):
         )
         from .controllers import BackgroundJobController
 
-        if self.is_user_allowed(self.access_type):
-            c = Configuration.get_object()
+        c = Configuration.get_object()
+        config = c.config_entry
+
+        if self.is_user_allowed(self.access_type) and config.background_tasks:
             context.update(c.get_context())
 
             context["is_user_allowed"] = True
@@ -122,7 +124,10 @@ class ViewPage(object):
             if "app_description" in context:
                 context["page_description"] = context["app_description"]
 
-        context["user_config"] = UserConfig.get(self.request.user)
+        if self.request:
+            context["user_config"] = UserConfig.get(self.request.user)
+        else:
+            context["user_config"] = UserConfig.get()
         context["is_mobile"] = self.is_mobile()
 
         return context
@@ -186,6 +191,9 @@ class ViewPage(object):
         return True
 
     def is_user_allowed_on_page_level(self, access_type):
+        if not self.request:
+            return False
+
         if (
             access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
             and not self.request.user.is_superuser
@@ -205,6 +213,9 @@ class ViewPage(object):
         return True
 
     def is_user_allowed_on_system_level(self):
+        if not self.request:
+            return False
+
         config = Configuration.get_object().config_entry
         if (
             config.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER

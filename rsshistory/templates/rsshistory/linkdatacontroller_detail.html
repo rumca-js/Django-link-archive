@@ -72,6 +72,13 @@
 
    {% include "rsshistory/linkdatacontroller_detail_related.html" %}
 
+   <h3>Bookmarked by</h3>
+   {% for bookmark in object.bookmarks.all %}
+      {{bookmark.user.username }}
+   {% endfor %}
+
+   <div>
    {% include "rsshistory/search_places_element.html" %}
+   </div>
 
 {% endblock %}

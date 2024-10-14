@@ -1043,9 +1043,7 @@ class EntryWrapper(object):
                 AppLogging.error("Coult not move from archive")
                 return
 
-        UserBookmarks.add(request.user, entry)
-
-        if request.user.is_staff:
+        if UserBookmarks.add(request.user, entry):
             entry.make_bookmarked()
 
         return entry
@@ -1053,13 +1051,12 @@ class EntryWrapper(object):
     def make_not_bookmarked(self, request):
         entry = self.entry
 
-        UserBookmarks.remove(request.user, entry)
+        if UserBookmarks.remove(request.user, entry):
+            is_bookmarked = UserBookmarks.is_bookmarked(entry)
 
-        is_bookmarked = UserBookmarks.is_bookmarked(entry)
-
-        if not is_bookmarked:
-            entry.make_not_bookmarked()
-            self.evaluate()
+            if not is_bookmarked:
+                entry.make_not_bookmarked()
+                self.evaluate()
 
         return entry
 

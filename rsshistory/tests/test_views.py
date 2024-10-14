@@ -11,6 +11,46 @@ from ..views import get_search_term
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
+class GenericViewsTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_get_search_term(self):
+        themap = {"search" : "something1 = else & something2 = else2"}
+
+        # call tested function
+        term = get_search_term(themap)
+
+        self.assertEqual(term, "something1 = else & something2 = else2")
+
+
+class ViewPageTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.user = User.objects.create_user(
+            username="testuser",
+            password="testpassword",
+            is_staff=True,
+        )
+
+    def test_init_context(self):
+        page = ViewPage(None)
+
+        context = {}
+
+        # call tested function
+        term = page.init_context(context)
+
+        self.assertFalse(context["is_user_allowed"])
+        self.assertTrue(context["is_internet_ok"])
+        self.assertTrue(context["is_threading_ok"])
+        self.assertFalse(context["is_status_error"])
+        self.assertFalse(context["is_configuration_error"])
+        self.assertFalse(context["is_backgroundjobs_error"])
+        self.assertFalse(context["rss_are_fetched"])
+
+
 class ViewsTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
@@ -180,16 +220,3 @@ class ViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-
-
-class GenericViewsTest(FakeInternetTestCase):
-    def setUp(self):
-        self.disable_web_pages()
-
-    def test_get_search_term(self):
-        themap = {"search" : "something1 = else & something2 = else2"}
-
-        # call tested function
-        term = get_search_term(themap)
-
-        self.assertEqual(term, "something1 = else & something2 = else2")

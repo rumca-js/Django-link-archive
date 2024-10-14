@@ -454,6 +454,7 @@ class UserBookmarks(models.Model):
         objs = UserBookmarks.objects.filter(user=user, entry=entry)
         if objs.count() == 0:
             UserBookmarks.objects.create(user=user, entry=entry)
+            return True
 
     def get_user_bookmarks(user):
         if not user:
@@ -469,7 +470,9 @@ class UserBookmarks(models.Model):
             return
 
         bookmarks = UserBookmarks.objects.filter(user=user, entry=entry)
-        bookmarks.delete()
+        if bookmarks.exists():
+            bookmarks.delete()
+            return True
 
     def remove_entry(entry):
         bookmarks = UserBookmarks.objects.filter(entry=entry)

@@ -65,6 +65,7 @@ class EntriesExporter(object):
         self.add_all(items, export_path, export_file_name, source_url)
 
     def add_all(self, items, export_path, export_file_name, source_url=None):
+
         export_config = self.data_writer_config.export_config
         if export_config.format_json:
             json_text = self.items2jsontext(items)

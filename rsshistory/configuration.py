@@ -20,7 +20,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.89.1"
+__version__ = "0.90.1"
 
 
 class Configuration(object):
@@ -56,8 +56,6 @@ class Configuration(object):
 
     def get_context(self):
         if len(self.context) == 0:
-            config_entry = ConfigurationEntry.get()
-
             self.context = Configuration.get_context_minimal()
             self.context["c"] = self
         else:

@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..models import ConfigurationEntry, UserSearchHistory, UserEntryVisitHistory
+from ..models import ConfigurationEntry, UserSearchHistory, UserEntryVisitHistory, UserConfig
 from ..controllers import UserCommentsController
 from ..views import ViewPage, UserGenericListView, GenericListView
 
@@ -14,9 +14,20 @@ class UserListView(GenericListView):
     model = User
     context_object_name = "content_list"
     paginate_by = 100
+    template_name = str(ViewPage.get_full_template("appusers.html"))
 
     def get_title(self):
         return "User list"
+
+
+class UserConfigsListView(GenericListView):
+    model = UserConfig
+    context_object_name = "user_objects"
+    paginate_by = 100
+    template_name = str(ViewPage.get_full_template("user_configs.html"))
+
+    def get_title(self):
+        return "User config list"
 
 
 class UserEntryVisitHistoryListView(UserGenericListView):

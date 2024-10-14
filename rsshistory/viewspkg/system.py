@@ -206,7 +206,7 @@ def user_config(request):
     p.context["config_form"] = form
     p.context["user_object"] = user_obj
 
-    return p.render("user_configuration.html")
+    return p.render("user_config.html")
 
 
 """

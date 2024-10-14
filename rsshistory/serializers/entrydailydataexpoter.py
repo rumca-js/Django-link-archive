@@ -48,7 +48,16 @@ class EntryDailyDataMainExporter(MainExporter):
     def write_source_entries(self, input_path, day_iso, entries):
         sources = set(entries.values_list("source", flat=True).distinct())
 
-        for source_obj in sources:
+        for source_id in sources:
+            if not source_id:
+                continue
+
+            sources_objs = SourceDataController.objects.filter(id = source_id)
+            if not sources_objs.exists():
+                continue
+
+            source_obj = sources_objs[0]
+
             filters = super().get_configuration_filters()
             writer = SourceEntriesDataExporter(
                 self.data_writer_config, source_obj.url, filters
