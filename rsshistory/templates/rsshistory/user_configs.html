@@ -1,0 +1,25 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+{% for user_config in user_objects %}
+    <h1>{{user_config.user.username}}</h1>
+
+    Karma: {{user_config.karma}}
+    UserConfig ID:{{user_config.id}}
+    User ID:{{user_config.user.id}}
+    User name:{{user_config.user.username}}
+    Password:<span title="{{user_config.user.password}}">password</span>
+    e-mail:{{user_config.user.email}}
+    Staff:{{user_config.user.is_staff}}
+    Active:{{user_config.user.is_active}}
+    Last login:{{user_config.user.last_login}}
+    Date joined:{{user_config.user.date_joined}}
+
+    <div>
+    <a href="{% url 'rsshistory:appuser-history' user_config.user.id %}" class="btn btn-primary">
+                Browse history</a>
+    </div>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<h1>User configuration: [{{ user_object.user.username }}]</h1>
+
+<div>Karma: {{user_object.karma}}</div>
+
+<form action="{{config_form.action_url}}" method="{{config_form.method}}" style="margin:10px">
+    <table>
+        {% csrf_token %}
+        {{config_form}}
+        <tr>
+            <td>
+                <input type="submit" value="Submit" class="btn btn-primary" role="button">
+            </td>
+        </tr>
+    </table>
+</form>
+
+{% with object=user_object.user %}
+User ID:{{object.id}}
+User name:{{object.username}}
+Password:<span title="{{object.password}}">password</span>
+e-mail:{{object.email}}
+Staff:{{object.is_staff}}
+Active:{{object.is_active}}
+Last login:{{object.last_login}}
+Date joined:{{object.date_joined}}
+{% endwith %}
+
+{% endblock %}
