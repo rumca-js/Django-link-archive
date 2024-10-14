@@ -303,19 +303,20 @@ class UserBookmarksTest(TestCase):
         self.assertTrue(bookmarks.count(), 1)
         self.assertEqual(bookmarks[0].entry, self.entry)
 
-    def test_cleanup(self):
+    def test_remove(self):
         UserBookmarks.objects.all().delete()
 
         self.create_entry()
 
-        self.entry.bookmarked = True
-        self.entry.save()
-
-        # call tested function
-        UserBookmarks.cleanup()
-
+        UserBookmarks.add(self.user, self.entry)
         bookmarks = UserBookmarks.objects.all()
         self.assertTrue(bookmarks.count(), 1)
+        self.assertEqual(bookmarks[0].entry, self.entry)
+
+        # call tested function
+        UserBookmarks.remove(self.user, self.entry)
+        bookmarks = UserBookmarks.objects.all()
+        self.assertEqual(bookmarks.count(), 0)
 
     def test_move_entry(self):
         UserBookmarks.objects.all().delete()
@@ -330,6 +331,20 @@ class UserBookmarksTest(TestCase):
         bookmarks = UserBookmarks.objects.all()
         self.assertTrue(bookmarks.count(), 1)
         self.assertEqual(bookmarks[0].entry, self.entry_new)
+
+    def test_cleanup(self):
+        UserBookmarks.objects.all().delete()
+
+        self.create_entry()
+
+        self.entry.bookmarked = True
+        self.entry.save()
+
+        # call tested function
+        UserBookmarks.cleanup()
+
+        self.entry.refresh_from_db()
+        self.assertFalse(self.entry.bookmarked, False)
 
 
 class CompactedTagsTest(TestCase):

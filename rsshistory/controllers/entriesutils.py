@@ -1052,9 +1052,7 @@ class EntryWrapper(object):
         entry = self.entry
 
         if UserBookmarks.remove(request.user, entry):
-            is_bookmarked = UserBookmarks.is_bookmarked(entry)
-
-            if not is_bookmarked:
+            if not UserBookmarks.is_bookmarked(entry):
                 entry.make_not_bookmarked()
                 self.evaluate()
 

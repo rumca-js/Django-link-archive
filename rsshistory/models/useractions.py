@@ -480,9 +480,9 @@ class UserBookmarks(models.Model):
 
     def is_bookmarked(entry):
         bookmarks = UserBookmarks.objects.filter(entry=entry)
-        for bookmark in bookmarks:
-            if bookmark.user.is_staff:
-                return True
+
+        if bookmarks.count() > 0:
+            return True
 
         return False
 
@@ -490,10 +490,8 @@ class UserBookmarks(models.Model):
         entries = LinkDataModel.objects.filter(bookmarked=True)
         for entry in entries:
             if not UserBookmarks.is_bookmarked(entry):
-                users = User.objects.filter(is_superuser=True)
-
-                if users.count() > 0:
-                    UserBookmarks.add(users[0], entry)
+                entry.bookmarked=False
+                entry.save()
 
     def move_entry(source_entry, destination_entry):
         bookmarks = UserBookmarks.objects.filter(entry=source_entry)
