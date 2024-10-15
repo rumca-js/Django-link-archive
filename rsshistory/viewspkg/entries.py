@@ -152,7 +152,7 @@ class EntriesSearchListView(generic.ListView):
         context["entry_query_names"] = LinkDataController.get_query_names()
         context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
 
-        if Url.is_web_link(self.search_term):
+        if Url.is_protocolled_link(self.search_term):
             context["search_query_add"] = self.search_term
 
         print(
@@ -701,11 +701,10 @@ def func_display_data_form(request, p, data):
 
     page = DomainAwarePage(link)
     domain = page.get_domain()
-
     config = Configuration.get_object().config_entry
-
     info = DomainCache.get_object(link, url_builder=UrlHandler)
 
+    # warnings
     if config.prefer_https and link.find("http://") >= 0:
         warnings.append(
             "Detected http protocol. Choose https if possible. It is a more secure protocol"
@@ -724,9 +723,12 @@ def func_display_data_form(request, p, data):
         warnings.append("Link contains arguments. Is that intentional?")
     if page.get_protocolless().find(":") >= 0:
         warnings.append("Link contains port. Is that intentional?")
-
     if not page.is_web_link():
-        errors.append("Not a web link. Forget http:// or https:// etc.?")
+        warnings.append("Not a web link. Expecting protocol://domain.tld styled location")
+
+    # errors
+    if not page.is_protocolled_link():
+        errors.append("Not a protocolled link. Forget http:// or https:// etc.?")
     if data["status_code"] < 200 or data["status_code"] > 300:
         errors.append("Information about page availability could not be obtained")
     if EntryRules.is_blocked(link):
@@ -815,10 +817,10 @@ def add_entry(request):
 
             link = UrlHandler.get_cleaned_link(link)
 
-            if not Url.is_web_link(link):
+            if not Url.is_protocolled_link(link):
                 p.context[
-                    "ummary_text"
-                ] = "Only http links are allowed. Link:{}".format(link)
+                    "summary_text"
+                ] = "Only protocolled links are allowed. Link:{}".format(link)
                 return p.render("summary_present.html")
 
             data = LinkDataController.get_full_information({"link": link})
@@ -851,10 +853,10 @@ def add_simple_entry(request):
             if cleaned_link != link:
                 return func_display_init_form(request, p, cleaned_link)
 
-            if not Url.is_web_link(link):
+            if not Url.is_protocolled_link(link):
                 p.context[
                     "summary_text"
-                ] = "Only http links are allowed. Link:{}".format(link)
+                ] = "Only protocolled links are allowed. Link:{}".format(link)
                 return p.render("summary_present.html")
 
             data = LinkDataController.get_full_information({"link": link})

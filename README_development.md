@@ -1,3 +1,7 @@
+# Howdy partner! So you want to become sheriff?
+
+You can be one.
+
 # Hardware requirements
 
 The goal is to create personal archive database. We require small footprint. It should be able to run on SBC, like raspberry PI 5.

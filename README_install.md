@@ -1,13 +1,15 @@
-
-# Docker [under constructon]
+# Docker
 
 Docker image is available at [hub.docker.com](https://hub.docker.com/r/rozbujnik/django-link-archive)
 
 Notes:
 
- - the image uses 'admin' user, with 'admin' password by default
  - configure docker-compose.yml according to your own setup
+ - the image by default uses 'admin' user, with 'admin' password
  - django can be accessed locally with 127.0.0.1:8000, via browser
+ - after running the docker image you will be asked to login, and to configure the instance
+ - you scan check 'browsers' if they work using page properties page
+ - you should check 'sources' to enable some of them
 
 # Overview
 
@@ -15,9 +17,9 @@ This project uses the following technologies:
  - django
  - celery - background task processing
  - postgresql - use of SQLite is discouraged
- - spacy - for text/keyword analysis
- - selenium / crawlee
  - rabbitmq-server
+ - selenium / crawlee
+ - spacy - for text/keyword analysis
 
 # Using the crawling system
 

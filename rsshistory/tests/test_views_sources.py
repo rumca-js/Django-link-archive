@@ -20,13 +20,31 @@ class SourcesViewsTests(FakeInternetTestCase):
         self.user.is_staff = True
         self.user.save()
 
-    def test_add_simple_source(self):
+    def test_add_simple_source__valid(self):
         SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:source-add-simple".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
+
+        post_data = {"url": test_link}
+
+        # call user action
+        response = self.client.post(url, data=post_data)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, test_link, html=False)
+
+    def test_add_simple_source__invalid(self):
+        SourceDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:source-add-simple".format(LinkDatabase.name))
+        test_link = "https://page-with-http-status-500.com"
 
         post_data = {"url": test_link}
 

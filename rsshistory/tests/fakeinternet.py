@@ -144,7 +144,7 @@ class YouTubeJsonHandlerMock(YouTubeJsonHandler):
         super().__init__(url, page_options)
 
     def download_details_youtube(self):
-        print("Mocked YouTube request URL: {}".format(self.url))
+        #print("Mocked YouTube request URL: {}".format(self.url))
         MockRequestCounter.mock_page_requests += 1
 
         if self.get_video_code() == "1234":
@@ -556,18 +556,9 @@ class FakeInternetTestCase(TestCase):
         super().__init__(*args, **kwargs)
         MockRequestCounter.mock_page_requests = 0
 
-    def get_contents_function(
-        self, url=None, headers=None, timeout_s=10, ping=False, request=None
-    ):
+    def get_contents_function(self, request):
         MockRequestCounter.mock_page_requests += 1
-
-        if not request:
-            request = PageRequestObject(url)
-
-        if headers:
-            request.headers = headers
-
-        request.timeout_s = timeout_s
+        #print("Mocked request URL: {}".format(request.url))
 
         return TestResponseObject(request.url, request.headers, request.timeout_s)
 

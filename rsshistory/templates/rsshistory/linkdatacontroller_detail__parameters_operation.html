@@ -12,3 +12,13 @@
     </div>
     {% endfor %}
 </div>
+
+{% if object.bookmarks.all %}
+<div class="text-nowrap mx-1">
+    <strong>Bookmarked by:</strong>
+
+   {% for bookmark in object.bookmarks.all %}
+      {{bookmark.user.username }}
+   {% endfor %}
+</div>
+{% endif %}

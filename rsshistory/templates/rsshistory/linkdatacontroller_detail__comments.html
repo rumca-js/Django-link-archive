@@ -1,0 +1,28 @@
+{% load static %}
+
+{% if object.comments.all %}
+<h2>Comments</h2>
+<div class="container">
+    {% for comment in object.comments.all %}
+    <div>{{comment.get_comment | safe | linebreaks}}</div>
+    <div class="container">
+        {{comment.date_published}} {{comment.user_object}}
+        {% if comment.user_object.username == user.get_username %}
+        <div class="btn-group">
+            <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="btn btn-secondary" role="button" title="Edit comment">
+                {% include "rsshistory/icon_edit.html" %}
+            </a>
+            <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="btn btn-secondary" role="button" title="Remove comment">
+                {% include "rsshistory/icon_remove.html" %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    <hr/>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if user.is_authenticated and object.is_commentable %}
+<a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="btn btn-secondary" role="button">Add comment</a>
+{% endif %}

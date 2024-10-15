@@ -163,6 +163,18 @@ class DomainAwarePage(object):
 
         return False
 
+    def is_protocolled_link(self):
+        if (
+            self.url.startswith("http://")
+            or self.url.startswith("https://")
+            or self.url.startswith("smb://")
+            or self.url.startswith("ftp://")
+            or self.url.startswith("//")
+            or self.url.startswith("\\\\")
+        ):
+            return True
+        return False
+
     def get_protocolless(self):
         protocol_pos = self.url.find("://")
         if protocol_pos >= 0:
@@ -291,7 +303,7 @@ class DomainAwarePage(object):
         text = parts[0] + parts[1] + parts[2].lower()
 
         x = DomainAwarePage(text)
-        if self.url and not x.is_web_link():
+        if self.url and not x.is_protocolled_link():
             return
 
         # if passed email, with user

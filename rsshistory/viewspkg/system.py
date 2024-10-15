@@ -73,11 +73,6 @@ def index(request):
         return p.render_implementation("about.html")
 
 
-"""
-Configuration views
-"""
-
-
 def admin_page(request):
     p = ViewPage(request)
     p.set_title("Admin")
@@ -420,6 +415,8 @@ def wizard_setup(request):
     if data is not None:
         return data
 
+    UserConfig.get_or_create(request.user)
+
     return p.render("wizard_setup.html")
 
 
@@ -429,6 +426,8 @@ def wizard_setup_init(request):
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
+
+    UserConfig.get_or_create(request.user)
 
     return p.render("wizard_setup_init.html")
 
@@ -443,6 +442,8 @@ def wizard_setup_news(request):
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
+
+    UserConfig.get_or_create(request.user)
 
     c = ConfigurationEntry.get()
     c.link_save = True
@@ -490,6 +491,8 @@ def wizard_setup_gallery(request):
     if data is not None:
         return data
 
+    UserConfig.get_or_create(request.user)
+
     c = ConfigurationEntry.get()
     c.link_save = False
     c.source_save = False
@@ -535,6 +538,8 @@ def wizard_setup_search_engine(request):
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
+
+    UserConfig.get_or_create(request.user)
 
     c = ConfigurationEntry.get()
     c.link_save = False

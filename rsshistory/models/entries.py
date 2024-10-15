@@ -572,6 +572,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         """
         Forms can add \r, we need to compensate for that
         """
+        if not description or description == "":
+            return description
+
         if description.find("\r") > 0:
             return description
 

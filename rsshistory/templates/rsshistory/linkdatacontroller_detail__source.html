@@ -1,0 +1,25 @@
+{% load static %}
+
+{% if object.source %}
+<div class="container borders rounded">
+    <a href="{{object.source.get_absolute_url}}">
+       <div class="d-flex">
+      {% if object.get_thumbnail != object.source.get_favicon %}
+             {% if user_config.show_icons%}
+             <div>
+                 {% if user_config.small_icons %}
+                   <img src="{{object.source.get_favicon}}" class="rounded icon-small border"/>
+                 {% else %}
+                   <img src="{{object.source.get_favicon}}" class="rounded icon-normal border"/>
+                 {% endif %}
+             </div>
+             {% endif %}
+          {% endif %}
+
+      <div>
+          {{object.source.title}}
+      </div>
+   </div>
+    </a>
+</div>
+{% endif %}

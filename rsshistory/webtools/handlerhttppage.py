@@ -1,6 +1,7 @@
 import subprocess
 import json
 import os
+import traceback
 from pathlib import Path
 
 from urllib3.exceptions import InsecureRequestWarning
@@ -658,6 +659,7 @@ class HttpPageHandler(ContentInterface):
         if self.p:
             if type(self.p) is RssPage:
                 return self.p.get_entries()
+        return []
 
     def get_feeds(self):
         # TODO ugly import

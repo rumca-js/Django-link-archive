@@ -130,13 +130,29 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         return limited_data
 
-    def test_add_simple_entry(self):
+    def test_add_simple_entry__valid(self):
         LinkDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:entry-add-simple".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
+
+        post_data = {"link": test_link}
+
+        # call user action
+        response = self.client.post(url, data=post_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, test_link, html=False)
+
+    def test_add_simple_entry__invalid(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-add-simple".format(LinkDatabase.name))
+        test_link = "https://page-with-http-status-500.com"
 
         post_data = {"link": test_link}
 

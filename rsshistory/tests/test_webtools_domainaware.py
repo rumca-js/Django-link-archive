@@ -167,6 +167,11 @@ class DomainAwarePageTest(FakeInternetTestCase):
         # call tested function
         self.assertEqual(p.get_domain(), "https://test.com")
 
+    def test_get_domain_port(self):
+        p = DomainAwarePage("https://my-server:8185/view/somethingsomething")
+        # call tested function
+        self.assertEqual(p.get_domain(), "https://my-server")
+
     def test_get_domain_only(self):
         p = DomainAwarePage("http://test.com/my-site-test")
         # call tested function

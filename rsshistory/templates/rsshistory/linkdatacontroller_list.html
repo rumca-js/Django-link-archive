@@ -4,9 +4,8 @@
 
   {% include "rsshistory/linkdatacontroller_list_actions.html" %}
 
-  {% if entry_list %}
+  <!-- user might want to change filter, and query again -->
   {% include "rsshistory/form_filter_oneliner_element.html" %}
-  {% endif %}
 
   {% if query_filter.is_error %}
   <p class="error-text">There errors with your query</p>

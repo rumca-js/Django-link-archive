@@ -31,12 +31,6 @@ class PageDisplay(object):
         for feed in feeds:
             print("Feed URL:{}".format(feed))
 
-        if not feeds or len(feeds) == 0:
-            rss = OpenRss(url)
-            link = rss.find_rss_link()
-            if link:
-                print("Feed URL:{}".format(link))
-
         handler = u.get_handler()
         if type(handler) is HttpPageHandler:
             response = handler.get_response()
@@ -47,27 +41,15 @@ class PageDisplay(object):
             print("Page type:{}".format(type(handler.p)))
 
             if type(handler.p) is RssPage:
-                print("Feed title:{}".format(handler.p.feed.feed.title))
-                print("Feed description:{}".format(handler.p.feed.feed.description))
-                print("Feed published:{}".format(handler.p.feed.feed.published))
+                pass
 
-                index = 0
-                for entry in handler.p.feed.entries:
-                    if index == 0:
-                        print("Feed Entry Link:{}".format(entry.link))
-                        print("Feed Entry Title:{}".format(entry.title))
-                    index += 1
-
-                print("Feed Entries:{}".format(index))
-
-                index = 0
-                for entry in handler.get_entries():
-                    if index == 0:
-                        print("Entry Link:{}".format(entry["link"]))
-                        print("Entry Title:{}".format(entry["title"]))
-                    index += 1
-                print("Entries:{}".format(index))
             if type(handler.p) is HtmlPage:
+                if not feeds or len(feeds) == 0:
+                    rss = OpenRss(url)
+                    link = rss.find_rss_link()
+                    if link:
+                        print("Feed URL:{}".format(link))
+
                 print("Favicon:{}".format(handler.p.get_favicon()))
                 print("meta title:{}".format(handler.p.get_meta_field("title")))
                 print(
@@ -87,13 +69,15 @@ class PageDisplay(object):
                 )
 
         elif type(handler) is Url.youtube_channel_handler:
-            index = 0
-            for entry in handler.get_entries():
-                if index == 0:
-                    print("Entry Link:{}".format(entry["link"]))
-                    print("Entry Title:{}".format(entry["title"]))
-                index += 1
-            print("Entries:{}".format(index))
+            pass
+
+        index = 0
+        for entry in u.get_entries():
+            if index == 0:
+                print("Has entries")
+                print("Entry Link:{}".format(entry["link"]))
+                print("Entry Title:{}".format(entry["title"]))
+            index += 1
 
         if u.get_contents():
             if verbose:

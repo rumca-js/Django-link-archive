@@ -125,7 +125,7 @@ class ViewPage(object):
                 context["page_description"] = context["app_description"]
 
         if self.request:
-            context["user_config"] = UserConfig.get(self.request.user)
+            context["user_config"] = UserConfig.get_or_create(self.request.user)
         else:
             context["user_config"] = UserConfig.get()
         context["is_mobile"] = self.is_mobile()

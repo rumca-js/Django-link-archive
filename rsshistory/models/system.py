@@ -657,16 +657,21 @@ class UserConfig(models.Model):
         if not input_user.is_authenticated:
             return UserConfig.get_config_user()
 
-        users = UserConfig.objects.filter(user=input_user)
-        if not users.exists():
-            user_config = UserConfig.get_config_user()
+        user_configs = UserConfig.objects.filter(user=input_user)
+        if not user_configs.exists():
+            user_configs = UserConfig.objects.filter(username=input_user.username)
+            if user_configs.exists():
+                user_config = user_configs[0]
+            else:
+                user_config = UserConfig.get_config_user()
+
             user_config.username = input_user.username
             user_config.user = input_user
-
             user_config.save()
 
             return user_config
-        return users[0]
+
+        return user_configs[0]
 
     def save(self, *args, **kwargs):
         config = ConfigurationEntry.get()

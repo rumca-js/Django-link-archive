@@ -286,6 +286,10 @@ class Url(ContentInterface):
         p = DomainAwarePage(url)
         return p.is_web_link()
 
+    def is_protocolled_link(url):
+        p = DomainAwarePage(url)
+        return p.is_protocolled_link()
+
     def get_cleaned_link(url):
         if not url:
             return
@@ -457,6 +461,8 @@ class Url(ContentInterface):
         handler = self.get_handler()
         if handler:
             return handler.get_entries()
+        else:
+            return []
 
     def find_rss_url(url):
         """

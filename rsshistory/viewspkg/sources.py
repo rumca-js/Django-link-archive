@@ -207,8 +207,8 @@ def add_source_simple(request):
     def get_add_link_form(p, url):
         url = UrlHandler.get_cleaned_link(url)
 
-        if not Url.is_web_link(url):
-            p.context["summary_text"] = "Only http links are allowed. Link:{}".format(
+        if not Url.is_protocolled_link(url):
+            p.context["summary_text"] = "Only protocolled links are allowed. Link:{}".format(
                 url
             )
             return p.render("summary_present.html")
@@ -237,17 +237,42 @@ def add_source_simple(request):
 
         p.context["form"] = form
 
+        link = data["url"]
+
         page = DomainAwarePage(data["url"])
         domain = page.get_domain()
+        config = Configuration.get_object().config_entry
+        info = DomainCache.get_object(link, url_builder=UrlHandler)
 
-        if data["url"].find("http://") >= 0:
-            warnings.append("Link is http. Https is more secure protocol")
-        if data["url"].find("http://") == -1 and data["url"].find("https://") == -1:
-            errors.append("Missing protocol. Could be http:// or https://")
+        # warnings
+        if config.prefer_https and link.find("http://") >= 0:
+            warnings.append(
+                "Detected http protocol. Choose https if possible. It is a more secure protocol"
+            )
+        if config.prefer_non_www_sites and domain.find("www.") >= 0:
+            warnings.append(
+                "Detected www in domain link name. Select non www link if possible"
+            )
         if domain.lower() != domain:
-            warnings.append("Link is not lowercase. Is that OK?")
+            warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
+        if config.respect_robots_txt and info and not info.is_allowed(link):
+            warnings.append("Link is not allowed by site robots.txt")
+        if link.find("?") >= 0:
+            warnings.append("Link contains arguments. Is that intentional?")
+        if link.find("#") >= 0:
+            warnings.append("Link contains arguments. Is that intentional?")
+        if page.get_protocolless().find(":") >= 0:
+            warnings.append("Link contains port. Is that intentional?")
+        if not page.is_web_link():
+            warnings.append("Not a web link. Expecting protocol://domain.tld styled location")
+
+        # errors
+        if not page.is_protocolled_link():
+            errors.append("Not a protocolled link. Forget http:// or https:// etc.?")
         if data["status_code"] < 200 or data["status_code"] > 300:
             errors.append("Information about page availability could not be obtained")
+        if EntryRules.is_blocked(link):
+            errors.append("Entry is blocked by entry rules")
 
         p.context["form_notes"] = notes
         p.context["form_warnings"] = warnings

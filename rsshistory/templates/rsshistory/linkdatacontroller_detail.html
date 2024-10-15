@@ -25,60 +25,33 @@
    </a>
 
    <div>
-     {% include "rsshistory/linkdatacontroller_detail_parameters.html" %}
+     {% include "rsshistory/linkdatacontroller_detail__parameters.html" %}
    </div>
 
-   <div class="mb-2">
-       {% if object.has_tags %}
-         {% for tag in object.get_tag_map %}
-           <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,
-         {% endfor %}
-       {% endif %}
-   </div>
+   {% include "rsshistory/linkdatacontroller_detail__tags.html" %}
 
-   {% if object.source %}
-   <div class="container borders rounded">
-       <a href="{{object.source.get_absolute_url}}">
-          <div class="d-flex">
-	     {% if object.get_thumbnail != object.source.get_favicon %}
-                {% if user_config.show_icons%}
-	            <div>
-                    {% if user_config.small_icons %}
-                      <img src="{{object.source.get_favicon}}" class="rounded icon-small border"/>
-                    {% else %}
-                      <img src="{{object.source.get_favicon}}" class="rounded icon-normal border"/>
-                    {% endif %}
-	            </div>
-                {% endif %}
-             {% endif %}
+   {% include "rsshistory/linkdatacontroller_detail__source.html" %}
 
-	     <div>
-             {{object.source.title}}
-	     </div>
-	  </div>
-       </a>
-   </div>
-   {% endif %}
-
-   {% include "rsshistory/linkdatacontroller_detail_buttons.html" %}
+   {% include "rsshistory/linkdatacontroller_detail__buttons.html" %}
 
    <div class="link-detail-description">
    {{object_controller.get_description_html | safe | linebreaks }}
    </div>
 
-   {% include "rsshistory/linkdatacontroller_detail_comments.html" %}
-
-   {% include "rsshistory/linkdatacontroller_detail_parameters_operation.html" %}
-
-   {% include "rsshistory/linkdatacontroller_detail_related.html" %}
-
-   {% if object.bookmarks.all %}
-      <h3>Bookmarked by</h3>
-      {% for bookmark in object.bookmarks.all %}
-         {{bookmark.user.username }}
-      {% endfor %}
+   {% if object.comments.all %}
+   <hr/>
    {% endif %}
+   {% include "rsshistory/linkdatacontroller_detail__comments.html" %}
 
+   <hr/>
+   {% include "rsshistory/linkdatacontroller_detail__parameters_operation.html" %}
+
+   {% if transitions %}
+   <hr/>
+   {% endif %}
+   {% include "rsshistory/linkdatacontroller_detail__related.html" %}
+
+   <hr/>
    <div>
    {% include "rsshistory/search_places_element.html" %}
    </div>
