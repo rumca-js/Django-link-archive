@@ -136,7 +136,7 @@ class SourceDataModel(models.Model):
     )
 
     class Meta:
-        ordering = ["-enabled", "title"]
+        ordering = ["-enabled", "-dynamic_data__consecutive_errors", "title"]
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""

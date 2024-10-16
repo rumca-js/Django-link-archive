@@ -2,6 +2,16 @@
 {% load static %}
 {% block content %}
 
+<div>
+   <a href="{% url 'admin:index' %}" title="User administration panel" class="btn btn-primary">
+       <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+       User admin panel</a>
+   <a href="{% url 'rsshistory:user-configs' %}" title="User configurations" class="btn btn-primary">
+       <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+       User configurations</a>
+</div>
+
+
 {% for user in content_list %}
 <div>
     User ID:{{user.id}}
@@ -13,8 +23,10 @@
     Last login:{{user.last_login}}
     Date joined:{{user.date_joined}}
     <div>
-    <a href="{% url 'rsshistory:appuser-history' user.id %}" class="btn btn-primary">
-                Browse history</a>
+        <a href="{% url 'rsshistory:appuser-history' user.id %}" class="btn btn-primary">
+                    Browse history</a>
+        <a href="{% url 'rsshistory:appuser-search-history' user.id %}" class="btn btn-primary">
+                    Search history</a>
     </div>
 </div>
 {% endfor %}

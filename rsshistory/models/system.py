@@ -119,6 +119,11 @@ class ConfigurationEntry(models.Model):
         help_text="If disabled, background tasks, and jobs are disabled.",
     )
 
+    user_internal_scripts = models.BooleanField(
+        default=False,
+        help_text="If enabled internal javascripts and styles will be used.",
+    )
+
     data_import_path = models.CharField(
         default="../data/imports",
         max_length=2000,

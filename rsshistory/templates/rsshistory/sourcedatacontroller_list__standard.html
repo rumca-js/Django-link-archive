@@ -16,6 +16,9 @@
         {% if not source.enabled %}
         [H]
         {% endif %}
+        {% if source.dynamic_data.consecutive_errors %}
+        [ERRORS]
+        {% endif %}
         {{source.title}}
     </span>
     <div class="link-list-item-description">

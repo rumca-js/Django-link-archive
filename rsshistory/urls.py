@@ -172,9 +172,8 @@ urlpatterns = [
     path("is-system-ok", system.is_system_ok, name="is-system-ok",),
     # users
     path("appusers/", users.UserListView.as_view(), name="appusers",),
-    path("user-config", system.user_config, name="user-config"),
-    path("user-configs", users.UserConfigsListView.as_view(), name="user-configs"),
     path("appuser-history/<int:user_id>/", users.UserEntryVisitHistoryListView.as_view(), name="appuser-history",),
+    path("appuser-search-history/<int:user_id>/", users.UserSearchHistoryListView.as_view(), name="appuser-search-history",),
     path("user-personal/", users.user_personal, name="user-personal",),
     path("user-entry-history/", users.UserEntryVisitHistoryListView.as_view(), name="user-entry-history"),
     path("user-comments/", users.UserCommentsListView.as_view(), name="user-comments",),
@@ -187,6 +186,8 @@ urlpatterns = [
     path("user-tags-show", useractions.UserCompactedTagsListView.as_view(), name="user-tags-show"),
     path("user-search-history/", users.UserSearchHistoryListView.as_view(), name="user-search-history",),
     path("search-history-remove/<int:pk>/", userhistory.search_history_remove, name="search-history-remove"),
+    path("user-config", system.user_config, name="user-config"),
+    path("user-configs", users.UserConfigsListView.as_view(), name="user-configs"),
     # logging
     path("logs/", system.AppLoggingView.as_view(), name="logs",),
     path("truncate-log", system.truncate_log, name="truncate-log"),
@@ -258,6 +259,9 @@ urlpatterns = [
     path("block-list-update/<int:pk>/", blockentry.block_list_update, name="block-list-update",),
     path("block-list-remove/<int:pk>/", blockentry.block_list_remove, name="block-list-remove",),
     path("block-lists-clear", blockentry.block_lists_clear, name="block-lists-clear",),
+    # json and ajax
+    path("get-footer-status-line", system.get_footer_status_line, name="get-footer-status-line",),
+    path("get-menu", system.get_menu, name="get-menu",),
     # other
     path("data-errors", custom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", custom.fix_entry_tags, name="fix-entry-tags",),

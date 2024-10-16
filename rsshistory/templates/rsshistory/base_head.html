@@ -32,10 +32,13 @@
       {% endif %}
     {% endif %}
 
-<!-- Third party things below -->
-    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap5.3.3.min.css' %}">
-<script src="{% static 'bootstrap/bootstrap.bundle5.3.3.min.js' %}"></script>
-<!-- Third party things above -->
+    {% if config.user_internal_scripts %}
+      <link rel="stylesheet" href="{% static 'bootstrap/bootstrap5.3.3.min.css' %}">
+      <script src="{% static 'bootstrap/bootstrap.bundle5.3.3.min.js' %}"></script>
+    {% else %}
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    {% endif %}
 
     {% if config.favicon_internet_location %}
     <link rel="shortcut icon" type="image" href="{{config.favicon_internet_location}}"/>
@@ -47,24 +50,76 @@
     <link rel="search" href="opensearch.xml" type="application/opensearchdescription+xml" title="Django archive search">
     {% endif %}
 
-    <!-- Third party things below -->
-    <!-- This was placed as last things. For search engines with icons this prevents us from accessing menu -->
-    <script src="{% static 'bootstrap/jquery-3.3.1.slim.min.js' %}"></script>
-    <script src="{% static 'bootstrap/popper1.14.7.min.js' %}"></script>
-    <script src="{% static 'bootstrap/bootstrap4.3.1.min.js' %}"></script>
-    <!-- Third party things above -->
+    {% if config.user_internal_scripts %}
+        <script src="{% static 'bootstrap/jquery-3.3.1.slim.min.js' %}"></script>
+        <script src="{% static 'bootstrap/popper1.14.7.min.js' %}"></script>
+    {% else %}
+        <!--script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script-->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    {% endif %}
 
     <script>
-        $(document).ready(function() {
-            $("#btnFetch").click(function() {
-              // disable button
-              $(this).prop("disabled", true);
-              // add spinner to button
-              $(this).html(
+        function putSpinnerOnIt(button) {
+            button.prop("disabled", true);
+
+            button.html(
                 `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
-              );
-              $(this).parents('form').submit();
+            );
+
+            button.parents('form').submit();
+        }
+
+        $(document).ready(function() {
+            $("#btnFetch").click(function(event) {
+                event.preventDefault();
+                putSpinnerOnIt($(this));
             });
+        });
+
+        function loadFooterContent() {
+            $.ajax({
+                url: '{% url 'rsshistory:get-footer-status-line' %}',
+                type: 'GET',
+                success: function(data) {
+                    $('#footerLine').html(data.message);
+                },
+                error: function(xhr, status, error) {
+                    $('#footerLine').html("Error loading dynamic content")
+                }
+            });
+        }
+        function loadMenuContent() {
+            $.ajax({
+                url: '{% url 'rsshistory:get-menu' %}',
+                type: 'GET',
+                success: function(data) {
+                    $('#blockMenu').html(data);
+                },
+                error: function(xhr, status, error) {
+                    $('#blockMenu').html("Error loading menu")
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            loadMenuContent();
+            loadFooterContent();
+
+            setInterval(function() {
+                loadMenuContent();
+                loadFooterContent();
+            }, 300000);  // 5 minutes in milliseconds
+        });
+
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                loadMenuContent();
+                loadFooterContent();
+            }
+        });
+
+        $('#btnUpdateFooter').on('click', function() {
+            loadFooterContent();
         });
     </script>
 </head>

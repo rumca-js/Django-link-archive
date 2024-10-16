@@ -6,7 +6,7 @@ from utils.dateutils import DateUtils
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..models import KeyWords, DataExport
-from ..views import get_search_term
+from ..views import get_search_term, ViewPage
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 

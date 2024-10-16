@@ -48,4 +48,5 @@ class RepositoryInterface(object):
         expected_dir = self.get_local_dir()
         data_dir = self.data_source_directory
 
-        shutil.copytree(data_dir, expected_dir, dirs_exist_ok=True)
+        if expected_dir != data_source_directory:
+            shutil.copytree(data_dir, expected_dir, dirs_exist_ok=True)

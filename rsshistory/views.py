@@ -69,8 +69,6 @@ class ViewPage(object):
     def init_context(self, context):
         from .models import (
             ReadLater,
-            SystemOperation,
-            SourceOperationalData,
         )
         from .controllers import BackgroundJobController
 
@@ -82,43 +80,11 @@ class ViewPage(object):
 
             context["is_user_allowed"] = True
 
-            queue_size = BackgroundJobController.get_number_of_jobs(
-                BackgroundJobController.JOB_PROCESS_SOURCE
-            )
-            context["rss_are_fetched"] = queue_size > 0
-            context["rss_queue_size"] = queue_size
-
-            context["is_internet_ok"] = SystemOperation.is_internet_ok()
-            context["is_threading_ok"] = SystemOperation.is_threading_ok()
-
-            sources = SourceOperationalData.objects.filter(consecutive_errors__gt = 0)
-            context["is_sources_error"] = sources.count() > 0
-
-            context["is_configuration_error"] = False
-
-            jobs = BackgroundJobController.objects.filter(enabled = False)
-            context["is_backgroundjobs_error"] = jobs.count() > 0
-
-            if self.request.user.is_authenticated:
-                context["is_read_later"] = (
-                    ReadLater.objects.filter(user=self.request.user).count() != 0
-                )
-
-            context["is_status_error"] = (context["is_backgroundjobs_error"] or 
-                                          not context["is_internet_ok"] or 
-                                          not context["is_threading_ok"])
-
         else:
             context.update(Configuration.get_context_minimal())
             # to not logged users indicate everything is fine and dandy
 
             context["is_user_allowed"] = False
-            context["is_internet_ok"] = True
-            context["is_threading_ok"] = True
-            context["is_status_error"] = False
-            context["is_configuration_error"] = False
-            context["is_backgroundjobs_error"] = False
-            context["rss_are_fetched"] = False
 
         if "page_description" not in context:
             if "app_description" in context:

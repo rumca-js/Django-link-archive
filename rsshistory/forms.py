@@ -101,6 +101,7 @@ class ConfigForm(forms.ModelForm):
             "add_access_type",
             "logging_level",
             "background_tasks",
+            "user_internal_scripts",
             "data_export_path",
             "data_import_path",
             "auto_store_thumbnails",

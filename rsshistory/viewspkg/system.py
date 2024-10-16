@@ -36,6 +36,7 @@ from ..models import (
     SourceExportHistory,
     SourceOperationalData,
     ModelFiles,
+    ReadLater,
 )
 from ..controllers import (
     SourceDataController,
@@ -673,3 +674,70 @@ def search_suggestions(request):
     text = "[]"
 
     return HttpResponse(text, status=status_code, content_type=content_type)
+
+
+def get_footer_status_line(request):
+    process_source_queue_size = BackgroundJobController.get_number_of_jobs(
+        BackgroundJobController.JOB_PROCESS_SOURCE
+    )
+
+    sources = SourceOperationalData.objects.filter(consecutive_errors__gt = 0, source_obj__enabled=True)
+
+    all_jobs = BackgroundJobController.objects.filter(enabled = False)
+
+    configuration_entry = ConfigurationEntry.get()
+
+    sources_are_fetched = process_source_queue_size > 0
+    sources_queue_size = process_source_queue_size
+    is_sources_error = sources.count() > 0
+    is_internet_ok = SystemOperation.is_internet_ok()
+    is_threading_ok  = SystemOperation.is_threading_ok()
+    is_backgroundjobs_error = all_jobs.count() > 0
+    is_configuration_error = False
+
+    message = ""
+    if sources_are_fetched:
+        message += f"Reading sources. Queue:{sources_queue_size}"
+    if is_sources_error:
+        if message != "":
+            message+= ", "
+        message += "Sources error"
+    if configuration_entry.background_tasks and not is_internet_ok:
+        if message != "":
+            message+= ", "
+        message += "Internet error"
+    if configuration_entry.background_tasks and not is_threading_ok:
+        if message != "":
+            message+= ", "
+        message += "Threads error"
+    if is_backgroundjobs_error:
+        if message != "":
+            message+= ", "
+        message += "Backgroundjobs error"
+    if is_configuration_error:
+        if message != "":
+            message+= ", "
+        message += "Configuration error"
+
+    data = {
+            "message" : message
+    }
+    return JsonResponse(data)
+
+
+def get_menu(request):
+    status_code = 200
+    content_type = "text/html"
+    text = ""
+
+    p = ViewPage(request)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    if request.user.is_authenticated:
+        p.context["is_read_later"] = (
+            ReadLater.objects.filter(user=request.user).count() != 0
+        )
+
+    return p.render_implementation("base_menu.html")
