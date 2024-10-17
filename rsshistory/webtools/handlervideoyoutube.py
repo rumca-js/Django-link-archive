@@ -11,6 +11,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         super().__init__(url, contents=contents, page_options=page_options)
 
         self.url = self.input2url(url)
+        self.code = self.input2code(url)
 
     def is_handled_by(self):
         from .url import Url
@@ -31,17 +32,17 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         )
 
     def get_video_code(self):
-        return YouTubeVideoHandler.input2code(self.url)
+        return self.input2code(self.url)
 
     def input2url(self, item):
-        code = YouTubeVideoHandler.input2code(item)
-        return YouTubeVideoHandler.code2url(code)
+        code = self.input2code(item)
+        return self.code2url(code)
 
-    def code2url(code):
+    def code2url(self, code):
         if code:
             return "https://www.youtube.com/watch?v={0}".format(code)
 
-    def input2code(url):
+    def input2code(self, url):
         if not url:
             return
 

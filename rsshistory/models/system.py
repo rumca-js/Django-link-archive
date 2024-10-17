@@ -75,7 +75,7 @@ class ConfigurationEntry(models.Model):
     )
 
     favicon_internet_location = models.CharField(
-        default="",
+        blank=True,
         max_length=200,
         help_text="Instance location. For example https://my-domain.com/apps/rsshistory/static/rsshistory/icons/favicon.ico",
     )

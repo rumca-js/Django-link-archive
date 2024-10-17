@@ -222,6 +222,7 @@ class Url(ContentInterface):
         for handler in handlers:
             h = handler(url=self.url, page_options=self.options)
             if h.is_handled_by():
+                self.url = h.url
                 return h
 
         if url.startswith("https") or url.startswith("http"):
@@ -331,6 +332,12 @@ class Url(ContentInterface):
                     url = Url.get_cleaned_link(url)
 
         return url
+
+    def get_clean_url(self):
+        if self.handler:
+            return self.handler.get_url()
+        else:
+            return self.url
 
     def get_domain_info(self):
         return DomainCache.get_object(self.url)
@@ -480,6 +487,8 @@ class Url(ContentInterface):
         if type(handler) is Url.youtube_channel_handler:
             if not handler.is_channel_name():
                 return url
+        elif type(handler) is Url.odysee_channel_handler:
+            return url
         elif type(handler) is HttpPageHandler:
             if type(handler.p) is RssPage:
                 return url

@@ -74,7 +74,7 @@
             });
         });
 
-        function loadFooterContent() {
+        function loadFooterContent(attempt = 1) {
             $.ajax({
                 url: '{% url 'rsshistory:get-footer-status-line' %}',
                 type: 'GET',
@@ -82,11 +82,16 @@
                     $('#footerLine').html(data.message);
                 },
                 error: function(xhr, status, error) {
-                    $('#footerLine').html("Error loading dynamic content")
+                    if (attempt < 2) {
+                        loadFooterContent(attempt + 1);
+                        $('#bodyBlock').html("Error loading dynamic content, retry")
+                    } else {
+                        $('#bodyBlock').html("Error loading dynamic content")
+                    }
                 }
             });
         }
-        function loadMenuContent() {
+        function loadMenuContent(attempt = 1) {
             $.ajax({
                 url: '{% url 'rsshistory:get-menu' %}',
                 type: 'GET',
@@ -94,6 +99,12 @@
                     $('#blockMenu').html(data);
                 },
                 error: function(xhr, status, error) {
+                    if (attempt < 2) {
+                        loadMenuContent(attempt + 1);
+                        $('#bodyBlock').html("Error loading dynamic content, retry")
+                    } else {
+                        $('#bodyBlock').html("Error loading dynamic content")
+                    }
                 }
             });
         }

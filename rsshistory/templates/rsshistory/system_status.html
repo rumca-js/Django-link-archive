@@ -7,32 +7,37 @@
 </div>
 
 <script>
-function loadBodyContent() {
-    $.ajax({
-	url: '{% url 'rsshistory:get-system-status' %}',
-	type: 'GET',
-	success: function(data) {
-	    $('#bodyBlock').html(data);
-	},
-	error: function(xhr, status, error) {
-	    $('#bodyBlock').html("Error loading dynamic content")
-	}
-    });
-}
-
-$(document).ready(function() {
-    loadBodyContent();
-
-    setInterval(function() {
-	loadBodyContent();
-    }, 300000);  // 5 minutes in milliseconds
-});
-
-document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
-	loadBodyContent();
+    function loadBodyContent(attempt = 1) {
+        $.ajax({
+            url: '{% url 'rsshistory:get-system-status' %}',
+            type: 'GET',
+            success: function(data) {
+                $('#bodyBlock').html(data);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 2) {
+                    loadBodyContent(attempt + 1);
+                    $('#bodyBlock').html("Error loading dynamic content, retry")
+                } else {
+                    $('#bodyBlock').html("Error loading dynamic content")
+                }
+            }
+        });
     }
-});
+
+    $(document).ready(function() {
+        loadBodyContent();
+
+        setInterval(function() {
+        loadBodyContent();
+        }, 300000);  // 5 minutes in milliseconds
+    });
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+        loadBodyContent();
+        }
+    });
 </script>
 
 {% endblock %}

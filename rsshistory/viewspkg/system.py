@@ -100,7 +100,14 @@ def configuration_advanced_page(request):
                 reverse("{}:admin-page".format(LinkDatabase.name))
             )
         else:
-            p.set_variable("summary_text", "Form is invalid")
+            error_message = "\n".join(
+                [
+                    "{}: {}".format(field, ", ".join(errors))
+                    for field, errors in form.errors.items()
+                ]
+            )
+
+            p.context["summary_text"] = "Form is invalid: {}".format(error_message)
             return p.render("summary_present.html")
 
     configuration_entry = ConfigurationEntry.get()

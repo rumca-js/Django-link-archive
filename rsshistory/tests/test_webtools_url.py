@@ -280,3 +280,21 @@ class UrlTest(FakeInternetTestCase):
         link = Url.get_cleaned_link(test_link)
 
         self.assertEqual(link, "https://my-server:8185/view/somethingsomething")
+
+    def test_get_feeds__youtube(self):
+        url = Url("https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw")
+
+        result = Url.find_rss_url(url)
+        self.assertEqual(result, url)
+
+    def test_get_feeds__odysee(self):
+        url = Url("https://odysee.com/@samtime:1?test")
+
+        result = Url.find_rss_url(url)
+        self.assertEqual(result, url)
+
+    def test_get_feeds__rss(self):
+        url = Url("https://www.codeproject.com/WebServices/NewsRSS.aspx")
+
+        result = Url.find_rss_url(url)
+        self.assertEqual(result, url)

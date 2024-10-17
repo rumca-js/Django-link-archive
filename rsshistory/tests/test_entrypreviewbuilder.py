@@ -24,7 +24,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source_url="https://odysee.com",
-            link="https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1",
+            link="https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1?test",
             title="The second link",
             bookmarked=False,
             language="en",
@@ -49,7 +49,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
     def test_video_odysee_handler(self):
         entries = LinkDataController.objects.filter(
-            link="https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1"
+            link="https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1?test"
         )
         entry = entries[0]
 

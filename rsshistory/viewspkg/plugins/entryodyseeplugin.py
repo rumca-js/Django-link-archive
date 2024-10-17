@@ -4,6 +4,7 @@ from django.templatetags.static import static
 from ...webtools import OdyseeVideoHandler
 
 from ...apps import LinkDatabase
+from ...models import ConfigurationEntry
 
 from .entrygenericplugin import EntryGenericPlugin, EntryButton, EntryParameter
 
@@ -15,7 +16,7 @@ class EntryOdyseePlugin(EntryGenericPlugin):
     def get_frame(self):
         h = OdyseeVideoHandler(self.entry.link)
         return """
-        <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" width="100%" height="100%" src="{}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen">
+        <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" width="100%" height="100%" src="{}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe>
         """.format(
             h.get_link_embed()
         )
@@ -25,18 +26,11 @@ class EntryOdyseePlugin(EntryGenericPlugin):
         return old_params
 
     def get_frame_html(self):
-        frame_text = """
-        <div class="youtube_player_container">
-           {}
-        </div>"""
-
-        if self.entry.age and self.entry.age >= 18:
+        if not self.entry.is_user_appropriate(self.user):
             frame_text = """
-            <div>
-                <img src="{}" class="content-thumbnail"/>
-            </div>"""
+            <div style="color:red">This material is restricted for age {}</div>"""
 
-            frame_text = frame_text.format(self.entry.get_thumbnail())
+            frame_text = frame_text.format(self.entry.age)
 
             return frame_text
         else:
@@ -56,7 +50,7 @@ class EntryOdyseePlugin(EntryGenericPlugin):
         return buttons
 
     def get_view_menu_buttons(self):
-        buttons = super().get_edit_menu_buttons()
+        buttons = super().get_view_menu_buttons()
         return buttons
 
     def get_advanced_menu_buttons(self):

@@ -126,7 +126,7 @@ urlpatterns = [
     path("set-read-marker", readmarkers.set_read_marker, name="set-read-marker"),
     path("set-source-read-marker/<int:pk>/", readmarkers.set_source_read_marker, name="set-source-read-marker"),
     # background jobs
-    path("backgroundjobs/", backgroundjobs.BackgroundJobsView.as_view(), name="backgroundjobs",),
+    path("backgroundjobs/", backgroundjobs.backgroundjobs, name="backgroundjobs",),
     path("backgroundjob-add", backgroundjobs.backgroundjob_add, name="backgroundjob-add",),
     path("backgroundjob-prio-up/<int:pk>/", backgroundjobs.backgroundjob_prio_up, name="backgroundjob-prio-up",),
     path("backgroundjob-prio-down/<int:pk>/", backgroundjobs.backgroundjob_prio_down, name="backgroundjob-prio-down",),
@@ -263,6 +263,8 @@ urlpatterns = [
     path("get-footer-status-line", system.get_footer_status_line, name="get-footer-status-line",),
     path("get-menu", system.get_menu, name="get-menu",),
     path("get-system-status/", system.get_system_status, name="get-system-status"),
+    path("get-backgroundjobs/", backgroundjobs.BackgroundJobsView.as_view(), name="get-backgroundjobs",),
+    path("get-entry-details/<int:pk>/", entries.EntryDetailDetailView.as_view(), name="get-entry-details"),
     # other
     path("data-errors", custom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", custom.fix_entry_tags, name="fix-entry-tags",),

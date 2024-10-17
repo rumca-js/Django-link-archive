@@ -545,6 +545,7 @@ class EntriesArchiveListView(EntriesOmniListView):
 
 class EntryDetailView(generic.DetailView):
     model = LinkDataController
+    template_name = str(ViewPage.get_full_template("linkdatacontroller_detail.html"))
 
     def get(self, *args, **kwargs):
         """
@@ -581,18 +582,6 @@ class EntryDetailView(generic.DetailView):
             context["page_date_published"] = self.object.date_published.isoformat()
         context["object_controller"] = object_controller
 
-        config = Configuration.get_object().config_entry
-        if config.track_user_actions and config.track_user_navigation:
-            context["transitions"] = UserEntryTransitionHistory.get_related_list(
-                self.request.user, self.object
-            )
-
-        m = WaybackMachine()
-        context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
-        context["search_engines"] = SearchEngines(
-            self.object.get_search_term(), self.object.link
-        )
-
         return context
 
     def set_visited(self):
@@ -611,6 +600,49 @@ class EntryDetailView(generic.DetailView):
                 from_entry = entries[0]
 
         return from_entry
+
+
+class EntryDetailDetailView(generic.DetailView):
+    model = LinkDataController
+    template_name = str(ViewPage.get_full_template("linkdatacontroller_detail__dynamic.html"))
+
+    def get(self, *args, **kwargs):
+        """
+        API: Used to redirect if user does not have rights
+        """
+
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        view = super().get(*args, **kwargs)
+        return view
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super().get_context_data(**kwargs)
+        context = ViewPage(self.request).init_context(context)
+
+        return self.setup_context(context)
+
+    def setup_context(self, context):
+        object_controller = EntryPreviewBuilder.get(self.object, self.request.user)
+
+        context["object_controller"] = object_controller
+
+        config = Configuration.get_object().config_entry
+        if config.track_user_actions and config.track_user_navigation:
+            context["transitions"] = UserEntryTransitionHistory.get_related_list(
+                self.request.user, self.object
+            )
+
+        m = WaybackMachine()
+        context["search_engines"] = SearchEngines(
+            self.object.get_search_term(), self.object.link
+        )
+
+        return context
 
 
 class EntryArchivedDetailView(generic.DetailView):

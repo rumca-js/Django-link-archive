@@ -46,12 +46,46 @@ class OdyseeChannelHandler(DefaultChannelHandler):
             return self.input2code_channel(url)
 
     def input2code_channel(self, url):
-        wh = url.rfind("/")
-        return url[wh + 1 :]
+        from .url import Url
+
+        if not self.url:
+            return False
+
+        short_url = Url.get_protololless(self.url)
+        lines = short_url.split("/")
+        if len(lines) < 2:
+            return
+
+        base = lines[0] # odysee.com
+        code = lines[1]
+
+        wh = code.find("?")
+        if wh >= 0:
+            code = code[:wh]
+
+        return code
 
     def input2code_feeds(self, url):
-        wh = url.rfind("/")
-        return url[wh + 1 :]
+        from .url import Url
+
+        if not self.url:
+            return False
+
+        short_url = Url.get_protololless(self.url)
+        lines = short_url.split("/")
+        if len(lines) < 2:
+            return
+
+        base = lines[0] # odysee.com
+        dollar = lines[1] # $
+        rss = lines[2] # rss
+        code = lines[3]
+
+        wh = code.find("?")
+        if wh >= 0:
+            code = code[:wh]
+
+        return code
 
     def get_channel_code(self):
         return self.code
@@ -61,3 +95,11 @@ class OdyseeChannelHandler(DefaultChannelHandler):
 
     def get_channel_feed(self):
         return self.code2feed(self.code)
+
+    def get_feeds(self):
+        result = []
+        if self.code:
+            result.append(self.code2feed(self.code))
+            return result
+        else:
+            return []

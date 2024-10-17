@@ -34,26 +34,42 @@
 
    {% include "rsshistory/linkdatacontroller_detail__buttons.html" %}
 
-   <div class="link-detail-description">
-   {{object_controller.get_description_html | safe | linebreaks }}
-   </div>
+<div id="bodyBlock">
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+</div>
 
-   {% if object.comments.all %}
-   <hr/>
-   {% endif %}
-   {% include "rsshistory/linkdatacontroller_detail__comments.html" %}
+<script>
+    function loadBodyContent(attempt = 1) {
+        $.ajax({
+            url: '{% url 'rsshistory:get-entry-details' object.id %}',
+            type: 'GET',
+            success: function(data) {
+                $('#bodyBlock').html(data);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 2) {
+                    loadBodyContent(attempt + 1);
+                    $('#bodyBlock').html("Error loading dynamic content, retry")
+                } else {
+                    $('#bodyBlock').html("Error loading dynamic content")
+                }
+            }
+        });
+    }
 
-   <hr/>
-   {% include "rsshistory/linkdatacontroller_detail__parameters_operation.html" %}
+    $(document).ready(function() {
+        loadBodyContent();
 
-   {% if transitions %}
-   <hr/>
-   {% endif %}
-   {% include "rsshistory/linkdatacontroller_detail__related.html" %}
+        setInterval(function() {
+        loadBodyContent();
+        }, 300000);  // 5 minutes in milliseconds
+    });
 
-   <hr/>
-   <div>
-   {% include "rsshistory/search_places_element.html" %}
-   </div>
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+        loadBodyContent();
+        }
+    });
+</script>
 
 {% endblock %}

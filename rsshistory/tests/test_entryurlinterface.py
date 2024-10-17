@@ -19,6 +19,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["title"], "1234 test title")
         self.assertEqual(props["status_code"], 200)
         self.assertEqual(props["page_rating"], 0)
+        self.assertTrue(props["date_dead_since"] is None)
 
     def test_video_mobile_youtube_handler(self):
         url = EntryUrlInterface("https://m.youtube.com/watch?v=1234")
@@ -47,6 +48,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props)
         self.assertEqual(props["status_code"], 200)
         self.assertEqual(props["page_rating"], 0)
+        self.assertTrue(props["date_dead_since"] is None)
 
     def test_rss_handler(self):
         url = EntryUrlInterface("https://rsspage.com/rss.xml")
@@ -59,6 +61,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props["description"])
         self.assertEqual(props["status_code"], 200)
         self.assertEqual(props["page_rating"], 0)
+        self.assertTrue(props["date_dead_since"] is None)
 
     def test_error_html(self):
         url = EntryUrlInterface("https://page-with-http-status-500.com")
@@ -94,7 +97,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         props = url.get_props()
         self.assertTrue(props)
         self.assertEqual(props["link"], "https://page-with-http-status-500.com")
-        self.assertEqual(props["title"], None)
+        self.assertEqual(props["title"], 'Page title') # even though status is 500, response was provided
         self.assertTrue(props["date_dead_since"] is not None)
         self.assertEqual(props["status_code"], 500)
 

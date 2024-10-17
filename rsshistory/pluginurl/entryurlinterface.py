@@ -68,15 +68,13 @@ class EntryUrlInterface(object):
             return
 
         ignore_errors = self.ignore_errors
-        props = self.get_props_implementation(input_props, source_obj)
 
         # we do not trim description here. We might need it later, when adding link we scan
         # description for URLs
 
+        props = self.get_props_implementation(input_props, source_obj=source_obj)
         if props:
-            self.update_info_default(props, source_obj)
             self.fix_properties(props)
-
         elif ignore_errors:
             """
             TODO should be set any part from self.u?
@@ -131,21 +129,8 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "source_url") and source_obj:
             input_props["source_url"] = source_obj.url
 
-        if type(handler) is UrlHandler.youtube_video_handler:
-            if handler.get_video_code():
-                return self.get_youtube_props(input_props, source_obj)
-
-        if type(handler) is HttpPageHandler:
-            if type(handler.p) is HtmlPage:
-                return self.get_htmlpage_props(input_props, source_obj)
-
-            if type(handler.p) is RssPage:
-                return self.get_rsspage_props(input_props, source_obj)
-
-        if type(handler) is UrlHandler.youtube_channel_handler:
-            return self.get_rsspage_props(input_props, source_obj)
-
-        # TODO provide RSS support
+        input_props = self.update_info_default(input_props, source_obj)
+        return input_props
 
     def is_update_supported(self):
         """
@@ -172,138 +157,6 @@ class EntryUrlInterface(object):
 
         return True
 
-    def get_youtube_props(self, input_props=None, source_obj=None):
-        if not input_props:
-            input_props = {}
-
-        url = self.url
-
-        p = self.u.get_handler()
-
-        # always use classic link format in storage
-        input_props["link"] = p.get_link_classic()
-
-        if not self.is_property_set(input_props, "title"):
-            input_props["title"] = p.get_title()
-        if not self.is_property_set(input_props, "description"):
-            input_props["description"] = p.get_description()
-        if not self.is_property_set(input_props, "date_published"):
-            input_props["date_published"] = p.get_date_published()
-        if not self.is_property_set(input_props, "thumbnail"):
-            input_props["thumbnail"] = p.get_thumbnail()
-
-        # https://help.indiefy.net/hc/en-us/articles/360047860834-What-is-a-YouTube-topic-channel-and-how-does-it-work-
-        channel_name = p.get_author()
-        if channel_name:
-            wh_channel = channel_name.find("- Topic")
-            if wh_channel >= 0:
-                channel_name = channel_name[:wh_channel]
-
-        if not self.is_property_set(input_props, "artist"):
-            input_props["artist"] = channel_name
-        if not self.is_property_set(input_props, "album"):
-            input_props["album"] = channel_name
-
-        if not self.is_property_set(input_props, "language") and source_obj:
-            input_props["language"] = source_obj.language
-
-        if self.is_property_set(input_props, "source"):
-            feeds = p.get_feeds()
-            if len(feeds) > 0:
-                input_props["source"] = feeds[0]
-            else:
-                AppLogging.error(
-                    "Could not obtain channel feed url:{}".format(self.url)
-                )
-
-        input_props["live"] = p.is_live()
-
-        return input_props
-
-    def get_htmlpage_props(self, input_props=None, source_obj=None):
-        if not input_props:
-            input_props = {}
-
-        url = self.url
-
-        p = self.u.get_handler()
-
-        # some pages return invalid code / information. let the user decide
-        # what to do about it
-
-        if not self.is_property_set(input_props, "link"):
-            input_props["link"] = p.url
-        if not self.is_property_set(input_props, "title"):
-            title = p.get_title()
-            input_props["title"] = title
-        if not self.is_property_set(input_props, "description"):
-            description = p.get_description()
-            if description is None:
-                if self.is_property_set(input_props, "title"):
-                    description = input_props["title"]
-            input_props["description"] = description
-
-        if not self.is_property_set(input_props, "language"):
-            language = p.get_language()
-            if not language:
-                if source_obj:
-                    language = source_obj.language
-            input_props["language"] = language
-
-        if not self.is_property_set(input_props, "date_published"):
-            date = p.get_date_published()
-            if date:
-                input_props["date_published"] = date
-            else:
-                date = p.guess_date()
-                if date:
-                    input_props["date_published"] = date
-                else:
-                    input_props["date_published"] = DateUtils.get_datetime_now_utc()
-
-        if not self.is_property_set(input_props, "thumbnail"):
-            input_props["thumbnail"] = p.get_thumbnail()
-
-        return input_props
-
-    def get_rsspage_props(self, input_props=None, source_obj=None):
-        if not input_props:
-            input_props = {}
-
-        url = self.url
-
-        p = self.u.get_handler()
-
-        if not self.is_property_set(input_props, "link"):
-            input_props["link"] = p.url
-        if not self.is_property_set(input_props, "title"):
-            title = p.get_title()
-            input_props["title"] = title
-        if not self.is_property_set(input_props, "description"):
-            description = p.get_description()
-            if description is None:
-                description = title
-            input_props["description"] = description
-
-        if not self.is_property_set(input_props, "language"):
-            language = p.get_language()
-            if not language:
-                if source_obj:
-                    language = source_obj.language
-            input_props["language"] = language
-
-        if not self.is_property_set(input_props, "date_published"):
-            date = p.get_date_published()
-            if date:
-                input_props["date_published"] = date
-            else:
-                input_props["date_published"] = DateUtils.get_datetime_now_utc()
-
-        if not self.is_property_set(input_props, "thumbnail"):
-            input_props["thumbnail"] = p.get_thumbnail()
-
-        return input_props
-
     def update_info_default(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
@@ -312,19 +165,19 @@ class EntryUrlInterface(object):
         p = self.u.get_handler()
 
         if not self.is_property_set(input_props, "link"):
-            input_props["link"] = self.url
+            input_props["link"] = self.u.get_clean_url()
         if not self.is_property_set(input_props, "title"):
-            input_props["title"] = p.get_title()
+            input_props["title"] = self.u.get_title()
         if not self.is_property_set(input_props, "description"):
-            input_props["description"] = p.get_description()
+            input_props["description"] = self.u.get_description()
         if not self.is_property_set(input_props, "language"):
-            input_props["language"] = p.get_language()
+            input_props["language"] = self.u.get_language()
         if not self.is_property_set(input_props, "thumbnail"):
-            input_props["thumbnail"] = p.get_thumbnail()
+            input_props["thumbnail"] = self.u.get_thumbnail()
         if not self.is_property_set(input_props, "author"):
-            input_props["author"] = p.get_thumbnail()
+            input_props["author"] = self.u.get_author()
         if not self.is_property_set(input_props, "album"):
-            input_props["album"] = p.get_thumbnail()
+            input_props["album"] = self.u.get_album()
         if not self.is_property_set(input_props, "page_rating_contents"):
             input_props["page_rating_contents"] = self.u.get_page_rating()
         if not self.is_property_set(input_props, "page_rating"):
@@ -338,6 +191,9 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "date_last_modified"):
             if self.response:
                 input_props["date_last_modified"] = self.response.get_last_modified()
+
+        if not self.is_property_set(input_props, "language") and source_obj and source_obj.language:
+            input_props["language"] = source_obj.language
 
         if not self.is_property_set(input_props, "age"):
             if self.is_property_set(input_props, "title") and self.is_property_set(
@@ -378,6 +234,11 @@ class EntryUrlInterface(object):
         ) and self.is_property_set(input_props, "date_published"):
             if input_props["date_last_modified"] < input_props["date_published"]:
                 input_props["date_published"] = input_props["date_last_modified"]
+
+        if not self.u.is_valid():
+            input_props["date_dead_since"] = DateUtils.get_datetime_now_utc()
+        else:
+            input_props["date_dead_since"] = None
 
         return input_props
 

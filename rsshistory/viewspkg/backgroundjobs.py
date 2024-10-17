@@ -17,11 +17,21 @@ from ..forms import (
 from ..views import ViewPage, GenericListView
 
 
+def backgroundjobs(request):
+    p = ViewPage(request)
+    p.set_title("Jobs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    return p.render("backgroundjob_list.html")
+
+
 class BackgroundJobsView(GenericListView):
     model = BackgroundJobController
     context_object_name = "content_list"
     paginate_by = 500
-    template_name = str(ViewPage.get_full_template("backgroundjob_list.html"))
+    template_name = str(ViewPage.get_full_template("backgroundjob_list__element.html"))
 
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)

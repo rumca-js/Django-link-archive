@@ -18,13 +18,16 @@ class DefaultUrlHandler(DefaultContentPage):
         self.dead = None
         self.code = None  # social media handle, ID of channel, etc.
         self.options = page_options
+        self.handler = None # one handler to rule them all
 
     def is_handled_by(self):
         return True
 
     def get_url(self):
         if self.code:
-            return code2url(self.code)
+            return self.code2url(self.code)
+        else:
+            return self.url
 
     def get_feeds(self):
         """
@@ -52,6 +55,73 @@ class DefaultUrlHandler(DefaultContentPage):
     def get_name(self):
         raise NotImplementedError
 
+    def get_contents(self):
+        if self.response:
+            return self.response.get_text()
+
+    def get_title(self):
+        if self.handler:
+            return self.handler.get_title()
+
+    def get_description(self):
+        if self.handler:
+            return self.handler.get_description()
+
+    def get_language(self):
+        if self.handler:
+            return self.handler.get_language()
+
+    def get_thumbnail(self):
+        if self.handler:
+            return self.handler.get_thumbnail()
+
+    def get_author(self):
+        if self.handler:
+            return self.handler.get_author()
+
+    def get_album(self):
+        if self.handler:
+            return self.handler.get_album()
+
+    def get_tags(self):
+        if self.handler:
+            return self.handler.get_tags()
+
+    def get_date_published(self):
+        if self.handler:
+            return self.handler.get_date_published()
+
+    def get_status_code(self):
+        if self.response:
+            return self.response.get_status_code()
+
+        return 0
+
+    def get_entries(self):
+        return []
+
+    def get_response(self):
+        """
+        By default we use HTML response
+        """
+        from .url import Url
+        from .handlerhttppage import HttpPageHandler
+
+        if self.response:
+            return self.response
+
+        # now call url with those options
+        self.handler = Url(self.url, handler_class=HttpPageHandler)
+        self.response = self.handler.get_response()
+
+        if not self.response or not self.response.is_valid():
+            self.dead = True
+
+        if self.response:
+            self.contents = self.response.get_text()
+
+            return self.response
+
 
 class DefaultChannelHandler(DefaultUrlHandler):
     def get_contents(self):
@@ -70,39 +140,30 @@ class DefaultChannelHandler(DefaultUrlHandler):
             return self.response.get_text()
 
     def get_response(self):
+        """
+        By default we use HTML response
+        """
         from .url import Url
+        from .handlerhttppage import HttpPageHandler
 
         if self.response:
             return self.response
 
         feeds = self.get_feeds()
         if not feeds or len(feeds) == 0:
-            AppLogging.error("Url:{} Cannot read feed URL".format(self.url))
             self.dead = True
             return
 
         feed_url = feeds[0]
 
-        options = self.get_options(feed_url)
-
         # now call url with those options
-        url = Url(feed_url, page_options=options, handler_class=HttpPageHandler)
-        self.response = url.get_response()
+        self.handler = Url(feed_url, handler_class=HttpPageHandler)
+        self.response = self.handler.get_response()
 
         if not self.response or not self.response.is_valid():
             self.dead = True
 
         if self.response:
             self.contents = self.response.get_text()
-            self.process_contents()
 
             return self.response
-
-    def get_options(self, feed_url):
-        url = Url(feed_url)
-        options = url.page_options
-
-        if self.options:
-            options.copy_config(self.options)
-
-        return options

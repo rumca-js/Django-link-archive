@@ -11,11 +11,11 @@
              {% for button in object_controller.get_edit_menu_buttons %}
                  {% if button.is_shown %}
      	         <li>
-                     <a href="{{button.action}}" class="dropdown-item" title="{{button.title}}">
-                     {% if button.image %}
-                        <img src="{{button.image}}" class="content-icon" />
-                     {% endif %}
-                     {{button.name}}
+                     <a href="{{button.action}}" id="{{button.get_id}}" class="dropdown-item" title="{{button.title}}">
+                       {% if button.image %}
+                          <img src="{{button.image}}" class="content-icon" />
+                       {% endif %}
+                       {{button.name}}
                      </a>
                  </li>
                  {% endif %}
@@ -32,14 +32,14 @@
      <ul class="dropdown-menu">
          {% for button in object_controller.get_view_menu_buttons %}
              {% if button.is_shown %}
-  	   <li>
-                 <a href="{{button.action}}" class="dropdown-item" title="{{button.title}}">
-                 {% if button.image %}
-                    <img src="{{button.image}}" class="content-icon" />
-                 {% endif %}
-                 {{button.name}}
+             <li>
+                 <a href="{{button.action}}" id="{{button.get_id}}" class="dropdown-item" title="{{button.title}}">
+                    {% if button.image %}
+                       <img src="{{button.image}}" class="content-icon" />
+                    {% endif %}
+                    {{button.name}}
                  </a>
-  	   </li>
+             </li>
              {% endif %}
          {% endfor %}
      </ul>
@@ -54,15 +54,15 @@
      <ul class="dropdown-menu">
          {% for button in object_controller.get_advanced_menu_buttons %}
              {% if button.is_shown %}
-  	     <li>
-                 <a href="{{button.action}}" class="dropdown-item" title="{{button.title}}">
-                 {% if button.image %}
-                    <img src="{{button.image}}" class="content-icon" />
-                 {% endif %}
-                 {{button.name}}
+             <li>
+                 <a href="{{button.action}}" id="{{button.get_id}}" class="dropdown-item" title="{{button.title}}">
+                     {% if button.image %}
+                        <img src="{{button.image}}" class="content-icon" />
+                     {% endif %}
+                     {{button.name}}
                  </a>
+             </li>
              {% endif %}
-  	     </li>
          {% endfor %}
      </ul>
   </div>

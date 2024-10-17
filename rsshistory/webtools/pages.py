@@ -45,6 +45,9 @@ class ContentInterface(object):
     def get_tags(self):
         raise NotImplementedError
 
+    def get_url(self):
+        return self.url
+
     def get_page_rating(self):
         """
         Default behavior
