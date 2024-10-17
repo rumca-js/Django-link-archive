@@ -51,10 +51,8 @@
     {% endif %}
 
     {% if config.user_internal_scripts %}
-        <script src="{% static 'bootstrap/jquery-3.3.1.slim.min.js' %}"></script>
-        <script src="{% static 'bootstrap/popper1.14.7.min.js' %}"></script>
+        <script src="{% static 'bootstrap/jquery-3.7.1.min.js' %}"></script>
     {% else %}
-        <!--script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script-->
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     {% endif %}
 
@@ -96,7 +94,6 @@
                     $('#blockMenu').html(data);
                 },
                 error: function(xhr, status, error) {
-                    $('#blockMenu').html("Error loading menu")
                 }
             });
         }

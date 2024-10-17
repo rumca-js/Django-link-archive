@@ -2,118 +2,37 @@
 {% load static %}
 {% block content %}
 
-<div class="container">
+<div id="bodyBlock">
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
 </div>
 
-<h1>Status</h1>
+<script>
+function loadBodyContent() {
+    $.ajax({
+	url: '{% url 'rsshistory:get-system-status' %}',
+	type: 'GET',
+	success: function(data) {
+	    $('#bodyBlock').html(data);
+	},
+	error: function(xhr, status, error) {
+	    $('#bodyBlock').html("Error loading dynamic content")
+	}
+    });
+}
 
-<ul class="list-group">
-    <li class="list-group-item">Version: {{app_version}}</li>
+$(document).ready(function() {
+    loadBodyContent();
 
-    <li class="list-group-item">Last internet connection check: {{last_internet_check}}
-       {% if not is_internet_ok %}
-       <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
-           !
-           <span class="visually-hidden">Status error</span>
-       </span>
-       {% endif %}
-    </li>
-    <li class="list-group-item">Last internet connection status: {{last_internet_status}}</li>
-</ul>
+    setInterval(function() {
+	loadBodyContent();
+    }, 300000);  // 5 minutes in milliseconds
+});
 
-<h1>Number of rows</h1>
-
-<ul class="list-group">
-    <li class="list-group-item">ConfigurationEntry: {{ConfigurationEntry}}</li>
-    <li class="list-group-item">UserConfig: {{UserConfig}}</li>
-    <li class="list-group-item">SystemOperation: {{SystemOperation}}</li>
-
-    <li class="list-group-item">SourceDataModel: {{SourceDataModel}}</li>
-    <li class="list-group-item">LinkDataModel: {{LinkDataModel}}</li>
-    {% if LinkDataModel_toupdate %}
-    <li class="list-group-item">LinkDataModel to update: {{LinkDataModel_toupdate}}</li>
-    {% endif %}
-    <li class="list-group-item">ArchiveLinkDataModel: {{ArchiveLinkDataModel}}</li>
-    <li class="list-group-item">Keywords: {{KeyWords}}</li>
-    <li class="list-group-item">BlockEntry: {{BlockEntry}}</li>
-    <li class="list-group-item">BlockEntryList: {{BlockEntryList}}</li>
-
-    <li class="list-group-item">UserTags: {{UserTags}}</li>
-    <li class="list-group-item">UserCompactedTags: {{UserCompactedTags}}</li>
-    <li class="list-group-item">CompactedTags: {{CompactedTags}}</li>
-    <li class="list-group-item">UserVotes: {{UserVotes}}</li>
-    <li class="list-group-item">UserBookmarks: {{UserBookmarks}}</li>
-    <li class="list-group-item">UserComments: {{UserComments}}</li>
-    <li class="list-group-item">UserSearchHistory: {{UserSearchHistory}}</li>
-    <li class="list-group-item">UserEntryVisitHistory: {{UserEntryVisitHistory}}</li>
-    <li class="list-group-item">UserEntryTransitionHistory: {{UserEntryTransitionHistory}}</li>
-
-    <li class="list-group-item">DataExport: {{DataExport}}</li>
-    <li class="list-group-item">SourceExportHistory: {{SourceExportHistory}}</li>
-
-    <li class="list-group-item">BackgroundJob: {{BackgroundJob}}
-        <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="btn btn-secondary btn-sm" role="button">View</a>
-    </li>
-
-    <li class="list-group-item">AppLogging: {{AppLogging}} 
-        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="btn btn-secondary btn-sm" role="button">View</a>
-    </li>
-
-    <li class="list-group-item">Domains: {{Domains}}
-        <a href="{% url 'rsshistory:domains' %}" title="Domains" class="btn btn-secondary btn-sm" role="button">View</a>
-    </li>
-
-    <li class="list-group-item">ModelFiles: {{ModelFiles}}
-        <a href="{% url 'rsshistory:model-files' %}" title="View background jobs" class="btn btn-secondary btn-sm" role="button">View</a>
-    </li>
-</ul>
-
-<h1>Threads</h1>
-<ul class="list-group">
-   {% if not is_threading_ok %}
-   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
-       !
-       <span class="visually-hidden">Status error</span>
-   </span>
-
-   {% endif %}
-    {% for thread_info in c.get_thread_info %}
-    <li class="list-group-item">{{thread_info.0}}: {{thread_info.1}}</li>
-    {% endfor %}
-</ul>
-
-<h1>Time</h1>
-<ul class="list-group">
-    <li class="list-group-item">Current time: {{DateTime_Current}}</li>
-
-    {% if days_to_move_to_archive %}
-      <li class="list-group-item">Move to archive date: {{days_to_move_to_archive}}</li>
-    {%endif%}
-    {% if days_to_remove_links %}
-      <li class="list-group-item">Remove entries by date: {{days_to_remove_links}}</li>
-    {%endif%}
-    {% if days_to_check_std_entries %}
-      <li class="list-group-item">Normal entries are checked if older than: {{days_to_check_std_entries}}</li>
-    {%endif%}
-    {% if days_to_check_stale_entries %}
-      <li class="list-group-item">Dead entries are checked if older than: {{days_to_check_stale_entries}}</li>
-    {%endif%}
-    {% if days_to_remove_stale_entries %}
-      <li class="list-group-item">Remove dead links before date: {{days_to_remove_stale_entries}}</li>
-    {%endif%}
-</ul>
-
-{% if export_history_list %}
-<h1>Export history</h1>
-<ul class="list-group">
-     {% for history_entry in export_history_list %}
-     <li class="list-group-item">{{history_entry.date}}, 
-        {% if history_entry.export %}
-            <a href="{% url 'rsshistory:data-export' history_entry.export.id %}">{{history_entry.export.remote_path}}, {{history_entry.export.export_type}}, {{history_entry.export.export_data}}</a>
-        {% endif %}
-     </li>
-     {% endfor %}
-</ul>
-{% endif %}
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+	loadBodyContent();
+    }
+});
+</script>
 
 {% endblock %}

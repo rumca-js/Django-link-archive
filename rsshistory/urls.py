@@ -262,6 +262,7 @@ urlpatterns = [
     # json and ajax
     path("get-footer-status-line", system.get_footer_status_line, name="get-footer-status-line",),
     path("get-menu", system.get_menu, name="get-menu",),
+    path("get-system-status/", system.get_system_status, name="get-system-status"),
     # other
     path("data-errors", custom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", custom.fix_entry_tags, name="fix-entry-tags",),

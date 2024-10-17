@@ -233,6 +233,16 @@ def system_status(request):
     if data is not None:
         return data
 
+    return p.render("system_status.html")
+
+
+def get_system_status(request):
+    p = ViewPage(request)
+    p.set_title("Status")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
     c = Configuration.get_object()
     p.context["directory"] = c.directory
 
@@ -306,7 +316,7 @@ def system_status(request):
     history = SourceExportHistory.get_safe()
     p.context["export_history_list"] = history
 
-    return p.render("system_status.html")
+    return p.render("system_status_element.html")
 
 
 class AppLoggingView(generic.ListView):
