@@ -9,7 +9,7 @@
          {% for search_history in content_list %}
          <div class="my-1">
              <div>
-                 <a href="{% url 'rsshistory:entries-omni-search' %}?search={{search_history.search_query}}">{{search_history.search_query}}</a>
+                 <a href="{% url 'rsshistory:entries' %}?search={{search_history.search_query}}">{{search_history.search_query}}</a>
              </div>
              <div>
                  Date: {{search_history.date}}

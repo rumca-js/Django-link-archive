@@ -6,12 +6,12 @@
   <div>
       {% for category in categories %}
          <h3>
-             <a href="{% url 'rsshistory:entries-omni-search'%}?search=source__category_name+%3D%3D+{{category.name}}">{{category.name}}</a>
+             <a href="{% url 'rsshistory:entries'%}?search=source__category_name+%3D%3D+{{category.name}}">{{category.name}}</a>
          </h3>
   
          {% for subcategory in category.subcategories.all %}
            <span>
-             <a href="{% url 'rsshistory:entries-omni-search'%}?search=source__category_name+%3D%3D+{{category.name}}+%26+source__subcategory_name+%3D%3D+{{subcategory.name}}">{{subcategory.name}}</a>
+             <a href="{% url 'rsshistory:entries'%}?search=source__category_name+%3D%3D+{{category.name}}+%26+source__subcategory_name+%3D%3D+{{subcategory.name}}">{{subcategory.name}}</a>
            </span>
          {% endfor %}
          <hr/>

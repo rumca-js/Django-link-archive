@@ -65,7 +65,7 @@ def index(request):
         if not entry.initialized:
             return redirect("{}:wizard-init".format(LinkDatabase.name))
         else:
-            return redirect("{}:entries-omni-search-init".format(LinkDatabase.name))
+            return redirect("{}:entries".format(LinkDatabase.name))
     else:
         exports = DataExport.get_public_export_names()
         p.context["public_exports"] = exports

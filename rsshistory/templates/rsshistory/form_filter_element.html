@@ -25,30 +25,30 @@
 
     <div class="mt-2">
     {% if form_submit_button_name %}
-       <button type="submit" value="Search" class="btn btn-primary" role="button">{{form_submit_button_name}}</button>
+       <button type="submit" value="Search" class="btn btn-primary btnFilterTrigger" role="button">{{form_submit_button_name}}</button>
     {% else %}
-       <button type="submit" value="Search" class="btn btn-primary" role="button">Search</button>
+       <button type="submit" value="Search" class="btn btn-primary btnFilterTrigger" role="button">Search</button>
     {% endif %}
 
     {% if search_history %}
-        <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchHistoryCollapse" role="button" aria-expanded="false" aria-controls="searchHistoryCollapse" title="Search history">
+        <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchHistory" role="button" aria-expanded="false" aria-controls="searchHistory" title="Search history">
           History
         </a>
     {% endif %}
 
-    <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchSyntaxCollapse" role="button" aria-expanded="false" aria-controls="searchSyntaxCollapse" title="Search syntax">
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchSyntax" role="button" aria-expanded="false" aria-controls="searchSyntax" title="Search syntax">
       ?
     </a>
     </div>
 </form>
 
 {% if search_history %}
-   <div class="collapse" id="searchHistoryCollapse">
+   <div class="collapse" id="searchHistory">
        {% include "rsshistory/search_history_element.html" %} 
    </div> 
 {% endif %}
 
-<div class="collapse" id="searchSyntaxCollapse">
+<div class="collapse" id="searchSyntax">
    {% include "rsshistory/form_search_syntax_element.html" %} 
 </div> 
 

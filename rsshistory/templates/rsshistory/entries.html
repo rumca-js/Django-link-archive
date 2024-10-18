@@ -1,0 +1,14 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+  {% include "rsshistory/linkdatacontroller_list_actions.html" %}
+
+  {% include "rsshistory/form_filter_oneliner_element.html" %}
+
+  <span id="entriesList">
+  </span>
+
+  {% include "rsshistory/entries__script.html" %}
+
+{% endblock %}

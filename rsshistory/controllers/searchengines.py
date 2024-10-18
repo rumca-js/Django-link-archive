@@ -505,6 +505,14 @@ class SearchEngineQuora(SearchEngine):
         return "https://www.quora.com/search"
 
 
+class SearchEngineFacebook(SearchEngine):
+    def get_name(self):
+        return "Facebook"
+
+    def get_address(self):
+        return "https://www.facebook.com"
+
+
 class SearchEngineSubstack(SearchEngine):
     def get_name(self):
         return "Substack"
@@ -575,6 +583,25 @@ class SearchEngineBard(SearchEngine):
         return "https://bard.google.com/"
 
 
+# Shops
+
+
+class SearchEngineAmazon(SearchEngine):
+    def get_name(self):
+        return "Amazon"
+
+    def get_address(self):
+        return "https://amazon.com"
+
+
+class SearchEngineAliexpress(SearchEngine):
+    def get_name(self):
+        return "Aliexpress"
+
+    def get_address(self):
+        return "https://aliexpress.com/"
+
+
 class SearchEngines(object):
     def __init__(self, search_term=None, url=None):
         self.search_term = search_term
@@ -606,6 +633,7 @@ class SearchEngines(object):
 
         result.extend(SearchEngines.get_streaming())
         result.extend(SearchEngines.get_social_media())
+        result.extend(SearchEngines.get_marketplaces())
 
         # TODO add to containers
         # https://lobste.rs/
@@ -614,8 +642,6 @@ class SearchEngines(object):
         # result.append("https://mastodon.social/explore")
         # result.append("https://join-lemmy.org/instances")
         # result.append("https://joinpeertube.org")
-        # result.append("https://facebook.com")
-        # result.append("https://amazon.com")
 
         return result
 
@@ -679,6 +705,7 @@ class SearchEngines(object):
             SearchEngineSubstack,
             SearchEngineStackOverFlow,
             SearchEngineQuora,
+            SearchEngineFacebook,
             SearchEngineHnAlgolia,
         ]
         # fmt: on
@@ -690,5 +717,13 @@ class SearchEngines(object):
             SearchEngineArchivePh,
             SearchEngineWikipedia,
             SearchEngineAnnasArchive,
+        ]
+        # fmt: on
+
+    def get_marketplaces():
+        # fmt: off
+        return [
+            SearchEngineAmazon,
+            SearchEngineAliexpress,
         ]
         # fmt: on

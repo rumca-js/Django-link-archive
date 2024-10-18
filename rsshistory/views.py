@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse
 from django.contrib.auth.models import User
+from urllib.parse import unquote
 
 from .webtools import HtmlPage, RssPage, HttpPageHandler
 
@@ -32,6 +33,8 @@ def get_search_term(themap):
             search_term = search_term[1:-1]
         if search_term[0] == '"':
             search_term = search_term[1:-1]
+
+        search_term = unquote(search_term)
 
     return search_term
 

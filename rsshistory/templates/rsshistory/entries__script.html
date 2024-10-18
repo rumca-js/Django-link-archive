@@ -1,0 +1,69 @@
+<script>
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    function loadEntryListContent(search_term = '', page = '', attempt = 1) {
+        const params = new URLSearchParams(window.location.search);
+        params.set('search', search_term);
+        if (page) {
+            params.set('page', page);
+        }
+
+        var url = "{{query_page}}?" + params.toString();
+
+        $('#entriesList').html("Loading dynamic content... " + url);
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(data) {
+                $('#entriesList').html(data);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 2) {
+                    loadEntryListContent(search_term, page, attempt + 1);
+                    $('#entriesList').html("Error loading dynamic content, retry")
+                }
+                else {
+                    $('#entriesList').html("Cannot load data from " + url)
+                }
+            },
+            complete: function() {
+                $(".btnFilterTrigger").prop("disabled", false);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        var search_term = getQueryParam('search') || '';
+        var show = getQueryParam('show') || '';
+
+        if (search_term || show) {
+            loadEntryListContent(search_term);
+        }
+
+        $(".btnFilterTrigger").click(function(e) {
+            e.preventDefault();
+
+            $(this).prop("disabled", true);
+
+            var search_term = $(this).data('search') || $('#id_search').val();
+            var page = $(this).data('search')
+
+            if ($(this).data('search')) {
+                $('#id_search').val(search_term);
+            }
+
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('search', search_term);
+            window.history.pushState({}, '', currentUrl);
+
+            $('#searchHistory').collapse('hide');
+            $('#searchSyntax').collapse('hide');
+
+            loadEntryListContent(search_term, page);
+        });
+    });
+</script>

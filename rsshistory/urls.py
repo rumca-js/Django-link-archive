@@ -37,19 +37,33 @@ app_name = str(LinkDatabase.name)
 urlpatterns = [
     path("", system.index, name="index"),
     # entries
-    path("entries-recent/", entries.EntriesRecentListView.as_view(), name="entries-recent"),
-    path("entries-archived/", entries.EntriesArchiveListView.as_view(), name="entries-archived"),
-    path("entries-untagged/", entries.EntriesNotTaggedView.as_view(), name="entries-untagged"),
-    path("entries-bookmarked/", entries.EntriesBookmarkedListView.as_view(), name="entries-bookmarked"),
     path("entries-json/", entries.entries_json, name="entries-json"),
+
     path("entries-omni-search-init", entries.entries_omni_search_init, name="entries-omni-search-init"),
     path("entries-search-init", entries.entries_search_init, name="entries-search-init"),
     path("entries-archived-init", entries.entries_archived_init, name="entries-archived-init"),
     path("entries-bookmarked-init", entries.entries_bookmarked_init, name="entries-bookmarked-init"),
     path("entries-recent-init", entries.entries_recent_init, name="entries-recent-init"),
+    path("entries-bookmarked-init", entries.user_entries_bookmarked_init, name="entries-bookmarked-init"),
     path("entries-omni-search", entries.EntriesOmniListView.as_view(), name="entries-omni-search"),
+
+    path("entries/", entries.entries, name="entries"),
+    path("entries-recent/", entries.entries_recent, name="entries-recent"),
+    path("entries-bookmarked/", entries.entries_bookmarked, name="entries-bookmarked"),
+    path("entries-user-bookmarked/", entries.entries_user_bookmarked, name="entries-user-bookmarked"),
+    path("entries-archived/", entries.entries_archived, name="entries-archived"),
+    path("entries-untagged/", entries.entries_untagged, name="entries-untagged"),
+
+    path("get-entries", entries.EntriesOmniListView.as_view(), name="get-entries"),
+    path("get-entries-recent/", entries.EntriesRecentListView.as_view(), name="get-entries-recent"),
+    path("get-entries-bookmarked/", entries.EntriesBookmarkedListView.as_view(), name="get-entries-bookmarked"),
+    path("get-entries-user-bookmarked/", entries.UserEntriesBookmarkedListView.as_view(), name="get-entries-user-bookmarked"),
+    path("get-entries-archived/", entries.EntriesArchiveListView.as_view(), name="get-entries-archived"),
+    path("get-entries-untagged/", entries.EntriesNotTaggedView.as_view(), name="get-entries-untagged"),
+
     path("entries-remove-all", entries.entries_remove_all, name="entries-remove-all"),
     path("entries-remove-nonbookmarked", entries.entries_remove_nonbookmarked, name="entries-remove-nonbookmarked"),
+    # entry
     path("entry/<int:pk>/", entries.EntryDetailView.as_view(), name="entry-detail"),
     path("entry-json/<int:pk>/", entries.entry_json, name="entry-json"),
     path("entry-archived/<int:pk>/", entries.EntryArchivedDetailView.as_view(), name="entry-archived"),
@@ -181,8 +195,6 @@ urlpatterns = [
     path("read-later-add/<int:pk>/", readlater.read_later_add, name="read-later-add"),
     path("read-later-remove/<int:pk>/", readlater.read_later_remove, name="read-later-remove"),
     path("read-later-clear/", readlater.read_later_clear, name="read-later-clear"),
-    path("user-entries-bookmarked/", entries.UserEntriesBookmarkedListView.as_view(), name="user-entries-bookmarked"),
-    path("user-entries-bookmarked-init", entries.user_entries_bookmarked_init, name="user-entries-bookmarked-init"),
     path("user-tags-show", useractions.UserCompactedTagsListView.as_view(), name="user-tags-show"),
     path("user-search-history/", users.UserSearchHistoryListView.as_view(), name="user-search-history",),
     path("search-history-remove/<int:pk>/", userhistory.search_history_remove, name="search-history-remove"),

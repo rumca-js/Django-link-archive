@@ -50,6 +50,9 @@ class EntryButton(object):
 
         return False
 
+    def get_id(self):
+        return self.title.replace(" ", "-")
+
 
 class EntryParameter(object):
     def __init__(self, name, description, title=None):
@@ -376,7 +379,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "[S] Parent entry",
                     reverse(
-                        "{}:entries-omni-search".format(LinkDatabase.name),
+                        "{}:entries".format(LinkDatabase.name),
                     )
                     + "?search=link+%3D%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
@@ -392,7 +395,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "[S] https entry",
                     reverse(
-                        "{}:entries-omni-search".format(LinkDatabase.name),
+                        "{}:entries".format(LinkDatabase.name),
                     )
                     + "?search=link+%3D%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
@@ -408,7 +411,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "[S] Source Entry",
                     reverse(
-                        "{}:entries-omni-search".format(LinkDatabase.name),
+                        "{}:entries".format(LinkDatabase.name),
                     )
                     + "?search=link+%3D%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
@@ -423,7 +426,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "[S] Artist: " + self.entry.artist[:20],
                     reverse(
-                        "{}:entries-omni-search".format(LinkDatabase.name),
+                        "{}:entries".format(LinkDatabase.name),
                     )
                     + "?search=artist+%3D+{}".format(self.entry.artist),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
@@ -437,7 +440,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "[S] Album: " + self.entry.album[:20],
                     reverse(
-                        "{}:entries-omni-search".format(LinkDatabase.name),
+                        "{}:entries".format(LinkDatabase.name),
                     )
                     + "?search=album+%3D+{}".format(self.entry.album),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
@@ -467,7 +470,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "[S] Domain",
                     reverse(
-                        "{}:entries-omni-search".format(LinkDatabase.name),
+                        "{}:entries".format(LinkDatabase.name),
                     )
                     + "?search=link+%3D%3D+{}".format(domain_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,

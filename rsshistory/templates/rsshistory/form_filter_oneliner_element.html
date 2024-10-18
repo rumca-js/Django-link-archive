@@ -2,7 +2,7 @@
 
 <!-- this element should be uesd by lists, to filter elements, where one line of input is enough -->
 
-<form action="{{form.action_url}}" method="{{form.method}}">
+<form id="filterForm" action="{{form.action_url}}" method="{{form.method}}">
    {% csrf_token %}
 
    {% for field in form %}
@@ -14,30 +14,36 @@
    {% endfor %}
 
     {% if form_submit_button_name %}
-       <button type="submit" id="btnFetch" value="{{form_submit_button_name}}" class="btn btn-primary" role="button">{{form_submit_button_name}}</button>
+       <button id="btnFilterForm" type="submit" value="{{form_submit_button_name}}" class="btn btn-primary btnFilterTrigger" role="button">{{form_submit_button_name}}</button>
     {% else %}
-       <button type="submit" id="btnFetch" value="Submit" class="btn btn-primary" role="button">Submit</button>
+       <button id="btnFilterForm" type="submit" value="Submit" class="btn btn-primary btnFilterTrigger" role="button">Submit</button>
     {% endif %}
 
     {% if search_history %}
-        <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchHistoryCollapse" role="button" aria-expanded="false" aria-controls="searchHistoryCollapse" title="Search history">
+        <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchHistory" role="button" aria-expanded="false" aria-controls="searchHistory" title="Search history">
           History
         </a>
     {% endif %}
 
-    <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchSyntaxCollapse" role="button" aria-expanded="false" aria-controls="searchSyntaxCollapse" title="Search syntax">
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchSyntax" role="button" aria-expanded="false" aria-controls="searchSyntax" title="Search syntax">
       ?
     </a>
 </form>
 
 {% if search_history %}
-   <div class="collapse" id="searchHistoryCollapse">
+   <div id="searchHistory" class="collapse">
        {% include "rsshistory/search_history_element.html" %} 
    </div> 
 {% endif %}
 
-<div class="collapse" id="searchSyntaxCollapse">
+<div id="searchSyntax" class="collapse">
    {% include "rsshistory/form_search_syntax_element.html" %} 
+
+  {% if query %}
+    <pre>
+    {{query}}
+    </pre>
+  {% endif %}
 </div> 
 
 {% if form.errors.items %}
@@ -72,4 +78,8 @@
      <div>{{note}}</div>
     {% endfor %}
   </div>
+{% endif %}
+
+{% if query_filter.is_error %}
+<div class="error-text">There errors with your query</div>
 {% endif %}

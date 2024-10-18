@@ -33,27 +33,27 @@
    
        <ul class="dropdown-menu">
           <li>
-             <a href="{% url 'rsshistory:entries-omni-search' %}?search=bookmarked+%3D+True" class="dropdown-item" title="Shows bookmarked only">
+             <a href="{% url 'rsshistory:entries' %}?search=bookmarked+%3D+True" class="dropdown-item" title="Shows bookmarked only">
               Bookmarked</a>
           </li>
           <li>
-             <a href="{% url 'rsshistory:entries-omni-search' %}?search=bookmarked+%3D+False" class="dropdown-item" title="Shows non bookmarked only">
+             <a href="{% url 'rsshistory:entries' %}?search=bookmarked+%3D+False" class="dropdown-item" title="Shows non bookmarked only">
               Not bookmarked</a>
           </li>
           <li>
-             <a href="{% url 'rsshistory:entries-omni-search' %}?search=tags__tag__isnull+%3D+True" class="dropdown-item" title="Shows not tagged entries">
+             <a href="{% url 'rsshistory:entries' %}?search=tags__tag__isnull+%3D+True" class="dropdown-item" title="Shows not tagged entries">
               Not tagged</a>
           </li>
           <li>
-             <a href="{% url 'rsshistory:entries-omni-search' %}?search=page_rating_votes+%3E+0" class="dropdown-item" title="Shows entries with votes">
+             <a href="{% url 'rsshistory:entries' %}?search=page_rating_votes+%3E+0" class="dropdown-item" title="Shows entries with votes">
               Voted</a>
           </li>
           <li>
-             <a href="{% url 'rsshistory:entries-omni-search' %}?search=page_rating+%3C+0" class="dropdown-item" title="Shows negative rating entries">
+             <a href="{% url 'rsshistory:entries' %}?search=page_rating+%3C+0" class="dropdown-item" title="Shows negative rating entries">
               Negative rating</a>
           </li>
           <li>
-             <a href="{% url 'rsshistory:entries-omni-search' %}?search=date_dead_since__isnull+%3D+False" class="dropdown-item" title="Shows dead entries">
+             <a href="{% url 'rsshistory:entries' %}?search=date_dead_since__isnull+%3D+False" class="dropdown-item" title="Shows dead entries">
               Dead</a>
           </li>
           <li>
@@ -67,11 +67,11 @@
                      %3E - <
                      ~(status_code = 200 | status_code = 0)
              -->
-             <a href="{% url 'rsshistory:entries-omni-search' %}?search=%7E%28status_code+%3D+200+%7C+status_code+%3D+0+%29" class="dropdown-item" title="Shows invalid status code entries">
+             <a href="{% url 'rsshistory:entries' %}?search=%7E%28status_code+%3D+200+%7C+status_code+%3D+0+%29" class="dropdown-item" title="Shows invalid status code entries">
               Invalid status codes</a>
           </li>
           <li>
-             <a href="{% url 'rsshistory:entries-omni-search' %}?search=%7E%28manual_status_code+%3D+200+%29" class="dropdown-item" title="Shows invalid manual status code entries">
+             <a href="{% url 'rsshistory:entries' %}?search=%7E%28manual_status_code+%3D+200+%29" class="dropdown-item" title="Shows invalid manual status code entries">
               Invalid manual status codes</a>
           </li>
        </ul>
@@ -84,35 +84,35 @@
    
        <ul class="dropdown-menu">
           <li>
-		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=page_rating&{{request.GET.urlencode}}" class="dropdown-item" title="Order by page rating">
+		  <a href="{% url 'rsshistory:entries' %}?order=page_rating&{{request.GET.urlencode}}" class="dropdown-item" title="Order by page rating">
               Page rating ASC</a>
           </li>
           <li>
-		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=-page_rating&{{request.GET.urlencode}}" class="dropdown-item" title="Order by page rating">
+		  <a href="{% url 'rsshistory:entries' %}?order=-page_rating&{{request.GET.urlencode}}" class="dropdown-item" title="Order by page rating">
               Page rating DESC</a>
           </li>
           <li>
-		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=date_published&{{request.GET.urlencode}}" class="dropdown-item" title="Order by date published">
+		  <a href="{% url 'rsshistory:entries' %}?order=date_published&{{request.GET.urlencode}}" class="dropdown-item" title="Order by date published">
               Date published ASC</a>
           </li>
           <li>
-		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=-date_published&{{request.GET.urlencode}}" class="dropdown-item" title="Order by date published">
+		  <a href="{% url 'rsshistory:entries' %}?order=-date_published&{{request.GET.urlencode}}" class="dropdown-item" title="Order by date published">
               Date published DESC</a>
           </li>
           <li>
-		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=date_update_last&{{request.GET.urlencode}}" class="dropdown-item" title="Order by date updated">
+		  <a href="{% url 'rsshistory:entries' %}?order=date_update_last&{{request.GET.urlencode}}" class="dropdown-item" title="Order by date updated">
               Date updated ASC</a>
           </li>
           <li>
-		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=-date_update_last&{{request.GET.urlencode}}" class="dropdown-item" title="Order by date updated">
+		  <a href="{% url 'rsshistory:entries' %}?order=-date_update_last&{{request.GET.urlencode}}" class="dropdown-item" title="Order by date updated">
               Date updated DESC</a>
           </li>
           <li>
-		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=link&{{request.GET.urlencode}}" class="dropdown-item" title="Order by link name">
+		  <a href="{% url 'rsshistory:entries' %}?order=link&{{request.GET.urlencode}}" class="dropdown-item" title="Order by link name">
               Link ASC</a>
           </li>
           <li>
-		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=-link&{{request.GET.urlencode}}" class="dropdown-item" title="Order by link name">
+		  <a href="{% url 'rsshistory:entries' %}?order=-link&{{request.GET.urlencode}}" class="dropdown-item" title="Order by link name">
               Link DESC</a>
           </li>
        </ul>

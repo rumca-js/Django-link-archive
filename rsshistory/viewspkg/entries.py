@@ -60,11 +60,99 @@ from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
 
 
+def get_query_args(themap):
+    """
+    display type is not required
+    search is added by filter form, so we do not want it to be here
+
+    # TODO - add argument, to pass all keys that should be rejected
+    """
+    arg_data = {}
+    for arg in themap:
+        if arg == "display_type":
+            continue
+        if arg == "search":
+            continue
+
+        arg_data[arg] = themap[arg]
+
+    return "&" + urlencode(arg_data)
+
+
+def get_generic_search_init_context(request, form, user_choices):
+    context = {}
+    context["form"] = form
+
+    search_term = get_search_term(request.GET)
+    context["search_term"] = search_term
+    context["search_engines"] = SearchEngines(search_term)
+    context["search_history"] = user_choices
+    context["view_link"] = form.action_url
+    context["form_submit_button_name"] = "Search"
+
+    context["entry_query_names"] = LinkDataController.get_query_names()
+    context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
+
+    return context
+
+
+def entries_generic(request, link):
+    p = ViewPage(request)
+    p.set_title("Entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    data = {}
+    if "search" in request.GET:
+        data={"search": request.GET["search"]}
+
+    filter_form = InitSearchForm(request=request, initial=data)
+    filter_form.method = "GET"
+    filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
+
+    # TODO jquery that
+    user_choices = UserSearchHistory.get_user_choices(request.user)
+    context = get_generic_search_init_context(request, filter_form, user_choices)
+
+    p.context.update(context)
+    p.context["query_args"] = get_query_args(request.GET)
+    p.context["query_page"] = link
+
+    return p.render("entries.html")
+
+
+def entries(request):
+    return entries_generic(request, reverse("{}:get-entries".format(LinkDatabase.name)))
+
+
+def entries_recent(request):
+    return entries_generic(request, reverse("{}:get-entries-recent".format(LinkDatabase.name)))
+
+
+def entries_bookmarked(request):
+    return entries_generic(request, reverse("{}:get-entries-bookmarked".format(LinkDatabase.name)))
+
+
+def entries_user_bookmarked(request):
+    return entries_generic(request, reverse("{}:get-entries-user-bookmarked".format(LinkDatabase.name)))
+
+
+def entries_archived(request):
+    return entries_generic(request, reverse("{}:get-entries-archived".format(LinkDatabase.name)))
+
+
+def entries_untagged(request):
+    return entries_generic(request, reverse("{}:get-entries-untagged".format(LinkDatabase.name)))
+
+    return p.render("entries.html")
+
+
 class EntriesSearchListView(generic.ListView):
     model = LinkDataController
     context_object_name = "entry_list"
     paginate_by = 100
-    template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
+    template_name = str(ViewPage.get_full_template("linkdatacontroller_list__dynamic.html"))
 
     def get(self, *args, **kwargs):
         """
@@ -130,27 +218,14 @@ class EntriesSearchListView(generic.ListView):
 
         self.search_term = get_search_term(self.request.GET)
 
-        context["page_title"] += self.get_title()
-
-        queue_size = BackgroundJobController.get_number_of_jobs(
-            BackgroundJob.JOB_PROCESS_SOURCE
-        )
         context["query_filter"] = self.query_filter
-        context["reset_link"] = self.get_reset_link()
         context["view_link"] = self.get_view_link()
-        context["more_results_link"] = self.get_more_results_link()
-        context["has_more_results"] = self.has_more_results()
+
         context["query_type"] = self.get_query_type()
         context["query"] = self.query
 
-        self.filter_form = self.get_form()
-        context["form"] = self.filter_form
-
         context["search_engines"] = SearchEngines(self.search_term)
         context["form_submit_button_name"] = "Search"
-
-        context["entry_query_names"] = LinkDataController.get_query_names()
-        context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
 
         if Url.is_protocolled_link(self.search_term):
             context["search_query_add"] = self.search_term
@@ -179,7 +254,7 @@ class EntriesSearchListView(generic.ListView):
         return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
-        return reverse("{}:entries-search-init".format(LinkDatabase.name))
+        return reverse("{}:entries".format(LinkDatabase.name))
 
     def get_view_link(self):
         return reverse("{}:entries".format(LinkDatabase.name))
@@ -189,7 +264,7 @@ class EntriesSearchListView(generic.ListView):
 
     def get_more_results_link(self):
         return (
-            reverse("{}:entries-omni-search".format(LinkDatabase.name))
+            reverse("{}:entries".format(LinkDatabase.name))
             + "?"
             + self.query_filter.get_filter_string()
         )
@@ -206,21 +281,6 @@ class EntriesSearchListView(generic.ListView):
 
         return search_term
 
-    def get_form_action_link(self):
-        return reverse("{}:entries".format(LinkDatabase.name))
-
-    def get_form_instance(self):
-        raise NotImplementedError("Not implemented")
-
-    def get_form(self):
-        filter_form = self.get_form_instance()
-        filter_form.create()
-
-        filter_form.method = "GET"
-        filter_form.action_url = self.get_form_action_link()
-
-        return filter_form
-
     def get_title(self):
         return " - entries {}".format(self.search_term)
 
@@ -234,15 +294,7 @@ class EntriesSearchListView(generic.ListView):
             context["display_type"] = self.request.GET["display_type"]
         else:
             context["display_type"] = "normal"
-        context["args"] = self.get_args()
-
-    def get_args(self):
-        arg_data = {}
-        for arg in self.request.GET:
-            if arg != "display_type":
-                arg_data[arg] = self.request.GET[arg]
-
-        return "&" + urlencode(arg_data)
+        context["query_args"] = get_query_args(self.request.GET)
 
     def get_default_range(self):
         config = Configuration.get_object().config_entry
@@ -257,10 +309,7 @@ class EntriesOmniListView(EntriesSearchListView):
     def get_filter(self):
         self.on_search()
 
-        data = self.request.GET.dict()
-        data["user"] = self.request.user
-
-        query_filter = OmniSearchFilter(data)
+        query_filter = OmniSearchFilter(self.request.GET)
 
         translate = BaseLinkDataController.get_query_names()
         query_filter.set_translation_mapping(translate)
@@ -322,13 +371,10 @@ class EntriesOmniListView(EntriesSearchListView):
             return LinkDataController.objects.all()
 
     def get_reset_link(self):
-        return reverse("{}:entries-omni-search-init".format(LinkDatabase.name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-omni-search".format(LinkDatabase.name))
+        return reverse("{}:entries".format(LinkDatabase.name))
 
     def get_view_link(self):
-        return reverse("{}:entries-omni-search".format(LinkDatabase.name))
+        return reverse("{}:entries".format(LinkDatabase.name))
 
     def has_more_results(self):
         if "archive" in self.request.GET:
@@ -339,57 +385,19 @@ class EntriesOmniListView(EntriesSearchListView):
     def get_more_results_link(self):
         if "search" in self.request.GET:
             return reverse(
-                "{}:entries-omni-search".format(LinkDatabase.name)
+                "{}:entries".format(LinkDatabase.name)
             ) + "?archive=on&search={}".format(self.request.GET["search"])
         else:
             return (
-                reverse("{}:entries-omni-search".format(LinkDatabase.name))
+                reverse("{}:entries".format(LinkDatabase.name))
                 + "?archive=on"
             )
-
-    def get_form_instance(self):
-        config = Configuration.get_object().config_entry
-
-        user = self.request.user
-        self.search_history = UserSearchHistory.get_user_choices(user)
-
-        initial = {}
-        if "search" in self.request.GET and self.request.GET["search"]:
-            initial["search"] = self.request.GET["search"]
-        if "search_history" in self.request.GET and self.request.GET["search_history"]:
-            initial["search"] = self.request.GET["search_history"]
-
-        # TODO enabled view with archive?
-
-        """
-        if config.days_to_move_to_archive == 0:
-            f = OmniSearchForm(
-                initial=initial, user_choices=self.search_history, request=self.request
-            )
-            return f
-        else:
-            return OmniSearchWithArchiveForm(
-                initial=initial, user_choices=self.search_history, request=self.request
-            )
-        """
-        f = OmniSearchForm(
-            initial=initial, user_choices=self.search_history, request=self.request
-        )
-        return f
-
-    def get_form(self):
-        filter_form = self.get_form_instance()
-        filter_form.method = "GET"
-        filter_form.action_url = self.get_form_action_link()
-
-        return filter_form
 
     def get_query_type(self):
         return "omni"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["search_history"] = self.search_history
 
         return context
 
@@ -408,9 +416,6 @@ class EntriesRecentListView(EntriesOmniListView):
 
     def get_reset_link(self):
         return reverse("{}:entries-recent-init".format(LinkDatabase.name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-recent".format(LinkDatabase.name))
 
     def get_view_link(self):
         return reverse("{}:entries-recent".format(LinkDatabase.name))
@@ -443,9 +448,6 @@ class EntriesNotTaggedView(EntriesOmniListView):
     def get_reset_link(self):
         return reverse("{}:entries-untagged".format(LinkDatabase.name))
 
-    def get_form_action_link(self):
-        return reverse("{}:entries-untagged".format(LinkDatabase.name))
-
     def get_view_link(self):
         return reverse("{}:entries-untagged".format(LinkDatabase.name))
 
@@ -471,9 +473,6 @@ class EntriesBookmarkedListView(EntriesOmniListView):
     def get_reset_link(self):
         return reverse("{}:entries-bookmarked-init".format(LinkDatabase.name))
 
-    def get_form_action_link(self):
-        return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
-
     def get_view_link(self):
         return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
@@ -498,13 +497,10 @@ class UserEntriesBookmarkedListView(EntriesOmniListView):
         return False
 
     def get_reset_link(self):
-        return reverse("{}:user-entries-bookmarked-init".format(LinkDatabase.name))
-
-    def get_form_action_link(self):
-        return reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
+        return reverse("{}:entries-user-bookmarked".format(LinkDatabase.name))
 
     def get_view_link(self):
-        return reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
+        return reverse("{}:entries-user-bookmarked".format(LinkDatabase.name))
 
     def get_title(self):
         return " - entries {}".format(self.search_term)
@@ -529,9 +525,6 @@ class EntriesArchiveListView(EntriesOmniListView):
 
     def get_reset_link(self):
         return reverse("{}:entries-archived-init".format(LinkDatabase.name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-archived".format(LinkDatabase.name))
 
     def get_view_link(self):
         return reverse("{}:entries-archived".format(LinkDatabase.name))
@@ -1121,23 +1114,6 @@ def entry_show_dislikes(request, pk):
         p.context["summary_text"] = "It is not a youtube link"
 
     return p.render("summary_present.html")
-
-
-def get_generic_search_init_context(request, form, user_choices):
-    context = {}
-    context["form"] = form
-
-    search_term = get_search_term(request.GET)
-    context["search_term"] = search_term
-    context["search_engines"] = SearchEngines(search_term)
-    context["search_history"] = user_choices
-    context["view_link"] = form.action_url
-    context["form_submit_button_name"] = "Search"
-
-    context["entry_query_names"] = LinkDataController.get_query_names()
-    context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
-
-    return context
 
 
 def entries_search_init(request):

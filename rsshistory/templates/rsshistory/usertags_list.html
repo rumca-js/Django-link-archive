@@ -33,7 +33,7 @@
 <div class="container">
  {% if content_list %}
      {% for tag in content_list %}
-        <a href='{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+"{{tag.tag}}"' title="#{{tag.tag}} {{tag.count}}">
+        <a href='{% url 'rsshistory:entries'%}?search=tags__tag+%3D%3D+"{{tag.tag}}"' title="#{{tag.tag}} {{tag.count}}">
         #{{tag.tag}}</a>,
      {% endfor %}
  {% else %}
