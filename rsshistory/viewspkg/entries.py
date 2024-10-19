@@ -152,7 +152,7 @@ class EntriesSearchListView(generic.ListView):
     model = LinkDataController
     context_object_name = "entry_list"
     paginate_by = 100
-    template_name = str(ViewPage.get_full_template("linkdatacontroller_list__dynamic.html"))
+    template_name = str(ViewPage.get_full_template("entries__dynamic.html"))
 
     def get(self, *args, **kwargs):
         """
@@ -597,7 +597,7 @@ class EntryDetailView(generic.DetailView):
 
 class EntryDetailDetailView(generic.DetailView):
     model = LinkDataController
-    template_name = str(ViewPage.get_full_template("linkdatacontroller_detail__dynamic.html"))
+    template_name = str(ViewPage.get_full_template("entry__dynamic.html"))
 
     def get(self, *args, **kwargs):
         """

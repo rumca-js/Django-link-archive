@@ -277,6 +277,8 @@ urlpatterns = [
     path("get-system-status/", system.get_system_status, name="get-system-status"),
     path("get-backgroundjobs/", backgroundjobs.BackgroundJobsView.as_view(), name="get-backgroundjobs",),
     path("get-entry-details/<int:pk>/", entries.EntryDetailDetailView.as_view(), name="get-entry-details"),
+    path("get-user-search-history", userhistory.GetUserSearchHistoryListView.as_view(), name="get-user-search-history"), # for this user
+    path("is-entry-download/<int:pk>/", backgroundjobs.is_entry_download, name="is-entry-download"),
     # other
     path("data-errors", custom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", custom.fix_entry_tags, name="fix-entry-tags",),

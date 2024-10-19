@@ -126,7 +126,7 @@ class BackgroundJobController(BackgroundJob):
         )
         return objs.count() > 0
 
-    def create_single_job(job_name, subject="", args=""):
+    def create_single_job(job_name, subject="", args="", user=None):
         items = BackgroundJob.objects.filter(job=job_name, subject=subject)
         if items.count() == 0:
             return BackgroundJob.objects.create(
@@ -135,6 +135,7 @@ class BackgroundJobController(BackgroundJob):
                 subject=subject,
                 args=args,
                 priority=BackgroundJobController.get_job_priority(job_name),
+                user=user,
             )
 
     # job functions are defined below
@@ -145,27 +146,27 @@ class BackgroundJobController(BackgroundJob):
                 return False
 
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_PROCESS_SOURCE, source.id, source.title
+            BackgroundJob.JOB_PROCESS_SOURCE, subject=source.id, args=source.title
         )
 
-    def download_music(entry):
+    def download_music(entry, user=None):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, entry.link
+            BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, subject=entry.link, user=user,
         )
 
-    def download_video(entry):
+    def download_video(entry, user=None):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, entry.link
+            BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, subject=entry.link, user=user,
         )
 
-    def download_music_url(url):
+    def download_music_url(url, user=None):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, url
+            BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, subject=url, user=user,
         )
 
-    def download_video_url(url):
+    def download_video_url(url, user=None):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, url
+            BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, subject=url, user=user,
         )
 
     def link_add(url, source=None, tag="", user=None, properties=None):
@@ -294,14 +295,13 @@ class BackgroundJobController(BackgroundJob):
                 url,
             )
 
-    def download_file(url=None):
+    def download_file(url=None, user=None):
         if url is None:
             return
 
         if not ModelFiles.objects.filter(file_name=url).exists():
             return BackgroundJobController.create_single_job(
-                BackgroundJob.JOB_DOWNLOAD_FILE,
-                url,
+                BackgroundJob.JOB_DOWNLOAD_FILE, subject=url, user=user,
             )
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
@@ -384,9 +384,9 @@ class BackgroundJobController(BackgroundJob):
                 if key > 100:
                     obj.delete()
 
-    def link_download(link_url):
+    def link_download(link_url, user=None):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_DOWNLOAD, link_url
+            BackgroundJob.JOB_LINK_DOWNLOAD, subject=link_url, user=user,
         )
 
     def entry_update_data(entry, force=False):
@@ -429,9 +429,9 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_RESET_DATA, entry.id, entry.link
         )
 
-    def export_data(export, input_date=None):
+    def export_data(export, input_date=None, user=None):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_EXPORT_DATA, str(export.id), input_date
+            BackgroundJob.JOB_EXPORT_DATA, subject=str(export.id), args=input_date, user=user
         )
 
     def make_cleanup():
@@ -444,12 +444,12 @@ class BackgroundJobController(BackgroundJob):
 
     def import_from_instance(link, author=""):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_IMPORT_INSTANCE, link, author
+            BackgroundJob.JOB_IMPORT_INSTANCE, subject=link, args=author,
         )
 
-    def run_rule(rule):
+    def run_rule(rule, user=None):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_RUN_RULE, str(rule.id)
+            BackgroundJob.JOB_RUN_RULE, subject=str(rule.id), user=user,
         )
 
     def truncate():

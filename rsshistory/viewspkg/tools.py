@@ -296,7 +296,7 @@ def page_process_rss_contents(request):
 
 def download_url(request):
     def download_url_internal(p, url):
-        BackgroundJobController.download_file(url)
+        BackgroundJobController.download_file(url, user=request.user)
 
         p.context["summary_text"] = "Added to download queue"
         return p.render("go_back.html")
@@ -307,6 +307,8 @@ def download_url(request):
     uc = UserConfig.get(request.user)
     if not uc.can_download():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+    p.context["form_submit_button_name"] = "Download"
 
     if request.method == "GET":
         if "page" not in request.GET:
@@ -336,7 +338,7 @@ def download_url(request):
 
 def download_music(request):
     def download_music_internal(p, url):
-        BackgroundJobController.download_music_url(url)
+        BackgroundJobController.download_music_url(url, user=request.user)
 
         p.context["summary_text"] = "Added to download queue"
         return p.render("go_back.html")
@@ -347,6 +349,8 @@ def download_music(request):
     uc = UserConfig.get(request.user)
     if not uc.can_download():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+    p.context["form_submit_button_name"] = "Download"
 
     if request.method == "GET":
         if "page" not in request.GET:
@@ -376,7 +380,7 @@ def download_music(request):
 
 def download_video(request):
     def download_video_internal(p, url):
-        BackgroundJobController.download_video_url(url)
+        BackgroundJobController.download_video_url(url, user=request.user)
 
         p.context["summary_text"] = "Added to download queue"
         return p.render("go_back.html")
@@ -387,6 +391,8 @@ def download_video(request):
     uc = UserConfig.get(request.user)
     if not uc.can_download():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+    p.context["form_submit_button_name"] = "Download"
 
     if request.method == "GET":
         if "page" not in request.GET:
@@ -421,13 +427,15 @@ def download_music_pk(request, pk):
     if not uc.can_download():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
 
+    p.context["form_submit_button_name"] = "Download"
+
     ft = LinkDataController.objects.filter(id=pk)
     if ft.exists():
         p.context["summary_text"] = "Added to download queue"
     else:
         p.context["summary_text"] = "Failed to add to download queue"
 
-    BackgroundJobController.download_music(ft[0])
+    BackgroundJobController.download_music(ft[0], user=request.user)
 
     return p.render("go_back.html")
 
@@ -440,13 +448,15 @@ def download_video_pk(request, pk):
     if not uc.can_download():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
 
+    p.context["form_submit_button_name"] = "Download"
+
     ft = LinkDataController.objects.filter(id=pk)
     if ft.exists():
         p.context["summary_text"] = "Added to download queue"
     else:
         p.context["summary_text"] = "Failed to add to download queue"
 
-    BackgroundJobController.download_video(ft[0])
+    BackgroundJobController.download_video(ft[0], user=request.user)
 
     return p.render("go_back.html")
 
@@ -529,6 +539,8 @@ def page_verify(request):
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
+
+    p.context["form_submit_button_name"] = "Verify"
 
     if request.method == "GET":
         if "page" not in request.GET:

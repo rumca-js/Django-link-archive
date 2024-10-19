@@ -485,7 +485,7 @@ def data_export_job_add(request, pk):
         ] = "Export is not enabled. <a href='{}'>Export</a>.".format(job_link)
         return p.render("summary_present.html")
 
-    BackgroundJobController.export_data(export)
+    BackgroundJobController.export_data(export, user=request.user)
 
     return redirect("{}:backgroundjobs".format(LinkDatabase.name))
 

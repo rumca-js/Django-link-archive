@@ -14,5 +14,66 @@
    </button>
 
    <div class="collapse navbar-collapse" id="mainNavBarDummy">
-   </div>
+       <ul class="nav navbar-nav mr-auto">
+
+           <li class="nav-item dropdown">
+               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                   Search
+               </a>
+               <ul class="dropdown-menu">
+                   <li>
+                       <a href="{% url 'rsshistory:search-engines' %}" class="dropdown-item" title="Shows search engines">
+                           <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
+                           Search engines</a>
+                   </li>
+                   <li>
+                       <a href="{% url 'rsshistory:gateways' %}" class="dropdown-item" title="Shows popular places">
+                           <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
+                           Gateways</a>
+                   </li>
+                   <li>
+                       <a href="{% url 'rsshistory:entries-recent' %}?show=1" class="dropdown-item" title="Shows new entries">
+                           <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
+                           What's new</a>
+                   </li>
+               </ul>
+           </li>
+
+           <li class="nav-item dropdown">
+               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                   Global
+               </a>
+               <ul class="dropdown-menu">
+                   <li>
+                       <a href="{% url 'rsshistory:entries-bookmarked' %}?show=1" class="dropdown-item" title="Shows bookmarked links. By default shows all users bookmarks.">
+                           <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+                           Bookmarks</a>
+                   </li>
+                   <li>
+                       <a href="{% url 'rsshistory:tags-show-all' %}" class="dropdown-item" title="Tags. By default shows all users tags">
+                           <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
+                           Tags</a>
+                   </li>
+                   <li>
+                       <a href="{% url 'rsshistory:sources' %}" class="dropdown-item" title="Sources">
+                           <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+                           Sources
+                           {% if is_source_error %}
+                           <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                               !
+                               <span class="visually-hidden">Source error</span>
+                           </span>
+                           {% endif %}
+                       </a>
+                   </li>
+               </ul>
+           </li>
+
+          <li class="nav-item">
+              <a href="{% url 'rsshistory:login' %}"  class="nav-link" title="Login">
+                  <img src="{% static 'rsshistory/icons/icons8-login-100.png' %}" class="mainbutton-icon" />
+                  Login</a>
+          </li>
+       </ul>
+    </div>
 </nav>

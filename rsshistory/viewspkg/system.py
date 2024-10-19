@@ -749,8 +749,8 @@ def get_menu(request):
 
     p = ViewPage(request)
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
+
+    # even not logged users need to be able to see something
 
     if request.user.is_authenticated:
         p.context["is_read_later"] = (

@@ -30,6 +30,9 @@
 
    {% include "rsshistory/linkdatacontroller_detail__tags.html" %}
 
+   <span id="entryStatusLine">
+   </span>
+
    {% include "rsshistory/linkdatacontroller_detail__source.html" %}
 
    {% include "rsshistory/linkdatacontroller_detail__buttons.html" %}
@@ -39,6 +42,24 @@
 </div>
 
 <script>
+    function loadIsDownloaded(attempt = 1) {
+        $.ajax({
+            url: '{% url 'rsshistory:is-entry-download' object.id %}',
+            type: 'GET',
+            success: function(data) {
+		if (data.status) {
+                   const text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Entry is being downloaded'
+                   $('#entryStatusLine').html(text);
+		}
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 2) {
+                    loadIsDownloaded(attempt + 1);
+                }
+            }
+        });
+    }
+
     function loadBodyContent(attempt = 1) {
         $.ajax({
             url: '{% url 'rsshistory:get-entry-details' object.id %}',
@@ -59,15 +80,16 @@
 
     $(document).ready(function() {
         loadBodyContent();
+        loadIsDownloaded();
 
         setInterval(function() {
-        loadBodyContent();
+          loadIsDownloaded();
         }, 300000);  // 5 minutes in milliseconds
     });
 
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
-        loadBodyContent();
+           loadIsDownloaded();
         }
     });
 </script>

@@ -67,13 +67,13 @@
                            Domains</a>
                    </li>
                    {% endif %}
+                   {% if config.enable_keyword_support %}
                    <li>
-                       {% if config.enable_keyword_support %}
                        <a href="{% url 'rsshistory:keywords' %}" class="dropdown-item" title="Shows keywords used by links">
                            <img src="{% static 'rsshistory/icons/icons8-letters-96.png' %}" class="mainbutton-icon" />
                            Keywords</a>
-                       {% endif %}
                    </li>
+                   {% endif %}
                    <li>
                        <a href="{% url 'rsshistory:sources' %}" class="dropdown-item" title="Sources">
                            <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />

@@ -25,6 +25,10 @@
                  {{job.subject}}
               {% endif %}
 
+              {% if job.user %}
+	        User: {{job.user.username}}
+              {% endif %}
+
               {{job.args}} 
            </div>
 

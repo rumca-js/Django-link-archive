@@ -995,6 +995,14 @@ class BackgroundJob(models.Model):
     errors = models.IntegerField(default=0)
     enabled = models.BooleanField(default=True)
 
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name) + "_jobs",
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         ordering = [
             "-enabled",

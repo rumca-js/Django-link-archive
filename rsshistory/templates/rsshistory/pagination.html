@@ -2,10 +2,10 @@
    <ul class="pagination">
       {% if page_obj.has_previous %}
       <li class="page-item">
-          <a href="?page=1{{query_filter.get_filter_string}}" data-page="1" class="page-link btnFilterTrigger">|&lt;</a>
+          <a href="?page=1{{query_filter.get_filter_string}}" data-page="1" class="btnFilterTrigger page-link">|&lt;</a>
       </li>
       <li class="page-item">
-          <a href="?page={{ page_obj.previous_page_number }}{{query_filter.get_filter_string}}" data-page="{{page_obj.previous_page_number}}" class="page-link btnFilterTrigger">&lt;</a>
+          <a href="?page={{ page_obj.previous_page_number }}{{query_filter.get_filter_string}}" data-page="{{page_obj.previous_page_number}}" class="btnFilterTrigger page-link">&lt;</a>
       </li>
       {% else %}
       <li class="page-item">
@@ -18,10 +18,10 @@
    
       {% if page_obj.has_next %}
       <li class="page-item">
-          <a href="?page={{ page_obj.next_page_number }}{{query_filter.get_filter_string}}" data-page="{{page_obj.next_page_number}}" class="page-link btnFilterTrigger">&gt;</a>
+          <a href="?page={{ page_obj.next_page_number }}{{query_filter.get_filter_string}}" data-page="{{page_obj.next_page_number}}" class="btnFilterTrigger page-link">&gt;</a>
       </li>
       <li class="page-item">
-          <a href="?page={{ page_obj.paginator.num_pages }}{{query_filter.get_filter_string}}" data-page="{{page_obj.paginator.num_pages}}" class="page-link btnFilterTrigger">&gt;|</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}{{query_filter.get_filter_string}}" data-page="{{page_obj.paginator.num_pages}}" class="btnFilterTrigger page-link">&gt;|</a>
       </li>
       {% else %}
       <li class="page-item">

@@ -4,34 +4,64 @@
         return urlParams.get(param);
     }
 
+    function loadHistory(attempt = 1) {
+        $.ajax({
+            url: '{% url 'rsshistory:get-user-search-history' %}',
+            type: 'GET',
+            success: function(data) {
+                $('#searchHistory').html(data);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 2) {
+                    loadHistory(search_term, page, attempt + 1);
+                    $('#searchHistory').html("Error loading dynamic content, retry");
+                }
+                else {
+                    $('#searchHistory').html("Cannot load data from " + url)
+                }
+            }
+        });
+    }
+
     function loadEntryListContent(search_term = '', page = '', attempt = 1) {
-        const params = new URLSearchParams(window.location.search);
-        params.set('search', search_term);
-        if (page) {
-            params.set('page', page);
+        $('.btnFilterTrigger').prop("disabled", true);
+
+        const currentUrl = new URL(window.location);
+        const currentSearch = currentUrl.searchParams.get('search');
+
+        if (currentSearch !== search_term) {
+            page = '1';
         }
 
-        var url = "{{query_page}}?" + params.toString();
+        currentUrl.searchParams.set('search', search_term);
+        if (page) currentUrl.searchParams.set('page', page);
+        
+        window.history.pushState({}, '', currentUrl);
 
-        $('#entriesList').html("Loading dynamic content... " + url);
+        const url = `{{query_page}}?${currentUrl.searchParams.toString()}`;
+
+        const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
+        $('#entriesListStatus').html(status_text);
 
         $.ajax({
             url: url,
             type: 'GET',
             success: function(data) {
                 $('#entriesList').html(data);
+                $('#entriesListStatus').html("");
+                loadHistory();
             },
             error: function(xhr, status, error) {
                 if (attempt < 2) {
                     loadEntryListContent(search_term, page, attempt + 1);
-                    $('#entriesList').html("Error loading dynamic content, retry")
+                    $('#entriesListStatus').html("Error loading dynamic content, retry");
                 }
                 else {
-                    $('#entriesList').html("Cannot load data from " + url)
+                    $('#entriesListStatus').html("Cannot load data from " + url);
                 }
             },
             complete: function() {
-                $(".btnFilterTrigger").prop("disabled", false);
+                $('.btnFilterTrigger').prop("disabled", false);
             }
         });
     }
@@ -44,21 +74,15 @@
             loadEntryListContent(search_term);
         }
 
-        $(".btnFilterTrigger").click(function(e) {
+        $(document).on('click', '.btnFilterTrigger', function(e) {
             e.preventDefault();
 
-            $(this).prop("disabled", true);
-
             var search_term = $(this).data('search') || $('#id_search').val();
-            var page = $(this).data('search')
+            var page = $(this).data('page')
 
             if ($(this).data('search')) {
                 $('#id_search').val(search_term);
             }
-
-            const currentUrl = new URL(window.location);
-            currentUrl.searchParams.set('search', search_term);
-            window.history.pushState({}, '', currentUrl);
 
             $('#searchHistory').collapse('hide');
             $('#searchSyntax').collapse('hide');

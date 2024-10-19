@@ -1,12 +1,15 @@
 from django.views import generic
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.db.models import Q
 
 from ..apps import LinkDatabase
 from ..models import (
     ConfigurationEntry,
     BackgroundJob,
+    LinkDataModel,
 )
 from ..controllers import (
     BackgroundJobController,
@@ -244,3 +247,33 @@ def backgroundjobs_remove(request, job_type):
     jobs.delete()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
+
+
+def is_entry_download(request, pk):
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("JSON entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    is_downloaded = False
+
+    entries = LinkDataModel.objects.filter(id = pk)
+
+    if entries.exists():
+        job_condition = (Q(job=BackgroundJobController.JOB_DOWNLOAD_FILE) |
+            Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC) |
+            Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO))
+
+        entry = entries[0]
+
+        jobs = BackgroundJobController.objects.filter(Q(subject = entry.link) & job_condition)
+        if jobs.exists():
+            is_downloaded = True
+
+    json_obj = {"status" : is_downloaded }
+
+    return JsonResponse(json_obj)
