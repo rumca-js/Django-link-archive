@@ -32,5 +32,5 @@ class YouTubeLinksTest(FakeInternetTestCase):
 
     def test_link_code2url(self):
         self.assertEqual(
-            YouTubeVideoHandler.code2url("1234"), "https://www.youtube.com/watch?v=1234"
+            YouTubeVideoHandler("1234").code2url("1234"), "https://www.youtube.com/watch?v=1234"
         )

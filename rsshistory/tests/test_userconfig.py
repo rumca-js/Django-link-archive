@@ -72,4 +72,4 @@ class UserTagsTest(FakeInternetTestCase):
     def test_can_add__false(self):
         uc = UserConfig()
         # call tested function
-        self.assertTrue(uc.can_add())
+        self.assertFalse(uc.can_add())

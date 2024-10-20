@@ -252,12 +252,12 @@ class LinkDownloadJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_LINK_DOWNLOAD
 
     def process(self, obj=None):
-        c = Configuration.get_object()
+        path = ConfigurationEntry.get().get_download_path
 
         url = obj.subject
         AppLogging.notify("Downloading page:".format(url))
 
-        wget = wget.Wget(url, cwd = c.get_export_path())
+        wget = wget.Wget(url, cwd = path)
         wget.download_all()
 
         AppLogging.notify(
@@ -291,13 +291,14 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
             return True
 
         file_name = self.get_file_name(data)
+        path = ConfigurationEntry.get().get_download_path
 
-        yt = ytdlp.YTDLP(url, cwd = c.get_export_path())
+        yt = ytdlp.YTDLP(url, cwd = path)
         if not yt.download_audio(file_name):
             AppLogging.error("Could not download music: " + url + " " + title)
             return
 
-        id3 = id3v2.Id3v2(file_name, data=data, cwd=c.get_export_path())
+        id3 = id3v2.Id3v2(file_name, data=data, cwd=path)
         id3.tag()
 
         elapsed_sec = self.get_time_diff()
@@ -369,8 +370,9 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
         AppLogging.info("Downloading music: " + url + " " + title)
 
         file_name = self.get_file_name(data)
+        path = ConfigurationEntry.get().get_download_path
 
-        yt = ytdlp.YTDLP(url, cwd = c.get_export_path())
+        yt = ytdlp.YTDLP(url, cwd = path)
         if not yt.download_video("file.mp4"):
             AppLogging.error("Could not download video: " + url + " " + title)
             return

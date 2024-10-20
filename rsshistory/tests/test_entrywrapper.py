@@ -177,7 +177,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
-        self.assertTrue(obj.bookmarked == False)
+        self.assertTrue(obj.bookmarked == True)
 
     def test_make_not_bookmarked_now(self):
         link_name = "https://youtube.com/v=12345"
@@ -263,7 +263,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         # call tested function
         EntryWrapper(entry=entry).make_bookmarked(request)
 
-        self.assertEqual(entry.bookmarked, False)
+        self.assertEqual(entry.bookmarked, True)
         self.assertEqual(UserBookmarks.objects.all().count(), 1)
 
     def test_make_not_bookmarked_staff(self):

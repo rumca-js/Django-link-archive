@@ -134,6 +134,11 @@ class ConfigurationEntry(models.Model):
         max_length=2000,
         null=True,
     )
+    download_path = models.CharField(
+        max_length=2000,
+        null=True,
+        blank=True,
+    )
 
     auto_store_thumbnails = models.BooleanField(
         default=False,
@@ -425,6 +430,13 @@ class ConfigurationEntry(models.Model):
         delimiter = ","
         result_list = [item.strip() for item in input_string.split(delimiter)]
         return result_list
+
+    def get_download_path(self):
+        if self.download_path:
+            return self.download_path
+
+        if self.data_export_path:
+            return self.data
 
     def save(self, *args, **kwargs):
         """
