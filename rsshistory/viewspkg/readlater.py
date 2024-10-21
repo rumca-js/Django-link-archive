@@ -1,3 +1,5 @@
+from django.http import JsonResponse
+
 from ..models import ReadLater
 from ..controllers import (
     LinkDataController,
@@ -22,21 +24,25 @@ def read_later_add(request, pk):
     if data is not None:
         return data
 
+    data = {}
+
     entries = LinkDataController.objects.filter(id=pk)
     if entries.exists():
         entry = entries[0]
 
         if ReadLater.objects.filter(entry=entry, user=request.user).count() == 0:
             read_later = ReadLater.objects.create(entry=entry, user=request.user)
-
-            p.context["summary_text"] = "Added successfully to read later queue"
-            return p.render("go_back.html")
+            data["message"] = "Added successfully to read later queue"
+            data["status"] = True
+            return JsonResponse(data)
         else:
-            p.context["summary_text"] = "Added successfully to read later queue"
-            return p.render("go_back.html")
+            data["message"] = "Already in queue"
+            data["status"] = True
+            return JsonResponse(data)
     else:
-        p.context["summary_text"] = "Cannot find such entry"
-        return p.render("go_back.html")
+        data["message"] = "Cannot find such entry"
+        data["status"] = False
+        return JsonResponse(data)
 
 
 def read_later_remove(request, pk):
@@ -46,15 +52,28 @@ def read_later_remove(request, pk):
     if data is not None:
         return data
 
-    read_laters = ReadLater.objects.filter(id=pk, user=request.user)
-    if read_laters.exists():
-        read_laters.delete()
+    data = {}
 
-        p.context["summary_text"] = "Successfully removed from read later list"
-        return p.render("go_back.html")
+    entries = LinkDataController.objects.filter(id=pk)
+    if entries.exists():
+        entry = entries[0]
+
+        read_laters = ReadLater.objects.filter(entry=entry, user=request.user)
+        if read_laters.count() > 0:
+            read_laters.delete()
+
+            data["message"] = "Successfully removed from read later queue"
+            data["status"] = True
+            return JsonResponse(data)
+        else:
+            data["message"] = "Cannot find such entry"
+            data["status"] = False
+            return JsonResponse(data)
+
     else:
-        p.context["summary_text"] = "Cannot find such entry"
-        return p.render("go_back.html")
+        data["message"] = "Cannot find such entry"
+        data["status"] = False
+        return JsonResponse(data)
 
 
 def read_later_clear(request):

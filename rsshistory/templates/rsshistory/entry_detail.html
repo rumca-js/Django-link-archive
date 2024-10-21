@@ -33,6 +33,9 @@
    <span id="entryVoteLine">
    </span>
 
+   <span id="entryDownloadLine">
+   </span>
+
    <span id="entryStatusLine">
    </span>
 
@@ -57,7 +60,7 @@
             success: function(data) {
                 if (data.status) {
                     const text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Downloading...';
-                    $('#entryStatusLine').html(text);
+                    $('#entryDownloadLine').html(text);
                 }
             },
             error: function(xhr, status, error) {
@@ -102,6 +105,10 @@
         });
     }
 
+    function refreshMenu() {
+        // TODO
+    }
+
     $(document).ready(function() {
         loadBodyContent();
         loadIsDownloaded();
@@ -115,6 +122,78 @@
         if (!document.hidden) {
             loadIsDownloaded();
         }
+    });
+
+    $(document).on('click', '#Vote', function(event) {
+        event.preventDefault();
+        getVoteEditForm();
+    });
+    $(document).on('click', '#Read-later', function(event) {
+        event.preventDefault();
+
+        $.ajax({
+            url: "{% url 'rsshistory:read-later-add' object.id %}",
+            type: 'GET',
+            timeout: 15000,
+            success: function(data) {
+                if (data.status) {
+                    const text = 'Added to read later queue'
+                    $('#entryStatusLine').html(text);
+                    refreshMenu();
+                }
+                else {
+                    const text = 'Could not add entry to read later queue'
+                    $('#entryStatusLine').html(text);
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#entryStatusLine').html("Failed")
+            }
+        });
+    });
+    $(document).on('click', '#Do-not-read-later', function(event) {
+        event.preventDefault();
+
+        $.ajax({
+            url: "{% url 'rsshistory:read-later-remove' object.id %}",
+            type: 'GET',
+            timeout: 15000,
+            success: function(data) {
+                if (data.status) {
+                    const text = 'Removed from read later queue'
+                    $('#entryStatusLine').html(text);
+                    refreshMenu();
+                }
+                else {
+                    const text = 'Could not remove entry from read later queue'
+                    $('#entryStatusLine').html(text);
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#entryStatusLine').html("Failed")
+            }
+        });
+    });
+    $(document).on('click', '#Remove', function(event) {
+        event.preventDefault();
+        
+        $.ajax({
+            url: "{% url 'rsshistory:entry-remove' object.id %}",
+            type: 'GET',
+            timeout: 15000,
+            success: function(data) {
+                if (data.status) {
+                    const text = 'Removed entry'
+                    $('#entryStatusLine').html(text);
+                }
+                else {
+                    const text = 'Could not remove entry'
+                    $('#entryStatusLine').html(text);
+                }
+            }
+        });
+
+        makeRequest(0);  // Start with the first attempt
     });
 
     $(document).on('submit', '#voteEditForm', function(event) {
@@ -142,11 +221,6 @@
                 $('#entryVoteLine').html(`<p class="text-danger">Error during vote update: ${error}</p>`);
             },
         });
-    });
-
-    $(document).on('click', '#Vote', function(event) {
-        event.preventDefault();
-        getVoteEditForm();
     });
 
     $(document).on('click', '#cancelVoteEdit', function() {
