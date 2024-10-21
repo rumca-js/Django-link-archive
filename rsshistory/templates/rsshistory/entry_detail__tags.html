@@ -1,0 +1,79 @@
+{% load static %}
+
+<div class="mb-2" id="entryTagLine">
+    {% if object.has_tags %}
+      {% for tag in object.get_tag_map %}
+        <a href="{% url 'rsshistory:entries'%}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,
+      {% endfor %}
+    {% endif %}
+
+    {% if object.is_taggable %}
+    <button id="editTagsButton"><img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" /></button>
+    {% endif %}
+</div>
+
+<script>
+  $(document).ready(function() {
+    function getTagEditForm() {
+      $.ajax({
+        url: '{% url "rsshistory:entry-tag-form" object.id %}',
+        type: 'GET',
+        timeout: 10000,
+        success: function(response) {
+          $('#entryTagLine').html(response);
+        },
+        error: function(xhr, status, error) {
+          console.error('Error fetching the form:', error);
+        }
+      });
+    }
+
+    $(document).on('submit', '#tagEditForm', function(event) {
+      event.preventDefault();
+
+      var tagsData = $('#id_tag').val();
+      const editButton = `<button id="editTagsButton"><img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" /></button>`;
+
+      $.ajax({
+        url: '{% url "rsshistory:entry-tag" object.id %}',
+        type: 'POST',
+        timeout: 10000,
+        data: {
+          tags: tagsData,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        dataType: 'json',
+        success: function(response) {
+          if (response.status === true) {
+            var tagsLinks = response.tags.map(function(tag) {
+              return `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>`;
+            }).join(', ');
+
+            $('#entryTagLine').html(`${tagsLinks} ${editButton}`);
+          } else {
+            $('#entryTagLine').html(`<p class="text-danger">Failed to update tags. Please try again. ${editButton}</p>`);
+          }
+        },
+        error: function(xhr, status, error) {
+          $('#entryTagLine').html(`<p class="text-danger">Error during tag update. Please try again. ${editButton}</p>`);
+        },
+      });
+    });
+
+    $(document).on('click', '#editTagsButton', function() {
+      getTagEditForm();
+      $(this).hide();
+    });
+
+    $(document).on('click', '#cancelTagEdit', function() {
+      $('#entryTagLine').html(`
+        {% if object.has_tags %}
+          {% for tag in object.get_tag_map %}
+            <a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,
+          {% endfor %}
+        {% endif %}
+        <button id="editTagsButton"><img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" /></button>
+      `);
+    });
+  });
+</script>

@@ -11,6 +11,7 @@
         $.ajax({
             url: '{% url 'rsshistory:get-system-status' %}',
             type: 'GET',
+            timeout: 15000,
             success: function(data) {
                 $('#bodyBlock').html(data);
             },

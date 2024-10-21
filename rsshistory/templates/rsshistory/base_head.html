@@ -78,6 +78,7 @@
             $.ajax({
                 url: '{% url 'rsshistory:get-footer-status-line' %}',
                 type: 'GET',
+                timeout: 15000,
                 success: function(data) {
                     $('#footerLine').html(data.message);
                 },
@@ -95,6 +96,7 @@
             $.ajax({
                 url: '{% url 'rsshistory:get-menu' %}',
                 type: 'GET',
+                timeout: 15000,
                 success: function(data) {
                     $('#blockMenu').html(data);
                 },

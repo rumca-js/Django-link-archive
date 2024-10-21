@@ -1,0 +1,6 @@
+<form id="voteEditForm" method="post" action="{% url 'rsshistory:entry-vote' pk %}">
+    {% csrf_token %}
+    {{ form.vote }}
+    <button type="submit" class="btn btn-success">Save</button>
+    <button type="button" id="cancelVoteEdit" class="btn btn-secondary">Cancel</button>
+</form>

@@ -1,9 +1,0 @@
-{% load static %}
-
-<div class="mb-2">
-    {% if object.has_tags %}
-      {% for tag in object.get_tag_map %}
-        <a href="{% url 'rsshistory:entries'%}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,
-      {% endfor %}
-    {% endif %}
-</div>

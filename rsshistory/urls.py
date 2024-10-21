@@ -115,7 +115,8 @@ urlpatterns = [
     path("categories-view", sources.categories_view, name="categories-view"),
     path("categories-reset", sources.categories_reset, name="categories-reset"),
     # tags
-    path("entry-tag/<int:pk>/", useractions.tag_entry, name="entry-tag"),
+    path("entry-tag/<int:pk>/", useractions.entry_tag, name="entry-tag"),
+    path("entry-tag-form/<int:pk>/", useractions.entry_tag_form, name="entry-tag-form"),
     path("tag-remove/<int:pk>/", useractions.tag_remove, name="tag-remove"),
     path("tag-remove-str/<str:tag>/", useractions.tag_remove_str, name="tag-remove-str"),
     path("tag-remove-form/", useractions.tag_remove_form, name="tag-remove-form"),
@@ -131,6 +132,7 @@ urlpatterns = [
     path("entry-comment-remove/<int:pk>/", comments.entry_comment_remove, name="entry-comment-remove",),
     # votes
     path("entry-vote/<int:pk>/", useractions.entry_vote, name="entry-vote"),
+    path("entry-vote-form/<int:pk>/", useractions.entry_vote_form, name="entry-vote-form"),
     # files
     path("model-file/<int:pk>/", modelfiles.model_file, name="model-file"),
     path("model-file-remove/<int:pk>/", modelfiles.model_file_remove, name="model-file-remove"),
@@ -279,6 +281,7 @@ urlpatterns = [
     path("get-entry-details/<int:pk>/", entries.EntryDetailDetailView.as_view(), name="get-entry-details"),
     path("get-user-search-history", userhistory.GetUserSearchHistoryListView.as_view(), name="get-user-search-history"), # for this user
     path("is-entry-download/<int:pk>/", backgroundjobs.is_entry_download, name="is-entry-download"),
+    path("entry-tags/<int:pk>/", useractions.entry_tags, name="entry-tags"),
     # other
     path("data-errors", custom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", custom.fix_entry_tags, name="fix-entry-tags",),

@@ -268,9 +268,12 @@ def is_entry_download(request, pk):
             Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC) |
             Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO))
 
+        job_condition &= Q(subject = entry.link)
+        job_condition &= Q(enabled = True)
+
         entry = entries[0]
 
-        jobs = BackgroundJobController.objects.filter(Q(subject = entry.link) & job_condition)
+        jobs = BackgroundJobController.objects.filter(job_condition)
         if jobs.exists():
             is_downloaded = True
 

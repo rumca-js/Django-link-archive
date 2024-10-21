@@ -104,6 +104,7 @@ class ConfigForm(forms.ModelForm):
             "user_internal_scripts",
             "data_export_path",
             "data_import_path",
+            "download_path",
             "auto_store_thumbnails",
             "favicon_internet_location",
             # features
@@ -649,21 +650,21 @@ class SourceForm(forms.ModelForm):
         return result
 
 
-class TagEntryForm(forms.Form):
-    """
-    Category choice form
-    TODO remake to standard form?
-    """
-
-    entry_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    tag = forms.CharField(max_length=1000)
+class TagEditForm(forms.Form):
+    tags = forms.CharField(
+        label='Edit',
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter tags, separated by commas',
+            'id': 'id_tag'
+        }),
+        max_length=255,
+        required=False
+    )
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
-
-        self.fields["tag"].widget.attrs.update(size=self.init.get_cols_size())
-        self.fields["tag"].widget.attrs["autofocus"] = True
+        self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
 
 
 class TagRenameForm(forms.Form):

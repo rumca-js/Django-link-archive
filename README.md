@@ -16,28 +16,33 @@ Manages link meta information.
 # Features
 
 ## General
+
  - bookmarks management, with tags, and comment support
  - support for 'spaces'. You can define own spaces like 'music', 'videos', 'movies', etc. Manged by django apps
- - obtaining keywords (nouns) from sources, to analyze trends
+ - keywords entry analysis to find trends
  - light mode and dark mode
  - automatic exports
     - to directory
     - to GitHub
  - access for multiple users
+ - kiosk mode. Auto refresh when URL is appended with param "auto-refresh" set to millisecond value
 
 ## Services
+
  - RSS feed support: Supports YouTube RSS, Reddit RSS, Odysee, OpenRss
  - support for archived pages through InternetArchive, or any configured archive medium
  - GitHub support. Exports. For example [Internet domains, users, projects](https://github.com/rumca-js/Internet-Places-Database)
  - YouTube download support through yt-dlp project
 
 ## Crawling
+
  - some Internet crawling capabilities
  - link search. Simple implementation, does not use elastic search
  - does not support proxy rotation. This is ethical web scraper, it should not spam with requests
  - configurable user agents, crawlers, selenium, requests, chrome undetected, crawlee, easily extendible
 
 ## Privacy
+
  - local data, no algorithms, no advertisements, self-hosted
  - user action tracking. You can observe and analyze history of your 'views', 'searches', 'comments', 'browsing history'
  

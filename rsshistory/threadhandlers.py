@@ -252,7 +252,7 @@ class LinkDownloadJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_LINK_DOWNLOAD
 
     def process(self, obj=None):
-        path = ConfigurationEntry.get().get_download_path
+        path = ConfigurationEntry.get().get_download_path()
 
         url = obj.subject
         AppLogging.notify("Downloading page:".format(url))
@@ -291,7 +291,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
             return True
 
         file_name = self.get_file_name(data)
-        path = ConfigurationEntry.get().get_download_path
+        path = ConfigurationEntry.get().get_download_path()
 
         yt = ytdlp.YTDLP(url, cwd = path)
         if not yt.download_audio(file_name):
@@ -370,7 +370,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
         AppLogging.info("Downloading music: " + url + " " + title)
 
         file_name = self.get_file_name(data)
-        path = ConfigurationEntry.get().get_download_path
+        path = ConfigurationEntry.get().get_download_path()
 
         yt = ytdlp.YTDLP(url, cwd = path)
         if not yt.download_video("file.mp4"):

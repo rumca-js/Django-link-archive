@@ -1,0 +1,158 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+   {{object_controller.get_frame_html | safe }}
+   
+   <a href="{{ object.link }}" title="{{ object.link }}">
+      <div>
+         <h1
+             class="link-title"
+              {% if not object.is_valid %}
+              style="opacity: 0.5"
+              {% endif %}
+             >
+
+	     <div>
+             {{ object_controller.get_title_html }}
+	     </div>
+         </h1>
+
+         <span>
+            {{object.link}}
+         </span>
+      </div>
+   </a>
+
+   <div>
+     {% include "rsshistory/entry_detail__parameters.html" %}
+   </div>
+
+   {% include "rsshistory/entry_detail__tags.html" %}
+
+   <span id="entryVoteLine">
+   </span>
+
+   <span id="entryStatusLine">
+   </span>
+
+   {% include "rsshistory/entry_detail__source.html" %}
+
+   {% include "rsshistory/entry_detail__buttons.html" %}
+
+   <div class="link-detail-description">
+   {{object_controller.get_description_html | safe | linebreaks }}
+   </div>
+
+   <div id="bodyBlock">
+       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+   </div>
+
+<script>
+    function loadIsDownloaded(attempt = 1) {
+        $.ajax({
+            url: "{% url 'rsshistory:is-entry-download' object.id %}",
+            type: 'GET',
+            timeout: 15000,
+            success: function(data) {
+                if (data.status) {
+                    const text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Downloading...';
+                    $('#entryStatusLine').html(text);
+                }
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    loadIsDownloaded(attempt + 1);
+                }
+            }
+        });
+    }
+
+    function loadBodyContent(attempt = 1) {
+        $.ajax({
+            url: "{% url 'rsshistory:get-entry-details' object.id %}",
+            type: 'GET',
+            timeout: 10000,
+            success: function(data) {
+                $('#bodyBlock').html(data);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    loadBodyContent(attempt + 1);
+                    $('#bodyBlock').html("Failed attempt");
+                } else {
+                    $('#bodyBlock').html("Error loading dynamic content");
+                }
+            }
+        });
+    }
+
+    function getVoteEditForm() {
+        $.ajax({
+            url: "{% url 'rsshistory:entry-vote-form' object.id %}",
+            type: 'GET',
+            timeout: 10000,
+            success: function(response) {
+                $('#entryVoteLine').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching the form:', error);
+                $('#entryVoteLine').html(`<p class="text-danger">Error fetching the vote edit form</p>`);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        loadBodyContent();
+        loadIsDownloaded();
+
+        setInterval(function() {
+            loadIsDownloaded();
+        }, 300000);
+    });
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            loadIsDownloaded();
+        }
+    });
+
+    $(document).on('submit', '#voteEditForm', function(event) {
+        event.preventDefault();
+
+        var voteData = $('#id_vote').val();
+
+        $.ajax({
+            url: "{% url 'rsshistory:entry-vote' object.id %}",
+            type: 'POST',
+            timeout: 10000,
+            data: {
+                vote: voteData,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === true) {
+                    $('#entryVoteLine').html("Vote added: " + response.vote);
+                } else {
+                    $('#entryVoteLine').html(`<p class="text-danger">Error: ${response.message}</p>`); // Handling potential error message
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#entryVoteLine').html(`<p class="text-danger">Error during vote update: ${error}</p>`);
+            },
+        });
+    });
+
+    $(document).on('click', '#Vote', function(event) {
+        event.preventDefault();
+        getVoteEditForm();
+    });
+
+    $(document).on('click', '#cancelVoteEdit', function() {
+        $('#entryVoteLine').html("");
+    });
+
+</script>
+
+{% endblock %}

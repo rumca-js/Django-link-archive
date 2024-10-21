@@ -8,6 +8,7 @@
         $.ajax({
             url: '{% url 'rsshistory:get-user-search-history' %}',
             type: 'GET',
+            timeout: 15000,
             success: function(data) {
                 $('#searchHistory').html(data);
             },
@@ -23,33 +24,46 @@
         });
     }
 
+    let currentRequestVersion = 0;
+
     function loadEntryListContent(search_term = '', page = '', attempt = 1) {
-        $('.btnFilterTrigger').prop("disabled", true);
+       $('.btnFilterTrigger').prop("disabled", true);
 
-        const currentUrl = new URL(window.location);
-        const currentSearch = currentUrl.searchParams.get('search');
+       const currentUrl = new URL(window.location);
+       const currentSearch = currentUrl.searchParams.get('search') || '';
 
-        if (currentSearch !== search_term) {
-            page = '1';
-        }
+       page = page || currentUrl.searchParams.get('page') || '1';
 
-        currentUrl.searchParams.set('search', search_term);
-        if (page) currentUrl.searchParams.set('page', page);
-        
-        window.history.pushState({}, '', currentUrl);
+       if (!search_term) {
+           search_term = currentSearch;
+       } else if (currentSearch !== search_term) {
+           page = '1';
+       }
 
-        const url = `{{query_page}}?${currentUrl.searchParams.toString()}`;
+       currentUrl.searchParams.set('search', search_term);
+       currentUrl.searchParams.set('page', page);
 
-        const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
-        $('#entriesListStatus').html(status_text);
+       window.history.pushState({}, '', currentUrl);
+
+       const url = `{{query_page}}?${currentUrl.searchParams.toString()}`;
+
+       const requestVersion = ++currentRequestVersion;
+
+       const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
+       $('#entriesListStatus').html(status_text);
 
         $.ajax({
             url: url,
             type: 'GET',
+	    timeout: 15000,
             success: function(data) {
-                $('#entriesList').html(data);
-                $('#entriesListStatus').html("");
-                loadHistory();
+                if (requestVersion === currentRequestVersion) {
+                   $('html, body').animate({ scrollTop: 0 }, 'slow'); // scroll to top
+
+                   $('#entriesList').html(data);
+                   $('#entriesListStatus').html("");
+                   loadHistory();
+                }
             },
             error: function(xhr, status, error) {
                 if (attempt < 2) {
@@ -66,16 +80,33 @@
         });
     }
 
-    $(document).ready(function() {
-        var search_term = getQueryParam('search') || '';
-        var show = getQueryParam('show') || '';
+    function isEmpty( el ){
+        return !$.trim(el.html())
+    }
 
+    $(document).ready(function() {
+        var show = getQueryParam('show') || '';
+        var auto_refresh = getQueryParam('auto-refresh') || '';
+        var search_term = getQueryParam('search') || '';
+
+        // if (user specified search, or show is true), and entrylist is empty
         if (search_term || show) {
-            loadEntryListContent(search_term);
+            if (isEmpty($('#entriesList'))) {
+                loadEntryListContent();
+            }
+        }
+
+        // if auto refresh - keep refreshing list - for kiosk mode
+        if (auto_refresh && !isNaN(auto_refresh)) {
+            setInterval(function() {
+                loadEntryListContent();
+            }, parseInt(auto_refresh));
         }
 
         $(document).on('click', '.btnFilterTrigger', function(e) {
             e.preventDefault();
+
+            // search if user specified search. pass page also
 
             var search_term = $(this).data('search') || $('#id_search').val();
             var page = $(this).data('page')

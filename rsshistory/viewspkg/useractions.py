@@ -2,6 +2,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import JsonResponse
 
 from datetime import datetime, timedelta
 from utils.dateutils import DateUtils
@@ -16,7 +17,7 @@ from ..models import (
 )
 from ..configuration import Configuration
 from ..controllers import LinkDataController, EntryWrapper
-from ..forms import TagForm, TagEntryForm, TagRenameForm, ScannerForm
+from ..forms import TagForm, TagEditForm, TagRenameForm, ScannerForm, LinkVoteForm
 from ..views import ViewPage, GenericListView, UserGenericListView
 
 
@@ -112,49 +113,72 @@ class ActualTags(UserGenericListView):
         return "Tags"
 
 
-def tag_entry(request, pk):
+def entry_tags(request, pk):
     p = ViewPage(request)
     p.set_title("Tag entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
+
+    operation_data = {}
+
+    entries = LinkDataController.objects.filter(id=pk)
+
+    if not entries.exists():
+        operation_data["message"] = "Entry does not exist"
+        operation_data["status"] = False
+        return JsonResponse(operation_data)
+
+    entry = entries[0]
+    if not entry.is_taggable():
+        operation_data["message"] = "Cannot tag entry"
+        operation_data["status"] = False
+        return JsonResponse(operation_data)
+
+    operation_data["tags"] = entry.get_tag_map() # vector
+    operation_data["status"] = True
+
+    return JsonResponse(operation_data)
+
+
+def entry_tag(request, pk):
+    p = ViewPage(request)
+    p.set_title("Tag entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
     if data is not None:
         return data
 
     # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
 
-    p.context["page_title"] += " - tag entry"
-    p.context["pk"] = pk
+    operation_data = {}
 
     entries = LinkDataController.objects.filter(id=pk)
 
     if not entries.exists():
-        p.context["summary_text"] = "Sorry, such object does not exist"
-        return p.render("go_back.html")
+        operation_data["message"] = "Entry does not exist"
+        operation_data["status"] = False
+        return JsonResponse(operation_data)
 
     entry = entries[0]
     if not entry.is_taggable():
-        p.context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
-        return p.render("go_back.html")
+        operation_data["message"] = "Cannot tag entry"
+        operation_data["status"] = False
+        return JsonResponse(operation_data)
 
     if request.method == "POST":
         method = "POST"
 
-        form = TagEntryForm(request.POST)
+        form = TagEditForm(request.POST)
 
         if form.is_valid():
-            args = form.cleaned_data
-            args["user_id"] = request.user.id
-            args["user"] = request.user
-            args["entry_id"] = entry.id
-            args["entry"] = entry
+            tag_string = form.cleaned_data["tags"]
+            UserTags.set_tags(entry, tag_string, user=request.user)
 
-            UserTags.set_tags(entry, args["tag"], user=request.user)
+            operation_data["message"] = "Tagged entry"
+            operation_data["tags"] = entry.get_tag_map() # vector
+            operation_data["status"] = True
+            return JsonResponse(operation_data)
 
-            return HttpResponseRedirect(
-                reverse(
-                    "{}:entry-detail".format(LinkDatabase.name),
-                    kwargs={"pk": entry.pk},
-                )
-            )
         else:
             summary_text = "Cannot add tag due to errors: "
             errors = form.errors
@@ -162,29 +186,55 @@ def tag_entry(request, pk):
                 for error_msg in error_msgs:
                     summary_text += " Field:{} Problem:{}".format(field, error_msg)
 
-            p.context["summary_text"] = summary_text
-            return p.render("summary_present.html")
+            operation_data["message"] = summary_text
+            operation_data["status"] = False
+            return JsonResponse(operation_data)
 
-    else:
-        user = request.user
-        tag_string = UserTags.get_user_tag_string(request.user, entry)
+    return JsonResponse(operation_data)
 
-        data_init = {"entry_id": entry.id}
 
-        if tag_string:
-            data_init["tag"] = tag_string
+def entry_tag_form(request, pk):
+    p = ViewPage(request)
+    p.set_title("Tag entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
 
-        form = TagEntryForm(initial=data_init)
+    # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
 
-        form.method = "POST"
-        form.pk = pk
-        form.action_url = reverse("{}:entry-tag".format(LinkDatabase.name), args=[pk])
-        p.context["form"] = form
-        p.context["form_title"] = entry.title
-        p.context["form_description"] = entry.title
-        p.context["form_description_pre"] = entry.link
+    p.context["page_title"] += " - tag entry"
 
-    return p.render("form_oneliner.html")
+    entries = LinkDataController.objects.filter(id=pk)
+
+    if not entries.exists():
+        # TODO return html that can be inserted
+        return
+
+    entry = entries[0]
+    if not entry.is_taggable():
+        # TODO return html that can be inserted
+        return
+
+    user = request.user
+    tag_string = UserTags.get_user_tag_string(request.user, entry)
+
+    data_init = {"entry_id": entry.id}
+
+    if tag_string:
+        data_init["tags"] = tag_string
+
+    form = TagEditForm(initial=data_init)
+
+    form.method = "POST"
+    form.pk = pk
+    form.action_url = reverse("{}:entry-tag".format(LinkDatabase.name), args=[pk])
+    p.context["form"] = form
+    p.context["form_title"] = entry.title
+    p.context["form_description"] = entry.title
+    p.context["form_description_pre"] = entry.link
+    p.context["pk"] = pk
+
+    return p.render("entry_detail__tag_form.html")
 
 
 def tag_remove(request, pk):
@@ -371,26 +421,28 @@ def tag_many(request):
 
 def entry_vote(request, pk):
     # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
-    from ..forms import LinkVoteForm
 
     p = ViewPage(request)
     p.set_title("Vote for entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
     if data is not None:
         return data
 
     p.context["pk"] = pk
 
-    objs = LinkDataController.objects.filter(id=pk)
+    operation_data = {}
+    entries = LinkDataController.objects.filter(id=pk)
 
-    if not objs.exists():
-        p.context["summary_text"] = "Sorry, such object does not exist"
-        return p.render("summary_present.html")
+    if not entries.exists():
+        operation_data["message"] = "Entry does not exist"
+        operation_data["status"] = False
+        return JsonResponse(operation_data)
 
-    obj = objs[0]
-    if not obj.is_taggable():
-        p.context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
-        return p.render("summary_present.html")
+    entry = entries[0]
+    if not entry.is_taggable():
+        operation_data["message"] = "Cannot vote on entry"
+        operation_data["status"] = False
+        return JsonResponse(operation_data)
 
     if request.method == "POST":
         method = "POST"
@@ -398,43 +450,63 @@ def entry_vote(request, pk):
         form = LinkVoteForm(request.POST)
 
         if form.is_valid():
-            data = form.cleaned_data
+            data = {}
             data["user"] = request.user
+            data["entry"] = entry
+            data["vote"] = form.cleaned_data["vote"]
             UserVotes.save_vote(data)
 
-            return HttpResponseRedirect(
-                reverse(
-                    "{}:entry-detail".format(LinkDatabase.name),
-                    kwargs={"pk": obj.pk},
-                )
-            )
+            operation_data["message"] = "Voted"
+            operation_data["vote"] = data["vote"]
+            operation_data["status"] = True
+            return JsonResponse(operation_data)
         else:
-            config = Configuration.get_object().config_entry
-            p.context[
-                "summary_text"
-            ] = "Entry not voted. Vote min, max = [{}, {}]".format(
-                config.vote_min, config.vote_max
-            )
-            return p.render("summary_present.html")
+            summary_text = "Cannot add tag due to errors: "
+            errors = form.errors
+            for field, error_msgs in errors.items():
+                for error_msg in error_msgs:
+                    summary_text += " Field:{} Problem:{}".format(field, error_msg)
 
-    else:
-        user = request.user
+            operation_data["message"] = summary_text
+            operation_data["status"] = False
+            return JsonResponse(operation_data)
 
-        vote = UserVotes.get_user_vote(user, obj)
 
-        form = LinkVoteForm(
-            initial={
-                "entry_id": obj.id,
-                "vote": vote,
-            }
-        )
+def entry_vote_form(request, pk):
+    user = request.user
 
-        form.method = "POST"
-        form.pk = pk
-        form.action_url = reverse("{}:entry-vote".format(LinkDatabase.name), args=[pk])
+    p = ViewPage(request)
+    p.set_title("Vote for entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
 
-        p.context["form"] = form
-        p.context["form_title"] = obj.title
-        p.context["form_description"] = obj.title
+    p.context["pk"] = pk
 
-    return p.render("form_oneliner.html")
+    entries = LinkDataController.objects.filter(id=pk)
+
+    if not entries.exists():
+        return
+
+    entry = entries[0]
+    if not entry.is_taggable():
+        return
+
+    vote = UserVotes.get_user_vote(user, entry)
+
+    form = LinkVoteForm(
+        initial={
+            "entry_id": entry.id,
+            "vote": vote,
+        }
+    )
+
+    form.method = "POST"
+    form.pk = pk
+    form.action_url = reverse("{}:entry-vote".format(LinkDatabase.name), args=[pk])
+
+    p.context["form"] = form
+    p.context["form_title"] = entry.title
+    p.context["form_description"] = entry.title
+
+    return p.render("entry_detail__vote_form.html")

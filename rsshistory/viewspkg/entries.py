@@ -538,7 +538,7 @@ class EntriesArchiveListView(EntriesOmniListView):
 
 class EntryDetailView(generic.DetailView):
     model = LinkDataController
-    template_name = str(ViewPage.get_full_template("linkdatacontroller_detail.html"))
+    template_name = str(ViewPage.get_full_template("entry_detail.html"))
 
     def get(self, *args, **kwargs):
         """
@@ -597,7 +597,7 @@ class EntryDetailView(generic.DetailView):
 
 class EntryDetailDetailView(generic.DetailView):
     model = LinkDataController
-    template_name = str(ViewPage.get_full_template("entry__dynamic.html"))
+    template_name = str(ViewPage.get_full_template("entry_detail__dynamic.html"))
 
     def get(self, *args, **kwargs):
         """
@@ -641,7 +641,7 @@ class EntryDetailDetailView(generic.DetailView):
 class EntryArchivedDetailView(generic.DetailView):
     model = ArchiveLinkDataController
 
-    template_name = str(ViewPage.get_full_template("linkdatacontroller_detail.html"))
+    template_name = str(ViewPage.get_full_template("entry_detail.html"))
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -1026,14 +1026,16 @@ def remove_entry(request, pk):
         return data
 
     entry = LinkDataController.objects.filter(id=pk)
+    status_code = 200
     if entry.exists():
         entry.delete()
 
         p.context["summary_text"] = "Remove ok"
     else:
         p.context["summary_text"] = "No source for ID: " + str(pk)
+        status_code = 500
 
-    return p.render("summary_present.html")
+    return p.render("summary_present.html", status_code=status_code)
 
 
 def entry_active(request, pk):

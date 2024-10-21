@@ -1,0 +1,19 @@
+{% load static %}
+
+{% if object.comments.all %}
+<hr/>
+{% endif %}
+{% include "rsshistory/entry_detail__comments.html" %}
+
+<hr/>
+{% include "rsshistory/entry_detail__parameters_operation.html" %}
+
+{% if transitions %}
+<hr/>
+{% endif %}
+{% include "rsshistory/entry_detail__related.html" %}
+
+<hr/>
+<div>
+{% include "rsshistory/search_places_element.html" %}
+</div>

@@ -1,0 +1,6 @@
+<form id="tagEditForm" method="post" action="{% url 'rsshistory:entry-tag' pk %}">
+    {% csrf_token %}
+    {{ form.tags }}
+    <button type="submit" class="btn btn-success">Save</button>
+    <button type="button" id="cancelTagEdit" class="btn btn-secondary">Cancel</button>
+</form>
