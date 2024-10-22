@@ -20,7 +20,7 @@ def process_jobs_task(Processor):
     """
     logger = LinkDatabase
 
-    logger.info("Starting process_jobs_task for processor: %s", Processor)
+    logger.info("Starting process_jobs_task for processor: {}".format(Processor))
 
     try:
         c = Configuration.get_object()
@@ -33,10 +33,10 @@ def process_jobs_task(Processor):
         handler = Processor()
         handler.run()
     except Exception as E:
-        logger.error("Exception in process_jobs_task for processor: %s", Processor, exc_info=True)
-        AppLogging.exc(e, f"Exception in process_jobs_task {Processor}")
+        logger.error("Exception in process_jobs_task for processor: {} {}".format(Processor, str(E)))
+        AppLogging.exc(E, f"Exception in process_jobs_task {Processor}")
 
-    logger.info("Finished process_jobs_task for processor: %s", Processor)
+    logger.info("Finished process_jobs_task for processor: {}".format(Processor))
 
 
 def get_processors():
