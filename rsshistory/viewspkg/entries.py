@@ -676,6 +676,26 @@ class EntryArchivedDetailView(generic.DetailView):
         return view
 
 
+def get_entry_menu(request, pk):
+    p = ViewPage(request)
+    p.set_title("Get entry menu")
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_add():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+    entries = LinkDataController.objects.filter(id = pk)
+    if entries.exists():
+        entry = entries[0]
+        p.context["object"] = entry
+        p.context["user"] = request.user
+        p.context["object_controller"] = EntryPreviewBuilder.get(
+            entry, request.user,
+        )
+
+    return p.render("entry_detail__buttons.html")
+
+
 def func_display_empty_form(request, p, template_name):
     form = LinkInputForm(request=request)
     form.method = "POST"

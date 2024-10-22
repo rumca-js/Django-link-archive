@@ -1,6 +1,6 @@
 {% load static %}
 
-<div class="mb-2" id="entryTagLine">
+<div class="mb-2" id="entryTagContainer">
     {% if object.has_tags %}
       {% for tag in object.get_tag_map %}
         <a href="{% url 'rsshistory:entries'%}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,
@@ -15,17 +15,7 @@
 <script>
   $(document).ready(function() {
     function getTagEditForm() {
-      $.ajax({
-        url: '{% url "rsshistory:entry-tag-form" object.id %}',
-        type: 'GET',
-        timeout: 10000,
-        success: function(response) {
-          $('#entryTagLine').html(response);
-        },
-        error: function(xhr, status, error) {
-          console.error('Error fetching the form:', error);
-        }
-      });
+      getDynamicContent('{% url "rsshistory:entry-tag-form" object.id %}', "#entryTagContainer", 1, true);
     }
 
     $(document).on('submit', '#tagEditForm', function(event) {
@@ -49,13 +39,13 @@
               return `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>`;
             }).join(', ');
 
-            $('#entryTagLine').html(`${tagsLinks} ${editButton}`);
+            $('#entryTagContainer').html(`${tagsLinks} ${editButton}`);
           } else {
-            $('#entryTagLine').html(`<p class="text-danger">Failed to update tags. Please try again. ${editButton}</p>`);
+            $('#entryTagContainer').html(`<p class="text-danger">Failed to update tags. Please try again. ${editButton}</p>`);
           }
         },
         error: function(xhr, status, error) {
-          $('#entryTagLine').html(`<p class="text-danger">Error during tag update. Please try again. ${editButton}</p>`);
+          $('#entryTagContainer').html(`<p class="text-danger">Error during tag update. Please try again. ${editButton}</p>`);
         },
       });
     });
@@ -66,7 +56,7 @@
     });
 
     $(document).on('click', '#cancelTagEdit', function() {
-      $('#entryTagLine').html(`
+      $('#entryTagContainer').html(`
         {% if object.has_tags %}
           {% for tag in object.get_tag_map %}
             <a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,

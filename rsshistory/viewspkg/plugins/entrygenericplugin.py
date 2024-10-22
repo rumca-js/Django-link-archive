@@ -51,7 +51,7 @@ class EntryButton(object):
         return False
 
     def get_id(self):
-        return self.title.replace(" ", "-")
+        return self.name.replace(" ", "-")
 
 
 class EntryParameter(object):
@@ -135,24 +135,6 @@ class EntryGenericPlugin(object):
                         "Vote on entry",
                         static(
                             "{}/icons/icons8-rate-100.png".format(LinkDatabase.name)
-                        ),
-                    ),
-                )
-
-        if self.entry.is_taggable():
-            if self.user.is_authenticated:
-                buttons.append(
-                    EntryButton(
-                        self.user,
-                        "Tag",
-                        reverse(
-                            "{}:entry-tag".format(LinkDatabase.name),
-                            args=[self.entry.id],
-                        ),
-                        ConfigurationEntry.ACCESS_TYPE_OWNER,
-                        "Tags entry: {}".format(self.entry.title),
-                        static(
-                            "{}/icons/icons8-edit-100.png".format(LinkDatabase.name)
                         ),
                     ),
                 )

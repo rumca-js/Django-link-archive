@@ -41,7 +41,9 @@
 
    {% include "rsshistory/entry_detail__source.html" %}
 
+   <div id="entryMenu" class="d-flex">
    {% include "rsshistory/entry_detail__buttons.html" %}
+   </div>
 
    <div class="link-detail-description">
    {{object_controller.get_description_html | safe | linebreaks }}
@@ -52,7 +54,7 @@
    </div>
 
 <script>
-    function loadIsDownloaded(attempt = 1) {
+    function loadIsEntryDownloaded(attempt = 1) {
         $.ajax({
             url: "{% url 'rsshistory:is-entry-download' object.id %}",
             type: 'GET',
@@ -65,29 +67,14 @@
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    loadIsDownloaded(attempt + 1);
+                    loadIsEntryDownloaded(attempt + 1);
                 }
             }
         });
     }
 
-    function loadBodyContent(attempt = 1) {
-        $.ajax({
-            url: "{% url 'rsshistory:get-entry-details' object.id %}",
-            type: 'GET',
-            timeout: 10000,
-            success: function(data) {
-                $('#bodyBlock').html(data);
-            },
-            error: function(xhr, status, error) {
-                if (attempt < 3) {
-                    loadBodyContent(attempt + 1);
-                    $('#bodyBlock').html("Failed attempt");
-                } else {
-                    $('#bodyBlock').html("Error loading dynamic content");
-                }
-            }
-        });
+    function loadEntryDynamicDetails(attempt = 1) {
+        getDynamicContent("{% url 'rsshistory:get-entry-details' object.id %}", "#bodyBlock", 1, true);
     }
 
     function getVoteEditForm() {
@@ -105,22 +92,22 @@
         });
     }
 
-    function refreshMenu() {
-        // TODO
+    function loadEntryMenuContent() {
+        getDynamicContent("{% url 'rsshistory:get-entry-menu' object.id %}", "#entryMenu", 1, true);
     }
 
     $(document).ready(function() {
-        loadBodyContent();
-        loadIsDownloaded();
+        loadEntryDynamicDetails();
+        loadIsEntryDownloaded();
 
         setInterval(function() {
-            loadIsDownloaded();
+            loadIsEntryDownloaded();
         }, 300000);
     });
 
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
-            loadIsDownloaded();
+            loadIsEntryDownloaded();
         }
     });
 
@@ -139,7 +126,8 @@
                 if (data.status) {
                     const text = 'Added to read later queue'
                     $('#entryStatusLine').html(text);
-                    refreshMenu();
+                    loadEntryMenuContent();
+                    loadMenuContent();
                 }
                 else {
                     const text = 'Could not add entry to read later queue'
@@ -162,7 +150,8 @@
                 if (data.status) {
                     const text = 'Removed from read later queue'
                     $('#entryStatusLine').html(text);
-                    refreshMenu();
+                    loadEntryMenuContent();
+                    loadMenuContent();
                 }
                 else {
                     const text = 'Could not remove entry from read later queue'
@@ -192,8 +181,6 @@
                 }
             }
         });
-
-        makeRequest(0);  // Start with the first attempt
     });
 
     $(document).on('submit', '#voteEditForm', function(event) {

@@ -664,7 +664,6 @@ class TagEditForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
-        self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
 
 
 class TagRenameForm(forms.Form):

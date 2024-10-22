@@ -74,41 +74,35 @@
             });
         });
 
-        function loadFooterContent(attempt = 1) {
+        function getDynamicContent(url_address, htmlElement, attempt = 1, errorInHtml = false) {
             $.ajax({
-                url: '{% url 'rsshistory:get-footer-status-line' %}',
-                type: 'GET',
-                timeout: 15000,
-                success: function(data) {
-                    $('#footerLine').html(data.message);
-                },
-                error: function(xhr, status, error) {
-                    if (attempt < 2) {
-                        loadFooterContent(attempt + 1);
-                        $('#bodyBlock').html("Error loading dynamic content, retry")
-                    } else {
-                        $('#bodyBlock').html("Error loading dynamic content")
-                    }
-                }
+               url: url_address,
+               type: 'GET',
+               timeout: 10000,
+               success: function(data) {
+                   $(htmlElement).html(data);
+               },
+               error: function(xhr, status, error) {
+                   if (attempt < 3) {
+                       getDynamicContent(url, htmlElement, attempt + 1, errorInHtml);
+                       if (errorInHtml) {
+                           $(htmlElement).html("Error loading dynamic content, retry");
+                       }
+                   } else {
+                       if (errorInHtml) {
+                           $(htmlElement).html("Error loading dynamic content");
+                       }
+                   }
+               }
             });
         }
-        function loadMenuContent(attempt = 1) {
-            $.ajax({
-                url: '{% url 'rsshistory:get-menu' %}',
-                type: 'GET',
-                timeout: 15000,
-                success: function(data) {
-                    $('#blockMenu').html(data);
-                },
-                error: function(xhr, status, error) {
-                    if (attempt < 2) {
-                        loadMenuContent(attempt + 1);
-                        $('#bodyBlock').html("Error loading dynamic content, retry")
-                    } else {
-                        $('#bodyBlock').html("Error loading dynamic content")
-                    }
-                }
-            });
+
+        function loadFooterContent() {
+            getDynamicContent('{% url 'rsshistory:get-footer-status-line' %}', "#footerLine");
+        }
+
+        function loadMenuContent() {
+            getDynamicContent('{% url 'rsshistory:get-menu' %}', "#blockMenu");
         }
 
         $(document).ready(function() {
