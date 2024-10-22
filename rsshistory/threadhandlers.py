@@ -119,41 +119,41 @@ class ProcessSourceJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_PROCESS_SOURCE
 
     def process(self, obj=None):
-            try:
-                source_id = int(obj.subject)
-            except ValueError as E:
-                AppLogging.exc(
-                    exception_object=E,
-                    info_text="Incorrect source ID:{}".format(obj.subject),
-                )
-
-                obj.enabled = False
-                obj.save()
-
-                return False
-
-            sources = SourceDataModel.objects.filter(id=source_id)
-            if sources.count() > 0 and not sources[0].enabled:
-                # This source is disabled, and job should be removed
-                return True
-
-            source = sources[0]
-
-            plugin = SourceControllerBuilder.get(source_id)
-            if plugin:
-                if plugin.check_for_data():
-                    elapsed_sec = self.get_time_diff()
-                    AppLogging.debug("Url:{}. Time:{}".format(source.url, elapsed_sec))
-
-                    return True
-                return True
-
-            AppLogging.error(
-                "Source:{}. Cannot find controller plugin for source".format(
-                    obj.subject
-                )
+        try:
+            source_id = int(obj.subject)
+        except ValueError as E:
+            AppLogging.exc(
+                exception_object=E,
+                info_text="Incorrect source ID:{}".format(obj.subject),
             )
+
+            obj.enabled = False
+            obj.save()
+
             return False
+
+        sources = SourceDataModel.objects.filter(id=source_id)
+        if sources.count() > 0 and not sources[0].enabled:
+            # This source is disabled, and job should be removed
+            return True
+
+        source = sources[0]
+
+        plugin = SourceControllerBuilder.get(source_id)
+        if plugin:
+            if plugin.check_for_data():
+                elapsed_sec = self.get_time_diff()
+                AppLogging.debug("Url:{}. Time:{}".format(source.url, elapsed_sec))
+
+                return True
+            return True
+
+        AppLogging.error(
+            "Source:{}. Cannot find controller plugin for source".format(
+                obj.subject
+            )
+        )
+        return False
 
 
 class EntryUpdateData(BaseJobHandler):
@@ -493,8 +493,8 @@ class LinkAddJobHandler(BaseJobHandler):
         # if this is a new entry, then tag it
         if entry.date_published:
             if entry.date_published >= current_time:
-                if "tag" in data:
-                    UserTags.set_tags(entry, tag=data["tag"], user=data["user_object"])
+                if "tags" in data:
+                    UserTags.set_tags(entry, tag=data["tags"], user=data["user_object"])
 
     def get_data_for_add(self, in_object=None):
         link = in_object.subject
@@ -1187,7 +1187,7 @@ class RefreshProcessor(CeleryTaskInterface):
 
         number_of_entries = entries.count()
 
-        if entries and number_of_entries > 0:
+        if number_of_entries > 0:
             current_num_of_jobs = (
                 BackgroundJobController.get_number_of_update_reset_jobs()
             )
@@ -1212,6 +1212,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
         Default timeout is 10 minutes
         """
         self.timeout_s = timeout_s
+        self.start_processing_time = None
 
     def get_handlers(self):
         """
@@ -1253,53 +1254,69 @@ class GenericJobsProcessor(CeleryTaskInterface):
         ]
 
     def run(self):
-        try:
-            self.start_processing_time = DateUtils.get_datetime_now_utc()
+        self.start_processing_time = DateUtils.get_datetime_now_utc()
 
-            c = Configuration.get_object()
-            c.refresh(self.__class__.__name__)
+        c = Configuration.get_object()
+        c.refresh(self.__class__.__name__)
 
-            if not SystemOperation.is_internet_ok():
-                return
+        if not SystemOperation.is_internet_ok():
+            return
 
-            while True:
-                items = self.get_handler_and_object()
-                if len(items) == 0:
-                    break
+        while True:
+            items = self.get_handler_and_object()
+            if len(items) == 0:
+                break
 
-                self.process_one_for_all(items)
+            try:
+                self.process_job(items)
 
-                passed_seconds = (
-                    DateUtils.get_datetime_now_utc() - self.start_processing_time
-                )
-                if passed_seconds.total_seconds() >= self.timeout_s:
-                    obj = items[0]
-                    handler = items[1]
-                    text = "Threads: last handler {} {} Time:{}".format(
-                        handler.get_job(), obj.subject, passed_seconds
-                    )
-                    AppLogging.error(text)
-
+                elapsed_time = (DateUtils.get_datetime_now_utc() - self.start_processing_time).total_seconds()
+                if elapsed_time >= self.timeout_s:
                     self.on_not_safe_exit(items)
                     break
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
 
-    def process_one_for_all(self, items):
+            except KeyboardInterrupt:
+                return
+
+            except Exception as E:
+                """
+                This is general exception handling - because we do not know what errors can jobs
+                generate. We do not want to stop all jobs processing.
+
+                We continue job processing
+                """
+                obj = items[0]
+                if obj:
+                    try:
+                        obj.refresh_from_db()
+                    except Exception as refresh_e:
+                        AppLogging.exc(
+                            refresh_e,
+                            info_text="Failed to refresh object from DB for Job:{}, Subject:{}".format(obj.job, obj.subject)
+                        )
+
+                    AppLogging.exc(
+                        E,
+                        info_text="Job:{}, Subject:{}".format(obj.job, obj.subject),
+                    )
+                    obj.on_error()
+                else:
+                    AppLogging.exc(
+                        E,
+                        "Excetion",
+                    )
+
+    def process_job(self, items):
         config = Configuration.get_object()
 
         obj = items[0]
         handler_class = items[1]
         handler = None
-        subject = obj.subject
         deleted = False
 
         if handler_class:
             handler = handler_class(config)
 
-        try:
             if handler and handler.process(obj):
                 deleted = True
                 if obj:
@@ -1319,46 +1336,6 @@ class GenericJobsProcessor(CeleryTaskInterface):
                 if not deleted and obj:
                     obj.delete()
                     deleted = True
-
-        except Exception as E:
-            if not deleted and obj:
-                AppLogging.exc(
-                    exception_object=E,
-                    info_text="Job:{}, Subject:{}".format(obj.job, obj.subject),
-                )
-                obj.on_error()
-            else:
-                AppLogging.exc(
-                    exception_object=E,
-                )
-
-    def process_one(self):
-        """
-        TODO remove this function, use process_one_for_all one above
-        """
-        try:
-            AppLogging.debug("Processing message")
-
-            config = Configuration.get_object()
-            start_processing_time = time.time()
-
-            items = self.get_handler_and_object()
-            if len(items) == 0:
-                return False
-
-            self.process_one_for_all(items)
-
-            items = self.get_handler_and_object()
-            if len(items) == 0:
-                return False
-
-            AppLogging.debug("Processing messages done")
-        except Exception as E:
-            AppLogging.exc(
-                exception_object=E,
-            )
-
-        return True
 
     def get_supported_jobs(self):
         return []
@@ -1382,16 +1359,18 @@ class GenericJobsProcessor(CeleryTaskInterface):
         objs = BackgroundJobController.objects.filter(query_conditions).order_by(
             "priority", "date_created"
         )
-        if objs.count() != 0:
-            obj = objs[0]
+        if objs.exists():
+            obj = objs.first()
 
-            for key, handler_class in enumerate(self.get_handlers()):
+            for handler_class in self.get_handlers():
                 if handler_class.get_job() == obj.job:
                     return [obj, handler_class]
             return [obj, None]
         return []
 
     def on_not_safe_exit(self, items):
+        AppLogging.error("Not safe exit, adjusting job priorities.")
+
         blocker = items[0]
         if not blocker:
             return

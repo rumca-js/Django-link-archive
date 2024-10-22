@@ -18,7 +18,7 @@
     <!-- Add additional CSS in static file -->
     {% load static %}
     <!--date is added to stylesheet name, to force it to be reloaded-->
-    {% if is_mobile %}
+    {% if view.is_mobile %}
       {% if user_config.display_style %}
          <link rel="stylesheet" href="{% static 'rsshistory/css/styles-mobile.css' %}_{{user_config.display_style}}.css?{% now "U" %}">
       {% else %}
@@ -85,6 +85,28 @@
                error: function(xhr, status, error) {
                    if (attempt < 3) {
                        getDynamicContent(url, htmlElement, attempt + 1, errorInHtml);
+                       if (errorInHtml) {
+                           $(htmlElement).html("Error loading dynamic content, retry");
+                       }
+                   } else {
+                       if (errorInHtml) {
+                           $(htmlElement).html("Error loading dynamic content");
+                       }
+                   }
+               }
+            });
+        }
+        function getDynamicJsonContent(url_address, htmlElement, attempt = 1, errorInHtml = false) {
+            $.ajax({
+               url: url_address,
+               type: 'GET',
+               timeout: 10000,
+               success: function(data) {
+                 $(htmlElement).html(data.message);
+               },
+               error: function(xhr, status, error) {
+                   if (attempt < 3) {
+                       getDynamicJsonContent(url, htmlElement, attempt + 1, errorInHtml);
                        if (errorInHtml) {
                            $(htmlElement).html("Error loading dynamic content, retry");
                        }

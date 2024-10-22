@@ -264,6 +264,8 @@ def is_entry_download(request, pk):
     entries = LinkDataModel.objects.filter(id = pk)
 
     if entries.exists():
+        entry = entries[0]
+
         job_condition = (Q(job=BackgroundJobController.JOB_DOWNLOAD_FILE) |
             Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC) |
             Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO))

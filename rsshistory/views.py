@@ -68,6 +68,7 @@ class ViewPage(object):
 
         self.context = None
         self.context = self.get_context()
+        self.is_mobile = self.read_mobile_status()
 
     def init_context(self, context):
         from .models import (
@@ -97,19 +98,17 @@ class ViewPage(object):
             context["user_config"] = UserConfig.get_or_create(self.request.user)
         else:
             context["user_config"] = UserConfig.get()
-        context["is_mobile"] = self.is_mobile()
+        context["view"] = self
 
         return context
 
-    def is_mobile(self):
+    def read_mobile_status(self):
         from django_user_agents.utils import get_user_agent
 
         try:
             user_agent = get_user_agent(self.request)
             return user_agent.is_mobile
         except Exception as E:
-            AppLogging.exc(E, "Could not read django user agent")
-
             return False
 
     def get_context(self, request=None):
@@ -237,6 +236,19 @@ class ViewPage(object):
         if type(urlhandler.get_handler()) == HttpPageHandler:
             context["is_html"] = type(urlhandler.get_handler().p) == HtmlPage
             context["is_rss"] = type(urlhandler.get_handler().p) == RssPage
+
+    def get_pagination_args(self):
+        infilters = self.request.GET
+
+        filter_data = {}
+        for key in infilters:
+            value = infilters[key]
+            if key != "page" and value != "":
+                filter_data[key] = value
+        return "&" + urlencode(filter_data)
+
+
+
 
 
 class GenericListView(generic.ListView):

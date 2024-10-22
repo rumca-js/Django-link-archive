@@ -40,7 +40,7 @@ class LinkDataController(LinkDataModel):
     def get_bookmark_unset_url(self):
         """Returns the URL to access a particular author instance."""
         return reverse(
-            "{}:entry-notbookmark".format(LinkDatabase.name), args=[str(self.id)]
+            "{}:entry-unbookmark".format(LinkDatabase.name), args=[str(self.id)]
         )
 
     def get_dead_url(self):

@@ -614,6 +614,26 @@ class HandlerThatThrowsExceptionInProcess(object):
         raise IOError("Though luck")
 
 
+class GenericJobsProcessorError(GenericJobsProcessor):
+    def __init__(self):
+        super().__init__()
+
+        self.obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_CLEANUP,
+            enabled=True,
+        )
+
+    def get_handler_and_object(self):
+        objs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_CLEANUP,
+            enabled=True,
+        )
+        if objs.exists():
+            return [objs[0], HandlerThatThrowsExceptionInProcess]
+        else:
+            return []
+
+
 # test processors
 
 
@@ -966,23 +986,45 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         operations = SystemOperation.objects.all()
         self.assertTrue(operations.count(), 1)
 
-    def test_process_one_for_all__exception(self):
+    def test_process_job(self):
+        mgr = GenericJobsProcessor(timeout_s=0)
+
         obj = BackgroundJobController.objects.create(
             job=BackgroundJobController.JOB_CLEANUP,
             enabled=True,
         )
-
         items = [obj, HandlerThatThrowsExceptionInProcess]
 
-        mgr = GenericJobsProcessor(timeout_s=0)
+        mgr = GenericJobsProcessor(timeout_s=60)
 
-        # call tested function
-        mgr.process_one_for_all(items)
+        exception_raised = False
+        try:
+            # call tested function
+            mgr.process_job(items)
+        except IOError as E:
+            exception_raised = True
 
         jobs = BackgroundJobController.objects.filter(
             job=BackgroundJobController.JOB_LINK_ADD
         )
         self.assertEqual(jobs.count(), 0)
+        self.assertTrue(exception_raised)
+
+    def test_run(self):
+        mgr = GenericJobsProcessorError()
+
+        exception_raised = False
+        try:
+            # call tested function
+            mgr.run()
+        except IOError as E:
+            exception_raised = True
+
+        jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_ADD
+        )
+        self.assertEqual(jobs.count(), 0)
+        self.assertFalse(exception_raised)
 
 
 class SourceJobsProcessorTest(FakeInternetTestCase):

@@ -43,12 +43,9 @@ class ViewPageTest(FakeInternetTestCase):
         term = page.init_context(context)
 
         self.assertFalse(context["is_user_allowed"])
-        self.assertTrue(context["is_internet_ok"])
-        self.assertTrue(context["is_threading_ok"])
-        self.assertFalse(context["is_status_error"])
-        self.assertFalse(context["is_configuration_error"])
-        self.assertFalse(context["is_backgroundjobs_error"])
-        self.assertFalse(context["rss_are_fetched"])
+        self.assertTrue(context["view"])
+        self.assertTrue(context["user_config"])
+        self.assertTrue(context["config"])
 
 
 class ViewsTest(FakeInternetTestCase):
@@ -164,8 +161,7 @@ class ViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
 
-        # one to read RSS, one to read HTML page for thumbnail
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_page_scan_contents(self):
         url = reverse("{}:page-scan-contents".format(LinkDatabase.name))

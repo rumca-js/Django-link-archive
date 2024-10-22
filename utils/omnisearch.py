@@ -79,8 +79,14 @@ class SingleSymbolEvaluator(object):
                 return [left_part, op, right_part]
 
     def is_translatable(self, condition):
+        """
+        If dev does not provide any translate validation - everything will be translated
+        """
+        if len(self.translatable_names) == 0:
+            return True
+
         for name in self.translatable_names:
-            if condition[0].find(name) >= 0:
+            if condition[0] == name:
                 return True
 
         return False
@@ -89,10 +95,12 @@ class SingleSymbolEvaluator(object):
         """
         Translate user input into system understood syntax.
 
-        For example:
+        Example for django:
          title == 'something'
-        Should be translated in django to
+        Translated:
          title__iexact : 'something'
+
+        by default - not translate
         """
         return condition_data
 

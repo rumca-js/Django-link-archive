@@ -60,7 +60,7 @@ class UserRequest(object):
         if self.request:
             from .views import ViewPage
 
-            self.is_mobile = ViewPage(self.request).is_mobile()
+            self.is_mobile = ViewPage(self.request).is_mobile
             self.user = self.request.user
 
     def pop_data(self, args, kwargs, data):

@@ -1,7 +1,13 @@
 from utils.dateutils import DateUtils
 
 from ..controllers import SourceDataController, LinkDataController
-from ..queryfilters import SourceFilter, EntryFilter
+from ..queryfilters import (
+    SourceFilter,
+    EntryFilter,
+    OmniSearchFilter,
+    DjangoSingleSymbolEvaluator,
+    OmniSearchWithDefault,
+)
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -54,25 +60,7 @@ class FiltersTest(FakeInternetTestCase):
 
         thefilter = SourceFilter(args)
 
-        filter_args = thefilter.get_filter_args_map()
-
-        self.assertTrue("title" in filter_args)
-        self.assertTrue("category_name" in filter_args)
-        self.assertTrue("subcategory_name" in filter_args)
-
-        self.assertTrue("unsupported" not in filter_args)
-
-    def test_source_arg_conditions_translate(self):
-        args = {
-            "title": "link",
-            "category_name": "none",
-            "subcategory_name": "none",
-            "notsupported": "none",
-        }
-
-        thefilter = SourceFilter(args)
-
-        filter_args = thefilter.get_filter_args_map()
+        filter_args = thefilter.get_args_filter_map()
 
         self.assertTrue("title" in filter_args)
         self.assertTrue("category_name" in filter_args)
@@ -84,88 +72,55 @@ class FiltersTest(FakeInternetTestCase):
         args = {
             "title": "link",
             "language": "none",
-            "user": "none",
-            "tag": "none",
-            "vote": "none",
-            "source_title": "none",
+            "tag__tag": "none",
             "bookmarked": "none",
             "artist": "none",
             "album": "none",
-            "date_from": "none",
-            "date_to": "none",
-            "archive": "none",
+            "date_published__gt": "none",
             "unsupported": "none",
         }
 
         thefilter = EntryFilter(args)
 
-        filter_args = thefilter.get_arg_conditions()
+        filter_args = thefilter.get_args_filter_map()
 
         self.assertTrue("title" in filter_args)
         self.assertTrue("language" in filter_args)
-        self.assertTrue("user" in filter_args)
-        self.assertTrue("tag" in filter_args)
-        self.assertTrue("vote" in filter_args)
-        self.assertTrue("source_title" in filter_args)
         self.assertTrue("bookmarked" in filter_args)
         self.assertTrue("artist" in filter_args)
         self.assertTrue("album" in filter_args)
-        self.assertTrue("date_from" in filter_args)
-        self.assertTrue("date_to" in filter_args)
-        self.assertTrue("archive" in filter_args)
+        self.assertTrue("date_published__gt" in filter_args)
 
         self.assertTrue("unsupported" not in filter_args)
 
-    def test_entry_filters_translate(self):
+    def test_entry_filters__foreign(self):
         args = {
-            "title": "link",
+            "title__icontains": "link",
             "language": "none",
-            "user": "none",
-            "tag": "none",
-            "vote": "none",
-            "source_id": "none",
-            "source_title": "none",
             "bookmarked": "none",
             "artist": "none",
             "album": "none",
-            "date_from": "none",
-            "date_to": "none",
-            "archive": "none",
+            "tags__tag": "none",
+            "user__username": "none",
+            "votes__vote__gt": "none",
+            "source__title": "none",
             "unsupported": "none",
         }
 
         thefilter = EntryFilter(args)
 
-        filter_args = thefilter.get_arg_conditions(True)
+        filter_args = thefilter.get_args_filter_map()
 
         self.assertTrue("title__icontains" in filter_args)
-        self.assertTrue("language__icontains" in filter_args)
-        self.assertTrue("user__icontains" in filter_args)
-        self.assertTrue("tags__tag__icontains" in filter_args)
-        self.assertTrue("votes__vote__gt" in filter_args)
-        self.assertTrue("source__id" in filter_args)
-        self.assertTrue("source__title" in filter_args)
+        self.assertTrue("language" in filter_args)
         self.assertTrue("bookmarked" in filter_args)
-        self.assertTrue("artist__icontains" in filter_args)
-        self.assertTrue("album__icontains" in filter_args)
-        self.assertTrue("date_published__range" in filter_args)
-
-        # archive is a filter thing, should not be used in queries
-        self.assertTrue("archive" not in filter_args)
-
-        self.assertTrue("unsupported" not in filter_args)
-
-    def test_entry_source_filters(self):
-        args = {
-            "source_title": "none",
-            "unsupported": "none",
-        }
-
-        thefilter = EntryFilter(args)
-
-        filter_args = thefilter.get_arg_conditions()
-
-        self.assertTrue("source_title" in filter_args)
+        self.assertTrue("artist" in filter_args)
+        self.assertTrue("album" in filter_args)
+        self.assertTrue("tags__tag" in filter_args)
+        self.assertTrue("user__username" in filter_args)
+        self.assertTrue("votes__vote__gt" in filter_args)
+        self.assertTrue("source__title" in filter_args)
+        self.assertTrue("tags__tag" in filter_args)
 
         self.assertTrue("unsupported" not in filter_args)
 
@@ -226,3 +181,287 @@ class FiltersTest(FakeInternetTestCase):
 
         self.assertEqual(limit[0], 100)
         self.assertEqual(limit[1], 200)
+
+
+class DjangoSingleSymbolEvaluatorTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_evaluate_symbol_exact(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping({"title": "title"})
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title === something")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "(AND: ('title__iexact', 'something'))")
+
+    def test_evaluate_symbol_eq(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping({"title": "title"})
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title == something")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "(AND: ('title', 'something'))")
+
+    def test_evauluate_symbol_no_space(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping({"title": "title"})
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title==something")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "(AND: ('title', 'something'))")
+
+    def test_evauluate_symbol_gte(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping({"title": "title"})
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title >= something")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "(AND: ('title__gte', 'something'))")
+
+    def test_evauluate_symbol_gt(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping({"title": "title"})
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title > something")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "(AND: ('title__gt', 'something'))")
+
+    def test_evauluate_symbol_equals(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping({"title": "title"})
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title = something")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "(AND: ('title__icontains', 'something'))")
+
+    def test_evauluate_symbol_translate_contains(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping({"title": "title"})
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title__isnull = True")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "(AND: ('title__isnull', True))")
+
+    def test_evauluate_symbol_equals_mapping(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping({"title.link": "title_obj__link"})
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title.link = something")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "(AND: ('title.link__icontains', 'something'))")
+
+    def test_evauluate_symbol_equals_none(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping(["nottitle"])
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title = something")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "None")
+
+        conditions = ev.not_translated_conditions
+
+        self.assertTrue("title" in conditions)
+        self.assertEqual(conditions["title"], "something")
+
+    def test_evauluate_symbol_default_symbols(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_default_search_symbols(["title__icontains", "description__icontains"])
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("my test")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(
+            str_sym_data,
+            "(OR: ('title__icontains', 'my test'), ('description__icontains', 'my test'))",
+        )
+
+
+class OmniSearchWithDefaultTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_get_not_translated_conditions(self):
+        LinkDataController.objects.create(link="https://test.com")
+
+        search_query = "link == https://test.com"
+        c = OmniSearchWithDefault(search_query, DjangoSingleSymbolEvaluator())
+
+        c.set_translation_mapping(["something"])
+
+        c.get_query_result()
+
+        # call tested function
+        conditions = c.get_not_translated_conditions()
+
+        self.assertTrue("link" in conditions)
+        self.assertEqual(conditions["link"], "https://test.com")
+
+    def test_get_query_result__processor_evaluator__eq(self):
+        LinkDataController.objects.create(link="https://test.com")
+
+        search_query = "link == https://test.com"
+        processor = OmniSearchWithDefault(search_query, DjangoSingleSymbolEvaluator())
+
+        processor.set_translation_mapping(["link"])
+
+        # call tested function
+        conditions = processor.get_query_result()
+
+        str_conditions = str(conditions)
+        self.assertEqual(str_conditions, "(AND: ('link', 'https://test.com'))")
+
+    def test_get_query_result__processor_evaluator__exact(self):
+        LinkDataController.objects.create(link="https://test.com")
+
+        search_query = "link === https://test.com"
+        processor = OmniSearchWithDefault(search_query, DjangoSingleSymbolEvaluator())
+
+        processor.set_translation_mapping(["link"])
+
+        # call tested function
+        conditions = processor.get_query_result()
+
+        str_conditions = str(conditions)
+        self.assertEqual(str_conditions, "(AND: ('link__iexact', 'https://test.com'))")
+
+    def test_get_query_result__default_symbols(self):
+        LinkDataController.objects.create(link="https://test.com", title="find title")
+
+        search_query = "find title"
+        processor = OmniSearchWithDefault(search_query, DjangoSingleSymbolEvaluator())
+
+        processor.set_translation_mapping(["link", "title"])
+        processor.set_default_search_symbols(
+            ["title__icontains", "description__icontains"]
+        )
+
+        # call tested function
+        conditions = processor.get_query_result()
+
+        str_conditions = str(conditions)
+        self.assertEqual(
+            str_conditions,
+            "(OR: ('title__icontains', 'find title'), ('description__icontains', 'find title'))",
+        )
+
+
+class OmniSearchFilterTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_get_filtered_objects_one_property(self):
+        LinkDataController.objects.create(link="https://test1.com")
+        LinkDataController.objects.create(link="https://test2.com")
+
+        qs = LinkDataController.objects.all()
+        print("Query set length: {}".format(qs.count()))
+
+        args = {"search": "link == https://test1.com"}
+        processor = OmniSearchFilter(args, init_objects = qs)
+        processor.set_translation_mapping(["link"])
+
+        # call tested function
+        qs = processor.get_filtered_objects()
+        print("Query set length: {}".format(qs.count()))
+
+        self.assertEqual(qs.count(), 1)
+
+    def test_get_filtered_objects_with_double_quotes(self):
+        LinkDataController.objects.create(link="https://test.com", artist="Sombody Anybody")
+
+        qs = LinkDataController.objects.all()
+        print("Query set length: {}".format(qs.count()))
+
+        args = {"search": 'artist = "Sombody "'}
+        processor = OmniSearchFilter(args, init_objects = qs)
+
+        processor.set_translation_mapping(["link", "artist"])
+
+        qs = processor.get_filtered_objects()
+        print("Query set length: {}".format(qs.count()))
+
+        self.assertEqual(qs.count(), 1)
+
+    def test_get_filtered_objects_with_single_quotes(self):
+        LinkDataController.objects.create(link="https://test.com", artist="Sombody Anybody")
+
+        qs = LinkDataController.objects.all()
+        print("Query set length: {}".format(qs.count()))
+
+        args = {"search": "artist = 'Sombody '"}
+        processor = OmniSearchFilter(args, init_objects = qs)
+
+        processor.set_translation_mapping(["link", "artist"])
+
+        qs = processor.get_filtered_objects()
+        print("Query set length: {}".format(qs.count()))
+
+        self.assertEqual(qs.count(), 1)
+
+    def test_get_filtered_objects_two_properties(self):
+        LinkDataController.objects.create(
+            link="https://test1.com", title="One title", description="One description"
+        )
+        LinkDataController.objects.create(
+            link="https://test2.com", title="Two title", description="Two description"
+        )
+
+        qs = LinkDataController.objects.all()
+        print("Query set length: {}".format(qs.count()))
+
+        args = {"search": "link === https://test1.com & title === One Title"}
+        processor = OmniSearchFilter(args, init_objects = qs)
+
+        processor.set_translation_mapping(["link", "title", "description"])
+
+        # call tested function
+        qs = processor.get_filtered_objects()
+        print("Query set length: {}".format(qs.count()))
+
+        self.assertEqual(qs.count(), 1)
+
+    def test_get_filtered_objects_with_no_equal(self):
+        LinkDataController.objects.create(link="https://test.com", artist="Sombody Anybody")
+
+        qs = LinkDataController.objects.all()
+        print("Query set length: {}".format(qs.count()))
+
+        args = {"search": "Sombody"}
+        processor = OmniSearchFilter(args, init_objects = qs)
+
+        processor.set_translation_mapping(["link", "artist"])
+
+        qs = processor.get_filtered_objects()
+        print("Query set length: {}".format(qs.count()))
+
+        self.assertEqual(qs.count(), 1)

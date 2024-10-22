@@ -78,7 +78,7 @@ class ReadLaterViewsTest(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse(
-            "{}:read-later-remove".format(LinkDatabase.name), args=[read_later.id]
+            "{}:read-later-remove".format(LinkDatabase.name), args=[entry.id]
         )
         response = self.client.get(url)
 

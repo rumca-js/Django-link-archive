@@ -26,7 +26,7 @@
                          <div>
                              {{entry.title}}
 
-                             <a href="{% url 'rsshistory:read-later-remove' readlater.id %}">
+                             <a href="{% url 'rsshistory:read-later-remove' entry.id %}">
                                 <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
                              </a>
                          </div>

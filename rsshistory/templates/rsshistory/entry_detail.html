@@ -77,6 +77,34 @@
         getDynamicContent("{% url 'rsshistory:get-entry-details' object.id %}", "#bodyBlock", 1, true);
     }
 
+    function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1, errorInHtml = false) {
+        $.ajax({
+           url: url_address,
+           type: 'GET',
+           timeout: 10000,
+           success: function(data) {
+              $(htmlElement).html(data.message);
+
+              if (data.status) {
+                 loadEntryMenuContent();
+                 loadMenuContent();
+              }
+           },
+           error: function(xhr, status, error) {
+               if (attempt < 3) {
+                   getDynamicJsonContent(url, htmlElement, attempt + 1, errorInHtml);
+                   if (errorInHtml) {
+                       $(htmlElement).html("Error loading dynamic content, retry");
+                   }
+               } else {
+                   if (errorInHtml) {
+                       $(htmlElement).html("Error loading dynamic content");
+                   }
+               }
+           }
+        });
+    }
+
     function getVoteEditForm() {
         $.ajax({
             url: "{% url 'rsshistory:entry-vote-form' object.id %}",
@@ -115,72 +143,27 @@
         event.preventDefault();
         getVoteEditForm();
     });
+    $(document).on('click', '#Bookmark', function(event) {
+        event.preventDefault();
+        getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-bookmark' object.id %}", '#entryStatusLine');
+    });
+    $(document).on('click', '#Unbookmark', function(event) {
+        event.preventDefault();
+        getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-unbookmark' object.id %}", '#entryStatusLine');
+    });
     $(document).on('click', '#Read-later', function(event) {
         event.preventDefault();
-
-        $.ajax({
-            url: "{% url 'rsshistory:read-later-add' object.id %}",
-            type: 'GET',
-            timeout: 15000,
-            success: function(data) {
-                if (data.status) {
-                    const text = 'Added to read later queue'
-                    $('#entryStatusLine').html(text);
-                    loadEntryMenuContent();
-                    loadMenuContent();
-                }
-                else {
-                    const text = 'Could not add entry to read later queue'
-                    $('#entryStatusLine').html(text);
-                }
-            },
-            error: function(xhr, status, error) {
-                $('#entryStatusLine').html("Failed")
-            }
-        });
+        getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-add' object.id %}", '#entryStatusLine');
     });
     $(document).on('click', '#Do-not-read-later', function(event) {
         event.preventDefault();
 
-        $.ajax({
-            url: "{% url 'rsshistory:read-later-remove' object.id %}",
-            type: 'GET',
-            timeout: 15000,
-            success: function(data) {
-                if (data.status) {
-                    const text = 'Removed from read later queue'
-                    $('#entryStatusLine').html(text);
-                    loadEntryMenuContent();
-                    loadMenuContent();
-                }
-                else {
-                    const text = 'Could not remove entry from read later queue'
-                    $('#entryStatusLine').html(text);
-                }
-            },
-            error: function(xhr, status, error) {
-                $('#entryStatusLine').html("Failed")
-            }
-        });
+        getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-remove' object.id %}", '#entryStatusLine');
     });
     $(document).on('click', '#Remove', function(event) {
         event.preventDefault();
-        
-        $.ajax({
-            url: "{% url 'rsshistory:entry-remove' object.id %}",
-            type: 'GET',
-            timeout: 15000,
-            success: function(data) {
-                if (data.status) {
-                    const text = 'Removed entry'
-                    $('#entryStatusLine').html(text);
-                }
-                else {
-                    const text = 'Could not remove entry'
-                    $('#entryStatusLine').html(text);
-                }
-            }
-        });
+
+        getDynamicJsonContent("{% url 'rsshistory:entry-remove' object.id %}", "#entryStatusLine");
     });
 
     $(document).on('submit', '#voteEditForm', function(event) {

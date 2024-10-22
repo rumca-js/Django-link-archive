@@ -226,6 +226,7 @@ class EntriesSearchListView(generic.ListView):
 
         context["search_engines"] = SearchEngines(self.search_term)
         context["form_submit_button_name"] = "Search"
+        context["pagination_args"] = get_pagination_args(self.request.GET)
 
         if Url.is_protocolled_link(self.search_term):
             context["search_query_add"] = self.search_term
@@ -1038,7 +1039,7 @@ def edit_entry(request, pk):
         return p.render("form_basic.html")
 
 
-def remove_entry(request, pk):
+def entry_remove(request, pk):
     p = ViewPage(request)
     p.set_title("Remove entry")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -1047,15 +1048,22 @@ def remove_entry(request, pk):
 
     entry = LinkDataController.objects.filter(id=pk)
     status_code = 200
+
+    data = {
+            "status" : False,
+            "message" : "",
+    }
+
     if entry.exists():
         entry.delete()
 
-        p.context["summary_text"] = "Remove ok"
+        data["message"] = "Remove ok"
+        data["status"] = True
     else:
-        p.context["summary_text"] = "No source for ID: " + str(pk)
-        status_code = 500
+        data["message"] = "No source for ID: " + str(pk)
+        data["status"] = False
 
-    return p.render("summary_present.html", status_code=status_code)
+    return JsonResponse(data)
 
 
 def entry_active(request, pk):
@@ -1273,7 +1281,7 @@ def entries_archived_init(request):
     return p.render("form_search_init.html")
 
 
-def make_bookmarked_entry(request, pk):
+def entry_bookmark(request, pk):
     p = ViewPage(request)
     p.set_title("Bookmark entry")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -1284,14 +1292,23 @@ def make_bookmarked_entry(request, pk):
 
     new_entry = EntryWrapper(entry=entry).make_bookmarked(request)
 
+    json_obj = {}
+
+    json_obj["status"] = False
+    json_obj["message"] = "Not bookmarked"
+
     if new_entry:
         if Configuration.get_object().config_entry.link_save:
             BackgroundJobController.link_save(entry.link)
 
-    return HttpResponseRedirect(new_entry.get_absolute_url())
+        json_obj["status"] = True
+        json_obj["message"] = "Bookmarked"
+
+    # JsonResponse
+    return JsonResponse(json_obj)
 
 
-def make_not_bookmarked_entry(request, pk):
+def entry_unbookmark(request, pk):
     p = ViewPage(request)
     p.set_title("Not bookmark entry")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -1301,7 +1318,13 @@ def make_not_bookmarked_entry(request, pk):
     entry = LinkDataController.objects.get(id=pk)
     new_entry = EntryWrapper(entry=entry).make_not_bookmarked(request)
 
-    return HttpResponseRedirect(new_entry.get_absolute_url())
+    json_obj = {
+            "status" : True,
+            "message" : "Unbookmarked",
+    }
+
+    # JsonResponse
+    return JsonResponse(json_obj)
 
 
 def download_entry(request, pk):

@@ -18,11 +18,14 @@ def process_jobs_task(Processor):
     """!
     Checks for new entries in sources
     """
-    LinkDatabase.info("process_jobs_task {}".format(str(Processor)))
+    logger = LinkDatabase
+
+    logger.info("Starting process_jobs_task for processor: %s", Processor)
 
     try:
         c = Configuration.get_object()
         if not c.config_entry.background_tasks:
+            logger.info("Background tasks are disabled in the configuration.")
             return
 
         c.config_entry = ConfigurationEntry.get()
@@ -30,9 +33,10 @@ def process_jobs_task(Processor):
         handler = Processor()
         handler.run()
     except Exception as E:
-        AppLogging.exc(E, "Exception in process_jobs_task {}".format(str(Processor)))
+        logger.error("Exception in process_jobs_task for processor: %s", Processor, exc_info=True)
+        AppLogging.exc(e, f"Exception in process_jobs_task {Processor}")
 
-    LinkDatabase.info("process_jobs_task {} DONE".format(str(Processor)))
+    logger.info("Finished process_jobs_task for processor: %s", Processor)
 
 
 def get_processors():

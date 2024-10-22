@@ -480,7 +480,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         UserBookmarks.objects.create(entry=entry, user=self.user)
 
         self.client.login(username="testuser", password="testpassword")
-        url = reverse("{}:entry-notbookmark".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:entry-unbookmark".format(LinkDatabase.name), args=[entry.id])
 
         # call user action
         response = self.client.get(url)
