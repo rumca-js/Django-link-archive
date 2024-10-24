@@ -9,7 +9,13 @@ from django.core.paginator import Paginator
 from ..webtools import Url, DomainAwarePage, HttpPageHandler, DomainCache
 
 from ..apps import LinkDatabase
-from ..models import ConfigurationEntry, UserConfig, AppLogging, SourceCategories
+from ..models import (
+    ConfigurationEntry,
+    UserConfig,
+    AppLogging,
+    SourceCategories,
+    EntryRules,
+)
 from ..controllers import (
     SourceDataController,
     SourceDataBuilder,

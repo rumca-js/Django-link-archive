@@ -1,6 +1,6 @@
 <div
    {% if entry.bookmarked %}
-   title="{{entry.get_title}} {{entry.entry}} {{entry.get_long_description}}"
+   title="{{entry.get_title_safe}} {{entry.entry}} {{entry.get_long_description}}"
    {% endif %}
 
    {% if entry.bookmarked %}
@@ -33,7 +33,7 @@
                     />
                {% endif %}
 
-               {{entry.get_title}} {{entry.get_long_description}}
+               {{entry.get_title_safe}} {{entry.get_long_description}}
            </div>
        </a>
        <div class="linklistitemdescription">

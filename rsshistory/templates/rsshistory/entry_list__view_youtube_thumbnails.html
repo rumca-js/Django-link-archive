@@ -24,7 +24,7 @@
        </div>
        <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
           <span style="font-weight:bold" class="text-primary">
-             {{entry.get_title | safe}}
+             {{entry.get_title_safe | safe}}
 	      </span>
           <div class="link-list-item-description">{{entry.source.title| slice:":100"}}</div>
        </div>

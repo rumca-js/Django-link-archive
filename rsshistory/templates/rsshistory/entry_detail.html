@@ -36,14 +36,14 @@
    <span id="entryDownloadLine">
    </span>
 
-   <span id="entryStatusLine">
-   </span>
-
    {% include "rsshistory/entry_detail__source.html" %}
 
    <div id="entryMenu" class="d-flex">
    {% include "rsshistory/entry_detail__buttons.html" %}
    </div>
+
+   <span id="entryStatusLine" class="mb-2 bg-warning text-dark">
+   </span>
 
    <div class="link-detail-description">
    {{object_controller.get_description_html | safe | linebreaks }}
@@ -53,150 +53,6 @@
        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
    </div>
 
-<script>
-    function loadIsEntryDownloaded(attempt = 1) {
-        $.ajax({
-            url: "{% url 'rsshistory:is-entry-download' object.id %}",
-            type: 'GET',
-            timeout: 15000,
-            success: function(data) {
-                if (data.status) {
-                    const text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Downloading...';
-                    $('#entryDownloadLine').html(text);
-                }
-            },
-            error: function(xhr, status, error) {
-                if (attempt < 3) {
-                    loadIsEntryDownloaded(attempt + 1);
-                }
-            }
-        });
-    }
-
-    function loadEntryDynamicDetails(attempt = 1) {
-        getDynamicContent("{% url 'rsshistory:get-entry-details' object.id %}", "#bodyBlock", 1, true);
-    }
-
-    function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1, errorInHtml = false) {
-        $.ajax({
-           url: url_address,
-           type: 'GET',
-           timeout: 10000,
-           success: function(data) {
-              $(htmlElement).html(data.message);
-
-              if (data.status) {
-                 loadEntryMenuContent();
-                 loadMenuContent();
-              }
-           },
-           error: function(xhr, status, error) {
-               if (attempt < 3) {
-                   getDynamicJsonContent(url, htmlElement, attempt + 1, errorInHtml);
-                   if (errorInHtml) {
-                       $(htmlElement).html("Error loading dynamic content, retry");
-                   }
-               } else {
-                   if (errorInHtml) {
-                       $(htmlElement).html("Error loading dynamic content");
-                   }
-               }
-           }
-        });
-    }
-
-    function getVoteEditForm() {
-        $.ajax({
-            url: "{% url 'rsshistory:entry-vote-form' object.id %}",
-            type: 'GET',
-            timeout: 10000,
-            success: function(response) {
-                $('#entryVoteLine').html(response);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error fetching the form:', error);
-                $('#entryVoteLine').html(`<p class="text-danger">Error fetching the vote edit form</p>`);
-            }
-        });
-    }
-
-    function loadEntryMenuContent() {
-        getDynamicContent("{% url 'rsshistory:get-entry-menu' object.id %}", "#entryMenu", 1, true);
-    }
-
-    $(document).ready(function() {
-        loadEntryDynamicDetails();
-        loadIsEntryDownloaded();
-
-        setInterval(function() {
-            loadIsEntryDownloaded();
-        }, 300000);
-    });
-
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-            loadIsEntryDownloaded();
-        }
-    });
-
-    $(document).on('click', '#Vote', function(event) {
-        event.preventDefault();
-        getVoteEditForm();
-    });
-    $(document).on('click', '#Bookmark', function(event) {
-        event.preventDefault();
-        getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-bookmark' object.id %}", '#entryStatusLine');
-    });
-    $(document).on('click', '#Unbookmark', function(event) {
-        event.preventDefault();
-        getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-unbookmark' object.id %}", '#entryStatusLine');
-    });
-    $(document).on('click', '#Read-later', function(event) {
-        event.preventDefault();
-        getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-add' object.id %}", '#entryStatusLine');
-    });
-    $(document).on('click', '#Do-not-read-later', function(event) {
-        event.preventDefault();
-
-        getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-remove' object.id %}", '#entryStatusLine');
-    });
-    $(document).on('click', '#Remove', function(event) {
-        event.preventDefault();
-
-        getDynamicJsonContent("{% url 'rsshistory:entry-remove' object.id %}", "#entryStatusLine");
-    });
-
-    $(document).on('submit', '#voteEditForm', function(event) {
-        event.preventDefault();
-
-        var voteData = $('#id_vote').val();
-
-        $.ajax({
-            url: "{% url 'rsshistory:entry-vote' object.id %}",
-            type: 'POST',
-            timeout: 10000,
-            data: {
-                vote: voteData,
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === true) {
-                    $('#entryVoteLine').html("Vote added: " + response.vote);
-                } else {
-                    $('#entryVoteLine').html(`<p class="text-danger">Error: ${response.message}</p>`); // Handling potential error message
-                }
-            },
-            error: function(xhr, status, error) {
-                $('#entryVoteLine').html(`<p class="text-danger">Error during vote update: ${error}</p>`);
-            },
-        });
-    });
-
-    $(document).on('click', '#cancelVoteEdit', function() {
-        $('#entryVoteLine').html("");
-    });
-
-</script>
+   {% include "rsshistory/entry_detail__script.html" %}
 
 {% endblock %}

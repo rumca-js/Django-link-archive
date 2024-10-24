@@ -1,0 +1,21 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+  {% include "rsshistory/entry_list__actions.html" %}
+
+  {% include "rsshistory/form_filter_oneliner_element.html" %}
+
+  <span id="entriesListStatus">
+  </span>
+
+{% if user_config.display_type == "gallery" %}
+  <span id="entriesList" class="d-flex flex-wrap">
+{% else %}
+  <span id="entriesList" class="container list-group">
+{% endif %}
+  </span>
+
+  {% include "rsshistory/entry_list__script.html" %}
+
+{% endblock %}

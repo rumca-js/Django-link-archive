@@ -216,3 +216,37 @@ class ViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+    """
+    jQuery, JSON, others
+    """
+
+    def test_get_footer_status_line(self):
+        url = reverse("{}:get-footer-status-line".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_menu(self):
+        url = reverse("{}:get-menu".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_system_status(self):
+        url = reverse("{}:get-system-status".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_backgroundjobs(self):
+        url = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_user_search_history(self):
+        url = reverse("{}:get-user-search-history".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)

@@ -57,6 +57,9 @@
     {% endif %}
 
     <script>
+        let view_display_style = "{{user_config.display_style}}";
+        let view_display_type = "{{user_config.display_type}}";
+
         function putSpinnerOnIt(button) {
             button.prop("disabled", true);
 
@@ -120,7 +123,7 @@
         }
 
         function loadFooterContent() {
-            getDynamicContent('{% url 'rsshistory:get-footer-status-line' %}', "#footerLine");
+            getDynamicJsonContent('{% url 'rsshistory:get-footer-status-line' %}', "#footerLine");
         }
 
         function loadMenuContent() {

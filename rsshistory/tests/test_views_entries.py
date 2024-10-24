@@ -177,6 +177,10 @@ class EntriesViewsTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=limited_data)
 
+        # page_source = response.content.decode("utf-8")
+        # print("Contents: {}".format(page_source))
+        # print(response)
+
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
@@ -191,17 +195,20 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:entry-add".format(LinkDatabase.name))
         test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        channel_name = "https://www.youtube.com/channel/SAMTIMESAMTIMESAMTIMESAM"
 
         limited_data = self.get_link_data(test_link)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
+        self.assertEqual(LinkDataController.objects.filter(link=channel_name).count(), 0)
 
         # call user action
         response = self.client.post(url, data=limited_data)
 
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
+        self.assertEqual(LinkDataController.objects.filter(link=channel_name).count(), 1)
 
     def test_add_entry_exists(self):
         LinkDataController.objects.all().delete()
@@ -446,15 +453,17 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         # call user action
         response = self.client.get(url)
-        print(url)
 
         entry.refresh_from_db()
 
-        # page_source = response.text.decode("utf-8")
+        # page_source = response.content.decode("utf-8")
         # print("Contents: {}".format(page_source))
         # print(response)
 
-        self.assertEqual(response.status_code, 302)
+        """
+        Should return JSON, always
+        """
+        self.assertEqual(response.status_code, 200)
 
         self.assertTrue(entry.bookmarked)
         self.assertFalse(entry.permanent)
@@ -487,10 +496,11 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         entry.refresh_from_db()
 
-        # page_source = response.text.decode("utf-8")
+        # page_source = response.content.decode("utf-8")
         # print("Contents: {}".format(page_source))
+        # print(response)
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         self.assertFalse(entry.bookmarked)
         self.assertFalse(entry.permanent)
@@ -521,7 +531,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         # call user action
         response = self.client.get(url)
 
-        # page_source = response.text.decode("utf-8")
+        # page_source = response.content.decode("utf-8")
         # print("Contents: {}".format(page_source))
         # print(response)
 
@@ -781,6 +791,17 @@ class EntriesDetailViews(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
+    def test_entries_export_json(self):
+        MockRequestCounter.mock_page_requests = 0
+        entries = LinkDataController.objects.filter(link__icontains="https://youtube")
+
+        url = reverse("{}:entries-export-json".format(LinkDatabase.name))
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_entry_detail__visit(self):
         c = Configuration.get_object()
         c.config_entry.track_user_actions = True
@@ -844,22 +865,96 @@ class EntriesDetailViews(FakeInternetTestCase):
         self.assertEqual(transition.entry_from, self.entry_html)
         self.assertEqual(transition.entry_to, self.entry_youtube)
 
-    def test_user_entries_bookmarked(self):
+    def test_entries_user_bookmarked(self):
         LinkDataController.objects.all().delete()
 
-        url = reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
+        url = reverse("{}:entries-user-bookmarked".format(LinkDatabase.name))
 
         # call tested function
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
 
-    def test_user_entries_bookmarked(self):
+    def test_get_entries(self):
         LinkDataController.objects.all().delete()
 
-        url = reverse("{}:user-entries-bookmarked-init".format(LinkDatabase.name))
+        url = reverse("{}:get-entries".format(LinkDatabase.name))
 
         # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_entries_recent(self):
+        LinkDataController.objects.all().delete()
+
+        url = reverse("{}:get-entries-recent".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_entries_bookmarked(self):
+        LinkDataController.objects.all().delete()
+
+        url = reverse("{}:get-entries-bookmarked".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_entries_user_bookmarked(self):
+        LinkDataController.objects.all().delete()
+
+        url = reverse("{}:get-entries-user-bookmarked".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_entries_archived(self):
+        LinkDataController.objects.all().delete()
+
+        url = reverse("{}:get-entries-archived".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_entries_untagged(self):
+        LinkDataController.objects.all().delete()
+
+        url = reverse("{}:get-entries-untagged".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_entry_details(self):
+        entry = LinkDataController.objects.filter(link__icontains="https://youtube")[0]
+
+        url = reverse("{}:get-entry-details".format(LinkDatabase.name), args=[entry.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_is_entry_download(self):
+        entry = LinkDataController.objects.filter(link__icontains="https://youtube")[0]
+
+        url = reverse("{}:is-entry-download".format(LinkDatabase.name), args=[entry.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entry_tags(self):
+        entry = LinkDataController.objects.filter(link__icontains="https://youtube")[0]
+
+        url = reverse("{}:entry-tags".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

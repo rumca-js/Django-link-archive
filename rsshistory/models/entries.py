@@ -178,7 +178,7 @@ class BaseLinkDataController(BaseLinkDataModel):
     def get_link_dead_text(self):
         return "______"
 
-    def get_title(self, full_title=False):
+    def get_title_safe(self):
         c = GenericEntryController(self)
         return c.get_title()
 
@@ -343,7 +343,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         names.add("date_dead_since")
         names.add("date_update_last")
-        return list(names)
+        return sorted(list(names))
 
     def get_all_export_names():
         """
@@ -562,15 +562,13 @@ class BaseLinkDataController(BaseLinkDataModel):
             return True
         return False
 
-    def get_description_safe(description):
-        if not description or description == "":
-            return description
+    def get_description_safe(self):
+        if not self.description or self.description == "":
+            return ""
 
         length = BaseLinkDataController.get_description_length()
 
-        description = description[: length - 1]
-
-        return description
+        return self.description[: length - 1]
 
     def get_description_for_add(description):
         """

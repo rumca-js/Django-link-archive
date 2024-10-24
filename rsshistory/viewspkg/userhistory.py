@@ -2,10 +2,17 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse
 
 from ..apps import LinkDatabase
-from ..models import ConfigurationEntry
-from ..models import UserEntryVisitHistory, UserSearchHistory
+from ..models import (
+  ConfigurationEntry,
+  UserEntryVisitHistory,
+  UserSearchHistory,
+  SourceCategories,
+  SourceSubCategories,
+)
+from ..controllers import SourceDataController
 from ..views import ViewPage, UserGenericListView
 
 
@@ -51,3 +58,51 @@ def search_history_remove(request, pk):
 
     p.context["summary_text"] = "Removed search from history"
     return p.render("go_back.html")
+
+
+def get_search_suggestions(request, searchstring):
+    p = ViewPage(request)
+    p.set_title("Search history")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
+
+    json_obj = {}
+    json_obj["items"] = []
+
+    suggested_texts = set()
+
+    history_items = UserSearchHistory.objects.filter(search_query__contains = searchstring)
+    for item in history_items:
+        text = item.search_query
+        if text not in json_obj["items"]:
+            json_obj["items"].append(text)
+
+    sources = SourceDataController.objects.filter(title__contains = searchstring, enabled=True)
+    for source in sources:
+        text = "source__title = '{}'".format(source.title)
+        if text not in json_obj["items"]:
+            json_obj["items"].append(text)
+
+    sources = SourceDataController.objects.filter(url__contains = searchstring, enabled=True)
+    for source in sources:
+        text = "source__url = '{}'".format(source.title)
+        if text not in json_obj["items"]:
+            json_obj["items"].append(text)
+
+    categories = SourceCategories.objects.filter(name__contains = searchstring)
+    for category in categories:
+        text = "category__name = '{}'".format(category.name)
+        if text not in json_obj["items"]:
+            json_obj["items"].append(text)
+
+    subcategories = SourceSubCategories.objects.filter(name__contains = searchstring)
+    for subcategory in subcategories:
+        text = "subcategory__name = '{}'".format(category.name)
+        if text not in json_obj["items"]:
+            json_obj["items"].append(text)
+
+    # we could search for link, but this may take too much time?
+
+    # JsonResponse
+    return JsonResponse(json_obj)

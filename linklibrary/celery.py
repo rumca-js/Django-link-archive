@@ -15,7 +15,9 @@ from celery import Celery
 from celery.utils.log import get_task_logger
 import importlib.util
 import importlib
-
+import logging
+import time
+import threading
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "linklibrary.settings")
@@ -32,32 +34,44 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 
+
 logger = get_task_logger(__name__)
 
-
-LOCK_EXPIRE = 60 * 60 * 60  # Lock should never expire
-
+LOCK_EXPIRE = 60 * 10  # 10 minutes lock expiration
 
 @contextmanager
 def memcache_lock(lock_id, oid):
-    """!
-    Memory cache lock
+    """
+    Memcache-based locking mechanism with automatic expiration.
 
-    @see
-    https://docs.djangoproject.com/en/4.2/topics/cache/
-    https://docs.djangoproject.com/en/4.2/ref/settings/
-    https://docs.celeryq.dev/en/stable/tutorials/task-cookbook.html#cookbook-task-serial
-    https://bobbyhadz.com/blog/operational-error-database-is-locked
+    Args:
+        lock_id (str): The unique identifier for the lock.
+        oid (str): The unique identifier for the task or worker trying to acquire the lock.
 
-    Note: This requires memcached to be configured in djanog
-    https://stackoverflow.com/questions/53950548/flask-celery-task-locking
+    Yields:
+        bool: True if the lock was successfully acquired, False otherwise.
     """
     status = cache.add(lock_id, oid, LOCK_EXPIRE)
+    
+    def extend_lock():
+        """ Function to periodically extend the lock """
+        while status and cache.get(lock_id) == oid:
+            time.sleep(LOCK_EXPIRE / 2)  # Sleep for half the lock expiration time
+            cache.set(lock_id, oid, LOCK_EXPIRE)  # Extend the lock by resetting expiration
+            logger.info(f"Lock {lock_id} extended for {LOCK_EXPIRE} seconds")
+
+    # Start a background thread to extend the lock periodically
+    if status:
+        extension_thread = threading.Thread(target=extend_lock, daemon=True)
+        extension_thread.start()
+
     try:
         yield status
     finally:
-        if status:
+        if status and cache.get(lock_id) == oid:
             cache.delete(lock_id)
+            logger.info(f"Lock {lock_id} released")
+
 
 # define for which apps support celery
 installed_apps = [ "rsshistory", ]
@@ -74,7 +88,6 @@ def setup_periodic_tasks(sender, **kwargs):
 
     try:
         logger.info("Clearing cache")
-        print("Clearing cache")
         cache.clear()
 
         tasks_info = [
@@ -89,39 +102,70 @@ def setup_periodic_tasks(sender, **kwargs):
             for task_info in tasks_info:
                 time_s = task_info[0]
                 task_processor = task_info[1]
-                print("Tasks. {} Adding {} {}".format(app, time_s, task_processor))
+
+                logger.info("Tasks. {} Adding {} {}".format(app, time_s, task_processor))
 
                 sender.add_periodic_task(
                     time_s,
                     process_all_jobs.s(app + ".threadhandlers." + task_processor),
                     name=app + " " + task_processor + " task",
                 )
-                print("Tasks. {} Adding {} {} DONE".format(app, time_s, task_processor))
 
-        print("Defined all tasks successfully")
+                logger.info("Tasks. {} Adding {} {} DONE".format(app, time_s, task_processor))
+
+        logger.info("Defined all tasks successfully")
     except Exception as E:
-        print(str(E))
+        logger.error("Processor class not found: %s", str(E))
+
 
 
 @app.task(bind=True)
 def process_all_jobs(self, processor):
     """
-    Same app/processor should not work at the same time twice
+    Ensures that the same app/processor doesn't run concurrently.
+    Uses a memcache-based lock to prevent duplicate runs.
     """
     lock_id = "{}{}-lock".format(self.name, processor)
+
+    # Using a context manager to acquire a lock
     with memcache_lock(lock_id, self.app.oid) as acquired:
         try:
-            logger.info("Lock on:%s acquired:%s", self.name, acquired)
+            logger.info("Attempting to acquire lock for: %s", processor)
+            
             if acquired:
-                app = processor.split(".")[0]
-                processor_file_name = processor.split(".")[1]
-                processor_class_name = processor.split(".")[2]
+                logger.info("Lock acquired for: %s", processor)
 
-                tasks_module = importlib.import_module(app + ".tasks", package=None)
-                threadhandlers_module = importlib.import_module(app + ".threadhandlers", package=None)
+                # Parsing the processor string
+                try:
+                    app_name, processor_file_name, processor_class_name = processor.split(".")
+                except ValueError as e:
+                    logger.error("Processor string format error: %s", processor, exc_info=True)
+                    return
 
-                processor_class = getattr(threadhandlers_module, processor_class_name)
+                # Importing tasks and processor modules
+                try:
+                    tasks_module = importlib.import_module(f"{app_name}.tasks")
+                    threadhandlers_module = importlib.import_module(f"{app_name}.threadhandlers")
+                except ModuleNotFoundError as e:
+                    logger.error("Module import failed for app: %s", app_name, exc_info=True)
+                    return
+                
+                # Retrieving the processor class
+                try:
+                    processor_class = getattr(threadhandlers_module, processor_class_name)
+                except AttributeError as e:
+                    logger.error("Processor class not found: %s", processor_class_name, exc_info=True)
+                    return
 
-                tasks_module.process_jobs_task(processor_class)
-        except Exception as E:
-            print(str(E))
+                # Call the task with the processor class
+                try:
+                    tasks_module.process_jobs_task(processor_class)
+                    logger.info("Task processed successfully for: %s", processor)
+                except Exception as e:
+                    logger.error("Error while processing jobs for: %s", processor, exc_info=True)
+
+            else:
+                logger.info("Lock not acquired for: %s, another task is already running.", processor)
+
+        except Exception as e:
+            logger.error("Unexpected error occurred in process_all_jobs: %s", processor, exc_info=True)

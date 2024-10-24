@@ -21,36 +21,117 @@
 
 <h1>AppLogging info list</h1>
 
-{% if content_list %}
-<div class="container">
-    {% for info in content_list %}
-       <div style="margin-bottom: 2%">
-          <div 
-           {% if info.is_info or info.is_notification%}
-	       class="bg-primary"
-           {% elif info.is_warning %}
-	       class="bg-warning"
-           {% elif info.is_error %}
-               class="bg-danger"
-           {% endif %}
-	          style="display:flex; flex-wrap: wrap;">
-             <div class="mx-1">Time: {{info.get_local_time}}</div>
-             <div class="mx-1">Level: {{info.level}}</div>
-          </div>
-
-          <div>{{info.info_text}}</div>
-
-          {% if info.detail_text %}
-            <a class="btn btn-secondary btn-sm" data-bs-toggle="collapse" href="#collapseDetails{{info.id}}" role="button" aria-expanded="false" aria-controls="collapseDetails{{info.id}}">
-                Show Details
-            </a>
-            <div class="collapse" id="collapseDetails{{info.id}}"><pre>{{info.detail_text}}</pre></div>
-          {% endif %}
-       </div>
-    {% endfor %}
+<div id="logList" class="container">
 </div>
-{% else %}
-   No logs
-{% endif %}
+
+<script>
+
+    function getTemplate(log) {
+        let innerDivClass = '';
+
+        if (log.is_info || log.is_notification) {
+            innerDivClass = 'bg-primary';
+        } else if (log.is_warning) {
+            innerDivClass = 'bg-warning';
+        } else if (log.is_error) {
+            innerDivClass = 'bg-danger';
+        }
+
+        let text = `
+            <div style="margin-bottom: 2%">
+                <div class="${innerDivClass} d-flex flex-wrap">
+                    <div class="mx-1">Time: {date}</div>
+                    <div class="mx-1">Level: {info.level}</div>
+                </div>
+                <div>{info.info_text}</div>
+        `;
+
+        if (log.detail_text) {
+            text += `
+                <a class="btn btn-secondary btn-sm" data-bs-toggle="collapse" href="#collapseDetails{info.id}" role="button" aria-expanded="false" aria-controls="collapseDetails{info.id}">
+                    Show Details
+                </a>
+                <div class="collapse" id="collapseDetails{info.id}">
+                    <pre>{info.detail_text}</pre>
+                </div>
+            `;
+        }
+
+        text += `</div>`;
+
+        return text;
+    }
+
+    function fillEntryListTemplate(logs) {
+        let htmlOutput = '';
+
+        if (logs && logs.length > 0) {
+            logs.forEach(log => {
+                let date = new Date(log.date);
+                if (isNaN(date)) {
+                    date = new Date();  // Fallback to current date if invalid
+                }
+
+                // Generate template using the log data (pass true if detail_text exists)
+                var template_text = getTemplate(log);
+
+                // Replace placeholders globally
+                const listItem = template_text
+                    .replace(/\{info.id\}/g, log.id)
+                    .replace(/\{info.level\}/g, log.level)
+                    .replace(/\{info.info_text\}/g, log.info_text)
+                    .replace(/\{info.detail_text\}/g, log.detail_text)
+                    .replace(/\{date\}/g, date.toLocaleString());
+
+                htmlOutput += listItem;
+            });
+        } else {
+            htmlOutput = '<li class="list-group-item">No entries found</li>';
+        }
+
+        return htmlOutput;
+    }
+
+    function loadBodyContent() {
+        let url_address = '{% url 'rsshistory:json-logs' %}?page=1';
+
+        $("#logList").html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`);
+
+        let attempt = 0;
+
+        $.ajax({
+            url: url_address,
+            type: 'GET',
+            timeout: 10000,
+            success: function(data) {
+                let template = fillEntryListTemplate(data.logs);
+                $("#logList").html(template);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    attempt++;
+                    loadBodyContent();
+                    $("#logList").html("Error loading dynamic content, retrying...");
+                } else {
+                    $("#logList").html("Error loading dynamic content.");
+                }
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        loadBodyContent();
+
+        setInterval(function() {
+        loadBodyContent();
+        }, 300000);
+    });
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+        loadBodyContent();
+        }
+    });
+</script>
 
 {% endblock %}

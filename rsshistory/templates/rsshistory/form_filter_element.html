@@ -2,7 +2,7 @@
 
 <!-- this element should be uesd by lists, to filter elements -->
 
-<form action="{{form.action_url}}" method="{{form.method}}">
+<form id="filterForm" action="{{form.action_url}}" method="{{form.method}}">
     {% for field in form %}
        {% if field.is_hidden %}
        <div style="display:none">
@@ -30,11 +30,9 @@
        <button type="submit" value="Search" class="btn btn-primary btnFilterTrigger" role="button">Search</button>
     {% endif %}
 
-    {% if search_history %}
-        <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchHistory" role="button" aria-expanded="false" aria-controls="searchHistory" title="Search history">
-          History
-        </a>
-    {% endif %}
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchHistory" role="button" aria-expanded="false" aria-controls="searchHistory" title="Search history">
+      History
+    </a>
 
     <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchSyntax" role="button" aria-expanded="false" aria-controls="searchSyntax" title="Search syntax">
       ?
@@ -42,11 +40,9 @@
     </div>
 </form>
 
-{% if search_history %}
-   <div class="collapse" id="searchHistory">
-       {% include "rsshistory/search_history_element.html" %} 
-   </div> 
-{% endif %}
+<div class="collapse" id="searchHistory">
+    No history
+</div> 
 
 <div class="collapse" id="searchSyntax">
    {% include "rsshistory/form_search_syntax_element.html" %} 

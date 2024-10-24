@@ -316,11 +316,11 @@ class SourceFilter(BaseQueryFilter):
 
 
 class EntryFilter(BaseQueryFilter):
-    def __init__(self, args, user=None):
+    def __init__(self, args, user=None, use_archive=False):
         super().__init__(args, user=user)
         self.time_limit = None
 
-        self.use_archive_source = False
+        self.use_archive_source = use_archive
 
     def get_model_pagination(self):
         from .viewspkg.entries import EntriesSearchListView

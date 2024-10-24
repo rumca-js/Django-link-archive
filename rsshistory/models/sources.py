@@ -198,14 +198,10 @@ class SourceDataModel(models.Model):
         return list(names)
 
     def get_query_names():
-        return [
+        return sorted([
             "id",
             "url",
             "title",
-            "category__category_id",
-            "subcategory__subcategory_id",
-            "category__category_name",
-            "subcategory__subcategory_name",
             "category_name",
             "subcategory_name",
             "export_to_cms",
@@ -217,7 +213,12 @@ class SourceDataModel(models.Model):
             "fetch_period",
             "source_type",
             "proxy_location",
-        ]
+
+            "category__category_id",
+            "subcategory__subcategory_id",
+            "category__category_name",
+            "subcategory__subcategory_name",
+        ])
 
 
 class SourceOperationalData(models.Model):

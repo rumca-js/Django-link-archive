@@ -421,40 +421,6 @@ class InitSearchForm(forms.Form):
         self.fields["search"].widget.attrs["autofocus"] = True
 
 
-# TODO support for datalist in form....
-
-#from django.utils.safestring import mark_safe
-#import json
-#import html
-#
-#
-#class DatalistTextInput(TextInput):
-#    def __init__(self, attrs=None):
-#        super().__init__(attrs)
-#        if "list" not in self.attrs or "datalist" not in self.attrs:
-#            raise ValueError(
-#                'DatalistTextInput widget is missing required attrs "list" or "datalist"'
-#            )
-#        self.datalist_name = self.attrs["list"]
-#
-#        text = self.attrs.pop("datalist")
-#        self.datalist = text
-#
-#    def render(self, **kwargs):
-#        datalist = self.datalist
-#
-#        print("render kwargs:{}".format(kwargs))
-#
-#        # DEBUG( self, kwargs)
-#        original_part = super().render(**kwargs)
-#
-#        opts = " ".join([f"<option>{x}</option>" for x in datalist])
-#
-#        part2 = f'<datalist id="{self.datalist_name}">{opts}</datalist>'
-#
-#        return original_part + part2
-
-
 class OmniSearchForm(forms.Form):
     """
     Omni search form
@@ -464,40 +430,22 @@ class OmniSearchForm(forms.Form):
         label="Search",
         max_length=500,
         required=False,
-        widget=TextInput(
-            attrs={"list": "", "datalist": [], "placeholder": "Type to search..."}
+        widget=TextInput(attrs={
+          "placeholder": "Type to search...",
+        }
         ),
     )
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
-        full_search_history = self.init.pop_data(args, kwargs, "user_choices")
-
-        search_history = []
-        if full_search_history:
-            for search in full_search_history:
-                search_history.append(search.search_query)
+        self.search_history = self.init.pop_data(args, kwargs, "user_choices")
 
         super().__init__(*args, **kwargs)
 
         attr = {"onchange": "this.form.submit()"}
 
-        self.fields["search"].widget = TextInput(
-            attrs={
-                "list": "foolist",
-                "datalist": search_history,
-                "placeholder": "Type to search...",
-            }
-        )
         self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["search"].widget.attrs["autofocus"] = True
-
-        if self.init.is_mobile:
-            # TODO setting size does not work
-            # self.fields["search_history"].widget.attrs.update(size="10")
-            # self.fields["search_history"].widget.attrs.update(width="100%")
-            # self.fields["search_history"].widget.attrs.update(width="10px")
-            pass
 
 
 class OmniSearchWithArchiveForm(OmniSearchForm):
@@ -664,6 +612,7 @@ class TagEditForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
+        self.fields["tags"].widget.attrs["autofocus"] = True
 
 
 class TagRenameForm(forms.Form):

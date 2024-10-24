@@ -231,13 +231,13 @@ class DomainsController(Domains):
         else:
             DomainsController.remove_unused_domains()
 
-        tlds = DomainsTlds.objects.filter(tld__icontains=":")
+        tlds = DomainsTlds.objects.filter(tld__contains=":")
         tlds.delete()
 
-        suffixes = DomainsSuffixes.objects.filter(suffix__icontains=":")
+        suffixes = DomainsSuffixes.objects.filter(suffix__contains=":")
         suffixes.delete()
 
-        mains = DomainsMains.objects.filter(main__icontains=":")
+        mains = DomainsMains.objects.filter(main__contains=":")
         mains.delete()
 
     def remove_unused_domains():

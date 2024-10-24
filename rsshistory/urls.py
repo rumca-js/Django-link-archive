@@ -36,17 +36,6 @@ app_name = str(LinkDatabase.name)
 # fmt: off
 urlpatterns = [
     path("", system.index, name="index"),
-    # entries
-    path("entries-json/", entries.entries_json, name="entries-json"),
-
-    path("entries-omni-search-init", entries.entries_omni_search_init, name="entries-omni-search-init"),
-    path("entries-search-init", entries.entries_search_init, name="entries-search-init"),
-    path("entries-archived-init", entries.entries_archived_init, name="entries-archived-init"),
-    path("entries-bookmarked-init", entries.entries_bookmarked_init, name="entries-bookmarked-init"),
-    path("entries-recent-init", entries.entries_recent_init, name="entries-recent-init"),
-    path("entries-bookmarked-init", entries.user_entries_bookmarked_init, name="entries-bookmarked-init"),
-    path("entries-omni-search", entries.EntriesOmniListView.as_view(), name="entries-omni-search"),
-
     path("entries/", entries.entries, name="entries"),
     path("entries-recent/", entries.entries_recent, name="entries-recent"),
     path("entries-bookmarked/", entries.entries_bookmarked, name="entries-bookmarked"),
@@ -54,12 +43,12 @@ urlpatterns = [
     path("entries-archived/", entries.entries_archived, name="entries-archived"),
     path("entries-untagged/", entries.entries_untagged, name="entries-untagged"),
 
-    path("get-entries", entries.EntriesOmniListView.as_view(), name="get-entries"),
-    path("get-entries-recent/", entries.EntriesRecentListView.as_view(), name="get-entries-recent"),
-    path("get-entries-bookmarked/", entries.EntriesBookmarkedListView.as_view(), name="get-entries-bookmarked"),
-    path("get-entries-user-bookmarked/", entries.UserEntriesBookmarkedListView.as_view(), name="get-entries-user-bookmarked"),
-    path("get-entries-archived/", entries.EntriesArchiveListView.as_view(), name="get-entries-archived"),
-    path("get-entries-untagged/", entries.EntriesNotTaggedView.as_view(), name="get-entries-untagged"),
+    path("entries-json/", entries.entries_json, name="entries-json"),
+    path("entries-json-recent/", entries.entries_json_recent, name="entries-json-recent"),
+    path("entries-json-bookmarked/", entries.entries_json_bookmarked, name="entries-json-bookmarked"),
+    path("entries-json-user-bookmarked/", entries.entries_json_user_bookmarked, name="entries-json-user-bookmarked"),
+    path("entries-json-archived/", entries.entries_json_archived, name="entries-json-archived"),
+    path("entries-json-untagged/", entries.entries_json_untagged, name="entries-json-untagged"),
 
     path("entries-remove-all", entries.entries_remove_all, name="entries-remove-all"),
     path("entries-remove-nonbookmarked", entries.entries_remove_nonbookmarked, name="entries-remove-nonbookmarked"),
@@ -123,7 +112,6 @@ urlpatterns = [
     path("tag-remove-form/", useractions.tag_remove_form, name="tag-remove-form"),
     path("tag-rename", useractions.tag_rename, name="tag-rename"),
     path("tags-entry-remove/<int:entrypk>/", useractions.tags_entry_remove, name="tags-entry-remove",),
-    path("tags-entry-show/<int:entrypk>/", useractions.tags_entry_show, name="tags-entry-show",),
     path("tags-show-all", useractions.CompactedTagsListView.as_view(), name="tags-show-all"),
     path("tags-show-actual", useractions.ActualTags.as_view(), name="tags-show-actual"),
     path("tags-many", useractions.tag_many, name="tag-many"),
@@ -177,7 +165,6 @@ urlpatterns = [
     path("about/", system.about, name="about"),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")), # https://en.wikipedia.org/wiki/Robots.txt
     path("opensearch.xml", system.opensearchxml, name="opensearchxml"), # https://developer.mozilla.org/en-US/docs/Web/OpenSearch
-    path("search-suggestions", system.search_suggestions, name="search-suggestions"),
     path("missing-rights/", system.missing_rights, name="missing-rights"),
     path("reset-config/", system.reset_config, name="reset-config"),
     path("wizard", system.wizard_setup, name="wizard",),
@@ -205,6 +192,7 @@ urlpatterns = [
     path("user-configs", users.UserConfigsListView.as_view(), name="user-configs"),
     # logging
     path("logs/", system.AppLoggingView.as_view(), name="logs",),
+    path("json-logs/", system.json_logs, name="json-logs",),
     path("truncate-log", system.truncate_log, name="truncate-log"),
     path("truncate-log-errors", system.truncate_log_errors, name="truncate-log-errors"),
     path("truncate-log-warnings", system.truncate_log_warnings, name="truncate-log-warnings"),
@@ -275,20 +263,15 @@ urlpatterns = [
     path("block-list-remove/<int:pk>/", blockentry.block_list_remove, name="block-list-remove",),
     path("block-lists-clear", blockentry.block_lists_clear, name="block-lists-clear",),
     # json and ajax
+    path("get-search-suggestions/<str:searchstring>/", userhistory.get_search_suggestions, name="get-search-suggestions"),
     path("get-footer-status-line", system.get_footer_status_line, name="get-footer-status-line",),
     path("get-menu", system.get_menu, name="get-menu",),
     path("get-system-status/", system.get_system_status, name="get-system-status"),
-    path("get-backgroundjobs/", backgroundjobs.BackgroundJobsView.as_view(), name="get-backgroundjobs",),
+    path("get-backgroundjobs/", backgroundjobs.get_backgroundjobs, name="get-backgroundjobs",),
     path("get-entry-details/<int:pk>/", entries.EntryDetailDetailView.as_view(), name="get-entry-details"),
     path("get-user-search-history", userhistory.GetUserSearchHistoryListView.as_view(), name="get-user-search-history"), # for this user
     path("is-entry-download/<int:pk>/", backgroundjobs.is_entry_download, name="is-entry-download"),
     path("entry-tags/<int:pk>/", useractions.entry_tags, name="entry-tags"),
-    # other
-    path("data-errors", custom.data_errors_page, name="data-errors"),
-    path("fix-entry-tags/<int:entrypk>/", custom.fix_entry_tags, name="fix-entry-tags",),
-    path("test-page", custom.test_page, name="test-page"),
-    path("test-form-page", custom.test_form_page, name="test-form-page"),
-    path("fix-bookmarked-yt", custom.fix_bookmarked_yt, name="fix-bookmarked-yt"),
     # login
     path("accounts/", include("django.contrib.auth.urls")),
     path("rsshistory/accounts/logout/", RedirectView.as_view(url="rsshistory/")),

@@ -10,6 +10,8 @@
 
         <span>
         {{field }}
+        <datalist id="formDataList">
+        </datalist>
         </span>
    {% endfor %}
 
@@ -28,11 +30,14 @@
     <a class="btn btn-primary" data-bs-toggle="collapse" href="#searchSyntax" role="button" aria-expanded="false" aria-controls="searchSyntax" title="Search syntax">
       ?
     </a>
+
+    <div id="searchSuggestions" class="collapse">
+    </div> 
 </form>
+
 
 {% if search_history %}
    <div id="searchHistory" class="collapse">
-       {% include "rsshistory/search_history_element.html" %} 
    </div> 
 {% endif %}
 

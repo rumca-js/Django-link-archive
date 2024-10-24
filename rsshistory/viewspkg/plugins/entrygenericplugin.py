@@ -691,7 +691,7 @@ class EntryGenericPlugin(object):
         if not self.entry.is_user_appropriate(self.user):
             return "Adult content"
 
-        return self.entry.get_title(True)
+        return self.entry.get_title_safe()
 
     def get_description_html(self):
         if not self.entry.is_user_appropriate(self.user):

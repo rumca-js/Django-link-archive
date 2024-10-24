@@ -1,0 +1,358 @@
+{% load static %}
+
+<script>
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    function fillUserSearchSuggestions(items) {
+        if (items && items.length > 0) {
+            $.each(items, function(index, item) {
+                var listItem = `
+                    <li class="list-group-item">
+                        <a class="btnFilterTrigger" data-search="${item}" href="?search=${encodeURIComponent(item)}">
+                            ${item}
+                        </a>
+                    </li>
+                `;
+                $('#searchSuggestions').append(listItem);
+            });
+        } else {
+            $('#searchSuggestions').html('<li class="list-group-item">No suggestions found</li>');
+        }
+    }
+
+    let currentUserSearchSuggestions = 0;
+
+    function loadUserSearchSuggestions(search_term, attempt = 1) {
+        if (!search_term)
+        {
+            $('#searchSuggestions').empty();
+            $('#searchSuggestions').collapse('hide');
+            return;
+        }
+
+        const requestVersion = ++currentUserSearchSuggestions;
+
+        $.ajax({
+            url: '{% url 'rsshistory:get-search-suggestions' "placeholder" %}'.replace("placeholder", search_term),
+            type: 'GET',
+            timeout: 15000,
+            success: function(data) {
+                if (requestVersion === currentEntryListVersion) {
+                    $('#searchSuggestions').empty();
+                    fillUserSearchSuggestions(data.items);
+                    $('#searchSuggestions').collapse('show');
+                }
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    loadUserSearchSuggestions(search_term, attempt + 1);
+                    console.log("Error loading dynamic content, retrying...");
+                } else {
+                    console.error("Cannot load data from " + url);
+                }
+            }
+        });
+    }
+
+    function loadUserSearchHistory(attempt = 1) {
+        $.ajax({
+            url: '{% url 'rsshistory:get-user-search-history' %}',
+            type: 'GET',
+            timeout: 15000,
+            success: function(data) {
+                $('#searchHistory').html(data);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    loadHistory(search_term, page, attempt + 1);
+                    $('#searchHistory').html("Error loading dynamic content, retry");
+                }
+                else {
+                    $('#searchHistory').html("Cannot load data from " + url)
+                }
+            }
+        });
+    }
+
+    function entryStandardTemplate() {
+        return `
+            <a 
+                href="{link_absolute}"
+                title="{title}"
+                class="my-1 p-1 list-group-item list-group-item-action"
+            >
+               <div class="d-flex">
+                 <img src="{thumbnail}" class="rounded icon-normal" />
+                  <div class="mx-2">
+                     <span style="font-weight:bold" class="text-reset">{title_safe}</span>
+                  </div>
+               </div>
+               <div class="text-reset">
+                    {source__title} {date_published}
+               </div>
+            </a>
+        `;
+    }
+
+    function entrySearchEngineTemplate() {
+        return `
+            <a 
+                href="{link_absolute}"
+                title="{title}"
+                class="my-1 p-1 list-group-item list-group-item-action"
+            >
+                <img src="{thumbnail}" class="rounded icon-small" />
+                <span style="font-weight:bold" class="text-reset">{title_safe}</span>
+                <span class="text-reset">{link}</span>
+            </a>
+        `;
+    }
+
+    function entryGalleryTemplate() {
+        return `
+            <a 
+                href="{link_absolute}"
+                title="{title}"
+                class="element_${view_display_type} list-group-item list-group-item-action"
+            >
+                <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
+                    <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
+                        <img src="{thumbnail}" style="width:100%;max-height:100%;object-fit:cover"/>
+                    </div>
+                    <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
+                        <span style="font-weight:bold" class="text-primary">{title_safe}</span>
+                        <div class="link-list-item-description">{source__title}</div>
+                    </div>
+                </div>
+            </a>
+        `;
+    }
+
+    function fillEntryListTemplate(entries, template_text) {
+        let htmlOutput = '';
+
+        if (entries && entries.length > 0) {
+            entries.forEach(entry => {
+                let datePublished = new Date(entry.date_published);
+                if (isNaN(datePublished)) {
+                    datePublished = new Date();
+                }
+
+                const listItem = template_text
+                    .replace('{link_absolute}', entry.link_absolute)
+                    .replace('{title}', entry.title)
+                    .replace('{thumbnail}', entry.thumbnail)
+                    .replace('{title_safe}', entry.title_safe)
+                    .replace('{source__title}', entry.source__title)
+                    .replace('{date_published}', datePublished.toLocaleString());
+
+                htmlOutput += listItem;
+            });
+        } else {
+            htmlOutput = '<li class="list-group-item">No entries found</li>';
+        }
+
+        return htmlOutput;
+    }
+
+    function fillPagination(data, text) {
+        let totalPages = data.num_pages;
+        let currentPage = data.page;
+
+        if (totalPages <= 1) {
+            return '';
+        }
+
+        let paginationText = `
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+        `;
+
+        const currentUrl = new URL(window.location);
+        currentUrl.searchParams.delete('page');
+        const paginationArgs = `${currentUrl.searchParams.toString()}`;
+
+        if (currentPage > 1) {
+            paginationText += `
+                <li class="page-item">
+                    <a href="?page=1${paginationArgs}" data-page="1" class="btnFilterTrigger page-link">|&lt;</a>
+                </li>
+                <li class="page-item">
+                    <a href="?page=${currentPage - 1}${paginationArgs}" data-page="${currentPage - 1}" class="btnFilterTrigger page-link">&lt;</a>
+                </li>
+            `;
+        }
+
+        let startPage = Math.max(1, currentPage - 1);
+        let endPage = Math.min(totalPages, currentPage + 1);
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationText += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a href="?page=${i}${paginationArgs}" data-page="${i}" class="btnFilterTrigger page-link">${i}</a>
+                </li>
+            `;
+        }
+
+        if (currentPage < totalPages) {
+            paginationText += `
+                <li class="page-item">
+                    <a href="?page=${currentPage + 1}${paginationArgs}" data-page="${currentPage + 1}" class="btnFilterTrigger page-link">&gt;</a>
+                </li>
+                <li class="page-item">
+                    <a href="?page=${totalPages}${paginationArgs}" data-page="${totalPages}" class="btnFilterTrigger page-link">&gt;|</a>
+                </li>
+            `;
+        }
+
+        paginationText += `
+                </ul>
+            </nav>
+        `;
+
+        return paginationText;
+    }
+
+    function fillEntryList(entries, data) {
+        $('#entriesList').html("");
+
+        const templateMap = {
+            "standard": entryStandardTemplate,
+            "gallery": entryGalleryTemplate,
+            "search-engine": entrySearchEngineTemplate
+        };
+
+        const templateFunc = templateMap[view_display_type];
+
+        if (templateFunc) {
+            var text = templateFunc();
+            var finished_text = fillEntryListTemplate(entries, text);
+            finished_text += fillPagination(data, text);
+            $('#entriesList').html(finished_text);
+        } else {
+            $('#entriesList').html('Unhandled display type: ' + view_display_type);
+        }
+    }
+
+    let currentEntryListVersion = 0;
+
+    function loadEntryListContent(search_term = '', page = '', attempt = 1) {
+       $('.btnFilterTrigger').prop("disabled", true);
+
+       const currentUrl = new URL(window.location);
+       const currentSearch = currentUrl.searchParams.get('search') || '';
+
+       page = page || currentUrl.searchParams.get('page') || '1';
+
+       if (!search_term) {
+           search_term = currentSearch;
+       } else if (currentSearch !== search_term) {
+           page = '1';
+       }
+
+       currentUrl.searchParams.set('search', search_term);
+       currentUrl.searchParams.set('page', page);
+
+       window.history.pushState({}, '', currentUrl);
+
+       const url = `{{query_page}}?${currentUrl.searchParams.toString()}`;
+
+       const requestVersion = ++currentEntryListVersion;
+
+       const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
+       $('#entriesListStatus').html(status_text);
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            timeout: 15000,
+            success: function(data) {
+                if (requestVersion === currentEntryListVersion) {
+                   $('html, body').animate({ scrollTop: 0 }, 'slow');
+                   fillEntryList(data.entries, data);
+                   $('#entriesListStatus').html("");
+                   loadUserSearchHistory();
+                }
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    loadEntryListContent(search_term, page, attempt + 1);
+                    $('#entriesListStatus').html("Error loading dynamic content, retry");
+                }
+                else {
+                    $('#entriesListStatus').html("Cannot load data from " + url);
+                }
+            },
+            complete: function() {
+                $('.btnFilterTrigger').prop("disabled", false);
+            }
+        });
+    }
+
+    function isEmpty( el ){
+        return !$.trim(el.html())
+    }
+
+    $(document).ready(function() {
+        var show = getQueryParam('show') || '';
+        var auto_refresh = getQueryParam('auto-refresh') || '';
+        var search_term = getQueryParam('search') || '';
+
+        var search_term_input = $('#filterForm input[name="search"]').val();
+        if (search_term_input)
+        {
+            loadUserSearchSuggestions(search_term_input);
+        }
+        loadUserSearchHistory();
+
+        // if (user specified search, or show is true), and entrylist is empty
+        if (search_term || show) {
+            if (isEmpty($('#entriesList'))) {
+                loadEntryListContent();
+            }
+        }
+
+        //-----------------------------------------------
+        // if auto refresh - keep refreshing list - for kiosk mode
+        if (auto_refresh && !isNaN(auto_refresh)) {
+            setInterval(function() {
+                loadEntryListContent();
+            }, parseInt(auto_refresh));
+        }
+
+        //-----------------------------------------------
+        $(document).on('click', '.btnFilterTrigger', function(e) {
+            e.preventDefault();
+
+            // search if user specified search. pass page also
+
+            var search_term = $(this).data('search') || $('#id_search').val();
+            var page = $(this).data('page')
+
+            if ($(this).data('search')) {
+                $('#id_search').val(search_term);
+            }
+
+            $('#searchSuggestions').collapse('hide');
+            $('#searchHistory').collapse('hide');
+            $('#searchSyntax').collapse('hide');
+
+            loadEntryListContent(search_term, page);
+        });
+
+        //-----------------------------------------------
+        // Bind to the input event of the search input within the form
+        $('#filterForm input[name="search"]').on('input', function() {
+            // Get the current value of the search input
+            var search_term = $(this).val();
+
+            $('#searchHistory').collapse('hide');
+
+            // Call the function to load user search suggestions
+            loadUserSearchSuggestions(search_term);
+        });
+    });
+</script>

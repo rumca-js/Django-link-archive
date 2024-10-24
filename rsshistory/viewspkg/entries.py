@@ -119,69 +119,41 @@ def entries_generic(request, link):
     p.context["query_args"] = get_query_args(request.GET)
     p.context["query_page"] = link
 
-    return p.render("entries.html")
+    return p.render("entry_list.html")
 
 
 def entries(request):
-    return entries_generic(request, reverse("{}:get-entries".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json".format(LinkDatabase.name)))
 
 
 def entries_recent(request):
-    return entries_generic(request, reverse("{}:get-entries-recent".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-recent".format(LinkDatabase.name)))
 
 
 def entries_bookmarked(request):
-    return entries_generic(request, reverse("{}:get-entries-bookmarked".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-bookmarked".format(LinkDatabase.name)))
 
 
 def entries_user_bookmarked(request):
-    return entries_generic(request, reverse("{}:get-entries-user-bookmarked".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-user-bookmarked".format(LinkDatabase.name)))
 
 
 def entries_archived(request):
-    return entries_generic(request, reverse("{}:get-entries-archived".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-archived".format(LinkDatabase.name)))
 
 
 def entries_untagged(request):
-    return entries_generic(request, reverse("{}:get-entries-untagged".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-untagged".format(LinkDatabase.name)))
 
     return p.render("entries.html")
 
 
-class EntriesSearchListView(generic.ListView):
-    model = LinkDataController
-    context_object_name = "entry_list"
-    paginate_by = 100
-    template_name = str(ViewPage.get_full_template("entries__dynamic.html"))
-
-    def get(self, *args, **kwargs):
-        """
-        API: Used to redirect if user does not have rights
-        """
-        print("EntriesSearchListView:get")
-
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-
-        self.time_start = datetime.now()
-        self.query = None
-
-        print("EntriesSearchListView:get constructor of list view")
-        view = super().get(*args, **kwargs)
-        print("EntriesSearchListView:get done")
-        return view
+class EntriesSearchListView(object):
 
     def get_queryset(self):
         """
         API: Returns queryset
         """
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-
         print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
         objects = self.get_filtered_objects().order_by(*self.get_order_by())
@@ -198,46 +170,11 @@ class EntriesSearchListView(generic.ListView):
         API: Returns pagination value
         """
         if not self.request.user.is_authenticated:
-            config = Configuration.get_object().config_entry
+            config = ConfigurationEntry.get().config_entry
             return config.links_per_page
         else:
             uc = UserConfig.get(self.request.user)
             return uc.links_per_page
-
-    def get_context_data(self, **kwargs):
-        """
-        API:
-        """
-        print("EntriesSearchListView:get_context_data")
-        # Call the base implementation first to get the context
-        context = super().get_context_data(**kwargs)
-
-        context = ViewPage(self.request).init_context(context)
-        # Create any data and add it to the context
-        self.init_display_type(context)
-
-        self.search_term = get_search_term(self.request.GET)
-
-        context["query_filter"] = self.query_filter
-        context["view_link"] = self.get_view_link()
-
-        context["query_type"] = self.get_query_type()
-        context["query"] = self.query
-
-        context["search_engines"] = SearchEngines(self.search_term)
-        context["form_submit_button_name"] = "Search"
-        context["pagination_args"] = get_pagination_args(self.request.GET)
-
-        if Url.is_protocolled_link(self.search_term):
-            context["search_query_add"] = self.search_term
-
-        print(
-            "EntriesSearchListView:get_context_data done. View time delta:{}".format(
-                datetime.now() - self.time_start
-            )
-        )
-
-        return context
 
     def get_order_by(self):
         return get_order_by(self.request.GET)
@@ -254,63 +191,17 @@ class EntriesSearchListView(generic.ListView):
         print("EntriesSearchListView:get_filtered_objects")
         return self.query_filter.get_filtered_objects()
 
-    def get_reset_link(self):
-        return reverse("{}:entries".format(LinkDatabase.name))
-
-    def get_view_link(self):
-        return reverse("{}:entries".format(LinkDatabase.name))
-
-    def has_more_results(self):
-        return True
-
-    def get_more_results_link(self):
-        return (
-            reverse("{}:entries".format(LinkDatabase.name))
-            + "?"
-            + self.query_filter.get_filter_string()
-        )
-
-    def get_search_link(self, search_term):
-        if search_term.find("link =") >= 0 or search_term.find("link=") >= 0:
-            wh = search_term.find("=")
-            if wh >= 0:
-                wh2 = search_term.find("=", wh + 1)
-                if wh2 >= 0:
-                    wh = wh2
-
-                search_term = search_term[wh + 1 :].strip()
-
-        return search_term
-
-    def get_title(self):
-        return " - entries {}".format(self.search_term)
-
-    def get_query_type(self):
-        return "standard"
-
-    def init_display_type(self, context):
-        # TODO https://stackoverflow.com/questions/57487336/change-value-for-paginate-by-on-the-fly
-        # if type is not normal, no pagination
-        if "display_type" in self.request.GET:
-            context["display_type"] = self.request.GET["display_type"]
-        else:
-            context["display_type"] = "normal"
-        context["query_args"] = get_query_args(self.request.GET)
-
-    def get_default_range(self):
-        config = Configuration.get_object().config_entry
-        return DateUtils.get_days_range(config.whats_new_days)
-
 
 class EntriesOmniListView(EntriesSearchListView):
-    model = LinkDataController
-    context_object_name = "entry_list"
-    paginate_by = 100
-
     def get_filter(self):
         self.on_search()
 
-        query_filter = OmniSearchFilter(self.request.GET)
+        if ("archive" in self.request.GET and self.request.GET["archive"] == "on"):
+            query_set = self.get_initial_query_set(archive=True)
+        else:
+            query_set = self.get_initial_query_set(archive=False)
+
+        query_filter = OmniSearchFilter(self.request.GET, init_objects = query_set)
 
         translate = BaseLinkDataController.get_query_names()
         query_filter.set_translation_mapping(translate)
@@ -349,17 +240,6 @@ class EntriesOmniListView(EntriesSearchListView):
                 UserSearchHistory.add(self.request.user, search_term)
 
     def get_filtered_objects(self):
-        fields = self.query_filter.get_not_translated_conditions()
-
-        if ("archive" in self.request.GET and self.request.GET["archive"] == "on") or (
-            "archive" in fields and fields["archive"] == "1"
-        ):
-            query_set = self.get_initial_query_set(archive=True)
-        else:
-            query_set = self.get_initial_query_set(archive=False)
-
-        self.query_filter.set_query_set(query_set)
-
         return self.query_filter.get_filtered_objects()
 
     def get_initial_query_set(self, archive=False):
@@ -371,43 +251,8 @@ class EntriesOmniListView(EntriesSearchListView):
         else:
             return LinkDataController.objects.all()
 
-    def get_reset_link(self):
-        return reverse("{}:entries".format(LinkDatabase.name))
-
-    def get_view_link(self):
-        return reverse("{}:entries".format(LinkDatabase.name))
-
-    def has_more_results(self):
-        if "archive" in self.request.GET:
-            return False
-        else:
-            return True
-
-    def get_more_results_link(self):
-        if "search" in self.request.GET:
-            return reverse(
-                "{}:entries".format(LinkDatabase.name)
-            ) + "?archive=on&search={}".format(self.request.GET["search"])
-        else:
-            return (
-                reverse("{}:entries".format(LinkDatabase.name))
-                + "?archive=on"
-            )
-
-    def get_query_type(self):
-        return "omni"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        return context
-
 
 class EntriesRecentListView(EntriesOmniListView):
-    model = LinkDataController
-    context_object_name = "entry_list"
-    paginate_by = 100
-
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
         return query_set.filter(date_published__range=self.get_default_range())
@@ -415,23 +260,12 @@ class EntriesRecentListView(EntriesOmniListView):
     def get_order_by(self):
         return ["-date_published"]
 
-    def get_reset_link(self):
-        return reverse("{}:entries-recent-init".format(LinkDatabase.name))
-
-    def get_view_link(self):
-        return reverse("{}:entries-recent".format(LinkDatabase.name))
-
-    def get_title(self):
-        return " - entries {}".format(self.search_term)
-
-    def get_query_type(self):
-        return "recent"
+    def get_default_range(self):
+        config = ConfigurationEntry.get()
+        return DateUtils.get_days_range(config.whats_new_days)
 
 
 class EntriesNotTaggedView(EntriesOmniListView):
-    model = LinkDataController
-    context_object_name = "entry_list"
-    paginate_by = 100
 
     def get_order_by(self):
         return ["-date_published"]
@@ -443,98 +277,27 @@ class EntriesNotTaggedView(EntriesOmniListView):
         permanent = Q(permanent=True)
         return query_set.filter(tags_is_null & (bookmarked | permanent))
 
-    def has_more_results(self):
-        return False
-
-    def get_reset_link(self):
-        return reverse("{}:entries-untagged".format(LinkDatabase.name))
-
-    def get_view_link(self):
-        return reverse("{}:entries-untagged".format(LinkDatabase.name))
-
-    def get_title(self):
-        return " - entries {}".format(self.search_term)
-
-    def get_query_type(self):
-        return "not-tagged"
-
 
 class EntriesBookmarkedListView(EntriesOmniListView):
-    model = LinkDataController
-    context_object_name = "entry_list"
-    paginate_by = 100
 
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
         return query_set.filter(bookmarked=1)
 
-    def has_more_results(self):
-        return False
-
-    def get_reset_link(self):
-        return reverse("{}:entries-bookmarked-init".format(LinkDatabase.name))
-
-    def get_view_link(self):
-        return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
-
-    def get_title(self):
-        return " - entries {}".format(self.search_term)
-
-    def get_query_type(self):
-        return "bookmarked"
-
 
 class UserEntriesBookmarkedListView(EntriesOmniListView):
-    model = LinkDataController
-    context_object_name = "entry_list"
-    paginate_by = 100
 
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
         user = self.request.user
         return query_set.filter(bookmarks__user__id=user.id)
 
-    def has_more_results(self):
-        return False
-
-    def get_reset_link(self):
-        return reverse("{}:entries-user-bookmarked".format(LinkDatabase.name))
-
-    def get_view_link(self):
-        return reverse("{}:entries-user-bookmarked".format(LinkDatabase.name))
-
-    def get_title(self):
-        return " - entries {}".format(self.search_term)
-
-    def get_query_type(self):
-        return "bookmarked"
-
 
 class EntriesArchiveListView(EntriesOmniListView):
-    model = LinkDataController
-    context_object_name = "entry_list"
-    paginate_by = 100
-    template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
 
     def get_filter(self):
-        query_filter = EntryFilter(self.request.GET, self.request.user)
-        query_filter.set_archive_source(True)
+        query_filter = EntryFilter(self.request.GET, self.request.user, use_archive=True)
         return query_filter
-
-    def has_more_results(self):
-        return False
-
-    def get_reset_link(self):
-        return reverse("{}:entries-archived-init".format(LinkDatabase.name))
-
-    def get_view_link(self):
-        return reverse("{}:entries-archived".format(LinkDatabase.name))
-
-    def get_title(self):
-        return " - entries {}".format(self.search_term)
-
-    def get_query_type(self):
-        return "archived"
 
 
 class EntryDetailView(generic.DetailView):
@@ -1146,141 +909,6 @@ def entry_show_dislikes(request, pk):
     return p.render("summary_present.html")
 
 
-def entries_search_init(request):
-    p = ViewPage(request)
-    p.set_title("Search entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
-
-    user = request.user.username
-    user_choices = UserSearchHistory.get_user_choices(request.user)
-    if user_choices and len(user_choices) > 0:
-        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
-    else:
-        filter_form = InitSearchForm(request=request)
-    filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
-
-    context = get_generic_search_init_context(request, filter_form, user_choices)
-
-    p.context.update(context)
-
-    return p.render("form_search_init.html")
-
-
-def entries_omni_search_init(request):
-    p = ViewPage(request)
-    p.set_title("Search entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
-
-    user = request.user.username
-    user_choices = UserSearchHistory.get_user_choices(request.user)
-    if user_choices and len(user_choices) > 0:
-        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
-    else:
-        filter_form = InitSearchForm(request=request)
-    filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
-
-    context = get_generic_search_init_context(request, filter_form, user_choices)
-    p.context.update(context)
-
-    return p.render("form_search_init.html")
-
-
-def entries_bookmarked_init(request):
-    p = ViewPage(request)
-    p.set_title("Bookmarked entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
-
-    user = request.user.username
-    user_choices = UserSearchHistory.get_user_choices(request.user)
-    if user_choices and len(user_choices) > 0:
-        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
-    else:
-        filter_form = InitSearchForm(request=request)
-    filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
-
-    context = get_generic_search_init_context(request, filter_form, user_choices)
-    p.context.update(context)
-
-    return p.render("form_search_init.html")
-
-
-def user_entries_bookmarked_init(request):
-    p = ViewPage(request)
-    p.set_title("Bookmarked entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
-
-    user = request.user.username
-    user_choices = UserSearchHistory.get_user_choices(request.user)
-    if user_choices and len(user_choices) > 0:
-        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
-    else:
-        filter_form = InitSearchForm(request=request)
-    filter_form.method = "GET"
-    filter_form.action_url = reverse(
-        "{}:user-entries-bookmarked".format(LinkDatabase.name)
-    )
-
-    context = get_generic_search_init_context(request, filter_form, user_choices)
-    p.context.update(context)
-
-    return p.render("form_search_init.html")
-
-
-def entries_recent_init(request):
-    p = ViewPage(request)
-    p.set_title("Search recent entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
-
-    user = request.user.username
-    user_choices = UserSearchHistory.get_user_choices(request.user)
-    if user_choices and len(user_choices) > 0:
-        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
-    else:
-        filter_form = InitSearchForm(request=request)
-    filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))
-
-    context = get_generic_search_init_context(request, filter_form, user_choices)
-    p.context.update(context)
-
-    return p.render("form_search_init.html")
-
-
-def entries_archived_init(request):
-    p = ViewPage(request)
-    p.set_title("Search archive entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
-
-    user = request.user.username
-    user_choices = UserSearchHistory.get_user_choices(request.user)
-    if user_choices and len(user_choices) > 0:
-        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
-    else:
-        filter_form = InitSearchForm(request=request)
-    filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries-archived".format(LinkDatabase.name))
-
-    context = get_generic_search_init_context(request, filter_form, user_choices)
-    p.context.update(context)
-
-    return p.render("form_search_init.html")
-
-
 def entry_bookmark(request, pk):
     p = ViewPage(request)
     p.set_title("Bookmark entry")
@@ -1389,7 +1017,75 @@ def entry_json(request, pk):
     return JsonResponse(json_obj)
 
 
+def entry_to_json(user_config, entry):
+    json_entry = {}
+    json_entry["id"] = entry.id
+    json_entry["title"] = entry.title
+    json_entry["title_safe"] = entry.get_title_safe()
+    json_entry["description"] = entry.description
+    json_entry["description_safe"] = entry.get_description_safe()
+    json_entry["link"] = entry.link
+    json_entry["link_absolute"] = entry.get_absolute_url()
+    json_entry["is_valid"] = entry.is_valid()
+    json_entry["date_published"] = entry.date_published
+    json_entry["date_dead_since"] = entry.date_dead_since
+    json_entry["date_update_last"] = entry.date_update_last
+    json_entry["bookmarked"] = entry.bookmarked
+    json_entry["permanent"] = entry.permanent
+    json_entry["artist"] = entry.artist
+    json_entry["album"] = entry.album
+    json_entry["page_rating_contents"] = entry.page_rating_contents
+    json_entry["page_rating_votes"] = entry.page_rating_votes
+
+    json_entry["source__title"] = ""
+    json_entry["source__url"] = ""
+
+    if hasattr(entry, "source"):
+        if entry.source:
+            json_entry["source__title"] = entry.source.title
+            json_entry["source__url"] = entry.source.url
+
+    if user_config.show_icons:
+        if user_config.thumbnails_as_icons:
+            json_entry["thumbnail"] = entry.get_thumbnail()
+        else:
+            json_entry["thumbnail"] = entry.get_favicon()
+
+    return json_entry
+
+
+def handle_json_view(request, view_to_use):
+    page_num = get_page_num(request.GET)
+
+    json_obj = {}
+    json_obj["entries"] = []
+    json_obj["count"] = 0
+    json_obj["page"] = page_num
+    json_obj["num_pages"] = 0
+
+    uc = UserConfig.get(request.user)
+
+    if view_to_use:
+        entries = view_to_use.get_queryset()
+        p = Paginator(entries, view_to_use.get_paginate_by(entries))
+        page_obj = p.get_page(page_num)
+
+        json_obj["count"] = p.count
+        json_obj["num_pages"] = p.num_pages
+
+        limited_entries = entries[page_obj.start_index() - 1 : page_obj.end_index()]
+
+        for entry in limited_entries:
+            entry_json = entry_to_json(uc, entry)
+
+            json_obj["entries"].append(entry_json)
+
+        # JsonResponse
+        return JsonResponse(json_obj)
+
+
 def entries_json(request):
+
     """
     User might set access through config. Default is all
     """
@@ -1399,43 +1095,95 @@ def entries_json(request):
     if data is not None:
         return data
 
-    found_view = False
+    view = EntriesSearchListView()
+    view.request = request
 
-    query_type = "standard"
-    if "query_type" in request.GET:
-        query_type = request.GET["query_type"]
+    return handle_json_view(request, view)
 
-    check_views = [
-        EntriesSearchListView,
-        EntriesRecentListView,
-        EntriesBookmarkedListView,
-        EntriesNotTaggedView,
-        EntriesArchiveListView,
-        EntriesOmniListView,
-    ]
 
-    view_to_use = None
+def entries_json_recent(request):
 
-    for view_class in check_views:
-        view = view_class()
-        view.request = request
-        if query_type == view.get_query_type():
-            view_to_use = view
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("JSON entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
 
-    page_num = get_page_num(request.GET)
+    view = EntriesRecentListView()
+    view.request = request
 
-    if view_to_use:
-        links = view_to_use.get_queryset()
-        p = Paginator(links, view.get_paginate_by(links))
-        page_obj = p.get_page(page_num)
+    return handle_json_view(request, view)
 
-        objects = links[page_obj.start_index() - 1 : page_obj.end_index()]
 
-        exporter = InstanceExporter()
-        json_obj = exporter.export_links(objects)
+def entries_json_bookmarked(request):
 
-        # JsonResponse
-        return JsonResponse(json_obj)
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("JSON entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    view = EntriesBookmarkedListView()
+    view.request = request
+
+    return handle_json_view(request, view)
+
+
+def entries_json_user_bookmarked(request):
+
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("JSON entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    view = UserEntriesBookmarkedListView()
+    view.request = request
+
+    return handle_json_view(request, view)
+
+
+def entries_json_archived(request):
+
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("JSON entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    view = EntriesArchiveListView()
+    view.request = request
+
+    return handle_json_view(request, view)
+
+
+def entries_json_untagged(request):
+
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("JSON entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    view = EntriesNotTaggedView()
+    view.request = request
+
+    return handle_json_view(request, view)
 
 
 def entries_remove_all(request):

@@ -1,14 +1,4 @@
 {% if entry_query_names and entry_query_operators %}
-      Examples:
-      <ul>
-          <li>"china" - searches china in title</li>
-          <li>"china | japan" - searches china, or japan in title</li>
-          <li>"title = china" - searches anything with China in title</li>
-          <li>"tags__tag = tag" - searches links with tag</li>
-          <li>"bookmarked = True" - all bookmarked link</li>
-          <li>"(title = china | title = japan) & bookmarked = True" - all bookmarked link, with china, or japan in title</li>
-      </ul>
-
       Available fields:
       <ul>
           <li>
@@ -25,22 +15,38 @@
               "{{entry_query_operator}}",
               {% endfor %}
           </li>
+      </ul>
 
+      Notes:
+      <ul>
+          <li>"&" - And</li>
+          <li>"|" - Or</li>
+          <li>"~" - Not, must appear before bracket</li>
           <li>
-              "==" for exact compare, "=" to find items containing string, ">" for comaparing if greater than, "<" for comaparing if less than, ">=", "<=", "~" for negation
+              "===" - iexact
           </li>
-
+          <li>
+              "==" for compare this = that
+          </li>
+          <li>
+              "=" to find items containing string (icontains)
+          </li>
           <li>
               <a href="https://docs.djangoproject.com/en/5.0/ref/models/querysets/#field-lookups">
                        {% include "rsshistory/icon_external.html" %}
                                    Standard Django operators</a> are also supported. "title__isnull == True" Is correct search term.
           </li>
+          <li>System accepts brackets</li>
       </ul>
 
-      Available condition operators
+      Examples:
       <ul>
-          <li>"&" - And, "|" - Or, "~" - Not</li>
+          <li>"china" - searches china in title</li>
+          <li>"china | japan" - searches china, or japan in title</li>
+          <li>"title = china" - searches anything with China in title</li>
+          <li>"tags__tag = tag" - searches links with tag</li>
+          <li>"bookmarked = True" - all bookmarked link</li>
+          <li>"(title = china | title = japan) & bookmarked = True" - all bookmarked link, with china, or japan in title</li>
       </ul>
 
-      System accepts brackets.
 {% endif %}

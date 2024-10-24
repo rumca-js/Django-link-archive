@@ -22,42 +22,170 @@
     {% endif %}
 </div>
 
+<h1 id="jobsTitle">Jobs</h1>
+
 <div id="bodyBlock">
     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
 </div>
 
 <script>
+
+    /*
+    function getTemplate(job) {
+        let text = `
+        <div class="my-1 p-1 list-group-item list-group-item-action"
+           title="${job.date_created} ${job.job} ${job.task} ${job.subject} ${job.args}">
+           <div>
+              ${job.id}
+              ${job.enabled ? '[DISABLED]' : ''}
+              ${job.errors > 0 ? `ERRORS: ${job.errors}` : ''}
+
+              [${job.date_created}] ${job.priority} <b>${job.job}</b>
+
+              ${job.is_subject_link ? `<a href="${job.subject}">${job.subject}</a>` : `${job.subject}`}
+              
+              ${job.user ? `User: ${job.user.username}` : ''}
+              
+              ${job.args}
+           </div>
+
+           <div>
+              ${job.link_affected ? `<a href="${job.link_affected}" class="btn btn-secondary btn-sm mb-2" role="button">Object</a>` : ''}
+           </div>
+        </div>`;
+
+        return text;
+    }
+    */
+
+    function getTemplate(job) {
+        let text = `
+        <div class="my-1 p-1 list-group-item list-group-item-action"
+           title="${job.date_created} ${job.job} ${job.task} ${job.subject} ${job.args}">
+           <div>
+              ${job.id}
+
+              [${job.date_created}] ${job.priority} <b>${job.job}</b>
+
+              ${job.subject}
+              
+              ${job.user}
+              
+              ${job.args}
+           </div>
+
+           <div>
+              <a href="{% url 'rsshistory:backgroundjob-disable' 1017 %}" class="btn btn-secondary btn-sm" role="button" title="Disable job">
+                  {% include "rsshistory/icon_disable.html" %}
+              </a>
+              <a href="{% url 'rsshistory:backgroundjob-enable' 1017 %}" class="btn btn-secondary btn-sm" role="button" title="Enable job">
+                  {% include "rsshistory/icon_enable.html" %}
+              </a>
+
+              <a href="{% url 'rsshistory:backgroundjob-prio-up' 1017 %}" class="btn btn-secondary btn-sm" role="button" title="Increase priority">
+                 <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
+              </a>
+              <a href="{% url 'rsshistory:backgroundjob-prio-down' 1017 %}" class="btn btn-secondary btn-sm" role="button" title="Decrease priority">
+                 <img src="{% static 'rsshistory/icons/icons8-down-100.png' %}" class="content-icon" />
+              </a>
+
+              <a href="{% url 'rsshistory:backgroundjob-remove' 1017 %}" class="btn btn-secondary btn-sm" role="button" title="Remove job">
+                 {% include "rsshistory/icon_remove.html" %}
+              </a>
+              <a href="{% url 'rsshistory:backgroundjobs-remove' 1017 %}" class="btn btn-secondary btn-sm" role="button" title="Remove all in type">
+                 <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
+                 Type
+              </a>
+           </div>
+        </div>`;
+
+        return text;
+    }
+
+    function fillEntryListTemplate(jobs) {
+        let htmlOutput = '';
+
+        if (jobs && jobs.length > 0) {
+            jobs.forEach(job => {
+                let date_created = new Date(job.date_created);
+                if (isNaN(date_created)) {
+                    date_created = new Date();  // Fallback to current date if invalid
+                }
+
+                let template_text = getTemplate(job);
+
+                // Replace placeholders globally
+                const listItem = template_text
+                    .replace(/\${job.id}/g, job.id)
+                    .replace(/\${job.date_created}/g, date_created.toLocaleString())
+                    .replace(/\${job.job}/g, job.job)
+                    .replace(/\${job.subject}/g, job.subject)
+                    .replace(/\${job.args}/g, job.args || '')
+                    .replace(/\${job.priority}/g, job.priority || '')
+                    .replace(/\${job.link_affected}/g, job.link_affected || '')
+                    .replace(/1017/g, job.id)
+                    .replace(/\${job.user}/g, job.user || '');
+
+                htmlOutput += listItem;
+            });
+        } else {
+            htmlOutput = '<li class="list-group-item">No entries found</li>';
+        }
+
+        return htmlOutput;
+    }
+
     function loadBodyContent(attempt = 1) {
+        let url_address = '{% url 'rsshistory:get-backgroundjobs' %}?page=1';
+
+        $("#logList").html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`);
+
         $.ajax({
-            url: '{% url 'rsshistory:get-backgroundjobs' %}',
+            url: url_address,
             type: 'GET',
-	    timeout: 15000,
+            timeout: 10000,
             success: function(data) {
-                $('#bodyBlock').html(data);
+                let size = data.jobs.length;
+                $("#jobsTitle").html(`<h1 id="jobsTitle">Jobs [${data.count}]</h1>`);
+
+                let template = fillEntryListTemplate(data.jobs);
+                $("#bodyBlock").html(template);
             },
             error: function(xhr, status, error) {
-                if (attempt < 2) {
+                if (attempt < 3) {
+                    $("#bodyBlock").html("Error loading dynamic content, retrying... (" + attempt + ")");
                     loadBodyContent(attempt + 1);
-                    $('#bodyBlock').html("Error loading dynamic content, retry")
                 } else {
-                    $('#bodyBlock').html("Error loading dynamic content")
+                    $("#bodyBlock").html("Error loading dynamic content.");
                 }
             }
         });
     }
 
     $(document).ready(function() {
+        // Initial load
         loadBodyContent();
 
-        setInterval(function() {
-        loadBodyContent();
-        }, 300000);  // 5 minutes in milliseconds
-    });
+        let refreshInterval = setInterval(function() {
+            loadBodyContent();
+        }, 300000);
 
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-        loadBodyContent();
-        }
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                loadBodyContent();
+            }
+        });
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                clearInterval(refreshInterval);
+            } else {
+                refreshInterval = setInterval(function() {
+                    loadBodyContent();
+                }, 300000);
+            }
+        });
     });
 </script>
+
 {% endblock %}

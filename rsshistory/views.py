@@ -1,10 +1,11 @@
 from pathlib import Path
+from urllib.parse import unquote
 
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse
 from django.contrib.auth.models import User
-from urllib.parse import unquote
+from django.utils.http import urlencode
 
 from .webtools import HtmlPage, RssPage, HttpPageHandler
 
@@ -247,8 +248,19 @@ class ViewPage(object):
                 filter_data[key] = value
         return "&" + urlencode(filter_data)
 
+    def get_page_num(self):
+        themap = self.request.GET
 
+        if "page" in themap:
+            page = themap["page"]
+            try:
+                page = int(page)
+            except ValueError:
+                page = 1
 
+            return page
+        else:
+            return 1
 
 
 class GenericListView(generic.ListView):

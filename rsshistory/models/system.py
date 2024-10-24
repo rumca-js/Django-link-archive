@@ -675,6 +675,7 @@ class UserConfig(models.Model):
             return UserConfig.get_config_user()
 
         user_configs = UserConfig.objects.filter(user=input_user)
+
         if not user_configs.exists():
             user_configs = UserConfig.objects.filter(username=input_user.username)
             if user_configs.exists():

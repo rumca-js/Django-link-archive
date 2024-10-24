@@ -228,6 +228,8 @@ class EntryUrlInterface(object):
         if self.is_property_set(input_props, "date_published"):
             if input_props["date_published"] > DateUtils.get_datetime_now_utc():
                 input_props["date_published"] = DateUtils.get_datetime_now_utc()
+        else:
+            input_props["date_published"] = DateUtils.get_datetime_now_utc()
 
         if self.is_property_set(
             input_props, "date_last_modified"

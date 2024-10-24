@@ -10,6 +10,8 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
+
 
 from utils.dateutils import DateUtils
 
@@ -346,6 +348,53 @@ class AppLoggingView(generic.ListView):
         return context
 
 
+def log_to_json(applogging_entry):
+    json = {}
+
+    json["id"] = applogging_entry.id
+    json["is_info"] = applogging_entry.is_info()
+    json["is_notification"] = applogging_entry.is_notification()
+    json["is_warning"] = applogging_entry.is_warning()
+    json["is_error"] = applogging_entry.is_error()
+    json["date"] = applogging_entry.date
+    json["level"] = applogging_entry.level
+    json["id"] = applogging_entry.id
+    json["info_text"] = applogging_entry.info_text
+    json["detail_text"] = applogging_entry.detail_text
+
+    return json
+
+
+def json_logs(request):
+    p = ViewPage(request)
+    p.set_title("Clearing all logs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    data = {}
+    data["logs"] = []
+    data["count"] = 0
+    data["num_pages"] = 0
+
+    page_num = p.get_page_num()
+    if page_num:
+        objects = AppLogging.objects.all()
+
+        items_per_page = 500
+        p = Paginator(objects, items_per_page)
+        page_object = p.page(page_num)
+
+        data["count"] = p.count
+        data["num_pages"] = p.num_pages
+
+        for app_logging_entry in page_object:
+            json_data = log_to_json(app_logging_entry)
+            data["logs"].append(json_data)
+
+        return JsonResponse(data)
+
+
 def truncate_log_all(request):
     p = ViewPage(request)
     p.set_title("Clearing all logs")
@@ -676,19 +725,6 @@ def opensearchxml(request):
 
     status_code = 200
     content_type = "application/opensearchdescription+xml"
-
-    return HttpResponse(text, status=status_code, content_type=content_type)
-
-
-def search_suggestions(request):
-    """
-    We could implement search suggestions based on history.
-    Wouldn't it be too performance taxing?
-    """
-
-    status_code = 200
-    content_type = "text/html"
-    text = "[]"
 
     return HttpResponse(text, status=status_code, content_type=content_type)
 

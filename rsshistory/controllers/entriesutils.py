@@ -92,7 +92,7 @@ class EntriesCleanup(object):
         """
         This will only fix domains
         """
-        invalid_domains = DomainsController.objects.filter(domain__icontains=":")
+        invalid_domains = DomainsController.objects.filter(domain__contains=":")
         for invalid_domain in invalid_domains:
             invalid_domain_name = invalid_domain.domain
             wh = invalid_domain_name.find(":")
@@ -1560,11 +1560,6 @@ class EntryDataBuilder(object):
             new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
         if "date_update_last" not in new_link_data:
             new_link_data["date_update_last"] = DateUtils.get_datetime_now_utc()
-
-        if "description" in new_link_data and new_link_data["description"] != None:
-            new_link_data["description"] = LinkDataController.get_description_safe(
-                new_link_data["description"]
-            )
 
         if (
             "page_rating" not in new_link_data

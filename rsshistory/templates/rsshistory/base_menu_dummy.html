@@ -5,7 +5,7 @@
 {% else %}
 <nav class="navbar sticky-top navbar-expand-sm bg-light">
 {% endif %}
-   <a class="navbar-brand nav-link" href="{% url 'rsshistory:entries' %}" title="Home">
+   <a class="navbar-brand nav-link" href="{% url 'rsshistory:entries-recent' %}" title="Home">
     <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
    </a>
 
@@ -32,9 +32,9 @@
                            Gateways</a>
                    </li>
                    <li>
-                       <a href="{% url 'rsshistory:entries-recent' %}?show=1" class="dropdown-item" title="Shows new entries">
+                       <a href="{% url 'rsshistory:entries' %}" class="dropdown-item" title="Shows new entries">
                            <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
-                           What's new</a>
+                           Search all</a>
                    </li>
                </ul>
            </li>

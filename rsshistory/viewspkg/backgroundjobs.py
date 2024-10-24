@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -30,31 +31,53 @@ def backgroundjobs(request):
     return p.render("backgroundjob_list.html")
 
 
-class BackgroundJobsView(GenericListView):
-    model = BackgroundJobController
-    context_object_name = "content_list"
-    paginate_by = 500
-    template_name = str(ViewPage.get_full_template("backgroundjob_list__element.html"))
+def job_to_json(job):
+    json = {}
 
-    def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super(BackgroundJobsView, self).get(*args, **kwargs)
+    json["id"] = job.id
+    json["job"] = job.job
+    json["task"] = job.task
+    json["subject"] = job.subject
+    json["args"] = job.args
+    json["date_created"] = job.date_created
+    json["priority"] = job.priority
+    json["errors"] = job.errors
+    json["enabled"] = job.enabled
+    if job.user:
+        json["user"] = job.user.id
+    json["link_affected"] = job.get_link()
 
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super(BackgroundJobsView, self).get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
+    return json
 
-        context["BackgroundJob"] = BackgroundJob.objects.count()
-        context["page_title"] += " " + self.get_title()
 
-        return context
+def get_backgroundjobs(request):
+    p = ViewPage(request)
+    p.set_title("Clearing all logs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-    def get_title(self):
-        return "Jobs"
+    data = {}
+    data["jobs"] = []
+    data["count"] = 0
+    data["num_pages"] = 0
+
+    page_num = p.get_page_num()
+    if page_num:
+        objects = BackgroundJobController.objects.all()
+
+        items_per_page = 300
+        p = Paginator(objects, items_per_page)
+        page_object = p.page(page_num)
+
+        data["count"] = p.count
+        data["num_pages"] = p.num_pages
+
+        for job in page_object:
+            json_data = job_to_json(job)
+            data["jobs"].append(json_data)
+
+        return JsonResponse(data)
 
 
 def backgroundjob_add(request):
