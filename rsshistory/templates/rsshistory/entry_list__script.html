@@ -48,7 +48,6 @@
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    loadUserSearchSuggestions(search_term, attempt + 1);
                     console.log("Error loading dynamic content, retrying...");
                 } else {
                     console.error("Cannot load data from " + url);
@@ -77,7 +76,14 @@
         });
     }
 
-    function entryStandardTemplate() {
+    function entryStandardTemplate(show_icons = true, small_icons = false) {
+        let thumbnail_text = '';
+        if (show_icons && small_icons) {
+            thumbnail_text = '<img src="{thumbnail}" class="rounded icon-small" />';
+        } else if (show_icons && !small_icons) {
+            thumbnail_text = '<img src="{thumbnail}" class="rounded icon-normal" />';
+        }
+
         return `
             <a 
                 href="{link_absolute}"
@@ -85,10 +91,10 @@
                 class="my-1 p-1 list-group-item list-group-item-action"
             >
                <div class="d-flex">
-                 <img src="{thumbnail}" class="rounded icon-normal" />
-                  <div class="mx-2">
-                     <span style="font-weight:bold" class="text-reset">{title_safe}</span>
-                  </div>
+                 ${thumbnail_text}
+                 <div class="mx-2">
+                    <span style="font-weight:bold" class="text-reset">{title_safe}</span>
+                 </div>
                </div>
                <div class="text-reset">
                     {source__title} {date_published}
@@ -97,21 +103,30 @@
         `;
     }
 
-    function entrySearchEngineTemplate() {
+    function entrySearchEngineTemplate(show_icons = true, small_icons= false) {
+        let thumbnail_text = '';
+        if (show_icons && small_icons) {
+            thumbnail_text = '<img src="{thumbnail}" class="rounded icon-small" />';
+        } else if (show_icons && !small_icons) {
+            thumbnail_text = '<img src="{thumbnail}" class="rounded icon-normal" />';
+        }
+
         return `
             <a 
                 href="{link_absolute}"
                 title="{title}"
                 class="my-1 p-1 list-group-item list-group-item-action"
             >
-                <img src="{thumbnail}" class="rounded icon-small" />
+                ${thumbnail_text}
                 <span style="font-weight:bold" class="text-reset">{title_safe}</span>
                 <span class="text-reset">{link}</span>
             </a>
         `;
     }
 
-    function entryGalleryTemplate() {
+    function entryGalleryTemplate(show_icons = true, small_icons= false) {
+        let thumbnail_text = '<img src="{thumbnail}" style="width:100%;max-height:100%;object-fit:cover"/>';
+
         return `
             <a 
                 href="{link_absolute}"
@@ -120,7 +135,7 @@
             >
                 <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
                     <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
-                        <img src="{thumbnail}" style="width:100%;max-height:100%;object-fit:cover"/>
+                        ${thumbnail_text}
                     </div>
                     <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
                         <span style="font-weight:bold" class="text-primary">{title_safe}</span>
@@ -141,13 +156,15 @@
                     datePublished = new Date();
                 }
 
-                const listItem = template_text
-                    .replace('{link_absolute}', entry.link_absolute)
-                    .replace('{title}', entry.title)
-                    .replace('{thumbnail}', entry.thumbnail)
-                    .replace('{title_safe}', entry.title_safe)
-                    .replace('{source__title}', entry.source__title)
-                    .replace('{date_published}', datePublished.toLocaleString());
+                // Replace all occurrences of the placeholders using a global regular expression
+                let listItem = template_text
+                    .replace(/{link_absolute}/g, entry.link_absolute)
+                    .replace(/{link}/g, entry.link)
+                    .replace(/{title}/g, entry.title)
+                    .replace(/{thumbnail}/g, entry.thumbnail)
+                    .replace(/{title_safe}/g, entry.title_safe)
+                    .replace(/{source__title}/g, entry.source__title)
+                    .replace(/{date_published}/g, datePublished.toLocaleString());
 
                 htmlOutput += listItem;
             });
@@ -228,7 +245,7 @@
         const templateFunc = templateMap[view_display_type];
 
         if (templateFunc) {
-            var text = templateFunc();
+            var text = templateFunc(view_show_icons, view_small_icons);
             var finished_text = fillEntryListTemplate(entries, text);
             finished_text += fillPagination(data, text);
             $('#entriesList').html(finished_text);
