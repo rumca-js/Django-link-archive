@@ -244,10 +244,9 @@
         }
 
         var finished_text = fillEntryList(entries);
-        finished_text += "<div>";
-        finished_text += fillPagination(data);
-        finished_text += "</div>";
         $('#listData').html(finished_text);
+        let pagination = fillPagination(data);
+        $('#pagination').html(pagination);
     }
 
     $(document).ready(function() {
