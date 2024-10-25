@@ -125,13 +125,13 @@
             dataType: 'json',
             success: function(response) {
                 if (response.status === true) {
-                    $('#entryVoteLine').html("Vote added: " + response.vote);
+                    $('#entryStatusLine').html("Vote added: " + response.vote);
                 } else {
-                    $('#entryVoteLine').html(`<p class="text-danger">Error: ${response.message}</p>`); // Handling potential error message
+                    $('#entryStatusLine').html(`<p class="text-danger">Error: ${response.message}</p>`);
                 }
             },
             error: function(xhr, status, error) {
-                $('#entryVoteLine').html(`<p class="text-danger">Error during vote update: ${error}</p>`);
+                $('#entryStatusLine').html(`<p class="text-danger">Error during vote update: ${error}</p>`);
             },
         });
     });

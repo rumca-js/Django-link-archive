@@ -60,7 +60,7 @@ def search_history_remove(request, pk):
     return p.render("go_back.html")
 
 
-def get_search_suggestions(request, searchstring):
+def get_search_suggestions_entries(request, searchstring):
     p = ViewPage(request)
     p.set_title("Search history")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
@@ -103,6 +103,20 @@ def get_search_suggestions(request, searchstring):
             json_obj["items"].append(text)
 
     # we could search for link, but this may take too much time?
+
+    # JsonResponse
+    return JsonResponse(json_obj)
+
+
+def get_search_suggestions_sources(request, searchstring):
+    p = ViewPage(request)
+    p.set_title("Search history")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
+
+    json_obj = {}
+    json_obj["items"] = []
 
     # JsonResponse
     return JsonResponse(json_obj)

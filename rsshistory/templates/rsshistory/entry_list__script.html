@@ -1,46 +1,25 @@
 {% load static %}
 
 <script>
-    function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-    }
-
-    function fillUserSearchSuggestions(items) {
-        if (items && items.length > 0) {
-            $.each(items, function(index, item) {
-                var listItem = `
-                    <li class="list-group-item">
-                        <a class="btnFilterTrigger" data-search="${item}" href="?search=${encodeURIComponent(item)}">
-                            ${item}
-                        </a>
-                    </li>
-                `;
-                $('#searchSuggestions').append(listItem);
-            });
-        } else {
-            $('#searchSuggestions').html('<li class="list-group-item">No suggestions found</li>');
-        }
-    }
+    {% include "rsshistory/javascript_list_utilities.js" %}
 
     let currentUserSearchSuggestions = 0;
 
     function loadUserSearchSuggestions(search_term, attempt = 1) {
         if (!search_term)
         {
-            $('#searchSuggestions').empty();
-            $('#searchSuggestions').collapse('hide');
             return;
         }
 
-        const requestVersion = ++currentUserSearchSuggestions;
+        let requestVersion = ++currentUserSearchSuggestions;
 
         $.ajax({
-            url: '{% url 'rsshistory:get-search-suggestions' "placeholder" %}'.replace("placeholder", search_term),
+            url: '{% url 'rsshistory:get-search-suggestions-entries' "placeholder" %}'.replace("placeholder", search_term),
             type: 'GET',
             timeout: 15000,
             success: function(data) {
-                if (requestVersion === currentEntryListVersion) {
+                if (requestVersion === currentUserSearchSuggestions) {
+                    $('#searchHistory').collapse('hide');
                     $('#searchSuggestions').empty();
                     fillUserSearchSuggestions(data.items);
                     $('#searchSuggestions').collapse('show');
@@ -48,10 +27,15 @@
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    console.log("Error loading dynamic content, retrying...");
-                } else {
-                    console.error("Cannot load data from " + url);
+                    $('#searchSuggestions').html("Cannot load suggestions, retry");
+				    $('#searchSuggestions').collapse('show');
+				   
+					loadUserSearchSuggestions(search_term, attempt + 1); 
                 }
+				else {
+                    $('#searchSuggestions').html("Cannot load suggestions");
+				    $('#searchSuggestions').collapse('show');
+				}
             }
         });
     }
@@ -66,7 +50,7 @@
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    loadHistory(search_term, page, attempt + 1);
+                    loadUserSearchHistory(search_term, page, attempt + 1);
                     $('#searchHistory').html("Error loading dynamic content, retry");
                 }
                 else {
@@ -76,12 +60,32 @@
         });
     }
 
-    function entryStandardTemplate(show_icons = true, small_icons = false) {
+    function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
+        let page_rating_votes = entry.page_rating_votes;
+
+        let badge_text = page_rating_votes > 0 ? `
+            <span class="badge badge-primary" style="position: absolute; top: 5px; right: 20px; font-size: 1rem;">
+                ${page_rating_votes}
+            </span>` : '';
+
+        let star_badge = entry.bookmarked ? `
+            <span class="badge badge-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
+                ★
+            </span>` : '';
+
         let thumbnail_text = '';
-        if (show_icons && small_icons) {
-            thumbnail_text = '<img src="{thumbnail}" class="rounded icon-small" />';
-        } else if (show_icons && !small_icons) {
-            thumbnail_text = '<img src="{thumbnail}" class="rounded icon-normal" />';
+        if (show_icons) {
+            const iconClass = small_icons ? 'icon-small' : 'icon-normal';
+            thumbnail_text = `<img src="{thumbnail}" class="rounded ${iconClass}" />`;
+        }
+        
+        if (thumbnail_text) {
+            thumbnail_text = `
+                <div style="position: relative; display: inline-block;">
+                    ${thumbnail_text}
+                    ${badge_text}
+                    ${star_badge}
+                </div>`;
         }
 
         return `
@@ -90,25 +94,41 @@
                 title="{title}"
                 class="my-1 p-1 list-group-item list-group-item-action"
             >
-               <div class="d-flex">
-                 ${thumbnail_text}
-                 <div class="mx-2">
-                    <span style="font-weight:bold" class="text-reset">{title_safe}</span>
-                 </div>
-               </div>
-               <div class="text-reset">
-                    {source__title} {date_published}
-               </div>
+                <div class="d-flex">
+                    ${thumbnail_text}
+                    <div class="mx-2">
+                        <span style="font-weight:bold" class="text-reset">{title_safe} [${page_rating_votes}]</span>
+                        <div class="text-reset">
+                            {source__title} {date_published}
+                        </div>
+                    </div>
+                </div>
             </a>
         `;
     }
 
-    function entrySearchEngineTemplate(show_icons = true, small_icons= false) {
+    function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false) {
+        let page_rating_votes = entry.page_rating_votes;
+
+        let badge_text = page_rating_votes > 0 ? `
+            <span class="badge badge-primary" style="position: absolute; top: 5px; right: 20px; font-size: 1rem;">
+                ${page_rating_votes}
+            </span>` : '';
+
+        let star_badge = entry.bookmarked ? `
+            <span class="badge badge-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
+                ★
+            </span>` : '';
+
         let thumbnail_text = '';
-        if (show_icons && small_icons) {
-            thumbnail_text = '<img src="{thumbnail}" class="rounded icon-small" />';
-        } else if (show_icons && !small_icons) {
-            thumbnail_text = '<img src="{thumbnail}" class="rounded icon-normal" />';
+        if (show_icons) {
+            const iconClass = small_icons ? 'icon-small' : 'icon-normal';
+            thumbnail_text = `
+                <div style="position: relative; display: inline-block;">
+                    <img src="{thumbnail}" class="rounded ${iconClass}"/>
+                    ${badge_text}
+                    ${star_badge}
+                </div>`;
         }
 
         return `
@@ -118,14 +138,33 @@
                 class="my-1 p-1 list-group-item list-group-item-action"
             >
                 ${thumbnail_text}
-                <span style="font-weight:bold" class="text-reset">{title_safe}</span>
-                <span class="text-reset">{link}</span>
+                <span style="font-weight:bold" class="text-reset">{title_safe} [${page_rating_votes}]</span>
+                <div class="text-reset">@ {link}</div>
             </a>
         `;
     }
 
-    function entryGalleryTemplate(show_icons = true, small_icons= false) {
-        let thumbnail_text = '<img src="{thumbnail}" style="width:100%;max-height:100%;object-fit:cover"/>';
+    function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
+        let page_rating_votes = entry.page_rating_votes;
+        
+        let badge_text = page_rating_votes > 0 ? `
+            <span class="badge badge-primary" style="position: absolute; top: 10px; right: 40px; font-size: 1rem;">
+                ${page_rating_votes}
+            </span>` : '';
+
+        let star_badge = entry.bookmarked ? `
+            <span class="badge badge-warning" style="position: absolute; top: 10px; right: 10px; font-size: 1rem;">
+                ★
+            </span>` : '';
+
+        let thumbnail = entry.thumbnail;
+        let thumbnail_text = `
+            <div style="position: relative; display: inline-block; width: 100%; max-height: 100%;">
+                <img src="${thumbnail}" style="width:100%; max-height:100%; object-fit:cover"/>
+                ${badge_text}
+                ${star_badge}
+            </div>
+        `;
 
         return `
             <a 
@@ -138,7 +177,7 @@
                         ${thumbnail_text}
                     </div>
                     <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
-                        <span style="font-weight:bold" class="text-primary">{title_safe}</span>
+                        <span style="font-weight: bold" class="text-primary">{title_safe}</span>
                         <div class="link-list-item-description">{source__title}</div>
                     </div>
                 </div>
@@ -146,7 +185,7 @@
         `;
     }
 
-    function fillEntryListTemplate(entries, template_text) {
+    function fillEntryList(entries) {
         let htmlOutput = '';
 
         if (entries && entries.length > 0) {
@@ -156,6 +195,22 @@
                     datePublished = new Date();
                 }
 
+                const templateMap = {
+                    "standard": entryStandardTemplate,
+                    "gallery": entryGalleryTemplate,
+                    "search-engine": entrySearchEngineTemplate
+                };
+
+                const templateFunc = templateMap[view_display_type];
+                if (!templateFunc) {
+                    return;
+                }
+                var template_text = templateFunc(entry, view_show_icons, view_small_icons);
+
+                let thumbnail = entry.thumbnail;
+                let page_rating_votes = entry.page_rating_votes;
+                let page_rating_contents = entry.page_rating_contents;
+
                 // Replace all occurrences of the placeholders using a global regular expression
                 let listItem = template_text
                     .replace(/{link_absolute}/g, entry.link_absolute)
@@ -163,6 +218,9 @@
                     .replace(/{title}/g, entry.title)
                     .replace(/{thumbnail}/g, entry.thumbnail)
                     .replace(/{title_safe}/g, entry.title_safe)
+                    .replace(/{page_rating_votes}/g, entry.page_rating_votes)
+                    .replace(/{page_rating_contents}/g, entry.page_rating_contents)
+                    .replace(/{page_rating}/g, entry.page_rating)
                     .replace(/{source__title}/g, entry.source__title)
                     .replace(/{date_published}/g, datePublished.toLocaleString());
 
@@ -175,142 +233,19 @@
         return htmlOutput;
     }
 
-    function fillPagination(data, text) {
-        let totalPages = data.num_pages;
-        let currentPage = data.page;
+    function fillListData(data) {
+        $('#listData').html("");
 
-        if (totalPages <= 1) {
-            return '';
+        let entries = data.entries;
+
+        if (!entries || entries.length == 0) {
+            $('#listData').html("No entries found");
+            return;
         }
 
-        let paginationText = `
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-        `;
-
-        const currentUrl = new URL(window.location);
-        currentUrl.searchParams.delete('page');
-        const paginationArgs = `${currentUrl.searchParams.toString()}`;
-
-        if (currentPage > 1) {
-            paginationText += `
-                <li class="page-item">
-                    <a href="?page=1${paginationArgs}" data-page="1" class="btnFilterTrigger page-link">|&lt;</a>
-                </li>
-                <li class="page-item">
-                    <a href="?page=${currentPage - 1}${paginationArgs}" data-page="${currentPage - 1}" class="btnFilterTrigger page-link">&lt;</a>
-                </li>
-            `;
-        }
-
-        let startPage = Math.max(1, currentPage - 1);
-        let endPage = Math.min(totalPages, currentPage + 1);
-
-        for (let i = startPage; i <= endPage; i++) {
-            paginationText += `
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a href="?page=${i}${paginationArgs}" data-page="${i}" class="btnFilterTrigger page-link">${i}</a>
-                </li>
-            `;
-        }
-
-        if (currentPage < totalPages) {
-            paginationText += `
-                <li class="page-item">
-                    <a href="?page=${currentPage + 1}${paginationArgs}" data-page="${currentPage + 1}" class="btnFilterTrigger page-link">&gt;</a>
-                </li>
-                <li class="page-item">
-                    <a href="?page=${totalPages}${paginationArgs}" data-page="${totalPages}" class="btnFilterTrigger page-link">&gt;|</a>
-                </li>
-            `;
-        }
-
-        paginationText += `
-                </ul>
-            </nav>
-        `;
-
-        return paginationText;
-    }
-
-    function fillEntryList(entries, data) {
-        $('#entriesList').html("");
-
-        const templateMap = {
-            "standard": entryStandardTemplate,
-            "gallery": entryGalleryTemplate,
-            "search-engine": entrySearchEngineTemplate
-        };
-
-        const templateFunc = templateMap[view_display_type];
-
-        if (templateFunc) {
-            var text = templateFunc(view_show_icons, view_small_icons);
-            var finished_text = fillEntryListTemplate(entries, text);
-            finished_text += fillPagination(data, text);
-            $('#entriesList').html(finished_text);
-        } else {
-            $('#entriesList').html('Unhandled display type: ' + view_display_type);
-        }
-    }
-
-    let currentEntryListVersion = 0;
-
-    function loadEntryListContent(search_term = '', page = '', attempt = 1) {
-       $('.btnFilterTrigger').prop("disabled", true);
-
-       const currentUrl = new URL(window.location);
-       const currentSearch = currentUrl.searchParams.get('search') || '';
-
-       page = page || currentUrl.searchParams.get('page') || '1';
-
-       if (!search_term) {
-           search_term = currentSearch;
-       } else if (currentSearch !== search_term) {
-           page = '1';
-       }
-
-       currentUrl.searchParams.set('search', search_term);
-       currentUrl.searchParams.set('page', page);
-
-       window.history.pushState({}, '', currentUrl);
-
-       const url = `{{query_page}}?${currentUrl.searchParams.toString()}`;
-
-       const requestVersion = ++currentEntryListVersion;
-
-       const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
-       $('#entriesListStatus').html(status_text);
-
-        $.ajax({
-            url: url,
-            type: 'GET',
-            timeout: 15000,
-            success: function(data) {
-                if (requestVersion === currentEntryListVersion) {
-                   $('html, body').animate({ scrollTop: 0 }, 'slow');
-                   fillEntryList(data.entries, data);
-                   $('#entriesListStatus').html("");
-                   loadUserSearchHistory();
-                }
-            },
-            error: function(xhr, status, error) {
-                if (attempt < 3) {
-                    loadEntryListContent(search_term, page, attempt + 1);
-                    $('#entriesListStatus').html("Error loading dynamic content, retry");
-                }
-                else {
-                    $('#entriesListStatus').html("Cannot load data from " + url);
-                }
-            },
-            complete: function() {
-                $('.btnFilterTrigger').prop("disabled", false);
-            }
-        });
-    }
-
-    function isEmpty( el ){
-        return !$.trim(el.html())
+        var finished_text = fillEntryList(entries);
+        finished_text += fillPagination(data);
+        $('#listData').html(finished_text);
     }
 
     $(document).ready(function() {
@@ -327,8 +262,8 @@
 
         // if (user specified search, or show is true), and entrylist is empty
         if (search_term || show) {
-            if (isEmpty($('#entriesList'))) {
-                loadEntryListContent();
+            if (isEmpty($('#listData'))) {
+                loadRowListContent();
             }
         }
 
@@ -336,40 +271,41 @@
         // if auto refresh - keep refreshing list - for kiosk mode
         if (auto_refresh && !isNaN(auto_refresh)) {
             setInterval(function() {
-                loadEntryListContent();
+                loadRowListContent();
             }, parseInt(auto_refresh));
         }
+    });
 
-        //-----------------------------------------------
-        $(document).on('click', '.btnFilterTrigger', function(e) {
-            e.preventDefault();
+    //-----------------------------------------------
+    $(document).on('click', '.btnFilterTrigger', function(e) {
+        e.preventDefault();
 
-            // search if user specified search. pass page also
+        // search if user specified search. pass page also
 
-            var search_term = $(this).data('search') || $('#id_search').val();
-            var page = $(this).data('page')
+        var search_term = $(this).data('search') || $('#id_search').val();
+        var page = $(this).data('page')
 
-            if ($(this).data('search')) {
-                $('#id_search').val(search_term);
-            }
+        if ($(this).data('search')) {
+            $('#id_search').val(search_term);
+        }
 
-            $('#searchSuggestions').collapse('hide');
-            $('#searchHistory').collapse('hide');
-            $('#searchSyntax').collapse('hide');
+        $('#searchSuggestions').collapse('hide');
+        $('#searchHistory').collapse('hide');
+        $('#searchSyntax').collapse('hide');
 
-            loadEntryListContent(search_term, page);
-        });
+        loadRowListContent(search_term, page);
+    });
 
-        //-----------------------------------------------
-        // Bind to the input event of the search input within the form
-        $('#filterForm input[name="search"]').on('input', function() {
-            // Get the current value of the search input
-            var search_term = $(this).val();
+    //-----------------------------------------------
+    // Bind to the input event of the search input within the form
+    $('#filterForm input[name="search"]').on('input', function() {
+        var search_term = $('#filterForm input[name="search"]').val();
 
-            $('#searchHistory').collapse('hide');
+        $('#searchSuggestions').empty();
+        $('#searchSuggestions').collapse('hide');
 
-            // Call the function to load user search suggestions
+        if (search_term) {
             loadUserSearchSuggestions(search_term);
-        });
+        }
     });
 </script>

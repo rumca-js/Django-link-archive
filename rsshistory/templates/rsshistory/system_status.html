@@ -2,42 +2,225 @@
 {% load static %}
 {% block content %}
 
-<div id="bodyBlock">
+<h1>Status</h1>
+
+<ul id="statusBlock" class="list-group">
     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
-</div>
+</ul>
+
+<h1>Number of rows</h1>
+
+<ul id="tableStats" class="list-group">
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+</ul>
+
+<h1>Threads</h1>
+<ul id="threadStats" class="list-group">
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+</ul>
+
+<h1>Exports</h1>
+<ul id="exportStats" class="list-group">
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+</ul>
 
 <script>
-    function loadBodyContent(attempt = 1) {
+    function getSystemStatusText(data) {
+        let htmlOutput = '';
+
+        if (data.last_internet_check) {
+            data.last_internet_check = new Date(data.last_internet_check).toLocaleString();
+        }
+        if (data.days_to_move_to_archive) {
+            data.days_to_move_to_archive = new Date(data.days_to_move_to_archive).toLocaleString();
+        }
+        if (data.days_to_remove_links) {
+            data.days_to_remove_links = new Date(data.days_to_remove_links).toLocaleString();
+        }
+        if (data.days_to_remove_stale_entries) {
+            data.days_to_remove_stale_entries = new Date(data.days_to_remove_stale_entries).toLocaleString();
+        }
+        if (data.days_to_remove_std_entries) {
+            data.days_to_remove_std_entries = new Date(data.days_to_remove_std_entries).toLocaleString();
+        }
+        if (data.days_to_check_stale_entries) {
+            data.days_to_check_stale_entries = new Date(data.days_to_check_stale_entries).toLocaleString();
+        }
+
+        let array = [
+            { name: "Last internet check", value: data.last_internet_check },
+            { name: "days to move to archive", value: data.days_to_move_to_archive },
+            { name: "days to remove links", value: data.days_to_remove_links },
+            { name: "days to remove stale entries", value: data.days_to_remove_stale_entries },
+            { name: "days to remove std entries", value: data.days_to_remove_std_entries },
+            { name: "days to check stale entries", value: data.days_to_check_stale_entries },
+            { name: "directory", value: data.directory }
+        ];
+
+        for (let element of array) {
+            htmlOutput += `<li class="list-group-item">${element.name}: ${element.value}</li>`;
+        }
+
+        return htmlOutput;
+    }
+    function getThreadsText(threads) {
+        let htmloutput = '';
+
+        if (threads && threads.length > 0) {
+            threads.forEach(thread => {
+                let thread_name = thread.name;
+
+                let thread_date = "null";
+                if (thread.date) {
+                    // Convert thread.date to a Date object, then toLocaleString
+                    thread_date = new Date(thread.date).toLocaleString();
+                }
+
+                let table_text = `
+                    <li class="list-group-item">${thread_name}: ${thread_date}</li>
+                `;
+
+                htmloutput += table_text;
+            });
+        } else {
+            htmloutput = '<li class="list-group-item">no entries found</li>';
+        }
+
+        return htmloutput;
+    }
+    function getTableStatusText(tables) {
+        let htmloutput = '';
+
+        if (tables && tables.length > 0) {
+            tables.forEach(table => {
+                let tablename = table.name;
+                let tablecount = table.count;
+
+                let table_text = `
+                <li class="list-group-item">${tablename}: ${tablecount}</li>
+                `
+
+                htmloutput += table_text;
+            });
+        } else {
+            htmloutput = '<li class="list-group-item">no entries found</li>';
+        }
+
+        return htmloutput;
+    }
+    function getExportStatusText(exports) {
+        let htmloutput = '';
+
+        if (exports && exports.length > 0) {
+            exports.forEach(theexport => {
+                let export_date = theexport.date;
+                let export_local_path = theexport.local_path;
+                let export_remote_path = theexport.remote_path;
+                let export_type = theexport.export_type;
+                let export_data = theexport.export_data;
+
+                let table_text = `
+                    <li class="list-group-item">${export_date}: ${export_type} ${export_data} ${export_remote_path} ${export_local_path}</li>
+                `
+
+                htmloutput += table_text;
+            });
+        } else {
+            htmloutput = '<li class="list-group-item">no entries found</li>';
+        }
+
+        return htmloutput;
+    }
+
+    function fillSystemStatus(data) {
+        var system_status_text = getSystemStatusText(data);
+        $('#statusBlock').html(system_status_text);
+        var threads_text = getThreadsText(data.threads);
+        $('#threadStats').html(threads_text);
+    }
+    function fillTableStatus(tables) {
+        var text = getTableStatusText(tables);
+        $('#tableStats').html(text);
+    }
+    function fillExportStatus(data) {
+        var text = getExportStatusText(data.exports);
+        $('#exportStats').html(text);
+    }
+
+    function loadSystemStatus(attempt = 1) {
+        $('#statusBlock').html("made request");
         $.ajax({
-            url: '{% url 'rsshistory:get-system-status' %}',
+            url: '{% url 'rsshistory:json-system-status' %}',
             type: 'GET',
-            timeout: 15000,
+            timeout: 10000,
             success: function(data) {
-                $('#bodyBlock').html(data);
+                fillSystemStatus(data);
             },
             error: function(xhr, status, error) {
-                if (attempt < 2) {
-                    loadBodyContent(attempt + 1);
-                    $('#bodyBlock').html("Error loading dynamic content, retry")
+                if (attempt < 3) {
+                    $('#statusBlock').html("Error loading dynamic content, retry")
+                    $('#threadStats').html("Error loading dynamic content, retry")
+                    loadSystemStatus(attempt + 1);
                 } else {
-                    $('#bodyBlock').html("Error loading dynamic content")
+                    $('#statusBlock').html("Error loading dynamic content")
+                    $('#threadStats').html("Error loading dynamic content")
+                }
+            }
+        });
+    }
+    function loadTableStatus(attempt = 1) {
+        $('#tableStats').html("made request");
+        $.ajax({
+            url: '{% url 'rsshistory:json-table-status' %}',
+            type: 'GET',
+            timeout: 10000,
+            success: function(data) {
+                $('#tableStats').html("Table success")
+                fillTableStatus(data.tables);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    $('#tableStats').html("Error loading dynamic content, retry")
+                    loadTableStatus(attempt + 1);
+                } else {
+                    $('#tableStats').html("Error loading dynamic content")
+                }
+            }
+        });
+    }
+    function loadExportStatus(attempt = 1) {
+        $('#exportStats').html("made request");
+        $.ajax({
+            url: '{% url 'rsshistory:json-export-status' %}',
+            type: 'GET',
+            timeout: 10000,
+            success: function(data) {
+                fillExportStatus(data);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    $('#exportStats').html("Error loading dynamic content, retry")
+                    loadExportStatus(attempt + 1);
+                } else {
+                    $('#exportStats').html("Error loading dynamic content")
                 }
             }
         });
     }
 
+    function loadAll() {
+        loadSystemStatus();
+        loadTableStatus();
+        loadExportStatus();
+    }
+
     $(document).ready(function() {
-        loadBodyContent();
+        $('#statusBlock').html("Document ready")
+        loadAll();
 
         setInterval(function() {
-        loadBodyContent();
-        }, 300000);  // 5 minutes in milliseconds
-    });
-
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-        loadBodyContent();
-        }
+            loadAll();
+        }, 300000);
     });
 </script>
 

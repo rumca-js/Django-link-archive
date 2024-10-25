@@ -291,10 +291,13 @@ class BaseQueryFilter(object):
 
 
 class SourceFilter(BaseQueryFilter):
-    def __init__(self, args, user=None):
-        super().__init__(args, user=user)
+    def __init__(self, args, user=None, init_objects=None):
+        super().__init__(args, user=user, init_objects=init_objects)
 
     def get_init_objects(self):
+        if self.init_objects:
+            return self.init_objects
+
         return SourceDataController.objects
 
     def get_default_omni_search_fields(self):

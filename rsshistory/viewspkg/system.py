@@ -1,6 +1,7 @@
 from pathlib import Path
 import logging
 from datetime import timedelta
+import os
 
 from django.views import generic
 from django.urls import reverse
@@ -245,87 +246,140 @@ def system_status(request):
     return p.render("system_status.html")
 
 
-def get_system_status(request):
+def json_table_status(request):
     p = ViewPage(request)
     p.set_title("Status")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
 
-    c = Configuration.get_object()
-    p.context["directory"] = c.directory
+    table = []
 
-    last_internet_check = c.get_local_time(SystemOperation.get_last_internet_check())
-    p.context["last_internet_check"] = last_internet_check
+    table.append({"name" : "ConfigurationEntry", "count" : ConfigurationEntry.objects.count()})
+    table.append({"name" : "UserConfig", "count" : UserConfig.objects.count()})
+    table.append({"name" : "SystemOperation", "count" : SystemOperation.objects.count()})
 
-    p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
-    p.context["UserConfig"] = UserConfig.objects.count()
-    p.context["SystemOperation"] = SystemOperation.objects.count()
+    table.append({"name" : "SourceDataModel", "count" : SourceDataController.objects.count()})
+    table.append({"name" : "SourceOperationalData", "count" : SourceOperationalData.objects.count()})
+    table.append({"name" : "LinkDataModel", "count" : LinkDataController.objects.count()})
+    table.append({"name" : "ArchiveLinkDataModel", "count" : ArchiveLinkDataController.objects.count()})
+    table.append({"name" : "KeyWords", "count" : KeyWords.objects.count()})
+    table.append({"name" : "BlockEntry", "count" : BlockEntry.objects.count()})
+    table.append({"name" : "BlockEntryList", "count" : BlockEntryList.objects.count()})
 
-    p.context["SourceDataModel"] = SourceDataController.objects.count()
-    p.context["SourceOperationalData"] = SourceOperationalData.objects.count()
-    p.context["LinkDataModel"] = LinkDataController.objects.count()
-    p.context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
-    p.context["KeyWords"] = KeyWords.objects.count()
-    p.context["BlockEntry"] = BlockEntry.objects.count()
-    p.context["BlockEntryList"] = BlockEntryList.objects.count()
+    table.append({"name" : "UserTags", "count" : UserTags.objects.count()})
+    table.append({"name" : "UserCompactedTags", "count" : UserCompactedTags.objects.count()})
+    table.append({"name" : "CompactedTags", "count" : CompactedTags.objects.count()})
+    table.append({"name" : "UserVotes", "count" : UserVotes.objects.count()})
+    table.append({"name" : "UserBookmarks", "count" : UserBookmarks.objects.count()})
+    table.append({"name" : "UserComments", "count" : UserCommentsController.objects.count()})
+    table.append({"name" : "UserSearchHistory", "count" : UserSearchHistory.objects.count()})
+    table.append({"name" : "UserEntryVisitHistory", "count" : UserEntryVisitHistory.objects.count()})
+    table.append({"name" : "UserEntryTransitionHistory", "count" : UserEntryTransitionHistory.objects.count()})
+
+    table.append({"name" : "BackgroundJob", "count" : BackgroundJob.objects.count()})
+    table.append({"name" : "DataExport", "count" : DataExport.objects.count()})
+    table.append({"name" : "SourceExportHistory", "count" : SourceExportHistory.objects.count()})
+    table.append({"name" : "ModelFiles", "count" : ModelFiles.objects.count()})
+    table.append({"name" : "AppLogging", "count" : AppLogging.objects.count()})
+    table.append({"name" : "Domains", "count" : Domains.objects.count()})
 
     # u = EntriesUpdater()
     # entries = u.get_entries_to_update()
     # if entries:
     #    p.context["LinkDataModel_toupdate"] = entries.count()
 
-    p.context["UserTags"] = UserTags.objects.count()
-    p.context["UserCompactedTags"] = UserCompactedTags.objects.count()
-    p.context["CompactedTags"] = CompactedTags.objects.count()
-    p.context["UserVotes"] = UserVotes.objects.count()
-    p.context["UserBookmarks"] = UserBookmarks.objects.count()
-    p.context["UserComments"] = UserCommentsController.objects.count()
-    p.context["UserSearchHistory"] = UserSearchHistory.objects.count()
-    p.context["UserEntryVisitHistory"] = UserEntryVisitHistory.objects.count()
-    p.context["UserEntryTransitionHistory"] = UserEntryTransitionHistory.objects.count()
 
-    p.context["BackgroundJob"] = BackgroundJob.objects.count()
-    p.context["DataExport"] = DataExport.objects.count()
-    p.context["SourceExportHistory"] = SourceExportHistory.objects.count()
-    p.context["ModelFiles"] = ModelFiles.objects.count()
+    data = {}
+    data["tables"] = table
+
+    return JsonResponse(data)
+
+
+def json_system_status(request):
+    p = ViewPage(request)
+    p.set_title("Status")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    data = {}
+
+    c = Configuration().get_object()
+
+    last_internet_check = c.get_local_time(SystemOperation.get_last_internet_check())
+    data["last_internet_check"] = last_internet_check
 
     now = c.get_local_time(DateUtils.get_datetime_now_utc())
-    p.context["DateTime_Current"] = now
+    data["current_time"] = now
 
     current_time = DateUtils.get_datetime_now_utc()
 
     conf = c.config_entry
     if conf.days_to_move_to_archive != 0:
         days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
-        p.context["days_to_move_to_archive"] = c.get_local_time(days_before)
+        data["days_to_move_to_archive"] = days_before
+    else:
+        data["days_to_move_to_archive"] = 0
 
     if conf.days_to_remove_links != 0:
         days_before = current_time - timedelta(days=conf.days_to_remove_links)
-        p.context["days_to_remove_links"] = c.get_local_time(days_before)
+        data["days_to_remove_links"] = days_before
+    else:
+        data["days_to_remove_links"] = 0
 
     if conf.days_to_remove_stale_entries != 0:
         days_before = current_time - timedelta(days=conf.days_to_remove_stale_entries)
-        p.context["days_to_remove_stale_entries"] = c.get_local_time(days_before)
+        data["days_to_remove_stale_entries"] = days_before
+    else:
+        data["days_to_remove_stale_entries"] = 0
 
     if conf.days_to_check_std_entries != 0:
         days_before = current_time - timedelta(days=conf.days_to_check_std_entries)
-        p.context["days_to_check_std_entries"] = c.get_local_time(days_before)
+        data["days_to_check_std_entries"] = days_before
+    else:
+        data["days_to_check_std_entries"] = 0
 
     if conf.days_to_check_stale_entries != 0:
         days_before = current_time - timedelta(days=conf.days_to_check_stale_entries)
-        p.context["days_to_check_stale_entries"] = c.get_local_time(days_before)
+        data["days_to_check_stale_entries"] = days_before
+    else:
+        data["days_to_check_stale_entries"] = 0
 
-    p.context["AppLogging"] = AppLogging.objects.count()
-    p.context["Domains"] = Domains.objects.count()
+    data["directory"] = c.directory
 
-    p.context["server_path"] = Path(".").resolve()
-    p.context["directory"] = Path(".").resolve()
+    data["threads"] = []
+    for thread_info in c.get_thread_info():
+        data["threads"].append({"name" : thread_info[0], "date" : thread_info[1]} )
 
-    history = SourceExportHistory.get_safe()
-    p.context["export_history_list"] = history
+    return JsonResponse(data)
 
-    return p.render("system_status_element.html")
+
+def history_to_json(history):
+    json = {}
+    json["date"] = history.date
+    json["export_type"] = history.export.export_type
+    json["export_data"] = history.export.export_data
+    json["remote_path"] = history.export.remote_path
+    json["local_path"] = history.export.local_path
+    return json
+
+
+def json_export_status(request):
+    p = ViewPage(request)
+    p.set_title("Status")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    data = {}
+    data["exports"] = []
+
+    histories = SourceExportHistory.get_safe()
+    for history in histories:
+        data["exports"].append(history_to_json(history))
+
+    return JsonResponse(data)
 
 
 class AppLoggingView(generic.ListView):

@@ -6,13 +6,13 @@
 
   {% include "rsshistory/form_filter_oneliner_element.html" %}
 
-  <span id="entriesListStatus">
+  <span id="listStatus">
   </span>
 
 {% if user_config.display_type == "gallery" %}
-  <span id="entriesList" class="d-flex flex-wrap">
+  <span id="listData" class="d-flex flex-wrap">
 {% else %}
-  <span id="entriesList" class="container list-group">
+  <span id="listData" class="container list-group">
 {% endif %}
   </span>
 

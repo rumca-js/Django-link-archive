@@ -1073,7 +1073,7 @@ def handle_json_view(request, view_to_use):
         json_obj["count"] = p.count
         json_obj["num_pages"] = p.num_pages
 
-        limited_entries = entries[page_obj.start_index() - 1 : page_obj.end_index()]
+        limited_entries = entries[page_obj.start_index() : page_obj.end_index()]
 
         for entry in limited_entries:
             entry_json = entry_to_json(uc, entry)

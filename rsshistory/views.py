@@ -80,6 +80,8 @@ class ViewPage(object):
         c = Configuration.get_object()
         config = c.config_entry
 
+        context["debug"] = config.debug_mode
+
         if self.is_user_allowed(self.access_type) and config.background_tasks:
             context.update(c.get_context())
 

@@ -673,6 +673,15 @@ class EntriesDetailViews(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+        self.archive_entry_html = ArchiveLinkDataController.objects.create(
+            source_url="https://linkedin.com/feed",
+            link="https://linkedin.com?v=archived",
+            title="The second link",
+            source=source_youtube,
+            bookmarked=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
 
         SourceDataController.objects.create(
             url="https://linkedin.com",
@@ -751,6 +760,18 @@ class EntriesDetailViews(FakeInternetTestCase):
         url = reverse(
             "{}:entry-detail".format(LinkDatabase.name),
             args=[self.entry_html.id],
+        )
+        # call tested function
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+        
+    def test_entry_detail__archived_html(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        url = reverse(
+            "{}:entry-archived".format(LinkDatabase.name),
+            args=[self.archive_entry_html.id],
         )
         # call tested function
         response = self.client.get(url)

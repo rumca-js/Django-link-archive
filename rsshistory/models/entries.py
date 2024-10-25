@@ -188,7 +188,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         return "{} {}".format(self.date_published, self.get_source_name())
 
     def has_tags(self):
-        if not getattr(self, "tags"):
+        if not hasattr(self, "tags"):
             return 0
 
         return len(self.tags.all()) > 0
@@ -579,8 +579,10 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         if description.find("\r") > 0:
             return description
+            
+        length = BaseLinkDataController.get_description_length()
 
-        description = BaseLinkDataController.get_description_safe(description)
+        description = description[:length-1]
         lines_number = description.count("\n")
         description = description[: -lines_number]
         return description

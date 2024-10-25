@@ -30,42 +30,28 @@
 
 <script>
 
-    /*
     function getTemplate(job) {
-        let text = `
-        <div class="my-1 p-1 list-group-item list-group-item-action"
-           title="${job.date_created} ${job.job} ${job.task} ${job.subject} ${job.args}">
+        let link_affected_text = "";
+        if (job.link_affected) {
+            let link_affected = job.link_affected;
+            link_affected_text = `
            <div>
-              ${job.id}
-              ${job.enabled ? '[DISABLED]' : ''}
-              ${job.errors > 0 ? `ERRORS: ${job.errors}` : ''}
-
-              [${job.date_created}] ${job.priority} <b>${job.job}</b>
-
-              ${job.is_subject_link ? `<a href="${job.subject}">${job.subject}</a>` : `${job.subject}`}
-              
-              ${job.user ? `User: ${job.user.username}` : ''}
-              
-              ${job.args}
+              <a href="${link_affected}" class="btn btn-secondary btn-sm mb-2" role="button">Object</a>
            </div>
+           `;
+        }
 
-           <div>
-              ${job.link_affected ? `<a href="${job.link_affected}" class="btn btn-secondary btn-sm mb-2" role="button">Object</a>` : ''}
-           </div>
-        </div>`;
-
-        return text;
-    }
-    */
-
-    function getTemplate(job) {
         let text = `
         <div class="my-1 p-1 list-group-item list-group-item-action"
            title="${job.date_created} ${job.job} ${job.task} ${job.subject} ${job.args}">
            <div>
               ${job.id}
 
-              [${job.date_created}] ${job.priority} <b>${job.job}</b>
+              [${job.date_created}] 
+
+              ${!job.enabled ? '[DISABLED]' : ''}
+
+              ${job.priority} <b>${job.job}</b>
 
               ${job.subject}
               
@@ -73,6 +59,8 @@
               
               ${job.args}
            </div>
+
+           ${link_affected_text}
 
            <div>
               <a href="{% url 'rsshistory:backgroundjob-disable' 1017 %}" class="btn btn-secondary btn-sm" role="button" title="Disable job">
@@ -92,7 +80,7 @@
               <a href="{% url 'rsshistory:backgroundjob-remove' 1017 %}" class="btn btn-secondary btn-sm" role="button" title="Remove job">
                  {% include "rsshistory/icon_remove.html" %}
               </a>
-              <a href="{% url 'rsshistory:backgroundjobs-remove' 1017 %}" class="btn btn-secondary btn-sm" role="button" title="Remove all in type">
+              <a href="{% url 'rsshistory:backgroundjobs-remove' 1018 %}" class="btn btn-secondary btn-sm" role="button" title="Remove all in type">
                  <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
                  Type
               </a>
@@ -109,7 +97,7 @@
             jobs.forEach(job => {
                 let date_created = new Date(job.date_created);
                 if (isNaN(date_created)) {
-                    date_created = new Date();  // Fallback to current date if invalid
+                    date_created = new Date();
                 }
 
                 let template_text = getTemplate(job);
@@ -124,6 +112,7 @@
                     .replace(/\${job.priority}/g, job.priority || '')
                     .replace(/\${job.link_affected}/g, job.link_affected || '')
                     .replace(/1017/g, job.id)
+                    .replace(/1018/g, job.job)
                     .replace(/\${job.user}/g, job.user || '');
 
                 htmlOutput += listItem;
@@ -163,28 +152,11 @@
     }
 
     $(document).ready(function() {
-        // Initial load
         loadBodyContent();
 
         let refreshInterval = setInterval(function() {
             loadBodyContent();
         }, 300000);
-
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                loadBodyContent();
-            }
-        });
-
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                clearInterval(refreshInterval);
-            } else {
-                refreshInterval = setInterval(function() {
-                    loadBodyContent();
-                }, 300000);
-            }
-        });
     });
 </script>
 

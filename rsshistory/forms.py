@@ -744,7 +744,6 @@ class SourcesChoiceForm(forms.Form):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
 
-    def create(self):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
         categories = self.get_categories()

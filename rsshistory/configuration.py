@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 import logging
+import os
 
 from django.contrib.auth.models import User
 
@@ -20,7 +21,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "1.2.7"
+__version__ = "1.2.8"
 
 
 class Configuration(object):
@@ -28,7 +29,11 @@ class Configuration(object):
 
     def __init__(self, app_name=LinkDatabase.name):
         self.app_name = str(app_name)
-        self.directory = Path(".")
+
+        file_path = os.path.realpath(__file__)
+        full_path = Path(file_path)
+        self.directory = str(full_path.parents[1])
+
         self.version = __version__
 
         self.enable_logging()
@@ -270,9 +275,6 @@ class Configuration(object):
         result = []
         for thread in SystemOperation.get_thread_ids():
             date = SystemOperation.get_last_thread_signal(thread)
-            if date:
-                date = self.get_local_time(date)
-
             result.append([thread, date])
 
         return result

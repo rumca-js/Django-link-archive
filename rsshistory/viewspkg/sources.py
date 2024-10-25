@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render, redirect
@@ -7,6 +9,7 @@ from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
 from ..webtools import Url, DomainAwarePage, HttpPageHandler, DomainCache
+from utils.omnisearch import SingleSymbolEvaluator
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -27,21 +30,20 @@ from ..controllers import (
 )
 from ..forms import SourceForm, ContentsForm, SourcesChoiceForm, SourceInputForm
 from ..queryfilters import SourceFilter
-from ..views import ViewPage, GenericListView, get_page_num
+from ..views import ViewPage, GenericListView, get_page_num, get_search_term
 from ..configuration import Configuration
 from ..pluginurl import UrlHandler
 from ..pluginsources import SourceControllerBuilder
 from ..serializers.instanceimporter import InstanceExporter
 
 
-class SourceListView(GenericListView):
-    model = SourceDataController
-    context_object_name = "source_list"
-    paginate_by = 100
-
+class SourceListView(object):
     def get_queryset(self):
-        self.query_filter = SourceFilter(self.request.GET, self.request.user)
+        self.query_filter = SourceFilter(self.request.GET, self.request.user, init_objects = self.get_init_query_set())
         return self.query_filter.get_filtered_objects()
+
+    def get_init_query_set(self):
+        return SourceDataController.objects.all()
 
     def get_paginate_by(self, queryset):
         if not self.request.user.is_authenticated:
@@ -51,45 +53,13 @@ class SourceListView(GenericListView):
             uc = UserConfig.get(self.request.user)
             return uc.sources_per_page
 
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super().get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
-        # Create any data and add it to the context
-
-        self.init_display_type(context)
-
-        self.filter_form = SourcesChoiceForm(self.request.GET, request=self.request)
-        self.filter_form.create()
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse("{}:sources".format(LinkDatabase.name))
-
-        context["query_filter"] = self.query_filter
-
-        context["form"] = self.filter_form
-        context["page_title"] += " " + self.get_title()
-
-        return context
-
-    def init_display_type(self, context):
-        # TODO https://stackoverflow.com/questions/57487336/change-value-for-paginate-by-on-the-fly
-        # if type is not normal, no pagination
-        if "type" in self.request.GET:
-            context["type"] = self.request.GET["type"]
-        else:
-            context["type"] = "normal"
-        context["args"] = self.get_args()
-
-    def get_args(self):
-        arg_data = {}
-        for arg in self.request.GET:
-            if arg != "type":
-                arg_data[arg] = self.request.GET[arg]
-
-        return "&" + urlencode(arg_data)
-
     def get_title(self):
         return "Sources"
+
+
+class SourcesEnabledListView(SourceListView):
+    def get_init_query_set(self):
+        return SourceDataController.objects.filter(enabled=True)
 
 
 class SourceDetailView(generic.DetailView):
@@ -147,9 +117,55 @@ class SourceDetailView(generic.DetailView):
         return context
 
 
+def get_generic_search_init_context(request, form, user_choices):
+    context = {}
+    context["form"] = form
+
+    search_term = get_search_term(request.GET)
+    context["search_term"] = search_term
+    context["search_engines"] = SearchEngines(search_term)
+    context["search_history"] = user_choices
+    context["view_link"] = form.action_url
+    context["form_submit_button_name"] = "Search"
+
+    context["entry_query_names"] = SourceDataController.get_query_names()
+    context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
+
+    return context
+
+
+def sources(request):
+    p = ViewPage(request)
+    p.set_title("Add source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    data = {}
+    if "search" in request.GET:
+        data={"search": request.GET["search"]}
+
+    filter_form = SourcesChoiceForm(request=request, initial=data)
+    filter_form.method = "GET"
+    filter_form.action_url = reverse("{}:sources".format(LinkDatabase.name))
+
+    # TODO jquery that
+    #user_choices = UserSearchHistory.get_user_choices(request.user)
+    user_choices = []
+    context = get_generic_search_init_context(request, filter_form, user_choices)
+
+    p.context.update(context)
+    p.context["query_page"] = reverse("{}:sources-json-all".format(LinkDatabase.name))
+
+    return p.render("sources_list.html")
+
+
 def add_source(request):
     p = ViewPage(request)
     p.set_title("Add source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
 
     uc = UserConfig.get(request.user)
     if not uc.can_add():
@@ -288,6 +304,9 @@ def add_source_simple(request):
 
     p = ViewPage(request)
     p.set_title("Add source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
 
     uc = UserConfig.get(request.user)
     if not uc.can_add():
@@ -738,38 +757,63 @@ def source_json(request, pk):
     return JsonResponse(json_obj)
 
 
-def sources_json(request):
+def source_to_json(user_config, source):
+    json_source = {}
+    json_source["id"] = source.id
+    json_source["title"] = source.title
+    json_source["url"] = source.url
+    json_source["url_absolute"] = source.get_absolute_url()
+    json_source["favicon"] = source.favicon
+    json_source["enabled"] = source.enabled
+    json_source["errors"] = source.dynamic_data.consecutive_errors
+
+    return json_source
+
+
+def sources_json_view(request, view_class):
     p = ViewPage(request)
-    p.set_title("Remove all entries")
+    p.set_title("Returns all sources JSON")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
     if data is not None:
         return data
 
-    check_views = [
-        SourceListView,
-    ]
+    page_num = p.get_page_num()
 
-    view_to_use = None
+    json_obj = {}
+    json_obj["sources"] = []
+    json_obj["count"] = 0
+    json_obj["page"] = page_num
+    json_obj["num_pages"] = 0
 
-    for view_class in check_views:
-        view = view_class()
-        view.request = request
-        view_to_use = view
+    view = view_class()
+    view.request = request
 
-    page_num = get_page_num(request.GET)
+    uc = UserConfig.get(request.user)
 
-    if view_to_use:
-        links = view_to_use.get_queryset()
-        p = Paginator(links, view.get_paginate_by(links))
-        page_obj = p.get_page(page_num)
+    sources = view.get_queryset()
+    p = Paginator(sources, view.get_paginate_by(sources))
+    page_obj = p.get_page(page_num)
 
-        objects = links[page_obj.start_index() - 1 : page_obj.end_index()]
+    json_obj["count"] = p.count
+    json_obj["num_pages"] = p.num_pages
 
-        exporter = InstanceExporter()
-        json_obj = exporter.export_sources(objects)
+    limited_sources = sources[page_obj.start_index() : page_obj.end_index()]
 
-        # JsonResponse
-        return JsonResponse(json_obj)
+    for source in limited_sources:
+        source_json = source_to_json(uc, source)
+
+        json_obj["sources"].append(source_json)
+
+    # JsonResponse
+    return JsonResponse(json_obj)
+
+
+def sources_json_all(request):
+    return sources_json_view(request, SourceListView)
+
+
+def sources_json_enabled(request):
+    return sources_json_view(request, SourcesEnabledListView)
 
 
 def categories_view(request):

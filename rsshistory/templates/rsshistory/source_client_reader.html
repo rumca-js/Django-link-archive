@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS Feed Example</title>
+    <script src="https://unpkg.com/rss-parser/dist/rss-parser.min.js"></script>
+</head>
+<body>
+    <div id="rssFeed"></div>
+
+    <script>
+    const parser = new RSSParser();
+
+    const feedUrl = 'https://example.com/rss'; 
+
+    parser.parseURL(feedUrl)
+        .then(feed => {
+            document.getElementById('rssFeed').innerHTML = `<h1>${feed.title}</h1>`;
+            feed.items.forEach(item => {
+                document.getElementById('rssFeed').innerHTML += `<h4><a href="${item.link}" target="_blank">${item.title}</a></h4>`;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching feed:', error);
+            document.getElementById('rssFeed').innerHTML = '<p>Error loading feed.</p>';
+        });
+    </script>
+</body>
+</html>

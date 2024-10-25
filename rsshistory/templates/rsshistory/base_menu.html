@@ -75,7 +75,7 @@
                    </li>
                    {% endif %}
                    <li>
-                       <a href="{% url 'rsshistory:sources' %}" class="dropdown-item" title="Sources">
+                       <a href="{% url 'rsshistory:sources' %}?show=1" class="dropdown-item" title="Sources">
                            <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
                            Sources
                            {% if is_source_error %}
