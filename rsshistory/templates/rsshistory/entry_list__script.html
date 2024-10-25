@@ -64,12 +64,12 @@
         let page_rating_votes = entry.page_rating_votes;
 
         let badge_text = page_rating_votes > 0 ? `
-            <span class="badge badge-primary" style="position: absolute; top: 5px; right: 20px; font-size: 1rem;">
+            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 20px; font-size: 1rem;">
                 ${page_rating_votes}
             </span>` : '';
 
         let star_badge = entry.bookmarked ? `
-            <span class="badge badge-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
+            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
                 ★
             </span>` : '';
 
@@ -111,12 +111,12 @@
         let page_rating_votes = entry.page_rating_votes;
 
         let badge_text = page_rating_votes > 0 ? `
-            <span class="badge badge-primary" style="position: absolute; top: 5px; right: 20px; font-size: 1rem;">
+            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 20px; font-size: 1rem;">
                 ${page_rating_votes}
             </span>` : '';
 
         let star_badge = entry.bookmarked ? `
-            <span class="badge badge-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
+            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
                 ★
             </span>` : '';
 
@@ -148,12 +148,12 @@
         let page_rating_votes = entry.page_rating_votes;
         
         let badge_text = page_rating_votes > 0 ? `
-            <span class="badge badge-primary" style="position: absolute; top: 10px; right: 40px; font-size: 1rem;">
+            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 30px; font-size: 1rem;">
                 ${page_rating_votes}
             </span>` : '';
 
         let star_badge = entry.bookmarked ? `
-            <span class="badge badge-warning" style="position: absolute; top: 10px; right: 10px; font-size: 1rem;">
+            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
                 ★
             </span>` : '';
 
@@ -244,7 +244,9 @@
         }
 
         var finished_text = fillEntryList(entries);
+        finished_text += "<div>";
         finished_text += fillPagination(data);
+        finished_text += "</div>";
         $('#listData').html(finished_text);
     }
 
