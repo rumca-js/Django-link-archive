@@ -20,22 +20,17 @@
             success: function(data) {
                 if (requestVersion === currentUserSearchSuggestions) {
                     $('#searchHistory').collapse('hide');
-                    $('#searchSuggestions').empty();
                     fillUserSearchSuggestions(data.items);
                     $('#searchSuggestions').collapse('show');
                 }
             },
             error: function(xhr, status, error) {
-                if (attempt < 3) {
-                    $('#searchSuggestions').html("Cannot load suggestions, retry");
-				    $('#searchSuggestions').collapse('show');
-				   
-					loadUserSearchSuggestions(search_term, attempt + 1); 
+                if (requestVersion === currentUserSearchSuggestions)
+                {
+                    if (attempt < 3) {
+                        loadUserSearchSuggestions(search_term, attempt + 1); 
+                    }
                 }
-				else {
-                    $('#searchSuggestions').html("Cannot load suggestions");
-				    $('#searchSuggestions').collapse('show');
-				}
             }
         });
     }
@@ -51,10 +46,6 @@
             error: function(xhr, status, error) {
                 if (attempt < 3) {
                     loadUserSearchHistory(search_term, page, attempt + 1);
-                    $('#searchHistory').html("Error loading dynamic content, retry");
-                }
-                else {
-                    $('#searchHistory').html("Cannot load data from " + url)
                 }
             }
         });
@@ -64,30 +55,30 @@
         let page_rating_votes = entry.page_rating_votes;
 
         let badge_text = page_rating_votes > 0 ? `
-            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 20px; font-size: 1rem;">
+            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 30px; font-size: 1rem;">
                 ${page_rating_votes}
             </span>` : '';
 
-        let star_badge = entry.bookmarked ? `
+        let badge_star = entry.bookmarked ? `
             <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
                 ★
             </span>` : '';
 
         let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
 	let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
-
         let votes_text = page_rating_votes > 0 ? `[${page_rating_votes}]` : '';
 
-        let thumbnail_text = '';
+        let img_text = '';
         if (show_icons) {
             const iconClass = small_icons ? 'icon-small' : 'icon-normal';
-            thumbnail_text = `<img src="{thumbnail}" class="rounded ${iconClass}" />`;
+            img_text = `<img src="{thumbnail}" class="rounded ${iconClass}" />`;
         }
         
-        if (thumbnail_text) {
+        let thumbnail_text = '';
+        if (img_text) {
             thumbnail_text = `
                 <div style="position: relative; display: inline-block;">
-                    ${thumbnail_text}
+                    ${img_text}
                 </div>`;
         }
 
@@ -101,12 +92,15 @@
                 <div class="d-flex">
                     ${thumbnail_text}
                     <div class="mx-2">
-                        <span style="font-weight:bold" class="text-reset">{title_safe} ${votes_text}</span>
+                        <span style="font-weight:bold" class="text-reset">{title_safe}</span>
                         <div class="text-reset">
                             {source__title} {date_published}
                         </div>
                     </div>
                 </div>
+
+                ${badge_text}
+                ${badge_star}
             </a>
         `;
     }
@@ -115,16 +109,16 @@
         let page_rating_votes = entry.page_rating_votes;
 
         let badge_text = page_rating_votes > 0 ? `
-            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 20px; font-size: 1rem;">
+            <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 30px; font-size: 1rem;">
                 ${page_rating_votes}
             </span>` : '';
 
-        let star_badge = entry.bookmarked ? `
+        let badge_star = entry.bookmarked ? `
             <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
                 ★
             </span>` : '';
 
-	let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
+        let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
         let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
 
         let votes_text = page_rating_votes > 0 ? `[${page_rating_votes}]` : '';
@@ -143,11 +137,17 @@
                 href="{link_absolute}"
                 title="{title}"
                 ${invalid_style}
-		class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class}"
+                class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class}"
             >
-                ${thumbnail_text}
-                <span style="font-weight:bold" class="text-reset">{title_safe} ${votes_text}</span>
-                <div class="text-reset">@ {link}</div>
+                <div class="d-flex">
+                   ${thumbnail_text}
+                   <div class="mx-2">
+                      <span style="font-weight:bold" class="text-reset">{title_safe}</span>
+                      <div class="text-reset">@ {link}</div>
+                      ${badge_text}
+                      ${badge_star}
+                   </div>
+                </div>
             </a>
         `;
     }
@@ -288,9 +288,7 @@
     //-----------------------------------------------
     $(document).on('click', '.btnFilterTrigger', function(e) {
         e.preventDefault();
-
-        // search if user specified search. pass page also
-
+        
         var search_term = $(this).data('search') || $('#id_search').val();
         var page = $(this).data('page')
 

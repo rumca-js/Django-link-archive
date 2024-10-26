@@ -165,7 +165,7 @@ class EntriesSearchListView(object):
 
         return objects
 
-    def get_paginate_by(self, queryset):
+    def get_paginate_by(self):
         """
         API: Returns pagination value
         """
@@ -1069,7 +1069,7 @@ def handle_json_view(request, view_to_use):
 
     if view_to_use:
         entries = view_to_use.get_queryset()
-        p = Paginator(entries, view_to_use.get_paginate_by(entries))
+        p = Paginator(entries, view_to_use.get_paginate_by())
         page_obj = p.get_page(page_num)
 
         json_obj["count"] = p.count

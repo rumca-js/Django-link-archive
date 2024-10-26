@@ -45,7 +45,7 @@ class SourceListView(object):
     def get_init_query_set(self):
         return SourceDataController.objects.all()
 
-    def get_paginate_by(self, queryset):
+    def get_paginate_by(self):
         if not self.request.user.is_authenticated:
             config = Configuration.get_object().config_entry
             return config.sources_per_page
@@ -794,7 +794,7 @@ def sources_json_view(request, view_class):
     uc = UserConfig.get(request.user)
 
     sources = view.get_queryset()
-    p = Paginator(sources, view.get_paginate_by(sources))
+    p = Paginator(sources, view.get_paginate_by())
     page_obj = p.get_page(page_num)
 
     json_obj["count"] = p.count

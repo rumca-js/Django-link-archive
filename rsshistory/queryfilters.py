@@ -313,7 +313,7 @@ class SourceFilter(BaseQueryFilter):
         from .viewspkg.sources import SourceListView
 
         try:
-            return int(SourceListView.paginate_by)
+            return int(SourceListView.get_paginate_by())
         except ValueError:
             return 100
 
@@ -329,7 +329,7 @@ class EntryFilter(BaseQueryFilter):
         from .viewspkg.entries import EntriesSearchListView
 
         try:
-            return int(EntriesSearchListView.paginate_by)
+            return int(EntriesSearchListView.get_paginate_by())
         except ValueError:
             return 100
 

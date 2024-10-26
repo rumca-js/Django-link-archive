@@ -19,22 +19,17 @@
             success: function(data) {
                 if (requestVersion === currentUserSearchSuggestions) {
                     $('#searchHistory').collapse('hide');
-                    $('#searchSuggestions').empty();
                     fillUserSearchSuggestions(data.items);
                     $('#searchSuggestions').collapse('show');
                 }
             },
             error: function(xhr, status, error) {
-                if (attempt < 3) {
-                    $('#searchSuggestions').html("Cannot load suggestions, retry");
-				    $('#searchSuggestions').collapse('show');
-				   
-					loadUserSearchSuggestions(search_term, attempt + 1); 
+                if (requestVersion === currentUserSearchSuggestions)
+                {
+                    if (attempt < 3) {
+                        loadUserSearchSuggestions(search_term, attempt + 1); 
+                    }
                 }
-				else {
-                    $('#searchSuggestions').html("Cannot load suggestions");
-				    $('#searchSuggestions').collapse('show');
-				}
             }
         });
     }

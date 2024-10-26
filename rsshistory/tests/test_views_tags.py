@@ -131,7 +131,7 @@ class UserTagsTest(FakeInternetTestCase):
 
         tag = UserTags.objects.create(tag="personal", user=self.user, entry=entry)
 
-        url = reverse("{}:tags-entry-show".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:entry-tags".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

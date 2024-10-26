@@ -52,10 +52,10 @@ class UserHistoryViewsTest(FakeInternetTestCase):
 
         self.client.login(username="testuser", password="testpassword")
 
-    def test_get_search_suggestions__search_history(self):
+    def test_get_search_suggestions_entries__search_history(self):
         history = UserSearchHistory.objects.create(search_query = "lolipop", user=self.user)
 
-        url = reverse("{}:get-search-suggestions".format(LinkDatabase.name), args=["lolipop"])
+        url = reverse("{}:get-search-suggestions-entries".format(LinkDatabase.name), args=["lolipop"])
 
         # call tested function
         response = self.client.get(url)
@@ -70,10 +70,10 @@ class UserHistoryViewsTest(FakeInternetTestCase):
         self.assertTrue(len(data['items']) > 0, "Items list should not be empty.")
         self.assertEqual(data['items'][0], "lolipop")
 
-    def test_get_search_suggestions__sources(self):
+    def test_get_search_suggestions_entries__sources(self):
         history = UserSearchHistory.objects.create(search_query = "lolipop", user=self.user)
 
-        url = reverse("{}:get-search-suggestions".format(LinkDatabase.name), args=["youtube"])
+        url = reverse("{}:get-search-suggestions-entries".format(LinkDatabase.name), args=["youtube"])
 
         # call tested function
         response = self.client.get(url)

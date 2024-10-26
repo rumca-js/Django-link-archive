@@ -73,8 +73,6 @@
                 `;
                 $('#searchSuggestions').append(listItem);
             });
-        } else {
-            $('#searchSuggestions').html('<li class="list-group-item">No suggestions found</li>');
         }
     }
 
@@ -119,12 +117,14 @@
                 }
             },
             error: function(xhr, status, error) {
-                if (attempt < 3) {
-                    loadRowListContent(search_term, page, attempt + 1);
-                    $('#listStatus').html("Error loading dynamic content, retry");
-                }
-                else {
-                    $('#listStatus').html("Cannot load data from " + url);
+                if (requestVersion === currentEntryListVersion) {
+                    if (attempt < 3) {
+                        loadRowListContent(search_term, page, attempt + 1);
+                        $('#listStatus').html("Error loading dynamic content, retry");
+                    }
+                    else {
+                        $('#listStatus').html("Cannot load data from " + url);
+                    }
                 }
             },
             complete: function() {

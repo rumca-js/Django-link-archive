@@ -525,7 +525,7 @@ def init_sources(request):
 
 def get_sources_text():
     sources_link = reverse("{}:sources".format(LinkDatabase.name))
-    link_string = """<a href="{}" class="btn btn-secondary">Sources</a>""".format(sources_link)
+    link_string = """<a href="{}?show=1" class="btn btn-secondary">Sources</a>""".format(sources_link)
     return "You can navigate to sources to enable some of them: {}".format(link_string)
 
 

@@ -37,6 +37,12 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
         UserConfig.get_or_create(self.user)
 
+    def test_entries(self):
+        url = reverse("{}:entries".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
     def test_entries_recent(self):
         url = reverse("{}:entries-recent".format(LinkDatabase.name))
         response = self.client.get(url)
@@ -51,6 +57,66 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
 
     def test_entries_bookmarked(self):
         url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_user_bookmarked(self):
+        url = reverse("{}:entries-user-bookmarked".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_archived(self):
+        url = reverse("{}:entries-archived".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_untagged(self):
+        url = reverse("{}:entries-untagged".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_json(self):
+        url = reverse("{}:entries-json".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_json_recent(self):
+        url = reverse("{}:entries-json-recent".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_json_untagged(self):
+        url = reverse("{}:entries-json_untagged".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_json_bookmarked(self):
+        url = reverse("{}:entries-json-bookmarked".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_json_user_bookmarked(self):
+        url = reverse("{}:entries-json-user-bookmarked".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_json_archived(self):
+        url = reverse("{}:entries-json-archived".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entries_json_untagged(self):
+        url = reverse("{}:entries-json-untagged".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -73,36 +139,6 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_omni_search_init(self):
-        url = reverse("{}:entries-omni-search-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_archived_init(self):
-        url = reverse("{}:entries-archived-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_bookmarked_init(self):
-        url = reverse("{}:entries-bookmarked-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_recent_init(self):
-        url = reverse("{}:entries-recent-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_omni_search(self):
-        url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
 
 class EntriesViewsTests(FakeInternetTestCase):
     def setUp(self):
@@ -119,9 +155,6 @@ class EntriesViewsTests(FakeInternetTestCase):
         data = {"link": test_link}
 
         full_data = LinkDataController.get_full_information(data)
-        full_data["description"] = LinkDataController.get_description_safe(
-            full_data["description"]
-        )
 
         limited_data = {}
         for key in full_data:
@@ -890,66 +923,6 @@ class EntriesDetailViews(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         url = reverse("{}:entries-user-bookmarked".format(LinkDatabase.name))
-
-        # call tested function
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_entries(self):
-        LinkDataController.objects.all().delete()
-
-        url = reverse("{}:get-entries".format(LinkDatabase.name))
-
-        # call tested function
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_entries_recent(self):
-        LinkDataController.objects.all().delete()
-
-        url = reverse("{}:get-entries-recent".format(LinkDatabase.name))
-
-        # call tested function
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_entries_bookmarked(self):
-        LinkDataController.objects.all().delete()
-
-        url = reverse("{}:get-entries-bookmarked".format(LinkDatabase.name))
-
-        # call tested function
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_entries_user_bookmarked(self):
-        LinkDataController.objects.all().delete()
-
-        url = reverse("{}:get-entries-user-bookmarked".format(LinkDatabase.name))
-
-        # call tested function
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_entries_archived(self):
-        LinkDataController.objects.all().delete()
-
-        url = reverse("{}:get-entries-archived".format(LinkDatabase.name))
-
-        # call tested function
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_entries_untagged(self):
-        LinkDataController.objects.all().delete()
-
-        url = reverse("{}:get-entries-untagged".format(LinkDatabase.name))
 
         # call tested function
         response = self.client.get(url)
