@@ -180,6 +180,7 @@ class EntriesSearchListView(object):
         return get_order_by(self.request.GET)
 
     def get_filter(self):
+        self.on_search()
         print("EntriesSearchListView:get_filter")
 
         query_filter = EntryFilter(self.request.GET, self.request.user)
@@ -190,6 +191,13 @@ class EntriesSearchListView(object):
     def get_filtered_objects(self):
         print("EntriesSearchListView:get_filtered_objects")
         return self.query_filter.get_filtered_objects()
+
+    def on_search(self):
+        if self.request.user.is_authenticated:
+            search_term = get_search_term(self.request.GET)
+            if search_term:
+                UserSearchHistory.add(self.request.user, search_term)
+
 
 
 class EntriesOmniListView(EntriesSearchListView):
@@ -232,12 +240,6 @@ class EntriesOmniListView(EntriesSearchListView):
         query_filter.get_conditions()
 
         return query_filter
-
-    def on_search(self):
-        if self.request.user.is_authenticated:
-            search_term = get_search_term(self.request.GET)
-            if search_term:
-                UserSearchHistory.add(self.request.user, search_term)
 
     def get_filtered_objects(self):
         return self.query_filter.get_filtered_objects()
@@ -1073,7 +1075,11 @@ def handle_json_view(request, view_to_use):
         json_obj["count"] = p.count
         json_obj["num_pages"] = p.num_pages
 
-        limited_entries = entries[page_obj.start_index() : page_obj.end_index()]
+        start = page_obj.start_index()
+        if start > 0:
+            start -= 1
+
+        limited_entries = entries[start : page_obj.end_index()]
 
         for entry in limited_entries:
             entry_json = entry_to_json(uc, entry)

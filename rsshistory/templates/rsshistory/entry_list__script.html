@@ -73,6 +73,11 @@
                 ★
             </span>` : '';
 
+        let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
+	let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
+
+        let votes_text = page_rating_votes > 0 ? `[${page_rating_votes}]` : '';
+
         let thumbnail_text = '';
         if (show_icons) {
             const iconClass = small_icons ? 'icon-small' : 'icon-normal';
@@ -83,8 +88,6 @@
             thumbnail_text = `
                 <div style="position: relative; display: inline-block;">
                     ${thumbnail_text}
-                    ${badge_text}
-                    ${star_badge}
                 </div>`;
         }
 
@@ -92,12 +95,13 @@
             <a 
                 href="{link_absolute}"
                 title="{title}"
-                class="my-1 p-1 list-group-item list-group-item-action"
+                ${invalid_style}
+                class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class}"
             >
                 <div class="d-flex">
                     ${thumbnail_text}
                     <div class="mx-2">
-                        <span style="font-weight:bold" class="text-reset">{title_safe} [${page_rating_votes}]</span>
+                        <span style="font-weight:bold" class="text-reset">{title_safe} ${votes_text}</span>
                         <div class="text-reset">
                             {source__title} {date_published}
                         </div>
@@ -120,14 +124,17 @@
                 ★
             </span>` : '';
 
+	let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
+        let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
+
+        let votes_text = page_rating_votes > 0 ? `[${page_rating_votes}]` : '';
+
         let thumbnail_text = '';
         if (show_icons) {
             const iconClass = small_icons ? 'icon-small' : 'icon-normal';
             thumbnail_text = `
                 <div style="position: relative; display: inline-block;">
                     <img src="{thumbnail}" class="rounded ${iconClass}"/>
-                    ${badge_text}
-                    ${star_badge}
                 </div>`;
         }
 
@@ -135,10 +142,11 @@
             <a 
                 href="{link_absolute}"
                 title="{title}"
-                class="my-1 p-1 list-group-item list-group-item-action"
+                ${invalid_style}
+		class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class}"
             >
                 ${thumbnail_text}
-                <span style="font-weight:bold" class="text-reset">{title_safe} [${page_rating_votes}]</span>
+                <span style="font-weight:bold" class="text-reset">{title_safe} ${votes_text}</span>
                 <div class="text-reset">@ {link}</div>
             </a>
         `;
@@ -156,20 +164,20 @@
             <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
                 ★
             </span>` : '';
+	let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
 
         let thumbnail = entry.thumbnail;
         let thumbnail_text = `
-            <div style="position: relative; display: inline-block; width: 100%; max-height: 100%;">
-                <img src="${thumbnail}" style="width:100%; max-height:100%; object-fit:cover"/>
-                ${badge_text}
-                ${star_badge}
-            </div>
+            <img src="${thumbnail}" style="width:100%; max-height:100%; object-fit:cover"/>
+            ${badge_text}
+            ${star_badge}
         `;
 
         return `
             <a 
                 href="{link_absolute}"
                 title="{title}"
+		${invalid_style}
                 class="element_${view_display_type} list-group-item list-group-item-action"
             >
                 <div style="display: flex; flex-direction:column; align-content:normal; height:100%">

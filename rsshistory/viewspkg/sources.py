@@ -765,7 +765,10 @@ def source_to_json(user_config, source):
     json_source["url_absolute"] = source.get_absolute_url()
     json_source["favicon"] = source.favicon
     json_source["enabled"] = source.enabled
-    json_source["errors"] = source.dynamic_data.consecutive_errors
+    json_source["errors"] = 0
+    if hasattr(source, "dynamic_data"):
+        if source.dynamic_data:
+            json_source["errors"] = source.dynamic_data.consecutive_errors
 
     return json_source
 
@@ -797,7 +800,11 @@ def sources_json_view(request, view_class):
     json_obj["count"] = p.count
     json_obj["num_pages"] = p.num_pages
 
-    limited_sources = sources[page_obj.start_index() : page_obj.end_index()]
+    start = page_obj.start_index()
+    if start > 0:
+        start -= 1
+
+    limited_sources = sources[start : page_obj.end_index()]
 
     for source in limited_sources:
         source_json = source_to_json(uc, source)

@@ -126,6 +126,7 @@
             success: function(response) {
                 if (response.status === true) {
                     $('#entryStatusLine').html("Vote added: " + response.vote);
+                    $('#entryVoteLine').html("");
                 } else {
                     $('#entryStatusLine').html(`<p class="text-danger">Error: ${response.message}</p>`);
                 }
