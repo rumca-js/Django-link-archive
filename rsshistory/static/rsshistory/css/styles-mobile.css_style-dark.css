@@ -269,8 +269,8 @@ option:hover {
 .youtube_player_container {
     position: relative;
     width: 100%;
-    padding-bottom: 46.25%;
-    /* background-color: yellow; */
+    padding-bottom: 56.25%;
+    overflow: hidden;
 }
 .youtube_player_frame {
     position: absolute;

@@ -62,6 +62,8 @@
     }
 
     function fillUserSearchSuggestions(items) {
+        let text = "<ul class='list-group border border-secondary rounded'>";
+
         if (items && items.length > 0) {
             $.each(items, function(index, item) {
                 var listItem = `
@@ -71,12 +73,59 @@
                         </a>
                     </li>
                 `;
-                $('#searchSuggestions').append(listItem);
+
+                text += listItem;
             });
         }
+
+        let button_text = "<button id='hideHistory' type='button' class='btn btn-primary'>Hide</button>";
+        text += '<li class="list-group-item">';
+	text += button_text;
+        text += '</li>';
+
+        text += '</ul>';
+
+        $('#searchSuggestions').html(text);
+
+        $(document).on("click", '#hideSuggestions', function(e) {
+            $('#searchSuggestions').hide();
+        });
     }
 
-    let currentEntryListVersion = 0;
+    function fillUserSearchHistory(items) {
+        let text = "<ul class='list-group border border-secondary rounded'>";
+
+        if (items && items.length > 0) {
+            $.each(items, function(index, item) {
+                let query = item.search_query
+
+                var listItem = `
+                    <li class="list-group-item">
+                        <a class="btnFilterTrigger" data-search="${query}" href="?search=${encodeURIComponent(query)}">
+                            ${query}
+                        </a>
+                    </li>
+                `;
+
+                text += listItem;
+            });
+        }
+
+        let button_text = "<button id='hideHistory' type='button' class='btn btn-primary'>Hide</button>";
+        text += '<li class="list-group-item">';
+	text += button_text;
+        text += '</li>';
+
+	text += "</ul>";
+
+        $('#searchHistory').html(text);
+
+        $(document).on("click", '#hideHistory', function(e) {
+            $('#searchHistory').hide();
+        });
+    }
+
+    let loadRowListContentCounter = 0;
 
     function loadRowListContent(search_term = '', page = '', attempt = 1) {
        $('.btnFilterTrigger').prop("disabled", true);
@@ -99,7 +148,7 @@
 
        const url = `{{query_page}}?${currentUrl.searchParams.toString()}`;
 
-       const requestVersion = ++currentEntryListVersion;
+       const requestVersion = ++loadRowListContentCounter;
 
        const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
        $('#listStatus').html(status_text);
@@ -109,7 +158,7 @@
             type: 'GET',
             timeout: 15000,
             success: function(data) {
-                if (requestVersion === currentEntryListVersion) {
+                if (requestVersion === loadRowListContentCounter) {
                    $('html, body').animate({ scrollTop: 0 }, 'slow');
                    fillListData(data);
                    $('#listStatus').html("");
@@ -117,7 +166,7 @@
                 }
             },
             error: function(xhr, status, error) {
-                if (requestVersion === currentEntryListVersion) {
+                if (requestVersion === loadRowListContentCounter) {
                     if (attempt < 3) {
                         loadRowListContent(search_term, page, attempt + 1);
                         $('#listStatus').html("Error loading dynamic content, retry");
@@ -136,3 +185,7 @@
     function isEmpty( el ){
         return !$.trim(el.html())
     }
+
+    $(document).on("click", '#btnSearchSyntax', function(e) {
+        $('#searchSyntax').toggle();
+    });

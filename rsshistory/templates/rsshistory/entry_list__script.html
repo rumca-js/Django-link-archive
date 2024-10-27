@@ -6,12 +6,12 @@
     let currentUserSearchSuggestions = 0;
 
     function loadUserSearchSuggestions(search_term, attempt = 1) {
+        let requestVersion = ++currentUserSearchSuggestions;
+
         if (!search_term)
         {
             return;
         }
-
-        let requestVersion = ++currentUserSearchSuggestions;
 
         $.ajax({
             url: '{% url 'rsshistory:get-search-suggestions-entries' "placeholder" %}'.replace("placeholder", search_term),
@@ -19,9 +19,9 @@
             timeout: 15000,
             success: function(data) {
                 if (requestVersion === currentUserSearchSuggestions) {
-                    $('#searchHistory').collapse('hide');
+                    $('#searchHistory').hide();
                     fillUserSearchSuggestions(data.items);
-                    $('#searchSuggestions').collapse('show');
+                    $('#searchSuggestions').show();
                 }
             },
             error: function(xhr, status, error) {
@@ -37,15 +37,15 @@
 
     function loadUserSearchHistory(attempt = 1) {
         $.ajax({
-            url: '{% url 'rsshistory:get-user-search-history' %}',
+            url: '{% url 'rsshistory:json-user-search-history' %}',
             type: 'GET',
             timeout: 15000,
             success: function(data) {
-                $('#searchHistory').html(data);
+		fillUserSearchHistory(data.histories);
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    loadUserSearchHistory(search_term, page, attempt + 1);
+                    loadUserSearchHistory(attempt + 1);
                 }
             }
         });
@@ -296,11 +296,18 @@
             $('#id_search').val(search_term);
         }
 
-        $('#searchSuggestions').collapse('hide');
-        $('#searchHistory').collapse('hide');
-        $('#searchSyntax').collapse('hide');
+        $('#searchSuggestions').hide();
+        $('#searchHistory').hide();
+        $('#searchSyntax').hide();
 
         loadRowListContent(search_term, page);
+    });
+    
+    $(document).on('click', '#btnHistory', function(e) {
+        e.preventDefault();
+        $('#searchSuggestions').hide();
+        $('#searchHistory').toggle();
+        $('#searchSyntax').hide();
     });
 
     //-----------------------------------------------
@@ -309,7 +316,7 @@
         var search_term = $('#filterForm input[name="search"]').val();
 
         $('#searchSuggestions').empty();
-        $('#searchSuggestions').collapse('hide');
+        $('#searchSyntax').hide();
 
         if (search_term) {
             loadUserSearchSuggestions(search_term);

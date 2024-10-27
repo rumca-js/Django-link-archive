@@ -46,6 +46,27 @@ class GetUserSearchHistoryListView(UserGenericListView):
             return UserSearchHistory.objects.all().order_by("-date")
 
 
+def history_to_json(history):
+    json_obj = {}
+    json_obj["search_query"] = history.search_query
+    json_obj["date"] = history.date
+    json_obj["user_id"] = history.user.id
+
+    return json_obj
+
+
+def json_user_search_history(request):
+    histories = UserSearchHistory.objects.filter(user=request.user).order_by("-date")
+
+    json_obj = {}
+    json_obj["histories"] = []
+
+    for history in histories:
+        json_obj["histories"].append(history_to_json(history))
+
+    return JsonResponse(json_obj)
+
+
 def search_history_remove(request, pk):
     p = ViewPage(request)
     p.set_title("Remove search history")
@@ -98,13 +119,12 @@ def get_search_suggestions_entries(request, searchstring):
 
     subcategories = SourceSubCategories.objects.filter(name__contains = searchstring)
     for subcategory in subcategories:
-        text = "subcategory__name = '{}'".format(category.name)
+        text = "subcategory__name = '{}'".format(subcategory.name)
         if text not in json_obj["items"]:
             json_obj["items"].append(text)
 
     # we could search for link, but this may take too much time?
 
-    # JsonResponse
     return JsonResponse(json_obj)
 
 
@@ -118,5 +138,4 @@ def get_search_suggestions_sources(request, searchstring):
     json_obj = {}
     json_obj["items"] = []
 
-    # JsonResponse
     return JsonResponse(json_obj)
