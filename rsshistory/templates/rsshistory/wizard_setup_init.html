@@ -25,10 +25,11 @@
 <script>
    function initializeSources() {
       $.ajax({
-        url: {% url 'rsshistory:sources-initialize' %},
+        url: "{% url 'rsshistory:sources-initialize' %}",
         type: "GET",
         success: function(response, status, xhr) {
           if (xhr.status === 200) {
+            $("#buttonsSpace").hide();
             $("#setupSpace").append("<p>Source initialization was successful.</p>");
             $("#setupSpace").append("<p>You can navigate to sources to enable some RSS sources.</p>");
           }
@@ -69,13 +70,13 @@
    }
 
    $("#btnFetchNews").click(function() {
-     setupFor({% url 'rsshistory:wizard-setup-news' %}, "#btnFetchNews");
+     setupFor("{% url 'rsshistory:wizard-setup-news' %}", "#btnFetchNews");
    });
    $("#btnFetchGallery").click(function() {
-     setupFor({% url 'rsshistory:wizard-setup-gallery' %}, "#btnFetchGallery");
+     setupFor("{% url 'rsshistory:wizard-setup-gallery' %}", "#btnFetchGallery");
    });
    $("#btnFetchSearchEngine").click(function() {
-     setupFor({% url 'rsshistory:wizard-setup-search-engine' %}, "#btnFetchSearchEngine");
+     setupFor("{% url 'rsshistory:wizard-setup-search-engine' %}", "#btnFetchSearchEngine");
    });
 </script>
 
