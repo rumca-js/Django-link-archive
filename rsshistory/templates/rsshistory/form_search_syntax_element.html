@@ -1,4 +1,5 @@
 {% if entry_query_names and entry_query_operators %}
+<div class="border border-secondary rounded">
       Available fields:
       <ul>
           <li>
@@ -41,12 +42,12 @@
 
       Examples:
       <ul>
-          <li>"china" - searches china in title</li>
-          <li>"china | japan" - searches china, or japan in title</li>
-          <li>"title = china" - searches anything with China in title</li>
-          <li>"tags__tag = tag" - searches links with tag</li>
-          <li>"bookmarked = True" - all bookmarked link</li>
+          <li>"china" - searches for china</li>
+          <li>"china | japan" - searches china, or japan</li>
+          <li>"title = china" - searches anything with china inside</li>
+          <li>"field = True" - all rows with 'field' being True</li>
+          <li>"field__icontains = something" - all rows with 'field' containing 'something'</li>
           <li>"(title = china | title = japan) & bookmarked = True" - all bookmarked link, with china, or japan in title</li>
       </ul>
-
+</div>
 {% endif %}

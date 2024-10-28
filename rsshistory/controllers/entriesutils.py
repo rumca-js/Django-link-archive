@@ -1586,7 +1586,9 @@ class EntryDataBuilder(object):
             domain = DomainsController.add(self.link_data["link"])
 
             if domain:
-                self.link_data["domain"] = domain
+                # attach domain if entry is domain
+                if self.link_data["link"] == domain.domain:
+                    self.link_data["domain"] = domain
         return self.link_data
 
     def check_and_set_source_object(self):

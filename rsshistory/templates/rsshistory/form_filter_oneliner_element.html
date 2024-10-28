@@ -6,6 +6,14 @@
    {% csrf_token %}
 
    {% for field in form %}
+	    {% if field.help_text %}
+          <div>
+            <small id="{{field.id_for_label}}_help" class="form-text text-muted">
+              {{field.help_text | safe }}
+            </small>
+          </div>
+	    {% endif %}
+
         <label for="{{field.id_for_label}}" class="col-form-label">{{field.label}}</label>
 
         <span>
@@ -13,6 +21,7 @@
         <datalist id="formDataList">
         </datalist>
         </span>
+
    {% endfor %}
 
     {% if form_submit_button_name %}

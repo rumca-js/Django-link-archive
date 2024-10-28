@@ -136,7 +136,7 @@ def get_generic_search_init_context(request, form, user_choices):
 
 def sources(request):
     p = ViewPage(request)
-    p.set_title("Add source")
+    p.set_title("Sources")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
     if data is not None:
         return data
@@ -156,6 +156,9 @@ def sources(request):
 
     p.context.update(context)
     p.context["query_page"] = reverse("{}:sources-json-all".format(LinkDatabase.name))
+
+    p.context["search_suggestion_page"] = reverse("{}:get-search-suggestions-sources".format(LinkDatabase.name), args=["placeholder"])
+    p.context["search_history_page"] = None
 
     return p.render("sources_list.html")
 

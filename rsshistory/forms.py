@@ -415,11 +415,15 @@ class InitSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
+
+        scope = kwargs.pop("scope", "")
+
         super().__init__(*args, **kwargs)
 
         attr = {"onchange": "this.form.submit()"}
         self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["search"].widget.attrs["autofocus"] = True
+        self.fields["search"].help_text = scope
 
 
 class OmniSearchForm(forms.Form):

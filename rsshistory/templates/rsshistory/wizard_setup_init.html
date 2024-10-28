@@ -2,53 +2,82 @@
 {% load static %}
 {% block content %}
 
-<script>
-$(document).ready(function() {
-    $("#btnFetchNews").click(function() {
-      // disable button
-      $(this).prop("disabled", true);
-      // add spinner to button
-      $(this).html(
-        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
-      );
-    });
-});
-$(document).ready(function() {
-    $("#btnFetchGallery").click(function() {
-      // disable button
-      $(this).prop("disabled", true);
-      // add spinner to button
-      $(this).html(
-        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
-      );
-    });
-});
-$(document).ready(function() {
-    $("#btnFetchSearchEngine").click(function() {
-      // disable button
-      $(this).prop("disabled", true);
-      // add spinner to button
-      $(this).html(
-        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
-      );
-    });
-});
-</script>
-
-<ul class="list-group mr-auto">
+<ul id="buttonsSpace" class="list-group mr-auto">
   <li class="list-group-item">
-      <a href="{% url 'rsshistory:wizard-setup-news' %}" id="btnFetchNews" class="btn btn-primary" role="button">Setup for News</a>
+      <button id="btnFetchNews" class="btn btn-primary">Setup for news reader</button>
       <div class="text-muted">Setup best suited for RSS clients, news.</div>
   </li>
 
   <li class="list-group-item">
-      <a href="{% url 'rsshistory:wizard-setup-gallery' %}" id="btnFetchGallery" class="btn btn-primary" role="button">Setup for Gallery</a>
+      <button id="btnFetchGallery" class="btn btn-primary">Setup as gallery viewer</button>
       <div class="text-muted">Setup best suited for YouTube-like players, tiktoks, image galleries.</div>
   </li>
 
   <li class="list-group-item">
-      <a href="{% url 'rsshistory:wizard-setup-search-engine' %}" id="btnFetchSearchEngine" class="btn btn-primary" role="button">Setup for Search Engine</a>
+      <button id="btnFetchSearchEngine" class="btn btn-primary">Setup as a simple search engine</button>
       <div class="text-muted">Setup best suited for Google like Search engines.</div>
   </li>
+</ul>
+
+<div id="setupSpace">
+</div>
+
+<script>
+   function initializeSources() {
+      $.ajax({
+        url: {% url 'rsshistory:sources-initialize' %},
+        type: "GET",
+        success: function(response, status, xhr) {
+          if (xhr.status === 200) {
+            $("#setupSpace").append("<p>Source initialization was successful.</p>");
+            $("#setupSpace").append("<p>You can navigate to sources to enable some RSS sources.</p>");
+          }
+        },
+        error: function() {
+          $("#setupSpace").append("<p>An error occurred. Please try again.</p>");
+        },
+        complete: function() {
+          $("#btnFetchNews").prop("disabled", false).html("Setup for News");
+        }
+      });
+   }
+   
+   function setupFor(url, element) {
+      $(element).prop("disabled", true);
+   
+      $("#setupSpace").append("<p>Starting configuration.</p>");
+      
+      $(element).html(
+        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
+      );
+      
+      $.ajax({
+        url: url,
+        type: "GET",
+        success: function(response, status, xhr) {
+          if (xhr.status === 200) {
+            $("#setupSpace").append("<p>Initialization was successful.</p>");
+          }
+        },
+        error: function() {
+          $("#setupSpace").append("<p>An error occurred. Please try again.</p>");
+        },
+        complete: function() {
+          $(element).prop("disabled", false).html("Setup for News");
+        }
+      });
+   }
+
+   $("#btnFetchNews").click(function() {
+     setupFor({% url 'rsshistory:wizard-setup-news' %}, "#btnFetchNews");
+   });
+   $("#btnFetchGallery").click(function() {
+     setupFor({% url 'rsshistory:wizard-setup-gallery' %}, "#btnFetchGallery");
+   });
+   $("#btnFetchSearchEngine").click(function() {
+     setupFor({% url 'rsshistory:wizard-setup-search-engine' %}, "#btnFetchSearchEngine");
+   });
+</script>
+
 
 {% endblock %}

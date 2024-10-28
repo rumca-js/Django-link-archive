@@ -106,7 +106,9 @@ def entries_generic(request, link, data_scope):
     if "search" in request.GET:
         data={"search": request.GET["search"]}
 
-    filter_form = InitSearchForm(request=request, initial=data)
+    data_scope = "Scope: " + data_scope
+
+    filter_form = InitSearchForm(request=request, initial=data, scope=data_scope)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
 
@@ -115,6 +117,8 @@ def entries_generic(request, link, data_scope):
     p.context.update(context)
     p.context["query_args"] = get_query_args(request.GET)
     p.context["query_page"] = link
+    p.context["search_suggestion_page"] = reverse("{}:get-search-suggestions-entries".format(LinkDatabase.name), args=["placeholder"])
+    p.context["search_history_page"] = reverse("{}:json-user-search-history".format(LinkDatabase.name))
 
     return p.render("entry_list.html")
 

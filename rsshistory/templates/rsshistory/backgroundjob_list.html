@@ -158,13 +158,11 @@
         });
     }
 
-    $(document).ready(function() {
-        loadBodyContent();
+    loadBodyContent();
 
-        let refreshInterval = setInterval(function() {
-            loadBodyContent();
-        }, 300000);
-    });
+    let refreshInterval = setInterval(function() {
+        loadBodyContent();
+    }, 300000);
 </script>
 
 {% endblock %}

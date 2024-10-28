@@ -273,7 +273,6 @@ urlpatterns = [
     path("json-export-status/", system.json_export_status, name="json-export-status"),
     path("get-backgroundjobs/", backgroundjobs.get_backgroundjobs, name="get-backgroundjobs",),
     path("get-entry-details/<int:pk>/", entries.EntryDetailDetailView.as_view(), name="get-entry-details"),
-    path("get-user-search-history", userhistory.GetUserSearchHistoryListView.as_view(), name="get-user-search-history"), # for this user
     path("json-user-search-history", userhistory.json_user_search_history, name="json-user-search-history"),
     path("is-entry-download/<int:pk>/", backgroundjobs.is_entry_download, name="is-entry-download"),
     path("entry-tags/<int:pk>/", useractions.entry_tags, name="entry-tags"),

@@ -30,6 +30,7 @@ class DomainsController(Domains):
     def add(url):
         """
         Public API
+        @return domain object
         """
         if not Configuration.get_object().config_entry.accept_domains:
             return

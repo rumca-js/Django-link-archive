@@ -214,14 +214,12 @@
         loadExportStatus();
     }
 
-    $(document).ready(function() {
-        $('#statusBlock').html("Document ready")
-        loadAll();
+    $('#statusBlock').html("Document ready")
+    loadAll();
 
-        setInterval(function() {
-            loadAll();
-        }, 300000);
-    });
+    setInterval(function() {
+        loadAll();
+    }, 300000);
 </script>
 
 {% endblock %}

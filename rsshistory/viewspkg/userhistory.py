@@ -25,27 +25,6 @@ class UserEntryVisitHistoryListView(UserGenericListView):
         return "User entry visits"
 
 
-class GetUserSearchHistoryListView(UserGenericListView):
-    model = UserSearchHistory
-    context_object_name = "search_history"
-    paginate_by = 100
-    template_name = str(ViewPage.get_full_template("search_history_element.html"))
-
-    def get_title(self):
-        return "User search history"
-
-    def get_queryset(self):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-
-        if self.search_user:
-            return UserSearchHistory.objects.filter(user=self.search_user).order_by("-date")
-        else:
-            return UserSearchHistory.objects.all().order_by("-date")
-
-
 def history_to_json(history):
     json_obj = {}
     json_obj["search_query"] = history.search_query

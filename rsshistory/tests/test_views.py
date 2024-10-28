@@ -256,9 +256,3 @@ class ViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-
-    def test_get_user_search_history(self):
-        url = reverse("{}:get-user-search-history".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)

@@ -64,21 +64,6 @@
         getDynamicContent("{% url 'rsshistory:get-entry-menu' object.id %}", "#entryMenu", 1, true);
     }
 
-    $(document).ready(function() {
-        loadEntryDynamicDetails();
-        loadIsEntryDownloaded();
-
-        setInterval(function() {
-            loadIsEntryDownloaded();
-        }, 300000);
-    });
-
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-            loadIsEntryDownloaded();
-        }
-    });
-
     $(document).on('click', '#Vote', function(event) {
         event.preventDefault();
         getVoteEditForm();
@@ -189,4 +174,10 @@
       `);
     });
 
+    loadEntryDynamicDetails();
+    loadIsEntryDownloaded();
+
+    setInterval(function() {
+        loadIsEntryDownloaded();
+    }, 300000);
 </script>

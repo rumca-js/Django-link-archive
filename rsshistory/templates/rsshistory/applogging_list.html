@@ -119,19 +119,11 @@
         });
     }
 
-    $(document).ready(function() {
-        loadBodyContent();
+    loadBodyContent();
 
-        setInterval(function() {
-        loadBodyContent();
-        }, 300000);
-    });
-
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-        loadBodyContent();
-        }
-    });
+    setInterval(function() {
+       loadBodyContent();
+    }, 300000);
 </script>
 
 {% endblock %}

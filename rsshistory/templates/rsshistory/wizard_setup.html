@@ -27,7 +27,6 @@
   </li>
 
 <script>
-$(document).ready(function() {
     $("#btnFetchNews").click(function() {
       $(this).prop("disabled", true);
       $(this).html(
@@ -48,8 +47,6 @@ $(document).ready(function() {
         `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
       );
     });
-});
 </script>
-
 
 {% endblock %}

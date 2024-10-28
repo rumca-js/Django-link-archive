@@ -3,8 +3,13 @@
         return urlParams.get(param);
     }
 
+    function isEmpty( el ){
+        return !$.trim(el.html())
+    }
+
     function fillPagination(data, text) {
         let totalPages = data.num_pages;
+        let count = data.count;
         let currentPage = data.page;
 
         if (totalPages <= 1) {
@@ -56,12 +61,13 @@
         paginationText += `
                 </ul>
             </nav>
+            ${currentPage} / ${totalPages} @ ${count} records.
         `;
 
         return paginationText;
     }
 
-    function fillUserSearchSuggestions(items) {
+    function fillSearchSuggestions(items) {
         if (items.length == 0) {
            $('#searchSuggestions').hide();
            return;
@@ -84,7 +90,7 @@
 
         let button_text = "<button id='hideHistory' type='button' class='btn btn-primary'>Hide</button>";
         text += '<li class="list-group-item">';
-	text += button_text;
+        text += button_text;
         text += '</li>';
 
         text += '</ul>';
@@ -96,7 +102,7 @@
         });
     }
 
-    function fillUserSearchHistory(items) {
+    function fillSearchHistory(items) {
         if (items.length == 0) {
            $('#searchHistory').hide();
            return;
@@ -122,15 +128,78 @@
 
         let button_text = "<button id='hideHistory' type='button' class='btn btn-primary'>Hide</button>";
         text += '<li class="list-group-item">';
-	text += button_text;
+        text += button_text;
         text += '</li>';
 
-	text += "</ul>";
+        text += "</ul>";
 
         $('#searchHistory').html(text);
 
         $(document).on("click", '#hideHistory', function(e) {
             $('#searchHistory').hide();
+        });
+    }
+
+    let currentSearchSuggestions = 0;
+    function loadSearchSuggestions(search_term, attempt = 1) {
+        let requestVersion = ++currentSearchSuggestions;
+
+        if ("{{search_suggestions_page}}" == "None") {
+            return;
+        }
+
+        if (!search_term)
+        {
+            return;
+        }
+
+        url = "{{search_suggestions_page}}".replace("placeholder", search_term);
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            timeout: 15000,
+            success: function(data) {
+                if (requestVersion === currentSearchSuggestions) {
+                    $('#searchHistory').hide();
+                    fillSearchSuggestions(data.items);
+                    $('#searchSuggestions').show();
+                }
+            },
+            error: function(xhr, status, error) {
+                if (requestVersion === currentSearchSuggestions)
+                {
+                    if (attempt < 3) {
+                        loadSearchSuggestions(search_term, attempt + 1); 
+                    }
+                }
+            }
+        });
+    }
+
+    let currentSearchHistory = 0;
+    function loadSearchHistory(attempt = 1) {
+        let requestVersion = ++currentSearchHistory;
+
+        if ("{{search_history_page}}" == "None") {
+            $('#searchHistory').html("No history");
+            return;
+        }
+
+        $.ajax({
+            url: "{{search_history_page}}",
+            type: 'GET',
+            timeout: 15000,
+            success: function(data) {
+                if (requestVersion === currentSearchHistory) {
+                    fillSearchHistory(data.histories);
+                }
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    loadSearchHistory(attempt + 1);
+                }
+            }
         });
     }
 
@@ -171,7 +240,7 @@
                    $('html, body').animate({ scrollTop: 0 }, 'slow');
                    fillListData(data);
                    $('#listStatus').html("");
-                   loadUserSearchHistory();
+                   loadSearchHistory();
                 }
             },
             error: function(xhr, status, error) {
@@ -191,9 +260,47 @@
         });
     }
 
-    function isEmpty( el ){
-        return !$.trim(el.html())
-    }
+    //-----------------------------------------------
+    $(document).on('click', '.btnFilterTrigger', function(e) {
+        e.preventDefault();
+        
+        var search_term = $(this).data('search') || $('#id_search').val();
+        var page = $(this).data('page')
+
+        if ($(this).data('search')) {
+            $('#id_search').val(search_term);
+        }
+        const currentUrl = new URL(window.location);
+        currentUrl.searchParams.set('search', search_term);
+        window.history.pushState({}, '', currentUrl);
+
+        $('#searchSuggestions').hide();
+        $('#searchHistory').hide();
+        $('#searchSyntax').hide();
+
+        loadRowListContent(search_term, page);
+    });
+    
+    $(document).on('click', '#btnSearchHistory', function(e) {
+        e.preventDefault();
+
+        $('#searchSuggestions').hide();
+        $('#searchHistory').toggle();
+        $('#searchSyntax').hide();
+    });
+
+    //-----------------------------------------------
+    // Bind to the input event of the search input within the form
+    $('#filterForm input[name="search"]').on('input', function() {
+        var search_term = $('#filterForm input[name="search"]').val();
+
+        $('#searchSuggestions').empty();
+        $('#searchSyntax').hide();
+
+        if (search_term) {
+            loadSearchSuggestions(search_term);
+        }
+    });
 
     $(document).on("click", '#btnSearchSyntax', function(e) {
         e.preventDefault();
@@ -202,3 +309,33 @@
         $('#searchHistory').hide();
         $('#searchSuggestsions').hide();
     });
+
+    var show = getQueryParam('show') || '';
+    var auto_refresh = getQueryParam('auto-refresh') || '';
+    var search_term = getQueryParam('search') || '';
+
+    $('#searchSuggestions').hide();
+    $('#searchHistory').hide();
+    $('#searchSyntax').hide();
+
+    var search_term_input = $('#filterForm input[name="search"]').val();
+    if (search_term_input)
+    {
+        loadSearchSuggestions(search_term_input);
+    }
+    loadSearchHistory();
+
+    // if (user specified search, or show is true), and entrylist is empty
+    if (search_term || show) {
+        if (isEmpty($('#listData'))) {
+            loadRowListContent();
+        }
+    }
+
+    //-----------------------------------------------
+    // if auto refresh - keep refreshing list - for kiosk mode
+    if (auto_refresh && !isNaN(auto_refresh)) {
+        setInterval(function() {
+            loadRowListContent();
+        }, parseInt(auto_refresh));
+    }

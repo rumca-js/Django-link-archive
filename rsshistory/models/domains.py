@@ -18,13 +18,13 @@ class Domains(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_update_last = models.DateTimeField(auto_now=True)  # to be removed
 
-    # link_obj = models.OneToOneField(
-    #    LinkDataModel,
-    #    on_delete=models.SET_NULL,
-    #    related_name="main_domain_obj",
-    #    null=True,
-    #    blank=True,
-    # )
+    #entry = models.ForeignKey(
+    #   LinkDataModel,
+    #   on_delete=models.CASCADE,
+    #   related_name="domain",
+    #   null=True,
+    #   blank=True,
+    #)
 
     class Meta:
         ordering = [
