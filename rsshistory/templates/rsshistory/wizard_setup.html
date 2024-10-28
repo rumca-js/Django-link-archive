@@ -2,39 +2,6 @@
 {% load static %}
 {% block content %}
 
-<script>
-$(document).ready(function() {
-    $("#btnFetchNews").click(function() {
-      // disable button
-      $(this).prop("disabled", true);
-      // add spinner to button
-      $(this).html(
-        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
-      );
-    });
-});
-$(document).ready(function() {
-    $("#btnFetchGallery").click(function() {
-      // disable button
-      $(this).prop("disabled", true);
-      // add spinner to button
-      $(this).html(
-        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
-      );
-    });
-});
-$(document).ready(function() {
-    $("#btnFetchSearchEngine").click(function() {
-      // disable button
-      $(this).prop("disabled", true);
-      // add spinner to button
-      $(this).html(
-        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
-      );
-    });
-});
-</script>
-
 <ul class="list-group mr-auto">
   <li class="list-group-item">
       <a href="{% url 'rsshistory:wizard-setup-news' %}" id="btnFetchNews" class="btn btn-primary" role="button">Setup for News</a>
@@ -58,5 +25,31 @@ $(document).ready(function() {
       </a>
       <div class="text-muted">See all available options.</div>
   </li>
+
+<script>
+$(document).ready(function() {
+    $("#btnFetchNews").click(function() {
+      $(this).prop("disabled", true);
+      $(this).html(
+        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
+      );
+    });
+
+    $("#btnFetchGallery").click(function() {
+      $(this).prop("disabled", true);
+      $(this).html(
+        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
+      );
+    });
+
+    $("#btnFetchSearchEngine").click(function() {
+      $(this).prop("disabled", true);
+      $(this).html(
+        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
+      );
+    });
+});
+</script>
+
 
 {% endblock %}

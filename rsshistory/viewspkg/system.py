@@ -588,12 +588,11 @@ def wizard_setup_news(request):
     c.prefer_https = False
     c.entries_order_by = "-date_published, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_STANDARD
+    c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_RECENT
 
     c.initialized = True
 
     c.save()
-
-    init_sources(request)
 
     p.context["summary_text"] = "Set configuration for news."
     p.context["summary_text"] += get_sources_text()
@@ -636,12 +635,11 @@ def wizard_setup_gallery(request):
     c.prefer_https = False
     c.entries_order_by = "-date_published, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_GALLERY
+    c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
 
     c.initialized = True
 
     c.save()
-
-    init_sources(request)
 
     p.context["summary_text"] = "Set configuration for gallery"
     p.context["summary_text"] += get_sources_text()
@@ -686,12 +684,11 @@ def wizard_setup_search_engine(request):
     c.prefer_https = True
     c.entries_order_by = "-page_rating, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_SEARCH_ENGINE
+    c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
 
     c.initialized = True
 
     c.save()
-
-    init_sources(request)
 
     # we want blocklist to be enabled for search engine
     BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)

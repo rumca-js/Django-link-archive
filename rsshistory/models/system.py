@@ -27,6 +27,18 @@ STYLE_TYPES = (
     (DISPLAY_STYLE_DARK, DISPLAY_STYLE_DARK),  #
 )
 
+SEARCH_BUTTON_ALL = "search-button-all"
+SEARCH_BUTTON_RECENT = "search-button-recent"
+SEARCH_BUTTON_GLOBAL_BOOKMARKS = "search-button-global-bookmarks"
+SEARCH_BUTTON_USER_BOOKMARKS = "search-button-user-bookmarks"
+
+SEARCH_BUTTONS = (
+    (SEARCH_BUTTON_ALL, SEARCH_BUTTON_ALL),
+    (SEARCH_BUTTON_RECENT, SEARCH_BUTTON_RECENT),
+    (SEARCH_BUTTON_GLOBAL_BOOKMARKS, SEARCH_BUTTON_GLOBAL_BOOKMARKS),
+    (SEARCH_BUTTON_USER_BOOKMARKS, SEARCH_BUTTON_USER_BOOKMARKS),
+)
+
 
 class ConfigurationEntry(models.Model):
     # fmt: off
@@ -121,7 +133,7 @@ class ConfigurationEntry(models.Model):
 
     user_internal_scripts = models.BooleanField(
         default=False,
-        help_text="If enabled internal javascripts and styles will be used.",
+        help_text="If enabled internal javascript files and styles will be used, otherwise jquery and other files will be obtained from the Internet",
     )
 
     data_import_path = models.CharField(
@@ -143,6 +155,14 @@ class ConfigurationEntry(models.Model):
     auto_store_thumbnails = models.BooleanField(
         default=False,
         help_text="Automatically stores thumbnail. Available when file support is enabled",
+    )
+
+    default_search_behavior = models.CharField(
+        max_length=500,
+        null=True,
+        default=SEARCH_BUTTON_ALL,
+        choices=SEARCH_BUTTONS,
+        help_text="Behavior of the main search icon",
     )
 
     # features
@@ -345,14 +365,14 @@ class ConfigurationEntry(models.Model):
     display_style = models.CharField(
         max_length=500,
         null=True,
-        default="style-light",
+        default=DISPLAY_STYLE_LIGHT,
         choices=STYLE_TYPES,
         help_text="Applies to not logged users",
     )
     display_type = models.CharField(
         max_length=500,
         null=True,
-        default="standard",
+        default=DISPLAY_TYPE_STANDARD,
         choices=DISPLAY_TYPE_CHOICES,
         help_text="Applies to not logged users",
     )
@@ -622,7 +642,7 @@ class UserConfig(models.Model):
     display_type = models.CharField(
         max_length=500,
         null=True,
-        default="standard",
+        default=ConfigurationEntry.DISPLAY_TYPE_STANDARD,
         choices=ConfigurationEntry.DISPLAY_TYPE_CHOICES,
     )
     show_icons = models.BooleanField(default=True)

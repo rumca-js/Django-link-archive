@@ -62,6 +62,10 @@
     }
 
     function fillUserSearchSuggestions(items) {
+        if (items.length == 0) {
+           $('#searchSuggestions').hide();
+           return;
+	}
         let text = "<ul class='list-group border border-secondary rounded'>";
 
         if (items && items.length > 0) {
@@ -93,6 +97,11 @@
     }
 
     function fillUserSearchHistory(items) {
+        if (items.length == 0) {
+           $('#searchHistory').hide();
+           return;
+	}
+
         let text = "<ul class='list-group border border-secondary rounded'>";
 
         if (items && items.length > 0) {
@@ -187,5 +196,9 @@
     }
 
     $(document).on("click", '#btnSearchSyntax', function(e) {
+        e.preventDefault();
+
         $('#searchSyntax').toggle();
+        $('#searchHistory').hide();
+        $('#searchSuggestsions').hide();
     });

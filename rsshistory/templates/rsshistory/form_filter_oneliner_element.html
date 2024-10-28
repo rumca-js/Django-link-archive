@@ -21,27 +21,23 @@
        <button id="btnFilterForm" type="submit" value="Submit" class="btn btn-primary btnFilterTrigger" role="button">Submit</button>
     {% endif %}
 
-    {% if search_history %}
-        <a id="btnHistory" class="btn btn-primary" data-bs-toggle="collapse" href="#searchHistory" role="button" aria-expanded="false" aria-controls="searchHistory" title="Search history">
-          History
-        </a>
-    {% endif %}
+    <a id="btnSearchHistory" class="btn btn-primary" href="#searchHistory" title="Search history">
+       History
+    </a>
 
-    <a id="btnSearchSyntax" class="btn btn-primary" data-bs-toggle="collapse" href="#searchSyntax" role="button" aria-expanded="false" aria-controls="searchSyntax" title="Search syntax">
+    <a id="btnSearchSyntax" class="btn btn-primary" href="#searchSyntax" title="Search syntax">
       ?
     </a>
 
-    <div id="searchSuggestions" class="collapse">
+    <div id="searchSuggestions">
     </div> 
 </form>
 
 
-{% if search_history %}
-   <div id="searchHistory" class="collapse">
-   </div> 
-{% endif %}
+<div id="searchHistory">
+</div> 
 
-<div id="searchSyntax" class="collapse">
+<div id="searchSyntax">
    {% include "rsshistory/form_search_syntax_element.html" %} 
 
   {% if query %}

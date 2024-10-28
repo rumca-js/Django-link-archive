@@ -45,7 +45,7 @@ def get_order_by(themap):
         order = themap["order"]
         return [order]
     else:
-        config = Configuration.get_object().config_entry
+        config = ConfigurationEntry.get()
         return config.get_entries_order_by()
 
 
@@ -78,7 +78,7 @@ class ViewPage(object):
         from .controllers import BackgroundJobController
 
         c = Configuration.get_object()
-        config = c.config_entry
+        config = ConfigurationEntry.get()
 
         context["debug"] = config.debug_mode
 
@@ -101,6 +101,8 @@ class ViewPage(object):
             context["user_config"] = UserConfig.get_or_create(self.request.user)
         else:
             context["user_config"] = UserConfig.get()
+
+        context["config"] = ConfigurationEntry.get()
         context["view"] = self
 
         return context
@@ -187,7 +189,7 @@ class ViewPage(object):
         if not self.request:
             return False
 
-        config = Configuration.get_object().config_entry
+        config = ConfigurationEntry.get()
         if (
             config.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
             and not self.request.user.is_superuser

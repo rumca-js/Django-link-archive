@@ -4,7 +4,6 @@
     {% include "rsshistory/javascript_list_utilities.js" %}
 
     let currentUserSearchSuggestions = 0;
-
     function loadUserSearchSuggestions(search_term, attempt = 1) {
         let requestVersion = ++currentUserSearchSuggestions;
 
@@ -35,13 +34,18 @@
         });
     }
 
+    let currentUserSearchHistory = 0;
     function loadUserSearchHistory(attempt = 1) {
+        let requestVersion = ++currentUserSearchHistory;
+
         $.ajax({
             url: '{% url 'rsshistory:json-user-search-history' %}',
             type: 'GET',
             timeout: 15000,
             success: function(data) {
-		fillUserSearchHistory(data.histories);
+                if (requestVersion === currentUserSearchHistory) {
+	           fillUserSearchHistory(data.histories);
+                }
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
@@ -262,6 +266,10 @@
         var auto_refresh = getQueryParam('auto-refresh') || '';
         var search_term = getQueryParam('search') || '';
 
+        $('#searchSuggestions').hide();
+        $('#searchHistory').hide();
+        $('#searchSyntax').hide();
+
         var search_term_input = $('#filterForm input[name="search"]').val();
         if (search_term_input)
         {
@@ -303,8 +311,9 @@
         loadRowListContent(search_term, page);
     });
     
-    $(document).on('click', '#btnHistory', function(e) {
+    $(document).on('click', '#btnSearchHistory', function(e) {
         e.preventDefault();
+
         $('#searchSuggestions').hide();
         $('#searchHistory').toggle();
         $('#searchSyntax').hide();

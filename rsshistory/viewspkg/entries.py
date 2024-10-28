@@ -79,14 +79,13 @@ def get_query_args(themap):
     return "&" + urlencode(arg_data)
 
 
-def get_generic_search_init_context(request, form, user_choices):
+def get_generic_search_init_context(request, form):
     context = {}
     context["form"] = form
 
     search_term = get_search_term(request.GET)
     context["search_term"] = search_term
     context["search_engines"] = SearchEngines(search_term)
-    context["search_history"] = user_choices
     context["view_link"] = form.action_url
     context["form_submit_button_name"] = "Search"
 
@@ -96,7 +95,7 @@ def get_generic_search_init_context(request, form, user_choices):
     return context
 
 
-def entries_generic(request, link):
+def entries_generic(request, link, data_scope):
     p = ViewPage(request)
     p.set_title("Entries")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
@@ -111,9 +110,7 @@ def entries_generic(request, link):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
 
-    # TODO jquery that
-    user_choices = UserSearchHistory.get_user_choices(request.user)
-    context = get_generic_search_init_context(request, filter_form, user_choices)
+    context = get_generic_search_init_context(request, filter_form)
 
     p.context.update(context)
     p.context["query_args"] = get_query_args(request.GET)
@@ -123,27 +120,27 @@ def entries_generic(request, link):
 
 
 def entries(request):
-    return entries_generic(request, reverse("{}:entries-json".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json".format(LinkDatabase.name)), "all")
 
 
 def entries_recent(request):
-    return entries_generic(request, reverse("{}:entries-json-recent".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-recent".format(LinkDatabase.name)), "recent")
 
 
 def entries_bookmarked(request):
-    return entries_generic(request, reverse("{}:entries-json-bookmarked".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-bookmarked".format(LinkDatabase.name)), "bookmarked")
 
 
 def entries_user_bookmarked(request):
-    return entries_generic(request, reverse("{}:entries-json-user-bookmarked".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-user-bookmarked".format(LinkDatabase.name)), "bookmarked by the user")
 
 
 def entries_archived(request):
-    return entries_generic(request, reverse("{}:entries-json-archived".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-archived".format(LinkDatabase.name)), "archived")
 
 
 def entries_untagged(request):
-    return entries_generic(request, reverse("{}:entries-json-untagged".format(LinkDatabase.name)))
+    return entries_generic(request, reverse("{}:entries-json-untagged".format(LinkDatabase.name)), "untagged")
 
     return p.render("entries.html")
 
