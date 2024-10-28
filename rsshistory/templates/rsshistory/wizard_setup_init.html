@@ -24,14 +24,15 @@
 
 <script>
    function initializeSources() {
+      $("#setupSpace").append("<p>Creating sources...</p>");
+
       $.ajax({
         url: "{% url 'rsshistory:sources-initialize' %}",
         type: "GET",
         success: function(response, status, xhr) {
           if (xhr.status === 200) {
-            $("#buttonsSpace").hide();
-            $("#setupSpace").append("<p>Source initialization was successful.</p>");
-            $("#setupSpace").append("<p>You can navigate to sources to enable some RSS sources.</p>");
+            $("#setupSpace").append("<p>Sources created.</p>");
+            $("#setupSpace").append("<p>You can navigate to sources to enable some RSS sources in 'Global'->'Source'.</p>");
           }
         },
         error: function() {
@@ -46,7 +47,7 @@
    function setupFor(url, element) {
       $(element).prop("disabled", true);
    
-      $("#setupSpace").append("<p>Starting configuration.</p>");
+      $("#setupSpace").append("<p>Configuring...</p>");
       
       $(element).html(
         `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
@@ -57,7 +58,9 @@
         type: "GET",
         success: function(response, status, xhr) {
           if (xhr.status === 200) {
-            $("#setupSpace").append("<p>Initialization was successful.</p>");
+            $("#buttonsSpace").hide();
+            $("#setupSpace").append("<p>Configuration OK..</p>");
+            initializeSources();
           }
         },
         error: function() {

@@ -34,7 +34,7 @@ from ..views import ViewPage, GenericListView, get_page_num, get_search_term
 from ..configuration import Configuration
 from ..pluginurl import UrlHandler
 from ..pluginsources import SourceControllerBuilder
-from ..serializers.instanceimporter import InstanceExporter
+from ..serializers import InstanceExporter, JsonImporter
 
 
 class SourceListView(object):
