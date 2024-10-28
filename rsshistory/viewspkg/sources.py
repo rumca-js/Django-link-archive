@@ -157,7 +157,7 @@ def sources(request):
     p.context.update(context)
     p.context["query_page"] = reverse("{}:sources-json-all".format(LinkDatabase.name))
 
-    p.context["search_suggestion_page"] = reverse("{}:get-search-suggestions-sources".format(LinkDatabase.name), args=["placeholder"])
+    p.context["search_suggestions_page"] = reverse("{}:get-search-suggestions-sources".format(LinkDatabase.name), args=["placeholder"])
     p.context["search_history_page"] = None
 
     return p.render("sources_list.html")

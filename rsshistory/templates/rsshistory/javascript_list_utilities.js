@@ -35,6 +35,16 @@
                 </li>
             `;
         }
+        if (currentPage > 1 && (currentPage - 1 != 1)) {
+            paginationText += `
+                <li class="page-item">
+                    <a href="?page=1${paginationArgs}" data-page="1" class="btnFilterTrigger page-link">|&lt;</a>
+                </li>
+                <li class="page-item">
+                    <a href="?page=${currentPage - 1}${paginationArgs}" data-page="${currentPage - 1}" class="btnFilterTrigger page-link">&lt;</a>
+                </li>
+            `;
+        }
 
         let startPage = Math.max(1, currentPage - 1);
         let endPage = Math.min(totalPages, currentPage + 1);
@@ -52,6 +62,10 @@
                 <li class="page-item">
                     <a href="?page=${currentPage + 1}${paginationArgs}" data-page="${currentPage + 1}" class="btnFilterTrigger page-link">&gt;</a>
                 </li>
+            `;
+        }
+        if (currentPage < totalPages && (currentPage + 1 != totalPages)) {
+            paginationText += `
                 <li class="page-item">
                     <a href="?page=${totalPages}${paginationArgs}" data-page="${totalPages}" class="btnFilterTrigger page-link">&gt;|</a>
                 </li>
@@ -60,8 +74,8 @@
 
         paginationText += `
                 </ul>
+                ${currentPage} / ${totalPages} @ ${count} records.
             </nav>
-            ${currentPage} / ${totalPages} @ ${count} records.
         `;
 
         return paginationText;
@@ -88,7 +102,7 @@
             });
         }
 
-        let button_text = "<button id='hideHistory' type='button' class='btn btn-primary'>Hide</button>";
+        let button_text = "<button id='hideSuggestions' type='button' class='btn btn-primary'>Hide</button>";
         text += '<li class="list-group-item">';
         text += button_text;
         text += '</li>';

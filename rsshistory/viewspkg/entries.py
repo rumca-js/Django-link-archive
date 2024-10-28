@@ -117,7 +117,7 @@ def entries_generic(request, link, data_scope):
     p.context.update(context)
     p.context["query_args"] = get_query_args(request.GET)
     p.context["query_page"] = link
-    p.context["search_suggestion_page"] = reverse("{}:get-search-suggestions-entries".format(LinkDatabase.name), args=["placeholder"])
+    p.context["search_suggestions_page"] = reverse("{}:get-search-suggestions-entries".format(LinkDatabase.name), args=["placeholder"])
     p.context["search_history_page"] = reverse("{}:json-user-search-history".format(LinkDatabase.name))
 
     return p.render("entry_list.html")
