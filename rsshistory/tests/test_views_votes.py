@@ -59,8 +59,8 @@ class UserVotesTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=vote_data)
 
-        # redirect to view the link again
-        self.assertEqual(response.status_code, 302)
+        # JSON
+        self.assertEqual(response.status_code, 200)
 
         # check that object has been changed
 
@@ -105,8 +105,8 @@ class UserVotesTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=vote_data)
 
-        # redirect to view the link again
-        self.assertEqual(response.status_code, 302)
+        # JSON
+        self.assertEqual(response.status_code, 200)
 
         # check that object has been changed
 

@@ -35,6 +35,13 @@ class OdyseeChannelHandler(DefaultChannelHandler):
     def code2feed(self, code):
         return "https://odysee.com/$/rss/{}".format(code)
 
+    def is_channel_name(self):
+        from .url import Url
+        short_url = Url.get_protololless(self.url)
+
+        if short_url.startswith("odysee.com/@"):
+            return True
+
     def input2code(self, url):
         wh = url.find("odysee.com")
         if wh == -1:

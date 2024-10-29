@@ -59,7 +59,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         # one call to obtain rss
         # second one to obtain thumbnail (through HTML)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_youtube_video(self):
         url = SourceUrlInterface("https://www.youtube.com/watch?v=1234")
@@ -175,4 +175,4 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue("title" in props)
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)

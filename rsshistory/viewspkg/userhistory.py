@@ -11,6 +11,7 @@ from ..models import (
   UserSearchHistory,
   SourceCategories,
   SourceSubCategories,
+  CompactedTags,
 )
 from ..controllers import SourceDataController
 from ..views import ViewPage, UserGenericListView
@@ -60,6 +61,15 @@ def search_history_remove(request, pk):
     return p.render("go_back.html")
 
 
+def add_suggestion(json_obj, text):
+    #if len(json_obj["items"]) > 100:
+    #    return
+
+    if text not in json_obj["items"]:
+        json_obj["items"].append(text)
+        return True
+
+
 def get_search_suggestions_entries(request, searchstring):
     p = ViewPage(request)
     p.set_title("Search history")
@@ -75,34 +85,36 @@ def get_search_suggestions_entries(request, searchstring):
     history_items = UserSearchHistory.objects.filter(search_query__contains = searchstring)
     for item in history_items:
         text = item.search_query
-        if text not in json_obj["items"]:
-            json_obj["items"].append(text)
+        add_suggestion(json_obj, text)
 
     sources = SourceDataController.objects.filter(title__contains = searchstring, enabled=True)
     for source in sources:
         text = "source__title = '{}'".format(source.title)
-        if text not in json_obj["items"]:
-            json_obj["items"].append(text)
+        add_suggestion(json_obj, text)
 
     sources = SourceDataController.objects.filter(url__contains = searchstring, enabled=True)
     for source in sources:
-        text = "source__url = '{}'".format(source.title)
-        if text not in json_obj["items"]:
-            json_obj["items"].append(text)
+        text = "source__url = '{}'".format(source.url)
+        add_suggestion(json_obj, text)
 
     categories = SourceCategories.objects.filter(name__contains = searchstring)
     for category in categories:
         text = "category__name = '{}'".format(category.name)
-        if text not in json_obj["items"]:
-            json_obj["items"].append(text)
+        add_suggestion(json_obj, text)
 
     subcategories = SourceSubCategories.objects.filter(name__contains = searchstring)
     for subcategory in subcategories:
         text = "subcategory__name = '{}'".format(subcategory.name)
-        if text not in json_obj["items"]:
-            json_obj["items"].append(text)
+        add_suggestion(json_obj, text)
 
-    # we could search for link, but this may take too much time?
+    tags = CompactedTags.objects.filter(tag__contains = searchstring)[:5]
+    for tag in tags:
+        text = "tags__tag = '{}'".format(tag.tag)
+        add_suggestion(json_obj, text)
+
+    # we do not search entries / links, takes too much time
+    
+    # TODO we can search gateways though
 
     return JsonResponse(json_obj)
 

@@ -56,7 +56,7 @@ class SourcesViewsTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, test_link, html=False)
 
-    def test_add_source_html(self):
+    def test_add_source__html(self):
         SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -86,7 +86,7 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 1)
 
-    def test_add_source_rss(self):
+    def test_add_source__youtube(self):
         SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -116,6 +116,35 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 1)
 
+    def test_add_source__odysee(self):
+        SourceDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:source-add".format(LinkDatabase.name))
+        test_link = "https://odysee.com/$/rss/@samtime:0"
+
+        data = {"url": test_link}
+        full_data = SourceDataController.get_full_information(data)
+
+        limited_data = {}
+        for key in full_data:
+            if full_data[key] is not None:
+                limited_data[key] = full_data[key]
+
+        print("Limited data")
+        print(limited_data)
+
+        self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 0)
+
+        # call user action
+        response = self.client.post(url, data=limited_data)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 1)
     def test_edit_source(self):
         SourceDataController.objects.all().delete()
 

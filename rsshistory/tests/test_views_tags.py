@@ -58,8 +58,8 @@ class UserTagsTest(FakeInternetTestCase):
         # page_source = response.text.decode("utf-8")
         # print("Contents: {}".format(page_source))
 
-        # redirect to view the link again
-        self.assertEqual(response.status_code, 302)
+        # JSON tag
+        self.assertEqual(response.status_code, 200)
 
         # check that object has been changed
 

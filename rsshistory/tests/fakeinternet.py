@@ -326,6 +326,9 @@ class TestResponseObject(PageResponseObject):
         if url == "https://www.youtube.com/product/sitemap.xml":
             return youtube_sitemap_product
 
+        if url.startswith("https://odysee.com/$/rss"):
+            return webpage_samtime_youtube_rss
+
         if url.startswith("https://hnrss.org"):
             return webpage_hackernews_rss
 

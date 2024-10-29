@@ -38,6 +38,9 @@ from ..serializers import InstanceExporter, JsonImporter
 
 
 class SourceListView(object):
+    def __init__(self, request=None):
+        self.request = request
+
     def get_queryset(self):
         self.query_filter = SourceFilter(self.request.GET, self.request.user, init_objects = self.get_init_query_set())
         return self.query_filter.get_filtered_objects()
@@ -791,8 +794,7 @@ def sources_json_view(request, view_class):
     json_obj["page"] = page_num
     json_obj["num_pages"] = 0
 
-    view = view_class()
-    view.request = request
+    view = view_class(request)
 
     uc = UserConfig.get(request.user)
 

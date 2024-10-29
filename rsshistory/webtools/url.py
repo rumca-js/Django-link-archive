@@ -482,16 +482,24 @@ class Url(ContentInterface):
         if not handler:
             return
 
+        # maybe our handler is able to produce feed without asking for response
+
+        feeds = url.get_feeds()
+        if url.url in feeds:
+            return url
+
+        if feeds and len(feeds) > 0:
+            u = url.url_builder(url=feeds[0])
+            return u
+
+        # obtain response?
         handler.get_response()
 
-        if type(handler) is Url.youtube_channel_handler:
-            if not handler.is_channel_name():
-                return url
-        elif type(handler) is Url.odysee_channel_handler:
-            return url
-        elif type(handler) is HttpPageHandler:
+        if type(handler) is HttpPageHandler:
             if type(handler.p) is RssPage:
                 return url
+
+        # try again to obtain feed
 
         feeds = url.get_feeds()
         if url.url in feeds:

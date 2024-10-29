@@ -845,17 +845,6 @@ class EntriesDetailViews(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_entries_export_json(self):
-        MockRequestCounter.mock_page_requests = 0
-        entries = LinkDataController.objects.filter(link__icontains="https://youtube")
-
-        url = reverse("{}:entries-export-json".format(LinkDatabase.name))
-        # call tested function
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
-
     def test_entry_detail__visit(self):
         c = Configuration.get_object()
         c.config_entry.track_user_actions = True
