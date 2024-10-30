@@ -3,38 +3,39 @@
 {% block content %}
 
 {% if categories %}
-  <div>
+   <div class="d-flex flex-wrap gap-3 justify-content-center">
       {% for category in categories %}
-         <h3>
-             <a href="{% url 'rsshistory:entries'%}?search=source__category_name+%3D%3D+{{category.name}}">{{category.name}}</a>
-         </h3>
-  
-         {% for subcategory in category.subcategories.all %}
-           <span>
-             <a href="{% url 'rsshistory:entries'%}?search=source__category_name+%3D%3D+{{category.name}}+%26+source__subcategory_name+%3D%3D+{{subcategory.name}}">{{subcategory.name}}</a>
-           </span>
-         {% endfor %}
-         <hr/>
+         <div class="card" style="width:18rem;">
+             <div class="card-body">
+                 <h3 class="card-title d-flex justify-content-between align-items-center">
+                     <span>{{ category.name }}</span>
+                     <span>
+                         <a href="{% url 'rsshistory:sources' %}?search=category_name+%3D%3D+{{ category.name }}" class="card-link">
+                             {% include "rsshistory/icon_source.html" %}
+                         </a>
+                         <a href="{% url 'rsshistory:entries' %}?search=source__category_name+%3D%3D+{{ category.name }}" class="card-link">
+                             {% include "rsshistory/icon_link.html" %}
+                         </a>
+                     </span>
+                 </h3>
+         
+                 {% for subcategory in category.subcategories.all %}
+                     <div class="d-flex justify-content-between align-items-center">
+                         <span>{{ subcategory.name }}</span>
+                         <span>
+                             <a href="{% url 'rsshistory:sources' %}?search=category_name+%3D%3D+{{ category.name }}+%26+subcategory_name+%3D%3D+{{ subcategory.name }}" class="card-link">
+                                 {% include "rsshistory/icon_source.html" %}
+                             </a>
+                             <a href="{% url 'rsshistory:entries' %}?search=source__category_name+%3D%3D+{{ category.name }}+%26+source__subcategory_name+%3D%3D+{{ subcategory.name }}" class="card-link">
+                                 {% include "rsshistory/icon_link.html" %}
+                             </a>
+                         </span>
+                     </div>
+                 {% endfor %}
+             </div>
+         </div>
       {% endfor %}
   </div>
-
-  <h3>Sources</h3>
-  <div>
-      {% for category in categories %}
-         <h3>
-             <a href="{% url 'rsshistory:sources'%}?search=category_name+%3D%3D+{{category.name}}">{{category.name}}</a>
-         </h3>
-  
-         {% for subcategory in category.subcategories.all %}
-           <span>
-               <a href="{% url 'rsshistory:sources'%}?search=category_name+%3D%3D+{{category.name}}+%26+subcategory_name+%3D%3D+{{subcategory.name}}">{{subcategory.name}}, </a>
-           </span>
-         {% endfor %}
-         <hr/>
-      {% endfor %}
-  </div>
-
-
 {% else %}
     No categories yet
 {% endif %}

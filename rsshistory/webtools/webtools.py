@@ -187,6 +187,23 @@ class DomainAwarePage(object):
             return "https://" + self.url
         return self.url
 
+    def get_port(self):
+        parts = self.parse_url()
+
+        if not parts:
+            return
+
+        if len(parts) > 0:
+            wh = parts[0].find(":")
+            if wh == -1:
+                return
+
+            else:
+                try:
+                  port = int(parts[0][wh:])
+                except ValueError:
+                    return
+
     def get_protocol_url(self, protocol="https"):
         """
         replaces any protocol with input protocol

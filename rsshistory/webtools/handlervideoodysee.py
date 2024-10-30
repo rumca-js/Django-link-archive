@@ -19,6 +19,8 @@ class OdyseeVideoHandler(DefaultUrlHandler):
             wh2 = protocol_less.find("/", wh1 + 1)
             if wh2 >= 0:
                 return True
+        elif protocol_less.startswith("odysee.com/"):
+            return True
 
     def input2url(self, url):
         from .url import Url
@@ -26,20 +28,43 @@ class OdyseeVideoHandler(DefaultUrlHandler):
         protocol_less = Url.get_protololless(self.url)
 
         if protocol_less.startswith("odysee.com/@"):
-            lines = protocol_less.split("/")
-            if len(lines) < 3:
-                return
+            return self.handle_channel_video_input(url)
+        elif protocol_less.startswith("odysee.com/"):
+            return self.handle_video_input(url)
 
-            first = lines[0] # odysee.com
-            self.channel = lines[1]
-            self.video = lines[2]
-            wh = self.video.find("?")
-            if wh >= 0:
-                self.video = self.video[:wh]
+    def handle_channel_video_input(self, url):
+        from .url import Url
+        protocol_less = Url.get_protololless(self.url)
 
-            protocol_less = "/".join([first,self.channel,self.video])
+        lines = protocol_less.split("/")
+        if len(lines) < 3:
+            return
 
-            return "https://" + protocol_less
+        first = lines[0] # odysee.com
+        self.channel = lines[1]
+        self.video = lines[2]
+        wh = self.video.find("?")
+        if wh >= 0:
+            self.video = self.video[:wh]
+
+        protocol_less = "/".join([first,self.channel,self.video])
+
+        return "https://" + protocol_less
+
+    def handle_video_input(self, url):
+        from .url import Url
+        protocol_less = Url.get_protololless(self.url)
+
+        lines = protocol_less.split("/")
+        if len(lines) < 2:
+            return url
+
+        first = lines[0] # odysee.com
+        self.video = lines[1]
+
+        protocol_less = "/".join([first, self.video])
+
+        return "https://" + protocol_less
 
     def get_video_code(self):
         return self.video

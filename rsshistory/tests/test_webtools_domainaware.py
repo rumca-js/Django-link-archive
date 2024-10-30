@@ -371,6 +371,18 @@ class DomainAwarePageTest(FakeInternetTestCase):
         self.assertEqual(parts[2], "www.youtube.com")
         self.assertEqual(parts[3], "/test/")
 
+    def test_parse_url__port(self):
+        p = DomainAwarePage("https://www.youtube.com:443/test?parameter=True")
+        parts = p.parse_url()
+        print(parts)
+
+        self.assertEqual(len(parts), 5)
+        self.assertEqual(parts[0], "https")
+        self.assertEqual(parts[1], "://")
+        self.assertEqual(parts[2], "www.youtube.com")
+        self.assertEqual(parts[3], "/test")
+        self.assertEqual(parts[4], "?parameter=True")
+
     def test_is_web_link(self):
         p = DomainAwarePage("https://www.youtube.com")
         # call tested function
@@ -408,3 +420,15 @@ class DomainAwarePageTest(FakeInternetTestCase):
         p = DomainAwarePage("https://www.youtube.com:443/test")
         # call tested function
         self.assertEqual(p.get_protocolless(), "www.youtube.com:443/test")
+
+    def test_get_port__full_url(self):
+        p = DomainAwarePage("https://www.youtube.com:443/test?parameter=True")
+        port = p.get_port()
+
+        self.assertEqual(port, 443)
+
+    def test_get_port__domain_only(self):
+        p = DomainAwarePage("https://www.youtube.com:443")
+        port = p.get_port()
+
+        self.assertEqual(port, 443)

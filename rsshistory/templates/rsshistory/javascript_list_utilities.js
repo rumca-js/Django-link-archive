@@ -211,7 +211,7 @@
         });
     }
 
-    let loadRowListContentCounter = 0;
+    let currentLoadRowListContentCounter = 0;
 
     function loadRowListContent(search_term = '', page = '', attempt = 1) {
        $('.btnFilterTrigger').prop("disabled", true);
@@ -230,11 +230,15 @@
        currentUrl.searchParams.set('search', search_term);
        currentUrl.searchParams.set('page', page);
 
+        if (search_term) {
+            $('#id_search').val(search_term);
+        }
+
        window.history.pushState({}, '', currentUrl);
 
        const url = `{{query_page}}?${currentUrl.searchParams.toString()}`;
 
-       const requestVersion = ++loadRowListContentCounter;
+       const requestVersion = ++currentLoadRowListContentCounter;
 
        const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
        $('#listStatus').html(status_text);
@@ -244,7 +248,7 @@
             type: 'GET',
             timeout: 15000,
             success: function(data) {
-                if (requestVersion === loadRowListContentCounter) {
+                if (requestVersion === currentLoadRowListContentCounter) {
                    $('html, body').animate({ scrollTop: 0 }, 'slow');
                    fillListData(data);
                    $('#listStatus').html("");
@@ -252,7 +256,7 @@
                 }
             },
             error: function(xhr, status, error) {
-                if (requestVersion === loadRowListContentCounter) {
+                if (requestVersion === currentLoadRowListContentCounter) {
                     if (attempt < 3) {
                         loadRowListContent(search_term, page, attempt + 1);
                         $('#listStatus').html("Error loading dynamic content, retry");
@@ -275,13 +279,6 @@
         var search_term = $(this).data('search') || $('#id_search').val();
         var page = $(this).data('page')
 
-        if ($(this).data('search')) {
-            $('#id_search').val(search_term);
-        }
-        const currentUrl = new URL(window.location);
-        currentUrl.searchParams.set('search', search_term);
-        window.history.pushState({}, '', currentUrl);
-
         $('#searchSuggestions').hide();
         $('#searchHistory').hide();
         $('#searchSyntax').hide();
@@ -302,14 +299,17 @@
     $('#filterForm input[name="search"]').on('input', function() {
         var search_term = $('#filterForm input[name="search"]').val();
 
-        $('#searchSuggestions').empty();
         $('#searchSyntax').hide();
+        $('#searchSuggestions').empty();
+        $('#searchHistory').hide();
 
         if (search_term) {
             loadSearchSuggestions(search_term);
         }
     });
 
+    //-----------------------------------------------
+    // Bind to the button syntax
     $(document).on("click", '#btnSearchSyntax', function(e) {
         e.preventDefault();
 
@@ -318,6 +318,8 @@
         $('#searchSuggestsions').hide();
     });
 
+    //-----------------------------------------------
+    // Do it now
     var show = getQueryParam('show') || '';
     var auto_refresh = getQueryParam('auto-refresh') || '';
     var search_term = getQueryParam('search') || '';

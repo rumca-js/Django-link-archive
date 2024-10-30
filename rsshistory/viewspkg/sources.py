@@ -289,7 +289,7 @@ def add_source_simple(request):
             warnings.append("Link contains arguments. Is that intentional?")
         if link.find("#") >= 0:
             warnings.append("Link contains arguments. Is that intentional?")
-        if page.get_protocolless().find(":") >= 0:
+        if page.get_port() and page.get_port() >= 0:
             warnings.append("Link contains port. Is that intentional?")
         if not page.is_web_link():
             warnings.append("Not a web link. Expecting protocol://domain.tld styled location")

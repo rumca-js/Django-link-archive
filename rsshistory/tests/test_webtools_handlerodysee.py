@@ -4,13 +4,34 @@ from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
 class OdyseeVideoHandlerTest(FakeInternetTestCase):
+
     def test_constructor(self):
         MockRequestCounter.mock_page_requests = 0
 
         handler = OdyseeVideoHandler("https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1?test")
         self.assertEqual(handler.url, "https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1")
+
+    def test_get_channel_code(self):
+        handler = OdyseeVideoHandler("https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1?test")
         self.assertEqual(handler.get_channel_code(), "@samtime:1")
-        self.assertEqual(handler.get_video_code(), "apple-reacts-to-leaked-windows-12:1")
+
+    def test_is_handled_by__channel_video(self):
+        handler = OdyseeVideoHandler("https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1?test")
+        self.assertTrue(handler.is_handled_by())
+
+    def test_is_handled_by__video(self):
+        handler = OdyseeVideoHandler("https://odysee.com/ridiculous-zendesk-vulnerability-causes:01c863c36e86789070adf02eaa5c0778975507d5")
+        self.assertTrue(handler.is_handled_by())
+
+    def test_get_video_code__channel_video(self):
+        handler = OdyseeVideoHandler("https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1?test")
+        code = handler.get_video_code()
+        self.assertEqual(code, "apple-reacts-to-leaked-windows-12:1")
+
+    def test_get_video_code__channel_video(self):
+        handler = OdyseeVideoHandler("https://odysee.com/ridiculous-zendesk-vulnerability-causes:01c863c36e86789070adf02eaa5c0778975507d5")
+        code = handler.get_video_code()
+        self.assertEqual(code, "ridiculous-zendesk-vulnerability-causes:01c863c36e86789070adf02eaa5c0778975507d5")
 
 
 class OdyseeChannelHandlerTest(FakeInternetTestCase):
