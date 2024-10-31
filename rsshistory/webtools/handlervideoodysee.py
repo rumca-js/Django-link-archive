@@ -5,6 +5,8 @@ class OdyseeVideoHandler(DefaultUrlHandler):
     def __init__(self, url=None, contents=None, page_options=None):
         super().__init__(url, contents=contents, page_options=page_options)
         self.url = self.input2url(url)
+        self.channel = None
+        self.video = None
 
     def is_handled_by(self):
         if not self.url:
@@ -20,6 +22,10 @@ class OdyseeVideoHandler(DefaultUrlHandler):
             if wh2 >= 0:
                 return True
         elif protocol_less.startswith("odysee.com/"):
+            # syntax reserved for channel RSS
+            # test_link = "https://odysee.com/$/rss/@samtime:0"
+            if protocol_less.startswith("odysee.com/$"):
+                return False
             return True
 
     def input2url(self, url):
@@ -73,9 +79,14 @@ class OdyseeVideoHandler(DefaultUrlHandler):
         return self.channel
 
     def get_link_classic(self):
-        return "https://odysee.com/{}/{}".format(
-            self.get_channel_code(), self.get_video_code()
-        )
+        if self.get_channel_code():
+            return "https://odysee.com/{}/{}".format(
+                self.get_channel_code(), self.get_video_code()
+            )
+        else:
+            return "https://odysee.com/{}".format(
+                self.get_video_code()
+            )
 
     def get_link_embed(self):
         return "https://odysee.com/$/embed/{0}".format(self.get_video_code())

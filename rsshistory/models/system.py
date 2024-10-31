@@ -948,6 +948,9 @@ class AppLogging(models.Model):
     def is_notification(self):
         return self.level == AppLogging.NOTIFICATION
 
+    def __str__(self):
+        return "Date:{}\tLevel:{}\tInfo:{}\nDetail:{}".format(self.date, self.level, self.info_text, self.detail_text)
+
 
 class BackgroundJob(models.Model):
     JOB_PROCESS_SOURCE = "process-source"
@@ -1046,6 +1049,9 @@ class BackgroundJob(models.Model):
             "subject",
             "errors",
         ]
+
+    def __str__(self):
+        return "Job:{}\tSubject:{}\tArgs:{}".format(self.job, self.subject, self.args)
 
 
 class AppLoggingController(object):

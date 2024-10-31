@@ -407,8 +407,7 @@ class EntryDetailDetailView(generic.DetailView):
 
 class EntryArchivedDetailView(generic.DetailView):
     model = ArchiveLinkDataController
-
-    template_name = str(ViewPage.get_full_template("entry_detail.html"))
+    template_name = str(ViewPage.get_full_template("entry_detail__dynamic.html"))
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context

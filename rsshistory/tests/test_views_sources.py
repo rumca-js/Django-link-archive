@@ -4,8 +4,18 @@ from django.contrib.auth.models import User
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkDataController, DomainsController
-from ..models import KeyWords, DataExport
+from ..controllers import (
+   SourceDataController,
+   LinkDataController,
+   DomainsController,
+   BackgroundJobController,
+)
+from ..models import (
+   KeyWords,
+   DataExport,
+   SourceCategories,
+   SourceSubCategories,
+)
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -20,25 +30,11 @@ class SourcesViewsTests(FakeInternetTestCase):
         self.user.is_staff = True
         self.user.save()
 
-    def test_add_simple_source__valid(self):
-        SourceDataController.objects.all().delete()
+        #c = Configuration.get_object()
+        #c.config_entry.logging_level = AppLogging.DEBUG
+        #c.config_entry.save()
 
-        self.client.login(username="testuser", password="testpassword")
-
-        url = reverse("{}:source-add-simple".format(LinkDatabase.name))
-        test_link = "https://linkedin.com"
-
-        post_data = {"url": test_link}
-
-        # call user action
-        response = self.client.post(url, data=post_data)
-
-        # print(response.text.decode('utf-8'))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, test_link, html=False)
-
-    def test_add_simple_source__invalid(self):
+    def test_source_add_simple__invalid(self):
         SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -56,7 +52,26 @@ class SourcesViewsTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, test_link, html=False)
 
-    def test_add_source__html(self):
+    def test_source_add_simple__valid_html(self):
+        SourceDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:source-add-simple".format(LinkDatabase.name))
+        test_link = "https://linkedin.com"
+
+        post_data = {"url": test_link}
+
+        # call user action
+        response = self.client.post(url, data=post_data)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, test_link, html=False)
+
+    def test_source_add__html(self):
+        BackgroundJobController.objects.all().delete()
         SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -66,6 +81,7 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         data = {"url": test_link}
         full_data = SourceDataController.get_full_information(data)
+        full_data["enabled"] = True
 
         limited_data = {}
         for key in full_data:
@@ -75,6 +91,7 @@ class SourcesViewsTests(FakeInternetTestCase):
         print("Limited data")
         print(limited_data)
 
+        self.assertEqual(BackgroundJobController.objects.all().count(), 0)
         self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 0)
 
         # call user action
@@ -84,9 +101,18 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 1)
+        sources = SourceDataController.objects.filter(url=test_link)
+        self.assertEqual(sources.count(), 1)
+        source = sources[0]
+        self.assertTrue(source.title != None)
+        self.assertTrue(source.enabled)
 
-    def test_add_source__youtube(self):
+        # entry for source is created via job
+        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_PROCESS_SOURCE).count(), 1)
+        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_ADD).count(), 1)
+
+    def test_source_add__youtube(self):
+        BackgroundJobController.objects.all().delete()
         SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -96,6 +122,7 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         data = {"url": test_link}
         full_data = SourceDataController.get_full_information(data)
+        full_data["enabled"] = True
 
         limited_data = {}
         for key in full_data:
@@ -105,6 +132,7 @@ class SourcesViewsTests(FakeInternetTestCase):
         print("Limited data")
         print(limited_data)
 
+        self.assertEqual(BackgroundJobController.objects.all().count(), 0)
         self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 0)
 
         # call user action
@@ -114,9 +142,18 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 1)
+        sources = SourceDataController.objects.filter(url=test_link)
+        self.assertEqual(sources.count(), 1)
+        source = sources[0]
+        self.assertTrue(source.title != None)
+        self.assertTrue(source.enabled)
 
-    def test_add_source__odysee(self):
+        # entry for source is created via job
+        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_PROCESS_SOURCE).count(), 1)
+        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_ADD).count(), 1)
+
+    def test_source_add__odysee(self):
+        BackgroundJobController.objects.all().delete()
         SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -126,6 +163,7 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         data = {"url": test_link}
         full_data = SourceDataController.get_full_information(data)
+        full_data["enabled"] = True
 
         limited_data = {}
         for key in full_data:
@@ -135,6 +173,7 @@ class SourcesViewsTests(FakeInternetTestCase):
         print("Limited data")
         print(limited_data)
 
+        self.assertEqual(BackgroundJobController.objects.all().count(), 0)
         self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 0)
 
         # call user action
@@ -144,7 +183,61 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 1)
+        sources = SourceDataController.objects.filter(url=test_link)
+        self.assertEqual(sources.count(), 1)
+        source = sources[0]
+        self.assertTrue(source.title != None)
+        self.assertTrue(source.enabled)
+
+        # entry for source is created via job
+        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_PROCESS_SOURCE).count(), 1)
+        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_ADD).count(), 1)
+
+    def test_source_add__categories(self):
+        BackgroundJobController.objects.all().delete()
+        SourceDataController.objects.all().delete()
+        SourceCategories.objects.all().delete()
+        SourceSubCategories.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:source-add".format(LinkDatabase.name))
+        test_link = "https://linkedin.com"
+
+        data = {"url": test_link}
+        full_data = SourceDataController.get_full_information(data)
+        full_data["enabled"] = True
+        full_data["category"] = "test1"
+        full_data["subcategory"] = "test2"
+
+        limited_data = {}
+        for key in full_data:
+            if full_data[key] is not None:
+                limited_data[key] = full_data[key]
+
+        print("Limited data")
+        print(limited_data)
+
+        # call user action
+        response = self.client.post(url, data=limited_data)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 302)
+
+        sources = SourceDataController.objects.filter(url=test_link)
+        self.assertEqual(sources.count(), 1)
+
+        categories = SourceCategories.objects.all()
+        self.assertEqual(categories.count(), 1)
+        category = categories[0]
+        self.assertEqual(category.name, "test1")
+
+        subcategories = SourceSubCategories.objects.all()
+        self.assertEqual(subcategories.count(), 1)
+        subcategory = subcategories[0]
+        self.assertEqual(subcategory.name, "test2")
+
     def test_edit_source(self):
         SourceDataController.objects.all().delete()
 
