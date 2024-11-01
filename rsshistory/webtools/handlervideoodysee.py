@@ -4,9 +4,9 @@ from .defaulturlhandler import DefaultUrlHandler
 class OdyseeVideoHandler(DefaultUrlHandler):
     def __init__(self, url=None, contents=None, page_options=None):
         super().__init__(url, contents=contents, page_options=page_options)
-        self.url = self.input2url(url)
         self.channel = None
         self.video = None
+        self.url = self.input2url(url)
 
     def is_handled_by(self):
         if not self.url:

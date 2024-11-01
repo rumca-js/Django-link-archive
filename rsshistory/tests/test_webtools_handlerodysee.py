@@ -33,6 +33,11 @@ class OdyseeVideoHandlerTest(FakeInternetTestCase):
         code = handler.get_video_code()
         self.assertEqual(code, "ridiculous-zendesk-vulnerability-causes:01c863c36e86789070adf02eaa5c0778975507d5")
 
+    def test_get_link_embed(self):
+        handler = OdyseeVideoHandler("https://odysee.com/ridiculous-zendesk-vulnerability-causes:01c863c36e86789070adf02eaa5c0778975507d5")
+        link_embed = handler.get_link_embed()
+        self.assertEqual(link_embed, "https://odysee.com/$/embed/ridiculous-zendesk-vulnerability-causes:01c863c36e86789070adf02eaa5c0778975507d5")
+
 
 class OdyseeChannelHandlerTest(FakeInternetTestCase):
     def test_constructor__channel_url(self):

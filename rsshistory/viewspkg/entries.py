@@ -151,6 +151,9 @@ def entries_untagged(request):
 
 class EntriesSearchListView(object):
 
+    def __init__(self, request = None):
+        self.request = request
+
     def get_queryset(self):
         """
         API: Returns queryset
