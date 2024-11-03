@@ -28,6 +28,14 @@ def backgroundjobs(request):
     if data is not None:
         return data
 
+    data = {}
+    if "search" in request.GET:
+        data={"search": request.GET["search"]}
+
+    p.context["query_page"] = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
+    p.context["search_suggestions_page"] = None
+    p.context["search_history_page"] = None
+
     return p.render("backgroundjob_list.html")
 
 
@@ -57,12 +65,14 @@ def get_backgroundjobs(request):
     if data is not None:
         return data
 
+    page_num = p.get_page_num()
+
     data = {}
     data["jobs"] = []
     data["count"] = 0
+    data["page"] = page_num
     data["num_pages"] = 0
 
-    page_num = p.get_page_num()
     if page_num:
         objects = BackgroundJobController.objects.all()
 

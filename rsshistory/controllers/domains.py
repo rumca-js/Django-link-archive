@@ -225,7 +225,7 @@ class DomainsController(Domains):
 
         return entry.main_domain_obj
 
-    def cleanup():
+    def cleanup(cfg=None):
         if not Configuration.get_object().config_entry.accept_domains:
             DomainsController.unconnect_entries()
             DomainsController.remove_all()

@@ -26,7 +26,7 @@ class SourceDataController(SourceDataModel):
     class Meta:
         proxy = True
 
-    def cleanup():
+    def cleanup(cfg=None):
         SourceDataModel.reset_dynamic_data()
 
         sources = SourceDataModel.objects.filter(enabled=True)
@@ -208,8 +208,9 @@ class SourceDataController(SourceDataModel):
             https_info = SourceUrlInterface(data["url"]).get_props()
 
             if "title" in info and "title" in https_info:
-                if len(https_info["title"]) == len(info["title"]):
-                    return https_info
+                if https_info["title"] and info["title"]:
+                    if len(https_info["title"]) == len(info["title"]):
+                       return https_info
 
         return info
 

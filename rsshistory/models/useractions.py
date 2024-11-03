@@ -169,17 +169,13 @@ class UserTags(models.Model):
 
         BackgroundJobController.entry_reset_local_data(entry)
 
-    def cleanup():
-        for q in UserTags.objects.filter(user__isnull=True):
-            users = User.objects.filter(is_superuser=True)
-            if users.count() > 0:
-                user = users[0]
-                q.user = user
-                q.save()
-
-                # LinkDatabase.error("Cannot find user '{}'".format(q.user.id))
-                # q.delete()
-                # time.sleep(0.5)
+    def cleanup(cfg=None):
+        #for q in UserTags.objects.all():
+        #    try:
+        #       users = q.entry.id
+        #    except Exception as E:
+        #        q.delete()
+        pass
 
     def move_entry(source_entry, destination_entry):
         tags = UserTags.objects.filter(entry=source_entry)
@@ -209,7 +205,7 @@ class UserCompactedTags(models.Model):
     class Meta:
         ordering = ["-count"]
 
-    def cleanup():
+    def cleanup(cfg=None):
         UserCompactedTags.objects.all().delete()
 
         tags = UserTags.objects.all()
@@ -231,7 +227,7 @@ class CompactedTags(models.Model):
     class Meta:
         ordering = ["-count"]
 
-    def cleanup():
+    def cleanup(cfg=None):
         CompactedTags.objects.all().delete()
 
         tags = UserTags.objects.all()
@@ -327,7 +323,13 @@ class UserVotes(models.Model):
 
         return UserVotes.add(user, entry, vote)
 
-    def cleanup():
+    def cleanup(cfg=None):
+        #for q in UserVotes.objects.all():
+        #    try:
+        #       users = q.entry.id
+        #    except Exception as E:
+        #        q.delete()
+
         # recreate missing entries, from votes alone
         for entry in LinkDataModel.objects.filter(page_rating_votes__gt=0):
             votes = UserVotes.objects.filter(entry=entry)
@@ -335,17 +337,6 @@ class UserVotes(models.Model):
                 users = User.objects.filter(is_superuser=True)
                 if users.count() > 0:
                     UserVotes.add(users[0], entry, entry.page_rating_votes)
-
-        # reset missing user object
-        for q in UserVotes.objects.filter(user__isnull=True):
-            users = User.objects.filter(username=q.user)
-            if users.count() > 0:
-                q.user = users[0]
-                q.save()
-            else:
-                LinkDatabase.error("Cannot find user '{}'".format(q.user))
-                q.delete()
-                time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
         votes = UserVotes.objects.filter(entry=source_entry)
@@ -399,16 +390,13 @@ class UserComments(models.Model):
     def get_comment(self):
         return InputContent(self.comment).htmlify()
 
-    def cleanup():
-        for q in UserComments.objects.filter(user__isnull=True):
-            users = User.objects.filter(username=q.user)
-            if users.count() > 0:
-                q.user = users[0]
-                q.save()
-            else:
-                LinkDatabase.error("Cannot find user '{}'".format(q.user))
-                q.delete()
-                time.sleep(0.5)
+    def cleanup(cfg=None):
+        #for q in UserComments.objects.all():
+        #    try:
+        #       users = q.entry.id
+        #    except Exception as E:
+        #        q.delete()
+        pass
 
     def move_entry(source_entry, destination_entry):
         comments = UserComments.objects.filter(entry=source_entry)
@@ -486,12 +474,13 @@ class UserBookmarks(models.Model):
 
         return False
 
-    def cleanup():
-        entries = LinkDataModel.objects.filter(bookmarked=True)
-        for entry in entries:
-            if not UserBookmarks.is_bookmarked(entry):
-                entry.bookmarked=False
-                entry.save()
+    def cleanup(cfg=None):
+        pass
+        #for q in UserBookmarks.objects.all():
+        #    try:
+        #       users = q.entry.id
+        #    except Exception as E:
+        #        q.delete()
 
     def move_entry(source_entry, destination_entry):
         bookmarks = UserBookmarks.objects.filter(entry=source_entry)

@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
 
-from ..models import Domains, AppLogging, UserBookmarks, UserTags, UserVotes
+from ..models import AppLogging, UserBookmarks, UserTags, UserVotes
 
 from ..controllers import (
     LinkDataController,
@@ -30,8 +30,6 @@ class MapImporter(object):
 
         if self.user is not None:
             self.user = self.get_user(user)
-        else:
-            self.user = self.get_superuser()
 
         self.import_settings = import_settings
         if self.import_settings is None:
@@ -48,19 +46,14 @@ class MapImporter(object):
     def import_from_data(self, json_data):
         if "links" in json_data:
             return self.import_from_links(json_data["links"])
-
         elif "sources" in json_data:
             return self.import_from_sources(json_data["sources"])
-
         elif "link" in json_data:
             return self.import_from_link(json_data["link"])
-
         elif "source" in json_data:
             return self.import_from_source(json_data["source"])
-
         elif len(json_data) > 0:
             return self.import_from_list(json_data)
-
         else:
             raise NotImplementedError()
 
@@ -98,15 +91,15 @@ class MapImporter(object):
         return True
 
     def copy_props(self, entry, clean_data):
-        if self.import_settings and self.import_settings["import_bookmarks"]:
+        if self.is_import("import_bookmarks"):
             if "bookmarked" in clean_data:
                 entry.bookmarked = clean_data["bookmarked"]
         if "permanent" in clean_data:
             entry.permanent = clean_data["permanent"]
-        if self.import_settings and self.import_settings["import_title"]:
+        if self.is_import("import_title"):
             if "title" in clean_data:
                 entry.title = clean_data["title"]
-        if self.import_settings and self.import_settings["import_description"]:
+        if self.is_import("import_description"):
             if "description" in clean_data:
                 entry.description = clean_data["description"]
         if "date_published" in clean_data:
@@ -128,12 +121,11 @@ class MapImporter(object):
             comments = json_data["comments"]
 
         clean_data = self.get_clean_entry_data(json_data)
-
         entry = None
 
         entries = LinkDataController.objects.filter(link=clean_data["link"])
         if entries.count() == 0:
-            if self.import_settings and self.import_settings["import_entries"]:
+            if self.is_import("import_entries"):
                 # This instance can have their own settings for import, may decide what is
                 # accepted and not. Let the builder deal with it
                 LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
@@ -154,23 +146,22 @@ class MapImporter(object):
             self.copy_props(entry, clean_data)
 
         if entry:
-            if self.import_settings and self.import_settings["import_bookmarks"]:
+            if self.is_import("import_bookmarks"):
                 if entry.bookmarked:
                     UserBookmarks.add(self.user, entry)
                 else:
                     UserBookmarks.remove_entry(entry)
 
-            if self.import_settings and self.import_settings["import_tags"]:
+            if self.is_import("import_tags"):
                 if len(tags) > 0:
-                    user = self.get_superuser()
                     for tag in tags:
-                        UserTags.set_tag(entry, tag, user)
+                        UserTags.set_tag(entry, tag, self.user)
 
-            if self.import_settings and self.import_settings["import_votes"]:
+            if self.is_import("import_votes"):
                 if vote is not None:
                     UserVotes.add(self.user, entry, vote)
 
-            if self.import_settings and self.import_settings["import_comments"]:
+            if self.is_import("import_comments"):
                 if len(comments) > 0:
                     for comment in comments:
                         user = self.get_user(comment["user"])
@@ -253,6 +244,12 @@ class MapImporter(object):
         if users.count() > 0:
             return users[0]
 
+    def is_import(self, keyword):
+        if self.import_settings and keyword in self.import_settings and self.import_settings[keyword]:
+            return True
+        else:
+            return False
+
 
 def get_list_files(directory):
     file_list = []
@@ -271,11 +268,12 @@ def read_file_contents(file_path):
 
 
 class JsonImporter(object):
-    def __init__(self, path=None, user=None):
+    def __init__(self, path=None, user=None, import_settings=None):
         AppLogging.info("Importing from a file")
 
         self.path = path
         self.user = user
+        self.import_settings = import_settings
 
         if self.path is None:
             Logger.error("Directory was not specified")
@@ -310,6 +308,7 @@ class JsonImporter(object):
                 user=self.user,
                 entry_builder=entry_builder,
                 source_builder=source_builder,
+                import_settings=self.import_settings,
             ).import_from_data(data)
 
         return False

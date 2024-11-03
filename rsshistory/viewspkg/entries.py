@@ -1082,9 +1082,12 @@ def handle_json_view(request, view_to_use):
         if start > 0:
             start -= 1
 
-        limited_entries = entries[start : page_obj.end_index()]
+        #json_obj["start_index"] = start
+        #json_obj["end_index"] = page_obj.end_index()
 
-        for entry in limited_entries:
+        #limited_entries = entries[start : page_obj.end_index()]
+
+        for entry in page_obj:
             entry_json = entry_to_json(uc, entry)
 
             json_obj["entries"].append(entry_json)
@@ -1094,7 +1097,6 @@ def handle_json_view(request, view_to_use):
 
 
 def entries_json(request):
-
     """
     User might set access through config. Default is all
     """

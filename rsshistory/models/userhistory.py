@@ -62,22 +62,10 @@ class UserSearchHistory(models.Model):
 
             return theobject
 
-    def cleanup():
+    def cleanup(cfg=None):
         config_entry = Configuration.get_object().config_entry
         if not config_entry.track_user_actions or not config_entry.track_user_searches:
             UserSearchHistory.objects.all().delete()
-
-        # safety cleanup, if user is not set
-        qs = UserSearchHistory.objects.filter(user__isnull=True)
-        for q in qs:
-            users = User.objects.filter(username=q.user)
-            if users.count() > 0:
-                q.user = users[0]
-                q.save()
-            else:
-                LinkDatabase.info("Removing invalid search")
-                q.delete()
-                time.sleep(0.5)
 
     def get_top_query(user):
         if not user.is_authenticated:
@@ -225,25 +213,13 @@ class UserEntryTransitionHistory(models.Model):
         if links.exists():
             return links[0]
 
-    def cleanup():
+    def cleanup(cfg=None):
         config_entry = Configuration.get_object().config_entry
         if (
             not config_entry.track_user_actions
             or not config_entry.track_user_navigation
         ):
             UserEntryTransitionHistory.objects.all().delete()
-
-        # safety cleanup, if user is not set
-        qs = UserEntryTransitionHistory.objects.filter(user__isnull=True)
-        for q in qs:
-            users = User.objects.filter(username=q.user)
-            if users.count() > 0:
-                q.user = users[0]
-                q.save()
-            else:
-                LinkDatabase.info("Cannot find user:'{}'".format(q.user))
-                q.delete()
-                time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
         """
@@ -441,25 +417,13 @@ class UserEntryVisitHistory(models.Model):
         if entries.exists():
             return entries[0].entry
 
-    def cleanup():
+    def cleanup(cfg=None):
         config_entry = Configuration.get_object().config_entry
         if (
             not config_entry.track_user_actions
             or not config_entry.track_user_navigation
         ):
             UserEntryVisitHistory.objects.all().delete()
-
-        # safety cleanup, if user is not set
-        qs = UserEntryVisitHistory.objects.filter(user__isnull=True)
-        for q in qs:
-            users = User.objects.filter(username=q.user)
-            if users.count() > 0:
-                q.user = users[0]
-                q.save()
-            else:
-                LinkDatabase.info("Cannot find user:'{}'".format(q.user))
-                q.delete()
-                time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
         visits = UserEntryVisitHistory.objects.filter(entry=source_entry)

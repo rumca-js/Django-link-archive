@@ -85,7 +85,7 @@ class LinkDataController(LinkDataModel):
         """Returns the URL to access a particular author instance."""
         return reverse("{}:entry-remove".format(LinkDatabase.name), args=[str(self.id)])
 
-    def cleanup(limit_s=0):
+    def cleanup(cfg=None):
         """
         We do not want to starve other threads.
         Add limit, so that we can exit from cleanup thread

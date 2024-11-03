@@ -33,7 +33,7 @@ class ModelFiles(models.Model):
             it = ModelFiles.objects.create(file_name=file_name, contents=contents)
             ModelFiles.cleanup()
 
-    def cleanup():
+    def cleanup(cfg=None):
         max_files = ModelFiles.get_max_files()
 
         all_files = ModelFiles.objects.all().order_by("date_created")

@@ -130,6 +130,10 @@ class ConfigurationEntry(models.Model):
         default=True,
         help_text="If disabled, background tasks, and jobs are disabled.",
     )
+    block_new_tasks = models.BooleanField(
+        default=False,
+        help_text="If true, no new tasks will arrive",
+    )
 
     user_internal_scripts = models.BooleanField(
         default=False,
@@ -557,7 +561,7 @@ class SystemOperation(models.Model):
         else:
             return True
 
-    def cleanup():
+    def cleanup(cfg=None):
         thread_ids = SystemOperation.get_thread_ids()
         for thread_id in thread_ids:
             # leave one entry with time check
@@ -723,7 +727,7 @@ class UserConfig(models.Model):
 
         super().save(*args, **kwargs)
 
-    def cleanup():
+    def cleanup(cfg=None):
         configs = UserConfig.objects.filter(user__isnull=True)
         for uc in configs:
             us = User.objects.filter(username=uc.user)
@@ -891,7 +895,7 @@ class AppLogging(models.Model):
 
         super().save(*args, **kwargs)
 
-    def cleanup():
+    def cleanup(cfg=None):
         AppLogging.remove_old_infos()
 
         obs = AppLogging.objects.filter(level=int(logging.INFO))

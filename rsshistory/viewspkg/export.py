@@ -314,7 +314,11 @@ def import_from_files(request):
             return p.render("summary_present.html")
 
     else:
-        form = ImportFromFilesForm()
+        initial={
+            "path": Configuration.get_object().get_import_path()
+        }
+
+        form = ImportFromFilesForm(initial=initial)
         form.method = "POST"
 
         p.context["form_title"] = "Import from files"

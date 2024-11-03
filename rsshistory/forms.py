@@ -102,6 +102,7 @@ class ConfigForm(forms.ModelForm):
             "add_access_type",
             "default_search_behavior",
             "background_tasks",
+            "block_new_tasks",
             "user_internal_scripts",
             "data_export_path",
             "data_import_path",
@@ -308,7 +309,7 @@ class ImportFromFilesForm(forms.Form):
     import_votes = forms.BooleanField(required=False)
     import_bookmarks = forms.BooleanField(required=False)
 
-    user = forms.CharField(max_length=500, required=False)
+    username = forms.CharField(max_length=500, required=False)
     tag = forms.CharField(max_length=500, required=False)
 
 

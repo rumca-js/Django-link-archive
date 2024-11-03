@@ -402,3 +402,13 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
         # call tested function
         self.assertEqual(entry.get_https_url(), "https://linkedin.com")
+
+    def test_get_clean_data(self):
+        data = {}
+        data["link"] = "https://google.com"
+        data["id"] = 3
+        data["not_int_link_model"] = "xxx"
+
+        clean_data = LinkDataController.get_clean_data(data)
+        self.assertTrue("link" in data)
+        self.assertTrue("id" in data)

@@ -690,19 +690,30 @@ class ImportFromFilesJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_FROM_FILES
 
     def process(self, obj=None):
-        data = obj.subject
-        try:
-            data = json.loads(data)
-        except ValueError:
-            return True
+        AppLogging.notify("Received request to import files")
 
-        path = data["path"]
-        import_title = data["import_title"]
-        import_description = data["import_description"]
-        import_tags = data["import_tags"]
-        import_votes = data["import_votes"]
-        username = data["user"]
-        tag = data["tag"]
+        data = {}
+        try:
+            data = json.loads(obj.args)
+        except ValueError:
+            AppLogging.error("Cannot load JSON")
+            return False
+
+        username = ""
+        if "username" in data:
+            username = data["username"]
+
+        path = ""
+        if "path" in data:
+            path = data["path"]
+
+        if path == "":
+            AppLogging.error("Improperly configured")
+            return False
+
+        if not Path(path).exists():
+            AppLogging.error("Path does not exist: {}".format(path))
+            return False
 
         user = None
         if username and username != "":
@@ -710,7 +721,13 @@ class ImportFromFilesJobHandler(BaseJobHandler):
             if users.count() > 0:
                 user = users[0]
 
-        JsonImporter(path=path, user=user)
+        data["user"] = user
+
+        AppLogging.notify("Importing from {}".format(path), detail_text = "{}".format(data))
+        importer = JsonImporter(path=path, user=user, import_settings = data)
+        importer.import_all()
+
+        AppLogging.notify("Importing from {} DONE".format(path))
 
         return True
 
@@ -980,31 +997,67 @@ class CleanupJobHandler(BaseJobHandler):
     def get_job():
         return BackgroundJob.JOB_CLEANUP
 
+    def cleanup_all(args=None):
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="LinkDataController", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="SourceDataController", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="AppLogging", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="DomainsController", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="KeyWords", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="UserConfig", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="SourceExportHistory", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="ModelFiles", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="SystemOperation", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="UserTags", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="UserComments", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="UserVotes", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="UserBookmarks", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="UserSearchHistory", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="UserEntryTransitionHistory", args=args)
+        BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="UserEntryVisitHistory", args=args)
+
     def process(self, obj=None):
+        table = obj.subject
+
+        if table == "":
+            CleanupJobHandler.cleanup_all(obj.args)
+            return
+
+        status = False
+
         limit_s = 0
-        try:
-            if obj is not None:
-                limit_s = int(obj.subject)
-        except ValueError as E:
-            AppLogging.debug("Cleanup, cannot read limit value:{}".format(str(E)))
+        cfg = {}
+        if obj.args != "":
+            try:
+                cfg = json.loads(obj.args)
+            except ValueError as E:
+                pass
+            except TypeError as E:
+                pass
 
-        status = EntriesCleanupAndUpdate().cleanup(limit_s)
+        cfg["limit_s"] = limit_s
 
-        if limit_s == 0:
-            SourceDataController.cleanup()
+        if table == "all" or table == "LinkDataController":
+            status = EntriesCleanupAndUpdate().cleanup(cfg)
+        if table == "all" or table == "SourceDataController":
+            SourceDataController.cleanup(cfg)
+        if table == "all" or table == "AppLogging":
+            AppLogging.cleanup(cfg)
+        if table == "all" or table == "DomainsController":
+            DomainsController.cleanup(cfg)
+        if table == "all" or table == "KeyWords":
+            KeyWords.cleanup(cfg)
+        if table == "all" or table == "UserConfig":
+            UserConfig.cleanup(cfg)
+        if table == "all" or table == "SourceExportHistory":
+            SourceExportHistory.cleanup(cfg)
+        if table == "all" or table == "ModelFiles":
+            ModelFiles.cleanup(cfg)
+        if table == "all" or table == "SystemOperation":
+            SystemOperation.cleanup(cfg)
 
-            AppLogging.cleanup()
-            DomainsController.cleanup()
-            KeyWords.cleanup()
-            UserConfig.cleanup()
-            SourceExportHistory.cleanup()
-            ModelFiles.cleanup()
-            SystemOperation.cleanup()
+        self.user_tables_cleanup(cfg, obj)
 
-            self.user_tables_cleanup()
-
-        # if status is True, everything has been cleared correctly
-        # we can remove the cleanup background job
+        status = True
 
         elapsed_sec = self.get_time_diff()
         AppLogging.notify(
@@ -1012,16 +1065,25 @@ class CleanupJobHandler(BaseJobHandler):
         )
         return status
 
-    def user_tables_cleanup(self):
-        UserTags.cleanup()
-        CompactedTags.cleanup()
-        UserCompactedTags.cleanup()
-        UserCommentsController.cleanup()
-        UserVotes.cleanup()
-        UserBookmarks.cleanup()
-        UserSearchHistory.cleanup()
-        UserEntryTransitionHistory.cleanup()
-        UserEntryVisitHistory.cleanup()
+    def user_tables_cleanup(self, cfg, obj):
+        table = obj.subject
+
+        if table == "all" or table == "UserTags":
+            UserTags.cleanup(cfg)
+            CompactedTags.cleanup(cfg)
+            UserCompactedTags.cleanup(cfg)
+        if table == "all" or table == "UserComments":
+            UserCommentsController.cleanup(cfg)
+        if table == "all" or table == "UserVotes":
+            UserVotes.cleanup(cfg)
+        if table == "all" or table == "UserBookmarks":
+            UserBookmarks.cleanup(cfg)
+        if table == "all" or table == "UserSearchHistory":
+            UserSearchHistory.cleanup(cfg)
+        if table == "all" or table == "UserEntryTransitionHistory":
+            UserEntryTransitionHistory.cleanup(cfg)
+        if table == "all" or table == "UserEntryVisitHistory":
+            UserEntryVisitHistory.cleanup(cfg)
 
 
 class CheckDomainsJobHandler(BaseJobHandler):
@@ -1139,6 +1201,10 @@ class RefreshProcessor(CeleryTaskInterface):
         if not SystemOperation.is_internet_ok():
             return
 
+        config = ConfigurationEntry.get()
+        if config.block_new_tasks:
+            return
+
         from .controllers import SourceDataController
 
         self.check_sources()
@@ -1169,7 +1235,7 @@ class RefreshProcessor(CeleryTaskInterface):
             for source in sources:
                 BackgroundJobController.link_save(source.url)
 
-        BackgroundJobController.make_cleanup()
+        CleanupJobHandler.cleanup_all()
 
     def update_entries(self):
         c = Configuration.get_object()

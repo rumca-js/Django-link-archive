@@ -46,7 +46,7 @@ class EntriesCleanup(object):
         else:
             self.limit_s = limit_s
 
-    def cleanup(self, limit_s=0):
+    def cleanup(self, cfg=None):
         """
         We do not exit prematurely.
 
@@ -353,7 +353,7 @@ class EntryCleanup(object):
     def is_delete_time(self):
         if self.entry.is_permanent():
             """
-            Cannot remove bookmarks, or permament entries
+            Cannot remove bookmarks, or permanent entries
             """
             return False
 
@@ -532,7 +532,7 @@ class EntryUpdater(object):
         props = url.get_props()
 
         if url.u:
-            if not entry.bookmarked and not entry.permament and url.u.is_blocked():
+            if not entry.bookmarked and not entry.permanent and url.u.is_blocked():
                 entry.delete()
                 return
 
@@ -935,7 +935,10 @@ class EntryWrapper(object):
     def create(self, link_data):
         self.date = link_data["date_published"]
         is_archive = self.is_archive()
+
         if "bookmarked" in link_data and link_data["bookmarked"]:
+            is_archive = False
+        if "permanent" in link_data and link_data["permanent"]:
             is_archive = False
 
         if (
@@ -1094,9 +1097,9 @@ class EntryWrapper(object):
                 return
 
         if not entry.should_entry_be_permanent():
-            entry.permament = False
+            entry.permanent = False
         else:
-            entry.permament = True
+            entry.permanent = True
         entry.save()
 
         if not entry.is_permanent():
@@ -1347,10 +1350,10 @@ class EntryDataBuilder(object):
         self.link_data = link_data
 
         if self.link:
-            self.build_from_link()
+            return self.build_from_link()
 
         if self.link_data:
-            self.build_from_props(ignore_errors=self.ignore_errors)
+            return self.build_from_props(ignore_errors=self.ignore_errors)
 
     def build_from_link(self, ignore_errors=False):
         from ..pluginurl import UrlHandler
@@ -1577,7 +1580,8 @@ class EntryDataBuilder(object):
             user=self.user,
         )
 
-        return wrapper.create(new_link_data)
+        entry = wrapper.create(new_link_data)
+        return entry
 
     def set_domain_object(self):
         config = Configuration.get_object().config_entry

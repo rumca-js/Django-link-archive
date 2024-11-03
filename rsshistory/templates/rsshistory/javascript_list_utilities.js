@@ -25,7 +25,7 @@
         currentUrl.searchParams.delete('page');
         const paginationArgs = `${currentUrl.searchParams.toString()}`;
 
-        if (currentPage > 1) {
+        if (currentPage > 2) {
             paginationText += `
                 <li class="page-item">
                     <a href="?page=1${paginationArgs}" data-page="1" class="btnFilterTrigger page-link">|&lt;</a>
@@ -58,7 +58,7 @@
                 </li>
             `;
         }
-        if (currentPage < totalPages) {
+        if (currentPage + 1 < totalPages) {
             paginationText += `
                 <li class="page-item">
                     <a href="?page=${totalPages}${paginationArgs}" data-page="${totalPages}" class="btnFilterTrigger page-link">&gt;|</a>
@@ -320,7 +320,7 @@
 
     //-----------------------------------------------
     // Do it now
-    var show = getQueryParam('show') || '';
+    var show = getQueryParam('show') || 'true';
     var auto_refresh = getQueryParam('auto-refresh') || '';
     var search_term = getQueryParam('search') || '';
 
@@ -336,7 +336,7 @@
     loadSearchHistory();
 
     // if (user specified search, or show is true), and entrylist is empty
-    if (search_term || show) {
+    if (search_term || (show !== '0' && show !== 'false')) {
         if (isEmpty($('#listData'))) {
             loadRowListContent();
         }

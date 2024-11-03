@@ -12,4 +12,4 @@ from .keywordexporter import KeywordExporter
 from .servicedatamarginaliacrawleroutput import MarginaliaCrawlerOutput
 from .instanceimporter import InstanceExporter, InstanceImporter
 
-from .jsonimporter import JsonImporter
+from .jsonimporter import JsonImporter, MapImporter

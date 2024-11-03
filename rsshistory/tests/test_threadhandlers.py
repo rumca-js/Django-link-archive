@@ -103,18 +103,15 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         self.assertEqual(persistent_objects.count(), 0)
 
         self.assertEqual(
-            BackgroundJobController.objects.filter(
-                job=BackgroundJobController.JOB_PROCESS_SOURCE
-            ).count(),
+            BackgroundJobController.get_number_of_jobs(BackgroundJobController.JOB_PROCESS_SOURCE),
             1,
         )
 
         self.assertEqual(
-            BackgroundJobController.objects.filter(
-                job=BackgroundJobController.JOB_CLEANUP
-            ).count(),
-            1,
+            BackgroundJobController.get_number_of_jobs(BackgroundJobController.JOB_CLEANUP),
+            16,
         )
+
 
         self.assertEqual(SourceExportHistory.objects.all().count(), 3)
 
@@ -144,10 +141,8 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         # TODO check if export id is in pks
 
         self.assertEqual(
-            BackgroundJobController.objects.filter(
-                job=BackgroundJobController.JOB_CLEANUP
-            ).count(),
-            1,
+            BackgroundJobController.get_number_of_jobs(BackgroundJobController.JOB_CLEANUP),
+            16,
         )
 
     def test_refresh__adds_update_entry_job(self):
@@ -311,11 +306,16 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         keyword.date_published = datetime
         keyword.save()
 
-    def test_cleanup_job(self):
+    def test_cleanup_job__keywords(self):
         self.prepare_data()
 
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_CLEANUP,
+            subject="KeyWords",
+        )
+
         handler = CleanupJobHandler()
-        handler.process()
+        handler.process(job)
 
         # cleanup of links, domains may trigger creating new entries, which may
         # trigger unwanted dependencies
@@ -331,6 +331,30 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         for domain in DomainsController.objects.all():
             print("Domain: {}".format(domain.domain))
 
+    def test_cleanup_job__domains(self):
+        self.prepare_data()
+
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_CLEANUP,
+            subject="DomainsController",
+        )
+
+        handler = CleanupJobHandler()
+        handler.process(job)
+
+        # cleanup of links, domains may trigger creating new entries, which may
+        # trigger unwanted dependencies
+
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info_text))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
+        for domain in DomainsController.objects.all():
+            print("Domain: {}".format(domain.domain))
+
         self.assertEqual(DomainsController.objects.all().count(), 0)
 
     def test_cleanup_job_no_store_domains(self):
@@ -340,8 +364,13 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         conf.accept_domains = False
         conf.save()
 
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_CLEANUP,
+            subject="DomainsController",
+        )
+
         handler = CleanupJobHandler()
-        handler.process()
+        handler.process(job)
 
         persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
@@ -349,8 +378,6 @@ class CleanJobHandlerTest(FakeInternetTestCase):
             print("Persisten object info:{}".format(persistent_object.info_text))
 
         self.assertEqual(persistent_objects.count(), 0)
-        self.assertEqual(KeyWords.objects.all().count(), 0)
-
         self.assertEqual(DomainsController.objects.all().count(), 0)
 
 
@@ -946,8 +973,6 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         self.print_errors()
 
-        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 2)
-
         jobs = BackgroundJobController.objects.filter(
             job=BackgroundJobController.JOB_LINK_ADD
         )
@@ -963,6 +988,12 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
                 BackgroundJobController.JOB_LINK_ADD
             ),
         )
+
+        # 2 link add, 16 cleanups
+        self.assertEqual(BackgroundJobController.get_number_of_jobs(BackgroundJobController.JOB_CLEANUP), 16)
+
+        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 18)
+
 
     def test_run__adds_system_operation(self):
         LinkDataController.objects.all().delete()

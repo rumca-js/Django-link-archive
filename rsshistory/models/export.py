@@ -200,7 +200,7 @@ class SourceExportHistory(models.Model):
         ):
             SourceExportHistory.objects.create(date=process_date, export=export)
 
-    def cleanup():
+    def cleanup(cfg=None):
         remove_threshold = datetime.today() - timedelta(days=30)
         histories = SourceExportHistory.objects.filter(date__lt=remove_threshold)
         histories.delete()

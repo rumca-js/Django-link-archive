@@ -155,7 +155,7 @@ class KeyWords(models.Model):
 
             return True
 
-    def cleanup():
+    def cleanup(cfg=None):
         from ..configuration import Configuration
 
         if Configuration.get_object().config_entry.enable_keyword_support:

@@ -362,7 +362,7 @@ class BackgroundJobController(BackgroundJob):
         args_text = json.dumps(data)
 
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_IMPORT_FROM_FILES, args_text
+            job_name=BackgroundJob.JOB_IMPORT_FROM_FILES, args=args_text
         )
 
     def link_save(link_url):
@@ -434,8 +434,22 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_EXPORT_DATA, subject=str(export.id), args=input_date, user=user
         )
 
-    def make_cleanup():
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP)
+    def make_cleanup(table = "", cfg=None, verify=False):
+        pass_cfg = {}
+
+        if cfg:
+               pass_cfg = cfg
+
+        if verify:
+            pass_cfg["verify"] = True
+
+        args_text = ""
+        try:
+           args_text = json.dumps(pass_cfg)
+        except ValueError as E:
+            pass
+
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject=table, args=args_text)
 
     def check_domains():
         return BackgroundJobController.create_single_job(
