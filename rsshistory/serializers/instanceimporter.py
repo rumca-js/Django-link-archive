@@ -89,7 +89,6 @@ class InstanceImporter(object):
                 source_builder=source_builder,
                 user=self.user,
             )
-            print(json_data["sources"])
             importer.import_from_sources(json_data["sources"])
 
         elif "link" in json_data:

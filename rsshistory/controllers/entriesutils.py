@@ -835,10 +835,14 @@ class EntryWrapper(object):
     Provides API to make links more uniform (http vs https)
     """
 
-    def __init__(self, link=None, date=None, entry=None, user=None):
+    def __init__(self, link=None, date=None, entry=None, user=None, strict_ids=False):
+        """
+        if strict_ids is true, then we use link_data "ids"
+        """
         self.date = date
         self.entry = entry
         self.user = user
+        self.strict_ids = strict_ids
 
         self.link=None
         if self.entry:
@@ -967,7 +971,7 @@ class EntryWrapper(object):
         ):
             link_data["description"] = link_data["description"][:998]
 
-        if "id" in link_data:
+        if not self.strict_ids and "id" in link_data:
             del link_data["id"]
 
         if self.user:
@@ -1318,12 +1322,14 @@ class EntryDataBuilder(object):
         user=None,
         allow_recursion=True,
         ignore_errors=False,
+        strict_ids=False,
     ):
         self.link = link
         self.link_data = link_data
         self.source_is_auto = source_is_auto
         self.allow_recursion = allow_recursion
         self.user = user
+        self.strict_ids = strict_ids
 
         self.ignore_errors = ignore_errors
         c = Configuration.get_object().config_entry
@@ -1345,9 +1351,11 @@ class EntryDataBuilder(object):
         source_is_auto=True,
         allow_recursion=True,
         ignore_errors=False,
+        strict_ids=False,
     ):
         self.link = link
         self.link_data = link_data
+        self.strict_ids = strict_ids
 
         if self.link:
             return self.build_from_link()
@@ -1578,6 +1586,7 @@ class EntryDataBuilder(object):
             link=new_link_data["link"],
             date=new_link_data["date_published"],
             user=self.user,
+            strict_ids=self.strict_ids,
         )
 
         entry = wrapper.create(new_link_data)
@@ -1590,9 +1599,7 @@ class EntryDataBuilder(object):
             domain = DomainsController.add(self.link_data["link"])
 
             if domain:
-                # attach domain if entry is domain
-                if self.link_data["link"] == domain.domain:
-                    self.link_data["domain"] = domain
+                self.link_data["domain"] = domain
         return self.link_data
 
     def check_and_set_source_object(self):

@@ -308,6 +308,7 @@ class ImportFromFilesForm(forms.Form):
     import_comments = forms.BooleanField(required=False)
     import_votes = forms.BooleanField(required=False)
     import_bookmarks = forms.BooleanField(required=False)
+    import_ids = forms.BooleanField(required=False)
 
     username = forms.CharField(max_length=500, required=False)
     tag = forms.CharField(max_length=500, required=False)

@@ -58,6 +58,7 @@ class ImportTests(FakeInternetTestCase):
             "import_comments": True,
             "import_votes": True,
             "import_bookmarks": True,
+            "import_ids": True,
         }
 
         # call user action

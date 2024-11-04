@@ -276,6 +276,31 @@ class SourcesViewsTests(FakeInternetTestCase):
         source = SourceDataController.objects.get(url=test_link)
         self.assertEqual(source.title, "LinkedIn Page title")
 
+    def test_source_remove__check_if_deps_removed(self):
+        SourceDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        test_link = "https://linkedin.com"
+
+        source = SourceDataController.objects.create(
+            url=test_link,
+            title="The first link",
+            language="en",
+        )
+
+        SourceOperationalData.objects.create(source_obj = source)
+
+        BackgroundJobController.objects.create(job=BackgroundJobController.JOB_PROCESS_SOURCE,
+                 subject=str(source.id))
+
+        # call tested function
+        url = reverse("{}:source-remove".format(LinkDatabase.name), args=[source.id])
+
+        self.assertEqual(SourceDataController.objects.count(), 0)
+        self.assertEqual(SourceOperationalData.objects.count(), 0)
+        self.assertEqual(BackgroundJobController.objects.count(), 0)
+
 
 class SourceDetailTest(FakeInternetTestCase):
     def setUp(self):

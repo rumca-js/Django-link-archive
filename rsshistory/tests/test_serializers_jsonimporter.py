@@ -29,11 +29,11 @@ entry_contents = """
 """
 
 
-def import_from_data(user, contents, import_settings=None):
+def import_from_data(user, contents, import_settings=None, strict_ids=False):
     data = json.loads(contents)
 
-    entry_builder = EntryDataBuilder()
-    source_builder = SourceDataBuilder()
+    entry_builder = EntryDataBuilder(strict_ids=strict_ids)
+    source_builder = SourceDataBuilder(strict_ids=strict_ids)
 
     importer = MapImporter(
         user=user,
@@ -60,7 +60,7 @@ class JsonImporterTest(FakeInternetTestCase):
         import_settings = {"import_entries" : True}
 
         # call tested functionality
-        p = import_from_data(self.user, entry_contents, import_settings)
+        p = import_from_data(self.user, entry_contents, import_settings, strict_ids=False)
 
         links = LinkDataController.objects.all()
 
@@ -68,6 +68,30 @@ class JsonImporterTest(FakeInternetTestCase):
 
         link = links[0]
         self.assertEqual(link.link, "https://linkedin.com")
+        self.assertNotEqual(link.id, 153720)
+        self.assertEqual(link.bookmarked, True)
+        self.assertEqual(link.permanent, True)
+
+        self.assertEqual(UserVotes.objects.all().count(), 0)
+        self.assertEqual(UserTags.objects.all().count(), 0)
+
+    def test_import_from_data__entries__strict(self):
+        LinkDataController.objects.all().delete()
+        UserVotes.objects.all().delete()
+        UserTags.objects.all().delete()
+
+        import_settings = {"import_entries" : True, "import_ids" : True}
+
+        # call tested functionality
+        p = import_from_data(self.user, entry_contents, import_settings, strict_ids=True)
+
+        links = LinkDataController.objects.all()
+
+        self.assertEqual(len(links), 1)
+
+        link = links[0]
+        self.assertEqual(link.link, "https://linkedin.com")
+        self.assertEqual(link.id, 153720)
         self.assertEqual(link.bookmarked, True)
         self.assertEqual(link.permanent, True)
 
@@ -83,7 +107,7 @@ class JsonImporterTest(FakeInternetTestCase):
         import_settings = None
 
         # call tested functionality
-        p = import_from_data(self.user, entry_contents, import_settings)
+        p = import_from_data(self.user, entry_contents, import_settings, strict_ids=False)
 
         links = LinkDataController.objects.all()
 

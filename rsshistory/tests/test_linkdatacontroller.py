@@ -411,4 +411,6 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
         clean_data = LinkDataController.get_clean_data(data)
         self.assertTrue("link" in data)
+        self.assertEqual(data["link"], "https://google.com")
         self.assertTrue("id" in data)
+        self.assertEqual(data["id"], 3)

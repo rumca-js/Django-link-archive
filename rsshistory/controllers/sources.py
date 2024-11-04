@@ -323,15 +323,22 @@ class SourceDataController(SourceDataModel):
         if entries.exists():
             entry = entries[0]
             entry.permament = False
+            entry.save()
+
+        jobs = BackgroundJobController.objects.filter(
+                job = BackgroundJobController.JOB_PROCESS_SOURCE,
+                subject=str(self.id))
+        jobs.delete()
 
         self.delete()
 
 
 class SourceDataBuilder(object):
-    def __init__(self, link=None, link_data=None, manual_entry=False):
+    def __init__(self, link=None, link_data=None, manual_entry=False, strict_ids=False):
         self.link = link
         self.link_data = link_data
         self.manual_entry = manual_entry
+        self.strict_ids = strict_ids
 
         if self.link:
             self.build_from_link()
@@ -339,10 +346,11 @@ class SourceDataBuilder(object):
         if self.link_data:
             self.build_from_props()
 
-    def build(self, link=None, link_data=None, manual_entry=False):
+    def build(self, link=None, link_data=None, manual_entry=False, strict_ids=False):
         self.link = link
         self.link_data = link_data
         self.manual_entry = manual_entry
+        self.strict_ids = strict_ids
 
         if self.link:
             self.build_from_link()
