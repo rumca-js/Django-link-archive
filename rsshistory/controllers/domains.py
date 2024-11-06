@@ -15,6 +15,7 @@ from ..models import (
     DomainsTlds,
     DomainsSuffixes,
     DomainsMains,
+    ConfigurationEntry,
 )
 from .entries import LinkDataController
 from ..configuration import Configuration
@@ -26,6 +27,34 @@ class DomainsController(Domains):
 
     class Meta:
         proxy = True
+
+    def get_map(self):
+        result = {
+            "protocol": self.protocol,
+            "domain": self.domain,
+            "main": self.main,
+            "subdomain": self.subdomain,
+            "suffix": self.suffix,
+            "tld": self.tld,
+            "dead": self.dead,
+            "date_created": self.date_created.isoformat(),
+            "date_update_last": self.date_update_last.isoformat(),
+        }
+        return result
+
+    def get_query_names():
+        result = [
+            "protocol",
+            "domain",
+            "main",
+            "subdomain",
+            "suffix",
+            "tld",
+            "dead",
+            "date_created",
+            "date_update_last",
+        ]
+        return result
 
     def add(url):
         """
@@ -49,28 +78,13 @@ class DomainsController(Domains):
             AppLogging.error("Not a domain text:{}, url:{}".format(domain_text, url))
             return
 
-        return DomainsController.create_or_update_domain(domain_text, protocol)
+        return DomainsController.create_object(domain_text, protocol)
 
-    def create_or_update_domain(domain_only_text, protocol):
-        LinkDatabase.info("Creating, or updating domain:{}".format(domain_only_text))
-        objs = Domains.objects.filter(domain=domain_only_text)
-
-        obj = None
-        if objs.count() == 0:
-            try:
-                obj = DomainsController.create_object(domain_only_text, protocol)
-            except Exception as E:
-                exc_str = traceback.format_exc()
-                AppLogging.exc(
-                    E,
-                    "Cannot create domain data:{}\n{}".format(
-                        domain_only_text, exc_str
-                    ),
-                )
+    def cleanup(cfg=None):
+        if ConfigurationEntry.get().accept_domains:
+            DomainsController.check_consistency_all(cfg)
         else:
-            obj = objs[0]
-
-        return obj
+            DomainsController.remove_all()
 
     def get_link_object(self):
         if not hasattr(self, "link_obj"):
@@ -81,26 +95,88 @@ class DomainsController(Domains):
         else:
             return self.link_obj
 
+    def check_consistency_all(cfg=None):
+        if cfg is not None and "verify" in cfg:
+            for domain in DomainsController.objects.all():
+                if not domain.check_consistency():
+                    domain.delete()
+
+        DomainsController.create_missing_domains()
+
+    def check_consistency(self):
+        if self.check_local_consistency():
+            return True
+
+        return False
+
+    def check_local_consistency(self):
+        entries = LinkDataController.objects.filter(link = "https://" + self.domain)
+        if entries.exists():
+            entry = entries[0]
+            entry.domain = self
+            entry.save()
+            return True
+
+        entries = LinkDataController.objects.filter(link = "http://" + self.domain)
+        if entries.exists():
+            entry = entries[0]
+            entry.domain = self
+            entry.save()
+            return True
+
+        entries = LinkDataController.objects.filter(link = "smb://" + self.domain)
+        if entries.exists():
+            entry = entries[0]
+            entry.domain = self
+            entry.save()
+            return True
+
+        entries = LinkDataController.objects.filter(link = "ftp://" + self.domain)
+        if entries.exists():
+            entry = entries[0]
+            entry.domain = self
+            entry.save()
+            return True
+
+        entries = LinkDataController.objects.filter(link = "//" + self.domain)
+        if entries.exists():
+            entry = entries[0]
+            entry.domain = self
+            entry.save()
+            return True
+
+        return False
+
+    def check_web_consistency(self):
+        from .entriesutils import EntryDataBuilder
+
+        full_domain = self.get_domain_full_url("https")
+
+        b = EntryDataBuilder()
+        b.link = full_domain
+        obj = b.build_from_link()
+        if obj:
+            return True
+
+        full_domain_http = domain.get_domain_full_url("http")
+
+        b.link = full_domain_http
+        obj = b.build_from_link()
+        if obj:
+            return True
+
     def create_object(domain_only_text, protocol):
-        import tldextract
-
-        extract = tldextract.TLDExtract()
-        domain_data = extract(domain_only_text)
-
-        tld = os.path.splitext(domain_only_text)[1][1:]
-
         old_entries = Domains.objects.filter(domain=domain_only_text)
         if old_entries.count() > 0:
             ob = old_entries[0]
-            ob.domain = domain_only_text
-            ob.main = domain_data.domain
-            ob.subdomain = domain_data.subdomain
-            ob.suffix = domain_data.suffix
-            ob.tld = tld
-            ob.protocol = protocol
-            ob.save()
-
         else:
+            import tldextract
+
+            extract = tldextract.TLDExtract()
+            domain_data = extract(domain_only_text)
+
+            tld = os.path.splitext(domain_only_text)[1][1:]
+
             ob = DomainsController.objects.create(
                 domain=domain_only_text,
                 main=domain_data.domain,
@@ -110,7 +186,7 @@ class DomainsController(Domains):
                 protocol=protocol,
             )
 
-            ob.update_complementary_data(True)
+        ob.update_complementary_data(True)
 
         return ob
 
@@ -151,11 +227,6 @@ class DomainsController(Domains):
             and self.tld != ""
         )
 
-    def is_update_time(self):
-        days = DateUtils.get_day_diff(self.date_update_last)
-        # TODO make this configurable
-        return days > Domains.get_update_days_limit()
-
     def update_domain(self):
         import tldextract
 
@@ -188,70 +259,11 @@ class DomainsController(Domains):
         else:
             LinkDatabase.info("domain:{} Nothing has changed".format(self.domain))
 
-    def get_map(self):
-        result = {
-            "protocol": self.protocol,
-            "domain": self.domain,
-            "main": self.main,
-            "subdomain": self.subdomain,
-            "suffix": self.suffix,
-            "tld": self.tld,
-            "dead": self.dead,
-            "date_created": self.date_created.isoformat(),
-            "date_update_last": self.date_update_last.isoformat(),
-        }
-        return result
-
-    def get_query_names():
-        result = [
-            "protocol",
-            "domain",
-            "main",
-            "subdomain",
-            "suffix",
-            "tld",
-            "dead",
-            "date_created",
-            "date_update_last",
-        ]
-        return result
-
-    def reset_dynamic_data():
-        pass
-
-    def is_domain_object(entry):
-        if not hasattr(entry, "main_domain_obj"):
-            return False
-
-        return entry.main_domain_obj
-
-    def cleanup(cfg=None):
-        if not Configuration.get_object().config_entry.accept_domains:
-            DomainsController.unconnect_entries()
-            DomainsController.remove_all()
-        else:
-            DomainsController.remove_unused_domains()
-
-        tlds = DomainsTlds.objects.filter(tld__contains=":")
-        tlds.delete()
-
-        suffixes = DomainsSuffixes.objects.filter(suffix__contains=":")
-        suffixes.delete()
-
-        mains = DomainsMains.objects.filter(main__contains=":")
-        mains.delete()
-
     def remove_unused_domains():
         domains = DomainsController.objects.filter(
             Q(entry_objects__isnull=True) & Q(archive_entry_objects__isnull=True)
         )
         domains.delete()
-
-    def unconnect_entries():
-        entries = LinkDataController.objects.filter(domain__isnull=False)
-        for entry in entries:
-            entry.domain = None
-            entry.save()
 
     def create_missing_domains():
         if not Configuration.get_object().config_entry.accept_domains:
@@ -262,6 +274,7 @@ class DomainsController(Domains):
             p = DomainAwarePage(entry.link)
             domain_url = p.get_domain()
             domain_only = p.get_domain_only()
+
             LinkDatabase.info(
                 "Entry:{} domain:{} {}".format(entry.link, domain_url, domain_only)
             )
@@ -284,34 +297,3 @@ class DomainsController(Domains):
                 )
                 entry.domain = domains[0]
                 entry.save()
-
-    def create_missing_entries():
-        from .entriesutils import EntryDataBuilder
-
-        domains = DomainsController.objects.all()
-        for domain in domains:
-            missing_entry = False
-
-            full_domain = domain.get_domain_full_url()
-            full_domain_http = domain.get_domain_full_url("http")
-
-            entries = LinkDataController.objects.filter(link=full_domain)
-
-            if entries.count() == 0:
-                http_entries = LinkDataController.objects.filter(link=full_domain_http)
-                if http_entries.count() == 0:
-                    missing_entry = True
-
-            if missing_entry:
-                b = EntryDataBuilder()
-                b.link = full_domain
-                obj = b.build_from_link()
-                if obj:
-                    domain.protocol = "https"
-                    domain.save()
-                else:
-                    b.link = full_domain_http
-                    obj = b.build_from_link()
-                    if obj:
-                        domain.protocol = "http"
-                        domain.save()

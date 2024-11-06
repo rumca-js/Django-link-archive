@@ -1,7 +1,7 @@
 from django.views import generic
 from django.urls import reverse
-from django.shortcuts import render, redirect
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 
 from datetime import datetime, timedelta

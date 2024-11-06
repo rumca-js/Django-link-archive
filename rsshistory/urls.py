@@ -267,6 +267,7 @@ urlpatterns = [
     path("get-search-suggestions-entries/<str:searchstring>/", userhistory.get_search_suggestions_entries, name="get-search-suggestions-entries"),
     path("get-search-suggestions-sources/<str:searchstring>/", userhistory.get_search_suggestions_sources, name="get-search-suggestions-sources"),
     path("get-footer-status-line", system.get_footer_status_line, name="get-footer-status-line",),
+    path("get-indicators", system.get_indicators, name="get-indicators",),
     path("get-menu", system.get_menu, name="get-menu",),
     path("json-table-status/", system.json_table_status, name="json-table-status"),
     path("json-system-status/", system.json_system_status, name="json-system-status"),

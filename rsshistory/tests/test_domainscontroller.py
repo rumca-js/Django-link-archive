@@ -18,6 +18,7 @@ class DomainTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
+        # call tested function
         DomainsController.add("waiterrant.blogspot.com")
 
         objs = DomainsController.objects.filter(domain__icontains="waiterrant")
@@ -38,6 +39,7 @@ class DomainTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
+        # call tested function
         DomainsController.add("https://waiterrant.blogspot.com")
 
         objs = DomainsController.objects.filter(domain__icontains="waiterrant")
@@ -58,6 +60,7 @@ class DomainTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
+        # call tested function
         DomainsController.add("https://waiterrant.blogspot.com/nothing-important")
 
         objs = DomainsController.objects.filter(domain__icontains="waiterrant")
@@ -74,22 +77,36 @@ class DomainTest(FakeInternetTestCase):
         entries = LinkDataController.objects.all()
         self.assertEqual(entries.count(), 0)
 
-    def test_domain_create_missing_entries(self):
+    def test_cleanup__not(self):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
+        LinkDataController.objects.create(link = "https://waiterrant.blogspot.com")
+
         DomainsController.objects.create(domain="waiterrant.blogspot.com")
 
-        DomainsController.create_missing_entries()
+        # call tested function
+        DomainsController.cleanup({"verify" : True})
 
-        self.assertEqual(LinkDataController.objects.all().count(), 1)
+        domains = DomainsController.objects.all()
+        entries = LinkDataController.objects.all()
 
-    def test_cleanup(self):
+        self.assertEqual(domains.count(), 1)
+        self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries[0].domain, domains[0])
+
+    def test_cleanup__recreate(self):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
-        DomainsController.objects.create(domain="waiterrant.blogspot.com")
+        DomainsController.objects.create(domain="linkedin.com")
 
-        DomainsController.cleanup()
+        # call tested function
+        DomainsController.cleanup({"verify" : True})
 
-        self.assertEqual(DomainsController.objects.all().count(), 0)
+        domains = DomainsController.objects.all()
+        entries = LinkDataController.objects.all()
+
+        self.assertEqual(domains.count(), 1)
+        self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries[0].domain, domains[0])

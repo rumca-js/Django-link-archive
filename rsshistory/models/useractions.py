@@ -170,6 +170,17 @@ class UserTags(models.Model):
         BackgroundJobController.entry_reset_local_data(entry)
 
     def cleanup(cfg=None):
+        if cfg and "verify" in cfg:
+            for tag in UserTags.objects.all():
+                try:
+                    tag.entry.id
+                except Exception as E:
+                    tag.delete()
+                try:
+                    tag.user.id
+                except Exception as E:
+                    tag.delete()
+
         #for q in UserTags.objects.all():
         #    try:
         #       users = q.entry.id
@@ -218,6 +229,13 @@ class UserCompactedTags(models.Model):
                 compacted = compacts[0]
                 compacted.count += 1
                 compacted.save()
+
+        if cfg and "verify" in cfg:
+            for tag in UserCompactedTags.objects.all():
+                try:
+                    tag.user.id
+                except Exception as E:
+                    tag.delete()
 
 
 class CompactedTags(models.Model):
@@ -324,11 +342,16 @@ class UserVotes(models.Model):
         return UserVotes.add(user, entry, vote)
 
     def cleanup(cfg=None):
-        #for q in UserVotes.objects.all():
-        #    try:
-        #       users = q.entry.id
-        #    except Exception as E:
-        #        q.delete()
+        if cfg and "verify" in cfg:
+            for vote in UserVotes.objects.all():
+                try:
+                    vote.user.id
+                except Exception as E:
+                    vote.delete()
+                try:
+                    vote.entry.id
+                except Exception as E:
+                    vote.delete()
 
         # recreate missing entries, from votes alone
         for entry in LinkDataModel.objects.filter(page_rating_votes__gt=0):
@@ -391,12 +414,16 @@ class UserComments(models.Model):
         return InputContent(self.comment).htmlify()
 
     def cleanup(cfg=None):
-        #for q in UserComments.objects.all():
-        #    try:
-        #       users = q.entry.id
-        #    except Exception as E:
-        #        q.delete()
-        pass
+        if cfg and "verify" in cfg:
+            for comment in UserComments.objects.all():
+                try:
+                    comment.user.id
+                except Exception as E:
+                    comment.delete()
+                try:
+                    comment.entry.id
+                except Exception as E:
+                    comment.delete()
 
     def move_entry(source_entry, destination_entry):
         comments = UserComments.objects.filter(entry=source_entry)
@@ -475,12 +502,16 @@ class UserBookmarks(models.Model):
         return False
 
     def cleanup(cfg=None):
-        pass
-        #for q in UserBookmarks.objects.all():
-        #    try:
-        #       users = q.entry.id
-        #    except Exception as E:
-        #        q.delete()
+        if cfg and "verify" in cfg:
+            for bookmark in UserBookmarks.objects.all():
+                try:
+                    bookmark.user.id
+                except Exception as E:
+                    bookmark.delete()
+                try:
+                    bookmark.entry.id
+                except Exception as E:
+                    bookmark.delete()
 
     def move_entry(source_entry, destination_entry):
         bookmarks = UserBookmarks.objects.filter(entry=source_entry)

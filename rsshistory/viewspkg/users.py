@@ -1,7 +1,4 @@
 from django.views import generic
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase

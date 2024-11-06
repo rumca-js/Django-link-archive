@@ -1016,6 +1016,11 @@ class CleanupJobHandler(BaseJobHandler):
         BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP, subject="UserEntryVisitHistory", args=args)
 
     def process(self, obj=None):
+        """
+        Cleanup:
+         subject - table name, or all
+         args["verify"] = True - check consistency of data, full
+        """
         table = obj.subject
 
         if table == "":
@@ -1323,7 +1328,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         c = Configuration.get_object()
-        c.refresh(self.__class__.__name__)
+        c.refresh(self.get_name())
 
         if not SystemOperation.is_internet_ok():
             return
@@ -1372,6 +1377,9 @@ class GenericJobsProcessor(CeleryTaskInterface):
                         "Excetion",
                     )
 
+    def get_name(self):
+        return self.__class__.__name__
+
     def process_job(self, items):
         config = Configuration.get_object()
 
@@ -1382,6 +1390,10 @@ class GenericJobsProcessor(CeleryTaskInterface):
 
         if handler_class:
             handler = handler_class(config)
+
+            if obj:
+                obj.task = self.get_name()
+                obj.save()
 
             if handler and handler.process(obj):
                 deleted = True

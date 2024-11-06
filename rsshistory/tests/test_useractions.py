@@ -129,13 +129,11 @@ class UserTagsTest(TestCase):
         UserTags.objects.create(user=None, entry=self.entry, tag="test")
 
         # call tested function
-        UserTags.cleanup()
+        UserTags.cleanup({"verify" : True})
 
         tags = UserTags.objects.all()
 
-        self.assertEqual(tags.count(), 1)
-        self.assertEqual(tags[0].entry, self.entry)
-        self.assertEqual(tags[0].user, self.user_super)
+        self.assertEqual(tags.count(), 0)
 
     def test_move_entry(self):
         user = self.user
@@ -227,7 +225,7 @@ class UserVotesTest(TestCase):
         self.entry.save()
 
         # call tested function
-        UserVotes.cleanup()
+        UserVotes.cleanup({"verify" : True})
 
         entries = LinkDataController.objects.all()
         self.assertTrue(entries.count(), 1)
@@ -341,10 +339,10 @@ class UserBookmarksTest(TestCase):
         self.entry.save()
 
         # call tested function
-        UserBookmarks.cleanup()
+        UserBookmarks.cleanup({"verify" : True})
 
         self.entry.refresh_from_db()
-        self.assertFalse(self.entry.bookmarked, False)
+        self.assertTrue(self.entry.bookmarked, False)
 
 
 class CompactedTagsTest(TestCase):
@@ -393,7 +391,7 @@ class CompactedTagsTest(TestCase):
         UserTags.set_tags(self.entry, data["tag"], self.user)
 
         # call tested function
-        CompactedTags.cleanup()
+        CompactedTags.cleanup({"verify" : True})
 
         compacts = CompactedTags.objects.all()
         self.assertEqual(compacts.count(), 2)
@@ -409,7 +407,7 @@ class CompactedTagsTest(TestCase):
         UserTags.set_tags(self.entry, data["tag"], self.user_super)
 
         # call tested function
-        CompactedTags.cleanup()
+        CompactedTags.cleanup({"verify" : True})
 
         compacts = CompactedTags.objects.all()
         self.assertEqual(compacts.count(), 2)
@@ -480,7 +478,7 @@ class UserCompactedTagsTest(TestCase):
         UserTags.set_tags(self.entry2, data["tag"], self.user)
 
         # call tested function
-        UserCompactedTags.cleanup()
+        UserCompactedTags.cleanup({"verify" : True})
 
         compacts = UserCompactedTags.objects.all()
         self.assertEqual(compacts.count(), 2)

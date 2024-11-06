@@ -3,8 +3,15 @@ from django.urls import reverse
 import django.utils
 import traceback
 
+from ..webtools import DomainAwarePage
+
 
 class Domains(models.Model):
+    """
+    Domains should be thought of something additional toward entries.
+    For example:
+      if there is not entry, then this object definitely should be removed
+    """
     protocol = models.CharField(
         max_length=100, default="https"
     )  # http or https, or ssl
@@ -53,11 +60,12 @@ class Domains(models.Model):
         DomainsTlds.add(self.tld)
         DomainsMains.add(self.main)
 
-        # if self.is_update_time() or force:
-        #    self.update_page_info()
-
-    def get_update_days_limit():
-        return 7
+    def update(self, entry):
+        p = DomainAwarePage(entry.link)
+        if p.is_domain():
+            domain_only = p.get_domain_only()
+            self.domain = domain_only
+            self.save()
 
 
 class DomainsSuffixes(models.Model):

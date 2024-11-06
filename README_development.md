@@ -94,6 +94,20 @@ What if we do not want to use main style for highlights, but for youtube we woul
 
 Each style should be independent from other styles.
 
+# Reserved names
+
+Expect some names to be reserved.
+
+Users:
+ - OpenPageRank - this user will be used to add votes from page rank
+
+Some tags will have special meaning. These tags might be used to produce dashboards, etc.
+
+Tags:
+ - gatekeepers
+ - search engine
+ - social platform
+
 # Debugging and other calls
 
 Celery can be debugged as follows

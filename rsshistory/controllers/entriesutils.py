@@ -979,12 +979,22 @@ class EntryWrapper(object):
 
         try:
             if not is_archive:
+                if self.strict_ids and "id" in link_data:
+                    obs = LinkDataController.objects.filter(id = link_data["id"])
+                    if objs.exists():
+                        return
+
                 ob = LinkDataController.objects.create(**link_data)
 
             elif is_archive:
+                if self.strict_ids and "id" in link_data:
+                    obs = ArchiveLinkDataController.objects.filter(id = link_data["id"])
+                    if objs.exists():
+                        return
+
                 ob = ArchiveLinkDataController.objects.create(**link_data)
         except Exception as E:
-            AppLogging.exc(E, "Link data:{}".format(link_data))
+            AppLogging.exc(E, "Link data:{}.\nStrict:{}".format(link_data, self.strict_ids))
             return
 
         if ob:

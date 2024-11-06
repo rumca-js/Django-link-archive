@@ -214,6 +214,17 @@ class UserEntryTransitionHistory(models.Model):
             return links[0]
 
     def cleanup(cfg=None):
+        if cfg and "verify" in cfg:
+            for transition in UserEntryTransitionHistory.objects.all():
+                try:
+                    id = transition.entry_from.id
+                except Exception as E:
+                    transition.delete()
+                try:
+                    id = transition.entry_to.id
+                except Exception as E:
+                    transition.delete()
+
         config_entry = Configuration.get_object().config_entry
         if (
             not config_entry.track_user_actions
@@ -418,6 +429,17 @@ class UserEntryVisitHistory(models.Model):
             return entries[0].entry
 
     def cleanup(cfg=None):
+        if cfg and "verify" in cfg:
+            for visit in UserEntryVisitHistory.objects.all():
+                try:
+                    id = visit.entry.id
+                except Exception as E:
+                    visit.delete()
+                try:
+                    id = visit.user.id
+                except Exception as E:
+                    visit.delete()
+
         config_entry = Configuration.get_object().config_entry
         if (
             not config_entry.track_user_actions

@@ -9,7 +9,7 @@ from ..controllers import (
     ArchiveLinkDataController,
     DomainsController,
 )
-from ..models import UserTags
+from ..models import UserTags, ConfigurationEntry
 from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
@@ -414,3 +414,28 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.assertEqual(data["link"], "https://google.com")
         self.assertTrue("id" in data)
         self.assertEqual(data["id"], 3)
+
+    def test_save__changing_entry__changes_domain(self):
+        config = ConfigurationEntry.get()
+        config.accept_domains = True
+        config.save()
+
+        domain = DomainsController.objects.create(
+                domain = "www.linkedin.com"
+        )
+
+        entry = LinkDataController.objects.create(
+            link="https://www.linkedin.com",
+            title="my title",
+            domain=domain,
+        )
+
+        entry.link = "https://linkedin.com"
+        # call tested function
+        entry.save()
+
+        domains = DomainsController.objects.filter(domain = "linkedin.com")
+        self.assertEqual(domains.count(), 1)
+
+        domains = DomainsController.objects.filter(domain = "www.linkedin.com")
+        self.assertEqual(domains.count(), 0)

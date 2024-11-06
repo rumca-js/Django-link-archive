@@ -68,7 +68,17 @@ def index(request):
         if not entry.initialized:
             return redirect("{}:wizard-init".format(LinkDatabase.name))
         else:
-            return redirect("{}:entries".format(LinkDatabase.name))
+            config = ConfigurationEntry.get()
+            if config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_ALL:
+                return redirect("{}:entries".format(LinkDatabase.name))
+            elif config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_RECENT:
+                return redirect("{}:entries-recent".format(LinkDatabase.name))
+            elif config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_GLOBAL_BOOKMARKS:
+                return redirect("{}:entries-bookmarks".format(LinkDatabase.name))
+            elif config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_USER_BOOKMARKS:
+                return redirect("{}:entries-user-bookmarks".format(LinkDatabase.name))
+            else:
+                return redirect("{}:entries".format(LinkDatabase.name))
     else:
         exports = DataExport.get_public_export_names()
         p.context["public_exports"] = exports
@@ -781,13 +791,22 @@ def opensearchxml(request):
 
 
 def get_footer_status_line(request):
+    def add_to_message(message, issue_text):
+        if message != "":
+            message+= ", "
+        else:
+            message += "Indicators: "
+        message += issue_text
+
+        return messae
+
     process_source_queue_size = BackgroundJobController.get_number_of_jobs(
         BackgroundJobController.JOB_PROCESS_SOURCE
     )
 
     sources = SourceOperationalData.objects.filter(consecutive_errors__gt = 0, source_obj__enabled=True)
 
-    all_jobs = BackgroundJobController.objects.filter(enabled = False)
+    error_jobs = BackgroundJobController.objects.filter(errors__gt = 0)
 
     configuration_entry = ConfigurationEntry.get()
 
@@ -796,35 +815,77 @@ def get_footer_status_line(request):
     is_sources_error = sources.count() > 0
     is_internet_ok = SystemOperation.is_internet_ok()
     is_threading_ok  = SystemOperation.is_threading_ok()
-    is_backgroundjobs_error = all_jobs.count() > 0
+    is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
 
     message = ""
     if sources_are_fetched:
         message += f"Reading sources. Queue:{sources_queue_size}"
     if is_sources_error:
-        if message != "":
-            message+= ", "
-        message += "Sources error"
+        message = add_to_message(message = "Sources")
     if configuration_entry.background_tasks and not is_internet_ok:
-        if message != "":
-            message+= ", "
-        message += "Internet error"
+        message = add_to_message(message = "Internet")
     if configuration_entry.background_tasks and not is_threading_ok:
-        if message != "":
-            message+= ", "
-        message += "Threads error"
+        message = add_to_message(message = "Threads")
     if is_backgroundjobs_error:
-        if message != "":
-            message+= ", "
-        message += "Backgroundjobs error"
+        message = add_to_message(message = "Jobs")
     if is_configuration_error:
-        if message != "":
-            message+= ", "
-        message += "Configuration error"
+        message = add_to_message(message = "Configuration")
 
     data = {
             "message" : message
+    }
+    return JsonResponse(data)
+
+
+def get_indicators(request):
+    process_source_queue_size = BackgroundJobController.get_number_of_jobs(
+        BackgroundJobController.JOB_PROCESS_SOURCE
+    )
+
+    sources = SourceOperationalData.objects.filter(consecutive_errors__gt = 0, source_obj__enabled=True)
+
+    error_jobs = BackgroundJobController.objects.filter(errors__gt = 0)
+
+    configuration_entry = ConfigurationEntry.get()
+
+    sources_are_fetched = process_source_queue_size > 0
+    sources_queue_size = process_source_queue_size
+    is_sources_error = sources.count() > 0
+    is_internet_ok = SystemOperation.is_internet_ok()
+    is_threading_ok  = SystemOperation.is_threading_ok()
+    is_backgroundjobs_error = error_jobs.count() > 0
+    is_configuration_error = False
+
+    indicators = {}
+
+    if sources_are_fetched:
+        indicators["is_reading"] = {}
+        indicators["is_reading"]["message"] = f"Reading sources. Queue:{sources_queue_size}"
+        indicators["is_reading"]["status"] = True
+    if is_sources_error:
+        indicators["sources_error"] = {}
+        indicators["sources_error"]["message"] = f"Sources error"
+        indicators["sources_error"]["status"] = True
+    if configuration_entry.background_tasks and not is_internet_ok:
+        indicators["internet_error"] = {}
+        indicators["internet_error"]["message"] = f"Internet error"
+        indicators["internet_error"]["status"] = True
+    if configuration_entry.background_tasks and not is_threading_ok:
+        indicators["threads_error"] = {}
+        indicators["threads_error"]["message"] = f"Threads error"
+        indicators["threads_error"]["status"] = True
+    if is_backgroundjobs_error:
+        indicators["jobs_error"] = {}
+        indicators["jobs_error"]["message"] = f"Jobs error"
+        indicators["jobs_error"]["status"] = True
+    if is_configuration_error:
+        indicators["configuration_error"] = {}
+        indicators["configuration_error"]["message"] = f"Configuration error"
+        indicators["configuration_error"]["status"] = True
+
+    data = {
+            "indicators" : indicators
     }
     return JsonResponse(data)
 

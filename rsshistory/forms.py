@@ -640,9 +640,9 @@ class BackgroundJobForm(forms.Form):
     job = forms.CharField(
         widget=forms.Select(choices=BackgroundJob.JOB_CHOICES), required=True
     )
-    task = forms.CharField(label="task", required=False)
     subject = forms.CharField(label="subject", required=False)
     args = forms.CharField(label="args", required=False)
+    task = forms.CharField(label="task", required=False)
 
 
 class DomainEditForm(forms.ModelForm):

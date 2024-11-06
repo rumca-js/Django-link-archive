@@ -139,6 +139,12 @@ class BaseLinkDataModel(models.Model):
             )
             self.language = None
 
+        if hasattr(self, "domain"):
+            if self.domain != None:
+                p = DomainAwarePage(self.link)
+                if p.is_domain():
+                    self.domain.update(self)
+
         super().save(*args, **kwargs)
 
 

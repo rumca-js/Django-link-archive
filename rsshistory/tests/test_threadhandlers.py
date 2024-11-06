@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 import logging
+import json
 
 from utils.dateutils import DateUtils
 
@@ -337,6 +338,12 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         job = BackgroundJobController.objects.create(
             job=BackgroundJob.JOB_CLEANUP,
             subject="DomainsController",
+            args = json.dumps({"verify" : True}),
+        )
+
+        DomainsController.objects.create(
+            protocol="https",
+            domain="definitely.domain.to.remove",
         )
 
         handler = CleanupJobHandler()
@@ -352,10 +359,8 @@ class CleanJobHandlerTest(FakeInternetTestCase):
 
         self.assertEqual(persistent_objects.count(), 0)
 
-        for domain in DomainsController.objects.all():
-            print("Domain: {}".format(domain.domain))
-
-        self.assertEqual(DomainsController.objects.all().count(), 0)
+        domains = DomainsController.objects.filter(domain = "definitely.domain.to.remove")
+        self.assertEqual(domains.count(), 0)
 
     def test_cleanup_job_no_store_domains(self):
         self.prepare_data()
@@ -994,7 +999,6 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         self.assertEqual(BackgroundJobController.get_number_of_jobs(), 18)
 
-
     def test_run__adds_system_operation(self):
         LinkDataController.objects.all().delete()
 
@@ -1017,7 +1021,7 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         operations = SystemOperation.objects.all()
         self.assertTrue(operations.count(), 1)
 
-    def test_process_job(self):
+    def test_process_job__exception(self):
         mgr = GenericJobsProcessor(timeout_s=0)
 
         obj = BackgroundJobController.objects.create(
@@ -1040,6 +1044,26 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         )
         self.assertEqual(jobs.count(), 0)
         self.assertTrue(exception_raised)
+
+    def test_process_job__noexception(self):
+        mgr = GenericJobsProcessor(timeout_s=0)
+
+        obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_CLEANUP,
+            enabled=True,
+        )
+        items = [obj, CleanupJobHandler]
+
+        mgr = GenericJobsProcessor(timeout_s=60)
+
+        exception_raised = False
+        try:
+            # call tested function
+            mgr.process_job(items)
+        except IOError as E:
+            exception_raised = True
+
+        self.assertTrue(not exception_raised)
 
     def test_run(self):
         mgr = GenericJobsProcessorError()
