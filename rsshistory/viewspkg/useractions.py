@@ -250,6 +250,20 @@ def tag_remove(request, pk):
     return HttpResponseRedirect(reverse("{}:tags-show-all".format(LinkDatabase.name)))
 
 
+def tags_remove_all(request):
+    p = ViewPage(request)
+    p.set_title("Tags removed")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    entry = UserTags.objects.all().delete()
+
+    # TODO recalculate entries?
+
+    return HttpResponseRedirect(reverse("{}:index".format(LinkDatabase.name)))
+
+
 def tag_remove_form(request):
     p = ViewPage(request)
     p.set_title("Remove tag form")
@@ -417,6 +431,20 @@ def tag_many(request):
         p.context["form"] = form
 
         return p.render("form_basic.html")
+
+
+def votes_remove_all(request):
+    p = ViewPage(request)
+    p.set_title("Tags removed")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    entry = UserVotes.objects.all().delete()
+
+    # TODO recalculate entries?
+
+    return HttpResponseRedirect(reverse("{}:index".format(LinkDatabase.name)))
 
 
 def entry_vote(request, pk):

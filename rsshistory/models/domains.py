@@ -12,18 +12,11 @@ class Domains(models.Model):
     For example:
       if there is not entry, then this object definitely should be removed
     """
-    protocol = models.CharField(
-        max_length=100, default="https"
-    )  # http or https, or ssl
     domain = models.CharField(max_length=1000, unique=True)
     main = models.CharField(max_length=200, null=True)
     subdomain = models.CharField(max_length=200, null=True)
     suffix = models.CharField(max_length=20, null=True)
     tld = models.CharField(max_length=20, null=True)
-    dead = models.BooleanField(default=False)  # to be removed
-
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_update_last = models.DateTimeField(auto_now=True)  # to be removed
 
     #entry = models.ForeignKey(
     #   LinkDataModel,

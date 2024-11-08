@@ -654,7 +654,6 @@ class DomainEditForm(forms.ModelForm):
         model = DomainsController
         fields = [
             "domain",
-            "dead",
         ]
 
     def __init__(self, *args, **kwargs):

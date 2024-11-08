@@ -287,20 +287,26 @@ class UserVotes(models.Model):
             return
 
         votes = UserVotes.objects.filter(user=user, entry=entry)
+        ob = None
 
-        if votes.count() == 0:
-            votes = UserVotes.objects.filter(user=user, entry=entry)
-            votes.delete()
+        if vote != 0:
+            if votes.count() == 0:
+                votes = UserVotes.objects.filter(user=user, entry=entry)
+                votes.delete()
 
-            ob = UserVotes.objects.create(
-                vote=vote,
-                entry=entry,
-                user=user,
-            )
+                ob = UserVotes.objects.create(
+                    vote=vote,
+                    entry=entry,
+                    user=user,
+                )
+            else:
+                ob = votes[0]
+                ob.vote = vote
+                ob.save()
         else:
-            ob = votes[0]
-            ob.vote = vote
-            ob.save()
+            if votes.count() != 0:
+                votes = UserVotes.objects.filter(user=user, entry=entry)
+                votes.delete()
 
         from ..controllers import BackgroundJobController
 

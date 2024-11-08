@@ -127,3 +127,18 @@ def get_search_suggestions_sources(request, searchstring):
     json_obj["items"] = []
 
     return JsonResponse(json_obj)
+
+
+def history_remove_all(request):
+    p = ViewPage(request)
+    p.set_title("Search history")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    UserSearchHistory.objects.all().delete()
+    UserEntryTransitionHistory.objects.all().delete()
+    UserEntryVisitHistory.objects.all().delete()
+
+    p.context["summary_text"] = "Removed all history objects"
+    return p.render("go_back.html")

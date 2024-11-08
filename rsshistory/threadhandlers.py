@@ -1025,7 +1025,7 @@ class CleanupJobHandler(BaseJobHandler):
 
         if table == "":
             CleanupJobHandler.cleanup_all(obj.args)
-            return
+            return True
 
         status = False
 

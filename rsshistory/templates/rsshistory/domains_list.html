@@ -1,0 +1,18 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+{% include "rsshistory/form_filter_element.html" %}
+
+<span id="listStatus">
+</span>
+
+<span id="listData" class="container list-group">
+</span>
+
+<div id="pagination">
+</div>
+
+{% include "rsshistory/domains_list__script.html" %}
+
+{% endblock %}

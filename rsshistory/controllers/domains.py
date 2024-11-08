@@ -30,29 +30,21 @@ class DomainsController(Domains):
 
     def get_map(self):
         result = {
-            "protocol": self.protocol,
             "domain": self.domain,
             "main": self.main,
             "subdomain": self.subdomain,
             "suffix": self.suffix,
             "tld": self.tld,
-            "dead": self.dead,
-            "date_created": self.date_created.isoformat(),
-            "date_update_last": self.date_update_last.isoformat(),
         }
         return result
 
     def get_query_names():
         result = [
-            "protocol",
             "domain",
             "main",
             "subdomain",
             "suffix",
             "tld",
-            "dead",
-            "date_created",
-            "date_update_last",
         ]
         return result
 
@@ -183,7 +175,6 @@ class DomainsController(Domains):
                 subdomain=domain_data.subdomain,
                 suffix=domain_data.suffix,
                 tld=tld,
-                protocol=protocol,
             )
 
         ob.update_complementary_data(True)
@@ -199,7 +190,7 @@ class DomainsController(Domains):
         if protocol:
             return protocol + "://" + self.domain
         else:
-            return self.protocol + "://" + self.domain
+            return "https://" + self.domain
 
     def get_absolute_url(self):
         return reverse(

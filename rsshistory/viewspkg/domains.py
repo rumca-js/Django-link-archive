@@ -4,93 +4,60 @@ from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
+from django.core.paginator import Paginator
+
+from utils.omnisearch import SingleSymbolEvaluator
 
 from ..apps import LinkDatabase
-from ..models import Domains, ConfigurationEntry
+from ..models import (
+    Domains,
+    ConfigurationEntry,
+    UserConfig,
+)
 from ..controllers import (
     EntryWrapper,
     EntryDataBuilder,
     LinkDataController,
     DomainsController,
+    SearchEngines,
 )
 from ..views import ViewPage, GenericListView
 from ..forms import DomainsChoiceForm, DomainEditForm, LinkInputForm
 from ..queryfilters import DomainFilter
+from ..views import (
+    ViewPage,
+    get_search_term,
+    get_order_by,
+    get_page_num,
+)
 
 
-class DomainsListView(GenericListView):
-    model = DomainsController
-    context_object_name = "content_list"
+class DomainsListView(object):
     paginate_by = 100
 
+    def __init__(self, request):
+        self.request = request
+
     def get_queryset(self):
-        self.sort = "normal"
-        if "sort" in self.request.GET:
-            sort = self.request.GET["sort"]
-            if sort.strip() != "":
-                self.sort = sort
-
         self.query_filter = DomainFilter(self.request.GET)
-
-        objects = self.query_filter.get_filtered_objects()
-
-        if self.sort != "normal":
-            return objects.order_by("-" + self.sort)
-        return objects
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super().get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
-
-        self.init_display_type(context)
-
-        context["sort"] = self.sort
-
-        self.filter_form = self.get_form()
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = self.get_form_action_link()
-
-        context["form"] = self.filter_form
-        context["query_filter"] = self.query_filter
-        context["reset_link"] = self.get_reset_link()
-        context["page_title"] += " " + self.get_title()
-
-        return context
-
-    def get_form(self):
-        return DomainsChoiceForm(self.request.GET)
-
-    def get_reset_link(self):
-        return reverse("{}:domains".format(LinkDatabase.name))
-
-    def get_form_action_link(self):
-        return reverse("{}:domains".format(LinkDatabase.name))
-
-    def init_display_type(self, context):
-        # TODO https://stackoverflow.com/questions/57487336/change-value-for-paginate-by-on-the-fly
-        # if type is not normal, no pagination
-        if "type" in self.request.GET:
-            context["type"] = self.request.GET["type"]
-        else:
-            context["type"] = "normal"
-        context["args"] = self.get_args()
-
-    def get_args(self):
-        arg_data = {}
-        for arg in self.request.GET:
-            if arg != "type":
-                arg_data[arg] = self.request.GET[arg]
-
-        return "&" + urlencode(arg_data)
+        return self.query_filter.get_filtered_objects()
 
     def get_title(self):
         return "Domains"
+
+    def get_paginate_by(self):
+        if not self.request.user.is_authenticated:
+            config = Configuration.get_object().config_entry
+            return config.links_per_page
+        else:
+            uc = UserConfig.get(self.request.user)
+            return uc.links_per_page
 
 
 class DomainsDetailView(generic.DetailView):
     model = DomainsController
     context_object_name = "domain_detail"
+    template_name = str(ViewPage.get_full_template("domains_detail.html"))
 
     def get(self, *args, **kwargs):
         """
@@ -106,8 +73,6 @@ class DomainsDetailView(generic.DetailView):
         return view
 
     def get_context_data(self, **kwargs):
-        from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
-
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
         context = ViewPage(self.request).init_context(context)
@@ -153,8 +118,6 @@ class DomainsByNameDetailView(generic.DetailView):
                     return self.object
 
     def get_context_data(self, **kwargs):
-        from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
-
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
         context = ViewPage(self.request).init_context(context)
@@ -163,6 +126,52 @@ class DomainsByNameDetailView(generic.DetailView):
             context["page_title"] += " {} domain".format(self.object.domain)
 
         return context
+
+
+def get_generic_search_init_context(request, form, user_choices):
+    context = {}
+    context["form"] = form
+
+    search_term = get_search_term(request.GET)
+    context["search_term"] = search_term
+    context["search_engines"] = SearchEngines(search_term)
+    context["search_history"] = user_choices
+    context["view_link"] = form.action_url
+    context["form_submit_button_name"] = "Search"
+
+    context["entry_query_names"] = DomainsController.get_query_names()
+    context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
+
+    return context
+
+
+def domains(request):
+    p = ViewPage(request)
+    p.set_title("Domains")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    data = {}
+    if "search" in request.GET:
+        data={"search": request.GET["search"]}
+
+    filter_form = DomainsChoiceForm(request=request, initial=data)
+    filter_form.method = "GET"
+    filter_form.action_url = reverse("{}:domains".format(LinkDatabase.name))
+
+    # TODO jquery that
+    #user_choices = UserSearchHistory.get_user_choices(request.user)
+    user_choices = []
+    context = get_generic_search_init_context(request, filter_form, user_choices)
+
+    p.context.update(context)
+    p.context["query_page"] = reverse("{}:domains-json".format(LinkDatabase.name))
+
+    p.context["search_suggestions_page"] = None
+    p.context["search_history_page"] = None
+
+    return p.render("domains_list.html")
 
 
 def domain_edit(request, pk):
@@ -278,31 +287,59 @@ def domain_json(request, pk):
 
     domain = domains[0]
 
-    # JsonResponse
     return JsonResponse(domain.get_map())
 
 
+def domain_to_json(user_config, domain):
+    json = {}
+    json["id"] = domain.id
+    json["domain"] = domain.domain
+    json["main"] = domain.main
+    json["subdomain"] = domain.subdomain
+    json["suffix"] = domain.suffix
+    json["tld"] = domain.tld
+
+    return json
+
+
 def domains_json(request):
-    from ..queryfilters import DomainFilter
+    p = ViewPage(request)
+    p.set_title("Returns all domains JSON")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
 
-    domains = DomainsController.objects.all()
+    page_num = p.get_page_num()
 
-    page_limit = "standard"
-    if "page_limit" in request.GET:
-        page_limit = request.GET["page_limit"]
+    json_obj = {}
+    json_obj["domains"] = []
+    json_obj["count"] = 0
+    json_obj["page"] = page_num
+    json_obj["num_pages"] = 0
 
-    # Data
-    query_filter = DomainFilter(request.GET)
-    if page_limit != "no-limit":
-        query_filter.use_page_limit = True
-    domains = query_filter.get_filtered_objects()
+    view = DomainsListView(request)
 
-    from ..serializers.domainexporter import DomainJsonExporter
+    uc = UserConfig.get(request.user)
 
-    exp = DomainJsonExporter()
+    domains = view.get_queryset()
+    p = Paginator(domains, view.get_paginate_by())
+    page_obj = p.get_page(page_num)
 
-    # JsonResponse
-    return JsonResponse(exp.get_json(domains))
+    json_obj["count"] = p.count
+    json_obj["num_pages"] = p.num_pages
+
+    start = page_obj.start_index()
+    if start > 0:
+        start -= 1
+
+    limited_domains = domains[start : page_obj.end_index()]
+
+    for domain in limited_domains:
+        domain_json = domain_to_json(uc, domain)
+
+        json_obj["domains"].append(domain_json)
+
+    return JsonResponse(json_obj)
 
 
 def domains_reset_dynamic_data(request):

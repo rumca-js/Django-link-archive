@@ -228,11 +228,21 @@ class MainExporter(object):
         export_config = self.data_writer_config.export_config
 
         filters = Q()
+
+        if not export_config.export_entries:
+            return filters
+
         if export_config.export_entries_bookmarks:
-            filters = filters & Q(bookmarked=True)
+            if filters == Q():
+                filters = Q(bookmarked=True)
+            else:
+                filters |= Q(bookmarked=True)
 
         if export_config.export_entries_permanents:
-            filters = filters & Q(permanent=True)
+            if filters == Q():
+                filters = Q(permanent=True)
+            else:
+                filters = filters | Q(permanent=True)
 
         return filters
 
@@ -240,6 +250,10 @@ class MainExporter(object):
         return "date_published", "link"
 
     def get_entries(self):
+        export_config = self.data_writer_config.export_config
+        if not export_config.export_entries:
+            return LinkDataController.objects.none()
+
         filters = self.get_configuration_filters()
         entries = LinkDataController.objects.filter(filters)
         return entries.order_by(*self.get_order_columns())

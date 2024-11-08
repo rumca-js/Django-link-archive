@@ -23,11 +23,7 @@ class UserTagsTest(FakeInternetTestCase):
             username="testuser", password="testpassword", is_staff=True
         )
 
-    def test_entry_tag(self):
-        BackgroundJobController.objects.all().delete()
-
-        self.client.login(username="testuser", password="testpassword")
-
+    def create_simple_entry(self):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
@@ -41,7 +37,15 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        self.assertEqual(UserTags.objects.all().count(), 0)
+        return entry
+
+    def test_entry_tag(self):
+        BackgroundJobController.objects.all().delete()
+        UserTags.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        entry = self.create_simple_entry()
 
         url = reverse("{}:entry-tag".format(LinkDatabase.name), args=[entry.id])
 
@@ -69,6 +73,21 @@ class UserTagsTest(FakeInternetTestCase):
         jobs = BackgroundJobController.objects.all()
         self.assertEqual(jobs.count(), 1)
         self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_RESET_LOCAL_DATA)
+
+        # check that it removes old tags
+
+        tag_data = {
+            "entry_id": entry.id,
+            "user_id": self.user.id,
+            "user": self.user.username,
+            "tags": "this",
+        }
+
+        # call user action
+        response = self.client.post(url, data=tag_data)
+
+        entries = UserTags.objects.filter(entry=entry)
+        self.assertEqual(entries.count(), 1)
 
     def test_tag_remove(self):
         self.client.login(username="testuser", password="testpassword")

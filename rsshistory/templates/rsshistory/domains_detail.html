@@ -19,10 +19,10 @@ This domain is marked as dead!
 
 <table>
     <tr>
-        {% if object.get_link_object %}
+    {% if object.get_link_object %}
 	<td>Link</td><td><a href="{{object.get_link_object.get_absolute_url }}">Link information</a></td>
 	{% else %}
-        <td>Link</td><td><a href="{{object.protocol}}://{{object.domain}}">{{object.domain}}</a></td>
+        <td>Link</td><td><a href="https://{{object.domain}}">{{object.domain}}</a></td>
 	{% endif %}
     </tr>
     <tr>
@@ -42,15 +42,6 @@ This domain is marked as dead!
     </tr>
     <tr>
         <td>SubCategory</td><td>{{object.subcategory}}</td>
-    </tr>
-    <tr>
-        <td>Dead</td><td>{{object.dead}}</td>
-    </tr>
-    <tr>
-        <td>Date created</td><td>{{object.date_created}}</td>
-    </tr>
-    <tr>
-        <td>Date last</td><td>{{object.date_update_last}}</td>
     </tr>
 </table>
 

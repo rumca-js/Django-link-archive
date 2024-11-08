@@ -33,19 +33,21 @@ class SourceEntriesDataExporter(object):
 
 
 class EntryDailyDataMainExporter(MainExporter):
-    def __init__(self, data_writer_config):
+    def __init__(self, data_writer_config, day_iso):
         super().__init__(data_writer_config)
+        self.day_iso = day_iso
 
-    def write_for_day(self, input_path, day_iso):
+    def write_for_day(self, input_path):
         """We do not want to provide for each day cumulative view. Users may want to select which 'streams' are selected individually '"""
 
         # TODO we first obtain entries to obtain them later again - this could be cleaned up
 
-        entries = self.get_entries(day_iso)
-        self.write_source_entries(input_path, day_iso, entries)
-        self.write_sourceless_entries(input_path, day_iso, entries)
+        entries = self.get_entries()
+        self.write_source_entries(input_path, entries)
+        self.write_sourceless_entries(input_path, entries)
 
-    def write_source_entries(self, input_path, day_iso, entries):
+    def write_source_entries(self, input_path, entries):
+        day_iso = self.day_iso
         sources = set(entries.values_list("source", flat=True).distinct())
 
         for source_id in sources:
@@ -64,23 +66,17 @@ class EntryDailyDataMainExporter(MainExporter):
             )
             writer.write_for_day(input_path, day_iso)
 
-    def write_sourceless_entries(self, input_path, day_iso, entries):
+    def write_sourceless_entries(self, input_path, entries):
+        day_iso = self.day_iso
+
         entries = entries.filter(Q(source_url__isnull = True) | Q(source_url = ""))
 
         e = EntriesExporter(self.data_writer_config, entries)
         e.export_entries(source_url = None, export_file_name="sourceless", export_path = input_path)
 
-    def get_entries(self, day_iso):
+    def get_configuration_filters(self):
+        day_iso = self.day_iso
         date_range = DateUtils.get_range4day(day_iso)
-
-        # some entries might not have source in the database - added manually.
-        # first capture entries, then check if has export to CMS.
-        # if entry does not have source, it was added manually and is subject for export
-
         filters = super().get_configuration_filters()
 
-        entries = LinkDataController.objects.filter(
-            filters & Q(date_published__range=date_range)
-        )
-
-        return entries.order_by(*self.get_order_columns())
+        return filters & Q(date_published__range=date_range)

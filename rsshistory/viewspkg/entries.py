@@ -489,6 +489,24 @@ def func_display_init_form(request, p, cleaned_link):
     return p.render("form_basic.html")
 
 
+def get_cleaned_up_entry_data(request, data):
+    link = data["link"]
+
+    data["user"] = request.user
+    data["bookmarked"] = True
+
+    page = DomainAwarePage(link)
+    config = ConfigurationEntry.get().config_entry
+
+    if page.is_domain() and config.keep_domains:
+        data["permanent"] = True
+
+    if "description" in data:
+        data["description"] = LinkDataController.get_description_for_add(data["description"])
+
+    return data
+
+
 def func_display_data_form(request, p, data):
     notes = []
     warnings = []
@@ -500,22 +518,17 @@ def func_display_data_form(request, p, data):
     if ob:
         return HttpResponseRedirect(ob.get_absolute_url())
 
-    data["user"] = request.user
-    data["bookmarked"] = True
+    data = get_cleaned_up_entry_data(request, data)
 
-    if "description" in data:
-        data["description"] = LinkDataController.get_description_for_add(
-            data["description"]
-        )
+    page = DomainAwarePage(link)
+    config = ConfigurationEntry.get().config_entry
 
     form = EntryForm(initial=data, request=request)
     form.method = "POST"
     form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
     p.context["form"] = form
 
-    page = DomainAwarePage(link)
     domain = page.get_domain()
-    config = Configuration.get_object().config_entry
     info = DomainCache.get_object(link, url_builder=UrlHandler)
 
     # warnings

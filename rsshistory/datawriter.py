@@ -86,8 +86,8 @@ class DailyDataWriter(BaseDataWriter):
             return
 
         day_iso = self.date_iso
-        writer = EntryDailyDataMainExporter(self.data_writer_config)
-        writer.write_for_day(daily_path, day_iso)
+        writer = EntryDailyDataMainExporter(self.data_writer_config, day_iso)
+        writer.write_for_day(daily_path)
 
     def write_sources(self):
         if not self.export_config.export_sources:

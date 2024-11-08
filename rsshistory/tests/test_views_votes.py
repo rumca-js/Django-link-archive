@@ -25,11 +25,7 @@ class UserVotesTests(FakeInternetTestCase):
         self.user.is_staff = True
         self.user.save()
 
-    def test_add_vote__valid(self):
-        BackgroundJobController.objects.all().delete()
-
-        self.client.login(username="testuser", password="testpassword")
-
+    def create_simple_entry(self):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
@@ -42,12 +38,19 @@ class UserVotesTests(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+        return entry
 
-        self.assertEqual(UserVotes.objects.all().count(), 0)
+    def test_add_vote__valid(self):
+        BackgroundJobController.objects.all().delete()
+        UserVotes.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        entry = self.create_simple_entry()
 
         url = reverse("{}:entry-vote".format(LinkDatabase.name), args=[entry.id])
 
-        data = {"link": test_link}
+        data = {"link": entry.link}
 
         vote_data = {
             "entry_id": entry.id,
@@ -70,6 +73,48 @@ class UserVotesTests(FakeInternetTestCase):
         jobs = BackgroundJobController.objects.all()
         self.assertEqual(jobs.count(), 1)
         self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_RESET_LOCAL_DATA)
+
+        # vote again. we should have still only 1 vote
+
+        vote_data = {
+            "entry_id": entry.id,
+            "user_id": self.user.id,
+            "user": self.user.username,
+            "vote": "31",
+        }
+
+        # call user action
+        response = self.client.post(url, data=vote_data)
+
+        entries = UserVotes.objects.filter(entry=entry)
+        self.assertEqual(entries.count(), 1)
+
+    def test_add_vote__vote_0_removes(self):
+        BackgroundJobController.objects.all().delete()
+        UserVotes.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        entry = self.create_simple_entry()
+
+        UserVotes.objects.create(entry = entry, vote=20, user = self.user)
+
+        url = reverse("{}:entry-vote".format(LinkDatabase.name), args=[entry.id])
+
+        data = {"link": entry.link}
+
+        vote_data = {
+            "entry_id": entry.id,
+            "user_id": self.user.id,
+            "user": self.user.username,
+            "vote": "0",
+        }
+
+        # call user action
+        response = self.client.post(url, data=vote_data)
+
+        entries = UserVotes.objects.filter(entry=entry)
+        self.assertEqual(entries.count(), 0)
 
     def test_add_vote__invalid(self):
         BackgroundJobController.objects.all().delete()

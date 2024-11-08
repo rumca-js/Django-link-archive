@@ -153,3 +153,18 @@ def entry_comment_remove(request, pk):
     p.context["summary_text"] = "Removed comment"
 
     return p.render("summary_present.html")
+
+
+def remove_all(request):
+    p = ViewPage(request)
+    p.set_title("Remove all comment")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    UserCommentsController.objects.all().delete()
+
+    p.context["summary_text"] = "Removed comment"
+
+    return p.render("summary_present.html")
+

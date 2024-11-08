@@ -109,3 +109,18 @@ class DomainTest(FakeInternetTestCase):
 
         self.assertEqual(domains.count(), 0)
         self.assertEqual(entries.count(), 0)
+
+    def test_link_remove_deletes_domain(self):
+
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+
+        entry = LinkDataController.objects.create(link="https://test.com")
+
+        # call tested function
+        DomainsController.add("test.com")
+
+        entry.delete()
+
+        domains = DomainsController.objects.filter(domain ="test.com")
+        self.assertEqual(domains.count(), 0)

@@ -40,8 +40,8 @@
         if (data.days_to_remove_stale_entries) {
             data.days_to_remove_stale_entries = new Date(data.days_to_remove_stale_entries).toLocaleString();
         }
-        if (data.days_to_remove_std_entries) {
-            data.days_to_remove_std_entries = new Date(data.days_to_remove_std_entries).toLocaleString();
+        if (data.days_to_check_std_entries) {
+            data.days_to_check_std_entries = new Date(data.days_to_check_std_entries).toLocaleString();
         }
         if (data.days_to_check_stale_entries) {
             data.days_to_check_stale_entries = new Date(data.days_to_check_stale_entries).toLocaleString();
@@ -52,7 +52,7 @@
             { name: "days to move to archive", value: data.days_to_move_to_archive },
             { name: "days to remove links", value: data.days_to_remove_links },
             { name: "days to remove stale entries", value: data.days_to_remove_stale_entries },
-            { name: "days to remove std entries", value: data.days_to_remove_std_entries },
+            { name: "days to check std entries", value: data.days_to_check_std_entries },
             { name: "days to check stale entries", value: data.days_to_check_stale_entries },
             { name: "directory", value: data.directory }
         ];

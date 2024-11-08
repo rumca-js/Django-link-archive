@@ -147,6 +147,14 @@ class BaseLinkDataModel(models.Model):
 
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        p = DomainAwarePage(self.link)
+        if p.is_domain():
+            domains = Domains.objects.filter(domain = p.get_domain_only())
+            domains.delete()
+
+        super().delete(*args, **kwargs)
+
 
 class BaseLinkDataController(BaseLinkDataModel):
     class Meta:

@@ -389,13 +389,12 @@ class DomainFilter(BaseQueryFilter):
 
     def get_default_omni_search_fields(self):
         return [
-                "category__icontains",
-                "subcategory__icontains",
                 "domain__icontains",
             ]
 
     def get_translateable_fields(self):
         translate = DomainsController.get_query_names()
+        return translate
 
 
 class OmniSearchWithDefault(OmniSearch):

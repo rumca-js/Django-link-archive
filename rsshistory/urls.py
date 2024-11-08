@@ -116,13 +116,16 @@ urlpatterns = [
     path("tags-show-all", useractions.CompactedTagsListView.as_view(), name="tags-show-all"),
     path("tags-show-actual", useractions.ActualTags.as_view(), name="tags-show-actual"),
     path("tags-many", useractions.tag_many, name="tag-many"),
+    path("tags-remove-all/", useractions.tags_remove_all, name="tags-remove-all"),
     # comments
     path("entry-comment-add/<int:link_id>", comments.entry_add_comment, name="entry-comment-add",),
     path("entry-comment-edit/<int:pk>/", comments.entry_comment_edit, name="entry-comment-edit",),
     path("entry-comment-remove/<int:pk>/", comments.entry_comment_remove, name="entry-comment-remove",),
+    path("comments-remove-all/", comments.remove_all, name="comments-remove-all"),
     # votes
     path("entry-vote/<int:pk>/", useractions.entry_vote, name="entry-vote"),
     path("entry-vote-form/<int:pk>/", useractions.entry_vote_form, name="entry-vote-form"),
+    path("votes-remove-all/", useractions.votes_remove_all, name="votes-remove-all"),
     # files
     path("model-file/<int:pk>/", modelfiles.model_file, name="model-file"),
     path("model-file-remove/<int:pk>/", modelfiles.model_file_remove, name="model-file-remove"),
@@ -146,7 +149,7 @@ urlpatterns = [
     path("backgroundjobs-remove/<str:job_type>/", backgroundjobs.backgroundjobs_remove, name="backgroundjobs-remove",),
     path("backgroundjobs-remove-all/", backgroundjobs.backgroundjobs_remove_all, name="backgroundjobs-remove-all",),
     # domains
-    path("domains/", domains.DomainsListView.as_view(), name="domains",),
+    path("domains/", domains.domains, name="domains",),
     path("domain/<int:pk>/", domains.DomainsDetailView.as_view(), name="domain-detail",),
     path("domain-by-name/", domains.DomainsByNameDetailView.as_view(), name="domain-by-name",),
     path("domain-edit/<int:pk>/", domains.domain_edit, name="domain-edit",),
@@ -277,6 +280,7 @@ urlpatterns = [
     path("json-user-search-history", userhistory.json_user_search_history, name="json-user-search-history"),
     path("is-entry-download/<int:pk>/", backgroundjobs.is_entry_download, name="is-entry-download"),
     path("entry-tags/<int:pk>/", useractions.entry_tags, name="entry-tags"),
+    path("history-remove-all/", userhistory.history_remove_all, name="history-remove-all"),
     # login
     path("accounts/", include("django.contrib.auth.urls")),
     path("rsshistory/accounts/logout/", RedirectView.as_view(url="rsshistory/")),
