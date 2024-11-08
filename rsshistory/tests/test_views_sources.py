@@ -15,6 +15,7 @@ from ..models import (
    DataExport,
    SourceCategories,
    SourceSubCategories,
+   SourceOperationalData,
 )
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
@@ -207,8 +208,8 @@ class SourcesViewsTests(FakeInternetTestCase):
         data = {"url": test_link}
         full_data = SourceDataController.get_full_information(data)
         full_data["enabled"] = True
-        full_data["category"] = "test1"
-        full_data["subcategory"] = "test2"
+        full_data["category_name"] = "test1"
+        full_data["subcategory_name"] = "test2"
 
         limited_data = {}
         for key in full_data:
@@ -296,6 +297,9 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         # call tested function
         url = reverse("{}:source-remove".format(LinkDatabase.name), args=[source.id])
+
+        # call user action
+        response = self.client.get(url)
 
         self.assertEqual(SourceDataController.objects.count(), 0)
         self.assertEqual(SourceOperationalData.objects.count(), 0)

@@ -193,15 +193,15 @@ class DomainAwarePage(object):
         if not parts:
             return
 
-        if len(parts) > 0:
-            wh = parts[0].find(":")
+        if len(parts) > 1:
+            wh = parts[2].find(":")
             if wh == -1:
                 return
-
             else:
                 try:
-                  port = int(parts[0][wh:])
-                except ValueError:
+                  port = int(parts[2][wh+1:])
+                  return port
+                except ValueError as E:
                     return
 
     def get_protocol_url(self, protocol="https"):

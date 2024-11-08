@@ -17,6 +17,9 @@ from ..models import (
     SourceCategories,
     SourceSubCategories,
 )
+from .backgroundjob import (
+    BackgroundJobController,
+)
 
 from ..configuration import Configuration
 from ..apps import LinkDatabase
@@ -347,16 +350,17 @@ class SourceDataBuilder(object):
             self.build_from_props()
 
     def build(self, link=None, link_data=None, manual_entry=False, strict_ids=False):
+
         self.link = link
         self.link_data = link_data
         self.manual_entry = manual_entry
         self.strict_ids = strict_ids
 
         if self.link:
-            self.build_from_link()
+            return self.build_from_link()
 
         if self.link_data:
-            self.build_from_props()
+            return self.build_from_props()
 
     def build_from_link(self):
         from ..pluginurl import UrlHandler

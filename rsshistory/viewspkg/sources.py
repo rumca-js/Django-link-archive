@@ -188,9 +188,7 @@ def add_source(request):
                 return HttpResponseRedirect(source.get_absolute_url())
 
             b = SourceDataBuilder(manual_entry=True)
-            b.link_data = form.cleaned_data
-            b.manual_entry = True
-            source = b.build_from_props()
+            source = b.build(link_data = form.cleaned_data, manual_entry = True)
 
             if not source:
                 p.context["summary_text"] = "Cannot add source"
@@ -401,8 +399,6 @@ def edit_source(request, pk):
 
 
 def refresh_source(request, pk):
-    from ..models import SourceOperationalData
-
     p = ViewPage(request)
     p.set_title("Refresh source")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)

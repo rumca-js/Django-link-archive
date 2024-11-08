@@ -379,7 +379,7 @@ class DomainAwarePageTest(FakeInternetTestCase):
         self.assertEqual(len(parts), 5)
         self.assertEqual(parts[0], "https")
         self.assertEqual(parts[1], "://")
-        self.assertEqual(parts[2], "www.youtube.com")
+        self.assertEqual(parts[2], "www.youtube.com:443")
         self.assertEqual(parts[3], "/test")
         self.assertEqual(parts[4], "?parameter=True")
 

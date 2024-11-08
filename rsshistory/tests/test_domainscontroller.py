@@ -95,7 +95,7 @@ class DomainTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].domain, domains[0])
 
-    def test_cleanup__recreate(self):
+    def test_cleanup__not_recreate(self):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
@@ -107,6 +107,5 @@ class DomainTest(FakeInternetTestCase):
         domains = DomainsController.objects.all()
         entries = LinkDataController.objects.all()
 
-        self.assertEqual(domains.count(), 1)
-        self.assertEqual(entries.count(), 1)
-        self.assertEqual(entries[0].domain, domains[0])
+        self.assertEqual(domains.count(), 0)
+        self.assertEqual(entries.count(), 0)

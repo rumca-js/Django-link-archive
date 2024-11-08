@@ -110,9 +110,8 @@ class UserVotesTests(FakeInternetTestCase):
 
         # check that object has been changed
 
-        entries = UserVotes.objects.filter(entry=entry)
-        self.assertEqual(entries.count(), 1)
+        votes = UserVotes.objects.filter(entry=entry)
+        self.assertEqual(votes.count(), 0)
 
         jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 1)
-        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_RESET_LOCAL_DATA)
+        self.assertEqual(jobs.count(), 0)

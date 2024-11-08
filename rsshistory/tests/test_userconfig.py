@@ -56,7 +56,7 @@ class UserTagsTest(FakeInternetTestCase):
     def test_can_download__false(self):
         uc = UserConfig()
         # call tested function
-        self.assertTrue(uc.can_download())
+        self.assertFalse(uc.can_download())
 
     def test_can_add__true(self):
         self.user = User.objects.create_user(

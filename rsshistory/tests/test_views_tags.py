@@ -49,14 +49,14 @@ class UserTagsTest(FakeInternetTestCase):
             "entry_id": entry.id,
             "user_id": self.user.id,
             "user": self.user.username,
-            "tag": "this, and, that",
+            "tags": "this, and, that",
         }
 
         # call user action
         response = self.client.post(url, data=tag_data)
 
-        # page_source = response.text.decode("utf-8")
-        # print("Contents: {}".format(page_source))
+        response_data = response.json()
+        print(response_data["message"])
 
         # JSON tag
         self.assertEqual(response.status_code, 200)

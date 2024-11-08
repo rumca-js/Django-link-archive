@@ -74,7 +74,7 @@ class ImportTests(FakeInternetTestCase):
         self.assertEqual(job.job, BackgroundJobController.JOB_IMPORT_FROM_FILES)
 
         try:
-            data = json.loads(job.subject)
+            data = json.loads(job.args)
         except ValueError as E:
             self.assertTrue(False)
 

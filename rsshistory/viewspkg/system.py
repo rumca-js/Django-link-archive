@@ -798,7 +798,7 @@ def get_footer_status_line(request):
             message += "Indicators: "
         message += issue_text
 
-        return messae
+        return message
 
     process_source_queue_size = BackgroundJobController.get_number_of_jobs(
         BackgroundJobController.JOB_PROCESS_SOURCE
@@ -822,15 +822,15 @@ def get_footer_status_line(request):
     if sources_are_fetched:
         message += f"Reading sources. Queue:{sources_queue_size}"
     if is_sources_error:
-        message = add_to_message(message = "Sources")
+        message = add_to_message(message, "Sources")
     if configuration_entry.background_tasks and not is_internet_ok:
-        message = add_to_message(message = "Internet")
+        message = add_to_message(message, "Internet")
     if configuration_entry.background_tasks and not is_threading_ok:
-        message = add_to_message(message = "Threads")
+        message = add_to_message(message, "Threads")
     if is_backgroundjobs_error:
-        message = add_to_message(message = "Jobs")
+        message = add_to_message(message, "Jobs")
     if is_configuration_error:
-        message = add_to_message(message = "Configuration")
+        message = add_to_message(message, "Configuration")
 
     data = {
             "message" : message
