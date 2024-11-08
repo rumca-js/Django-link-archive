@@ -496,7 +496,7 @@ def get_cleaned_up_entry_data(request, data):
     data["bookmarked"] = True
 
     page = DomainAwarePage(link)
-    config = ConfigurationEntry.get().config_entry
+    config = ConfigurationEntry.get()
 
     if page.is_domain() and config.keep_domains:
         data["permanent"] = True
