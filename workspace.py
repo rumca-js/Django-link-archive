@@ -159,8 +159,10 @@ def create_workspace(source_app, destination_app):
 
 
 def get_workspaces():
+    directory = Path(__file__).parent
+
     result = []
-    items_in_dir = os.listdir(".")
+    items_in_dir = os.listdir(str(directory))
     for item in items_in_dir:
         full_path_item = item + "/apps.py"
         if os.path.isfile(full_path_item):
@@ -201,6 +203,7 @@ def main():
         parser.print_help()
 
 
-main()
+if __name__ == "__main__":
+    main()
 
 # TODO write celery.py file, autogenerate
