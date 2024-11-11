@@ -521,7 +521,7 @@ def func_display_data_form(request, p, data):
     data = get_cleaned_up_entry_data(request, data)
 
     page = DomainAwarePage(link)
-    config = ConfigurationEntry.get().config_entry
+    config = ConfigurationEntry.get()
 
     form = EntryForm(initial=data, request=request)
     form.method = "POST"

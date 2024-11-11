@@ -180,4 +180,5 @@ def main():
     print("Processing DONE")
 
 
-main()
+if __name__ == "__main__":
+    main()

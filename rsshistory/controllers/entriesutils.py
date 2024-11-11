@@ -22,6 +22,7 @@ from ..models import (
     KeyWords,
     UserBookmarks,
     ModelFiles,
+    ConfigurationEntry,
 )
 from ..configuration import Configuration
 from ..apps import LinkDatabase
@@ -163,7 +164,7 @@ class EntriesCleanup(object):
         """
         Choose shorter date - configured, or source limit
         """
-        config = Configuration.get_object().config_entry
+        config = ConfigurationEntry.get()
         config_days = config.days_to_remove_links
 
         if not source.is_removeable():
@@ -199,7 +200,7 @@ class EntriesCleanup(object):
             return entries
 
     def get_general_entries(self):
-        config = Configuration.get_object().config_entry
+        config = ConfigurationEntry.get()
         config_days = config.days_to_remove_links
 
         days = config_days
@@ -224,7 +225,7 @@ class EntriesCleanup(object):
         """
         We only update current database, not archive
         """
-        config = Configuration.get_object().config_entry
+        config = ConfigurationEntry.get()
         days = config.days_to_remove_stale_entries
         if days == 0:
             return

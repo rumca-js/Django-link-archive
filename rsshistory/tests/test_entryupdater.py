@@ -19,6 +19,10 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.disable_web_pages()
         self.setup_configuration()
 
+        conf = Configuration.get_object().config_entry
+        conf.keep_permanent_items = False
+        conf.save()
+
         self.user = User.objects.create_user(
             username="TestUser", password="testpassword", is_staff=True
         )
@@ -124,7 +128,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 
-    def test_reset_data_removes_old_dead_entry(self):
+    def test_reset_data__removes_old_dead_entry(self):
         conf = Configuration.get_object().config_entry
 
         add_time = DateUtils.get_datetime_now_utc() - timedelta(
@@ -162,7 +166,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
         self.assertEqual(entries.count(), 0)
 
-    def test_update_data_removes_old_dead_entry(self):
+    def test_update_data__removes_old_dead_entry(self):
         conf = Configuration.get_object().config_entry
 
         add_time = DateUtils.get_datetime_now_utc() - timedelta(

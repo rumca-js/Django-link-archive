@@ -299,7 +299,6 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         )
 
         DomainsController.objects.create(
-            protocol="https",
             domain="youtube.com",
         )
         datetime = KeyWords.get_keywords_date_limit() - timedelta(days=1)
@@ -342,7 +341,6 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         )
 
         DomainsController.objects.create(
-            protocol="https",
             domain="definitely.domain.to.remove",
         )
 

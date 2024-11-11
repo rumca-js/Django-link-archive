@@ -173,11 +173,11 @@ class DataWriterTest(FakeInternetTestCase):
 
         conf = Configuration.get_object()
 
-        self.export_year.format_json = True
-        self.export_year.format_md = False
-        self.export_year.format_rss = False
-        self.export_year.format_html = False
-        self.export_year.save()
+        self.export_notime.format_json = True
+        self.export_notime.format_md = False
+        self.export_notime.format_rss = False
+        self.export_notime.format_html = False
+        self.export_notime.save()
 
         dw_conf = DataWriterConfiguration(
             conf, self.export_notime, Path("./data/test/notime")
@@ -200,7 +200,7 @@ class DataWriterTest(FakeInternetTestCase):
         self.assertEqual(json_file.exists(), True)
         json_obj = json.loads(json_file.read_text())
 
-        self.assertEqual(len(json_obj), 1)
+        self.assertEqual(len(json_obj), 3)
 
         json_file = Path("./data") / "test" / "notime" / "sources.json"
         self.assertEqual(json_file.exists(), True)
@@ -212,11 +212,11 @@ class DataWriterTest(FakeInternetTestCase):
 
         conf = Configuration.get_object()
 
-        self.export_year.format_json = True
-        self.export_year.format_md = False
-        self.export_year.format_rss = False
-        self.export_year.format_html = False
-        self.export_year.save()
+        self.export_daily.format_json = True
+        self.export_daily.format_md = False
+        self.export_daily.format_rss = False
+        self.export_daily.format_html = False
+        self.export_daily.save()
 
         dw_conf = DataWriterConfiguration(
             conf, self.export_daily, Path("./data/test/daily_data"), "2023-03-03"
@@ -236,7 +236,7 @@ class DataWriterTest(FakeInternetTestCase):
         )
         json_obj = json.loads(json_file.read_text())
 
-        self.assertEqual(len(json_obj), 3)
+        self.assertEqual(len(json_obj), 2)
 
         json_file = Path("./data") / "test" / "daily_data" / "sources.json"
         self.assertEqual(json_file.exists(), True)
@@ -259,11 +259,11 @@ class DataWriterTest(FakeInternetTestCase):
 
         conf = Configuration.get_object()
 
-        self.export_year.format_json = True
-        self.export_year.format_md = False
-        self.export_year.format_rss = False
-        self.export_year.format_html = False
-        self.export_year.save()
+        self.export_notime.format_json = True
+        self.export_notime.format_md = False
+        self.export_notime.format_rss = False
+        self.export_notime.format_html = False
+        self.export_notime.save()
 
         dw_conf = DataWriterConfiguration(
             conf, self.export_notime, Path("./data/test/notime")
@@ -285,7 +285,7 @@ class DataWriterTest(FakeInternetTestCase):
         )
         self.assertEqual(json_file.exists(), True)
         json_obj = json.loads(json_file.read_text())
-        self.assertEqual(len(json_obj), 1)
+        self.assertEqual(len(json_obj), 3)
 
         json_dir = Path("./data") / "test" / "notime" / "sources"
         self.assertEqual(json_dir.exists(), True)

@@ -55,6 +55,10 @@ def run_command(run_info):
         print("Backup completed successfully.")
     except subprocess.CalledProcessError as e:
         print("An error occurred:", e)
+        return False
+
+    return True
+
 
 def backup_workspace(run_info):
     print("--------------------")
@@ -75,7 +79,10 @@ def backup_workspace(run_info):
         run_info["output_file"] = key
         run_info["tables"] = tablemapping[key]
 
-        run_command(run_info)
+        if not run_command(run_info):
+            return False
+
+    return True
 
 
 def parse_backup():
@@ -99,7 +106,8 @@ def main():
         run_info["database"] = args.database
         run_info["host"] = args.host
 
-        backup_workspace(run_info)
+        if not backup_workspace(run_info):
+            break
 
 
 if __name__ == "__main__":

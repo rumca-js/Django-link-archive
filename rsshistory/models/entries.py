@@ -488,11 +488,12 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         p = DomainAwarePage(self.link)
 
-        if p.is_domain() and conf.accept_domains:
+        if p.is_domain() and conf.accept_domains and conf.keep_permanent_items:
             return True
 
         if self.source:
-            return self.source.enabled
+            if self.link == self.source.url:
+                return self.source.enabled
 
         return False
 

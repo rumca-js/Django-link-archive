@@ -137,3 +137,6 @@ class BlockEntryListTest(FakeInternetTestCase):
         )
 
         self.assertEqual(test_list.processed, True)
+
+    def tearDown(self):
+        BlockEntry.objects.all().delete()

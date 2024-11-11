@@ -439,3 +439,50 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
         domains = DomainsController.objects.filter(domain = "www.linkedin.com")
         self.assertEqual(domains.count(), 0)
+
+    def test_should_entry_be_permanent__source(self):
+        config = ConfigurationEntry.get()
+        config.accept_domains = True
+        config.keep_permanent_items = True
+        config.save()
+
+        source = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            link="https://youtube.com",
+            title="my title",
+            source=source,
+        )
+
+        self.assertTrue(entry.should_entry_be_permanent())
+
+    def test_should_entry_be_permanent__domain(self):
+        config = ConfigurationEntry.get()
+        config.accept_domains = True
+        config.keep_permanent_items = True
+        config.save()
+
+        entry = LinkDataController.objects.create(
+            link="https://youtube.com",
+            title="my title",
+        )
+
+        self.assertTrue(entry.should_entry_be_permanent())
+
+    def test_should_entry_be_permanent__not_domain(self):
+        config = ConfigurationEntry.get()
+        config.accept_domains = True
+        config.keep_permanent_items = True
+        config.save()
+
+        entry = LinkDataController.objects.create(
+            link="https://youtube.com?v=123",
+            title="my title",
+        )
+
+        self.assertFalse(entry.should_entry_be_permanent())
