@@ -96,7 +96,7 @@
             });
         }
 
-        let button_text = "<button id='hideSuggestions' type='button' class='btn btn-primary'>Hide</button>";
+        let button_text = "<button id='hideSuggestions' type='button' class='btn btn-primary float-end'>Hide</button>";
         text += '<li class="list-group-item">';
         text += button_text;
         text += '</li>';
@@ -134,7 +134,7 @@
             });
         }
 
-        let button_text = "<button id='hideHistory' type='button' class='btn btn-primary'>Hide</button>";
+        let button_text = "<button id='hideHistory' type='button' class='btn btn-primary float-end'>Hide</button>";
         text += '<li class="list-group-item">';
         text += button_text;
         text += '</li>';

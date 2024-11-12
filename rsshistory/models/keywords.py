@@ -78,6 +78,16 @@ class KeyWords(models.Model):
             return True
         return False
 
+    def is_configuration_error():
+        from ..configuration import Configuration
+        if not ConfigurationEntry.get().enable_keyword_support:
+            return False
+
+        if KeyWords.load_token_program("en") is None:
+            return True
+
+        return False
+
     def load_token_program(language):
         try:
             import spacy
@@ -91,6 +101,7 @@ class KeyWords(models.Model):
 
             return spacy.load(load_text)
         except Exception as E:
+            AppLogging.exc(E)
             return
 
     def add_text(text, language):
@@ -142,10 +153,6 @@ class KeyWords(models.Model):
                 return False
 
             if not KeyWords.is_keyword_date_range(link_data["date_published"]):
-                return False
-
-            # TODO we should make some switch in sources if it should store keywords
-            if link_data["link"].find("www.reddit.com") != -1:
                 return False
 
             # duplicate words are not counted. We joint title and description

@@ -39,6 +39,7 @@ class FeedReaderEntry(FeedObject):
             return
 
         self.link = self.try_to_get_attribute("link", "href")
+
         self.title = self.try_to_get_field("title")
         self.subtitle = self.try_to_get_field("subtitle")
         self.description = self.try_to_get_field("description")
@@ -107,7 +108,7 @@ class FeedReaderEntry(FeedObject):
         return value
 
     def try_to_get_attribute(self, field, attribute):
-        value = self.get_prop("./" + field)
+        value = self.get_prop(".//" + field)
         if not value:
             value = self.get_prop_attribute(field, attribute)
         if not value:

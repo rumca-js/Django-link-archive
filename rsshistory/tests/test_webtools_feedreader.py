@@ -33,7 +33,7 @@ class FeedreaderTest(FakeInternetTestCase):
         self.assertEqual(
             p.feed.link, "http://www.youtube.com/feeds/videos.xml?channel_id=UCUSElbgKZpE4Xdh5aFWG-Ig"
         )
-        self.assertEqual(len(p.entries), 26)
+        self.assertEqual(len(p.entries), 15)
 
     def test_the_hill(self):
         MockRequestCounter.mock_page_requests = 0
@@ -42,4 +42,4 @@ class FeedreaderTest(FakeInternetTestCase):
         p = FeedReader.parse(thehill_rss)
         self.assertEqual(p.feed.title, "The Hill News")
         self.assertEqual(p.feed.link, "https://thehill.com")
-        self.assertEqual(len(p.entries), 26)
+        self.assertEqual(len(p.entries), 100)

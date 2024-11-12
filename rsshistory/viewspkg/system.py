@@ -817,6 +817,7 @@ def get_footer_status_line(request):
     is_threading_ok  = SystemOperation.is_threading_ok()
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
+    is_keywords_configured = KeyWords.is_configuration_error()
 
     message = ""
     if sources_are_fetched:
@@ -831,6 +832,8 @@ def get_footer_status_line(request):
         message = add_to_message(message, "Jobs")
     if is_configuration_error:
         message = add_to_message(message, "Configuration")
+    if is_keywords_configured:
+        message = add_to_message(message, "Keywords configuration")
 
     data = {
             "message" : message

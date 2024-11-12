@@ -179,7 +179,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         self.assertTrue(obj.bookmarked == True)
 
-    def test_make_not_bookmarked_now(self):
+    def test_make_not_bookmarked__now(self):
         link_name = "https://youtube.com/v=12345"
 
         link_data = {
@@ -214,7 +214,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         self.assertTrue(obj.bookmarked == False)
 
-    def test_make_bookmarked_staff(self):
+    def test_make_bookmarked__staff(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         entry = LinkDataController.objects.create(
@@ -240,7 +240,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         self.assertEqual(entry.bookmarked, True)
         self.assertEqual(UserBookmarks.objects.all().count(), 1)
 
-    def test_make_bookmarked_not_staff(self):
+    def test_make_bookmarked__not_staff(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         entry = LinkDataController.objects.create(
@@ -266,7 +266,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         self.assertEqual(entry.bookmarked, True)
         self.assertEqual(UserBookmarks.objects.all().count(), 1)
 
-    def test_make_not_bookmarked_staff(self):
+    def test_make_not_bookmarked__staff(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         entry = LinkDataController.objects.create(
@@ -292,7 +292,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         self.assertEqual(entry.bookmarked, False)
         self.assertEqual(UserBookmarks.objects.all().count(), 0)
 
-    def test_make_not_bookmarked_not_staff(self):
+    def test_make_not_bookmarked__not_staff(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         entry = LinkDataController.objects.create(
@@ -852,8 +852,9 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         visits = UserEntryVisitHistory.objects.all()
         self.assertEqual(visits.count(), 2)
-        visit = visits[0]
-        self.assertEqual(visit.entry, https_entry)
+
+        visits = UserEntryVisitHistory.objects.filter(entry = https_entry)
+        self.assertEqual(visits.count(), 1)
 
     def test_move_entry_to_url__destination_exists(self):
         https_entry = LinkDataController.objects.create(
@@ -946,8 +947,9 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         visits = UserEntryVisitHistory.objects.all()
         self.assertEqual(visits.count(), 2)
-        visit = visits[0]
-        self.assertEqual(visit.entry, https_entry)
+
+        visits = UserEntryVisitHistory.objects.filter(entry = https_entry)
+        self.assertEqual(visits.count(), 1)
 
     def test_move_entry_to_url__destination_does_not_exist(self):
         http_entry = LinkDataController.objects.create(
@@ -1035,5 +1037,6 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         visits = UserEntryVisitHistory.objects.all()
         self.assertEqual(visits.count(), 2)
-        visit = visits[0]
-        self.assertEqual(visit.entry, http_entry)
+
+        visits = UserEntryVisitHistory.objects.filter(entry = http_entry)
+        self.assertEqual(visits.count(), 1)

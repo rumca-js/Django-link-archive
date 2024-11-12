@@ -152,25 +152,15 @@ class RssParserPluginTest(FakeInternetTestCase):
             export_to_cms=True,
         )
 
-    def is_domain(self, alist, value):
-        if alist is None:
-            return False
-
-        for avalue in alist:
-            if avalue["link"] == value:
-                return True
-
-        return False
-
     def test_is_props_valid(self):
         parser = RssParserPlugin(self.source_youtube.id)
 
         # call tested function
-        props = list(parser.get_container_elements())
+        props = list(parser.get_entries())
 
         self.assertEqual(len(props), 20)
 
-        jobs = BackgroundJobController.objects.all().values_list("subject", flat=True)
+        jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_ADD).values_list("subject", flat=True)
 
         self.assertTrue(jobs.count() > 0)
 
@@ -199,11 +189,18 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
         parser = HackerNewsParserPlugin(self.source_youtube.id)
 
         # call tested function
-        props = list(parser.get_container_elements())
+        props = list(parser.get_entries())
+
+        #for prop in props:
+        #    print(prop["link"])
 
         self.assertEqual(len(props), 20)
 
         self.assertEqual(props[0]["source"], "https://hnrss.org/frontpage")
+
+        jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_SCAN)
+
+        self.assertEqual(jobs.count(), len(props))
 
 
 class BaseParsePluginTest(FakeInternetTestCase):
@@ -227,7 +224,7 @@ class BaseParsePluginTest(FakeInternetTestCase):
         parser = BaseParsePlugin(self.source_linkedin.id)
 
         # call tested function
-        props = list(parser.get_container_elements())
+        props = list(parser.get_entries())
 
         self.assertEqual(len(props), 0)
 
