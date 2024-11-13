@@ -1008,20 +1008,24 @@ class EntryWrapper(object):
 
         if objs.count() == 0:
             themap = entry_obj.get_map()
-            themap["source"] = entry_obj.source
-            themap["domain"] = entry_obj.domain
-            try:
-                archive_obj = ArchiveLinkDataController.objects.create(**themap)
-                entry_obj.delete()
-                return archive_obj
+            if hasattr(entry_obj, "source"):
+                if entry_obj.source:
+                    try:
+                        themap["source"] = entry_obj.source
+                    except Exception as E:
+                        AppLogging.exc(E)
+            if hasattr(entry_obj, "domain"):
+                if entry_obj.domain:
+                    try:
+                        themap["domain"] = entry_obj.domain
+                    except Exception as E:
+                        AppLogging.exc(E)
 
-            except Exception as E:
-                AppLogging.exc(E, "Cannot move to archive {}".format(link))
+            archive_obj = ArchiveLinkDataController.objects.create(**themap)
+            entry_obj.delete()
+            return archive_obj
         else:
-            try:
-                entry_obj.delete()
-            except Exception as E:
-                AppLogging.exc(E, "Cannot delete entry {}".format(link))
+            entry_obj.delete()
 
     def move_from_archive(self):
         archive_obj = self.entry
@@ -1030,20 +1034,23 @@ class EntryWrapper(object):
         objs = LinkDataController.objects.filter(link=archive_obj.link)
         if objs.count() == 0:
             themap = archive_obj.get_map()
-            themap["source"] = archive_obj.source
-            themap["domain"] = archive_obj.domain
-            try:
-                new_obj = LinkDataController.objects.create(**themap)
-                archive_obj.delete()
-                return new_obj
-
-            except Exception as E:
-                AppLogging.exc(E, "Canont move link to archive {}".format(link))
+            if hasattr(archive_obj, "source"):
+                if archive_obj.source:
+                    try:
+                        themap["source"] = archive_obj.source
+                    except Exception as E:
+                        AppLogging.exc(E)
+            if hasattr(archive_obj, "domain"):
+                if archive_obj.domain:
+                    try:
+                        themap["domain"] = archive_obj.domain
+                    except Exception as E:
+                        AppLogging.exc(E)
+            new_obj = LinkDataController.objects.create(**themap)
+            archive_obj.delete()
+            return new_obj
         else:
-            try:
-                archive_obj.delete()
-            except Exception as E:
-                AppLogging.exc(E, "Canont move link to archive {}".format(link))
+            archive_obj.delete()
 
     def make_bookmarked(self, request):
         """
