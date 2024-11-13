@@ -37,20 +37,23 @@ class DomainsListView(object):
 
     def __init__(self, request):
         self.request = request
+        self.user = user
+        if not self.user and self.request:
+            self.user = self.request.user
 
     def get_queryset(self):
-        self.query_filter = DomainFilter(self.request.GET)
+        self.query_filter = DomainFilter(self.request.GET, user=self.user)
         return self.query_filter.get_filtered_objects()
 
     def get_title(self):
         return "Domains"
 
     def get_paginate_by(self):
-        if not self.request.user.is_authenticated:
+        if not self.user or not self.user.is_authenticated:
             config = Configuration.get_object().config_entry
             return config.links_per_page
         else:
-            uc = UserConfig.get(self.request.user)
+            uc = UserConfig.get(self.user)
             return uc.links_per_page
 
 
@@ -154,14 +157,14 @@ def domains(request):
 
     data = {}
     if "search" in request.GET:
-        data={"search": request.GET["search"]}
+        data = {"search": request.GET["search"]}
 
     filter_form = DomainsChoiceForm(request=request, initial=data)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:domains".format(LinkDatabase.name))
 
     # TODO jquery that
-    #user_choices = UserSearchHistory.get_user_choices(request.user)
+    # user_choices = UserSearchHistory.get_user_choices(request.user)
     user_choices = []
     context = get_generic_search_init_context(request, filter_form, user_choices)
 

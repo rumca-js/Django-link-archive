@@ -213,7 +213,7 @@ class SourceDataController(SourceDataModel):
             if "title" in info and "title" in https_info:
                 if https_info["title"] and info["title"]:
                     if len(https_info["title"]) == len(info["title"]):
-                       return https_info
+                        return https_info
 
         return info
 
@@ -329,8 +329,8 @@ class SourceDataController(SourceDataModel):
             entry.save()
 
         jobs = BackgroundJobController.objects.filter(
-                job = BackgroundJobController.JOB_PROCESS_SOURCE,
-                subject=str(self.id))
+            job=BackgroundJobController.JOB_PROCESS_SOURCE, subject=str(self.id)
+        )
         jobs.delete()
 
         self.delete()

@@ -129,7 +129,7 @@ class UserTagsTest(TestCase):
         UserTags.objects.create(user=None, entry=self.entry, tag="test")
 
         # call tested function
-        UserTags.cleanup({"verify" : True})
+        UserTags.cleanup({"verify": True})
 
         tags = UserTags.objects.all()
 
@@ -225,7 +225,7 @@ class UserVotesTest(TestCase):
         self.entry.save()
 
         # call tested function
-        UserVotes.cleanup({"verify" : True})
+        UserVotes.cleanup({"verify": True})
 
         entries = LinkDataController.objects.all()
         self.assertTrue(entries.count(), 1)
@@ -339,7 +339,7 @@ class UserBookmarksTest(TestCase):
         self.entry.save()
 
         # call tested function
-        UserBookmarks.cleanup({"verify" : True})
+        UserBookmarks.cleanup({"verify": True})
 
         self.entry.refresh_from_db()
         self.assertTrue(self.entry.bookmarked, False)
@@ -391,7 +391,7 @@ class CompactedTagsTest(TestCase):
         UserTags.set_tags(self.entry, data["tag"], self.user)
 
         # call tested function
-        CompactedTags.cleanup({"verify" : True})
+        CompactedTags.cleanup({"verify": True})
 
         compacts = CompactedTags.objects.all()
         self.assertEqual(compacts.count(), 2)
@@ -407,7 +407,7 @@ class CompactedTagsTest(TestCase):
         UserTags.set_tags(self.entry, data["tag"], self.user_super)
 
         # call tested function
-        CompactedTags.cleanup({"verify" : True})
+        CompactedTags.cleanup({"verify": True})
 
         compacts = CompactedTags.objects.all()
         self.assertEqual(compacts.count(), 2)
@@ -478,7 +478,7 @@ class UserCompactedTagsTest(TestCase):
         UserTags.set_tags(self.entry2, data["tag"], self.user)
 
         # call tested function
-        UserCompactedTags.cleanup({"verify" : True})
+        UserCompactedTags.cleanup({"verify": True})
 
         compacts = UserCompactedTags.objects.all()
         self.assertEqual(compacts.count(), 2)

@@ -845,7 +845,7 @@ class EntryWrapper(object):
         self.user = user
         self.strict_ids = strict_ids
 
-        self.link=None
+        self.link = None
         if self.entry:
             self.link = self.entry.link
         if link:
@@ -978,25 +978,21 @@ class EntryWrapper(object):
         if self.user:
             link_data["user"] = self.user
 
-        try:
-            if not is_archive:
-                if self.strict_ids and "id" in link_data:
-                    obs = LinkDataController.objects.filter(id = link_data["id"])
-                    if objs.exists():
-                        return
+        if not is_archive:
+            if self.strict_ids and "id" in link_data:
+                objs = LinkDataController.objects.filter(id=link_data["id"])
+                if objs.exists():
+                    return
 
-                ob = LinkDataController.objects.create(**link_data)
+            ob = LinkDataController.objects.create(**link_data)
 
-            elif is_archive:
-                if self.strict_ids and "id" in link_data:
-                    obs = ArchiveLinkDataController.objects.filter(id = link_data["id"])
-                    if objs.exists():
-                        return
+        elif is_archive:
+            if self.strict_ids and "id" in link_data:
+                objs = ArchiveLinkDataController.objects.filter(id=link_data["id"])
+                if objs.exists():
+                    return
 
-                ob = ArchiveLinkDataController.objects.create(**link_data)
-        except Exception as E:
-            AppLogging.exc(E, "Link data:{}.\nStrict:{}".format(link_data, self.strict_ids))
-            return
+            ob = ArchiveLinkDataController.objects.create(**link_data)
 
         if ob:
             u = EntryUpdater(ob)

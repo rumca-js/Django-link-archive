@@ -18,7 +18,7 @@ class DefaultUrlHandler(DefaultContentPage):
         self.dead = None
         self.code = None  # social media handle, ID of channel, etc.
         self.options = page_options
-        self.handler = None # one handler to rule them all
+        self.handler = None  # one handler to rule them all
 
     def is_handled_by(self):
         return True

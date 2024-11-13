@@ -437,9 +437,10 @@ class OmniSearchForm(forms.Form):
         label="Search",
         max_length=500,
         required=False,
-        widget=TextInput(attrs={
-          "placeholder": "Type to search...",
-        }
+        widget=TextInput(
+            attrs={
+                "placeholder": "Type to search...",
+            }
         ),
     )
 
@@ -607,13 +608,12 @@ class SourceForm(forms.ModelForm):
 
 class TagEditForm(forms.Form):
     tags = forms.CharField(
-        label='Edit',
-        widget=forms.TextInput(attrs={
-            'placeholder': 'Enter tags, separated by commas',
-            'id': 'id_tag'
-        }),
+        label="Edit",
+        widget=forms.TextInput(
+            attrs={"placeholder": "Enter tags, separated by commas", "id": "id_tag"}
+        ),
         max_length=255,
-        required=False
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
@@ -844,6 +844,4 @@ class BrowserEditForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["crawler"].widget.attrs["readonly"] = True
 
-        self.fields["settings"].widget = forms.Textarea(
-            attrs={"rows": 10, "cols": 20}
-        )
+        self.fields["settings"].widget = forms.Textarea(attrs={"rows": 10, "cols": 20})

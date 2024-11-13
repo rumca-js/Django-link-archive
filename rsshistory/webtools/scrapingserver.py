@@ -74,6 +74,7 @@ def run_script(script, request, port):
         print("Could not finish command")
         return
 
+
 def delete_connection(c):
     for index, request_data in enumerate(requests):
         connection = request_data["connection"]
@@ -220,7 +221,7 @@ def handle_connection_inner(c, address, port):
                 response.headers = json.loads(command[1].decode())
             except ValueError:
                 pass
-            
+
             print("Received response headers")
 
         elif command[0] == "PageResponseObject.request_url":

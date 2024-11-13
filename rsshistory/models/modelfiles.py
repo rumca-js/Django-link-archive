@@ -24,7 +24,7 @@ class ModelFiles(models.Model):
             ModelFiles.objects.all().delete()
             return
 
-        files = ModelFiles.objects.filter(file_name = file_name)
+        files = ModelFiles.objects.filter(file_name=file_name)
         if files.exists():
             file = files[0]
             file.contents = contents

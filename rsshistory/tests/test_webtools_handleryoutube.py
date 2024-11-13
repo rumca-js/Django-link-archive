@@ -29,8 +29,13 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
     def test_constructor__rss(self):
         MockRequestCounter.mock_page_requests = 0
 
-        handler = YouTubeChannelHandler("https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
-        self.assertEqual(handler.url, "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        handler = YouTubeChannelHandler(
+            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        )
+        self.assertEqual(
+            handler.url,
+            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
+        )
 
     def test_constructor__html(self):
         MockRequestCounter.mock_page_requests = 0

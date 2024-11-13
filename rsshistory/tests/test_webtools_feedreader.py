@@ -31,7 +31,8 @@ class FeedreaderTest(FakeInternetTestCase):
         p = FeedReader.parse(webpage_youtube_airpano_feed)
         self.assertEqual(p.feed.title, "AirPano VR")
         self.assertEqual(
-            p.feed.link, "http://www.youtube.com/feeds/videos.xml?channel_id=UCUSElbgKZpE4Xdh5aFWG-Ig"
+            p.feed.link,
+            "http://www.youtube.com/feeds/videos.xml?channel_id=UCUSElbgKZpE4Xdh5aFWG-Ig",
         )
         self.assertEqual(len(p.entries), 15)
 

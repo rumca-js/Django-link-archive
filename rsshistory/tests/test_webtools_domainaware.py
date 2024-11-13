@@ -173,7 +173,9 @@ class DomainAwarePageTest(FakeInternetTestCase):
         self.assertEqual(p.get_domain(), "https://my-server")
 
     def test_get_domain_odysee(self):
-        p = DomainAwarePage("https://odysee.com/@MetalRockRules!:1/Metallica---The-Memory-Remains--Music-Video-HD-Remastered-:6")
+        p = DomainAwarePage(
+            "https://odysee.com/@MetalRockRules!:1/Metallica---The-Memory-Remains--Music-Video-HD-Remastered-:6"
+        )
         # call tested function
         self.assertEqual(p.get_domain(), "https://odysee.com")
 

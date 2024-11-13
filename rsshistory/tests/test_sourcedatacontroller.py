@@ -22,8 +22,8 @@ class SourceDataControllerTest(FakeInternetTestCase):
             title="YouTube",
         )
 
-        SourceCategories.objects.create(name = "test1")
-        SourceSubCategories.objects.create(category_name = "test1", name="test2")
+        SourceCategories.objects.create(name="test1")
+        SourceSubCategories.objects.create(category_name="test1", name="test2")
 
         # nothing is connected. Stray categories are removed
 

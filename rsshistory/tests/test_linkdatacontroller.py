@@ -420,9 +420,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         config.accept_domains = True
         config.save()
 
-        domain = DomainsController.objects.create(
-                domain = "www.linkedin.com"
-        )
+        domain = DomainsController.objects.create(domain="www.linkedin.com")
 
         entry = LinkDataController.objects.create(
             link="https://www.linkedin.com",
@@ -434,10 +432,10 @@ class LinkDataControllerTest(FakeInternetTestCase):
         # call tested function
         entry.save()
 
-        domains = DomainsController.objects.filter(domain = "linkedin.com")
+        domains = DomainsController.objects.filter(domain="linkedin.com")
         self.assertEqual(domains.count(), 1)
 
-        domains = DomainsController.objects.filter(domain = "www.linkedin.com")
+        domains = DomainsController.objects.filter(domain="www.linkedin.com")
         self.assertEqual(domains.count(), 0)
 
     def test_should_entry_be_permanent__source(self):

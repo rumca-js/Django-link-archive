@@ -4,6 +4,7 @@ This module provides replacement for the Internet.
  - when test make requests to obtain a page, we return artificial data here
  - when there is a request to obtain youtube JSON data, we provide artificial data, etc.
 """
+
 import logging
 from django.test import TestCase
 from django.contrib.auth.models import User
@@ -144,7 +145,7 @@ class YouTubeJsonHandlerMock(YouTubeJsonHandler):
         super().__init__(url, page_options)
 
     def download_details_youtube(self):
-        #print("Mocked YouTube request URL: {}".format(self.url))
+        # print("Mocked YouTube request URL: {}".format(self.url))
         MockRequestCounter.mock_page_requests += 1
 
         if self.get_video_code() == "1234":
@@ -561,7 +562,7 @@ class FakeInternetTestCase(TestCase):
 
     def get_contents_function(self, request):
         MockRequestCounter.mock_page_requests += 1
-        #print("Mocked request URL: {}".format(request.url))
+        # print("Mocked request URL: {}".format(request.url))
 
         return TestResponseObject(request.url, request.headers, request.timeout_s)
 

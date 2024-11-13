@@ -97,7 +97,9 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         props = url.get_props()
         self.assertTrue(props)
         self.assertEqual(props["link"], "https://page-with-http-status-500.com")
-        self.assertEqual(props["title"], 'Page title') # even though status is 500, response was provided
+        self.assertEqual(
+            props["title"], "Page title"
+        )  # even though status is 500, response was provided
         self.assertTrue(props["date_dead_since"] is not None)
         self.assertEqual(props["status_code"], 500)
 

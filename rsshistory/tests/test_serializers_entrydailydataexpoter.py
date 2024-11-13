@@ -79,28 +79,27 @@ class EntryDailyDataMainExporterTest(FakeInternetTestCase):
             export_sources=True,
         )
 
-
     def create_entries(self):
         LinkDataController.objects.create(
             link="https://link-1.com",
             title="The first link",
             bookmarked=False,
             permanent=False,
-            date_published = DateUtils.from_string("2024-12-08T05:29:52Z")
+            date_published=DateUtils.from_string("2024-12-08T05:29:52Z"),
         )
         LinkDataController.objects.create(
             link="https://link-2.com",
             title="The first link",
             bookmarked=True,
             permanent=False,
-            date_published = DateUtils.from_string("2024-12-08T05:29:52Z")
+            date_published=DateUtils.from_string("2024-12-08T05:29:52Z"),
         )
         LinkDataController.objects.create(
             link="https://link-3.com",
             title="The first link",
             bookmarked=False,
             permanent=True,
-            date_published = DateUtils.from_string("2024-12-08T05:29:52Z")
+            date_published=DateUtils.from_string("2024-12-08T05:29:52Z"),
         )
 
     def test_bookmarks(self):

@@ -1,6 +1,7 @@
 """
 Script that can be used for debuggin server, checking connection
 """
+
 import socket
 import argparse
 import json

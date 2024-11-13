@@ -3,6 +3,7 @@ Here only models should be.
 
 When a model has too much code, some of it is moved to "controllers"
 """
+
 from .system import (
     ConfigurationEntry,
     SystemOperation,

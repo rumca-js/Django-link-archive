@@ -5,17 +5,17 @@ from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
 from ..controllers import (
-   SourceDataController,
-   LinkDataController,
-   DomainsController,
-   BackgroundJobController,
+    SourceDataController,
+    LinkDataController,
+    DomainsController,
+    BackgroundJobController,
 )
 from ..models import (
-   KeyWords,
-   DataExport,
-   SourceCategories,
-   SourceSubCategories,
-   SourceOperationalData,
+    KeyWords,
+    DataExport,
+    SourceCategories,
+    SourceSubCategories,
+    SourceOperationalData,
 )
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
@@ -31,9 +31,9 @@ class SourcesViewsTests(FakeInternetTestCase):
         self.user.is_staff = True
         self.user.save()
 
-        #c = Configuration.get_object()
-        #c.config_entry.logging_level = AppLogging.DEBUG
-        #c.config_entry.save()
+        # c = Configuration.get_object()
+        # c.config_entry.logging_level = AppLogging.DEBUG
+        # c.config_entry.save()
 
     def test_source_add_simple__invalid(self):
         SourceDataController.objects.all().delete()
@@ -109,8 +109,18 @@ class SourcesViewsTests(FakeInternetTestCase):
         self.assertTrue(source.enabled)
 
         # entry for source is created via job
-        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_PROCESS_SOURCE).count(), 1)
-        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_ADD).count(), 1)
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_PROCESS_SOURCE
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_LINK_ADD
+            ).count(),
+            1,
+        )
 
     def test_source_add__youtube(self):
         BackgroundJobController.objects.all().delete()
@@ -150,8 +160,18 @@ class SourcesViewsTests(FakeInternetTestCase):
         self.assertTrue(source.enabled)
 
         # entry for source is created via job
-        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_PROCESS_SOURCE).count(), 1)
-        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_ADD).count(), 1)
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_PROCESS_SOURCE
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_LINK_ADD
+            ).count(),
+            1,
+        )
 
     def test_source_add__odysee(self):
         BackgroundJobController.objects.all().delete()
@@ -191,8 +211,18 @@ class SourcesViewsTests(FakeInternetTestCase):
         self.assertTrue(source.enabled)
 
         # entry for source is created via job
-        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_PROCESS_SOURCE).count(), 1)
-        self.assertEqual(BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_ADD).count(), 1)
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_PROCESS_SOURCE
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_LINK_ADD
+            ).count(),
+            1,
+        )
 
     def test_source_add__categories(self):
         BackgroundJobController.objects.all().delete()
@@ -290,10 +320,11 @@ class SourcesViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        SourceOperationalData.objects.create(source_obj = source)
+        SourceOperationalData.objects.create(source_obj=source)
 
-        BackgroundJobController.objects.create(job=BackgroundJobController.JOB_PROCESS_SOURCE,
-                 subject=str(source.id))
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE, subject=str(source.id)
+        )
 
         # call tested function
         url = reverse("{}:source-remove".format(LinkDatabase.name), args=[source.id])

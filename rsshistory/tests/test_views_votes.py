@@ -97,7 +97,7 @@ class UserVotesTests(FakeInternetTestCase):
 
         entry = self.create_simple_entry()
 
-        UserVotes.objects.create(entry = entry, vote=20, user = self.user)
+        UserVotes.objects.create(entry=entry, vote=20, user=self.user)
 
         url = reverse("{}:entry-vote".format(LinkDatabase.name), args=[entry.id])
 

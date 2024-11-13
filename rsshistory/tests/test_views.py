@@ -16,7 +16,7 @@ class GenericViewsTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_get_search_term(self):
-        themap = {"search" : "something1 = else & something2 = else2"}
+        themap = {"search": "something1 = else & something2 = else2"}
 
         # call tested function
         term = get_search_term(themap)

@@ -467,16 +467,16 @@ def is_url_allowed(request):
         status = c.is_allowed(url)
 
         if status:
-            p.context[
-                "summary_text"
-            ] = "{} is allowed by <a href='{}'>robots.txt</a>".format(
-                url, c.get_robots_txt_url()
+            p.context["summary_text"] = (
+                "{} is allowed by <a href='{}'>robots.txt</a>".format(
+                    url, c.get_robots_txt_url()
+                )
             )
         else:
-            p.context[
-                "summary_text"
-            ] = "{} is NOT allowed by <a href='{}'>robots.txt</a>".format(
-                url, c.get_robots_txt_url()
+            p.context["summary_text"] = (
+                "{} is NOT allowed by <a href='{}'>robots.txt</a>".format(
+                    url, c.get_robots_txt_url()
+                )
             )
         return p.render("summary_present.html")
 
@@ -644,8 +644,8 @@ def cleanup_link(request):
         form.method = "POST"
 
         p.context["form"] = form
-        p.context[
-            "form_description_post"
-        ] = "Internet is dangerous, so carefully select which links you add"
+        p.context["form_description_post"] = (
+            "Internet is dangerous, so carefully select which links you add"
+        )
 
         return p.render("form_oneliner.html")

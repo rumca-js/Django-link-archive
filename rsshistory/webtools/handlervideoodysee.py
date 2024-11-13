@@ -40,32 +40,34 @@ class OdyseeVideoHandler(DefaultUrlHandler):
 
     def handle_channel_video_input(self, url):
         from .url import Url
+
         protocol_less = Url.get_protololless(self.url)
 
         lines = protocol_less.split("/")
         if len(lines) < 3:
             return
 
-        first = lines[0] # odysee.com
+        first = lines[0]  # odysee.com
         self.channel = lines[1]
         self.video = lines[2]
         wh = self.video.find("?")
         if wh >= 0:
             self.video = self.video[:wh]
 
-        protocol_less = "/".join([first,self.channel,self.video])
+        protocol_less = "/".join([first, self.channel, self.video])
 
         return "https://" + protocol_less
 
     def handle_video_input(self, url):
         from .url import Url
+
         protocol_less = Url.get_protololless(self.url)
 
         lines = protocol_less.split("/")
         if len(lines) < 2:
             return url
 
-        first = lines[0] # odysee.com
+        first = lines[0]  # odysee.com
         self.video = lines[1]
 
         protocol_less = "/".join([first, self.video])
@@ -84,9 +86,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
                 self.get_channel_code(), self.get_video_code()
             )
         else:
-            return "https://odysee.com/{}".format(
-                self.get_video_code()
-            )
+            return "https://odysee.com/{}".format(self.get_video_code())
 
     def get_link_embed(self):
         return "https://odysee.com/$/embed/{0}".format(self.get_video_code())
@@ -106,4 +106,5 @@ class OdyseeVideoHandler(DefaultUrlHandler):
 
     def get_feeds(self):
         from .handlerchannelodysee import OdyseeChannelHandler
+
         return [OdyseeChannelHandler().code2feed(self.channel)]

@@ -30,7 +30,7 @@ def backgroundjobs(request):
 
     data = {}
     if "search" in request.GET:
-        data={"search": request.GET["search"]}
+        data = {"search": request.GET["search"]}
 
     p.context["query_page"] = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
     p.context["search_suggestions_page"] = None
@@ -294,17 +294,19 @@ def is_entry_download(request, pk):
 
     is_downloaded = False
 
-    entries = LinkDataModel.objects.filter(id = pk)
+    entries = LinkDataModel.objects.filter(id=pk)
 
     if entries.exists():
         entry = entries[0]
 
-        job_condition = (Q(job=BackgroundJobController.JOB_DOWNLOAD_FILE) |
-            Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC) |
-            Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO))
+        job_condition = (
+            Q(job=BackgroundJobController.JOB_DOWNLOAD_FILE)
+            | Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC)
+            | Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO)
+        )
 
-        job_condition &= Q(subject = entry.link)
-        job_condition &= Q(enabled = True)
+        job_condition &= Q(subject=entry.link)
+        job_condition &= Q(enabled=True)
 
         entry = entries[0]
 
@@ -312,6 +314,6 @@ def is_entry_download(request, pk):
         if jobs.exists():
             is_downloaded = True
 
-    json_obj = {"status" : is_downloaded }
+    json_obj = {"status": is_downloaded}
 
     return JsonResponse(json_obj)

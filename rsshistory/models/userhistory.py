@@ -5,6 +5,7 @@ API needs to check user privileges.
  - the causation needs to be established
  - the engine needs to know the person it tracks (does anonymization exist for search engines?)
 """
+
 import time
 from datetime import timedelta
 
@@ -157,7 +158,8 @@ class UserEntryTransitionHistory(models.Model):
         max_related_links = config_entry.max_number_of_related_links
 
         link_transitions = UserEntryTransitionHistory.objects.filter(
-            Q(user=user) & (Q(entry_from=navigated_to_entry) | Q(entry_to=navigated_to_entry))
+            Q(user=user)
+            & (Q(entry_from=navigated_to_entry) | Q(entry_to=navigated_to_entry))
         ).order_by("-counter")
 
         if link_transitions.exists():
@@ -167,7 +169,9 @@ class UserEntryTransitionHistory(models.Model):
 
                 if navigated_to_entry == link_info.entry_to:
                     if link_info.entry_from:
-                        entries = LinkDataModel.objects.filter(id=link_info.entry_from.id)
+                        entries = LinkDataModel.objects.filter(
+                            id=link_info.entry_from.id
+                        )
                 else:
                     if link_info.entry_to:
                         entries = LinkDataModel.objects.filter(id=link_info.entry_to.id)

@@ -124,7 +124,9 @@ def disable(request, pk):
     ob.enabled = False
     ob.save()
 
-    jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_EXPORT_DATA, subject = str(pk))
+    jobs = BackgroundJobController.objects.filter(
+        job=BackgroundJobController.JOB_EXPORT_DATA, subject=str(pk)
+    )
     jobs.delete()
 
     return redirect("{}:data-exports".format(LinkDatabase.name))
@@ -282,9 +284,9 @@ def import_from_instance(request):
         form.method = "POST"
 
         p.context["form_title"] = "Instance URL import"
-        p.context[
-            "form_description_pre"
-        ] = "Provide URL to another instance od Django-link-archive, the link of JSON data."
+        p.context["form_description_pre"] = (
+            "Provide URL to another instance od Django-link-archive, the link of JSON data."
+        )
         p.context["form"] = form
 
     return p.render("form_basic.html")
@@ -314,9 +316,7 @@ def import_from_files(request):
             return p.render("summary_present.html")
 
     else:
-        initial={
-            "path": Configuration.get_object().get_import_path()
-        }
+        initial = {"path": Configuration.get_object().get_import_path()}
 
         form = ImportFromFilesForm(initial=initial)
         form.method = "POST"
@@ -484,9 +484,9 @@ def data_export_job_add(request, pk):
             "{}:data-export".format(LinkDatabase.name), args=[str(export.id)]
         )
 
-        p.context[
-            "summary_text"
-        ] = "Export is not enabled. <a href='{}'>Export</a>.".format(job_link)
+        p.context["summary_text"] = (
+            "Export is not enabled. <a href='{}'>Export</a>.".format(job_link)
+        )
         return p.render("summary_present.html")
 
     BackgroundJobController.export_data(export, user=request.user)
@@ -510,10 +510,10 @@ def write_daily_data_form(request):
             time_stop = form.cleaned_data["time_stop"]
 
             if BackgroundJobController.write_daily_data_range(time_start, time_stop):
-                p.context[
-                    "summary_text"
-                ] = "Added daily write job. Start:{} Stop:{}".format(
-                    time_start, time_stop
+                p.context["summary_text"] = (
+                    "Added daily write job. Start:{} Stop:{}".format(
+                        time_start, time_stop
+                    )
                 )
             else:
                 p.context["summary_text"] = "Form is invalid. Start:{} Stop:{}".format(

@@ -68,7 +68,6 @@ class MainExporterTest(FakeInternetTestCase):
             export_sources=True,
         )
 
-
     def create_entries(self):
         LinkDataController.objects.create(
             link="https://link-1.com",
@@ -132,4 +131,3 @@ class MainExporterTest(FakeInternetTestCase):
         exporter = MainExporter(data_writer_config)
         entries = exporter.get_entries()
         self.assertEqual(entries.count(), 0)
-

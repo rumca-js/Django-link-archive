@@ -38,22 +38,27 @@ from ..serializers import InstanceExporter, JsonImporter
 
 
 class SourceListView(object):
-    def __init__(self, request=None):
+    def __init__(self, request=None, user=None):
         self.request = request
+        self.user = user
+        if not self.user and self.request:
+            self.user = self.request.user
 
     def get_queryset(self):
-        self.query_filter = SourceFilter(self.request.GET, self.request.user, init_objects = self.get_init_query_set())
+        self.query_filter = SourceFilter(
+            self.request.GET, user=self.user, init_objects=self.get_init_query_set()
+        )
         return self.query_filter.get_filtered_objects()
 
     def get_init_query_set(self):
         return SourceDataController.objects.all()
 
     def get_paginate_by(self):
-        if not self.request.user.is_authenticated:
+        if not self.user or not self.user.is_authenticated:
             config = Configuration.get_object().config_entry
             return config.sources_per_page
         else:
-            uc = UserConfig.get(self.request.user)
+            uc = UserConfig.get(self.user)
             return uc.sources_per_page
 
     def get_title(self):
@@ -146,21 +151,24 @@ def sources(request):
 
     data = {}
     if "search" in request.GET:
-        data={"search": request.GET["search"]}
+        data = {"search": request.GET["search"]}
 
     filter_form = SourcesChoiceForm(request=request, initial=data)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:sources".format(LinkDatabase.name))
 
     # TODO jquery that
-    #user_choices = UserSearchHistory.get_user_choices(request.user)
+    # user_choices = UserSearchHistory.get_user_choices(request.user)
     user_choices = []
     context = get_generic_search_init_context(request, filter_form, user_choices)
 
     p.context.update(context)
     p.context["query_page"] = reverse("{}:sources-json-all".format(LinkDatabase.name))
 
-    p.context["search_suggestions_page"] = reverse("{}:get-search-suggestions-sources".format(LinkDatabase.name), args=["placeholder"])
+    p.context["search_suggestions_page"] = reverse(
+        "{}:get-search-suggestions-sources".format(LinkDatabase.name),
+        args=["placeholder"],
+    )
     p.context["search_history_page"] = None
 
     return p.render("sources_list.html")
@@ -188,7 +196,7 @@ def add_source(request):
                 return HttpResponseRedirect(source.get_absolute_url())
 
             b = SourceDataBuilder(manual_entry=True)
-            source = b.build(link_data = form.cleaned_data, manual_entry = True)
+            source = b.build(link_data=form.cleaned_data, manual_entry=True)
 
             if not source:
                 p.context["summary_text"] = "Cannot add source"
@@ -204,10 +212,10 @@ def add_source(request):
                 ]
             )
 
-            p.context[
-                "summary_text"
-            ] = "Data: Could not add source {} <div>Data: {}</div>".format(
-                error_message, form.cleaned_data
+            p.context["summary_text"] = (
+                "Data: Could not add source {} <div>Data: {}</div>".format(
+                    error_message, form.cleaned_data
+                )
             )
             return p.render("summary_present.html")
 
@@ -234,8 +242,8 @@ def add_source_simple(request):
         url = UrlHandler.get_cleaned_link(url)
 
         if not Url.is_protocolled_link(url):
-            p.context["summary_text"] = "Only protocolled links are allowed. Link:{}".format(
-                url
+            p.context["summary_text"] = (
+                "Only protocolled links are allowed. Link:{}".format(url)
             )
             return p.render("summary_present.html")
 
@@ -280,7 +288,9 @@ def add_source_simple(request):
                 "Detected www in domain link name. Select non www link if possible"
             )
         if domain.lower() != domain:
-            warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
+            warnings.append(
+                "Link domain is not lowercase. Are you sure link name is OK?"
+            )
         if config.respect_robots_txt and info and not info.is_allowed(link):
             warnings.append("Link is not allowed by site robots.txt")
         if link.find("?") >= 0:
@@ -290,7 +300,9 @@ def add_source_simple(request):
         if page.get_port() and page.get_port() >= 0:
             warnings.append("Link contains port. Is that intentional?")
         if not page.is_web_link():
-            warnings.append("Not a web link. Expecting protocol://domain.tld styled location")
+            warnings.append(
+                "Not a web link. Expecting protocol://domain.tld styled location"
+            )
 
         # errors
         if not page.is_protocolled_link():
@@ -367,10 +379,10 @@ def edit_source(request, pk):
             ]
         )
 
-        p.context[
-            "summary_text"
-        ] = "Could not edit source {} <div>Data: {}</div>".format(
-            error_message, form.cleaned_data
+        p.context["summary_text"] = (
+            "Could not edit source {} <div>Data: {}</div>".format(
+                error_message, form.cleaned_data
+            )
         )
         return p.render("summary_present.html")
     else:

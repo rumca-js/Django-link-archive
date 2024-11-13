@@ -1,17 +1,8 @@
 import traceback
 
 from .apps import LinkDatabase
-from .models import AppLogging
-from .configuration import Configuration, ConfigurationEntry
-from .threadhandlers import (
-    GenericJobsProcessor,
-    SourceJobsProcessor,
-    WriteJobsProcessor,
-    ImportJobsProcessor,
-    LeftOverJobsProcessor,
-)
-
-from .threadhandlers import RefreshProcessor
+from .models import AppLogging, ConfigurationEntry
+from .configuration import Configuration
 
 
 def process_jobs_task(Processor):
@@ -33,33 +24,11 @@ def process_jobs_task(Processor):
         handler = Processor()
         handler.run()
     except Exception as E:
-        logger.error("Exception in process_jobs_task for processor: {} {}".format(Processor, str(E)))
+        logger.error(
+            "Exception in process_jobs_task for processor: {} {}".format(
+                Processor, str(E)
+            )
+        )
         AppLogging.exc(E, f"Exception in process_jobs_task {Processor}")
 
     logger.info("Finished process_jobs_task for processor: {}".format(Processor))
-
-
-def get_processors():
-    """
-    Each processor will have each own dedicated queue.
-    Write block will not affect source processing.
-    """
-    return [
-        # if you are bottlenecked by resources,
-        # you can leave only leftover processor
-        # less queues, less CPU overhead
-        SourceJobsProcessor,
-        WriteJobsProcessor,
-        ImportJobsProcessor,
-        LeftOverJobsProcessor,
-    ]
-
-
-def get_tasks():
-    tasks = [[300.0, RefreshProcessor]]
-    processors = get_processors()
-
-    for processor in processors:
-        tasks.append([60.0, processor])
-
-    return tasks

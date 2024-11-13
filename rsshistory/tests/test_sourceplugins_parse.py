@@ -160,7 +160,9 @@ class RssParserPluginTest(FakeInternetTestCase):
 
         self.assertEqual(len(props), 20)
 
-        jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_ADD).values_list("subject", flat=True)
+        jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_ADD
+        ).values_list("subject", flat=True)
 
         self.assertTrue(jobs.count() > 0)
 
@@ -191,14 +193,16 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
         # call tested function
         props = list(parser.get_entries())
 
-        #for prop in props:
+        # for prop in props:
         #    print(prop["link"])
 
         self.assertEqual(len(props), 20)
 
         self.assertEqual(props[0]["source"], "https://hnrss.org/frontpage")
 
-        jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_SCAN)
+        jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_SCAN
+        )
 
         self.assertEqual(jobs.count(), len(props))
 

@@ -853,7 +853,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         visits = UserEntryVisitHistory.objects.all()
         self.assertEqual(visits.count(), 2)
 
-        visits = UserEntryVisitHistory.objects.filter(entry = https_entry)
+        visits = UserEntryVisitHistory.objects.filter(entry=https_entry)
         self.assertEqual(visits.count(), 1)
 
     def test_move_entry_to_url__destination_exists(self):
@@ -948,7 +948,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         visits = UserEntryVisitHistory.objects.all()
         self.assertEqual(visits.count(), 2)
 
-        visits = UserEntryVisitHistory.objects.filter(entry = https_entry)
+        visits = UserEntryVisitHistory.objects.filter(entry=https_entry)
         self.assertEqual(visits.count(), 1)
 
     def test_move_entry_to_url__destination_does_not_exist(self):
@@ -1038,5 +1038,5 @@ class EntryWrapperTest(FakeInternetTestCase):
         visits = UserEntryVisitHistory.objects.all()
         self.assertEqual(visits.count(), 2)
 
-        visits = UserEntryVisitHistory.objects.filter(entry = http_entry)
+        visits = UserEntryVisitHistory.objects.filter(entry=http_entry)
         self.assertEqual(visits.count(), 1)

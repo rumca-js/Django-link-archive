@@ -8,9 +8,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
 )
-from ..models import (
-   UserSearchHistory
-)
+from ..models import UserSearchHistory
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -47,15 +45,20 @@ class UserHistoryViewsTest(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
         )
 
-        #self.user = User.objects.create_user(
+        # self.user = User.objects.create_user(
         #    username="testuser", password="testpassword",)
 
         self.client.login(username="testuser", password="testpassword")
 
     def test_get_search_suggestions_entries__search_history(self):
-        history = UserSearchHistory.objects.create(search_query = "lolipop", user=self.user)
+        history = UserSearchHistory.objects.create(
+            search_query="lolipop", user=self.user
+        )
 
-        url = reverse("{}:get-search-suggestions-entries".format(LinkDatabase.name), args=["lolipop"])
+        url = reverse(
+            "{}:get-search-suggestions-entries".format(LinkDatabase.name),
+            args=["lolipop"],
+        )
 
         # call tested function
         response = self.client.get(url)
@@ -66,14 +69,19 @@ class UserHistoryViewsTest(FakeInternetTestCase):
         data = response.json()
 
         # Check if 'items' is in the response and its length is > 0
-        self.assertIn('items', data)
-        self.assertTrue(len(data['items']) > 0, "Items list should not be empty.")
-        self.assertEqual(data['items'][0], "lolipop")
+        self.assertIn("items", data)
+        self.assertTrue(len(data["items"]) > 0, "Items list should not be empty.")
+        self.assertEqual(data["items"][0], "lolipop")
 
     def test_get_search_suggestions_entries__sources(self):
-        history = UserSearchHistory.objects.create(search_query = "lolipop", user=self.user)
+        history = UserSearchHistory.objects.create(
+            search_query="lolipop", user=self.user
+        )
 
-        url = reverse("{}:get-search-suggestions-entries".format(LinkDatabase.name), args=["youtube"])
+        url = reverse(
+            "{}:get-search-suggestions-entries".format(LinkDatabase.name),
+            args=["youtube"],
+        )
 
         # call tested function
         response = self.client.get(url)
@@ -84,6 +92,6 @@ class UserHistoryViewsTest(FakeInternetTestCase):
         data = response.json()
 
         # Check if 'items' is in the response and its length is > 0
-        self.assertIn('items', data)
-        self.assertTrue(len(data['items']) > 0, "Items list should not be empty.")
-        self.assertEqual(data['items'][0], "source__title = 'YouTube'")
+        self.assertIn("items", data)
+        self.assertTrue(len(data["items"]) > 0, "Items list should not be empty.")
+        self.assertEqual(data["items"][0], "source__title = 'YouTube'")

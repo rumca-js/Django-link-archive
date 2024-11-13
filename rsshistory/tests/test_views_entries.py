@@ -244,7 +244,9 @@ class EntriesViewsTests(FakeInternetTestCase):
         limited_data = self.get_link_data(test_link)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
-        self.assertEqual(LinkDataController.objects.filter(link=channel_name).count(), 0)
+        self.assertEqual(
+            LinkDataController.objects.filter(link=channel_name).count(), 0
+        )
 
         # call user action
         response = self.client.post(url, data=limited_data)
@@ -252,7 +254,9 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
-        self.assertEqual(LinkDataController.objects.filter(link=channel_name).count(), 1)
+        self.assertEqual(
+            LinkDataController.objects.filter(link=channel_name).count(), 1
+        )
 
     def test_entry_add__exists(self):
         LinkDataController.objects.all().delete()
@@ -835,7 +839,7 @@ class EntriesDetailViews(FakeInternetTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
-        
+
     def test_entry_detail__archived_html(self):
         MockRequestCounter.mock_page_requests = 0
 

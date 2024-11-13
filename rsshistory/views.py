@@ -10,10 +10,10 @@ from django.utils.http import urlencode
 from .webtools import HtmlPage, RssPage, HttpPageHandler
 
 from .models import (
-   UserConfig,
-   ConfigurationEntry,
-   AppLogging,
-   ApiKeys,
+    UserConfig,
+    ConfigurationEntry,
+    AppLogging,
+    ApiKeys,
 )
 from .apps import LinkDatabase
 from .configuration import Configuration

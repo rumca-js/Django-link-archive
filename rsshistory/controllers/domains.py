@@ -102,35 +102,35 @@ class DomainsController(Domains):
         return False
 
     def check_local_consistency(self):
-        entries = LinkDataController.objects.filter(link = "https://" + self.domain)
+        entries = LinkDataController.objects.filter(link="https://" + self.domain)
         if entries.exists():
             entry = entries[0]
             entry.domain = self
             entry.save()
             return True
 
-        entries = LinkDataController.objects.filter(link = "http://" + self.domain)
+        entries = LinkDataController.objects.filter(link="http://" + self.domain)
         if entries.exists():
             entry = entries[0]
             entry.domain = self
             entry.save()
             return True
 
-        entries = LinkDataController.objects.filter(link = "smb://" + self.domain)
+        entries = LinkDataController.objects.filter(link="smb://" + self.domain)
         if entries.exists():
             entry = entries[0]
             entry.domain = self
             entry.save()
             return True
 
-        entries = LinkDataController.objects.filter(link = "ftp://" + self.domain)
+        entries = LinkDataController.objects.filter(link="ftp://" + self.domain)
         if entries.exists():
             entry = entries[0]
             entry.domain = self
             entry.save()
             return True
 
-        entries = LinkDataController.objects.filter(link = "//" + self.domain)
+        entries = LinkDataController.objects.filter(link="//" + self.domain)
         if entries.exists():
             entry = entries[0]
             entry.domain = self

@@ -2,7 +2,12 @@ from django.views import generic
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..models import ConfigurationEntry, UserSearchHistory, UserEntryVisitHistory, UserConfig
+from ..models import (
+    ConfigurationEntry,
+    UserSearchHistory,
+    UserEntryVisitHistory,
+    UserConfig,
+)
 from ..controllers import UserCommentsController
 from ..views import ViewPage, UserGenericListView, GenericListView
 

@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+
 from utils.dateutils import DateUtils
 
 from ..controllers import SourceDataController, LinkDataController
@@ -50,6 +52,10 @@ class FiltersTest(FakeInternetTestCase):
             export_to_cms=False,
         )
 
+        self.user = User.objects.create_user(
+            username="TestUser", password="testpassword", is_staff=True
+        )
+
     def test_source_arg_conditions(self):
         args = {
             "title": "link",
@@ -58,7 +64,7 @@ class FiltersTest(FakeInternetTestCase):
             "notsupported": "none",
         }
 
-        thefilter = SourceFilter(args)
+        thefilter = SourceFilter(args, user=self.user)
 
         filter_args = thefilter.get_args_filter_map()
 
@@ -80,7 +86,7 @@ class FiltersTest(FakeInternetTestCase):
             "unsupported": "none",
         }
 
-        thefilter = EntryFilter(args)
+        thefilter = EntryFilter(args, user=self.user)
 
         filter_args = thefilter.get_args_filter_map()
 
@@ -107,7 +113,7 @@ class FiltersTest(FakeInternetTestCase):
             "unsupported": "none",
         }
 
-        thefilter = EntryFilter(args)
+        thefilter = EntryFilter(args, user=self.user)
 
         filter_args = thefilter.get_args_filter_map()
 
@@ -133,7 +139,7 @@ class FiltersTest(FakeInternetTestCase):
             "page": "1",
         }
 
-        thefilter = SourceFilter(args)
+        thefilter = SourceFilter(args, user=self.user)
         limit = thefilter.get_limit()
 
         self.assertEqual(limit[0], 0)
@@ -147,7 +153,7 @@ class FiltersTest(FakeInternetTestCase):
             "page": "2",
         }
 
-        thefilter = SourceFilter(args)
+        thefilter = SourceFilter(args, user=self.user)
         limit = thefilter.get_limit()
 
         self.assertEqual(limit[0], 100)
@@ -162,7 +168,7 @@ class FiltersTest(FakeInternetTestCase):
             "page": "1",
         }
 
-        thefilter = EntryFilter(args)
+        thefilter = EntryFilter(args, user=self.user)
         limit = thefilter.get_limit()
 
         self.assertEqual(limit[0], 0)
@@ -176,7 +182,7 @@ class FiltersTest(FakeInternetTestCase):
             "page": "2",
         }
 
-        thefilter = EntryFilter(args)
+        thefilter = EntryFilter(args, user=self.user)
         limit = thefilter.get_limit()
 
         self.assertEqual(limit[0], 100)
@@ -387,7 +393,7 @@ class OmniSearchFilterTest(FakeInternetTestCase):
         print("Query set length: {}".format(qs.count()))
 
         args = {"search": "link == https://test1.com"}
-        processor = OmniSearchFilter(args, init_objects = qs)
+        processor = OmniSearchFilter(args, init_objects=qs)
         processor.set_translation_mapping(["link"])
 
         # call tested function
@@ -397,13 +403,15 @@ class OmniSearchFilterTest(FakeInternetTestCase):
         self.assertEqual(qs.count(), 1)
 
     def test_get_filtered_objects_with_double_quotes(self):
-        LinkDataController.objects.create(link="https://test.com", artist="Sombody Anybody")
+        LinkDataController.objects.create(
+            link="https://test.com", artist="Sombody Anybody"
+        )
 
         qs = LinkDataController.objects.all()
         print("Query set length: {}".format(qs.count()))
 
         args = {"search": 'artist = "Sombody "'}
-        processor = OmniSearchFilter(args, init_objects = qs)
+        processor = OmniSearchFilter(args, init_objects=qs)
 
         processor.set_translation_mapping(["link", "artist"])
 
@@ -413,13 +421,15 @@ class OmniSearchFilterTest(FakeInternetTestCase):
         self.assertEqual(qs.count(), 1)
 
     def test_get_filtered_objects_with_single_quotes(self):
-        LinkDataController.objects.create(link="https://test.com", artist="Sombody Anybody")
+        LinkDataController.objects.create(
+            link="https://test.com", artist="Sombody Anybody"
+        )
 
         qs = LinkDataController.objects.all()
         print("Query set length: {}".format(qs.count()))
 
         args = {"search": "artist = 'Sombody '"}
-        processor = OmniSearchFilter(args, init_objects = qs)
+        processor = OmniSearchFilter(args, init_objects=qs)
 
         processor.set_translation_mapping(["link", "artist"])
 
@@ -440,7 +450,7 @@ class OmniSearchFilterTest(FakeInternetTestCase):
         print("Query set length: {}".format(qs.count()))
 
         args = {"search": "link === https://test1.com & title === One Title"}
-        processor = OmniSearchFilter(args, init_objects = qs)
+        processor = OmniSearchFilter(args, init_objects=qs)
 
         processor.set_translation_mapping(["link", "title", "description"])
 
@@ -451,13 +461,15 @@ class OmniSearchFilterTest(FakeInternetTestCase):
         self.assertEqual(qs.count(), 1)
 
     def test_get_filtered_objects_with_no_equal(self):
-        LinkDataController.objects.create(link="https://test.com", artist="Sombody Anybody")
+        LinkDataController.objects.create(
+            link="https://test.com", artist="Sombody Anybody"
+        )
 
         qs = LinkDataController.objects.all()
         print("Query set length: {}".format(qs.count()))
 
         args = {"search": "Sombody"}
-        processor = OmniSearchFilter(args, init_objects = qs)
+        processor = OmniSearchFilter(args, init_objects=qs)
 
         processor.set_translation_mapping(["link", "artist"])
 

@@ -405,9 +405,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         current_time = DateUtils.get_datetime_now_utc()
         creation_date = current_time - timedelta(days=1)
 
-        first_created_entry = LinkDataController.objects.create(link = link_name,
-                title = "Title",
-                description = "Description")
+        first_created_entry = LinkDataController.objects.create(
+            link=link_name, title="Title", description="Description"
+        )
 
         link_data = {
             "link": link_name,

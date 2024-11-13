@@ -345,7 +345,9 @@ class StealthRequestsCrawler(CrawlerInterface):
         )
 
         import stealth_requests as requests
-        answer = requests.get(self.request.url,
+
+        answer = requests.get(
+            self.request.url,
             timeout=self.timeout_s,
             verify=self.request.ssl_verify,
             stream=True,
@@ -935,8 +937,7 @@ class ScriptCrawler(CrawlerInterface):
                 shell=True,
                 capture_output=True,
                 cwd=self.cwd,
-                timeout=self.timeout_s
-                + 10,  # add more time for closing browser, etc
+                timeout=self.timeout_s + 10,  # add more time for closing browser, etc
             )
         except subprocess.TimeoutExpired as E:
             WebLogger.exc(E, "Timeout on running script")
@@ -958,7 +959,10 @@ class ScriptCrawler(CrawlerInterface):
 
             WebLogger.error(
                 "Url:{}. Script:'{}'. Return code invalid:{}. Path:{}".format(
-                    self.request.url, script, p.returncode, self.cwd,
+                    self.request.url,
+                    script,
+                    p.returncode,
+                    self.cwd,
                 )
             )
 

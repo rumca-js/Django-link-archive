@@ -20,6 +20,7 @@ class ExportTests(FakeInternetTestCase):
             username="testuser", password="testpassword", is_staff=True
         )
 
+
 class ImportTests(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()

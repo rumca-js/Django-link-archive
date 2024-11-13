@@ -135,7 +135,7 @@ def entry_tags(request, pk):
         operation_data["status"] = False
         return JsonResponse(operation_data)
 
-    operation_data["tags"] = entry.get_tag_map() # vector
+    operation_data["tags"] = entry.get_tag_map()  # vector
     operation_data["status"] = True
 
     return JsonResponse(operation_data)
@@ -175,7 +175,7 @@ def entry_tag(request, pk):
             UserTags.set_tags(entry, tag_string, user=request.user)
 
             operation_data["message"] = "Tagged entry"
-            operation_data["tags"] = entry.get_tag_map() # vector
+            operation_data["tags"] = entry.get_tag_map()  # vector
             operation_data["status"] = True
             return JsonResponse(operation_data)
 

@@ -1,6 +1,3 @@
-
-
-
 from sqlalchemy import (
     create_engine,
 )
@@ -35,7 +32,9 @@ class PageDisplayTest(FakeInternetTestCase):
     def test_youtube(self):
         MockRequestCounter.mock_page_requests = 0
 
-        page_display = PageDisplay("https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        page_display = PageDisplay(
+            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        )
 
         # one for page, one for rss
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)

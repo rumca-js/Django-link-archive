@@ -199,8 +199,8 @@ class DomainAwarePage(object):
                 return
             else:
                 try:
-                  port = int(parts[2][wh+1:])
-                  return port
+                    port = int(parts[2][wh + 1 :])
+                    return port
                 except ValueError as E:
                     return
 

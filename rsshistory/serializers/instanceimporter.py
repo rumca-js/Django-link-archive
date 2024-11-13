@@ -66,10 +66,7 @@ class InstanceImporter(object):
         try:
             json_data = json.loads(instance_text)
         except ValueError as E:
-            AppLogging.exc(
-                E,
-                "Cannot load JSON:{}".format(instance_text)
-            )
+            AppLogging.exc(E, "Cannot load JSON:{}".format(instance_text))
             return
 
         entry_builder = EntryDataBuilder()

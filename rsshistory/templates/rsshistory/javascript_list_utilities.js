@@ -299,6 +299,8 @@
     $('#filterForm input[name="search"]').on('input', function() {
         var search_term = $('#filterForm input[name="search"]').val();
 
+        $('.btnFilterTrigger').prop("disabled", false);
+
         $('#searchSyntax').hide();
         $('#searchSuggestions').empty();
         $('#searchHistory').hide();

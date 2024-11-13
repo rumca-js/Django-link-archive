@@ -107,7 +107,7 @@ def setup_periodic_tasks(sender, **kwargs):
 
                 sender.add_periodic_task(
                     time_s,
-                    process_all_jobs.s(app + ".threadhandlers." + task_processor),
+                    process_all_jobs.s(app + ".threadprocessors." + task_processor),
                     name=app + " " + task_processor + " task",
                 )
 
@@ -135,6 +135,13 @@ def process_all_jobs(self, processor):
             if acquired:
                 logger.info("Lock acquired for: %s", processor)
 
+                app_name = None
+                processor_file_name = None
+                processor_class_name = None
+                processor_class = None
+                tasks_module = None
+                threadprocessors_module = None
+
                 # Parsing the processor string
                 try:
                     app_name, processor_file_name, processor_class_name = processor.split(".")
@@ -145,14 +152,14 @@ def process_all_jobs(self, processor):
                 # Importing tasks and processor modules
                 try:
                     tasks_module = importlib.import_module(f"{app_name}.tasks")
-                    threadhandlers_module = importlib.import_module(f"{app_name}.threadhandlers")
+                    threadprocessors_module = importlib.import_module(f"{app_name}.threadprocessors")
                 except ModuleNotFoundError as e:
                     logger.error("Module import failed for app: %s", app_name, exc_info=True)
                     return
                 
                 # Retrieving the processor class
                 try:
-                    processor_class = getattr(threadhandlers_module, processor_class_name)
+                    processor_class = getattr(threadprocessors_module, processor_class_name)
                 except AttributeError as e:
                     logger.error("Processor class not found: %s", processor_class_name, exc_info=True)
                     return

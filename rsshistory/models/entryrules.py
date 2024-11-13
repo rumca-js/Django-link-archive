@@ -1,6 +1,7 @@
 """
 Defined by user, by GUI
 """
+
 from django.db import models
 
 from .entries import LinkDataModel

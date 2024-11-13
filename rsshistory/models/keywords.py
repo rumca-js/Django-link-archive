@@ -79,7 +79,8 @@ class KeyWords(models.Model):
         return False
 
     def is_configuration_error():
-        from ..configuration import Configuration
+        from .system import ConfigurationEntry
+
         if not ConfigurationEntry.get().enable_keyword_support:
             return False
 

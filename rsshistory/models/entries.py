@@ -150,7 +150,7 @@ class BaseLinkDataModel(models.Model):
     def delete(self, *args, **kwargs):
         p = DomainAwarePage(self.link)
         if p.is_domain():
-            domains = Domains.objects.filter(domain = p.get_domain_only())
+            domains = Domains.objects.filter(domain=p.get_domain_only())
             domains.delete()
 
         super().delete(*args, **kwargs)
@@ -594,12 +594,12 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         if description.find("\r") > 0:
             return description
-            
+
         length = BaseLinkDataController.get_description_length()
 
-        description = description[:length-1]
+        description = description[: length - 1]
         lines_number = description.count("\n")
-        description = description[: -lines_number]
+        description = description[:-lines_number]
         return description
 
     def get_description_length():

@@ -34,12 +34,12 @@ from ..models import (
     KeyWords,
     BlockEntry,
     BlockEntryList,
-    SystemOperation,
     DataExport,
     SourceExportHistory,
     SourceOperationalData,
     ModelFiles,
     ReadLater,
+    SystemOperation,
 )
 from ..controllers import (
     SourceDataController,
@@ -49,6 +49,7 @@ from ..controllers import (
     EntryDataBuilder,
     EntriesUpdater,
     BackgroundJobController,
+    SystemOperationController,
 )
 from ..configuration import Configuration
 from ..serializers import JsonImporter
@@ -71,11 +72,20 @@ def index(request):
             config = ConfigurationEntry.get()
             if config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_ALL:
                 return redirect("{}:entries".format(LinkDatabase.name))
-            elif config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_RECENT:
+            elif (
+                config.default_search_behavior
+                == ConfigurationEntry.SEARCH_BUTTON_RECENT
+            ):
                 return redirect("{}:entries-recent".format(LinkDatabase.name))
-            elif config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_GLOBAL_BOOKMARKS:
+            elif (
+                config.default_search_behavior
+                == ConfigurationEntry.SEARCH_BUTTON_GLOBAL_BOOKMARKS
+            ):
                 return redirect("{}:entries-bookmarks".format(LinkDatabase.name))
-            elif config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_USER_BOOKMARKS:
+            elif (
+                config.default_search_behavior
+                == ConfigurationEntry.SEARCH_BUTTON_USER_BOOKMARKS
+            ):
                 return redirect("{}:entries-user-bookmarks".format(LinkDatabase.name))
             else:
                 return redirect("{}:entries".format(LinkDatabase.name))
@@ -265,40 +275,71 @@ def json_table_status(request):
 
     table = []
 
-    table.append({"name" : "ConfigurationEntry", "count" : ConfigurationEntry.objects.count()})
-    table.append({"name" : "UserConfig", "count" : UserConfig.objects.count()})
-    table.append({"name" : "SystemOperation", "count" : SystemOperation.objects.count()})
+    table.append(
+        {"name": "ConfigurationEntry", "count": ConfigurationEntry.objects.count()}
+    )
+    table.append({"name": "UserConfig", "count": UserConfig.objects.count()})
+    table.append({"name": "SystemOperation", "count": SystemOperation.objects.count()})
 
-    table.append({"name" : "SourceDataModel", "count" : SourceDataController.objects.count()})
-    table.append({"name" : "SourceOperationalData", "count" : SourceOperationalData.objects.count()})
-    table.append({"name" : "LinkDataModel", "count" : LinkDataController.objects.count()})
-    table.append({"name" : "ArchiveLinkDataModel", "count" : ArchiveLinkDataController.objects.count()})
-    table.append({"name" : "KeyWords", "count" : KeyWords.objects.count()})
-    table.append({"name" : "BlockEntry", "count" : BlockEntry.objects.count()})
-    table.append({"name" : "BlockEntryList", "count" : BlockEntryList.objects.count()})
+    table.append(
+        {"name": "SourceDataModel", "count": SourceDataController.objects.count()}
+    )
+    table.append(
+        {
+            "name": "SourceOperationalData",
+            "count": SourceOperationalData.objects.count(),
+        }
+    )
+    table.append({"name": "LinkDataModel", "count": LinkDataController.objects.count()})
+    table.append(
+        {
+            "name": "ArchiveLinkDataModel",
+            "count": ArchiveLinkDataController.objects.count(),
+        }
+    )
+    table.append({"name": "KeyWords", "count": KeyWords.objects.count()})
+    table.append({"name": "BlockEntry", "count": BlockEntry.objects.count()})
+    table.append({"name": "BlockEntryList", "count": BlockEntryList.objects.count()})
 
-    table.append({"name" : "UserTags", "count" : UserTags.objects.count()})
-    table.append({"name" : "UserCompactedTags", "count" : UserCompactedTags.objects.count()})
-    table.append({"name" : "CompactedTags", "count" : CompactedTags.objects.count()})
-    table.append({"name" : "UserVotes", "count" : UserVotes.objects.count()})
-    table.append({"name" : "UserBookmarks", "count" : UserBookmarks.objects.count()})
-    table.append({"name" : "UserComments", "count" : UserCommentsController.objects.count()})
-    table.append({"name" : "UserSearchHistory", "count" : UserSearchHistory.objects.count()})
-    table.append({"name" : "UserEntryVisitHistory", "count" : UserEntryVisitHistory.objects.count()})
-    table.append({"name" : "UserEntryTransitionHistory", "count" : UserEntryTransitionHistory.objects.count()})
+    table.append({"name": "UserTags", "count": UserTags.objects.count()})
+    table.append(
+        {"name": "UserCompactedTags", "count": UserCompactedTags.objects.count()}
+    )
+    table.append({"name": "CompactedTags", "count": CompactedTags.objects.count()})
+    table.append({"name": "UserVotes", "count": UserVotes.objects.count()})
+    table.append({"name": "UserBookmarks", "count": UserBookmarks.objects.count()})
+    table.append(
+        {"name": "UserComments", "count": UserCommentsController.objects.count()}
+    )
+    table.append(
+        {"name": "UserSearchHistory", "count": UserSearchHistory.objects.count()}
+    )
+    table.append(
+        {
+            "name": "UserEntryVisitHistory",
+            "count": UserEntryVisitHistory.objects.count(),
+        }
+    )
+    table.append(
+        {
+            "name": "UserEntryTransitionHistory",
+            "count": UserEntryTransitionHistory.objects.count(),
+        }
+    )
 
-    table.append({"name" : "BackgroundJob", "count" : BackgroundJob.objects.count()})
-    table.append({"name" : "DataExport", "count" : DataExport.objects.count()})
-    table.append({"name" : "SourceExportHistory", "count" : SourceExportHistory.objects.count()})
-    table.append({"name" : "ModelFiles", "count" : ModelFiles.objects.count()})
-    table.append({"name" : "AppLogging", "count" : AppLogging.objects.count()})
-    table.append({"name" : "Domains", "count" : Domains.objects.count()})
+    table.append({"name": "BackgroundJob", "count": BackgroundJob.objects.count()})
+    table.append({"name": "DataExport", "count": DataExport.objects.count()})
+    table.append(
+        {"name": "SourceExportHistory", "count": SourceExportHistory.objects.count()}
+    )
+    table.append({"name": "ModelFiles", "count": ModelFiles.objects.count()})
+    table.append({"name": "AppLogging", "count": AppLogging.objects.count()})
+    table.append({"name": "Domains", "count": Domains.objects.count()})
 
     # u = EntriesUpdater()
     # entries = u.get_entries_to_update()
     # if entries:
     #    p.context["LinkDataModel_toupdate"] = entries.count()
-
 
     data = {}
     data["tables"] = table
@@ -317,7 +358,9 @@ def json_system_status(request):
 
     c = Configuration().get_object()
 
-    last_internet_check = c.get_local_time(SystemOperation.get_last_internet_check())
+    last_internet_check = c.get_local_time(
+        SystemOperationController.get_last_internet_check()
+    )
     data["last_internet_check"] = last_internet_check
 
     now = c.get_local_time(DateUtils.get_datetime_now_utc())
@@ -359,8 +402,8 @@ def json_system_status(request):
     data["directory"] = c.directory
 
     data["threads"] = []
-    for thread_info in c.get_thread_info():
-        data["threads"].append({"name" : thread_info[0], "date" : thread_info[1]} )
+    for thread_info in SystemOperationController.get_thread_info():
+        data["threads"].append({"name": thread_info[0], "date": thread_info[1]})
 
     return JsonResponse(data)
 
@@ -535,7 +578,11 @@ def init_sources(request):
 
 def get_sources_text():
     sources_link = reverse("{}:sources".format(LinkDatabase.name))
-    link_string = """<a href="{}?show=1" class="btn btn-secondary">Sources</a>""".format(sources_link)
+    link_string = (
+        """<a href="{}?show=1" class="btn btn-secondary">Sources</a>""".format(
+            sources_link
+        )
+    )
     return "You can navigate to sources to enable some of them: {}".format(link_string)
 
 
@@ -734,7 +781,7 @@ def is_system_ok(request):
     if data is not None:
         return data
 
-    system_is_ok = SystemOperation.is_system_healthy()
+    system_is_ok = SystemOperationController.is_system_healthy()
 
     text = "YES" if system_is_ok else "NO"
     status_code = 200 if system_is_ok else 500
@@ -793,7 +840,7 @@ def opensearchxml(request):
 def get_footer_status_line(request):
     def add_to_message(message, issue_text):
         if message != "":
-            message+= ", "
+            message += ", "
         else:
             message += "Indicators: "
         message += issue_text
@@ -804,17 +851,19 @@ def get_footer_status_line(request):
         BackgroundJobController.JOB_PROCESS_SOURCE
     )
 
-    sources = SourceOperationalData.objects.filter(consecutive_errors__gt = 0, source_obj__enabled=True)
+    sources = SourceOperationalData.objects.filter(
+        consecutive_errors__gt=0, source_obj__enabled=True
+    )
 
-    error_jobs = BackgroundJobController.objects.filter(errors__gt = 0)
+    error_jobs = BackgroundJobController.objects.filter(errors__gt=0)
 
     configuration_entry = ConfigurationEntry.get()
 
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
-    is_internet_ok = SystemOperation.is_internet_ok()
-    is_threading_ok  = SystemOperation.is_threading_ok()
+    is_internet_ok = SystemOperationController.is_internet_ok()
+    is_threading_ok = SystemOperationController.is_threading_ok()
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
     is_keywords_configured = KeyWords.is_configuration_error()
@@ -835,9 +884,7 @@ def get_footer_status_line(request):
     if is_keywords_configured:
         message = add_to_message(message, "Keywords configuration")
 
-    data = {
-            "message" : message
-    }
+    data = {"message": message}
     return JsonResponse(data)
 
 
@@ -846,17 +893,19 @@ def get_indicators(request):
         BackgroundJobController.JOB_PROCESS_SOURCE
     )
 
-    sources = SourceOperationalData.objects.filter(consecutive_errors__gt = 0, source_obj__enabled=True)
+    sources = SourceOperationalData.objects.filter(
+        consecutive_errors__gt=0, source_obj__enabled=True
+    )
 
-    error_jobs = BackgroundJobController.objects.filter(errors__gt = 0)
+    error_jobs = BackgroundJobController.objects.filter(errors__gt=0)
 
     configuration_entry = ConfigurationEntry.get()
 
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
-    is_internet_ok = SystemOperation.is_internet_ok()
-    is_threading_ok  = SystemOperation.is_threading_ok()
+    is_internet_ok = SystemOperationController.is_internet_ok()
+    is_threading_ok = SystemOperationController.is_threading_ok()
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
 
@@ -864,7 +913,9 @@ def get_indicators(request):
 
     if sources_are_fetched:
         indicators["is_reading"] = {}
-        indicators["is_reading"]["message"] = f"Reading sources. Queue:{sources_queue_size}"
+        indicators["is_reading"][
+            "message"
+        ] = f"Reading sources. Queue:{sources_queue_size}"
         indicators["is_reading"]["status"] = True
     if is_sources_error:
         indicators["sources_error"] = {}
@@ -887,9 +938,7 @@ def get_indicators(request):
         indicators["configuration_error"]["message"] = f"Configuration error"
         indicators["configuration_error"]["status"] = True
 
-    data = {
-            "indicators" : indicators
-    }
+    data = {"indicators": indicators}
     return JsonResponse(data)
 
 

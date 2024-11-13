@@ -198,27 +198,28 @@ class SourceDataModel(models.Model):
         return list(names)
 
     def get_query_names():
-        return sorted([
-            "id",
-            "url",
-            "title",
-            "category_name",
-            "subcategory_name",
-            "export_to_cms",
-            "remove_after_days",
-            "language",
-            "age",
-            "favicon",
-            "enabled",
-            "fetch_period",
-            "source_type",
-            "proxy_location",
-
-            "category__category_id",
-            "subcategory__subcategory_id",
-            "category__category_name",
-            "subcategory__subcategory_name",
-        ])
+        return sorted(
+            [
+                "id",
+                "url",
+                "title",
+                "category_name",
+                "subcategory_name",
+                "export_to_cms",
+                "remove_after_days",
+                "language",
+                "age",
+                "favicon",
+                "enabled",
+                "fetch_period",
+                "source_type",
+                "proxy_location",
+                "category__category_id",
+                "subcategory__subcategory_id",
+                "category__category_name",
+                "subcategory__subcategory_name",
+            ]
+        )
 
 
 class SourceOperationalData(models.Model):

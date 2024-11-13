@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from utils.dateutils import DateUtils
 from utils.logger import set_logger
 
-from .models import ConfigurationEntry, SystemOperation
+from .models import ConfigurationEntry
 from .apps import LinkDatabase
 
 """
@@ -21,7 +21,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "1.5.3"
+__version__ = "1.5.4"
 
 
 class Configuration(object):
@@ -212,44 +212,6 @@ class Configuration(object):
                 result.append(keyword.strip())
         return result
 
-    def refresh(self, thread_id):
-        if thread_id == 'RefreshProcessor':
-            if self.is_it_time_to_ping():
-                if self.ping_internet(thread_id):
-                    SystemOperation.add_by_thread(
-                        thread_id, internet_status_checked=True, internet_status_ok=True
-                    )
-                else:
-                    SystemOperation.add_by_thread(
-                        thread_id,
-                        internet_status_checked=True,
-                        internet_status_ok=False,
-                    )
-        else:
-            SystemOperation.add_by_thread(thread_id)
-
-    def is_it_time_to_ping(self):
-        datetime = SystemOperation.get_last_internet_check()
-        if not datetime:
-            return True
-
-        timedelta = DateUtils.get_datetime_now_utc() - datetime
-        if (timedelta.seconds / 60) > 15:
-            return True
-        return False
-
-    def ping_internet(self, thread_id):
-        # TODO this should be done by Url. ping
-
-        from .pluginurl import UrlHandler
-
-        test_page_url = self.config_entry.internet_test_page
-
-        p = UrlHandler(url=test_page_url)
-        # TODO fix this
-        #return p.ping()
-        return p.get_response().is_valid()
-
     def encrypt(self, message):
         from django.conf import settings
         from cryptography.fernet import Fernet
@@ -266,14 +228,3 @@ class Configuration(object):
 
         fernet = Fernet(key)
         return fernet.decrypt(message).decode()
-
-    def get_thread_info(self, display=True):
-        """
-        @display If true, then provide dates meant for display (local time)
-        """
-        result = []
-        for thread in SystemOperation.get_thread_ids():
-            date = SystemOperation.get_last_thread_signal(thread)
-            result.append([thread, date])
-
-        return result

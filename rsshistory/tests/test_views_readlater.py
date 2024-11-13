@@ -77,9 +77,7 @@ class ReadLaterViewsTest(FakeInternetTestCase):
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse(
-            "{}:read-later-remove".format(LinkDatabase.name), args=[entry.id]
-        )
+        url = reverse("{}:read-later-remove".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

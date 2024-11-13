@@ -133,18 +133,26 @@ class MapImporter(object):
                 LinkDatabase.info("Import ids {}".format(self.is_import("import_ids")))
 
                 if "id" in clean_data:
-                    LinkDatabase.info("Importing link:{} ID:{}".format(clean_data["link"], clean_data["id"]))
+                    LinkDatabase.info(
+                        "Importing link:{} ID:{}".format(
+                            clean_data["link"], clean_data["id"]
+                        )
+                    )
                 else:
                     LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
 
                 entry = self.entry_builder.build(
-                    link_data=clean_data, source_is_auto=True, strict_ids = self.is_import("import_ids")
+                    link_data=clean_data,
+                    source_is_auto=True,
+                    strict_ids=self.is_import("import_ids"),
                 )
 
                 if not entry:
                     AppLogging.error("Cannot build entry {}".format(clean_data["link"]))
                 else:
-                    LinkDatabase.info("Added Link:{} ID:{}".format(entry.link, entry.id))
+                    LinkDatabase.info(
+                        "Added Link:{} ID:{}".format(entry.link, entry.id)
+                    )
 
                 if entry and entry.is_archive_entry():
                     entry = EntryWrapper.move_from_archive(entry)
@@ -199,7 +207,9 @@ class MapImporter(object):
         if sources.count() == 0:
             clean_data = self.drop_source_instance_internal_data(clean_data)
             clean_data["enabled"] = False
-            self.source_builder.build(link_data=clean_data, strict_ids = self.is_import("import_ids"))
+            self.source_builder.build(
+                link_data=clean_data, strict_ids=self.is_import("import_ids")
+            )
 
         # TODO cleanup
         # else:
@@ -255,7 +265,11 @@ class MapImporter(object):
             return users[0]
 
     def is_import(self, keyword):
-        if self.import_settings and keyword in self.import_settings and self.import_settings[keyword]:
+        if (
+            self.import_settings
+            and keyword in self.import_settings
+            and self.import_settings[keyword]
+        ):
             return True
         else:
             return False

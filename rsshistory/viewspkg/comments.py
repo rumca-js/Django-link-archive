@@ -24,10 +24,10 @@ def entry_add_comment(request, link_id):
 
     user_name = request.user.get_username()
     if not UserCommentsController.can_user_add_comment(link_id, request.user):
-        p.context[
-            "summary_text"
-        ] = "User cannot add more comments. Limit to {} comment per day".format(
-            config.number_of_comments_per_day
+        p.context["summary_text"] = (
+            "User cannot add more comments. Limit to {} comment per day".format(
+                config.number_of_comments_per_day
+            )
         )
         return p.render("summary_present.html")
 
@@ -71,9 +71,9 @@ def entry_add_comment(request, link_id):
 
     p.context["form"] = form
     p.context["form_title"] = link.title
-    p.context[
-        "form_description_post"
-    ] = """Please think twice about what you are going to say. Is it written in vengance? Is it something you truly believe? Have you done research in that matter? This is important. You will be able to post only 1 comment per day"""
+    p.context["form_description_post"] = (
+        """Please think twice about what you are going to say. Is it written in vengance? Is it something you truly believe? Have you done research in that matter? This is important. You will be able to post only 1 comment per day"""
+    )
 
     return p.render("form_basic.html")
 
@@ -167,4 +167,3 @@ def remove_all(request):
     p.context["summary_text"] = "Removed comment"
 
     return p.render("summary_present.html")
-

@@ -165,7 +165,7 @@ class BaseQueryFilter(object):
     def get_limit(self):
         if "page" in self.args:
             try:
-               page = int(self.args["page"])
+                page = int(self.args["page"])
             except ValueError:
                 page = 1
         else:
@@ -205,7 +205,7 @@ class BaseQueryFilter(object):
         args = self.args.dict()
         args["user"] = self.user
 
-        query_filter = OmniSearchFilter(args)
+        query_filter = OmniSearchFilter(args, user=self.user)
 
         translate_names = self.get_translateable_fields()
         query_filter.set_translation_mapping(translate_names)
@@ -250,15 +250,15 @@ class BaseQueryFilter(object):
             wh = key.rfind("__")
             if wh >= 0:
                 key_word = key[:wh]
-                key_operator = key[wh+2:]
+                key_operator = key[wh + 2 :]
 
                 if key_word in translatables:
-                    """ title__icontains """
+                    """title__icontains"""
                     value = self.get_args_filter_map_value(key)
                     if value:
                         parameter_map[key] = value
                 elif key in translatables:
-                    """ object__foreign__title """
+                    """object__foreign__title"""
                     value = self.get_args_filter_map_value(key)
                     if value:
                         parameter_map[key] = value
@@ -302,9 +302,9 @@ class SourceFilter(BaseQueryFilter):
 
     def get_default_omni_search_fields(self):
         return [
-                "title__icontains",
-                "url__icontains",
-               ]
+            "title__icontains",
+            "url__icontains",
+        ]
 
     def get_translateable_fields(self):
         return SourceDataController.get_query_names()
@@ -313,7 +313,7 @@ class SourceFilter(BaseQueryFilter):
         from .viewspkg.sources import SourceListView
 
         try:
-            return int(SourceListView().get_paginate_by())
+            return int(SourceListView(user=self.user).get_paginate_by())
         except ValueError:
             return 100
 
@@ -329,7 +329,7 @@ class EntryFilter(BaseQueryFilter):
         from .viewspkg.entries import EntriesSearchListView
 
         try:
-            return int(EntriesSearchListView().get_paginate_by())
+            return int(EntriesSearchListView(user=self.user).get_paginate_by())
         except ValueError:
             return 100
 
@@ -370,11 +370,11 @@ class EntryFilter(BaseQueryFilter):
 
     def get_default_omni_search_fields(self):
         return [
-                "title__icontains",
-                "link__icontains",
-                "description__icontains",
-                "tags__tag__icontains",
-            ]
+            "title__icontains",
+            "link__icontains",
+            "description__icontains",
+            "tags__tag__icontains",
+        ]
 
     def set_time_limit(self, time_limit):
         self.time_limit = time_limit
@@ -389,8 +389,8 @@ class DomainFilter(BaseQueryFilter):
 
     def get_default_omni_search_fields(self):
         return [
-                "domain__icontains",
-            ]
+            "domain__icontains",
+        ]
 
     def get_translateable_fields(self):
         translate = DomainsController.get_query_names()
@@ -443,8 +443,8 @@ class OmniSearchWithDefault(OmniSearch):
 
 
 class OmniSearchFilter(BaseQueryFilter):
-    def __init__(self, args, init_objects = None):
-        super().__init__(args, init_objects = init_objects)
+    def __init__(self, args, user=None, init_objects=None):
+        super().__init__(args, init_objects=init_objects)
 
         self.search_query = get_search_term(args)
         if not self.search_query:
@@ -454,6 +454,7 @@ class OmniSearchFilter(BaseQueryFilter):
             self.search_query, DjangoSingleSymbolEvaluator()
         )
 
+        self.user = user
         self.query_set = None
         self.combined_query = None
 

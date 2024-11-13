@@ -57,10 +57,12 @@ class JsonImporterTest(FakeInternetTestCase):
         UserVotes.objects.all().delete()
         UserTags.objects.all().delete()
 
-        import_settings = {"import_entries" : True}
+        import_settings = {"import_entries": True}
 
         # call tested functionality
-        p = import_from_data(self.user, entry_contents, import_settings, strict_ids=False)
+        p = import_from_data(
+            self.user, entry_contents, import_settings, strict_ids=False
+        )
 
         links = LinkDataController.objects.all()
 
@@ -80,10 +82,12 @@ class JsonImporterTest(FakeInternetTestCase):
         UserVotes.objects.all().delete()
         UserTags.objects.all().delete()
 
-        import_settings = {"import_entries" : True, "import_ids" : True}
+        import_settings = {"import_entries": True, "import_ids": True}
 
         # call tested functionality
-        p = import_from_data(self.user, entry_contents, import_settings, strict_ids=True)
+        p = import_from_data(
+            self.user, entry_contents, import_settings, strict_ids=True
+        )
 
         links = LinkDataController.objects.all()
 
@@ -107,7 +111,9 @@ class JsonImporterTest(FakeInternetTestCase):
         import_settings = None
 
         # call tested functionality
-        p = import_from_data(self.user, entry_contents, import_settings, strict_ids=False)
+        p = import_from_data(
+            self.user, entry_contents, import_settings, strict_ids=False
+        )
 
         links = LinkDataController.objects.all()
 

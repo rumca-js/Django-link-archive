@@ -81,12 +81,12 @@ class DomainTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
-        LinkDataController.objects.create(link = "https://waiterrant.blogspot.com")
+        LinkDataController.objects.create(link="https://waiterrant.blogspot.com")
 
         DomainsController.objects.create(domain="waiterrant.blogspot.com")
 
         # call tested function
-        DomainsController.cleanup({"verify" : True})
+        DomainsController.cleanup({"verify": True})
 
         domains = DomainsController.objects.all()
         entries = LinkDataController.objects.all()
@@ -102,7 +102,7 @@ class DomainTest(FakeInternetTestCase):
         DomainsController.objects.create(domain="linkedin.com")
 
         # call tested function
-        DomainsController.cleanup({"verify" : True})
+        DomainsController.cleanup({"verify": True})
 
         domains = DomainsController.objects.all()
         entries = LinkDataController.objects.all()
@@ -122,5 +122,5 @@ class DomainTest(FakeInternetTestCase):
 
         entry.delete()
 
-        domains = DomainsController.objects.filter(domain ="test.com")
+        domains = DomainsController.objects.filter(domain="test.com")
         self.assertEqual(domains.count(), 0)

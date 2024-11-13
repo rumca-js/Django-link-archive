@@ -1,6 +1,7 @@
 """
 This is example script about how to use this project as a simple RSS reader
 """
+
 import argparse
 import sys
 import asyncio

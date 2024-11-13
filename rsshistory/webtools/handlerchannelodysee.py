@@ -37,6 +37,7 @@ class OdyseeChannelHandler(DefaultChannelHandler):
 
     def is_channel_name(self):
         from .url import Url
+
         short_url = Url.get_protololless(self.url)
 
         if short_url.startswith("odysee.com/@"):
@@ -63,7 +64,7 @@ class OdyseeChannelHandler(DefaultChannelHandler):
         if len(lines) < 2:
             return
 
-        base = lines[0] # odysee.com
+        base = lines[0]  # odysee.com
         code = lines[1]
 
         wh = code.find("?")
@@ -83,9 +84,9 @@ class OdyseeChannelHandler(DefaultChannelHandler):
         if len(lines) < 2:
             return
 
-        base = lines[0] # odysee.com
-        dollar = lines[1] # $
-        rss = lines[2] # rss
+        base = lines[0]  # odysee.com
+        dollar = lines[1]  # $
+        rss = lines[2]  # rss
         code = lines[3]
 
         wh = code.find("?")

@@ -104,7 +104,7 @@ def entries_generic(request, link, data_scope):
 
     data = {}
     if "search" in request.GET:
-        data={"search": request.GET["search"]}
+        data = {"search": request.GET["search"]}
 
     data_scope = "Scope: " + data_scope
 
@@ -117,42 +117,70 @@ def entries_generic(request, link, data_scope):
     p.context.update(context)
     p.context["query_args"] = get_query_args(request.GET)
     p.context["query_page"] = link
-    p.context["search_suggestions_page"] = reverse("{}:get-search-suggestions-entries".format(LinkDatabase.name), args=["placeholder"])
-    p.context["search_history_page"] = reverse("{}:json-user-search-history".format(LinkDatabase.name))
+    p.context["search_suggestions_page"] = reverse(
+        "{}:get-search-suggestions-entries".format(LinkDatabase.name),
+        args=["placeholder"],
+    )
+    p.context["search_history_page"] = reverse(
+        "{}:json-user-search-history".format(LinkDatabase.name)
+    )
 
     return p.render("entry_list.html")
 
 
 def entries(request):
-    return entries_generic(request, reverse("{}:entries-json".format(LinkDatabase.name)), "all")
+    return entries_generic(
+        request, reverse("{}:entries-json".format(LinkDatabase.name)), "all"
+    )
 
 
 def entries_recent(request):
-    return entries_generic(request, reverse("{}:entries-json-recent".format(LinkDatabase.name)), "recent")
+    return entries_generic(
+        request, reverse("{}:entries-json-recent".format(LinkDatabase.name)), "recent"
+    )
 
 
 def entries_bookmarked(request):
-    return entries_generic(request, reverse("{}:entries-json-bookmarked".format(LinkDatabase.name)), "bookmarked")
+    return entries_generic(
+        request,
+        reverse("{}:entries-json-bookmarked".format(LinkDatabase.name)),
+        "bookmarked",
+    )
 
 
 def entries_user_bookmarked(request):
-    return entries_generic(request, reverse("{}:entries-json-user-bookmarked".format(LinkDatabase.name)), "bookmarked by the user")
+    return entries_generic(
+        request,
+        reverse("{}:entries-json-user-bookmarked".format(LinkDatabase.name)),
+        "bookmarked by the user",
+    )
 
 
 def entries_archived(request):
-    return entries_generic(request, reverse("{}:entries-json-archived".format(LinkDatabase.name)), "archived")
+    return entries_generic(
+        request,
+        reverse("{}:entries-json-archived".format(LinkDatabase.name)),
+        "archived",
+    )
 
 
 def entries_untagged(request):
-    return entries_generic(request, reverse("{}:entries-json-untagged".format(LinkDatabase.name)), "untagged")
+    return entries_generic(
+        request,
+        reverse("{}:entries-json-untagged".format(LinkDatabase.name)),
+        "untagged",
+    )
 
     return p.render("entries.html")
 
 
 class EntriesSearchListView(object):
 
-    def __init__(self, request = None):
+    def __init__(self, request=None, user=None):
         self.request = request
+        self.user = user
+        if not self.user and self.request and self.request.user:
+            self.user = self.request.user
 
     def get_queryset(self):
         """
@@ -173,11 +201,11 @@ class EntriesSearchListView(object):
         """
         API: Returns pagination value
         """
-        if not self.request.user.is_authenticated:
-            config = ConfigurationEntry.get().config_entry
+        if not self.user or not self.user.is_authenticated:
+            config = ConfigurationEntry.get()
             return config.links_per_page
         else:
-            uc = UserConfig.get(self.request.user)
+            uc = UserConfig.get(self.user)
             return uc.links_per_page
 
     def get_order_by(self):
@@ -187,7 +215,7 @@ class EntriesSearchListView(object):
         self.on_search()
         print("EntriesSearchListView:get_filter")
 
-        query_filter = EntryFilter(self.request.GET, self.request.user)
+        query_filter = EntryFilter(self.request.GET, user=self.user)
         thefilter = query_filter
         print("EntriesSearchListView:get_filter done")
         return thefilter
@@ -197,23 +225,24 @@ class EntriesSearchListView(object):
         return self.query_filter.get_filtered_objects()
 
     def on_search(self):
-        if self.request.user.is_authenticated:
+        if self.user and self.user.is_authenticated:
             search_term = get_search_term(self.request.GET)
             if search_term:
-                UserSearchHistory.add(self.request.user, search_term)
-
+                UserSearchHistory.add(self.user, search_term)
 
 
 class EntriesOmniListView(EntriesSearchListView):
     def get_filter(self):
         self.on_search()
 
-        if ("archive" in self.request.GET and self.request.GET["archive"] == "on"):
+        if "archive" in self.request.GET and self.request.GET["archive"] == "on":
             query_set = self.get_initial_query_set(archive=True)
         else:
             query_set = self.get_initial_query_set(archive=False)
 
-        query_filter = OmniSearchFilter(self.request.GET, init_objects = query_set)
+        query_filter = OmniSearchFilter(
+            self.request.GET, init_objects=query_set, user=self.user
+        )
 
         translate = BaseLinkDataController.get_query_names()
         query_filter.set_translation_mapping(translate)
@@ -295,14 +324,16 @@ class UserEntriesBookmarkedListView(EntriesOmniListView):
 
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
-        user = self.request.user
-        return query_set.filter(bookmarks__user__id=user.id)
+        user = self.user
+
+        if user:
+            return query_set.filter(bookmarks__user__id=user.id)
 
 
 class EntriesArchiveListView(EntriesOmniListView):
 
     def get_filter(self):
-        query_filter = EntryFilter(self.request.GET, self.request.user, use_archive=True)
+        query_filter = EntryFilter(self.request.GET, user=self.user, use_archive=True)
         return query_filter
 
 
@@ -348,7 +379,8 @@ class EntryDetailView(generic.DetailView):
         return context
 
     def set_visited(self):
-        if self.request.user.is_authenticated:
+        user = self.request.user
+        if user.is_authenticated:
             BackgroundJobController.entry_update_data(self.object)
             from_entry = self.get_from_entry()
 
@@ -422,9 +454,7 @@ class EntryArchivedDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
-        context["object_controller"] = EntryPreviewBuilder.get(
-            self.object, self.request.user
-        )
+        context["object_controller"] = EntryPreviewBuilder.get(self.object, self.request.user)
 
         m = WaybackMachine()
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
@@ -453,13 +483,14 @@ def get_entry_menu(request, pk):
     if not uc.can_add():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
 
-    entries = LinkDataController.objects.filter(id = pk)
+    entries = LinkDataController.objects.filter(id=pk)
     if entries.exists():
         entry = entries[0]
         p.context["object"] = entry
         p.context["user"] = request.user
         p.context["object_controller"] = EntryPreviewBuilder.get(
-            entry, request.user,
+            entry,
+            request.user,
         )
 
     return p.render("entry_detail__buttons.html")
@@ -470,9 +501,9 @@ def func_display_empty_form(request, p, template_name):
     form.method = "POST"
 
     p.context["form"] = form
-    p.context[
-        "form_description_post"
-    ] = "Internet is dangerous, so carefully select which links you add"
+    p.context["form_description_post"] = (
+        "Internet is dangerous, so carefully select which links you add"
+    )
 
     return p.render(template_name)
 
@@ -482,9 +513,9 @@ def func_display_init_form(request, p, cleaned_link):
     form.method = "POST"
 
     p.context["form"] = form
-    p.context[
-        "form_description_post"
-    ] = "Internet is dangerous, so carefully select which links you add"
+    p.context["form_description_post"] = (
+        "Internet is dangerous, so carefully select which links you add"
+    )
 
     return p.render("form_basic.html")
 
@@ -502,7 +533,9 @@ def get_cleaned_up_entry_data(request, data):
         data["permanent"] = True
 
     if "description" in data:
-        data["description"] = LinkDataController.get_description_for_add(data["description"])
+        data["description"] = LinkDataController.get_description_for_add(
+            data["description"]
+        )
 
     return data
 
@@ -551,7 +584,9 @@ def func_display_data_form(request, p, data):
     if page.get_port() and page.get_port() >= 0:
         warnings.append("Link contains port. Is that intentional?")
     if not page.is_web_link():
-        warnings.append("Not a web link. Expecting protocol://domain.tld styled location")
+        warnings.append(
+            "Not a web link. Expecting protocol://domain.tld styled location"
+        )
 
     # errors
     if not page.is_protocolled_link():
@@ -645,9 +680,9 @@ def add_entry(request):
             link = UrlHandler.get_cleaned_link(link)
 
             if not Url.is_protocolled_link(link):
-                p.context[
-                    "summary_text"
-                ] = "Only protocolled links are allowed. Link:{}".format(link)
+                p.context["summary_text"] = (
+                    "Only protocolled links are allowed. Link:{}".format(link)
+                )
                 return p.render("summary_present.html")
 
             data = LinkDataController.get_full_information({"link": link})
@@ -681,9 +716,9 @@ def add_simple_entry(request):
                 return func_display_init_form(request, p, cleaned_link)
 
             if not Url.is_protocolled_link(link):
-                p.context[
-                    "summary_text"
-                ] = "Only protocolled links are allowed. Link:{}".format(link)
+                p.context["summary_text"] = (
+                    "Only protocolled links are allowed. Link:{}".format(link)
+                )
                 return p.render("summary_present.html")
 
             data = LinkDataController.get_full_information({"link": link})
@@ -831,8 +866,8 @@ def entry_remove(request, pk):
     status_code = 200
 
     data = {
-            "status" : False,
-            "message" : "",
+        "status": False,
+        "message": "",
     }
 
     if entry.exists():
@@ -965,8 +1000,8 @@ def entry_unbookmark(request, pk):
     new_entry = EntryWrapper(entry=entry).make_not_bookmarked(request)
 
     json_obj = {
-            "status" : True,
-            "message" : "Unbookmarked",
+        "status": True,
+        "message": "Unbookmarked",
     }
 
     # JsonResponse
@@ -1039,7 +1074,9 @@ def entry_to_json(user_config, entry):
     json_entry = {}
     json_entry["id"] = entry.id
 
-    user_inappropate = entry.age != 0 and entry.age != None and entry.age > user_config.get_age()
+    user_inappropate = (
+        entry.age != 0 and entry.age != None and entry.age > user_config.get_age()
+    )
 
     if user_inappropate:
         json_entry["title"] = "Not appropriate"
@@ -1117,10 +1154,10 @@ def handle_json_view(request, view_to_use):
         if start > 0:
             start -= 1
 
-        #json_obj["start_index"] = start
-        #json_obj["end_index"] = page_obj.end_index()
+        # json_obj["start_index"] = start
+        # json_obj["end_index"] = page_obj.end_index()
 
-        #limited_entries = entries[start : page_obj.end_index()]
+        # limited_entries = entries[start : page_obj.end_index()]
 
         for entry in page_obj:
             entry_json = entry_to_json(uc, entry)
@@ -1141,14 +1178,12 @@ def entries_json(request):
     if data is not None:
         return data
 
-    view = EntriesSearchListView()
-    view.request = request
+    view = EntriesSearchListView(request)
 
     return handle_json_view(request, view)
 
 
 def entries_json_recent(request):
-
     """
     User might set access through config. Default is all
     """
@@ -1158,14 +1193,12 @@ def entries_json_recent(request):
     if data is not None:
         return data
 
-    view = EntriesRecentListView()
-    view.request = request
+    view = EntriesRecentListView(request)
 
     return handle_json_view(request, view)
 
 
 def entries_json_bookmarked(request):
-
     """
     User might set access through config. Default is all
     """
@@ -1175,14 +1208,12 @@ def entries_json_bookmarked(request):
     if data is not None:
         return data
 
-    view = EntriesBookmarkedListView()
-    view.request = request
+    view = EntriesBookmarkedListView(request)
 
     return handle_json_view(request, view)
 
 
 def entries_json_user_bookmarked(request):
-
     """
     User might set access through config. Default is all
     """
@@ -1192,14 +1223,12 @@ def entries_json_user_bookmarked(request):
     if data is not None:
         return data
 
-    view = UserEntriesBookmarkedListView()
-    view.request = request
+    view = UserEntriesBookmarkedListView(request)
 
     return handle_json_view(request, view)
 
 
 def entries_json_archived(request):
-
     """
     User might set access through config. Default is all
     """
@@ -1209,14 +1238,12 @@ def entries_json_archived(request):
     if data is not None:
         return data
 
-    view = EntriesArchiveListView()
-    view.request = request
+    view = EntriesArchiveListView(request)
 
     return handle_json_view(request, view)
 
 
 def entries_json_untagged(request):
-
     """
     User might set access through config. Default is all
     """
@@ -1226,8 +1253,7 @@ def entries_json_untagged(request):
     if data is not None:
         return data
 
-    view = EntriesNotTaggedView()
-    view.request = request
+    view = EntriesNotTaggedView(request)
 
     return handle_json_view(request, view)
 

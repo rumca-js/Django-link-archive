@@ -181,7 +181,7 @@ class UserTags(models.Model):
                 except Exception as E:
                     tag.delete()
 
-        #for q in UserTags.objects.all():
+        # for q in UserTags.objects.all():
         #    try:
         #       users = q.entry.id
         #    except Exception as E:

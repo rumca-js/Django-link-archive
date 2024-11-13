@@ -1,6 +1,7 @@
 """
 Defined by automated hosts files, ad block extensions
 """
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
@@ -22,7 +23,7 @@ class BlockListReader(object):
                 return
 
             line = self.contents[:wh]
-            self.contents = self.contents[wh+1:]
+            self.contents = self.contents[wh + 1 :]
 
             line = line.strip()
             if not line:

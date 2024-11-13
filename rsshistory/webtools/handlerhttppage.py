@@ -420,7 +420,6 @@ class HttpPageHandler(ContentInterface):
             if p.is_valid():
                 return p
 
-
             p = RssPage(url, contents)
             if p.is_valid():
                 return p
@@ -503,10 +502,10 @@ class HttpPageHandler(ContentInterface):
         if status_code < 200 or status_code > 404:
             return True
 
-        #if not self.p:
+        # if not self.p:
         #    return True
 
-        #if not self.p.is_valid():
+        # if not self.p.is_valid():
         #    # if we have response, but it is invalid, we may try obtaining contents with more advanced processing
         #    return True
 

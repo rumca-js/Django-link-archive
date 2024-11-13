@@ -12,19 +12,20 @@ class Domains(models.Model):
     For example:
       if there is not entry, then this object definitely should be removed
     """
+
     domain = models.CharField(max_length=1000, unique=True)
     main = models.CharField(max_length=200, null=True)
     subdomain = models.CharField(max_length=200, null=True)
     suffix = models.CharField(max_length=20, null=True)
     tld = models.CharField(max_length=20, null=True)
 
-    #entry = models.ForeignKey(
+    # entry = models.ForeignKey(
     #   LinkDataModel,
     #   on_delete=models.CASCADE,
     #   related_name="domain",
     #   null=True,
     #   blank=True,
-    #)
+    # )
 
     class Meta:
         ordering = [
