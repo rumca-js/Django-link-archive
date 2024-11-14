@@ -76,7 +76,7 @@ class DomainsController(Domains):
         return DomainsController.create_object(domain_text, protocol)
 
     def cleanup(cfg=None):
-        conf ConfigurationEntry.get()
+        conf = ConfigurationEntry.get()
         if conf.enable_domain_support:
             DomainsController.check_consistency_all(cfg)
         else:
