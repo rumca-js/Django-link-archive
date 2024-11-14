@@ -57,7 +57,6 @@ from .controllers import (
     EntriesUpdater,
     EntryScanner,
     ModelFilesBuilder,
-    SystemOperationController,
 )
 from .configuration import Configuration
 from .pluginurl import UrlHandler
@@ -1087,6 +1086,7 @@ class CleanupJobHandler(BaseJobHandler):
         if table == "all" or table == "ModelFiles":
             ModelFiles.cleanup(cfg)
         if table == "all" or table == "SystemOperation":
+            from .controllers import SystemOperationController
             SystemOperationController.cleanup(cfg)
 
         self.user_tables_cleanup(cfg, obj)

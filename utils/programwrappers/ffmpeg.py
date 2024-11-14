@@ -13,7 +13,7 @@ class FFmpeg(object):
             ["ffmpeg", "-y", "-i", self.name, "-vn", mp3_name],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd = self.cwd,
+            cwd=self.cwd,
             timeout=self.timeout_s,
         )
 
@@ -47,7 +47,7 @@ class Vlc(object):
             ["vlc", self.name, "vlc://quit"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd = self.cwd,
+            cwd=self.cwd,
             timeout=self.timeout_s,
         )
 

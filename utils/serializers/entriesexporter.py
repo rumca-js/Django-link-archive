@@ -86,7 +86,7 @@ class EntriesPageExporter(object):
         return page_dir / "entries.md"
 
     def get_file_handle(self, page_no):
-        if self.current_page_no is None self.current_page_no != page_no:
+        if self.current_page_no is None and self.current_page_no != page_no:
             if self.current_handle:
                 self.current_handle.close()
 

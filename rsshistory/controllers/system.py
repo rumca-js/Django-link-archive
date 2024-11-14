@@ -1,6 +1,6 @@
 from utils.dateutils import DateUtils
 
-from ..models import SystemOperation, ConfigurationEntry
+from ..models import SystemOperation, ConfigurationEntry, AppLogging
 
 
 class SystemOperationController(object):
@@ -16,7 +16,7 @@ class SystemOperationController(object):
     def is_threading_ok():
         hours_limit = 1800
 
-        thread_ids = SystemOperationController.get_thread_ids()
+        thread_ids = SystemOperationController.get_task_names()
 
         for thread_id in thread_ids:
             date = SystemOperationController.get_last_thread_signal(thread_id)
@@ -89,18 +89,17 @@ class SystemOperationController(object):
             is_internet_connection_ok=internet_status_ok,
         )
 
-    def get_thread_ids():
-        from ..threadprocessors import get_tasks
+    def get_task_names():
+        try:
+            from ..threadprocessors import get_task_names
+            return get_task_names()
+        except Exception as E:
+            AppLogging.exc(E)
 
-        thread_ids = []
-
-        for task in get_tasks():
-            thread_ids.append(task[1].__name__)
-
-        return thread_ids
+            return []
 
     def cleanup(cfg=None):
-        thread_ids = SystemOperationController.get_thread_ids()
+        thread_ids = SystemOperationController.get_task_names()
         for thread_id in thread_ids:
             # leave one entry with time check
             all_entries = SystemOperation.objects.filter(
@@ -162,7 +161,7 @@ class SystemOperationController(object):
         @display If true, then provide dates meant for display (local time)
         """
         result = []
-        for thread in SystemOperationController.get_thread_ids():
+        for thread in SystemOperationController.get_task_names():
             date = SystemOperationController.get_last_thread_signal(thread)
             result.append([thread, date])
 

@@ -106,23 +106,26 @@ class SourceDetailView(generic.DetailView):
         if entries.count() > 0:
             context["entry_object"] = entries[0]
         else:
-            AppLogging.error("Missing source entry {}".format(self.object.url))
-            builder = EntryDataBuilder(link=self.object.url)
-            if builder.result:
-                entry = builder.result
-                if entry.is_archive_entry():
-                    entry = EntryWrapper(entry=entry).move_from_archive()
-
-                entry.permanent = True
-                entry.save()
-
-                context["entry_object"] = entry
+            entry = self.create_entry(self.object.url)
+            context["entry_object"] = entry
 
         ViewPage.fill_context_type(context, url=self.object.url)
 
         context["handler"] = SourceControllerBuilder.get(self.object.id)
 
         return context
+
+    def create_entry(self, url):
+        builder = EntryDataBuilder(link=url)
+        if builder.result:
+            entry = builder.result
+            if entry.is_archive_entry():
+                entry = EntryWrapper(entry=entry).move_from_archive()
+
+            entry.permanent = True
+            entry.save()
+
+            return entry
 
 
 def get_generic_search_init_context(request, form, user_choices):

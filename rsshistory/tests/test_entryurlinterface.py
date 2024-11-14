@@ -1,3 +1,4 @@
+from utils.dateutils import DateUtils
 from ..webtools import YouTubeVideoHandler
 
 from ..pluginurl.entryurlinterface import EntryUrlInterface
@@ -13,6 +14,9 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
     def test_video_youtube_handler(self):
         url = EntryUrlInterface("https://www.youtube.com/watch?v=1234")
 
+        expected_date_published = DateUtils.from_string("2023-11-13;00:00", "%Y-%m-%d;%H:%M")
+        expected_date_published = DateUtils.to_utc_date(expected_date_published)
+
         props = url.get_props()
         self.assertTrue(props)
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
@@ -20,6 +24,8 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["status_code"], 200)
         self.assertEqual(props["page_rating"], 0)
         self.assertTrue(props["date_dead_since"] is None)
+        self.assertEqual(props["page_rating"], 0)
+        self.assertEqual(props["date_published"], expected_date_published)
 
     def test_video_mobile_youtube_handler(self):
         url = EntryUrlInterface("https://m.youtube.com/watch?v=1234")

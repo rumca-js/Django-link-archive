@@ -1,6 +1,7 @@
 """
 Cannot have any dependencies to django
 """
+
 try:
     from sympy import sympify
     import sympy

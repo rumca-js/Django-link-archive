@@ -775,7 +775,6 @@ class SeleniumUndetected(SeleniumDriver):
             options.add_argument("--lang={}".format("en-US"))
             return uc.Chrome(options=options)
         except Exception as E:
-            print(str(E))
             error_text = traceback.format_exc()
             WebLogger.debug(
                 "Cannot obtain driver:{}\n{}".format(self.request.url, error_text)

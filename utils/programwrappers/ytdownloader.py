@@ -5,7 +5,6 @@ from pathlib import Path
 
 
 class YouTubeDownloader(object):
-
     """
     We do not use python youtube interface. It will not work with windows executable.
     https://stackoverflow.com/questions/18054500/how-to-use-youtube-dl-from-a-python-program

@@ -191,6 +191,8 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "date_last_modified"):
             if self.response:
                 input_props["date_last_modified"] = self.response.get_last_modified()
+        if not self.is_property_set(input_props, "date_published"):
+            input_props["date_published"] = self.u.get_date_published()
 
         if (
             not self.is_property_set(input_props, "language")

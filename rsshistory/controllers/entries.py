@@ -99,29 +99,17 @@ class LinkDataController(LinkDataModel):
         # TODO Move to link wrapper
         moved_all = EntryWrapper.move_old_links_to_archive(limit_s)
 
-        # LinkDataController.recreate_from_domains()
         LinkDataController.update_entries()
 
         # indicate that all has been finished correctly
         return moved_all
-
-    def recreate_from_domains():
-        from .backgroundjob import BackgroundJobController
-        from .domains import DomainsController
-
-        domains = DomainsController.objects.all()
-        for domain in domains:
-            full_domain = "https://" + domain.domain
-            entries = LinkDataController.objects.filter(link=full_domain)
-            if not entries.exist():
-                LinkDatabase.info("Creating entry for domain:{}".format(full_domain))
-                BackgroundJobController.link_add(full_domain)
 
     def get_full_information(data):
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         info = EntryUrlInterface(data["link"], log=True, ignore_errors=True).get_props()
         info["page_rating_votes"] = 0
+
         return info
 
     def get_clean_data(props):

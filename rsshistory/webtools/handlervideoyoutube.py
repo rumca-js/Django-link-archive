@@ -1,6 +1,8 @@
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
+from utils.dateutils import DateUtils
+
 from .webtools import PageResponseObject, WebLogger
 from .pages import HtmlPage, ContentInterface
 from .defaulturlhandler import DefaultUrlHandler
@@ -108,13 +110,11 @@ class YouTubeHtmlHandler(HtmlPage, YouTubeVideoHandler):
         # invalid_text = '{"simpleText":"GO TO HOME"}'
         # contents = self.h.get_contents()
         # if contents and contents.find(invalid_text) >= 0:
-        #    print("It is invalid:{} - invalid text found".format(self.url))
         #    return False
 
         if block_live_videos:
             live_field = self.h.get_meta_custom_field("itemprop", "isLiveBroadcast")
             if live_field and live_field.lower() == "true":
-                # print("It is invalid:{} - live".format(self.url))
                 return False
 
         return True
@@ -208,10 +208,14 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
             from datetime import datetime
             from pytz import timezone
 
+
             date_string = self.yt_ob.get_date_published()
             date = datetime.strptime(date_string, "%Y%m%d")
             dt = datetime.combine(date, datetime.min.time())
-            dt = dt.replace(tzinfo=timezone("UTC"))
+
+            dt = DateUtils.to_utc_date(dt)
+
+            #dt = dt.replace(tzinfo=timezone("UTC"))
 
             return dt
 

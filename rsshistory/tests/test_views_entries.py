@@ -232,6 +232,42 @@ class EntriesViewsTests(FakeInternetTestCase):
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
         self.assertEqual(bookmarks.count(), 0)
 
+    def test_entry_add__youtube(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        test_link = "https://youtube.com/watch?v=1234"
+
+        limited_data = self.get_link_data(test_link)
+        print(limited_data)
+
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
+
+        # call user action
+        response = self.client.post(url, data=limited_data)
+
+        # page_source = response.content.decode("utf-8")
+        # print("Contents: {}".format(page_source))
+        # print(response)
+
+        self.assertEqual(response.status_code, 200)
+
+        entries = LinkDataController.objects.filter(link=test_link)
+
+        self.assertEqual(entries.count(), 1)
+
+        entry = entries[0]
+
+        self.assertEqual(entry.link, "https://youtube.com?v=1234")
+        expected_date_published = DateUtils.from_string("2023-11-13;00:00", "%Y-%m-%d;%H:%M")
+        expected_date_published = DateUtils.to_utc_date(expected_date_published)
+        self.assertEqual(entry.date_published, expected_date_published)
+
+        bookmarks = UserBookmarks.get_user_bookmarks(self.user)
+        self.assertEqual(bookmarks.count(), 0)
+
     def test_entry_add__rss(self):
         LinkDataController.objects.all().delete()
 

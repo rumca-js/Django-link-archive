@@ -14,7 +14,6 @@ from .controllers import (
     BackgroundJobController,
     SourceDataController,
     EntriesUpdater,
-    SystemOperationController,
 )
 
 from .threadhandlers import (
@@ -57,6 +56,9 @@ class CeleryTaskInterface(object):
     def run(self):
         raise NotImplementedError("Not implemented")
 
+    def get_name(self):
+        return self.__class__.__name__
+
 
 class RefreshProcessor(CeleryTaskInterface):
     """!
@@ -68,8 +70,10 @@ class RefreshProcessor(CeleryTaskInterface):
     """
 
     def run(self):
+        from .controllers import SystemOperationController
+
         c = Configuration.get_object()
-        SystemOperationController.refresh(self.__class__.__name__)
+        SystemOperationController.refresh(self.get_name())
 
         if not SystemOperationController.is_internet_ok():
             return
@@ -192,6 +196,8 @@ class GenericJobsProcessor(CeleryTaskInterface):
         ]
 
     def run(self):
+        from .controllers import SystemOperationController
+
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         c = Configuration.get_object()
@@ -247,9 +253,6 @@ class GenericJobsProcessor(CeleryTaskInterface):
                         E,
                         "Excetion",
                     )
-
-    def get_name(self):
-        return self.__class__.__name__
 
     def process_job(self, items):
         config = Configuration.get_object()
@@ -440,6 +443,7 @@ def get_processors():
         LeftOverJobsProcessor,
     ]
 
+
 def get_tasks():
     tasks = [[300.0, RefreshProcessor]]
     processors = get_processors()
@@ -448,3 +452,12 @@ def get_tasks():
         tasks.append([60.0, processor])
 
     return tasks
+
+
+def get_task_names():
+    thread_ids = []
+
+    for task in get_tasks():
+        thread_ids.append(task[1].__name__)
+
+    return thread_ids

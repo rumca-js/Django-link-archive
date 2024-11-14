@@ -798,8 +798,7 @@ class EntriesUpdater(object):
         Normal entries are checked with interval days_to_check_std_entries
         Dead entries are checked with interval days_to_check_stale_entries
         """
-        c = Configuration.get_object()
-        conf = c.config_entry
+        conf = ConfigurationEntry.get()
 
         if conf.days_to_check_std_entries == 0:
             return
@@ -1008,18 +1007,19 @@ class EntryWrapper(object):
 
         if objs.count() == 0:
             themap = entry_obj.get_map()
-            if hasattr(entry_obj, "source"):
-                if entry_obj.source:
-                    try:
+            try:
+                if hasattr(entry_obj, "source"):
+                    if entry_obj.source:
                         themap["source"] = entry_obj.source
-                    except Exception as E:
-                        AppLogging.exc(E)
-            if hasattr(entry_obj, "domain"):
-                if entry_obj.domain:
-                    try:
-                        themap["domain"] = entry_obj.domain
-                    except Exception as E:
-                        AppLogging.exc(E)
+            except Exception as E:
+                AppLogging.exc(E)
+
+            try:
+                if hasattr(entry_obj, "domain"):
+                    if entry_obj.domain:
+                            themap["domain"] = entry_obj.domain
+            except Exception as E:
+                AppLogging.exc(E)
 
             archive_obj = ArchiveLinkDataController.objects.create(**themap)
             entry_obj.delete()
@@ -1034,18 +1034,18 @@ class EntryWrapper(object):
         objs = LinkDataController.objects.filter(link=archive_obj.link)
         if objs.count() == 0:
             themap = archive_obj.get_map()
-            if hasattr(archive_obj, "source"):
-                if archive_obj.source:
-                    try:
+            try:
+                if hasattr(archive_obj, "source"):
+                    if archive_obj.source:
                         themap["source"] = archive_obj.source
-                    except Exception as E:
-                        AppLogging.exc(E)
-            if hasattr(archive_obj, "domain"):
-                if archive_obj.domain:
-                    try:
-                        themap["domain"] = archive_obj.domain
-                    except Exception as E:
-                        AppLogging.exc(E)
+            except Exception as E:
+                AppLogging.exc(E)
+            try:
+                if hasattr(archive_obj, "domain"):
+                    if archive_obj.domain:
+                            themap["domain"] = archive_obj.domain
+            except Exception as E:
+                AppLogging.exc(E)
             new_obj = LinkDataController.objects.create(**themap)
             archive_obj.delete()
             return new_obj

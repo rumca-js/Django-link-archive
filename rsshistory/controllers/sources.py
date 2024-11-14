@@ -430,10 +430,7 @@ class SourceDataBuilder(object):
         if "language" not in self.link_data or self.link_data["language"] is None:
             self.link_data["language"] = ""
 
-        try:
-            source = SourceDataController.objects.create(**self.link_data)
-        except Exception as E:
-            AppLogging.exc(E, "Cannot create source:{}\n{}".format(self.link_data))
+        source = SourceDataController.objects.create(**self.link_data)
 
         self.additional_source_operations(source)
 

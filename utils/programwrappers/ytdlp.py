@@ -7,7 +7,6 @@ from .ytdownloader import YouTubeDownloader
 
 
 class YTDLP(YouTubeDownloader):
-
     """
     yt-dlp Wrapper class
     https://github.com/yt-dlp/yt-dlp

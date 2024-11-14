@@ -75,12 +75,27 @@
         return paginationText;
     }
 
+    function getHideButton() {
+        let text = "";
+
+        let button_text = "<button id='hideSuggestions' type='button' class='btn btn-primary float-end'>Hide</button>";
+        text += '<li class="list-group-item">';
+        text += button_text;
+        text += '</li>';
+
+        return text;
+    }
+
     function fillSearchSuggestions(items) {
         if (items.length == 0) {
            $('#searchSuggestions').hide();
            return;
-	}
+        }
+
         let text = "<ul class='list-group border border-secondary rounded'>";
+
+        let button_text = getHideButton();
+        text += button_text;
 
         if (items && items.length > 0) {
             $.each(items, function(index, item) {
@@ -96,18 +111,11 @@
             });
         }
 
-        let button_text = "<button id='hideSuggestions' type='button' class='btn btn-primary float-end'>Hide</button>";
-        text += '<li class="list-group-item">';
         text += button_text;
-        text += '</li>';
 
         text += '</ul>';
 
         $('#searchSuggestions').html(text);
-
-        $(document).on("click", '#hideSuggestions', function(e) {
-            $('#searchSuggestions').hide();
-        });
     }
 
     function fillSearchHistory(items) {
@@ -117,6 +125,9 @@
 	}
 
         let text = "<ul class='list-group border border-secondary rounded'>";
+
+        let button_text = getHideButton();
+        text += button_text;
 
         if (items && items.length > 0) {
             $.each(items, function(index, item) {
@@ -134,18 +145,11 @@
             });
         }
 
-        let button_text = "<button id='hideHistory' type='button' class='btn btn-primary float-end'>Hide</button>";
-        text += '<li class="list-group-item">';
         text += button_text;
-        text += '</li>';
 
         text += "</ul>";
 
         $('#searchHistory').html(text);
-
-        $(document).on("click", '#hideHistory', function(e) {
-            $('#searchHistory').hide();
-        });
     }
 
     let currentSearchSuggestions = 0;
@@ -318,6 +322,16 @@
         $('#searchSyntax').toggle();
         $('#searchHistory').hide();
         $('#searchSuggestsions').hide();
+    });
+
+    $(document).on("click", '#hideSuggestions', function(e) {
+        $('#searchSuggestions').hide();
+        $('#searchHistory').hide();
+    });
+
+    $(document).on("click", '#hideHistory', function(e) {
+        $('#searchSuggestions').hide();
+        $('#searchHistory').hide();
     });
 
     //-----------------------------------------------

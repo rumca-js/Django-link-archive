@@ -36,13 +36,13 @@ class Id3v2(object):
                     str(self._track),
                     self.file_name,
                 ],
-                cwd = self.cwd,
+                cwd=self.cwd,
                 timeout=self.timeout_s,
             )
         else:
             subprocess.run(
                 ["id3v2", "-t", song, "-a", artist, "-A", album, self.file_name],
-                cwd = self.cwd,
+                cwd=self.cwd,
                 timeout=self.timeout_s,
             )
 
