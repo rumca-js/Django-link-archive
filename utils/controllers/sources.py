@@ -56,3 +56,10 @@ class SourceDataBuilder(object):
             result = True
 
         return result
+
+    def import_source(self, link_data=None):
+        """
+        importing might be different than building from scratch
+        """
+        self.build(link_data=link_data)
+        print("import test")

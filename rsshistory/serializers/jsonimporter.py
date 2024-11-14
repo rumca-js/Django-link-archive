@@ -44,6 +44,25 @@ class MapImporter(object):
             self.import_settings["import_bookmarks"] = True
             self.import_settings["import_ids"] = False
 
+        if "import_entries" not in self.import_settings:
+            self.import_settings["import_entries"] = True
+        if "import_sources" not in self.import_settings:
+            self.import_settings["import_sources"] = True
+        if "import_title" not in self.import_settings:
+            self.import_settings["import_title"] = True
+        if "import_description" not in self.import_settings:
+            self.import_settings["import_description"] = True
+        if "import_tags" not in self.import_settings:
+            self.import_settings["import_tags"] = True
+        if "import_comments" not in self.import_settings:
+            self.import_settings["import_comments"] = True
+        if "import_votes" not in self.import_settings:
+            self.import_settings["import_votes"] = True
+        if "import_bookmarks" not in self.import_settings:
+            self.import_settings["import_bookmarks"] = True
+        if "verbose" not in self.import_settings:
+            self.import_settings["verbose"] = False
+
     def import_from_data(self, json_data):
         if "links" in json_data:
             return self.import_from_links(json_data["links"])

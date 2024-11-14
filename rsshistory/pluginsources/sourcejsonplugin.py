@@ -2,7 +2,7 @@ import traceback
 from dateutil import parser
 import json
 
-from utils.serializers import MapImporter
+from ..serializers import MapImporter
 
 from ..controllers import (
     SourceDataBuilder,

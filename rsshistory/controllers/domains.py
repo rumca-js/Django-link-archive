@@ -53,7 +53,10 @@ class DomainsController(Domains):
         Public API
         @return domain object
         """
-        if not Configuration.get_object().config_entry.accept_domains:
+        conf = ConfigurationEntry.get()
+        if not conf.enable_domain_support:
+            return
+        if not conf.accept_domains:
             return
 
         protocol = DomainAwarePage(url).get_scheme()
@@ -73,7 +76,8 @@ class DomainsController(Domains):
         return DomainsController.create_object(domain_text, protocol)
 
     def cleanup(cfg=None):
-        if ConfigurationEntry.get().accept_domains:
+        conf ConfigurationEntry.get()
+        if conf.enable_domain_support:
             DomainsController.check_consistency_all(cfg)
         else:
             DomainsController.remove_all()

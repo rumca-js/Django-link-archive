@@ -11,6 +11,24 @@ from utils.sqlmodel import (
 )
 
 
+class EntryWrapper(object):
+    def __init__(self, entry=None, link=None):
+        self.entry = entry
+        self.link = link
+
+    def get(self):
+        pass
+
+    def move_from_archive(self, entry):
+        pass
+
+    def move_to_archive(self, entry):
+        pass
+
+    def get_clean_data(data):
+        return data
+
+
 class EntryDataBuilder(object):
     def __init__(
         self,
@@ -67,3 +85,10 @@ class EntryDataBuilder(object):
 
             session.add(table)
             session.commit()
+
+    def import_entry(self, link_data = None, source_is_auto=False):
+        """
+        importing might be different than building from scratch
+        """
+        pass
+        print("test")

@@ -20,6 +20,7 @@ from utils.sqlmodel import (
 from utils.controllers import (
     SourceDataBuilder,
     EntryDataBuilder,
+    EntryWrapper,
 )
 
 
@@ -31,12 +32,19 @@ class MapImporter(object):
 
         if self.user is not None:
             self.user = self.get_normal_user(user)
-        else:
-            self.user = self.get_superuser()
 
         self.import_settings = import_settings
         if self.import_settings is None:
             self.import_settings = {}
+            self.import_settings["import_entries"] = True
+            self.import_settings["import_sources"] = True
+            self.import_settings["import_title"] = True
+            self.import_settings["import_description"] = True
+            self.import_settings["import_tags"] = True
+            self.import_settings["import_comments"] = True
+            self.import_settings["import_votes"] = True
+            self.import_settings["import_bookmarks"] = True
+            self.import_settings["import_ids"] = False
 
         if "import_entries" not in self.import_settings:
             self.import_settings["import_entries"] = True
@@ -60,19 +68,14 @@ class MapImporter(object):
     def import_from_data(self, json_data):
         if "links" in json_data:
             return self.import_from_links(json_data["links"])
-
         elif "sources" in json_data:
             return self.import_from_sources(json_data["sources"])
-
         elif "link" in json_data:
             return self.import_from_link(json_data["link"])
-
         elif "source" in json_data:
             return self.import_from_source(json_data["source"])
-
         elif len(json_data) > 0:
             return self.import_from_list(json_data)
-
         else:
             raise NotImplementedError()
 
@@ -145,24 +148,13 @@ class MapImporter(object):
 
         entry = None
 
-        entries = LinkDataController.objects.filter(link=clean_data["link"])
-        if entries.count() == 0:
-            if self.import_settings and self.import_settings["import_entries"]:
-                # This instance can have their own settings for import, may decide what is
-                # accepted and not. Let the builder deal with it
-                LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
+        if self.import_settings and self.import_settings["import_entries"]:
+            # This instance can have their own settings for import, may decide what is
+            # accepted and not. Let the builder deal with it
+            # Logger.info("Importing link:{}".format(clean_data["link"]))
 
-                b = self.entry_builder.build(link_data=clean_data, source_is_auto=True)
-                entry = b.result
-
-                if entry and entry.is_archive_entry():
-                    entry = EntryWrapper.move_from_archive(entry)
-
-                    self.copy_props(entry, clean_data)
-        else:
-            entry = entries[0]
-
-            self.copy_props(entry, clean_data)
+            b = self.entry_builder.import_entry(link_data=clean_data, source_is_auto=True)
+            entry = b.result
 
         if entry:
             if self.import_settings and self.import_settings["import_bookmarks"]:
@@ -206,7 +198,7 @@ class MapImporter(object):
         clean_data["enabled"] = False
 
         b = self.source_builder
-        b.build(link_data=clean_data)
+        b.import_source(link_data=clean_data)
 
         # TODO cleanup
         # else:
@@ -244,7 +236,7 @@ class MapImporter(object):
         return clean_data
 
     def get_clean_entry_data(self, input_data):
-        clean_data = LinkDataController.get_clean_data(input_data)
+        clean_data = EntryWrapper.get_clean_data(input_data)
         clean_data = self.drop_entry_instance_internal_data(clean_data)
 
         if "date_published" in clean_data:
