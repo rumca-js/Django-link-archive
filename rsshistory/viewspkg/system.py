@@ -34,12 +34,12 @@ from ..models import (
     KeyWords,
     BlockEntry,
     BlockEntryList,
+    SystemOperation,
     DataExport,
     SourceExportHistory,
     SourceOperationalData,
     ModelFiles,
     ReadLater,
-    SystemOperation,
 )
 from ..controllers import (
     SourceDataController,
@@ -49,7 +49,6 @@ from ..controllers import (
     EntryDataBuilder,
     EntriesUpdater,
     BackgroundJobController,
-    SystemOperationController,
 )
 from ..configuration import Configuration
 from ..serializers import JsonImporter
@@ -65,11 +64,10 @@ def index(request):
     p.set_title("Index")
 
     if p.is_user_allowed(ConfigurationEntry.ACCESS_TYPE_ALL):
-        entry = ConfigurationEntry.get()
-        if not entry.initialized:
+        config = Configuration.get_object().config_entry
+        if not config.initialized:
             return redirect("{}:wizard-init".format(LinkDatabase.name))
         else:
-            config = ConfigurationEntry.get()
             if config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_ALL:
                 return redirect("{}:entries".format(LinkDatabase.name))
             elif (
@@ -358,9 +356,7 @@ def json_system_status(request):
 
     c = Configuration().get_object()
 
-    last_internet_check = c.get_local_time(
-        SystemOperationController.get_last_internet_check()
-    )
+    last_internet_check = c.get_local_time(SystemOperation.get_last_internet_check())
     data["last_internet_check"] = last_internet_check
 
     now = c.get_local_time(DateUtils.get_datetime_now_utc())
@@ -402,7 +398,7 @@ def json_system_status(request):
     data["directory"] = c.directory
 
     data["threads"] = []
-    for thread_info in SystemOperationController.get_thread_info():
+    for thread_info in c.get_thread_info():
         data["threads"].append({"name": thread_info[0], "date": thread_info[1]})
 
     return JsonResponse(data)
@@ -781,7 +777,7 @@ def is_system_ok(request):
     if data is not None:
         return data
 
-    system_is_ok = SystemOperationController.is_system_healthy()
+    system_is_ok = SystemOperation.is_system_healthy()
 
     text = "YES" if system_is_ok else "NO"
     status_code = 200 if system_is_ok else 500
@@ -862,8 +858,8 @@ def get_footer_status_line(request):
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
-    is_internet_ok = SystemOperationController.is_internet_ok()
-    is_threading_ok = SystemOperationController.is_threading_ok()
+    is_internet_ok = SystemOperation.is_internet_ok()
+    is_threading_ok = SystemOperation.is_threading_ok()
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
     is_keywords_configured = KeyWords.is_configuration_error()
@@ -904,8 +900,8 @@ def get_indicators(request):
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
-    is_internet_ok = SystemOperationController.is_internet_ok()
-    is_threading_ok = SystemOperationController.is_threading_ok()
+    is_internet_ok = SystemOperation.is_internet_ok()
+    is_threading_ok = SystemOperation.is_threading_ok()
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
 

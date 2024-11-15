@@ -202,7 +202,7 @@ class EntriesSearchListView(object):
         API: Returns pagination value
         """
         if not self.user or not self.user.is_authenticated:
-            config = ConfigurationEntry.get()
+            config = Configuration.get_object().config_entry
             return config.links_per_page
         else:
             uc = UserConfig.get(self.user)
@@ -296,7 +296,7 @@ class EntriesRecentListView(EntriesOmniListView):
         return ["-date_published"]
 
     def get_default_range(self):
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
         return DateUtils.get_days_range(config.whats_new_days)
 
 
@@ -527,7 +527,7 @@ def get_cleaned_up_entry_data(request, data):
     data["bookmarked"] = True
 
     page = DomainAwarePage(link)
-    config = ConfigurationEntry.get()
+    config = Configuration.get_object().config_entry
 
     if page.is_domain() and config.keep_domains:
         data["permanent"] = True
@@ -554,7 +554,7 @@ def func_display_data_form(request, p, data):
     data = get_cleaned_up_entry_data(request, data)
 
     page = DomainAwarePage(link)
-    config = ConfigurationEntry.get()
+    config = Configuration.get_object().config_entry
 
     form = EntryForm(initial=data, request=request)
     form.method = "POST"

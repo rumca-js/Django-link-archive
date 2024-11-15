@@ -2,7 +2,7 @@
 .PHONY: createtables createtables-minimal createtables-celery createsuperuser installsysdeps configuresysdeps
 .PHONY: run run-celery run-server run-web-server run-minimal run-crawlee-server 
 .PHONY: update update-instances static migrate reformat oncommit test create-companion-app
-.PHONY: clear clear-crawlee-files clear-celery
+.PHONY: clear clear-crawlee-files clear-celery backfiles
 
 CP = cp
 PROJECT_NAME = linklibrary
@@ -130,3 +130,6 @@ clear-celery:
 
 clear-crawlee-files:
 	rm -rf storage
+
+backfiles:
+	find . -type f -name "*.bak" -exec rm -f {} +

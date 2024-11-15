@@ -32,7 +32,7 @@
            },
            error: function(xhr, status, error) {
                if (attempt < 3) {
-                   getDynamicContent(url, htmlElement, attempt + 1, errorInHtml);
+                   getDynamicContent(url_address, htmlElement, attempt + 1, errorInHtml);
                    if (errorInHtml) {
                        $(htmlElement).html("Error loading dynamic content, retry");
                    }
@@ -54,7 +54,7 @@
            },
            error: function(xhr, status, error) {
                if (attempt < 3) {
-                   getDynamicJsonContent(url, htmlElement, attempt + 1, errorInHtml);
+                   getDynamicJsonContent(url_address, htmlElement, attempt + 1, errorInHtml);
                    if (errorInHtml) {
                        $(htmlElement).html("Error loading dynamic content, retry");
                    }

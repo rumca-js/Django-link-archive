@@ -516,6 +516,122 @@ class SystemOperation(models.Model):
     class Meta:
         ordering = ["-date_created"]
 
+    def is_system_healthy():
+        c = ConfigurationEntry.get()
+        if c.background_tasks:
+            if not SystemOperation.is_internet_ok():
+                return False
+            if not SystemOperation.is_threading_ok():
+                return False
+
+    def is_threading_ok():
+        hours_limit = 1800
+
+        thread_ids = SystemOperation.get_thread_ids()
+
+        for thread_id in thread_ids:
+            date = SystemOperation.get_last_thread_signal(thread_id)
+            if not date:
+                return False
+
+            delta = DateUtils.get_datetime_now_utc() - date
+
+            if delta.total_seconds() > hours_limit:
+                return False
+
+        return True
+
+    def is_internet_ok():
+        statuses = SystemOperation.objects.filter(is_internet_connection_checked=True)
+        if statuses.exists():
+            status = statuses[0]
+
+            delta = DateUtils.get_datetime_now_utc() - status.date_created
+
+            hours_limit = 3600  # TODO hardcoded refresh task should be running more often than 1 hour?
+
+            if delta.total_seconds() > hours_limit:
+                status_is_valid = False
+                return False
+
+            return status.is_internet_connection_ok
+        else:
+            return True
+
+    def cleanup(cfg=None):
+        thread_ids = SystemOperation.get_thread_ids()
+        for thread_id in thread_ids:
+            # leave one entry with time check
+            all_entries = SystemOperation.objects.filter(
+                thread_id=thread_id, is_internet_connection_checked=True
+            )
+            if all_entries.exists() and all_entries.count() > 1:
+                entries = all_entries[1:]
+                for entry in entries:
+                    entry.delete()
+
+            # leave one entry without time check
+            all_entries = SystemOperation.objects.filter(
+                thread_id=thread_id, is_internet_connection_checked=False
+            )
+            if all_entries.exists() and all_entries.count() > 1:
+                entries = all_entries[1:]
+                for entry in entries:
+                    entry.delete()
+
+    def get_last_thread_signal(thread_id):
+        entries = SystemOperation.objects.filter(thread_id=thread_id)
+
+        if entries.exists():
+            return entries[0].date_created
+
+    def get_last_internet_check():
+        entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
+
+        if entries.exists():
+            return entries[0].date_created
+
+    def get_last_internet_status():
+        entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
+
+        if entries.exists():
+            return entries[0].is_internet_connection_ok
+
+    def add_by_thread(
+        thread_id, internet_status_checked=False, internet_status_ok=True
+    ):
+        # delete all entries without internet check
+        all_entries = SystemOperation.objects.filter(
+            thread_id=thread_id, is_internet_connection_checked=False
+        )
+        all_entries.delete()
+
+        # leave one entry with time check
+        all_entries = SystemOperation.objects.filter(
+            thread_id=thread_id, is_internet_connection_checked=True
+        )
+        if all_entries.exists() and all_entries.count() > 1:
+            entries = all_entries[1:]
+            for entry in entries:
+                entry.delete()
+
+        SystemOperation.objects.create(
+            thread_id=thread_id,
+            is_internet_connection_checked=internet_status_checked,
+            is_internet_connection_ok=internet_status_ok,
+        )
+
+    def get_thread_ids():
+        from ..tasks import get_processors, get_tasks
+        from ..threadhandlers import LeftOverJobsProcessor, RefreshProcessor
+
+        thread_ids = []
+
+        for task in get_tasks():
+            thread_ids.append(task[1].__name__)
+
+        return thread_ids
+
 
 class UserConfig(models.Model):
     # TODO move this to relation towards Users

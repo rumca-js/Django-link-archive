@@ -645,7 +645,7 @@ class LinkDataModel(BaseLinkDataController):
     )
     domain = models.ForeignKey(
         Domains,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="entry_objects",
         null=True,
         blank=True,

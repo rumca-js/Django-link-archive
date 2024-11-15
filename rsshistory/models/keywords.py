@@ -6,7 +6,7 @@ from django.templatetags.static import static
 
 from utils.dateutils import DateUtils
 
-from .system import AppLogging
+from .system import AppLogging, ConfigurationEntry
 
 
 class KeyWords(models.Model):
@@ -79,33 +79,22 @@ class KeyWords(models.Model):
         return False
 
     def is_configuration_error():
-        from .system import ConfigurationEntry
-
         if not ConfigurationEntry.get().enable_keyword_support:
             return False
 
-        if KeyWords.load_token_program("en") is None:
-            return True
+        from ..configuration import Configuration
+        if Configuration.get_nlp("en") is None:
+            return False
 
-        return False
+        # TODO this kind of is slow, breaks browser speed
+        #if KeyWords.load_token_program("en") is None:
+        #    return True
 
-    def load_token_program(language):
-        try:
-            import spacy
-
-            if language.find("en") >= 0:
-                load_text = "en_core_web_sm"
-            elif language.find("pl") >= 0:
-                load_text = "pl_core_news_sm"
-            else:
-                return
-
-            return spacy.load(load_text)
-        except Exception as E:
-            AppLogging.exc(E)
-            return
+        return True
 
     def add_text(text, language):
+        from ..configuration import Configuration
+
         if not language:
             return
 
@@ -115,7 +104,7 @@ class KeyWords(models.Model):
         if language.find("en") == -1:
             return
 
-        nlp = KeyWords.load_token_program(language)
+        nlp = Configuration.get_object().get_nlp(language)
         if not nlp:
             AppLogging.error(
                 "Cannot load token program for language:{}".format(language)

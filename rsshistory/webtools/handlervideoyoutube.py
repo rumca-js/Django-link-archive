@@ -215,8 +215,6 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
             dt = DateUtils.to_utc_date(dt)
 
-            #dt = dt.replace(tzinfo=timezone("UTC"))
-
             return dt
 
     def get_thumbnail(self):

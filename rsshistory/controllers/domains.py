@@ -53,7 +53,7 @@ class DomainsController(Domains):
         Public API
         @return domain object
         """
-        conf = ConfigurationEntry.get()
+        conf = Configuration.get_object().config_entry
         if not conf.enable_domain_support:
             return
         if not conf.accept_domains:
@@ -76,7 +76,7 @@ class DomainsController(Domains):
         return DomainsController.create_object(domain_text, protocol)
 
     def cleanup(cfg=None):
-        conf = ConfigurationEntry.get()
+        conf = Configuration.get_object().config_entry
         if conf.enable_domain_support:
             DomainsController.check_consistency_all(cfg)
         else:

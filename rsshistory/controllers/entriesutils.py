@@ -164,7 +164,7 @@ class EntriesCleanup(object):
         """
         Choose shorter date - configured, or source limit
         """
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
         config_days = config.days_to_remove_links
 
         if not source.is_removeable():
@@ -200,7 +200,7 @@ class EntriesCleanup(object):
             return entries
 
     def get_general_entries(self):
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
         config_days = config.days_to_remove_links
 
         days = config_days
@@ -225,7 +225,7 @@ class EntriesCleanup(object):
         """
         We only update current database, not archive
         """
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
         days = config.days_to_remove_stale_entries
         if days == 0:
             return
@@ -798,16 +798,16 @@ class EntriesUpdater(object):
         Normal entries are checked with interval days_to_check_std_entries
         Dead entries are checked with interval days_to_check_stale_entries
         """
-        conf = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
 
-        if conf.days_to_check_std_entries == 0:
+        if config.days_to_check_std_entries == 0:
             return
 
         date_to_check_std = DateUtils.get_datetime_now_utc() - timedelta(
-            days=conf.days_to_check_std_entries
+            days=config.days_to_check_std_entries
         )
         date_to_check_stale = DateUtils.get_datetime_now_utc() - timedelta(
-            days=conf.days_to_check_stale_entries
+            days=config.days_to_check_stale_entries
         )
 
         condition_days_to_check_std = Q(date_update_last__lt=date_to_check_std)
@@ -888,8 +888,6 @@ class EntryWrapper(object):
                 return obj
 
     def get_from_db(self, objects):
-        conf = Configuration.get_object().config_entry
-
         if self.link.startswith("http"):
             p = DomainAwarePage(self.link)
 

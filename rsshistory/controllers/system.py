@@ -6,8 +6,9 @@ from ..models import SystemOperation, ConfigurationEntry, AppLogging
 class SystemOperationController(object):
 
     def is_system_healthy():
-        c = ConfigurationEntry.get()
-        if c.background_tasks:
+        from ..configuration import Configuration
+        config = Configuration.get_object().config_entry
+        if config.background_tasks:
             if not SystemOperationController.is_internet_ok():
                 return False
             if not SystemOperationController.is_threading_ok():
@@ -122,8 +123,10 @@ class SystemOperationController(object):
     def ping_internet(thread_id):
         # TODO this should be done by Url. ping
         from ..pluginurl import UrlHandler
+        from ..configuration import Configuration
 
-        test_page_url = ConfigurationEntry.get().internet_test_page
+        config = Configuration.get_object().config_entry
+        test_page_url = config.internet_test_page
 
         p = UrlHandler(url=test_page_url)
         # TODO fix this
