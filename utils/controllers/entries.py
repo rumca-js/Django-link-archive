@@ -86,7 +86,7 @@ class EntryDataBuilder(object):
             session.add(table)
             session.commit()
 
-    def import_entry(self, link_data = None, source_is_auto=False):
+    def import_entry(self, link_data=None, source_is_auto=False):
         """
         importing might be different than building from scratch
         """

@@ -622,8 +622,7 @@ class SystemOperation(models.Model):
         )
 
     def get_thread_ids():
-        from ..tasks import get_processors, get_tasks
-        from ..threadhandlers import LeftOverJobsProcessor, RefreshProcessor
+        from ..tasks import get_tasks
 
         thread_ids = []
 

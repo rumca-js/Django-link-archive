@@ -153,7 +153,9 @@ class MapImporter(object):
             # accepted and not. Let the builder deal with it
             # Logger.info("Importing link:{}".format(clean_data["link"]))
 
-            b = self.entry_builder.import_entry(link_data=clean_data, source_is_auto=True)
+            b = self.entry_builder.import_entry(
+                link_data=clean_data, source_is_auto=True
+            )
             entry = b.result
 
         if entry:

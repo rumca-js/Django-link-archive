@@ -83,7 +83,7 @@ class KeyWords(models.Model):
             return False
 
         from ..configuration import Configuration
-        if Configuration.get_nlp("en") is None:
+        if Configuration.get_object().get_nlp("en") is None:
             return False
 
         # TODO this kind of is slow, breaks browser speed

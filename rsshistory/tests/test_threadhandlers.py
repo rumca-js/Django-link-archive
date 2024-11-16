@@ -28,9 +28,6 @@ from ..threadhandlers import (
     ExportDataJobHandler,
     ProcessSourceJobHandler,
 )
-from ..threadprocessors import (
-    RefreshProcessor,
-)
 
 from .fakeinternet import FakeInternetTestCase
 

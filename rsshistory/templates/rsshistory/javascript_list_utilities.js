@@ -111,7 +111,10 @@
             });
         }
 
-        text += button_text;
+        if (items.length > 10)
+        {
+           text += button_text;
+        }
 
         text += '</ul>';
 
@@ -122,7 +125,7 @@
         if (items.length == 0) {
            $('#searchHistory').hide();
            return;
-	}
+        }
 
         let text = "<ul class='list-group border border-secondary rounded'>";
 
@@ -145,7 +148,10 @@
             });
         }
 
-        text += button_text;
+        if (items.length > 10)
+        {
+           text += button_text;
+        }
 
         text += "</ul>";
 

@@ -12,6 +12,7 @@ class EntriesExporter(object):
     """
     Generic exporter that just puts entries to file
     """
+
     def __init__(self, handle, entries, page_dir):
         self._entries = entries
         self.handle = handle
@@ -49,6 +50,7 @@ class EntriesPageExporter(object):
     """
     Paged format
     """
+
     def __init__(self, entries, export_directory):
         self.export_directory = export_directory
         self.entries = entries
@@ -79,7 +81,9 @@ class EntriesPageExporter(object):
         inner_serializer.export(sources)
 
     def get_file_dir(self, page_no):
-        return self.export_dir / Path("entries") / "{page_no:05d}".format(page_no=page_no)
+        return (
+            self.export_dir / Path("entries") / "{page_no:05d}".format(page_no=page_no)
+        )
 
     def get_file_name(self, page_no):
         page_dir = self.get_file_dir(page_no)
@@ -99,6 +103,7 @@ class EntriesDateExporter(object):
     """
     Writes entries for source
     """
+
     def __init__(self, directory, day_iso):
         self.directory = directory
         self.day_iso = day_iso

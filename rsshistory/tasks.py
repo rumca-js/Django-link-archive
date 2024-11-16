@@ -3,15 +3,15 @@ import traceback
 from .apps import LinkDatabase
 from .models import AppLogging
 from .configuration import Configuration, ConfigurationEntry
-from .threadhandlers import (
+
+from .threadprocessors import (
+    RefreshProcessor,
     GenericJobsProcessor,
     SourceJobsProcessor,
     WriteJobsProcessor,
     ImportJobsProcessor,
     LeftOverJobsProcessor,
 )
-
-from .threadhandlers import RefreshProcessor
 
 
 def process_jobs_task(Processor):
