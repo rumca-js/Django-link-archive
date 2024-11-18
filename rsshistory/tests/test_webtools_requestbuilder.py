@@ -72,47 +72,54 @@ class PageOptionsTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_use_browser__standard(self):
+    def test_get_crawler(self):
         o = PageOptions()
-        o.mode = "standard"
+        o.mode_mapping = [
+                {
+                    "name" : "test",
+                    "crawler" : "test",
+                    "settings" : {},
+                },
+                {
+                    "name" : "test2",
+                    "crawler" : "test2",
+                    "settings" : {},
+                },
+        ]
 
         # call tested function
-        self.assertFalse(o.is_advanced_processing_required())
-
-    def test_use_browser__headless(self):
-        o = PageOptions()
-        o.mode = "headless"
+        self.assertTrue(o.get_crawler("test"))
 
         # call tested function
-        self.assertTrue(o.is_advanced_processing_required())
+        self.assertFalse(o.get_crawler("notest"))
 
-    def test_use_browser__both(self):
+    def test_bring_to_frong(self):
         o = PageOptions()
-        o.mode = "full"
+        o.mode_mapping = [
+                {
+                    "name" : "test1",
+                    "crawler" : "test1",
+                    "settings" : {},
+                },
+                {
+                    "name" : "test2",
+                    "crawler" : "test2",
+                    "settings" : {},
+                },
+                {
+                    "name" : "test3",
+                    "crawler" : "test3",
+                    "settings" : {},
+                },
+        ]
+
+        crawler = o.get_crawler("test2")
 
         # call tested function
-        self.assertTrue(o.is_advanced_processing_required())
+        self.assertTrue(o.bring_to_front(crawler))
 
-    def test_use_basic_crawler__full(self):
-        o = PageOptions()
-        o.mode = "full"
-
-        # call tested function
-        self.assertFalse(o.use_basic_crawler())
-
-    def test_use_basic_crawler__headless(self):
-        o = PageOptions()
-        o.mode = "headless"
-
-        # call tested function
-        self.assertFalse(o.use_basic_crawler())
-
-    def test_use_basic_crawler__none(self):
-        o = PageOptions()
-        o.mode = "standard"
-
-        # call tested function
-        self.assertTrue(o.use_basic_crawler())
+        self.assertEqual(o.mode_mapping[0]["crawler"], "test2")
+        self.assertEqual(o.mode_mapping[1]["crawler"], "test1")
 
 
 class HttpRequestBuilderTest(FakeInternetTestCase):

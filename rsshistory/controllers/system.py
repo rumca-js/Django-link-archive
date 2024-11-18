@@ -130,7 +130,7 @@ class SystemOperationController(object):
         from ..tasks import get_tasks
 
         threads = get_tasks()
-        return threads_to_threads(threads)
+        return self.threads_to_threads(threads)
 
     def threads_to_threads(self, threads):
         thread_ids = []

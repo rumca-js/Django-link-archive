@@ -1,7 +1,7 @@
 from ..models import SystemOperation
 from ..controllers import SystemOperationController
 from ..configuration import Configuration
-from ..threadprocessors import get_tasks
+from ..tasks import get_tasks
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -11,14 +11,16 @@ class SystemOperationTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_get_task_ids(self):
-        task_ids = SystemOperationController.get_task_ids()
+        # call tested function
+        task_ids = SystemOperationController().get_thread_ids()
 
         self.assertEqual(len(task_ids), len(get_tasks()))
 
     def test_refresh__refreshprocessor(self):
         SystemOperation.objects.all().delete()
 
-        SystemOperationController.refresh("RefreshProcessor")
+        # call tested function
+        SystemOperationController().refresh("RefreshProcessor")
 
         operations = SystemOperation.objects.all()
         self.assertEqual(operations.count(), 1)
@@ -28,7 +30,8 @@ class SystemOperationTest(FakeInternetTestCase):
     def test_refresh__not_refreshprocessor(self):
         SystemOperation.objects.all().delete()
 
-        SystemOperationController.refresh("NotRefreshProcessor")
+        # call tested function
+        SystemOperationController().refresh("NotRefreshProcessor")
 
         operations = SystemOperation.objects.all()
         self.assertEqual(operations.count(), 1)

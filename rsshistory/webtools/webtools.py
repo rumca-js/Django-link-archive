@@ -761,8 +761,12 @@ class PageOptions(object):
 
     def get_crawler(self, name):
         for item in self.mode_mapping:
-            if item["name"] == name and item["enabled"] == True:
-                return item
+            if "enabled" in item:
+                if item["name"] == name and item["enabled"] == True:
+                    return item
+            else:
+                if item["name"] == name:
+                    return item
 
     def bring_to_front(self, crawler):
         result = [crawler]
