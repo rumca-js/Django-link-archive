@@ -1,37 +1,52 @@
 from utils.dateutils import DateUtils
 
-from ..models import SystemOperation, ConfigurationEntry, AppLogging
-
+from ..models import (
+   ConfigurationEntry,
+   SystemOperation,
+)
 
 class SystemOperationController(object):
+    def refresh(self, thread_id):
+        if thread_id == "RefreshProcessor":
+            if self.is_it_time_to_ping():
+                if self.ping_internet(thread_id):
+                    SystemOperation.add_by_thread(
+                        thread_id, internet_status_checked=True, internet_status_ok=True
+                    )
+                else:
+                    SystemOperation.add_by_thread(
+                        thread_id,
+                        internet_status_checked=True,
+                        internet_status_ok=False,
+                    )
+        else:
+            SystemOperation.add_by_thread(thread_id)
 
-    def is_system_healthy():
-        from ..configuration import Configuration
-        config = Configuration.get_object().config_entry
-        if config.background_tasks:
-            if not SystemOperationController.is_internet_ok():
-                return False
-            if not SystemOperationController.is_threading_ok():
-                return False
+    def is_it_time_to_ping(self):
+        datetime = self.get_last_internet_check()
+        if not datetime:
+            return True
 
-    def is_threading_ok():
-        hours_limit = 1800
+        timedelta = DateUtils.get_datetime_now_utc() - datetime
+        if (timedelta.seconds / 60) > 15:
+            return True
+        return False
 
-        thread_ids = SystemOperationController.get_task_names()
+    def ping_internet(self, thread_id):
+        # TODO this should be done by Url. ping
 
-        for thread_id in thread_ids:
-            date = SystemOperationController.get_last_thread_signal(thread_id)
-            if not date:
-                return False
+        from ..pluginurl import UrlHandler
 
-            delta = DateUtils.get_datetime_now_utc() - date
+        config_entry = ConfigurationEntry.get()
 
-            if delta.total_seconds() > hours_limit:
-                return False
+        test_page_url = config_entry.internet_test_page
 
-        return True
+        p = UrlHandler(url=test_page_url)
+        # TODO fix this
+        # return p.ping()
+        return p.get_response().is_valid()
 
-    def is_internet_ok():
+    def is_internet_ok(self):
         statuses = SystemOperation.objects.filter(is_internet_connection_checked=True)
         if statuses.exists():
             status = statuses[0]
@@ -48,124 +63,79 @@ class SystemOperationController(object):
         else:
             return True
 
-    def get_last_thread_signal(thread_id):
+    def is_system_healthy(self):
+        c = ConfigurationEntry.get()
+        if c.background_tasks:
+            if not self.is_internet_ok():
+                return False
+            if not self.is_threading_ok():
+                return False
+
+    def is_threading_ok(self, thread_ids=None):
+        hours_limit = 1800
+
+        if not thread_ids:
+            thread_ids = self.get_thread_ids()
+        else:
+            thread_ids = self.threads_to_threads(thread_ids)
+
+        for thread_id in thread_ids:
+            date = self.get_last_thread_signal(thread_id)
+            if not date:
+                return False
+
+            delta = DateUtils.get_datetime_now_utc() - date
+
+            if delta.total_seconds() > hours_limit:
+                return False
+
+        return True
+
+    def get_last_thread_signal(self, thread_id):
         entries = SystemOperation.objects.filter(thread_id=thread_id)
 
         if entries.exists():
             return entries[0].date_created
 
-    def get_last_internet_check():
+    def get_last_internet_check(self):
         entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
 
         if entries.exists():
             return entries[0].date_created
 
-    def get_last_internet_status():
+    def get_last_internet_status(self):
         entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
 
         if entries.exists():
             return entries[0].is_internet_connection_ok
 
-    def add_by_thread(
-        thread_id, internet_status_checked=False, internet_status_ok=True
-    ):
-        # delete all entries without internet check
-        all_entries = SystemOperation.objects.filter(
-            thread_id=thread_id, is_internet_connection_checked=False
-        )
-        all_entries.delete()
-
-        # leave one entry with time check
-        all_entries = SystemOperation.objects.filter(
-            thread_id=thread_id, is_internet_connection_checked=True
-        )
-        if all_entries.exists() and all_entries.count() > 1:
-            entries = all_entries[1:]
-            for entry in entries:
-                entry.delete()
-
-        SystemOperation.objects.create(
-            thread_id=thread_id,
-            is_internet_connection_checked=internet_status_checked,
-            is_internet_connection_ok=internet_status_ok,
-        )
-
-    def get_task_names():
-        try:
-            from ..threadprocessors import get_task_names
-            return get_task_names()
-        except Exception as E:
-            AppLogging.exc(E)
-
-            return []
-
-    def cleanup(cfg=None):
-        thread_ids = SystemOperationController.get_task_names()
-        for thread_id in thread_ids:
-            # leave one entry with time check
-            all_entries = SystemOperation.objects.filter(
-                thread_id=thread_id, is_internet_connection_checked=True
-            )
-            if all_entries.exists() and all_entries.count() > 1:
-                entries = all_entries[1:]
-                for entry in entries:
-                    entry.delete()
-
-            # leave one entry without time check
-            all_entries = SystemOperation.objects.filter(
-                thread_id=thread_id, is_internet_connection_checked=False
-            )
-            if all_entries.exists() and all_entries.count() > 1:
-                entries = all_entries[1:]
-                for entry in entries:
-                    entry.delete()
-
-    def ping_internet(thread_id):
-        # TODO this should be done by Url. ping
-        from ..pluginurl import UrlHandler
-        from ..configuration import Configuration
-
-        config = Configuration.get_object().config_entry
-        test_page_url = config.internet_test_page
-
-        p = UrlHandler(url=test_page_url)
-        # TODO fix this
-        # return p.ping()
-        return p.get_response().is_valid()
-
-    def refresh(thread_id):
-        if thread_id == "RefreshProcessor":
-            if SystemOperationController.is_it_time_to_ping():
-                if SystemOperationController.ping_internet(thread_id):
-                    SystemOperationController.add_by_thread(
-                        thread_id, internet_status_checked=True, internet_status_ok=True
-                    )
-                else:
-                    SystemOperationController.add_by_thread(
-                        thread_id,
-                        internet_status_checked=True,
-                        internet_status_ok=False,
-                    )
-        else:
-            SystemOperationController.add_by_thread(thread_id)
-
-    def is_it_time_to_ping():
-        datetime = SystemOperationController.get_last_internet_check()
-        if not datetime:
-            return True
-
-        timedelta = DateUtils.get_datetime_now_utc() - datetime
-        if (timedelta.seconds / 60) > 15:
-            return True
-        return False
-
-    def get_thread_info(display=True):
+    def get_thread_info(self, display=True, thread_ids=None):
         """
         @display If true, then provide dates meant for display (local time)
         """
         result = []
-        for thread in SystemOperationController.get_task_names():
-            date = SystemOperationController.get_last_thread_signal(thread)
+
+        if not thread_ids:
+            thread_ids = self.get_thread_ids()
+        else:
+            thread_ids = self.threads_to_threads(thread_ids)
+
+        for thread in thread_ids:
+            date = self.get_last_thread_signal(thread)
             result.append([thread, date])
 
         return result
+
+    def get_thread_ids(self):
+        from ..tasks import get_tasks
+
+        threads = get_tasks()
+        return threads_to_threads(threads)
+
+    def threads_to_threads(self, threads):
+        thread_ids = []
+
+        for thread in threads:
+            thread_ids.append(thread[1].__name__)
+
+        return thread_ids

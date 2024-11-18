@@ -728,44 +728,13 @@ class PageOptions(object):
             True  # tries headles if normal processing does not work
         )
 
-        self.mode = "standard"
         self.mode_mapping = {}
 
         self.user_agent = None  # passed if you wish certain user agent to be used
 
-    def use_basic_crawler(self):
-        return not self.is_advanced_processing_required()
-
-    def is_advanced_processing_required(self):
-        return self.mode == "full" or self.mode == "headless"
-
     def is_mode_mapping(self):
         if self.mode_mapping and len(self.mode_mapping) > 0:
             return True
-
-    def get_mode(self):
-        return self.mode
-
-    def get_timeout(self, timeout_s):
-        mode = self.get_mode()
-
-        if mode == "standard":
-            # up to 20
-            timeout_s = min(timeout_s, 20)
-            # at least 10
-            timeout_s = max(timeout_s, 10)
-        elif mode == "headless":
-            # up to 30
-            timeout_s = min(timeout_s, 30)
-            # at least 20
-            timeout_s = max(timeout_s, 20)
-        elif mode == "headless":
-            # up to 40
-            timeout_s = min(timeout_s, 40)
-            # at least 30
-            timeout_s = max(timeout_s, 30)
-
-        return timeout_s
 
     def copy_config(self, other_config):
         # if we have mode mapping - use it
@@ -773,15 +742,45 @@ class PageOptions(object):
         self.ssl_verify = other_config.ssl_verify
 
     def __str__(self):
-        return "P:{} M:{} SSL:{} PR:{}".format(
-            self.ping,
-            self.mode,
-            self.ssl_verify,
-            self.use_browser_promotions,
-        )
+        if self.mode_mapping and len(self.mode_mapping) > 0:
+            return "Browser:{} P:{} SSL:{} PR:{}".format(
+                self.mode_mapping[0],
+                self.ping,
+                self.ssl_verify,
+                self.use_browser_promotions,
+            )
+        else:
+            return "Browser:None P:{} SSL:{} PR:{}".format(
+                self.ping,
+                self.ssl_verify,
+                self.use_browser_promotions,
+            )
 
     def get_str(self):
         return str(self)
+
+    def get_crawler(self, name):
+        for item in self.mode_mapping:
+            if item["name"] == name and item["enabled"] == True:
+                return item
+
+    def bring_to_front(self, crawler):
+        result = [crawler]
+        for item in self.mode_mapping:
+            if item == crawler:
+                continue
+
+            result.append(item)
+
+        self.mode_mapping = result
+
+    def get_timeout(self, timeout_s):
+        settings = self.mode_mapping[0]["settings"]
+        if "timeout" in settings:
+            timeout_crawler = settings["timeout"]
+            return timeout_crawler
+
+        return timeout_s
 
 
 class PageRequestObject(object):

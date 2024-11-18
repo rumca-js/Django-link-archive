@@ -236,8 +236,7 @@ class EntryRulesForm(forms.ModelForm):
             "rule_url",
             "block",
             "auto_tag",
-            "requires_headless",
-            "requires_full_browser",
+            "browser",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -834,7 +833,8 @@ class BrowserEditForm(forms.ModelForm):
         model = Browser
         fields = [
             "enabled",
-            "mode",
+            "name",
+            "priority",
             "crawler",
             "settings",
         ]

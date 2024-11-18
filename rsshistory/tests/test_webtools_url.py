@@ -318,3 +318,26 @@ class UrlTest(FakeInternetTestCase):
         result = Url.find_rss_url(url)
         self.assertEqual(result, url)
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_get_init_page_options__yahoo(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        options = Url("https://yahoo.com/test_link").get_init_page_options()
+
+        self.assertTrue(len(options.mode_mapping) > 0)
+        self.assertEqual(options.mode_mapping[0]["crawler"], "ScriptCrawler")
+        self.assertEqual(options.mode_mapping[0]["name"], "CrawleeScript")
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_init_page_options__techcrunch(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        options = Url("https://techcrunch.com/test_link").get_init_page_options()
+
+        self.assertTrue(len(options.mode_mapping) > 0)
+        print(options.mode_mapping[0])
+        self.assertEqual(options.mode_mapping[0]["crawler"], "ScriptCrawler")
+        self.assertEqual(options.mode_mapping[0]["name"], "CrawleeScript")
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)

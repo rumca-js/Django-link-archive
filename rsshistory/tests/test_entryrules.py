@@ -8,7 +8,7 @@ from ..controllers import (
     LinkDataController,
     EntryUpdater,
 )
-from ..models import EntryRules
+from ..models import EntryRules, Browser
 from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
@@ -22,6 +22,13 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.user = User.objects.create_user(
             username="TestUser", password="testpassword", is_staff=True
         )
+
+        self.browser = Browser.objects.create(
+            name = "SeleniumChromeHeadless",
+            crawler = "SeleniumChromeHeadless",
+            settings = '{"test_setting" : "something"}',
+        )
+        self.browser.refresh_from_db()
 
     def test_entry_rule_is_blocked__not_filed(self):
         EntryRules.objects.create(
@@ -77,46 +84,32 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         self.assertFalse(EntryRules.is_blocked("https://www.test5.com"))
 
-    def test_entry_rule_is_headless_browser_required(self):
-        EntryRules.objects.create(
+    def test_entry_rule__get_url_rules(self):
+
+        self.browser.save()
+
+        therule = EntryRules.objects.create(
             enabled=True,
             block=False,
-            requires_headless=True,
+            browser=self.browser,
             rule_name="Rule1",
             rule_url=".test1.com, .test2.com",
         )
 
         # call tested function
-        self.assertFalse(
-            EntryRules.is_headless_browser_required("https://www.test0.com")
-        )
+        rules0 = EntryRules.get_url_rules("https://www.test0.com")
         # call tested function
-        self.assertTrue(
-            EntryRules.is_headless_browser_required("https://www.test1.com")
-        )
+        rules1 = EntryRules.get_url_rules("https://www.test1.com")
         # call tested function
-        self.assertTrue(
-            EntryRules.is_headless_browser_required("https://www.test2.com")
-        )
+        rules2 = EntryRules.get_url_rules("https://www.test2.com")
         # call tested function
-        self.assertFalse(
-            EntryRules.is_headless_browser_required("https://www.test3.com")
-        )
-
-    def test_entry_rule_is_full_browser_required(self):
-        EntryRules.objects.create(
-            enabled=True,
-            block=False,
-            requires_full_browser=True,
-            rule_name="Rule1",
-            rule_url=".test1.com, .test2.com",
-        )
+        rules3 = EntryRules.get_url_rules("https://www.test3.com")
 
         # call tested function
-        self.assertFalse(EntryRules.is_full_browser_required("https://www.test0.com"))
-        # call tested function
-        self.assertTrue(EntryRules.is_full_browser_required("https://www.test1.com"))
-        # call tested function
-        self.assertTrue(EntryRules.is_full_browser_required("https://www.test2.com"))
-        # call tested function
-        self.assertFalse(EntryRules.is_full_browser_required("https://www.test3.com"))
+        self.assertEqual( len(rules0), 0)
+        self.assertEqual( len(rules1), 1)
+        self.assertEqual( len(rules2), 1)
+        self.assertEqual( len(rules3), 0)
+
+        self.assertEqual( rules1[0], therule)
+        self.assertEqual( rules2[0], therule)

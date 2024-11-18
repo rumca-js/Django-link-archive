@@ -86,6 +86,11 @@ class RefreshProcessorTest(FakeInternetTestCase):
             password="password",
         )
 
+    def test_get_name(self):
+        handler = RefreshProcessor()
+
+        self.assertEqual(handler.get_name(), "RefreshProcessor")
+
     def test_refresh__process_no_exports(self):
         DataExport.objects.all().delete()
         SourceExportHistory.objects.all().delete()

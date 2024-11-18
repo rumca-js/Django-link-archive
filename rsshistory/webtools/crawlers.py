@@ -1176,3 +1176,50 @@ class ServerCrawler(CrawlerInterface):
             return False
 
         return True
+
+
+class SeleniumBase(CrawlerInterface):
+    """
+    This is based
+    """
+
+    def __init__(
+        self,
+        request,
+        response_file=None,
+        response_port=None,
+        driver_executable=None,
+        settings=None,
+    ):
+        super().__init__(
+            request=request,
+            response_file=response_file,
+            response_port=response_port,
+            settings=settings,
+        )
+
+    def run(self):
+        if not self.is_valid():
+            return
+
+        try:
+            from seleniumbase import SB
+        except Exception as E:
+            return
+
+        with SB() as sb:
+            sb.open(request.url)
+            page_source = sb.get_page_source()
+
+            response = webtools.PageResponseObject(request.url)
+            # TODO obtain url from SB
+            # TODO obtain headers from SB
+            # TODO obtain status code from SB
+            response.request_url = request.url
+
+            response.set_text(page_source)
+
+            return response
+
+    def is_valid(self):
+        return True

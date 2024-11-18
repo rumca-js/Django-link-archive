@@ -5,8 +5,8 @@ Defined by user, by GUI
 from django.db import models
 
 from .entries import LinkDataModel
+from .browser import Browser
 from .system import AppLogging
-
 from ..apps import LinkDatabase
 
 
@@ -28,14 +28,12 @@ class EntryRules(models.Model):
         max_length=1000, blank=True, help_text="Automatically tag"
     )
 
-    requires_headless = models.BooleanField(
-        default=False,
-        help_text="Requires headless browser",
-    )
-
-    requires_full_browser = models.BooleanField(
-        default=False,
-        help_text="Requires full browser setup",
+    browser = models.ForeignKey(
+        Browser,
+        on_delete=models.SET_NULL,
+        related_name="browser_rules",
+        blank=True,
+        null=True,
     )
 
     def get_rule_urls(self):
@@ -65,25 +63,17 @@ class EntryRules(models.Model):
 
         return False
 
-    def is_headless_browser_required(url):
-        rules = EntryRules.objects.filter(requires_headless=True, enabled=True)
+    def get_url_rules(url):
+        result = []
+        
+        rules = EntryRules.objects.filter(enabled=True)
         for rule in rules:
             rule_urls = rule.get_rule_urls()
             for rule_url in rule_urls:
                 if url.find(rule_url) >= 0:
-                    return True
+                    result.append(rule)
 
-        return False
-
-    def is_full_browser_required(url):
-        rules = EntryRules.objects.filter(requires_full_browser=True, enabled=True)
-        for rule in rules:
-            rule_urls = rule.get_rule_urls()
-            for rule_url in rule_urls:
-                if url.find(rule_url) >= 0:
-                    return True
-
-        return False
+        return result
 
     def update_link_service_rule():
         name = "link service"

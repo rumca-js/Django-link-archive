@@ -9,7 +9,7 @@
 </div>
 
 <h1>Browser list</h1>
-Browsers are chosen using this list. Order of appearance is important.
+Browsers are selected using this list, by priority
 
 <hr/>
 
@@ -21,7 +21,7 @@ Browsers are chosen using this list. Order of appearance is important.
                  {% if not browser.enabled %}
                  <b>[DISABLED]</b>
                  {% endif %}
-                 Mode:{{browser.mode.mode}}
+                 Name:{{browser.name}}
                  Crawler:{{browser.crawler}}
                  Settings:{{browser.settings}}
              </div>

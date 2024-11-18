@@ -16,18 +16,22 @@
 
 <h1>{{object.rule_name}}</h1>
 
-<p>
 {% if object.enabled %}
-<div>Enabled: {{object.enabled}}</div>
+  <div>Enabled: {{object.enabled}}</div>
 {% else %}
-<div class="fw-bold">Enabled: {{object.enabled}}</div>
+  <div class="fw-bold">Enabled: {{object.enabled}}</div>
 {% endif %}
+
 <div>Rule URL: {{object.rule_url}}</div>
 <div>Block: {{object.block}}</div>
 <div>Auto tag: {{object.auto_tag}}</div>
-<div>Requires selenium: {{object.requies_selenium}}</div>
-<div>Requires selenium full: {{object.requies_selenium_full}}</div>
+
+{% if object.browser %}
+  <div>Browser name: {{object.browser.name}}</div>
+  <div>Crawler: {{object.browser.crawler}}</div>
+  <div>Settings: {{object.browser.settings}}</div>
+{% endif %}
+
 <div>ID: {{object.id}}</div>
-</p>
 
 {% endblock %}

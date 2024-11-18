@@ -82,7 +82,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.assertEqual(type(handler.get_handler()), HttpPageHandler)
         self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
-        self.assertTrue(handler.options.mode == "headless")
+        self.assertEqual(handler.options.mode_mapping[0]["crawler"], "CrawleeScript")
 
     def test_get__defcon_org(self):
         handler = UrlHandler("https://defcon.org")
@@ -91,7 +91,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.assertEqual(type(handler.get_handler()), HttpPageHandler)
         self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
-        self.assertTrue(handler.options.mode == "full")
+        self.assertEqual(handler.options.mode_mapping[0]["crawler"], "ScriptCrawler")
 
     def test_get_cleaned_link_stupid_google_link(self):
         cleaned_link = UrlHandler.get_cleaned_link(

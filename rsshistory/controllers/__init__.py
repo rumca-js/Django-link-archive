@@ -35,5 +35,8 @@ from .entriesutils import (
 from .modelfiles import (
     ModelFilesBuilder,
 )
+from .system import (
+    SystemOperationController,
+)
 
 from .searchengines import SearchEngines, SearchEngineGoogle, SearchEngineGoogleCache

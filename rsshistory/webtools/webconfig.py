@@ -15,6 +15,7 @@ from .crawlers import (
     SeleniumUndetected,
     ScriptCrawler,
     ServerCrawler,
+    SeleniumBase,
 )
 
 
@@ -31,9 +32,6 @@ class WebConfig(object):
     def init():
         pass
 
-    def get_modes():
-        return ["standard", "headless", "full"]
-
     def get_browsers():
         return [
             "RequestsCrawler",
@@ -42,6 +40,7 @@ class WebConfig(object):
             "SeleniumUndetected",  # requires driver location
             "ScriptCrawler",  # requires script
             "ServerCrawler",  # requires script & port
+            "SeleniumBase",
         ]
 
     def get_crawler_from_string(input_string):
@@ -56,6 +55,8 @@ class WebConfig(object):
             return SeleniumChromeFull
         elif input_string == "SeleniumUndetected":
             return SeleniumUndetected
+        elif input_string == "SeleniumBase":
+            return SeleniumBase
         elif input_string == "ScriptCrawler":
             return ScriptCrawler
         elif input_string == "ServerCrawler":
@@ -76,7 +77,7 @@ class WebConfig(object):
         """
         Caller may provide scripts
         """
-        mapping = {}
+        mapping = []
 
         # one of the methods should be available
         from .ipc import DEFAULT_PORT, SocketConnection
@@ -106,86 +107,56 @@ class WebConfig(object):
         except:
             pass
 
-        std_preference_table = []
-
-        std_preference_table.append(WebConfig.get_requests())
-        std_preference_table.append(WebConfig.get_servercralwer(port, headless_script))
-        std_preference_table.append(WebConfig.get_scriptcralwer(headless_script))
-        std_preference_table.append(WebConfig.get_seleniumheadless())
-        std_preference_table.append(WebConfig.get_servercralwer(port, full_script))
-        std_preference_table.append(WebConfig.get_scriptcralwer(full_script))
-        std_preference_table.append(WebConfig.get_seleniumfull())
-        std_preference_table.append(WebConfig.get_seleniumundetected())
-
-        mapping["standard"] = std_preference_table
-
-        # one of the methods should be available
-
-        headless_preference_table = []
-
-        headless_preference_table.append(
-            WebConfig.get_servercralwer(port, headless_script)
-        )
-        headless_preference_table.append(WebConfig.get_scriptcralwer(headless_script))
-        headless_preference_table.append(WebConfig.get_seleniumheadless())
-        headless_preference_table.append(WebConfig.get_servercralwer(port, full_script))
-        headless_preference_table.append(WebConfig.get_scriptcralwer(full_script))
-        headless_preference_table.append(WebConfig.get_seleniumfull())
-        headless_preference_table.append(WebConfig.get_requests())
-        headless_preference_table.append(WebConfig.get_seleniumundetected())
-
-        mapping["headless"] = headless_preference_table
-
-        # one of the methods should be available
-
-        full_preference_table = []
-
-        full_preference_table.append(WebConfig.get_servercralwer(port, full_script))
-        full_preference_table.append(WebConfig.get_scriptcralwer(full_script))
-        full_preference_table.append(WebConfig.get_seleniumfull())
-        full_preference_table.append(WebConfig.get_servercralwer(port, headless_script))
-        full_preference_table.append(WebConfig.get_scriptcralwer(headless_script))
-        full_preference_table.append(WebConfig.get_seleniumheadless())
-        full_preference_table.append(WebConfig.get_requests())
-        full_preference_table.append(WebConfig.get_seleniumundetected())
-
-        mapping["full"] = full_preference_table
+        mapping.append(WebConfig.get_requests())
+        mapping.append(WebConfig.get_scriptcralwer(headless_script, "CrawleeScript"))
+        mapping.append(WebConfig.get_servercralwer(port, headless_script, "CrawleeServer"))
+        mapping.append(WebConfig.get_scriptcralwer(full_script, "PlaywrightScript"))
+        mapping.append(WebConfig.get_servercralwer(port, full_script, "PlaywrightServer"))
+        mapping.append(WebConfig.get_seleniumundetected())
+        mapping.append(WebConfig.get_seleniumbase())
+        mapping.append(WebConfig.get_seleniumheadless())
+        mapping.append(WebConfig.get_seleniumfull())
 
         return mapping
 
     def get_requests():
         return {
-            "enabled": True,
-            "crawler": "RequestsCrawler",
-            "settings": {"timeout_s": 10},
+            "enabled"   : True,
+            "name"      : "RequestsCrawler",
+            "crawler"   : "RequestsCrawler",
+            "settings"  : {"timeout_s": 20},
         }
 
-    def get_servercralwer(port, script):
-        if port and script:
-            return {
-                "enabled": True,
-                "crawler": "ServerCrawler",
-                "settings": {"port": port, "script": script, "timeout_s": 20},
-            }
-        else:
-            return {
-                "enabled": False,
-                "crawler": "ServerCrawler",
-                "settings": {"port": port, "script": script, "timeout_s": 20},
-            }
-
-    def get_scriptcralwer(script):
+    def get_scriptcralwer(script, name=""):
         if script:
             return {
-                "enabled": True,
-                "crawler": "ScriptCrawler",
-                "settings": {"script": script, "timeout_s": 20},
+                "enabled"   : True,
+                "name"      : name,
+                "crawler"   : "ScriptCrawler",
+                "settings"  : {"script": script, "timeout_s": 40},
             }
         else:
             return {
-                "enabled": False,
-                "crawler": "ScriptCrawler",
-                "settings": {"script": script, "timeout_s": 20},
+                "enabled"   : False,
+                "name"      : name,
+                "crawler"   : "ScriptCrawler",
+                "settings"  : {"script": script, "timeout_s": 40},
+            }
+
+    def get_servercralwer(port, script, name=""):
+        if port and script:
+            return {
+                "enabled"   : False,
+                "name"      : name,
+                "crawler"   : "ServerCrawler",
+                "settings"  : {"port": port, "script": script, "timeout_s": 40},
+            }
+        else:
+            return {
+                "enabled"   : False,
+                "name"      : name,
+                "crawler"   : "ServerCrawler",
+                "settings"  : {"port": port, "script": script, "timeout_s": 40},
             }
 
     def get_seleniumheadless():
@@ -193,18 +164,20 @@ class WebConfig(object):
 
         if chromedriver_path.exists():
             return {
-                "enabled": True,
-                "crawler": "SeleniumChromeHeadless",
-                "settings": {
+                "enabled"   : False,
+                "name"      : "SeleniumChromeHeadless",
+                "crawler"   : "SeleniumChromeHeadless",
+                "settings"  : {
                     "driver_executable": str(chromedriver_path),
-                    "timeout_s": 20,
+                    "timeout_s": 30,
                 },
             }
         else:
             return {
-                "enabled": True,
-                "crawler": "SeleniumChromeHeadless",
-                "settings": {"driver_executable": None, "timeout_s": 20},
+                "enabled"   : True,
+                "name"      : "SeleniumChromeHeadless",
+                "crawler"   : "SeleniumChromeHeadless",
+                "settings"  : {"driver_executable": None, "timeout_s": 40},
             }
 
     def get_seleniumfull():
@@ -212,18 +185,20 @@ class WebConfig(object):
 
         if chromedriver_path.exists():
             return {
-                "enabled": True,
-                "crawler": "SeleniumChromeFull",
-                "settings": {
+                "enabled"   : False,
+                "name"      : "SeleniumChromeFull",
+                "crawler"   : "SeleniumChromeFull",
+                "settings"  : {
                     "driver_executable": str(chromedriver_path),
-                    "timeout_s": 20,
+                    "timeout_s": 40,
                 },
             }
         else:
             return {
-                "enabled": True,
-                "crawler": "SeleniumChromeFull",
-                "settings": {"driver_executable": None, "timeout_s": 20},
+                "enabled"   : False,
+                "name"      : "SeleniumChromeFull",
+                "crawler"   : "SeleniumChromeFull",
+                "settings"  : {"driver_executable": None, "timeout_s": 40},
             }
 
     def get_seleniumundetected():
@@ -231,19 +206,30 @@ class WebConfig(object):
 
         if chromedriver_path.exists():
             return {
-                "enabled": True,
-                "crawler": "SeleniumUndetected",
-                "settings": {
+                "enabled"   : False,
+                "name"      : "SeleniumUndetected",
+                "crawler"   : "SeleniumUndetected",
+                "settings"  : {
                     "driver_executable": str(chromedriver_path),
-                    "timeout_s": 20,
+                    "timeout_s": 30,
                 },
             }
         else:
             return {
-                "enabled": True,
-                "crawler": "SeleniumUndetected",
-                "settings": {"driver_executable": None, "timeout_s": 20},
+                "enabled"   : False,
+                "name"      : "SeleniumUndetected",
+                "crawler"   : "SeleniumUndetected",
+                "settings"  : {"driver_executable": None, "timeout_s": 40},
             }
+
+    def get_seleniumbase():
+        return {
+            "enabled"   : False,
+            "name"      : "SeleniumBase",
+            "crawler"   : "SeleniumBase",
+            "settings"  : {
+            },
+        }
 
     def use_logger(Logger):
         WebLogger.web_logger = Logger

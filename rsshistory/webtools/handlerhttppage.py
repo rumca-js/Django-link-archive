@@ -149,40 +149,44 @@ class HttpRequestBuilder(object):
             request.ping = self.options.ping
 
         if self.options:
-            mode = self.options.get_mode()
             mode_mapping = self.options.mode_mapping
         else:
-            mode = "standard"
             mode_mapping = WebConfig.get_init_crawler_config()
 
         request.timeout_s = self.options.get_timeout(request.timeout_s)
 
-        if mode in mode_mapping:
-            for crawler_data in mode_mapping[mode]:
-                crawler = WebConfig.get_crawler_from_mapping(request, crawler_data)
-                if not crawler:
-                    WebLogger.debug(
-                        "Cannot find crawler in WebConfig:{}".format(
-                            crawler_data["crawler"]
-                        )
-                    )
-                    continue
-
-                WebLogger.debug(
-                    "Url:{}: Running crawler {}".format(request.url, type(crawler))
-                )
-                crawler.run()
-                response = crawler.get_response()
-                crawler.close()
-                if response:
-                    return response
-
-        else:
+        if not mode_mapping or len(mode_mapping) == 0:
             self.dead = True
             WebLogger.error(
                 "Url:{} Could not identify method of page capture".format(request.url)
             )
             raise NotImplementedError("Could not identify method of page capture")
+
+        for crawler_data in mode_mapping:
+            crawler = WebConfig.get_crawler_from_mapping(request, crawler_data)
+            if not crawler:
+                WebLogger.debug(
+                    "Cannot find crawler in WebConfig:{}".format(
+                        crawler_data["crawler"]
+                    )
+                )
+                continue
+
+            WebLogger.debug(
+                "Url:{}: Running crawler {}".format(request.url, type(crawler))
+            )
+            crawler.run()
+            response = crawler.get_response()
+            crawler.close()
+            if response:
+                return response
+
+        self.dead = True
+        WebLogger.error(
+            "Url:{} No response from crawler".format(request.url)
+        )
+        raise NotImplementedError("Url:{} No response from crawler".format(request.url))
+
 
     def ping(self, timeout_s=5, options=None):
         url = self.url
@@ -260,26 +264,21 @@ class HttpRequestBuilder(object):
             self.dead = True
             return None
 
-        try:
-            WebLogger.info("[R] Url:{}. Options:{}".format(self.url, self.options))
+        WebLogger.info("[R] Url:{}. Options:{}".format(self.url, self.options))
 
-            request = PageRequestObject(
-                url=self.url,
-                headers=self.headers,
-                timeout_s=self.timeout_s,
+        request = PageRequestObject(
+            url=self.url,
+            headers=self.headers,
+            timeout_s=self.timeout_s,
+        )
+
+        self.response = self.get_contents_function(request=request)
+
+        WebLogger.info(
+            "Url:{}. Options:{} Requesting page: DONE".format(
+                self.url, self.options
             )
-
-            self.response = self.get_contents_function(request=request)
-
-            WebLogger.info(
-                "Url:{}. Options:{} Requesting page: DONE".format(
-                    self.url, self.options
-                )
-            )
-
-        except Exception as E:
-            self.dead = True
-            WebLogger.exc(E, "Url:{}".format(self.url))
+        )
 
         return self.response
 
@@ -362,6 +361,12 @@ class HttpPageHandler(ContentInterface):
     def get_response_implementation(self):
         self.get_response_once()
 
+        original_mapping = self.options.mode_mapping
+
+        if len(self.options.mode_mapping) < 2:
+            return
+
+
         if (
             self.options.use_browser_promotions
             and self.is_advanced_processing_possible()
@@ -369,16 +374,17 @@ class HttpPageHandler(ContentInterface):
             # we warn, because if that happens too often, it is easy just to
             # define EntryRule for that domain
             WebLogger.error(
-                "Url:{}. Trying to promote to other mode from {} mode".format(
-                    self.url, self.options.mode
+                "Url:{}. Retrying with different browser {}".format(
+                    self.url,
+                    self.options.mode_mapping[0],
                 )
             )
-            if self.options.mode == "standard":
-                self.options.mode = "headless"
-            if self.options.mode == "headless":
-                self.options.mode = "full"
+
+            self.options.mode_mapping = self.options.mode_mapping[1:]
 
             self.get_response_once()
+
+            self.options.mode_mapping = original_mapping
 
     def get_response_once(self):
         url = self.url
@@ -389,6 +395,7 @@ class HttpPageHandler(ContentInterface):
             if not dap.is_media():
                 builder = HttpRequestBuilder(url=url, options=self.options)
                 self.response = builder.get_response()
+
                 if not self.response:
                     return
 
@@ -484,7 +491,7 @@ class HttpPageHandler(ContentInterface):
         """
         If we do not have data, but we think we can do better
         """
-        if self.options.mode == "full":
+        if self.options.mode_mapping is None:
             return False
 
         if not self.response:

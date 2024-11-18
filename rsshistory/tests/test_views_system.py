@@ -141,3 +141,33 @@ class SystemViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 500)
+
+    def test_json_table_status(self):
+        url = reverse("{}:json-table-status".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_json_system_status(self):
+        url = reverse("{}:json-system-status".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_json_export_status(self):
+        url = reverse("{}:json-export-status".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_backgroundjobs(self):
+        url = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_settings(self):
+        url = reverse("{}:get-settings".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)

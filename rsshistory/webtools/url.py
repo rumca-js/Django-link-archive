@@ -68,7 +68,7 @@ class Url(ContentInterface):
         if page_options:
             self.options = page_options
         else:
-            self.options = self.get_init_page_options(url, page_options)
+            self.options = self.get_init_page_options(page_options)
 
         if handler_class:
             self.handler = handler_class(url, page_options=self.options)
@@ -185,27 +185,17 @@ class Url(ContentInterface):
         builder = HttpRequestBuilder(self.url)
         builder.ping(timeout_s=timeout_s, options=self.options)
 
-    def get_init_page_options(self, url, initial_options=None):
+    def get_init_page_options(self, initial_options=None):
         from .webconfig import WebConfig
 
         options = PageOptions()
-        options.mode_mapping = WebConfig.get_init_crawler_config()
 
-        if initial_options and initial_options.mode:
-            options.mode = initial_options.mode
-        if (
-            initial_options
-            and initial_options.mode_mapping
-            and len(initial_options.mode_mapping) > 0
-        ):
+        if initial_options:
             options.mode_mapping = initial_options.mode_mapping
+        else:
+            options.mode_mapping = WebConfig.get_init_crawler_config()
 
-        if Url.is_full_browser_required(url):
-            options.mode = "full"
-        elif Url.is_headless_browser_required(url):
-            options.mode = "headless"
-
-        self.overvwrite_mapping(options)
+        self.override_mapping(options)
 
         return options
 
@@ -419,18 +409,21 @@ class Url(ContentInterface):
         if url.startswith("//") >= 0:
             return url.replace("//", "")
 
-    def overvwrite_mapping(self, options):
-        if Url.is_full_browser_required(self.url):
-            options.mode = "full"
-        elif Url.is_headless_browser_required(self.url):
-            options.mode = "headless"
+    def override_mapping(self, options):
+        if Url.is_selenium_browser_required(self.url):
+            browser = options.get_crawler("SeleniumChromeFull")
+            if browser:
+                options.bring_to_front(browser)
+        elif Url.is_crawlee_browser_required(self.url):
+            browser = options.get_crawler("CrawleeScript")
+            if browser:
+                options.bring_to_front(browser)
 
-    def is_headless_browser_required(url):
+    def is_selenium_browser_required(url):
         p = DomainAwarePage(url)
 
         require_headless_browser = [
             "open.spotify.com",
-            "thehill.com",
         ]
         domain = p.get_domain_only()
 
@@ -446,7 +439,7 @@ class Url(ContentInterface):
 
         return False
 
-    def is_full_browser_required(url):
+    def is_crawlee_browser_required(url):
         p = DomainAwarePage(url)
         if p.is_link_service():
             return True
@@ -456,6 +449,7 @@ class Url(ContentInterface):
             "reuters.com",
             "yahoo.com",
             "techcrunch.com",
+            "thehill.com",
         ]
         domain = p.get_domain_only()
 

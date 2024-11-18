@@ -77,7 +77,6 @@ run-celery:
 	rm -rf storage
 	rm -f celerybeat-schedule.db
 	# if we do not limit celery worker memory, then it will grow indefinitely
-	# poetry run celery -A linklibrary worker -l INFO -B --max-memory-per-child=12000
 	poetry run celery -A linklibrary beat -l INFO &
 	poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=100000 &
 

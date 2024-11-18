@@ -33,31 +33,21 @@ class UrlHandler(Url):
 
             return
 
-    def is_headless_browser_required(url):
-        if EntryRules.is_headless_browser_required(url):
-            return True
-
-        if Url.is_headless_browser_required(url):
-            return True
-
-        return False
-
-    def is_full_browser_required(url):
-        if EntryRules.is_full_browser_required(url):
-            return True
-
-        if Url.is_full_browser_required(url):
-            return True
-
-        return False
-
-    def get_init_page_options(self, url, init_options=None):
-        o = super().get_init_page_options(url, init_options)
+    def get_init_page_options(self, init_options=None):
+        o = super().get_init_page_options(init_options)
 
         # TODO this is reading overhead. We might cache something?
         from ..models import Browser
 
-        o.mode_mapping = Browser.get_browser_setup()
+        browser_mapping = Browser.get_browser_setup()
+        if browser_mapping != []:
+            o.mode_mapping = browser_mapping
+
+        rules = EntryRules.get_url_rules(self.url)
+        if len(rules) > 0:
+            for rule in rules:
+                if rule.browser:
+                    o.bring_to_front(rule.browser.get_setup())
 
         config = Configuration.get_object().config_entry
         o.ssl_verify = config.ssl_verification

@@ -49,6 +49,7 @@ from ..controllers import (
     EntryDataBuilder,
     EntriesUpdater,
     BackgroundJobController,
+    SystemOperationController,
 )
 from ..configuration import Configuration
 from ..serializers import JsonImporter
@@ -356,7 +357,9 @@ def json_system_status(request):
 
     c = Configuration().get_object()
 
-    last_internet_check = c.get_local_time(SystemOperation.get_last_internet_check())
+    system_controller = SystemOperationController()
+
+    last_internet_check = c.get_local_time(system_controller.get_last_internet_check())
     data["last_internet_check"] = last_internet_check
 
     now = c.get_local_time(DateUtils.get_datetime_now_utc())
@@ -397,8 +400,11 @@ def json_system_status(request):
 
     data["directory"] = c.directory
 
+    from ..tasks import get_tasks
+    tasks = get_tasks()
+
     data["threads"] = []
-    for thread_info in c.get_thread_info():
+    for thread_info in system_controller.get_thread_info(tasks):
         data["threads"].append({"name": thread_info[0], "date": thread_info[1]})
 
     return JsonResponse(data)
@@ -790,7 +796,8 @@ def is_system_ok(request):
     if data is not None:
         return data
 
-    system_is_ok = SystemOperation.is_system_healthy()
+    system_controller = SystemOperationController()
+    system_is_ok = system_controller.is_system_healthy()
 
     text = "YES" if system_is_ok else "NO"
     status_code = 200 if system_is_ok else 500
@@ -866,16 +873,21 @@ def get_footer_status_line(request):
 
     error_jobs = BackgroundJobController.objects.filter(errors__gt=0)
 
-    configuration_entry = ConfigurationEntry.get()
+    configuration_entry = Configuration.get_object().config_entry
+
+    system_controller = SystemOperationController()
+
+    from ..tasks import get_tasks
+    tasks = get_tasks()
 
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
-    is_internet_ok = SystemOperation.is_internet_ok()
-    is_threading_ok = SystemOperation.is_threading_ok()
+    is_internet_ok = system_controller.is_internet_ok()
+    is_threading_ok = system_controller.is_threading_ok(thread_ids = tasks)
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
-    is_keywords_configured = KeyWords.is_configuration_error()
+    is_keywords_error = KeyWords.is_configuration_error()
 
     message = ""
     if sources_are_fetched:
@@ -890,8 +902,8 @@ def get_footer_status_line(request):
         message = add_to_message(message, "Jobs")
     if is_configuration_error:
         message = add_to_message(message, "Configuration")
-    if is_keywords_configured:
-        message = add_to_message(message, "Keywords configuration")
+    if is_keywords_error:
+        message = add_to_message(message, "Keywords")
 
     data = {"message": message}
     return JsonResponse(data)
@@ -908,13 +920,14 @@ def get_indicators(request):
 
     error_jobs = BackgroundJobController.objects.filter(errors__gt=0)
 
-    configuration_entry = ConfigurationEntry.get()
+    configuration_entry = Configuration.get_object().config_entry
+    system_controller = SystemOperationController()
 
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
-    is_internet_ok = SystemOperation.is_internet_ok()
-    is_threading_ok = SystemOperation.is_threading_ok()
+    is_internet_ok = system_controller.is_internet_ok()
+    is_threading_ok = system_controller.is_threading_ok()
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
 

@@ -33,7 +33,6 @@ from .models import (
     SourceExportHistory,
     DataExport,
     ConfigurationEntry,
-    SystemOperation,
 )
 
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -41,6 +40,7 @@ from .controllers import (
     BackgroundJobController,
     SourceDataController,
     EntriesUpdater,
+    SystemOperationController,
 )
 from .threadhandlers import (
     InitializeJobHandler,
@@ -81,6 +81,9 @@ class CeleryTaskInterface(object):
     def run(self):
         raise NotImplementedError("Not implemented")
 
+    def get_name(self):
+        return self.__class__.__name__
+
 
 class RefreshProcessor(CeleryTaskInterface):
     """!
@@ -93,12 +96,14 @@ class RefreshProcessor(CeleryTaskInterface):
 
     def run(self):
         c = Configuration.get_object()
-        c.refresh(self.__class__.__name__)
 
-        if not SystemOperation.is_internet_ok():
+        systemcontroller = SystemOperationController()
+        systemcontroller.refresh(self.get_name())
+
+        if not systemcontroller.is_internet_ok():
             return
 
-        config = ConfigurationEntry.get()
+        config = c.config_entry
         if config.block_new_tasks:
             return
 
@@ -220,9 +225,11 @@ class GenericJobsProcessor(CeleryTaskInterface):
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         c = Configuration.get_object()
-        c.refresh(self.get_name())
 
-        if not SystemOperation.is_internet_ok():
+        systemcontroller = SystemOperationController()
+        systemcontroller.refresh(self.get_name())
+
+        if not systemcontroller.is_internet_ok():
             return
 
         while True:
@@ -272,9 +279,6 @@ class GenericJobsProcessor(CeleryTaskInterface):
                         E,
                         "Excetion",
                     )
-
-    def get_name(self):
-        return self.__class__.__name__
 
     def process_job(self, items):
         config = Configuration.get_object()

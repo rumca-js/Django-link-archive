@@ -7,7 +7,6 @@ from ..webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
 from ..apps import LinkDatabase
 from ..models import (
     ConfigurationEntry,
-    BrowserMode,
     UserConfig,
 )
 from ..controllers import (
@@ -37,12 +36,12 @@ def page_show_properties(request):
         url = UrlHandler(page_link)
         options = url.options
 
-        method = "standard"
+        browser = None
 
-        if "method" in request.GET and request.GET["method"] != "":
-            options.mode = request.GET["method"]
-        else:
-            options.use_browser_promotions = True
+        if "browser" in request.GET and request.GET["browser"] != "":
+            browser = Browser.objects.filter(pk = request.GET["browser"])
+            if browser:
+                options.bring_to_front(browser.get_setup())
 
         page_url = UrlHandler(page_link, page_options=options)
         page_url.get_response()
@@ -58,8 +57,7 @@ def page_show_properties(request):
         p.context["is_link_allowed"] = DomainCache.get_object(
             page_link, url_builder=UrlHandler
         ).is_allowed(page_link)
-        p.context["method"] = options.mode
-        p.context["modes"] = BrowserMode.get_modes()
+        p.context["browser"] = browser
 
         return p.render("show_page_props.html")
 

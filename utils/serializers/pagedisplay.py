@@ -11,10 +11,8 @@ from utils.services import OpenRss
 
 
 class PageDisplay(object):
-    def __init__(self, url, verbose=False, method=None):
+    def __init__(self, url, verbose=False):
         u = Url(url)
-        if method:
-            u.options.mode = method
         u.get_response()
 
         print("Handler:{}".format(type(u.get_handler())))
@@ -24,6 +22,7 @@ class PageDisplay(object):
         print("Author:{}".format(u.get_author()))
         print("Album:{}".format(u.get_album()))
         print("Thumbnail:{}".format(u.get_thumbnail()))
+        print("Options:{}".format(u.options))
 
         print("RSS path:{}".format(Url.find_rss_url(u)))
 
@@ -34,11 +33,12 @@ class PageDisplay(object):
         handler = u.get_handler()
         if type(handler) is HttpPageHandler:
             response = handler.get_response()
-            print("Response is valid?:{}".format(u.get_response().is_valid()))
-            print("Status code:{}".format(response.status_code))
-            print("Content-Type:{}".format(response.get_content_type()))
-            print("Charset:{}".format(response.get_content_type_charset()))
-            print("Page type:{}".format(type(handler.p)))
+            if response:
+                print("Response is valid?:{}".format(response.is_valid()))
+                print("Status code:{}".format(response.status_code))
+                print("Content-Type:{}".format(response.get_content_type()))
+                print("Charset:{}".format(response.get_content_type_charset()))
+                print("Page type:{}".format(type(handler.p)))
 
             if type(handler.p) is RssPage:
                 pass
@@ -101,7 +101,6 @@ class PageDisplayParser(object):
         self.parser.add_argument(
             "--port", type=int, default=0, help="Port, if using web scraping server"
         )
-        self.parser.add_argument("--method", help="method. Choices: full, headless")
         self.parser.add_argument("--url", help="Url to fetch")
         self.parser.add_argument(
             "-v",
