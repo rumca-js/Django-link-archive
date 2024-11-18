@@ -1,9 +1,9 @@
 from datetime import datetime
 from pathlib import Path
-import logging
 import os
 
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from utils.dateutils import DateUtils
 from utils.logger import set_logger
@@ -21,7 +21,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "1.5.9"
+__version__ = "1.5.10"
 
 
 class Configuration(object):
@@ -309,3 +309,44 @@ class Configuration(object):
             result.append([thread, date])
 
         return result
+
+    def get_settings(self, db_switch="default"):
+        result = {}
+
+        result["DATABASES"] = settings.DATABASES[db_switch]
+
+        result["DEBUG"] = settings.DEBUG
+        result["ALLOWED_HOSTS"] = settings.ALLOWED_HOSTS
+
+        if hasattr(settings, "CELERY_BROKER_URL"):
+            result["CELERY_BROKER_URL"] = settings.CELERY_BROKER_URL
+
+        if hasattr(settings, "STATIC_URL"):
+            result["STATIC_URL"] = settings.STATIC_URL
+
+        if hasattr(settings, "TIME_ZONE"):
+            result["TIME_ZONE"] = settings.TIME_ZONE
+
+        if hasattr(settings, "USE_TZ"):
+            result["USE_TZ"] = settings.USE_TZ
+
+        if hasattr(settings, "USE_I18N"):
+            result["USE_I18N"] = settings.USE_I18N
+
+        if hasattr(settings, "LANGUAGE_CODE"):
+            result["LANGUAGE_CODE"] = settings.LANGUAGE_CODE
+
+        if hasattr(settings, "CELERY_RESULT_BACKEND"):
+            result["CELERY_RESULT_BACKEND"] = settings.CELERY_RESULT_BACKEND
+
+        if hasattr(settings, "CACHES"):
+            result["CACHES"] = settings.CACHES
+
+        return result
+
+    def get_db_data(self, db_switch="default"):
+        """
+        result["USER"],
+        result["DB"],
+        """
+        return settings.DATABASES[db_switch]

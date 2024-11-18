@@ -281,6 +281,7 @@ urlpatterns = [
     path("is-entry-download/<int:pk>/", backgroundjobs.is_entry_download, name="is-entry-download"),
     path("entry-tags/<int:pk>/", useractions.entry_tags, name="entry-tags"),
     path("history-remove-all/", userhistory.history_remove_all, name="history-remove-all"),
+    path("get-settings/", system.get_settings, name="get-settings"),
     # login
     path("accounts/", include("django.contrib.auth.urls")),
     path("rsshistory/accounts/logout/", RedirectView.as_view(url="rsshistory/")),

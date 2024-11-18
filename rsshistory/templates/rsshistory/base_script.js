@@ -5,6 +5,10 @@
     let view_small_icons = "{{user_config.small_icons}}" == "True";
     let debug = "{{debug}}" == "True"
 
+    function getSpinnerText(text = 'Loading...') {
+       return `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${text}`;
+    }
+
     function putSpinnerOnIt(button) {
         button.prop("disabled", true);
 

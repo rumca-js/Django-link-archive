@@ -5,24 +5,25 @@
 <h1>Status</h1>
 
 <ul id="statusBlock" class="list-group">
-    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+</ul>
+
+<h1>Settings</h1>
+
+<ul id="settingsBlock" class="list-group">
 </ul>
 
 <h1>Number of rows</h1>
-
 <ul id="tableStats" class="list-group">
-    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
 </ul>
 
 <h1>Threads</h1>
 <ul id="threadStats" class="list-group">
-    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
 </ul>
 
 <h1>Exports</h1>
 <ul id="exportStats" class="list-group">
-    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
 </ul>
+
 
 <script>
     function getSystemStatusText(data) {
@@ -146,9 +147,29 @@
         var text = getExportStatusText(data.exports);
         $('#exportStats').html(text);
     }
+    function fillSettings(data) {
+        let htmlOutput = '';
+    
+        for (const [key, value] of Object.entries(data)) {
+            let displayValue;
+    
+            if (typeof value === 'object' && value !== null) {
+                displayValue = JSON.stringify(value, null, 2);
+            } else if (key.includes('date') || key.includes('time')) {
+                displayValue = value ? new Date(value).toLocaleString() : 'N/A';
+            } else {
+                displayValue = value;
+            }
+    
+            htmlOutput += `<li class="list-group-item">${key}: ${displayValue}</li>`;
+        }
+    
+        // Inject the HTML into the settings block
+        $('#settingsBlock').html(htmlOutput);
+    }
 
     function loadSystemStatus(attempt = 1) {
-        $('#statusBlock').html("made request");
+        $('#statusBlock').html(getSpinnerText());
         $.ajax({
             url: '{% url 'rsshistory:json-system-status' %}',
             type: 'GET',
@@ -169,7 +190,7 @@
         });
     }
     function loadTableStatus(attempt = 1) {
-        $('#tableStats').html("made request");
+        $('#tableStats').html(getSpinnerText());
         $.ajax({
             url: '{% url 'rsshistory:json-table-status' %}',
             type: 'GET',
@@ -189,7 +210,7 @@
         });
     }
     function loadExportStatus(attempt = 1) {
-        $('#exportStats').html("made request");
+        $('#exportStats').html(getSpinnerText());
         $.ajax({
             url: '{% url 'rsshistory:json-export-status' %}',
             type: 'GET',
@@ -207,11 +228,31 @@
             }
         });
     }
+    function loadSettings(attempt = 1) {
+        $('#settingsBlock').html(getSpinnerText());
+        $.ajax({
+            url: '{% url 'rsshistory:get-settings' %}',
+            type: 'GET',
+            timeout: 10000,
+            success: function(data) {
+                fillSettings(data);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    $('#settingsBlock').html("Error loading dynamic content, retry")
+                    loadSettings(attempt + 1);
+                } else {
+                    $('#settingsBlock').html("Error loading dynamic content")
+                }
+            }
+        });
+    }
 
     function loadAll() {
         loadSystemStatus();
         loadTableStatus();
         loadExportStatus();
+        loadSettings();
     }
 
     $('#statusBlock').html("Document ready")

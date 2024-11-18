@@ -414,6 +414,19 @@ def history_to_json(history):
     return json
 
 
+def get_settings(request):
+    p = ViewPage(request)
+    p.set_title("Settings")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    configuration = Configuration.get_object()
+    data = configuration.get_settings()
+
+    return JsonResponse(data)
+
+
 def json_export_status(request):
     p = ViewPage(request)
     p.set_title("Status")
