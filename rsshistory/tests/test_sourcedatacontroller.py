@@ -1,4 +1,8 @@
-from ..models import SourceCategories, SourceSubCategories
+from ..models import (
+    SourceCategories,
+    SourceSubCategories,
+    SourceOperationalData,
+)
 
 from ..controllers import (
     SourceDataController,
@@ -32,3 +36,41 @@ class SourceDataControllerTest(FakeInternetTestCase):
 
         self.assertEqual(SourceCategories.objects.all().count(), 0)
         self.assertEqual(SourceSubCategories.objects.all().count(), 0)
+
+    def test_set_operational_info(self):
+        SourceOperationalData.objects.all().delete()
+
+        ob = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+        )
+
+        ob.set_operational_info(date_fetched, 20, 3, "binary", valid=False)
+
+        operations = SourceOperationalData.objects.all()
+        self.assertEqual(operations.count(), 1)
+
+        operation = operations[0]
+        self.assertEqual(operations.consecutive_errors, 1)
+
+    def test_set_operational_info__max_errors(self):
+        SourceOperationalData.objects.all().delete()
+
+        source = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+        )
+
+        SourceOperationalData.objects.create(source_obj = source, consecutive_errors = 30)
+
+        ob.set_operational_info(date_fetched, 20, 3, "binary", valid=False)
+
+        operations = SourceOperationalData.objects.all()
+        self.assertEqual(operations.count(), 1)
+
+        operation = operations[0]
+        self.assertEqual(operations.consecutive_errors, 31)
+
+        source.refresh_from_db()
+
+        self.assertFalse(source.enabled)

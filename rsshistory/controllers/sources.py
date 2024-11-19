@@ -135,6 +135,12 @@ class SourceDataController(SourceDataModel):
             else:
                 obj.consecutive_errors += 1
 
+            if obj.consecutive_errors > 20:
+                id = self.id
+                url = self.url
+                AppLogging.notify("Disabling source ID:{} URL:{} because of errors".format(id, url))
+                obj.enabled = False
+
             obj.save()
         else:
             # previously we could have dangling data without relation
