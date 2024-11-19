@@ -108,6 +108,44 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         keyword.date_published = datetime
         keyword.save()
 
+    def test_cleanup_job__all(self):
+        self.prepare_data()
+
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_CLEANUP,
+            subject="",
+        )
+
+        handler = CleanupJobHandler()
+        # call tested function
+        handler.process(job)
+
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 17)
+
+    def test_cleanup_job__all_process(self):
+        self.prepare_data()
+
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_CLEANUP,
+            subject="",
+        )
+
+        handler = CleanupJobHandler()
+        # call tested function
+        handler.process(job)
+
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 17)
+
+        for job in jobs:
+            handler = CleanupJobHandler()
+            # call tested function
+            handler.process(job)
+
+        # no exception
+        self.assertTrue(True)
+
     def test_cleanup_job__keywords(self):
         self.prepare_data()
 
@@ -162,11 +200,13 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         domains = DomainsController.objects.filter(domain="definitely.domain.to.remove")
         self.assertEqual(domains.count(), 0)
 
-    def test_cleanup_job_no_store_domains(self):
+    def test_cleanup_job__disable_domains(self):
         self.prepare_data()
 
         conf = Configuration.get_object().config_entry
         conf.accept_domains = False
+        conf.keep_domains = False
+        conf.enable_domain_support = False
         conf.save()
 
         job = BackgroundJobController.objects.create(

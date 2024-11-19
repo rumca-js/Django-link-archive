@@ -1088,7 +1088,8 @@ class CleanupJobHandler(BaseJobHandler):
         if table == "all" or table == "ModelFiles":
             ModelFiles.cleanup(cfg)
         if table == "all" or table == "SystemOperation":
-            SystemOperation.cleanup(cfg)
+            from .controllers import SystemOperationController
+            SystemOperationController.cleanup(cfg)
 
         self.user_tables_cleanup(cfg, obj)
 

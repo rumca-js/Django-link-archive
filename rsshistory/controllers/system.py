@@ -6,6 +6,7 @@ from ..models import (
 )
 
 class SystemOperationController(object):
+
     def refresh(self, thread_id):
         if thread_id == "RefreshProcessor":
             if self.is_it_time_to_ping():
@@ -21,6 +22,28 @@ class SystemOperationController(object):
                     )
         else:
             SystemOperation.add_by_thread(thread_id)
+
+    def cleanup(cfg=None):
+        controller = SystemOperationController()
+        thread_ids = controller.get_thread_ids()
+        for thread_id in thread_ids:
+            # leave one entry with time check
+            all_entries = SystemOperation.objects.filter(
+                thread_id=thread_id, is_internet_connection_checked=True
+            )
+            if all_entries.exists() and all_entries.count() > 1:
+                entries = all_entries[1:]
+                for entry in entries:
+                    entry.delete()
+
+            # leave one entry without time check
+            all_entries = SystemOperation.objects.filter(
+                thread_id=thread_id, is_internet_connection_checked=False
+            )
+            if all_entries.exists() and all_entries.count() > 1:
+                entries = all_entries[1:]
+                for entry in entries:
+                    entry.delete()
 
     def is_it_time_to_ping(self):
         datetime = self.get_last_internet_check()

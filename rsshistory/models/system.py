@@ -514,29 +514,6 @@ class SystemOperation(models.Model):
     class Meta:
         ordering = ["-date_created"]
 
-
-    def cleanup(cfg=None):
-        thread_ids = SystemOperation.get_thread_ids()
-        for thread_id in thread_ids:
-            # leave one entry with time check
-            all_entries = SystemOperation.objects.filter(
-                thread_id=thread_id, is_internet_connection_checked=True
-            )
-            if all_entries.exists() and all_entries.count() > 1:
-                entries = all_entries[1:]
-                for entry in entries:
-                    entry.delete()
-
-            # leave one entry without time check
-            all_entries = SystemOperation.objects.filter(
-                thread_id=thread_id, is_internet_connection_checked=False
-            )
-            if all_entries.exists() and all_entries.count() > 1:
-                entries = all_entries[1:]
-                for entry in entries:
-                    entry.delete()
-
-
     def add_by_thread(
         thread_id, internet_status_checked=False, internet_status_ok=True
     ):
