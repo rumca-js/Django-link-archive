@@ -121,7 +121,6 @@ class ConfigForm(forms.ModelForm):
             "accept_domains",
             "accept_not_domain_entries",
             "keep_domains",
-            "keep_permanent_items",
             "auto_scan_entries",
             "new_entries_merge_data",
             "new_entries_use_clean_data",

@@ -1,3 +1,6 @@
+from utils.dateutils import DateUtils
+from ..webtools import calculate_hash
+
 from ..models import (
     SourceCategories,
     SourceSubCategories,
@@ -21,7 +24,7 @@ class SourceDataControllerTest(FakeInternetTestCase):
         SourceDataController.objects.all().delete()
 
     def test_cleanup(self):
-        ob = SourceDataController.objects.create(
+        source = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
         )
@@ -39,19 +42,23 @@ class SourceDataControllerTest(FakeInternetTestCase):
 
     def test_set_operational_info(self):
         SourceOperationalData.objects.all().delete()
+        oate_fetched = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
 
-        ob = SourceDataController.objects.create(
+        source = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
         )
 
-        ob.set_operational_info(date_fetched, 20, 3, "binary", valid=False)
+        date_fetched = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        ahash = calculate_hash("test")
+
+        source.set_operational_info(date_fetched, 20, 3, ahash, valid=False)
 
         operations = SourceOperationalData.objects.all()
         self.assertEqual(operations.count(), 1)
 
         operation = operations[0]
-        self.assertEqual(operations.consecutive_errors, 1)
+        self.assertEqual(operation.consecutive_errors, 1)
 
     def test_set_operational_info__max_errors(self):
         SourceOperationalData.objects.all().delete()
@@ -63,14 +70,18 @@ class SourceDataControllerTest(FakeInternetTestCase):
 
         SourceOperationalData.objects.create(source_obj = source, consecutive_errors = 30)
 
-        ob.set_operational_info(date_fetched, 20, 3, "binary", valid=False)
+        date_fetched = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        ahash = calculate_hash("test")
+
+        source.set_operational_info(date_fetched, 20, 3, ahash, valid=False)
 
         operations = SourceOperationalData.objects.all()
         self.assertEqual(operations.count(), 1)
 
         operation = operations[0]
-        self.assertEqual(operations.consecutive_errors, 31)
+        self.assertEqual(operation.consecutive_errors, 31)
 
-        source.refresh_from_db()
-
+        sources = SourceDataController.objects.all()
+        self.assertEqual(sources.count(), 1)
+        source = sources[0]
         self.assertFalse(source.enabled)

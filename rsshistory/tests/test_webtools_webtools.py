@@ -114,9 +114,10 @@ class PageOptionsTest(FakeInternetTestCase):
         ]
 
         crawler = o.get_crawler("test2")
+        self.assertTrue(crawler)
 
         # call tested function
-        self.assertTrue(o.bring_to_front(crawler))
+        o.bring_to_front(crawler)
 
         self.assertEqual(o.mode_mapping[0]["crawler"], "test2")
         self.assertEqual(o.mode_mapping[1]["crawler"], "test1")

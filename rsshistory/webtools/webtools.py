@@ -760,26 +760,35 @@ class PageOptions(object):
         return str(self)
 
     def get_crawler(self, name):
-        for item in self.mode_mapping:
-            if "enabled" in item:
-                if item["name"] == name and item["enabled"] == True:
-                    return item
+        for mode_data in self.mode_mapping:
+            if "enabled" in mode_data:
+                if mode_data["name"] == name and mode_data["enabled"] == True:
+                    return mode_data
             else:
-                if item["name"] == name:
-                    return item
+                if mode_data["name"] == name:
+                    return mode_data
 
-    def bring_to_front(self, crawler):
-        result = [crawler]
-        for item in self.mode_mapping:
-            if item == crawler:
+    def bring_to_front(self, input_data):
+        result = [input_data]
+        for mode_data in self.mode_mapping:
+            if mode_data == input_data:
                 continue
 
-            result.append(item)
+            result.append(mode_data)
 
         self.mode_mapping = result
 
     def get_timeout(self, timeout_s):
-        settings = self.mode_mapping[0]["settings"]
+        if not self.mode_mapping or len(self.mode_mapping) == 0:
+            return timeout_s
+
+        first_mode = self.mode_mapping[0] 
+
+        if "settings" not in first_mode:
+            return timeout_s
+
+        settings = first_mode["settings"]
+
         if "timeout" in settings:
             timeout_crawler = settings["timeout"]
             return timeout_crawler

@@ -20,7 +20,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.setup_configuration()
 
         conf = Configuration.get_object().config_entry
-        conf.keep_permanent_items = False
+        conf.keep_domains = False
         conf.save()
 
         self.user = User.objects.create_user(

@@ -121,27 +121,28 @@ class SourceDataController(SourceDataModel):
     def set_operational_info(
         self, date_fetched, number_of_entries, import_seconds, hash_value, valid=True
     ):
-        obj = self.get_dynamic_data()
-        if obj:
-            obj.date_fetched = date_fetched
-            obj.import_seconds = import_seconds
-            obj.number_of_entries = number_of_entries
+        dynamic_data = self.get_dynamic_data()
+        if dynamic_data:
+            dynamic_data.date_fetched = date_fetched
+            dynamic_data.import_seconds = import_seconds
+            dynamic_data.number_of_entries = number_of_entries
 
             if valid:
-                obj.page_hash = hash_value
+                dynamic_data.page_hash = hash_value
 
             if valid:
-                obj.consecutive_errors = 0
+                dynamic_data.consecutive_errors = 0
             else:
-                obj.consecutive_errors += 1
+                dynamic_data.consecutive_errors += 1
 
-            if obj.consecutive_errors > 20:
+            if dynamic_data.consecutive_errors > 20:
                 id = self.id
                 url = self.url
                 AppLogging.notify("Disabling source ID:{} URL:{} because of errors".format(id, url))
-                obj.enabled = False
+                self.enabled = False
+                self.save()
 
-            obj.save()
+            dynamic_data.save()
         else:
             # previously we could have dangling data without relation
             op_datas = SourceOperationalData.objects.filter(source_obj=self)
@@ -160,23 +161,23 @@ class SourceDataController(SourceDataModel):
                     source_obj=self,
                 )
             else:
-                obj = op_datas[0]
-                obj.date_fetched = date_fetched
-                obj.import_seconds = import_seconds
-                obj.number_of_entries = number_of_entries
-                obj.source_obj = self
+                dynamic_data = op_datas[0]
+                dynamic_data.date_fetched = date_fetched
+                dynamic_data.import_seconds = import_seconds
+                dynamic_data.number_of_entries = number_of_entries
+                dynamic_data.source_obj = self
 
                 if valid:
-                    obj.page_hash = hash_value
+                    dynamic_data.page_hash = hash_value
 
                 if valid:
-                    obj.consecutive_errors = 0
+                    dynamic_data.consecutive_errors = 0
                 else:
-                    obj.consecutive_errors += 0
+                    dynamic_data.consecutive_errors += 0
 
-                obj.save()
+                dynamic_data.save()
 
-        return obj
+        return dynamic_data
 
     def get_domain(self):
         page = DomainAwarePage(self.url)
@@ -245,6 +246,7 @@ class SourceDataController(SourceDataModel):
     def enable(self):
         if self.enabled:
             return
+        print("enabling")
 
         from .backgroundjob import BackgroundJobController
 

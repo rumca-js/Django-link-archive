@@ -176,7 +176,7 @@ class ConfigurationEntry(models.Model):
     )
 
     enable_domain_support = models.BooleanField(
-        default=True, help_text="Enable domain feature support"
+        default=True, help_text="Enable domain feature support, creates additional domain objects"
     )
 
     enable_file_support = models.BooleanField(
@@ -211,12 +211,10 @@ class ConfigurationEntry(models.Model):
         default=True, help_text="Links that are not domains can be added to system"
     )
 
+    # this option is necessary, if we want to have rss client, with option to drop old entries,
+    # but which keeps domains, or other permanent entries
     keep_domains = models.BooleanField(
         default=False, help_text="If true domains will be made permanent"
-    )
-
-    keep_permanent_items = models.BooleanField(
-        default=True, help_text="This affects permament and bookmarked status entries"
     )
 
     auto_scan_entries = models.BooleanField(
@@ -234,7 +232,7 @@ class ConfigurationEntry(models.Model):
         help_text="Fetches clean information from the Internet for new entries",
     )
 
-    auto_create_sources = models.BooleanField(  # TODO rename to auto_create_sources?
+    auto_create_sources = models.BooleanField(
         default=False,
         help_text="Adds any new found source",
     )

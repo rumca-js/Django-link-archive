@@ -476,9 +476,6 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         conf = Configuration.get_object().config_entry
 
-        if not conf.keep_permanent_items:
-            return False
-
         return self.permanent or self.bookmarked
 
     def should_entry_be_permanent(self):
@@ -488,7 +485,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         p = DomainAwarePage(self.link)
 
-        if p.is_domain() and conf.accept_domains and conf.keep_permanent_items:
+        if p.is_domain() and conf.accept_domains and conf.keep_domains:
             return True
 
         if self.source:

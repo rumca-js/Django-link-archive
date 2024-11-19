@@ -4,17 +4,17 @@
 
 <ul id="buttonsSpace" class="list-group mr-auto">
   <li class="list-group-item">
-      <button id="btnFetchNews" class="btn btn-primary">Setup for news reader</button>
+      <button id="btnFetchNews" class="btn btn-primary">Setup News Reader</button>
       <div class="text-muted">Setup best suited for RSS clients, news.</div>
   </li>
 
   <li class="list-group-item">
-      <button id="btnFetchGallery" class="btn btn-primary">Setup as gallery viewer</button>
-      <div class="text-muted">Setup best suited for YouTube-like players, tiktoks, image galleries.</div>
+      <button id="btnFetchGallery" class="btn btn-primary">Setup Gallery Viewer</button>
+      <div class="text-muted">Setup best suited for YouTube-like players, image galleries.</div>
   </li>
 
   <li class="list-group-item">
-      <button id="btnFetchSearchEngine" class="btn btn-primary">Setup as a simple search engine</button>
+      <button id="btnFetchSearchEngine" class="btn btn-primary">Setup Simple Search Engine</button>
       <div class="text-muted">Setup best suited for Google like Search engines.</div>
   </li>
 </ul>
@@ -23,65 +23,7 @@
 </div>
 
 <script>
-   function initializeSources() {
-      $("#setupSpace").append("<p>Creating sources...</p>");
-
-      $.ajax({
-        url: "{% url 'rsshistory:sources-initialize' %}",
-        type: "GET",
-        success: function(response, status, xhr) {
-          if (xhr.status === 200) {
-            $("#setupSpace").append("<p>Sources created.</p>");
-            $("#setupSpace").append("<p>You can navigate to sources to enable some RSS sources in 'Global'->'Source'.</p>");
-          }
-        },
-        error: function() {
-          $("#setupSpace").append("<p>An error occurred. Please try again.</p>");
-        },
-        complete: function() {
-          $("#btnFetchNews").prop("disabled", false).html("Setup for News");
-        }
-      });
-   }
-   
-   function setupFor(url, element) {
-      $(element).prop("disabled", true);
-   
-      $("#setupSpace").append("<p>Configuring...</p>");
-      
-      $(element).html(
-        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
-      );
-      
-      $.ajax({
-        url: url,
-        type: "GET",
-        success: function(response, status, xhr) {
-          if (xhr.status === 200) {
-            $("#buttonsSpace").hide();
-            $("#setupSpace").append("<p>Configuration OK..</p>");
-            initializeSources();
-          }
-        },
-        error: function() {
-          $("#setupSpace").append("<p>An error occurred. Please try again.</p>");
-        },
-        complete: function() {
-          $(element).prop("disabled", false).html("Setup for News");
-        }
-      });
-   }
-
-   $("#btnFetchNews").click(function() {
-     setupFor("{% url 'rsshistory:wizard-setup-news' %}", "#btnFetchNews");
-   });
-   $("#btnFetchGallery").click(function() {
-     setupFor("{% url 'rsshistory:wizard-setup-gallery' %}", "#btnFetchGallery");
-   });
-   $("#btnFetchSearchEngine").click(function() {
-     setupFor("{% url 'rsshistory:wizard-setup-search-engine' %}", "#btnFetchSearchEngine");
-   });
+{% include "rsshistory/wizard_setup_init.js" %}
 </script>
-
 
 {% endblock %}

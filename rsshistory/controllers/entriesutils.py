@@ -183,8 +183,7 @@ class EntriesCleanup(object):
         days_before = DateUtils.get_days_before_dt(days)
 
         condition_source = Q(source=source) & Q(date_published__lt=days_before)
-        if config.keep_permanent_items:
-            condition_source &= Q(bookmarked=False, permanent=False)
+        condition_source &= Q(bookmarked=False, permanent=False)
 
         if not self.archive_cleanup:
             entries = LinkDataController.objects.filter(condition_source).order_by(
@@ -210,8 +209,7 @@ class EntriesCleanup(object):
         days_before = DateUtils.get_days_before_dt(days)
 
         condition = Q(date_published__lt=days_before)
-        if config.keep_permanent_items:
-            condition &= Q(bookmarked=False, permanent=False)
+        condition &= Q(bookmarked=False, permanent=False)
 
         if not self.archive_cleanup:
             entries = LinkDataController.objects.filter(condition)
@@ -233,8 +231,7 @@ class EntriesCleanup(object):
         days_before = DateUtils.get_days_before_dt(days)
 
         condition = Q(date_published__lt=days_before)
-        if config.keep_permanent_items:
-            condition &= Q(bookmarked=False, permanent=False)
+        condition &= Q(bookmarked=False, permanent=False)
 
         entries = LinkDataController.objects.filter(condition)
 
@@ -331,7 +328,6 @@ class EntriesCleanup(object):
         """
         Permaments are:
          - if enable_domain_support & keep_domains
-        This could be intensive
         """
         link_is_url = Q(source__url=F("link"))
         domain_is_notnull = Q(domain__isnull=False)
@@ -1761,7 +1757,7 @@ class EntryDataBuilder(object):
         config = Configuration.get_object().config_entry
 
         if config.enable_keyword_support:
-            if "title" in link_data:
+            if "title" in link_data and link_data["title"] and link_data["title"] != "":
                 KeyWords.add_link_data(link_data)
 
     def read_domains_from_bookmarks():
