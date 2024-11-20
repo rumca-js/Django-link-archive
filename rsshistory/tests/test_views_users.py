@@ -40,23 +40,6 @@ class UserThingsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_user_entry_history(self):
-        entry = LinkDataController.objects.create(
-            source_url="https://linkedin.com",
-            link="https://linkedin.com/test",
-            title="The first link",
-            description="the first link description",
-            source=None,
-            bookmarked=True,
-            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
-            language="en",
-        )
-
-        url = reverse("{}:user-entry-history".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
     def test_user_comments(self):
         entry = LinkDataController.objects.create(
             source_url="https://linkedin.com",

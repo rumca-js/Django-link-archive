@@ -1,6 +1,6 @@
 {% load static %}
 
-<form action="{{form.action_url}}" method="{{form.method}}">
+<form id="theForm" action="{{form.action_url}}" method="{{form.method}}">
     {% csrf_token %}
 
     {% for field in form %}
@@ -25,9 +25,9 @@
 
 
     {% if form_submit_button_name %}
-       <button type="submit" id="btnFetch" value="{{form_submit_button_name}}" class="btn btn-primary" role="button">{{form_submit_button_name}}</button>
+       <button type="submit" id="btnFetch" value="{{form_submit_button_name}}" class="btn btn-primary btnFilterTrigger" role="button">{{form_submit_button_name}}</button>
     {% else %}
-       <button type="submit" id="btnFetch" value="Submit" class="btn btn-primary" role="button">Submit</button>
+       <button type="submit" id="btnFetch" value="Submit" class="btn btn-primary btnFilterTrigger" role="button">Submit</button>
     {% endif %}
 </form>
 

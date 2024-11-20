@@ -44,6 +44,7 @@ from .models import (
     ModelFiles,
     SystemOperation,
     BlockEntryList,
+    Gateway,
 )
 
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -1044,6 +1045,9 @@ class CleanupJobHandler(BaseJobHandler):
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CLEANUP, subject="UserEntryVisitHistory", args=args
         )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_CLEANUP, subject="Gateway", args=args
+        )
 
     def process(self, obj=None):
         """
@@ -1090,6 +1094,8 @@ class CleanupJobHandler(BaseJobHandler):
         if table == "all" or table == "SystemOperation":
             from .controllers import SystemOperationController
             SystemOperationController.cleanup(cfg)
+        if table == "all" or table == "Gateway":
+            Gateway.cleanup(cfg)
 
         self.user_tables_cleanup(cfg, obj)
 

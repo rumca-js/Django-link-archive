@@ -82,6 +82,15 @@ class UserRequest(object):
     def get_submit_attrs(self):
         attr = {"onchange": "this.form.submit()"}
 
+    def to_choices(self, names):
+        names = sorted(names)
+        result = []
+
+        for name in names:
+            result.append([name, name])
+
+        return result
+
 
 class ConfigForm(forms.ModelForm):
     """
@@ -334,6 +343,32 @@ class LinkInputForm(forms.Form):
         self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["link"].widget.attrs["placeholder"] = "Input URL"
         self.fields["link"].widget.attrs["autofocus"] = True
+
+    def get_information(self):
+        return self.cleaned_data
+
+
+class LinkPropertiesForm(forms.Form):
+    link = forms.CharField(label="Link", max_length=500)
+    browser = forms.IntegerField(widget=forms.Select(choices=()), required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+        self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["link"].widget.attrs["placeholder"] = "Input URL"
+        self.fields["link"].widget.attrs["autofocus"] = True
+
+        browsers = self.get_browser_choices()
+        self.fields["browser"].widget = forms.Select(choices=browsers) 
+
+    def get_browser_choices(self):
+        result = []
+        browsers = Browser.objects.filter(enabled=True).values('id', 'name')
+        for browser in browsers:
+            result.append([browser["id"], browser["name"]])
+
+        return result
 
     def get_information(self):
         return self.cleaned_data

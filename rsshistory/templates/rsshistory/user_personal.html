@@ -4,7 +4,7 @@
 
 <div class="container">
     {% if config.track_user_navigation %}
-    <a href="{% url 'rsshistory:user-entry-history' %}" class="btn btn-primary" title="Shows browsing history">
+    <a href="{% url 'rsshistory:user-browse-history' %}" class="btn btn-primary" title="Shows browsing history">
        <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
        Browse History</a>
     {% endif %}

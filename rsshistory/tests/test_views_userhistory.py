@@ -8,7 +8,10 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
 )
-from ..models import UserSearchHistory
+from ..models import (
+    UserSearchHistory,
+    UserEntryVisitHistory,
+)
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -95,3 +98,37 @@ class UserHistoryViewsTest(FakeInternetTestCase):
         self.assertIn("items", data)
         self.assertTrue(len(data["items"]) > 0, "Items list should not be empty.")
         self.assertEqual(data["items"][0], "source__title = 'YouTube'")
+
+    def test_user_browse_history(self):
+        history = UserSearchHistory.objects.create(
+            search_query="lolipop", user=self.user
+        )
+
+        UserEntryVisitHistory.visited(self.entry_youtube, self.user)
+        UserEntryVisitHistory.visited(self.entry_linkedin, self.user)
+
+        url = reverse(
+            "{}:user-browse-history".format(LinkDatabase.name)
+        )
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_user_browse_history(self):
+        history = UserSearchHistory.objects.create(
+            search_query="lolipop", user=self.user
+        )
+
+        UserEntryVisitHistory.visited(self.entry_youtube, self.user)
+        UserEntryVisitHistory.visited(self.entry_linkedin, self.user)
+
+        url = reverse(
+            "{}:get-user-browse-history".format(LinkDatabase.name)
+        )
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)

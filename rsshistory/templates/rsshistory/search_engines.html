@@ -6,11 +6,11 @@
 <ul>
       {% for search_engine in search_engines %}
       <li>
-	      <a href="{{search_engine.get_address}}" title="{{search_engine.get_title}}">
+	      <a href="{{search_engine.link}}" title="{{search_engine.title}}">
               {% include "rsshistory/icon_external.html" %}
-              {{search_engine.get_name}} @ {{search_engine.get_address}}
-              {% if search_engine.get_description %}
-               - {{search_engine.get_description}}
+              {{search_engine.name}} @ {{search_engine.link}}
+              {% if search_engine.description %}
+               - {{search_engine.description}}
               {% endif %}
           </a>
       </li>
@@ -21,11 +21,11 @@
 <ul>
       {% for search_engine in ai_search_engines %}
       <li>
-	      <a href="{{search_engine.get_address}}" title="{{search_engine.get_title}}">
+	      <a href="{{search_engine.link}}" title="{{search_engine.title}}">
               {% include "rsshistory/icon_external.html" %}
-              {{search_engine.get_name}} @ {{search_engine.get_address}}
-              {% if search_engine.get_description %}
-               - {{search_engine.get_description}}
+              {{search_engine.name}} @ {{search_engine.link}}
+              {% if search_engine.description %}
+               - {{search_engine.description}}
               {% endif %}
           </a>
       </li>
@@ -36,11 +36,11 @@
 <ul>
       {% for search_engine in archives %}
       <li>
-	      <a href="{{search_engine.get_address}}" title="{{search_engine.get_title}}">
+	      <a href="{{search_engine.link}}" title="{{search_engine.title}}">
               {% include "rsshistory/icon_external.html" %}
-              {{search_engine.get_name}} @ {{search_engine.get_address}}
-              {% if search_engine.get_description %}
-               - {{search_engine.get_description}}
+              {{search_engine.name}} @ {{search_engine.link}}
+              {% if search_engine.description %}
+               - {{search_engine.description}}
               {% endif %}
           </a>
       </li>

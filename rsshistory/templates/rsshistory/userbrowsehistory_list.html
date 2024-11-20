@@ -1,0 +1,20 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<h1>Browse History</h1>
+
+<span id="listStatus">
+</span>
+
+<span id="listData" class="container list-group">
+</span>
+
+<div id="pagination">
+</div>
+
+<script>
+{% include "rsshistory/userbrowsehistory_list__script.js" %}
+</script>
+
+{% endblock %} 

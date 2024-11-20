@@ -1,6 +1,7 @@
 from django.urls import reverse
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.db.models import Q
 
 from ..webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
 
@@ -8,6 +9,8 @@ from ..apps import LinkDatabase
 from ..models import (
     ConfigurationEntry,
     UserConfig,
+    Browser,
+    Gateway,
 )
 from ..controllers import (
     LinkDataController,
@@ -20,9 +23,70 @@ from ..forms import (
     LinkInputForm,
     ScannerForm,
     UrlContentsForm,
+    LinkPropertiesForm,
 )
 from ..views import ViewPage
 from ..pluginurl.urlhandler import UrlHandler
+
+
+def get_page_properties(request):
+    p = ViewPage(request)
+    p.set_title("Page properties")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    page_link = request.GET["page"]
+    url = UrlHandler(page_link)
+    options = url.get_init_page_options()
+
+    browser = None
+
+    if "browser" in request.GET and request.GET["browser"] != "":
+        browsers = Browser.objects.filter(pk = request.GET["browser"])
+        if browsers.exists():
+            browser = browsers[0]
+            options.bring_to_front(browser.get_setup())
+        else:
+            return
+
+    page_url = UrlHandler(page_link, page_options=options)
+    page_url.get_response()
+
+    is_link_allowed = DomainCache.get_object(page_link, url_builder=UrlHandler).is_allowed(page_link)
+
+    all_properties = []
+
+    properties = {}
+    properties["title"] = page_url.get_title()
+    properties["description"] = page_url.get_description()
+    properties["author"] = page_url.get_author()
+    properties["album"] = page_url.get_album()
+    properties["thumbnail"] = page_url.get_thumbnail()
+    properties["language"] = page_url.get_language()
+    properties["page_rating"] = page_url.get_page_rating()
+    properties["date_published"] = page_url.get_date_published()
+    properties["is_link_allowed"] = is_link_allowed
+
+    all_properties.append({"name" : "Properties", "data" : properties})
+    all_properties.append({"name" : "Contents", "data" : {"Contents" : page_url.get_contents()}})
+
+    page_handler = page_url.get_handler()
+
+    request_data = {}
+    request_data["Options"] = str(page_url.options)
+    request_data["Response"] = str(page_url.get_response())
+    request_data["Browser"] = str(browser)
+    request_data["Page Handler"] = str(page_handler)
+    if hasattr(page_handler, "p"):
+        request_data["Page Type"] = str(page_handler.p)
+
+    all_properties.append({"name" : "Options", "data" : request_data})
+
+    data = {}
+    data["properties"] = all_properties
+
+    return JsonResponse(data)
 
 
 def page_show_properties(request):
@@ -32,57 +96,9 @@ def page_show_properties(request):
     if data is not None:
         return data
 
-    def show_page_props_internal(requests, page_link):
-        url = UrlHandler(page_link)
-        options = url.options
-
-        browser = None
-
-        if "browser" in request.GET and request.GET["browser"] != "":
-            browser = Browser.objects.filter(pk = request.GET["browser"])
-            if browser:
-                options.bring_to_front(browser.get_setup())
-
-        page_url = UrlHandler(page_link, page_options=options)
-        page_url.get_response()
-
-        ViewPage.fill_context_type(p.context, urlhandler=page_url)
-
-        page_handler = page_url.get_handler()
-
-        # fast check is disabled. We want to make sure based on contents if it is RSS or HTML
-        p.context["page_url"] = page_url
-        p.context["page_handler"] = page_handler
-        p.context["page_handler_type"] = str(type(page_handler))
-        p.context["is_link_allowed"] = DomainCache.get_object(
-            page_link, url_builder=UrlHandler
-        ).is_allowed(page_link)
-        p.context["browser"] = browser
-
-        return p.render("show_page_props.html")
-
-    if request.method == "GET":
-        if "page" not in request.GET:
-            form = LinkInputForm(request=request)
-            form.method = "POST"
-            form.action_url = reverse("{}:page-show-props".format(LinkDatabase.name))
-            p.context["form"] = form
-
-            return p.render("form_oneliner.html")
-
-        else:
-            page_link = request.GET["page"]
-            return show_page_props_internal(request, page_link)
-
-    else:
-        form = LinkInputForm(request.POST, request=request)
-        if not form.is_valid():
-            p.context["summary_text"] = "Form is invalid"
-
-            return p.render("summary_present.html")
-        else:
-            page_link = form.cleaned_data["link"]
-            return show_page_props_internal(request, page_link)
+    form = LinkPropertiesForm(request=request)
+    p.context["form"] = form
+    return p.render("page_show_properties.html")
 
 
 def create_scanner_form(request, links):
@@ -573,28 +589,11 @@ def search_engines(request):
     if data is not None:
         return data
 
-    search_engines = []
-    ai_search_engines = []
-    archives = []
+    Gateway.check_init()
 
-    engine_classes = SearchEngines.get_search_engines()
-    for engine_class in engine_classes:
-        engine = engine_class()
-        search_engines.append(engine)
-
-    engine_classes = SearchEngines.get_aibots()
-    for engine_class in engine_classes:
-        engine = engine_class()
-        ai_search_engines.append(engine)
-
-    engine_classes = SearchEngines.get_archive_libraries()
-    for engine_class in engine_classes:
-        engine = engine_class()
-        archives.append(engine)
-
-    p.context["search_engines"] = search_engines
-    p.context["ai_search_engines"] = ai_search_engines
-    p.context["archives"] = archives
+    p.context["search_engines"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_SEARCH_ENGINE)
+    p.context["ai_search_engines"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_AI_BOT)
+    p.context["archives"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_DIGITAL_LIBRARY)
 
     return p.render("search_engines.html")
 
@@ -606,14 +605,21 @@ def gateways(request):
     if data is not None:
         return data
 
+    Gateway.check_init()
+
     result = []
 
-    engine_classes = SearchEngines.get_gateways()
-    for engine_class in engine_classes:
-        engine = engine_class()
-        result.append(engine)
+    cond1 = Q(gateway_type = Gateway.TYPE_GATEWAY)
+    cond2 = Q(gateway_type = Gateway.TYPE_POPULAR)
+    cond3 = Q(gateway_type = Gateway.TYPE_FAVOURITE)
+    cond4 = Q(gateway_type = Gateway.TYPE_SOCIAL_MEDIA)
+    cond5 = Q(gateway_type = Gateway.TYPE_AUDIO_STREAMING)
+    cond6 = Q(gateway_type = Gateway.TYPE_VIDEO_STREAMING)
+    cond7 = Q(gateway_type = Gateway.TYPE_MARKETPLACE)
 
-    p.context["gateways"] = result
+    cond = cond1 | cond2 | cond3 | cond4 | cond5 | cond6 | cond7
+
+    p.context["gateways"] = Gateway.objects.filter(cond)
 
     return p.render("gateways.html")
 

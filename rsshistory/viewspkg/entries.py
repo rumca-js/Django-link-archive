@@ -16,6 +16,9 @@ from utils.omnisearch import SingleSymbolEvaluator
 from utils.services import WaybackMachine
 
 from ..apps import LinkDatabase
+
+from ..serializers import entry_to_json
+
 from ..models import (
     BaseLinkDataController,
     BackgroundJob,
@@ -1070,67 +1073,6 @@ def entry_json(request, pk):
     return JsonResponse(json_obj)
 
 
-def entry_to_json(user_config, entry):
-    json_entry = {}
-    json_entry["id"] = entry.id
-
-    user_inappropate = (
-        entry.age != 0 and entry.age != None and entry.age > user_config.get_age()
-    )
-
-    if user_inappropate:
-        json_entry["title"] = "Not appropriate"
-    else:
-        json_entry["title"] = entry.title
-
-    if user_inappropate:
-        json_entry["title_safe"] = "Not appropriate"
-    else:
-        json_entry["title_safe"] = entry.get_title_safe()
-
-    if user_inappropate:
-        json_entry["description"] = "Not appropriate"
-    else:
-        json_entry["description"] = entry.description
-
-    if user_inappropate:
-        json_entry["description_safe"] = "Not appropriate"
-    else:
-        json_entry["description_safe"] = entry.get_description_safe()
-    json_entry["link"] = entry.link
-    json_entry["link_absolute"] = entry.get_absolute_url()
-    json_entry["is_valid"] = entry.is_valid()
-    json_entry["date_published"] = entry.date_published
-    json_entry["date_dead_since"] = entry.date_dead_since
-    json_entry["date_update_last"] = entry.date_update_last
-    json_entry["bookmarked"] = entry.bookmarked
-    json_entry["permanent"] = entry.permanent
-    json_entry["artist"] = entry.artist
-    json_entry["album"] = entry.album
-    json_entry["page_rating_contents"] = entry.page_rating_contents
-    json_entry["page_rating_votes"] = entry.page_rating_votes
-    json_entry["age"] = entry.age
-
-    json_entry["source__title"] = ""
-    json_entry["source__url"] = ""
-
-    if hasattr(entry, "source"):
-        if entry.source:
-            json_entry["source__title"] = entry.source.title
-            json_entry["source__url"] = entry.source.url
-
-    if user_config.show_icons:
-        if user_inappropate:
-            json_entry["thumbnail"] = None
-        else:
-            if user_config.thumbnails_as_icons:
-                json_entry["thumbnail"] = entry.get_thumbnail()
-            else:
-                json_entry["thumbnail"] = entry.get_favicon()
-
-    return json_entry
-
-
 def handle_json_view(request, view_to_use):
     page_num = get_page_num(request.GET)
 
@@ -1140,7 +1082,7 @@ def handle_json_view(request, view_to_use):
     json_obj["page"] = page_num
     json_obj["num_pages"] = 0
 
-    uc = UserConfig.get(request.user)
+    user_config = UserConfig.get(request.user)
 
     if view_to_use:
         entries = view_to_use.get_queryset()
@@ -1160,7 +1102,7 @@ def handle_json_view(request, view_to_use):
         # limited_entries = entries[start : page_obj.end_index()]
 
         for entry in page_obj:
-            entry_json = entry_to_json(uc, entry)
+            entry_json = entry_to_json(user_config, entry)
 
             json_obj["entries"].append(entry_json)
 

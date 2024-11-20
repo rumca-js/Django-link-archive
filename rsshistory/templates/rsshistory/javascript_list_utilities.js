@@ -159,6 +159,8 @@ function fillSearchHistory(items) {
 }
 
 let currentSearchSuggestions = 0;
+let showSuggestions = true;
+
 function loadSearchSuggestions(search_term, attempt = 1) {
     let requestVersion = ++currentSearchSuggestions;
 
@@ -181,7 +183,11 @@ function loadSearchSuggestions(search_term, attempt = 1) {
             if (requestVersion === currentSearchSuggestions) {
                 $('#searchHistory').hide();
                 fillSearchSuggestions(data.items);
-                $('#searchSuggestions').show();
+
+                if (showSuggestions)
+                {
+                   $('#searchSuggestions').show();
+                }
             }
         },
         error: function(xhr, status, error) {
@@ -293,6 +299,8 @@ $(document).on('click', '.btnFilterTrigger', function(e) {
     $('#searchHistory').hide();
     $('#searchSyntax').hide();
 
+    showSuggestions = false;
+
     loadRowListContent(search_term, page);
 });
 
@@ -314,6 +322,8 @@ $('#filterForm input[name="search"]').on('input', function() {
     $('#searchSyntax').hide();
     $('#searchSuggestions').empty();
     $('#searchHistory').hide();
+
+    showSuggestions = true;
 
     if (search_term) {
         loadSearchSuggestions(search_term);

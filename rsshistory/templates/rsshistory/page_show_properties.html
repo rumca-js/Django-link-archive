@@ -1,0 +1,16 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div id="formDiv" style="margin-top: 20vh;">
+{% include "rsshistory/form_multiline_element.html" %} 
+</div>
+
+<div id="formResponse">
+</div>
+
+<script>
+{% include "rsshistory/page_show_properties__script.js" %}
+</script>
+
+{% endblock %}

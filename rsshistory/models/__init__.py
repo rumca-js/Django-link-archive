@@ -64,3 +64,5 @@ from .readlater import ReadLater
 from .browser import Browser
 
 from .blockentry import BlockEntryList, BlockEntry, BlockListReader
+
+from .gateway import Gateway

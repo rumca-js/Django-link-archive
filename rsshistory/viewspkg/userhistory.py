@@ -1,5 +1,7 @@
 from django.views import generic
 from django.http import JsonResponse
+from django.core.paginator import Paginator
+from django.urls import reverse
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -9,18 +11,72 @@ from ..models import (
     SourceCategories,
     SourceSubCategories,
     CompactedTags,
+    UserConfig,
 )
 from ..controllers import SourceDataController
 from ..views import ViewPage, UserGenericListView
+from ..serializers import entry_to_json
 
 
-class UserEntryVisitHistoryListView(UserGenericListView):
-    model = UserEntryVisitHistory
-    context_object_name = "content_list"
-    paginate_by = 100
+def user_browse_history(request):
+    p = ViewPage(request)
+    p.set_title("User browse history")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-    def get_title(self):
-        return "User entry visits"
+    data = {}
+    if "search" in request.GET:
+        data = {"search": request.GET["search"]}
+
+    p.context["query_page"] = reverse("{}:get-user-browse-history".format(LinkDatabase.name))
+    p.context["search_suggestions_page"] = None
+    p.context["search_history_page"] = None
+
+    return p.render("userbrowsehistory_list.html")
+
+
+def visit_to_json(user_config, visit_data):
+    entry = visit_data.entry
+
+    data = entry_to_json(user_config, entry)
+    data["date_last_visit"] = visit_data.date_last_visit
+    data["number_of_visits"] = visit_data.visits
+
+    return data
+
+
+def get_user_browse_history(request):
+    p = ViewPage(request)
+    p.set_title("Get user browse history")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    page_num = p.get_page_num()
+
+    data = {}
+    data["queue"] = []
+    data["count"] = 0
+    data["page"] = page_num
+    data["num_pages"] = 0
+
+    if page_num:
+        objects = UserEntryVisitHistory.objects.filter(user=request.user)
+
+        items_per_page = 100
+        p = Paginator(objects, items_per_page)
+        page_object = p.page(page_num)
+
+        data["count"] = p.count
+        data["num_pages"] = p.num_pages
+        user_config = UserConfig.get(request.user)
+
+        for read_later in page_object:
+            json_data = visit_to_json(user_config, read_later)
+            data["queue"].append(json_data)
+
+        return JsonResponse(data)
 
 
 def history_to_json(history):

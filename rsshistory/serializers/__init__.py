@@ -2,7 +2,7 @@
 Data serializers. Mostly for Export / import
 """
 
-from .entriesexporter import MainExporter
+from .entriesexporter import MainExporter, entry_to_json
 from .entrydailydataexpoter import EntryDailyDataMainExporter
 from .entryyeardataexporter import EntryYearDataMainExporter
 from .entrynotimedataexporter import EntryNoTimeDataMainExporter

@@ -45,7 +45,7 @@ def run_backup_command(run_info):
     operating_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        # subprocess.run(transformed, cwd = str(operating_dir), check=True)
+        subprocess.run(transformed, cwd = str(operating_dir), check=True)
         print("Backup completed successfully.")
     except subprocess.CalledProcessError as e:
         print("An error occurred:", e)
@@ -146,7 +146,8 @@ def backup_workspace(run_info):
     print("--------------------")
 
     tablemapping = {
-       "./instance_entries"   : ["instance_linkdatamodel", "instance_domains"],
+       "./instance_entries"   : ["instance_linkdatamodel"],
+       "./instance_domains"   : ["instance_domains"],
        "./instance_sources"   : ["instance_sourcedatamodel"],
        "./instance_tags"      : ["instance_usertags", "instance_compactedtags", "instance_usercompactedtags"],
        "./instance_votes"     : ["instance_uservotes"],
@@ -173,7 +174,8 @@ def restore_workspace(run_info):
     # order is important
     tablemapping = [
        ["./instance_sources"         , ["instance_sourcedatamodel"]],
-       ["./instance_entries"         , ["instance_linkdatamodel", "instance_domains"]],
+       ["./instance_domains"         , ["instance_domains"]],
+       ["./instance_entries"         , ["instance_linkdatamodel"],
        ["./instance_tags"            , ["instance_usertags", "instance_compactedtags", "instance_usercompactedtags"]],
        ["./instance_votes"           , ["instance_uservotes"]],
        ["./instance_comments"        , ["instance_usercomments"]],
@@ -206,13 +208,14 @@ def restore_workspace(run_info):
 
 
 def parse_backup():
-    parser = argparse.ArgumentParser(prog="Backup", description="Backup manager")
+    parser = argparse.ArgumentParser(prog="Backup", description="Backup manager. To pass password define .pgpass file, and define password there.")
 
     parser.add_argument("-b", "--backup", action="store_true")
     parser.add_argument("-r", "--restore", action="store_true")
     parser.add_argument("-U", "--user", default="user")
     parser.add_argument("-d", "--database", default="db")
     parser.add_argument("-w", "--workspace")
+    parser.add_argument("-d", "--debug") # TODO implement that shit
     parser.add_argument("--host", default="127.0.0.1")
 
     return parser, parser.parse_args()
@@ -220,6 +223,9 @@ def parse_backup():
 
 def main():
     parser, args = parse_backup()
+
+    if not args.backup and not args.restore:
+        parser.print_help()
 
     workspaces = []
 
