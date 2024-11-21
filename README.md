@@ -1,6 +1,4 @@
-Personal link database, link aggregator, with RSS functionality. Similar to Reddit, but completely open source. You can self host it.
-
-Manages link meta information.
+Personal link database, link aggregator, with RSS functionality.
 
 ## Use cases
 
