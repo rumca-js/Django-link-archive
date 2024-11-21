@@ -121,7 +121,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         handler.process(job)
 
         jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 17)
+        self.assertEqual(jobs.count(), 18)
 
     def test_cleanup_job__all_process(self):
         self.prepare_data()
@@ -136,7 +136,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         handler.process(job)
 
         jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 17)
+        self.assertEqual(jobs.count(), 18)
 
         for job in jobs:
             handler = CleanupJobHandler()

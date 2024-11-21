@@ -23,9 +23,12 @@ class SystemOperationController(object):
         else:
             SystemOperation.add_by_thread(thread_id)
 
-    def cleanup(cfg=None):
-        controller = SystemOperationController()
-        thread_ids = controller.get_thread_ids()
+    def cleanup(cfg=None, thread_ids=None):
+        if not thread_ids:
+            return
+
+        thread_ids = self.threads_to_threads(thread_ids)
+
         for thread_id in thread_ids:
             # leave one entry with time check
             all_entries = SystemOperation.objects.filter(
@@ -86,21 +89,18 @@ class SystemOperationController(object):
         else:
             return True
 
-    def is_system_healthy(self):
+    def is_system_healthy(self, thread_ids):
         c = ConfigurationEntry.get()
         if c.background_tasks:
             if not self.is_internet_ok():
                 return False
-            if not self.is_threading_ok():
+            if not self.is_threading_ok(thread_ids):
                 return False
 
     def is_threading_ok(self, thread_ids=None):
         hours_limit = 1800
 
-        if not thread_ids:
-            thread_ids = self.get_thread_ids()
-        else:
-            thread_ids = self.threads_to_threads(thread_ids)
+        thread_ids = self.threads_to_threads(thread_ids)
 
         for thread_id in thread_ids:
             date = self.get_last_thread_signal(thread_id)
@@ -132,28 +132,19 @@ class SystemOperationController(object):
         if entries.exists():
             return entries[0].is_internet_connection_ok
 
-    def get_thread_info(self, display=True, thread_ids=None):
+    def get_thread_info(self, thread_ids=None):
         """
         @display If true, then provide dates meant for display (local time)
         """
         result = []
 
-        if not thread_ids:
-            thread_ids = self.get_thread_ids()
-        else:
-            thread_ids = self.threads_to_threads(thread_ids)
+        thread_ids = self.threads_to_threads(thread_ids)
 
         for thread in thread_ids:
             date = self.get_last_thread_signal(thread)
             result.append([thread, date])
 
         return result
-
-    def get_thread_ids(self):
-        from ..tasks import get_tasks
-
-        threads = get_tasks()
-        return self.threads_to_threads(threads)
 
     def threads_to_threads(self, threads):
         thread_ids = []

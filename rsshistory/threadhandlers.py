@@ -1093,7 +1093,8 @@ class CleanupJobHandler(BaseJobHandler):
             ModelFiles.cleanup(cfg)
         if table == "all" or table == "SystemOperation":
             from .controllers import SystemOperationController
-            SystemOperationController.cleanup(cfg)
+            from .threadprocessors import get_tasks
+            SystemOperationController.cleanup(cfg, get_tasks())
         if table == "all" or table == "Gateway":
             Gateway.cleanup(cfg)
 

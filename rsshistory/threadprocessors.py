@@ -416,8 +416,6 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
         super().__init__()
 
     def get_supported_jobs(self):
-        from .tasks import get_processors
-
         jobs = []
         choices = BackgroundJobController.JOB_CHOICES
 
@@ -448,11 +446,35 @@ class OneTaskProcessor(GenericJobsProcessor):
         super().__init__()
 
     def run(self):
-        from .tasks import get_processors
-
         for processor in get_processors():
             processor_object = processor()
             processor_object.run()
 
         leftover_processor = LeftOverJobsProcessor()
         leftover_processor.run()
+
+
+def get_processors():
+    """
+    Each processor will have each own dedicated queue.
+    Write block will not affect source processing.
+    """
+    return [
+        # if you are bottlenecked by resources,
+        # you can leave only leftover processor
+        # less queues, less CPU overhead
+        SourceJobsProcessor,
+        WriteJobsProcessor,
+        ImportJobsProcessor,
+        LeftOverJobsProcessor,
+    ]
+
+
+def get_tasks():
+    tasks = [[300.0, RefreshProcessor]]
+    processors = get_processors()
+
+    for processor in processors:
+        tasks.append([60.0, processor])
+
+    return tasks

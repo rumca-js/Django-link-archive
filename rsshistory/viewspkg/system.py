@@ -400,7 +400,7 @@ def json_system_status(request):
 
     data["directory"] = c.directory
 
-    from ..tasks import get_tasks
+    from ..threadprocessors import get_tasks
     tasks = get_tasks()
 
     data["threads"] = []
@@ -796,8 +796,11 @@ def is_system_ok(request):
     if data is not None:
         return data
 
+    from ..threadprocessors import get_tasks
+
     system_controller = SystemOperationController()
-    system_is_ok = system_controller.is_system_healthy()
+    tasks = get_tasks()
+    system_is_ok = system_controller.is_system_healthy(tasks)
 
     text = "YES" if system_is_ok else "NO"
     status_code = 200 if system_is_ok else 500

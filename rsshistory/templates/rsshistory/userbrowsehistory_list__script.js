@@ -19,20 +19,12 @@ function fillQueueListElement(entry) {
         const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
         img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
     }
-    
-    let thumbnail_text = '';
-    if (img_text) {
-        thumbnail_text = `
-            <div style="position: relative; display: inline-block;">
-                ${img_text}
-            </div>`;
-    }
 
     let text = `
         <div class="my-1">
          <a href="${link_absolute}" title="${title}">
              <div class="d-flex">
-		 ${thumbnail_text}
+             ${img_text}
         
         	 <div>
         	     ${title_safe}
