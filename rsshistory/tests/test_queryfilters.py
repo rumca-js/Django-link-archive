@@ -80,7 +80,7 @@ class FiltersTest(FakeInternetTestCase):
             "language": "none",
             "tag__tag": "none",
             "bookmarked": "none",
-            "artist": "none",
+            "author": "none",
             "album": "none",
             "date_published__gt": "none",
             "unsupported": "none",
@@ -93,7 +93,7 @@ class FiltersTest(FakeInternetTestCase):
         self.assertTrue("title" in filter_args)
         self.assertTrue("language" in filter_args)
         self.assertTrue("bookmarked" in filter_args)
-        self.assertTrue("artist" in filter_args)
+        self.assertTrue("author" in filter_args)
         self.assertTrue("album" in filter_args)
         self.assertTrue("date_published__gt" in filter_args)
 
@@ -104,7 +104,7 @@ class FiltersTest(FakeInternetTestCase):
             "title__icontains": "link",
             "language": "none",
             "bookmarked": "none",
-            "artist": "none",
+            "author": "none",
             "album": "none",
             "tags__tag": "none",
             "user__username": "none",
@@ -120,7 +120,7 @@ class FiltersTest(FakeInternetTestCase):
         self.assertTrue("title__icontains" in filter_args)
         self.assertTrue("language" in filter_args)
         self.assertTrue("bookmarked" in filter_args)
-        self.assertTrue("artist" in filter_args)
+        self.assertTrue("author" in filter_args)
         self.assertTrue("album" in filter_args)
         self.assertTrue("tags__tag" in filter_args)
         self.assertTrue("user__username" in filter_args)
@@ -404,16 +404,16 @@ class OmniSearchFilterTest(FakeInternetTestCase):
 
     def test_get_filtered_objects_with_double_quotes(self):
         LinkDataController.objects.create(
-            link="https://test.com", artist="Sombody Anybody"
+            link="https://test.com", author="Sombody Anybody"
         )
 
         qs = LinkDataController.objects.all()
         print("Query set length: {}".format(qs.count()))
 
-        args = {"search": 'artist = "Sombody "'}
+        args = {"search": 'author = "Sombody "'}
         processor = OmniSearchFilter(args, init_objects=qs)
 
-        processor.set_translation_mapping(["link", "artist"])
+        processor.set_translation_mapping(["link", "author"])
 
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))
@@ -422,16 +422,16 @@ class OmniSearchFilterTest(FakeInternetTestCase):
 
     def test_get_filtered_objects_with_single_quotes(self):
         LinkDataController.objects.create(
-            link="https://test.com", artist="Sombody Anybody"
+            link="https://test.com", author="Sombody Anybody"
         )
 
         qs = LinkDataController.objects.all()
         print("Query set length: {}".format(qs.count()))
 
-        args = {"search": "artist = 'Sombody '"}
+        args = {"search": "author = 'Sombody '"}
         processor = OmniSearchFilter(args, init_objects=qs)
 
-        processor.set_translation_mapping(["link", "artist"])
+        processor.set_translation_mapping(["link", "author"])
 
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))
@@ -462,7 +462,7 @@ class OmniSearchFilterTest(FakeInternetTestCase):
 
     def test_get_filtered_objects_with_no_equal(self):
         LinkDataController.objects.create(
-            link="https://test.com", artist="Sombody Anybody"
+            link="https://test.com", author="Sombody Anybody"
         )
 
         qs = LinkDataController.objects.all()
@@ -471,7 +471,7 @@ class OmniSearchFilterTest(FakeInternetTestCase):
         args = {"search": "Sombody"}
         processor = OmniSearchFilter(args, init_objects=qs)
 
-        processor.set_translation_mapping(["link", "artist"])
+        processor.set_translation_mapping(["link", "author"])
 
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))

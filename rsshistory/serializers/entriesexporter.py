@@ -294,7 +294,7 @@ def entry_to_json(user_config, entry):
     json_entry["date_update_last"] = entry.date_update_last
     json_entry["bookmarked"] = entry.bookmarked
     json_entry["permanent"] = entry.permanent
-    json_entry["artist"] = entry.artist
+    json_entry["author"] = entry.author
     json_entry["album"] = entry.album
     json_entry["page_rating_contents"] = entry.page_rating_contents
     json_entry["page_rating_votes"] = entry.page_rating_votes

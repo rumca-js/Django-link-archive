@@ -402,17 +402,17 @@ class EntryGenericPlugin(object):
                 ),
             )
 
-        if self.entry.artist and self.entry.artist != "":
+        if self.entry.author and self.entry.author != "":
             buttons.append(
                 EntryButton(
                     self.user,
-                    "[S] Artist: " + self.entry.artist[:20],
+                    "[S] Artist: " + self.entry.author[:20],
                     reverse(
                         "{}:entries".format(LinkDatabase.name),
                     )
-                    + "?search=artist+%3D+{}".format(self.entry.artist),
+                    + "?search=author+%3D+{}".format(self.entry.author),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "Search for entries made by {} artist".format(self.entry.artist),
+                    "Search for entries made by {} author".format(self.entry.author),
                 ),
             )
 
@@ -630,8 +630,8 @@ class EntryGenericPlugin(object):
         if modified_date:
             parameters.append(EntryParameter("Modified date", modified_date))
 
-        if self.entry.artist:
-            parameters.append(EntryParameter("Artist", self.entry.artist))
+        if self.entry.author:
+            parameters.append(EntryParameter("Artist", self.entry.author))
         if self.entry.album:
             parameters.append(EntryParameter("Album", self.entry.album))
 

@@ -58,6 +58,7 @@ def get_page_properties(request):
     all_properties = []
 
     properties = {}
+    properties["link"] = page_url.url
     properties["title"] = page_url.get_title()
     properties["description"] = page_url.get_description()
     properties["author"] = page_url.get_author()
@@ -73,15 +74,24 @@ def get_page_properties(request):
 
     page_handler = page_url.get_handler()
 
+    response = page_url.get_response()
+
     request_data = {}
     request_data["Options"] = str(page_url.options)
-    request_data["Response"] = str(page_url.get_response())
     request_data["Browser"] = str(browser)
     request_data["Page Handler"] = str(page_handler)
     if hasattr(page_handler, "p"):
         request_data["Page Type"] = str(page_handler.p)
 
     all_properties.append({"name" : "Options", "data" : request_data})
+
+    if response:
+        response_data = {}
+        response_data["Response"] = str(response)
+        response_data["status_code"] = response.get_status_code()
+        response_data["Content-Type"] = response.get_content_type()
+        response_data["Content-Length"] = response.get_content_length()
+        all_properties.append({"name" : "Response", "data" : response_data})
 
     data = {}
     data["properties"] = all_properties
@@ -591,9 +601,11 @@ def search_engines(request):
 
     Gateway.check_init()
 
-    p.context["search_engines"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_SEARCH_ENGINE)
-    p.context["ai_search_engines"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_AI_BOT)
-    p.context["archives"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_DIGITAL_LIBRARY)
+    mapping = Gateway.get_types_mapping([Gateway.TYPE_SEARCH_ENGINE,
+                                         Gateway.TYPE_AI_BOT,
+                                         Gateway.TYPE_DIGITAL_LIBRARY])
+
+    p.context["search_engines"] = mapping
 
     return p.render("search_engines.html")
 
@@ -607,21 +619,34 @@ def gateways(request):
 
     Gateway.check_init()
 
-    result = []
+    mapping = Gateway.get_types_mapping([Gateway.TYPE_GATEWAY,
+                                         Gateway.TYPE_APP_STORE,
+                                         Gateway.TYPE_POPULAR,
+                                         Gateway.TYPE_FAVOURITE,
+                                         Gateway.TYPE_SOCIAL_MEDIA,
+                                         Gateway.TYPE_AUDIO_STREAMING,
+                                         Gateway.TYPE_VIDEO_STREAMING,
+                                         Gateway.TYPE_FILE_SHARING,
+                                         Gateway.TYPE_MARKETPLACE,
+                                         Gateway.TYPE_OTHER,
+                                         ])
 
-    cond1 = Q(gateway_type = Gateway.TYPE_GATEWAY)
-    cond2 = Q(gateway_type = Gateway.TYPE_POPULAR)
-    cond3 = Q(gateway_type = Gateway.TYPE_FAVOURITE)
-    cond4 = Q(gateway_type = Gateway.TYPE_SOCIAL_MEDIA)
-    cond5 = Q(gateway_type = Gateway.TYPE_AUDIO_STREAMING)
-    cond6 = Q(gateway_type = Gateway.TYPE_VIDEO_STREAMING)
-    cond7 = Q(gateway_type = Gateway.TYPE_MARKETPLACE)
-
-    cond = cond1 | cond2 | cond3 | cond4 | cond5 | cond6 | cond7
-
-    p.context["gateways"] = Gateway.objects.filter(cond)
+    p.context["gateways"] = mapping
 
     return p.render("gateways.html")
+
+
+def gateways_initialize(request):
+    p = ViewPage(request)
+    p.set_title("Gateways initialization")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+    Gateway.objects.all().delete()
+    Gateway.populate()
+
+    p.context["summary_text"] = "Initialized gateways"
+    return p.render("go_back.html")
 
 
 def cleanup_link(request):

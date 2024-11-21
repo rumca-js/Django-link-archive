@@ -21,6 +21,8 @@ def get_browser_choices():
 
 
 class Browser(models.Model):
+    THIS_BROWSER = -1
+
     enabled = models.BooleanField(default=True)
     priority = models.IntegerField(default=0)
 

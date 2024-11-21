@@ -49,6 +49,7 @@ from ..forms import (
     InitSearchForm,
     OmniSearchWithArchiveForm,
     LinkInputForm,
+    LinkPropertiesForm,
 )
 from ..views import (
     ViewPage,
@@ -255,7 +256,7 @@ class EntriesOmniListView(EntriesSearchListView):
                 [
                     "title__icontains",
                     "link__icontains",
-                    "artist__icontains",
+                    "author__icontains",
                     "album__icontains",
                     "description__icontains",
                     # "tags__tag__icontains",
@@ -266,7 +267,7 @@ class EntriesOmniListView(EntriesSearchListView):
                 [
                     "title__icontains",
                     "link__icontains",
-                    "artist__icontains",
+                    "author__icontains",
                     "album__icontains",
                     "description__icontains",
                     "tags__tag__icontains",
@@ -500,7 +501,7 @@ def get_entry_menu(request, pk):
 
 
 def func_display_empty_form(request, p, template_name):
-    form = LinkInputForm(request=request)
+    form = LinkPropertiesForm(request=request)
     form.method = "POST"
 
     p.context["form"] = form
@@ -544,6 +545,8 @@ def get_cleaned_up_entry_data(request, data):
 
 
 def func_display_data_form(request, p, data):
+    # TODO remove this
+    # or move this code to get-page-properties
     notes = []
     warnings = []
     errors = []
@@ -675,29 +678,36 @@ def add_entry(request):
 
         p.context["summary_text"] = "Form is invalid: {}".format(error_message)
         return p.render("summary_present.html")
-
     else:
-        if "link" in request.GET:
-            link = request.GET["link"]
+        p.context["summary_text"] = "Incorrect call of form"
+        return p.render("summary_present.html")
 
-            link = UrlHandler.get_cleaned_link(link)
 
-            if not Url.is_protocolled_link(link):
-                p.context["summary_text"] = (
-                    "Only protocolled links are allowed. Link:{}".format(link)
-                )
-                return p.render("summary_present.html")
+def add_entry_form(request):
+    p = ViewPage(request)
+    p.set_title("Checks if entry exists")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-            data = LinkDataController.get_full_information({"link": link})
-            if data:
-                return func_display_data_form(request, p, data)
+    init = {"user":request.user}
 
-            p.context["summary_text"] = "Could not obtain details from link {}".format(
-                link
-            )
-            return p.render("go_back.html")
+    link = None
+    if "link" in request.GET:
+        link = request.GET["link"]
 
-        return func_display_empty_form(request, p, "form_entry_add.html")
+        page = DomainAwarePage(link)
+        config = Configuration.get_object().config_entry
+
+        if page.is_domain() and config.keep_domains:
+            # if something is permanent, it does not have to be bookmarked
+            init["permanent"] = True
+            init["bookmarked"] = False
+
+    form = EntryForm(initial = init, request=request)
+    p.context["form"] = form
+
+    return p.render("entry_add__form.html")
 
 
 def add_simple_entry(request):
@@ -708,36 +718,37 @@ def add_simple_entry(request):
     if not uc.can_add():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
 
-    if request.method == "POST":
-        form = LinkInputForm(request.POST, request=request)
-        if form.is_valid():
-            link = form.cleaned_data["link"]
+    return func_display_empty_form(request, p, "entry__add_simple.html")
 
-            cleaned_link = UrlHandler.get_cleaned_link(link)
 
-            if cleaned_link != link:
-                return func_display_init_form(request, p, cleaned_link)
+def entry_is(request):
+    def try_link(link):
+        entries = LinkDataController.objects.filter(link = link)
+        if entries.count() != 0:
+            return entries[0]
 
-            if not Url.is_protocolled_link(link):
-                p.context["summary_text"] = (
-                    "Only protocolled links are allowed. Link:{}".format(link)
-                )
-                return p.render("summary_present.html")
+    p = ViewPage(request)
+    p.set_title("Checks if entry exists")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-            data = LinkDataController.get_full_information({"link": link})
-            if data:
-                return func_display_data_form(request, p, data)
+    link = request.GET['link']
 
-            p.context["summary_text"] = "Could not obtain details from link {}".format(
-                link
-            )
-            return p.render("go_back.html")
+    data = {}
+    entry = try_link(link)
+    wrapper = EntryWrapper(link=link)
 
-        else:
-            p.context["summary_text"] = "Form is invalid {}".format(link)
-            return p.render("summary_present.html")
+    entry = wrapper.get()
+
+    if entry:
+        data["status"] = True
+        data["pk"] = entry.id
     else:
-        return func_display_empty_form(request, p, "form_entry_add_simple.html")
+        data["status"] = False
+        data["message"] = "Does not exist"
+
+    return JsonResponse(data)
 
 
 def entry_update_data(request, pk):

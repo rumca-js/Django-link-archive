@@ -74,8 +74,8 @@ class LinkDataController(LinkDataModel):
         if self.album and self.album != "" and term.find(self.album) == -1:
             term = self.album + " " + term
 
-        if self.artist and self.artist != "" and term.find(self.artist) == -1:
-            term = self.artist + " " + term
+        if self.author and self.author != "" and term.find(self.author) == -1:
+            term = self.author + " " + term
 
         term.strip()
 

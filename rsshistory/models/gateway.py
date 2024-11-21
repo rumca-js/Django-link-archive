@@ -1,5 +1,7 @@
 from django.db import models
 
+from collections import OrderedDict
+
 
 class Gateway(models.Model):
     """
@@ -20,6 +22,8 @@ class Gateway(models.Model):
     TYPE_FAVOURITE = "favourite"
     TYPE_AUDIO_STREAMING = "audio-streaming"
     TYPE_VIDEO_STREAMING = "video-streaming"
+    TYPE_FILE_SHARING = "file-sharing"
+    TYPE_BANKING = "banking"
     TYPE_DIGITAL_LIBRARY = "digital-library"
     TYPE_MARKETPLACE = "marketplace"
     TYPE_APP_STORE = "app-store"
@@ -34,6 +38,8 @@ class Gateway(models.Model):
         TYPE_SOCIAL_MEDIA,
         TYPE_AUDIO_STREAMING,
         TYPE_VIDEO_STREAMING,
+        TYPE_FILE_SHARING,
+        TYPE_BANKING,
         TYPE_DIGITAL_LIBRARY,
         TYPE_MARKETPLACE,
         TYPE_APP_STORE,
@@ -49,6 +55,8 @@ class Gateway(models.Model):
         [TYPE_FAVOURITE, TYPE_FAVOURITE],
         [TYPE_AUDIO_STREAMING, TYPE_AUDIO_STREAMING],
         [TYPE_VIDEO_STREAMING, TYPE_VIDEO_STREAMING],
+        [TYPE_FILE_SHARING, TYPE_FILE_SHARING],
+        [TYPE_BANKING, TYPE_BANKING],
         [TYPE_DIGITAL_LIBRARY, TYPE_DIGITAL_LIBRARY],
         [TYPE_MARKETPLACE, TYPE_MARKETPLACE],
         [TYPE_APP_STORE, TYPE_APP_STORE],
@@ -89,6 +97,9 @@ class Gateway(models.Model):
         Gateway.populate_social_media()
         Gateway.populate_ai_bot()
         Gateway.populate_marketplaces()
+        Gateway.populate_file_sharing()
+        Gateway.populate_banking()
+        Gateway.populate_app_store()
         Gateway.populate_other()
 
     def populate_search_engines():
@@ -99,7 +110,6 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://google.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://bing.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://kagi.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://perplexity.ai", gateway_type=thetype)
         Gateway.objects.create(link = "https://wolframalpha.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://mwmbl.org", gateway_type=thetype)
         Gateway.objects.create(link = "https://whoogle.io", gateway_type=thetype)
@@ -123,7 +133,7 @@ class Gateway(models.Model):
         thetype = Gateway.TYPE_DIGITAL_LIBRARY
 
         Gateway.objects.create(link = "https://wikipedia.org", gateway_type=thetype)
-        Gateway.objects.create(link = "https://web.archive.org", gateway_type=thetype)
+        Gateway.objects.create(link = "https://archive.org", gateway_type=thetype)
         Gateway.objects.create(link = "https://archive.ph", gateway_type=thetype)
         Gateway.objects.create(link = "https://annas-archive.org", gateway_type=thetype)
         Gateway.objects.create(link = "https://github.com", gateway_type=thetype)
@@ -138,6 +148,19 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://rumble.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://netflix.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://disneyplus.com", gateway_type=thetype)
+
+    def populate_file_sharing():
+        thetype = Gateway.TYPE_FILE_SHARING
+
+        Gateway.objects.create(link = "https://drive.google.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://icloud.com", gateway_type=thetype)
+
+    def populate_banking():
+        thetype = Gateway.TYPE_BANKING
+
+        Gateway.objects.create(link = "https://paypal.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://wallet.google", gateway_type=thetype)
+        Gateway.objects.create(link = "https://www.apple.com/pl/apple-pay", gateway_type=thetype)
 
     def populate_audio_streaming():
         thetype = Gateway.TYPE_AUDIO_STREAMING
@@ -169,6 +192,7 @@ class Gateway(models.Model):
 
         Gateway.objects.create(link = "https://chatgpt.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://bard.google.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://perplexity.ai", gateway_type=thetype)
 
     def populate_marketplaces():
         thetype = Gateway.TYPE_MARKETPLACE
@@ -181,6 +205,7 @@ class Gateway(models.Model):
     def populate_app_store():
         thetype = Gateway.TYPE_APP_STORE
 
+        Gateway.objects.create(link = "https://shop.battle.net", gateway_type=thetype)
         Gateway.objects.create(link = "https://apps.apple.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://play.google.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://store.playstation.com", gateway_type=thetype)
@@ -194,3 +219,32 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://gmail.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://maps.google.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://chrome.google.com", gateway_type=thetype)
+
+    def get_types_mapping(gateway_types):
+        data = OrderedDict()
+        if Gateway.TYPE_SEARCH_ENGINE in gateway_types:
+            data["search_engines"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_SEARCH_ENGINE)
+        if Gateway.TYPE_AI_BOT in gateway_types:
+            data["ai_search_engines"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_AI_BOT)
+        if Gateway.TYPE_DIGITAL_LIBRARY in gateway_types:
+            data["digital_library"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_DIGITAL_LIBRARY)
+        if Gateway.TYPE_GATEWAY in gateway_types:
+            data["gateways"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_GATEWAY)
+        if Gateway.TYPE_APP_STORE in gateway_types:
+            data["app_store"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_APP_STORE)
+        if Gateway.TYPE_POPULAR in gateway_types:
+            data["popular"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_POPULAR)
+        if Gateway.TYPE_FAVOURITE in gateway_types:
+            data["favourite"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_FAVOURITE)
+        if Gateway.TYPE_SOCIAL_MEDIA in gateway_types:
+            data["social_media"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_SOCIAL_MEDIA)
+        if Gateway.TYPE_AUDIO_STREAMING in gateway_types:
+            data["audio_streaming"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_AUDIO_STREAMING)
+        if Gateway.TYPE_VIDEO_STREAMING in gateway_types:
+            data["video_streaming"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_VIDEO_STREAMING)
+        if Gateway.TYPE_MARKETPLACE in gateway_types:
+            data["marketplace"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_MARKETPLACE)
+        if Gateway.TYPE_OTHER in gateway_types:
+            data["other"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_OTHER)
+
+        return data

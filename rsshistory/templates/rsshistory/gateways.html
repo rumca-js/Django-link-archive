@@ -2,19 +2,23 @@
 {% load static %}
 {% block content %}
 
-<h1>Gateways</h1>
-<ul>
-      {% for gateway in gateways %}
-      <li>
-	      <a href="{{gateway.link}}" title="{{gateway.title}}">
-              {% include "rsshistory/icon_external.html" %}
-              {{gateway.name}} @ {{gateway.link}}
-              {% if gateway.description %}
-               - {{gateway.description}}
-              {% endif %}
-          </a>
-      </li>
-      {% endfor %}
-</ul>
+{% for Type_Name, items in gateways.items %}
+  {% if items %}
+     <h1>{{Type_Name}}</h1>
+     <ul>
+         {% for search_engine in items %}
+         <li>
+             <a href="{{search_engine.link}}" title="{{search_engine.title}}">
+                 {% include "rsshistory/icon_external.html" %}
+                 {{search_engine.name}} @ {{search_engine.link}}
+                 {% if search_engine.description %}
+                  - {{search_engine.description}}
+                 {% endif %}
+             </a>
+         </li>
+         {% endfor %}
+     </ul>
+   {% endif %}
+{% endfor %}
 
 {% endblock %}

@@ -75,29 +75,33 @@ function sendRequest(page_url, browser, attempt = 1) {
            let text = fillData(data.properties);
            $("#formResponse").html(text);
            $('.btnFilterTrigger').prop("disabled", false);
+           $('.btnFilterTrigger').html("Submit")
        },
        error: function(xhr, status, error) {
            if (attempt < 3) {
                $("#formResponse").html("Could not obtain information. Retry");
                sendRequest(page_url, browser, attempt + 1);
            } else {
-             $("#formResponse").html("Could not obtain information. Error");
-             $('.btnFilterTrigger').prop("disabled", false);
+               $("#formResponse").html("Could not obtain information. Error");
+               $('.btnFilterTrigger').prop("disabled", false);
+               $('.btnFilterTrigger').html("Submit")
            }
        }
     });
 }
 
 
-$(document).on('click', '.btnFilterTrigger', function(e) {
-    e.preventDefault();
+$(document).ready(function() {
+    $("#btnFetch").click(function(event) {
+        event.preventDefault();
 
-    $('.btnFilterTrigger').prop("disabled", true);
+        $('.btnFilterTrigger').prop("disabled", true);
 
-    const link = $('#id_link').val();
-    const browser = $('#id_browser').val();
+        const link = $('#id_link').val();
+        const browser = $('#id_browser').val();
 
-    sendRequest(link, browser);
+        sendRequest(link, browser);
+    });
 });
 
 $(document).on('submit', '#theForm', function(event) {

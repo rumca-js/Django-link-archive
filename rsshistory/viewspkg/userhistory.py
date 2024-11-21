@@ -94,7 +94,7 @@ def json_user_search_history(request):
     json_obj = {}
     json_obj["histories"] = []
 
-    for history in histories:
+    for history in histories[:50]:
         json_obj["histories"].append(history_to_json(history))
 
     return JsonResponse(json_obj)

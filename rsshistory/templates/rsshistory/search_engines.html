@@ -2,49 +2,23 @@
 {% load static %}
 {% block content %}
 
-<h1>Search engines</h1>
-<ul>
-      {% for search_engine in search_engines %}
-      <li>
-	      <a href="{{search_engine.link}}" title="{{search_engine.title}}">
-              {% include "rsshistory/icon_external.html" %}
-              {{search_engine.name}} @ {{search_engine.link}}
-              {% if search_engine.description %}
-               - {{search_engine.description}}
-              {% endif %}
-          </a>
-      </li>
-      {% endfor %}
-</ul>
-
-<h1>AI Search engines</h1>
-<ul>
-      {% for search_engine in ai_search_engines %}
-      <li>
-	      <a href="{{search_engine.link}}" title="{{search_engine.title}}">
-              {% include "rsshistory/icon_external.html" %}
-              {{search_engine.name}} @ {{search_engine.link}}
-              {% if search_engine.description %}
-               - {{search_engine.description}}
-              {% endif %}
-          </a>
-      </li>
-      {% endfor %}
-</ul>
-
-<h1>Archives</h1>
-<ul>
-      {% for search_engine in archives %}
-      <li>
-	      <a href="{{search_engine.link}}" title="{{search_engine.title}}">
-              {% include "rsshistory/icon_external.html" %}
-              {{search_engine.name}} @ {{search_engine.link}}
-              {% if search_engine.description %}
-               - {{search_engine.description}}
-              {% endif %}
-          </a>
-      </li>
-      {% endfor %}
-</ul>
+{% for Type_Name, items in search_engines.items %}
+  {% if items %}
+     <h1>{{Type_Name}}</h1>
+     <ul>
+         {% for search_engine in items %}
+         <li>
+             <a href="{{search_engine.link}}" title="{{search_engine.title}}">
+                 {% include "rsshistory/icon_external.html" %}
+                 {{search_engine.name}} @ {{search_engine.link}}
+                 {% if search_engine.description %}
+                  - {{search_engine.description}}
+                 {% endif %}
+             </a>
+         </li>
+         {% endfor %}
+     </ul>
+  {% endif %}
+{% endfor %}
 
 {% endblock %} 

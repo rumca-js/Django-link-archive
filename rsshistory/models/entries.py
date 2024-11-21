@@ -81,11 +81,11 @@ class BaseLinkDataModel(models.Model):
     #  - link model (fast)
     #  - archive (slow)
 
-    # If we have moved artist & album to one big table, then it would go against this
+    # If we have moved author & album to one big table, then it would go against this
     # solution.
     # We do not want to have archive tables for everything.
 
-    artist = models.CharField(max_length=1000, null=True, blank=True)
+    author = models.CharField(max_length=1000, null=True, blank=True)
     album = models.CharField(max_length=1000, null=True, blank=True)
 
     status_code = models.IntegerField(default=0)
@@ -112,7 +112,7 @@ class BaseLinkDataModel(models.Model):
         """
         title_length = BaseLinkDataModel._meta.get_field("title").max_length
         description_length = BaseLinkDataModel._meta.get_field("description").max_length
-        artist_length = BaseLinkDataModel._meta.get_field("artist").max_length
+        author_length = BaseLinkDataModel._meta.get_field("author").max_length
         album_length = BaseLinkDataModel._meta.get_field("album").max_length
         thumbnail_length = BaseLinkDataModel._meta.get_field("thumbnail").max_length
         language_length = BaseLinkDataModel._meta.get_field("language").max_length
@@ -127,8 +127,8 @@ class BaseLinkDataModel(models.Model):
         if self.album and len(self.album) > album_length:
             self.album = self.description[: album_length - 1]
 
-        if self.artist and len(self.artist) > artist_length:
-            self.artist = self.description[: artist_length - 1]
+        if self.author and len(self.author) > author_length:
+            self.author = self.description[: author_length - 1]
 
         if self.thumbnail and len(self.thumbnail) > thumbnail_length:
             self.thumbnail = None
@@ -326,7 +326,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             "date_published",
             "permanent",
             "bookmarked",
-            "artist",
+            "author",
             "album",
             "language",
             "thumbnail",

@@ -18,9 +18,11 @@ function putSpinnerOnIt(button) {
     button.parents('form').submit();
 }
 
-$("#btnFetch").click(function(event) {
-    event.preventDefault();
-    putSpinnerOnIt($(this));
+$(document).ready(function() {
+   $("#btnFetch").click(function(event) {
+       event.preventDefault();
+       putSpinnerOnIt($(this));
+   });
 });
 
 function getDynamicContent(url_address, htmlElement, attempt = 1, errorInHtml = false) {

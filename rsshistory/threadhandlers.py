@@ -278,7 +278,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
         url = data["url"]
         title = data["title"]
-        artist = data["artist"]
+        author = data["author"]
         album = data["album"]
 
         AppLogging.notify("Downloading music: " + url + " " + title)
@@ -308,7 +308,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
     def get_data(self, obj):
         title = ""
-        artist = None
+        author = None
         album = None
 
         url = obj.subject
@@ -317,11 +317,11 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
         if entries.exists():
             entry = entries[0]
             title = entry.title
-            artist = entry.artist
+            author = entry.author
             album = entry.album
 
         data = {
-            "artist": str(artist),
+            "author": str(author),
             "album": str(album),
             "title": str(title),
             "url": url,
@@ -334,8 +334,8 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
         if data["album"]:
             file_name = Path(data["album"]) / file_name
 
-        if data["artist"]:
-            file_name = Path(data["artist"]) / file_name
+        if data["author"]:
+            file_name = Path(data["author"]) / file_name
 
         file_name = fix_path_for_os(str(file_name))
 
@@ -357,7 +357,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
 
         url = data["url"]
         title = data["title"]
-        artist = data["artist"]
+        author = data["author"]
         album = data["album"]
 
         if not DomainAwarePage(url).is_youtube():
@@ -383,7 +383,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
 
     def get_data(self, obj):
         title = ""
-        artist = None
+        author = None
         album = None
 
         url = obj.subject
@@ -392,11 +392,11 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
         if entries.exists():
             entry = entries[0]
             title = entry.title
-            artist = entry.artist
+            author = entry.author
             album = entry.album
 
         data = {
-            "artist": str(artist),
+            "author": str(author),
             "album": str(album),
             "title": str(title),
             "url": url,
@@ -409,8 +409,8 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
         if data["album"]:
             file_name = Path(data["album"]) / file_name
 
-        if data["artist"]:
-            file_name = Path(data["artist"]) / file_name
+        if data["author"]:
+            file_name = Path(data["author"]) / file_name
 
         file_name = fix_path_for_os(str(file_name))
 

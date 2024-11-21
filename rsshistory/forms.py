@@ -368,6 +368,36 @@ class LinkPropertiesForm(forms.Form):
         for browser in browsers:
             result.append([browser["id"], browser["name"]])
 
+        result.append([Browser.THIS_BROWSER, "This browser"])
+
+        return result
+
+    def get_information(self):
+        return self.cleaned_data
+
+
+class AddEntryForm(forms.Form):
+    link = forms.CharField(label="Link", max_length=500)
+    browser = forms.IntegerField(widget=forms.Select(choices=()), required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+        self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["link"].widget.attrs["placeholder"] = "Input URL"
+        self.fields["link"].widget.attrs["autofocus"] = True
+
+        browsers = self.get_browser_choices()
+        self.fields["browser"].widget = forms.Select(choices=browsers) 
+
+    def get_browser_choices(self):
+        result = []
+        browsers = Browser.objects.filter(enabled=True).values('id', 'name')
+        for browser in browsers:
+            result.append([browser["id"], browser["name"]])
+
+        result.append([browser.THIS_BROWSER], ["This browser"])
+
         return result
 
     def get_information(self):
@@ -517,7 +547,7 @@ class EntryForm(forms.ModelForm):
             "permanent",
             "language",
             "user",
-            "artist",
+            "author",
             "album",
             "age",
             "thumbnail",
@@ -547,7 +577,7 @@ class EntryForm(forms.ModelForm):
         self.fields["language"].required = False
         self.fields["description"].required = False
         self.fields["title"].required = False
-        self.fields["artist"].required = False
+        self.fields["author"].required = False
         self.fields["album"].required = False
         self.fields["bookmarked"].initial = True
         self.fields["user"].widget.attrs["readonly"] = True
@@ -580,7 +610,7 @@ class EntryArchiveForm(forms.ModelForm):
             "bookmarked",
             "language",
             "user",
-            "artist",
+            "author",
             "album",
             "age",
             "thumbnail",

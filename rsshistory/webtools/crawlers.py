@@ -158,6 +158,11 @@ class CrawlerInterface(object):
     def close(self):
         pass
 
+    def get_main_path(self):
+        file_path = os.path.realpath(__file__)
+        full_path = Path(file_path)
+        return full_path.parents[2]
+
 
 class RequestsCrawler(CrawlerInterface):
     """
@@ -879,6 +884,9 @@ class ScriptCrawler(CrawlerInterface):
         self.cwd = cwd
         self.script = script
 
+        if "cwd" in self.settings:
+            self.cwd = self.settings["cwd"]
+
         if not self.cwd:
             self.cwd = self.get_main_path()
 
@@ -893,11 +901,6 @@ class ScriptCrawler(CrawlerInterface):
             self.response_file = (
                 self.get_main_path() / response_dir / self.get_response_file_name()
             )
-
-    def get_main_path(self):
-        file_path = os.path.realpath(__file__)
-        full_path = Path(file_path)
-        return full_path.parents[2]
 
     def run(self):
         if not self.is_valid():

@@ -27,7 +27,7 @@ class SystemOperationController(object):
         if not thread_ids:
             return
 
-        thread_ids = self.threads_to_threads(thread_ids)
+        thread_ids = SystemOperationController.threads_to_threads(thread_ids)
 
         for thread_id in thread_ids:
             # leave one entry with time check
@@ -100,7 +100,7 @@ class SystemOperationController(object):
     def is_threading_ok(self, thread_ids=None):
         hours_limit = 1800
 
-        thread_ids = self.threads_to_threads(thread_ids)
+        thread_ids = SystemOperationController.threads_to_threads(thread_ids)
 
         for thread_id in thread_ids:
             date = self.get_last_thread_signal(thread_id)
@@ -138,7 +138,7 @@ class SystemOperationController(object):
         """
         result = []
 
-        thread_ids = self.threads_to_threads(thread_ids)
+        thread_ids = SystemOperationController.threads_to_threads(thread_ids)
 
         for thread in thread_ids:
             date = self.get_last_thread_signal(thread)
@@ -146,7 +146,7 @@ class SystemOperationController(object):
 
         return result
 
-    def threads_to_threads(self, threads):
+    def threads_to_threads(threads):
         thread_ids = []
 
         for thread in threads:

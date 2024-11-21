@@ -64,6 +64,8 @@ class Url(ContentInterface):
         """
         if url:
             self.url = url
+        else:
+            self.url = None
 
         if page_options:
             self.options = page_options
