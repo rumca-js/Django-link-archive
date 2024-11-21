@@ -2,9 +2,10 @@ Personal link database, link aggregator, with RSS functionality.
 
 ## Use cases
 
- - news/RSS reader
- - YouTube client / filter. You will not be able to search YouTube catalog, but if you add YouTube channels as sources of data, new videos will be fetched into the database
- - database of important links: for work, or for school
+ - RSS reader
+ - Gallery view. YouTube client. You will not be able to search YouTube catalog, but if you add YouTube channels as sources of data, new videos will be fetched into the database
+ - Bookmark manager
+ - Very simple search engine
  - data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains, etc.
 
 <div align="center">
