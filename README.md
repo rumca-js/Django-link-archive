@@ -45,17 +45,6 @@ Personal link database, link aggregator, with RSS functionality.
  - local data, no algorithms, no advertisements, self-hosted
  - user action tracking. You can observe and analyze history of your 'views', 'searches', 'comments', 'browsing history'
  
-## Problems with other RSS readers, or apps
-
- - License: some clients are not open source, or not entirely open source (for example Reddit). Some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. They require account. Their Terms and service can change
- - Interface: Most of the RSS programs are GUI: Thunderbird, Feeder. I wanted a web page, an app that can be accessed from anywhere
- - missing search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
- - missing tag support (Thunderbird, Android Feeder app)
- - some programs do not provide link rating
- - Import / Export: most programs do not provide easy way to do that (I want JSON files!)
- - Scale: Some projects are BIG. This project focuses on providing "single user" experience. I do not want many dependencies here
- - Goal: Reddit, Lemmy aim is to provide social media experience, this project aims to grant the ability to create database of links
-
 <div align="center">
   <img alt="Django Logo" src="images/old-wild-west.jpg" width="500px">
 </div>
@@ -195,6 +184,7 @@ There are some scripts that can be used without Django application:
  - script_server.py - server that can be used to dispatch crawlers for certain URLs, to obtain meta data
  - script_client.py - client that can be used to connect to server, and debug crawler scripts
  - workspace.py - workspace management. Can be used to update project
+ - backup.py - script to backup postgreSQL data
 
 # Ease of navigation
 
@@ -258,6 +248,19 @@ User actions are tracked by the system, only if it is configured so:
  - users can vote for entries
  - system stores limited amount of search queries, the user can select previous queries from combobox
  - system stores order of visits on entries. This allows to provide "related" section for each entry. For example if you vist entry "X" after "Y", then "X" will appear on "Y" related section
+
+## Rationale
+
+Many programs exists, but most of them have some limitations.
+
+ - License: some clients are not open source, or not entirely open source (for example Reddit). Some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. They require account. Their Terms and service can change
+ - Interface: Most of the RSS programs are GUI: Thunderbird, Feeder. I wanted a web page, an app that can be accessed from anywhere
+ - missing search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
+ - missing tag support (Thunderbird, Android Feeder app)
+ - some programs do not provide link rating
+ - Import / Export: most programs do not provide easy way to do that (I want JSON files!)
+ - Scale: Some projects are BIG. This project focuses on providing "single user" experience. I do not want many dependencies here
+ - Goal: Reddit, Lemmy aim is to provide social media experience, this project aims to grant the ability to create database of links
 
 # Additional notes
 
