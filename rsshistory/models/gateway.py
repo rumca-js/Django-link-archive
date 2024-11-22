@@ -105,18 +105,18 @@ class Gateway(models.Model):
     def populate_search_engines():
         thetype = Gateway.TYPE_SEARCH_ENGINE
 
-        Gateway.objects.create(link = "https://duckduckgo.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://startpage.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://google.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://bing.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://duckduckgo.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://kagi.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://search.brave.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://yahoo.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://startpage.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://wolframalpha.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://mwmbl.org", gateway_type=thetype)
         Gateway.objects.create(link = "https://whoogle.io", gateway_type=thetype)
         Gateway.objects.create(link = "https://search.marginalia.nu", gateway_type=thetype)
-        Gateway.objects.create(link = "https://yahoo.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://baidu.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://search.brave.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://mojeek.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://morphic.sh", gateway_type=thetype)
         Gateway.objects.create(link = "https://shodan.io", gateway_type=thetype)
@@ -128,26 +128,27 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://greppr.org", gateway_type=thetype)
         Gateway.objects.create(link = "https://letsearch.ru", gateway_type=thetype)
         Gateway.objects.create(link = "https://presearch.io", gateway_type=thetype)
+        Gateway.objects.create(link = "https://yandex.com", gateway_type=thetype)
 
     def populate_digital_libraries():
         thetype = Gateway.TYPE_DIGITAL_LIBRARY
 
         Gateway.objects.create(link = "https://wikipedia.org", gateway_type=thetype)
+        Gateway.objects.create(link = "https://github.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://archive.org", gateway_type=thetype)
         Gateway.objects.create(link = "https://archive.ph", gateway_type=thetype)
         Gateway.objects.create(link = "https://annas-archive.org", gateway_type=thetype)
-        Gateway.objects.create(link = "https://github.com", gateway_type=thetype)
 
     def populate_video_streaming():
         thetype = Gateway.TYPE_VIDEO_STREAMING
 
-        Gateway.objects.create(link = "https://yewtu.be", gateway_type=thetype)
         Gateway.objects.create(link = "https://youtube.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://odysee.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://tiktok.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://rumble.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://netflix.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://disneyplus.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://rumble.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://odysee.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://yewtu.be", gateway_type=thetype)
 
     def populate_file_sharing():
         thetype = Gateway.TYPE_FILE_SHARING
@@ -160,7 +161,7 @@ class Gateway(models.Model):
 
         Gateway.objects.create(link = "https://paypal.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://wallet.google", gateway_type=thetype)
-        Gateway.objects.create(link = "https://www.apple.com/pl/apple-pay", gateway_type=thetype)
+        Gateway.objects.create(link = "https://apple.com/pl/apple-pay", gateway_type=thetype)
 
     def populate_audio_streaming():
         thetype = Gateway.TYPE_AUDIO_STREAMING
@@ -178,13 +179,13 @@ class Gateway(models.Model):
         thetype = Gateway.TYPE_SOCIAL_MEDIA
 
         Gateway.objects.create(link = "https://reddit.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://quora.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://facebook.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://stackoverflow.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://linkedin.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://discord.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://messanger.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://whatsapp.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://quora.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://wechat.com", gateway_type=thetype)
 
     def populate_ai_bot():
@@ -205,21 +206,21 @@ class Gateway(models.Model):
     def populate_app_store():
         thetype = Gateway.TYPE_APP_STORE
 
-        Gateway.objects.create(link = "https://shop.battle.net", gateway_type=thetype)
-        Gateway.objects.create(link = "https://apps.apple.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://play.google.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://store.playstation.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://store.steampowered.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://apps.apple.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://store.playstation.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://shop.battle.net", gateway_type=thetype)
 
     def populate_other():
         thetype = Gateway.TYPE_OTHER
 
-        Gateway.objects.create(link = "https://apple.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://microsoft.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://gmail.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://maps.google.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://chrome.google.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://office.com/", gateway_type=thetype)
+        Gateway.objects.create(link = "https://apple.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://microsoft.com", gateway_type=thetype)
 
     def get_types_mapping(gateway_types):
         data = OrderedDict()

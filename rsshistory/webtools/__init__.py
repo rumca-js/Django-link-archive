@@ -20,6 +20,7 @@ from .handlerhttppage import (
 )
 
 from .crawlers import (
+    CrawlerInterface,
     RequestsCrawler,
     SeleniumChromeHeadless,
     SeleniumChromeFull,
@@ -31,7 +32,6 @@ from .crawlers import (
 )
 from .crawlerscript import (
     ScriptCrawlerParser,
-    CrawlerInterface,
     ScriptCrawlerInterface,
 )
 

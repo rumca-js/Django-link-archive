@@ -94,10 +94,13 @@ class Browser(models.Model):
                 AppLogging.exc(E, "Cannot load browser settings")
 
         browser_config = {
-            "crawler": WebConfig.get_crawler_from_string(self.crawler),
+            "crawler": Browser.get_crawler_from_string(self.crawler),
             "name": self.name,
             "priority": self.priority,
             "settings": settings,
         }
 
         return browser_config
+
+    def get_crawler_from_string(crawler_string):
+        return WebConfig.get_crawler_from_string(crawler_string)

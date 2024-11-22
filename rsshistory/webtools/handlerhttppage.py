@@ -42,9 +42,6 @@ class HttpRequestBuilder(object):
     """
 
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
-    get_contents_function = (
-        None  # TODO remove this, in tests provide own WebConfig crawler mapping
-    )
 
     def __init__(self, url=None, options=None, page_object=None, request=None):
         """
@@ -94,9 +91,6 @@ class HttpRequestBuilder(object):
 
         if not self.user_agent:
             self.user_agent = HttpPageHandler.user_agent
-
-        if HttpRequestBuilder.get_contents_function is None:
-            self.get_contents_function = self.get_contents_internal
 
         self.headers = None
         if request:
@@ -208,7 +202,7 @@ class HttpRequestBuilder(object):
         )
 
         try:
-            response = self.get_contents_function(request=o)
+            response = self.get_contents_internal(request=o)
 
             return response and response.is_valid()
 
@@ -234,7 +228,7 @@ class HttpRequestBuilder(object):
                 ping=True,
             )
 
-            response = self.get_contents_function(request=o)
+            response = self.get_contents_internal(request=o)
             if response and response.is_valid():
                 return response
 
@@ -272,7 +266,7 @@ class HttpRequestBuilder(object):
             timeout_s=self.timeout_s,
         )
 
-        self.response = self.get_contents_function(request=request)
+        self.response = self.get_contents_internal(request=request)
 
         WebLogger.info(
             "Url:{}. Options:{} Requesting page: DONE".format(

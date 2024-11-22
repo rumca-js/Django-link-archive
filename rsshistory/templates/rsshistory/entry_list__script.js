@@ -203,7 +203,7 @@ function fillListData(data) {
 
     var finished_text = fillEntryList(entries);
     $('#listData').html(finished_text);
-    let pagination = fillPagination(data);
+    let pagination = GetPaginationNav(data);
     $('#pagination').html(pagination);
 }
 

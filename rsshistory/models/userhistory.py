@@ -93,7 +93,12 @@ class UserSearchHistory(models.Model):
 
     def delete_old_entries(user):
         qs = UserSearchHistory.objects.filter(user=user).order_by("date")
-        limit = UserSearchHistory.get_choices_model_limit()
+
+        config_entry = Configuration.get_object().config_entry
+        if config_entry.max_number_of_searches == 0:
+            return
+
+        limit = config_entry.max_number_of_searches
         if qs.count() > limit:
             too_many = qs.count() - limit
             entries = qs[:too_many]
@@ -104,10 +109,6 @@ class UserSearchHistory(models.Model):
         entries = UserSearchHistory.objects.filter(search_query=search_query, user=user)
         if entries.exists():
             entries.delete()
-
-    def get_choices_model_limit():
-        config_entry = Configuration.get_object().config_entry
-        return config_entry.max_number_of_searches
 
     def get_choices_limit():
         return 60
@@ -451,6 +452,8 @@ class UserEntryVisitHistory(models.Model):
         ):
             UserEntryVisitHistory.objects.all().delete()
 
+        UserSearchHistory.delete_old_entries()
+
     def move_entry(source_entry, destination_entry):
         visits = UserEntryVisitHistory.objects.filter(entry=source_entry)
         for visit in visits:
@@ -469,6 +472,20 @@ class UserEntryVisitHistory(models.Model):
 
             visit.entry = destination_entry
             visit.save()
+
+    def delete_old_entries():
+        qs = UserEntryVisitHistory.objects.all().order_by("date_last_visit")
+
+        config_entry = Configuration.get_object().config_entry
+        if config_entry.max_number_of_browse == 0:
+            return
+
+        limit = config_entry.max_number_of_browse
+        if qs.count() > limit:
+            too_many = qs.count() - limit
+            entries = qs[:too_many]
+            for entry in entries:
+                entry.delete()
 
 
 class EntryHitUserSearchHistory(models.Model):

@@ -114,7 +114,7 @@ function fillListData(data) {
 
     var finished_text = fillJobsList(jobs);
     $('#listData').html(finished_text);
-    let pagination = fillPagination(data);
+    let pagination = GetPaginationNav(data);
     $('#pagination').html(pagination);
 }
 

@@ -434,3 +434,15 @@ class DomainAwarePageTest(FakeInternetTestCase):
         port = p.get_port()
 
         self.assertEqual(port, 443)
+
+    def test_get_robots_txt_url(self):
+        p = DomainAwarePage("https://www.youtube.com")
+        robots = p.get_robots_txt_url()
+
+        self.assertEqual(robots, "https://www.youtube.com/robots.txt")
+
+    def test_get_robots_txt_url(self):
+        p = DomainAwarePage("https://www.youtube.com:43")
+        robots = p.get_robots_txt_url()
+
+        self.assertEqual(robots, "https://www.youtube.com/robots.txt")

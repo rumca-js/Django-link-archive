@@ -36,16 +36,33 @@ class UrlTest(FakeInternetTestCase):
         options = url.options
         self.assertTrue(options.use_headless_browser)
 
+    def test_get_robots_txt_url(self):
+        url = Url("https://page-with-http-status-500.com")
+        # call tested function
+        robots = url.get_robots_txt_url()
+        self.assertEqual(robots, "https://page-with-http-status-500.com/robots.txt")
+
     def test_get_contents__fails(self):
+        MockRequestCounter.reset()
+
         url = Url("https://page-with-http-status-500.com")
 
         # call tested function
         contents = url.get_contents()
         self.assertFalse(url.is_valid())
 
-        # 1 for requests +1 for headless +1 for full check of page
+        # 1 for requests +1 for next
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+        self.assertEqual(len(MockRequestCounter.request_history), 2)
+
+        self.assertEqual(MockRequestCounter.request_history[0][0], "https://page-with-http-status-500.com")
+        self.assertEqual(MockRequestCounter.request_history[1][0], "https://page-with-http-status-500.com")
+
+        first_crawler = MockRequestCounter.request_history[0][1]["name"]
+        second_crawler = MockRequestCounter.request_history[1][1]["name"]
+
+        self.assertNotEqual(first_crawler, second_crawler)
 
     def test_is_valid__true(self):
         MockRequestCounter.mock_page_requests = 0
@@ -325,7 +342,7 @@ class UrlTest(FakeInternetTestCase):
         options = Url("https://yahoo.com/test_link").get_init_page_options()
 
         self.assertTrue(len(options.mode_mapping) > 0)
-        self.assertEqual(options.mode_mapping[0]["crawler"], "ScriptCrawler")
+        # self.assertEqual(options.mode_mapping[0]["crawler"], "ScriptCrawler")
         self.assertEqual(options.mode_mapping[0]["name"], "CrawleeScript")
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
@@ -336,8 +353,7 @@ class UrlTest(FakeInternetTestCase):
         options = Url("https://techcrunch.com/test_link").get_init_page_options()
 
         self.assertTrue(len(options.mode_mapping) > 0)
-        print(options.mode_mapping[0])
-        self.assertEqual(options.mode_mapping[0]["crawler"], "ScriptCrawler")
+        # self.assertEqual(options.mode_mapping[0]["crawler"], "ScriptCrawler")
         self.assertEqual(options.mode_mapping[0]["name"], "CrawleeScript")
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)

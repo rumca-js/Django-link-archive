@@ -37,7 +37,12 @@ def user_browse_history(request):
 
 
 def visit_to_json(user_config, visit_data):
-    entry = visit_data.entry
+    try:
+        entry = visit_data.entry
+    except Exception as E:
+        # if entry was removed?
+        visit_data.delete()
+        return
 
     data = entry_to_json(user_config, entry)
     data["date_last_visit"] = visit_data.date_last_visit

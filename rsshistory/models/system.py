@@ -334,7 +334,9 @@ class ConfigurationEntry(models.Model):
 
     track_user_navigation = models.BooleanField(default=False)
 
-    max_number_of_searches = models.IntegerField(default=300)
+    max_number_of_browse = models.IntegerField(default=5000, help_text="Number of history searches. If 0, then search history is not cleared")
+
+    max_number_of_searches = models.IntegerField(default=700, help_text="Number of history searches. If 0, then search history is not cleared")
 
     vote_min = models.IntegerField(default=-100)
 

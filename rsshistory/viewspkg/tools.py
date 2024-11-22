@@ -11,6 +11,7 @@ from ..models import (
     UserConfig,
     Browser,
     Gateway,
+    EntryRules,
 )
 from ..controllers import (
     LinkDataController,
@@ -27,6 +28,65 @@ from ..forms import (
 )
 from ..views import ViewPage
 from ..pluginurl.urlhandler import UrlHandler
+
+
+def get_errors(page_url):
+    warnings = []
+    notes = []
+    warnings = []
+
+    link = page_url.url
+
+    page = DomainAwarePage(link)
+    config = Configuration.get_object().config_entry
+
+    domain = page.get_domain()
+    info = DomainCache.get_object(link, url_builder=UrlHandler)
+
+    # warnings
+    if config.prefer_https and link.find("http://") >= 0:
+        warnings.append(
+            "Detected http protocol. Choose https if possible. It is a more secure protocol"
+        )
+    if config.prefer_non_www_sites and domain.find("www.") >= 0:
+        warnings.append(
+            "Detected www in domain link name. Select non www link if possible"
+        )
+    if domain.lower() != domain:
+        warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
+    if config.respect_robots_txt and info and not info.is_allowed(link):
+        warnings.append("Link is not allowed by site robots.txt")
+    if link.find("?") >= 0:
+        warnings.append("Link contains arguments. Is that intentional?")
+    if link.find("#") >= 0:
+        warnings.append("Link contains arguments. Is that intentional?")
+    if page.get_port() and page.get_port() >= 0:
+        warnings.append("Link contains port. Is that intentional?")
+    if not page.is_web_link():
+        warnings.append(
+            "Not a web link. Expecting protocol://domain.tld styled location"
+        )
+
+    response = page_url.get_response()
+
+    # errors
+    if not page.is_protocolled_link():
+        errors.append("Not a protocolled link. Forget http:// or https:// etc.?")
+    if not response:
+        errors.append("Information about page availability could not be obtained")
+    if response:
+        code = response.get_status_code()
+        if code < 200 or code > 300:
+            errors.append("Invalid status code")
+    if EntryRules.is_blocked(link):
+        errors.append("Entry is blocked by entry rules")
+
+    result = {}
+    result["warnings"] = warnings
+    result["errors"] = errors
+    result["notes"] = notes
+
+    return result
 
 
 def get_page_properties(request):
@@ -92,6 +152,9 @@ def get_page_properties(request):
         response_data["Content-Type"] = response.get_content_type()
         response_data["Content-Length"] = response.get_content_length()
         all_properties.append({"name" : "Response", "data" : response_data})
+
+    errors = get_errors(page_url)
+    all_properties.append({"name" : "Errors", "data" : errors})
 
     data = {}
     data["properties"] = all_properties

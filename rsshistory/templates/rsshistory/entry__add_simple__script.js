@@ -1,3 +1,7 @@
+// TODO - make two parallel requests
+// one for form, one for data
+// when both return, then perform.
+// could be faster
 
 function escapeHtml(unsafe)
 {
@@ -10,6 +14,20 @@ function escapeHtml(unsafe)
 }
 
 let submission_locked = true;
+
+
+function getFormattedDate(input_date) {
+    let dateObject = new Date(input_date);
+
+    let formattedDate = dateObject.getFullYear() + "-" +
+        String(dateObject.getMonth() + 1).padStart(2, "0") + "-" +
+        String(dateObject.getDate()).padStart(2, "0") + " " +
+        String(dateObject.getHours()).padStart(2, "0") + ":" +
+        String(dateObject.getMinutes()).padStart(2, "0") + ":" +
+        String(dateObject.getSeconds()).padStart(2, "0");
+
+    return formattedDate;
+}
 
 
 function fillEditForm(properties, form_text, token) {
@@ -55,7 +73,17 @@ function fillEditForm(properties, form_text, token) {
     let page_rating_votes = 0;
     let age = 0;
 
+    // make necessary updates
+
+    if (description.length > 1000) {
+        description = description.slice(0, 1000);
+    }
+
+    date_published = getFormattedDate(date_published);
+
     form_text = form_text.replace('btnFetch', 'btnAddLink');
+
+    // set
 
     $("#formResponse").html(form_text);
 
@@ -71,6 +99,7 @@ function fillEditForm(properties, form_text, token) {
     $("#id_page_rating_contents").val(page_rating_contents);
     $("#id_page_rating_votes").val(page_rating_votes);
     $("#id_page_rating").val(page_rating);
+    $("#id_date_published").val(date_published);
 
     $("#theForm").attr({
         method: "POST",

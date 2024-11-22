@@ -401,3 +401,38 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         transition = all_transitions[0]
         self.assertEqual(transition.entry_from, http_entry)
         self.assertEqual(transition.entry_to, youtube_entry)
+
+    def test_cleanup(self):
+        https_entry = LinkDataController.objects.create(
+            source_url="https://archive.com/test",
+            link="https://testlink.com",
+            title="The archive https link",
+            bookmarked=True,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=3),
+        )
+
+        http_entry = LinkDataController.objects.create(
+            source_url="http://archive.com/test",
+            link="http://testlink.com",
+            title="The archive https link",
+            bookmarked=True,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=3),
+        )
+
+        youtube_entry = LinkDataController.objects.create(
+            source_url="http://youtube.com/test",
+            link="http://youtube.com?v=1",
+            title="The archive https link",
+            bookmarked=True,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=3),
+        )
+
+        UserEntryVisitHistory.visited(http_entry, self.user)
+        UserEntryVisitHistory.visited(youtube_entry, self.user)
+
+        all_transitions = UserEntryVisitHistory.cleanup()
+
+        self.assertEqual(UserEntryVisitHistory.objects.all().count(), 2)

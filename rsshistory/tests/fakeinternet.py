@@ -9,7 +9,6 @@ import logging
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-# import chardet
 from utils.dateutils import DateUtils
 from ..webtools import (
     YouTubeVideoHandler,
@@ -19,9 +18,15 @@ from ..webtools import (
     HttpRequestBuilder,
     PageResponseObject,
     WebLogger,
+    WebConfig,
+    CrawlerInterface,
 )
 
-from ..models import AppLogging, ConfigurationEntry
+from ..models import (
+    AppLogging,
+    ConfigurationEntry,
+    Browser,
+)
 from ..configuration import Configuration
 
 
@@ -138,6 +143,19 @@ class PageBuilder(object):
 
 class MockRequestCounter(object):
     mock_page_requests = 0
+    request_history = []
+
+    def requested(url, info=None):
+        """
+        Info can be a dict
+        """
+        MockRequestCounter.request_history.append([url, info])
+        MockRequestCounter.mock_page_requests += 1
+
+    def reset():
+        MockRequestCounter.mock_page_requests = 0
+        MockRequestCounter.request_history = []
+
 
 
 class YouTubeJsonHandlerMock(YouTubeJsonHandler):
@@ -145,8 +163,7 @@ class YouTubeJsonHandlerMock(YouTubeJsonHandler):
         super().__init__(url, page_options)
 
     def download_details_youtube(self):
-        # print("Mocked YouTube request URL: {}".format(self.url))
-        MockRequestCounter.mock_page_requests += 1
+        MockRequestCounter.requested(self.url)
 
         if self.get_video_code() == "1234":
             self.yt_text = """{"_filename" : "1234 test file name",
@@ -555,28 +572,50 @@ class TestResponseObject(PageResponseObject):
         )
 
 
+class DefaultCrawler(CrawlerInterface):
+
+    def run(self):
+        request = self.request
+
+        print("TestInfo:Running: {}".format(self.crawler_data["name"]))
+
+        MockRequestCounter.requested(request.url, info=self.crawler_data)
+
+        self.response = TestResponseObject(request.url, request.headers, request.timeout_s)
+
+        return self.response
+
+    def is_valid(self):
+        return True
+
+
 class FakeInternetTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        MockRequestCounter.mock_page_requests = 0
-
-    def get_contents_function(self, request):
-        MockRequestCounter.mock_page_requests += 1
-        # print("Mocked request URL: {}".format(request.url))
-
-        return TestResponseObject(request.url, request.headers, request.timeout_s)
+        MockRequestCounter.reset()
 
     def disable_web_pages(self):
-        HttpRequestBuilder.get_contents_function = self.get_contents_function
+        # HttpRequestBuilder.get_contents_function = self.get_contents_function
 
-        # Url.youtube_video_handler = YouTubeVideoHandlerMock
         Url.youtube_video_handler = YouTubeJsonHandlerMock
+        # Url.youtube_video_handler = YouTubeVideoHandlerMock
+
         # channel uses RSS page to obtain data. We do not need to mock it
         # Url.youtube_channel_handler = YouTubeChannelHandlerMock
         # Url.odysee_video_handler = YouTubeVideoHandlerMock
         # Url.odysee_channel_handler = YouTubeVideoHandlerMock
 
         WebLogger.web_logger = AppLogging
+        WebConfig.get_crawler_from_mapping = FakeInternetTestCase.get_crawler_from_mapping
+
+    def get_crawler_from_mapping(request, crawler_data):
+        if "settings" in crawler_data:
+            crawler = DefaultCrawler(request = request, settings = crawler_data["settings"])
+        else:
+            crawler = DefaultCrawler(request = request)
+        crawler.crawler_data = crawler_data
+
+        return crawler
 
     def setup_configuration(self):
         # each suite should start with a default configuration entry

@@ -1,79 +1,3 @@
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-
-function isEmpty( el ){
-    return !$.trim(el.html())
-}
-
-function fillPagination(data, text) {
-    let totalPages = data.num_pages;
-    let count = data.count;
-    let currentPage = data.page;
-
-    if (totalPages <= 1) {
-        return '';
-    }
-
-    let paginationText = `
-        <nav aria-label="Page navigation">
-            <ul class="pagination">
-    `;
-
-    const currentUrl = new URL(window.location);
-    currentUrl.searchParams.delete('page');
-    const paginationArgs = `${currentUrl.searchParams.toString()}`;
-
-    if (currentPage > 2) {
-        paginationText += `
-            <li class="page-item">
-                <a href="?page=1${paginationArgs}" data-page="1" class="btnFilterTrigger page-link">|&lt;</a>
-            </li>
-        `;
-    }
-    if (currentPage > 2) {
-        paginationText += `
-            <li class="page-item">
-                <a href="?page=${currentPage - 1}${paginationArgs}" data-page="${currentPage - 1}" class="btnFilterTrigger page-link">&lt;</a>
-            </li>
-        `;
-    }
-
-    let startPage = Math.max(1, currentPage - 1);
-    let endPage = Math.min(totalPages, currentPage + 1);
-
-    for (let i = startPage; i <= endPage; i++) {
-        paginationText += `
-            <li class="page-item ${i === currentPage ? 'active' : ''}">
-                <a href="?page=${i}${paginationArgs}" data-page="${i}" class="btnFilterTrigger page-link">${i}</a>
-            </li>
-        `;
-    }
-
-    if (currentPage + 1 < totalPages) {
-        paginationText += `
-            <li class="page-item">
-                <a href="?page=${currentPage + 1}${paginationArgs}" data-page="${currentPage + 1}" class="btnFilterTrigger page-link">&gt;</a>
-            </li>
-        `;
-    }
-    if (currentPage + 1 < totalPages) {
-        paginationText += `
-            <li class="page-item">
-                <a href="?page=${totalPages}${paginationArgs}" data-page="${totalPages}" class="btnFilterTrigger page-link">&gt;|</a>
-            </li>
-        `;
-    }
-
-    paginationText += `
-            </ul>
-            ${currentPage} / ${totalPages} @ ${count} records.
-        </nav>
-    `;
-
-    return paginationText;
-}
 
 function getHideButton() {
     let text = "";
@@ -360,11 +284,6 @@ $('#searchSuggestions').hide();
 $('#searchHistory').hide();
 $('#searchSyntax').hide();
 
-var search_term_input = $('#filterForm input[name="search"]').val();
-if (search_term_input)
-{
-    loadSearchSuggestions(search_term_input);
-}
 loadSearchHistory();
 
 // if (user specified search, or show is true), and entrylist is empty
