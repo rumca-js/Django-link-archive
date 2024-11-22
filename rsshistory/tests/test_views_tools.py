@@ -27,7 +27,7 @@ class ToolsViewsTest(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
     def test_show_page_props(self):
-        url = reverse("{}:page-show-properties".format(LinkDatabase.name))
+        url = reverse("{}:page-show-props".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

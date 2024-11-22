@@ -16,6 +16,7 @@ from .crawlers import (
     ScriptCrawler,
     ServerCrawler,
     SeleniumBase,
+    StealthRequestsCrawler,
 )
 
 
@@ -32,38 +33,38 @@ class WebConfig(object):
     def init():
         pass
 
-    def get_browsers():
-        return [
-            "RequestsCrawler",
-            "SeleniumChromeHeadless",  # requires driver location
-            "SeleniumChromeFull",  # requires driver location
-            "SeleniumUndetected",  # requires driver location
-            "ScriptCrawler",  # requires script
-            "ServerCrawler",  # requires script & port
-            "SeleniumBase",
+    def get_browsers_raw():
+        browsers = [
+            RequestsCrawler,
+            SeleniumChromeHeadless,  # requires driver location
+            SeleniumChromeFull,  # requires driver location
+            SeleniumUndetected,  # requires driver location
+            ScriptCrawler,  # requires script
+            ServerCrawler,  # requires script & port
+            SeleniumBase,
+            StealthRequestsCrawler,
         ]
+
+        return browsers
+
+    def get_browsers():
+        str_browsers = []
+        for browser in WebConfig.get_browsers_raw():
+            str_browsers.append(browser.__name__)
+
+        return str_browsers
 
     def get_crawler_from_string(input_string):
         """
         TODO - apply generic approach
         """
-        if input_string == "RequestsCrawler":
-            return RequestsCrawler
-        elif input_string == "SeleniumChromeHeadless":
-            return SeleniumChromeHeadless
-        elif input_string == "SeleniumChromeFull":
-            return SeleniumChromeFull
-        elif input_string == "SeleniumUndetected":
-            return SeleniumUndetected
-        elif input_string == "SeleniumBase":
-            return SeleniumBase
-        elif input_string == "ScriptCrawler":
-            return ScriptCrawler
-        elif input_string == "ServerCrawler":
-            return ServerCrawler
+        browsers = WebConfig.get_browsers_raw()
+        for browser in browsers:
+            if browser.__name__ == input_string:
+                return browser
 
     def get_crawler_from_mapping(request, mapping_data):
-        crawler = WebConfig.get_crawler_from_string(mapping_data["crawler"])
+        crawler = mapping_data["crawler"]
         if not crawler:
             return
 
@@ -107,7 +108,8 @@ class WebConfig(object):
         except:
             pass
 
-        mapping.append(WebConfig.get_requests())
+        mapping.append(WebConfig.get_default_browser_setup(RequestsCrawler))
+
         mapping.append(WebConfig.get_scriptcralwer(headless_script, "CrawleeScript"))
         mapping.append(WebConfig.get_servercralwer(port, headless_script, "CrawleeServer"))
         mapping.append(WebConfig.get_scriptcralwer(full_script, "PlaywrightScript"))
@@ -117,13 +119,23 @@ class WebConfig(object):
         mapping.append(WebConfig.get_seleniumheadless())
         mapping.append(WebConfig.get_seleniumfull())
 
+        mapping.append(WebConfig.get_default_browser_setup(StealthRequestsCrawler))
+
         return mapping
+
+    def get_default_browser_setup(browser, enabled=True):
+        return {
+            "enabled"   : enabled,
+            "name"      : browser.__name__,
+            "crawler"   : browser,
+            "settings"  : {"timeout_s": 20},
+        }
 
     def get_requests():
         return {
             "enabled"   : True,
             "name"      : "RequestsCrawler",
-            "crawler"   : "RequestsCrawler",
+            "crawler"   : RequestsCrawler,
             "settings"  : {"timeout_s": 20},
         }
 
@@ -132,14 +144,14 @@ class WebConfig(object):
             return {
                 "enabled"   : True,
                 "name"      : name,
-                "crawler"   : "ScriptCrawler",
+                "crawler"   : ScriptCrawler,
                 "settings"  : {"script": script, "timeout_s": 40},
             }
         else:
             return {
                 "enabled"   : False,
                 "name"      : name,
-                "crawler"   : "ScriptCrawler",
+                "crawler"   : ScriptCrawler,
                 "settings"  : {"script": script, "timeout_s": 40},
             }
 
@@ -148,14 +160,14 @@ class WebConfig(object):
             return {
                 "enabled"   : False,
                 "name"      : name,
-                "crawler"   : "ServerCrawler",
+                "crawler"   : ServerCrawler,
                 "settings"  : {"port": port, "script": script, "timeout_s": 40},
             }
         else:
             return {
                 "enabled"   : False,
                 "name"      : name,
-                "crawler"   : "ServerCrawler",
+                "crawler"   : ServerCrawler,
                 "settings"  : {"port": port, "script": script, "timeout_s": 40},
             }
 
@@ -166,7 +178,7 @@ class WebConfig(object):
             return {
                 "enabled"   : False,
                 "name"      : "SeleniumChromeHeadless",
-                "crawler"   : "SeleniumChromeHeadless",
+                "crawler"   : SeleniumChromeHeadless,
                 "settings"  : {
                     "driver_executable": str(chromedriver_path),
                     "timeout_s": 30,
@@ -176,7 +188,7 @@ class WebConfig(object):
             return {
                 "enabled"   : True,
                 "name"      : "SeleniumChromeHeadless",
-                "crawler"   : "SeleniumChromeHeadless",
+                "crawler"   : SeleniumChromeHeadless,
                 "settings"  : {"driver_executable": None, "timeout_s": 40},
             }
 
@@ -187,7 +199,7 @@ class WebConfig(object):
             return {
                 "enabled"   : False,
                 "name"      : "SeleniumChromeFull",
-                "crawler"   : "SeleniumChromeFull",
+                "crawler"   : SeleniumChromeFull,
                 "settings"  : {
                     "driver_executable": str(chromedriver_path),
                     "timeout_s": 40,
@@ -197,7 +209,7 @@ class WebConfig(object):
             return {
                 "enabled"   : False,
                 "name"      : "SeleniumChromeFull",
-                "crawler"   : "SeleniumChromeFull",
+                "crawler"   : SeleniumChromeFull,
                 "settings"  : {"driver_executable": None, "timeout_s": 40},
             }
 
@@ -208,7 +220,7 @@ class WebConfig(object):
             return {
                 "enabled"   : False,
                 "name"      : "SeleniumUndetected",
-                "crawler"   : "SeleniumUndetected",
+                "crawler"   : SeleniumUndetected,
                 "settings"  : {
                     "driver_executable": str(chromedriver_path),
                     "timeout_s": 30,
@@ -218,7 +230,7 @@ class WebConfig(object):
             return {
                 "enabled"   : False,
                 "name"      : "SeleniumUndetected",
-                "crawler"   : "SeleniumUndetected",
+                "crawler"   : SeleniumUndetected,
                 "settings"  : {"driver_executable": None, "timeout_s": 40},
             }
 
@@ -226,7 +238,7 @@ class WebConfig(object):
         return {
             "enabled"   : False,
             "name"      : "SeleniumBase",
-            "crawler"   : "SeleniumBase",
+            "crawler"   : SeleniumBase,
             "settings"  : {
             },
         }

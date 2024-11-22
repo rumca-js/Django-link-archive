@@ -219,6 +219,7 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://gmail.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://maps.google.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://chrome.google.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://office.com/", gateway_type=thetype)
 
     def get_types_mapping(gateway_types):
         data = OrderedDict()

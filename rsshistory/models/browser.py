@@ -48,7 +48,7 @@ class Browser(models.Model):
         """
         Reads default WebConfigs browser config, and applies it to model
         """
-        Browser.objects.all().delete()
+        # Browser.objects.all().delete()
 
         mapping = WebConfig.get_init_crawler_config()
         for index, browser_config in enumerate(mapping):
@@ -60,13 +60,15 @@ class Browser(models.Model):
 
             enabled = browser_config["enabled"]
 
-            conf = Browser.objects.create(
-                enabled=enabled,
-                name=browser_config["name"],
-                crawler=browser_config["crawler"],
-                priority=index,
-                settings=settings,
-            )
+            browsers = Browser.objects.filter(name = browser_config["name"])
+            if browsers.count() == 0:
+                conf = Browser.objects.create(
+                    enabled=enabled,
+                    name=browser_config["name"],
+                    crawler=browser_config["crawler"].__name__,
+                    priority=index,
+                    settings=settings,
+                )
 
     def get_browser_setup():
         """
@@ -92,7 +94,7 @@ class Browser(models.Model):
                 AppLogging.exc(E, "Cannot load browser settings")
 
         browser_config = {
-            "crawler": self.crawler,
+            "crawler": WebConfig.get_crawler_from_string(self.crawler),
             "name": self.name,
             "priority": self.priority,
             "settings": settings,
