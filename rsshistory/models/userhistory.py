@@ -352,6 +352,8 @@ class UserEntryVisitHistory(models.Model):
         if previous_entry:
             UserEntryTransitionHistory.add(user, previous_entry, entry)
 
+        UserEntryVisitHistory.delete_old_entries(user)
+
         # to increment visited counter on entry
         # BackgroundJobController.entry_update_data(entry)
         # TODO - there should be recalculated JOB. we do not want to udpate it's data
@@ -452,8 +454,6 @@ class UserEntryVisitHistory(models.Model):
         ):
             UserEntryVisitHistory.objects.all().delete()
 
-        UserSearchHistory.delete_old_entries()
-
     def move_entry(source_entry, destination_entry):
         visits = UserEntryVisitHistory.objects.filter(entry=source_entry)
         for visit in visits:
@@ -473,8 +473,8 @@ class UserEntryVisitHistory(models.Model):
             visit.entry = destination_entry
             visit.save()
 
-    def delete_old_entries():
-        qs = UserEntryVisitHistory.objects.all().order_by("date_last_visit")
+    def delete_old_entries(user):
+        qs = UserEntryVisitHistory.objects.filter(user=user).order_by("date_last_visit")
 
         config_entry = Configuration.get_object().config_entry
         if config_entry.max_number_of_browse == 0:

@@ -17,7 +17,7 @@ let submission_locked = true;
 
 
 function getFormattedDate(input_date) {
-    let dateObject = new Date(input_date);
+    let dateObject = input_date ? new Date(input_date) : new Date();
 
     let formattedDate = dateObject.getFullYear() + "-" +
         String(dateObject.getMonth() + 1).padStart(2, "0") + "-" +

@@ -31,9 +31,9 @@ from ..pluginurl.urlhandler import UrlHandler
 
 
 def get_errors(page_url):
-    warnings = []
     notes = []
     warnings = []
+    errors = []
 
     link = page_url.url
 
@@ -82,9 +82,9 @@ def get_errors(page_url):
         errors.append("Entry is blocked by entry rules")
 
     result = {}
+    result["notes"] = notes
     result["warnings"] = warnings
     result["errors"] = errors
-    result["notes"] = notes
 
     return result
 
