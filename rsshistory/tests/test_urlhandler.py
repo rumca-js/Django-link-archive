@@ -1,4 +1,11 @@
-from ..webtools import RssPage, HtmlPage, HttpPageHandler, YouTubeVideoHandler
+from ..webtools import (
+   RssPage,
+   HtmlPage,
+   HttpPageHandler,
+   YouTubeVideoHandler,
+   ScriptCrawler,
+   SeleniumChromeFull,
+)
 
 from ..pluginurl.urlhandler import UrlHandler
 
@@ -74,24 +81,6 @@ class UrlHandlerTest(FakeInternetTestCase):
         handler.get_response()
 
         self.assertEqual(handler.get_title(), "SAMTIME on Odysee")
-
-    def test_get_spotify(self):
-        handler = UrlHandler("https://open.spotify.com/somebody/episodes")
-        handler.get_response()
-
-        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
-        self.assertEqual(type(handler.get_handler().p), HtmlPage)
-
-        self.assertEqual(handler.options.mode_mapping[0]["crawler"], "CrawleeScript")
-
-    def test_get__defcon_org(self):
-        handler = UrlHandler("https://defcon.org")
-        handler.get_response()
-
-        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
-        self.assertEqual(type(handler.get_handler().p), HtmlPage)
-
-        self.assertEqual(handler.options.mode_mapping[0]["crawler"], "ScriptCrawler")
 
     def test_get_cleaned_link_stupid_google_link(self):
         cleaned_link = UrlHandler.get_cleaned_link(

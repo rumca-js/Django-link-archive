@@ -55,17 +55,17 @@ function fillEditForm(properties, form_text, token) {
     let action_url = `{% url 'rsshistory:entry-add' %}`;
 
     let link = properties[0].data.link;
-    let title = properties[0].data.title;
-    let description = properties[0].data.description;
+    let title = properties[0].data.title || '';
+    let description = properties[0].data.description || '';
     let date_published = properties[0].data.date_published;
     let source_url = "";
     let bookmarked = true;
     let permanent = false;
-    let language = properties[0].data.language;
+    let language = properties[0].data.language || '';
     let user = properties[0].data.user;
-    let author = properties[0].data.author;
-    let album = properties[0].data.album;
-    let thumbnail = properties[0].data.thumbnail;
+    let author = properties[0].data.author || '';
+    let album = properties[0].data.album || '';
+    let thumbnail = properties[0].data.thumbnail || '';
     let manual_status_code = 0;
     let status_code = properties[3].data.status_code;
     let page_rating = properties[0].data.page_rating;
@@ -110,16 +110,23 @@ function fillEditForm(properties, form_text, token) {
     submission_locked = false;
 }
 
-
+let currentGetEditForm = 0;
 function getEditForm(link, properties, attempt = 1) {
     $("#formResponse").html(`Obtaining form for link :${link}`);
 
     let url = `{% url 'rsshistory:entry-add-form' %}?link=${link}`;
+    let requestCurrentGetEditForm = ++currentGetEditForm;
+    
     $.ajax({
        url: url,
        type: 'GET',
        timeout: 10000,
        success: function(data) {
+           if (requestCurrentGetEditForm != currentGetEditForm)
+           {
+               return;
+           }
+           
            // TODO you do not have to hide it.
            // we can use different id_link names here.
            let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
@@ -128,6 +135,11 @@ function getEditForm(link, properties, attempt = 1) {
            fillEditForm(properties, data, csrfToken);
        },
        error: function(xhr, status, error) {
+           if (requestCurrentGetEditForm != currentGetEditForm)
+           {
+               return;
+           }
+           
            if (attempt < 3) {
                getEditForm(link, properties, attempt + 1);
            } else {
@@ -147,21 +159,35 @@ function fillData(page_url, properties) {
     return htmlOutput;
 }
 
+let currentPageProperties = 0;
 function sendPagePropertiesRequest(page_url, browser, attempt = 1) {
     $("#formResponse").html(`Fetching link properties ${page_url} with browser:${browser}`);
     let url = `{% url 'rsshistory:get-page-properties' %}?page=${page_url}&browser=${browser}`;
+
+    const requestCurrentPageProperties = ++currentPageProperties;
 
     $.ajax({
        url: url,
        type: 'GET',
        timeout: 10000,
        success: function(data) {
-           let text = fillData(page_url, data.properties);
-           $("#formResponse").html(text);
-           $('#btnFetch').prop("disabled", false);
-           $('#btnFetch').html("Submit")
+           if (requestCurrentPageProperties != currentPageProperties)
+               return;
+           
+           if (data.status) {
+               let text = fillData(page_url, data.properties);
+               $("#formResponse").html(text);
+               $('#btnFetch').prop("disabled", false);
+               $('#btnFetch').html("Submit");
+           }
+           else {
+               $("#formResponse").html("Incorrect call of get page request");
+           }
        },
        error: function(xhr, status, error) {
+           if (requestCurrentPageProperties != currentPageProperties)
+               return;
+               
            if (attempt < 3) {
                $("#formResponse").html("Could not obtain information. Retry");
                getPageProperties(page_url, browser, attempt + 1);
@@ -228,17 +254,24 @@ function getEntryLink(entry_id) {
     return entry_link;
 }
 
-
+let currentcheckEntryExists = 0;
 function checkEntryExists(link, browser, attempt=1) {
     $("#formResponse").html(`Checking if link exists ${link}`);
 
     let url = `{% url 'rsshistory:entry-is' %}?link=${link}`;
+    
+    let requestCurrentcheckEntryExists = ++currentcheckEntryExists;
 
     $.ajax({
        url: url,
        type: 'GET',
        timeout: 10000,
        success: function(data) {
+           if (requestCurrentcheckEntryExists != currentcheckEntryExists)
+           {
+               return;
+           }
+           
            if (data.status) {
                entry_id = data.pk;
                entry_link = getEntryLink(entry_id);
@@ -252,6 +285,10 @@ function checkEntryExists(link, browser, attempt=1) {
            }
        },
        error: function(xhr, status, error) {
+           if (requestCurrentcheckEntryExists != currentcheckEntryExists)
+           {
+               return;
+           }
            if (attempt < 3) {
                $("#formResponse").html("Could not obtain information. Retry");
                checkEntryExists(page_url, browser, attempt + 1);

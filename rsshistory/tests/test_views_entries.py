@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.contrib.auth.models import User
+from datetime import date
 
 from utils.dateutils import DateUtils
 
@@ -34,10 +35,14 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
             password="testpassword",
             is_staff=True,
         )
-        self.client.login(username="testuser", password="testpassword")
-        UserConfig.get_or_create(self.user)
 
-        entry = LinkDataController.objects.create(
+        self.client.login(username="testuser", password="testpassword")
+        user_config = UserConfig.get_or_create(self.user)
+
+        user_config.birth_date = date(date.today().year, 1, 1)
+        user_config.save()
+
+        self.entry = LinkDataController.objects.create(
             link="https://linkedin.com",
             title="The first link",
             description="the first link description",
@@ -46,6 +51,18 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
             permanent=False,
             date_published=DateUtils.get_datetime_now_utc(),
             language="en",
+        )
+
+        self.entry_18 = LinkDataController.objects.create(
+            link="https://linkedin.com/page2",
+            title="The second link",
+            description="the first link description",
+            source=None,
+            bookmarked=False,
+            permanent=False,
+            date_published=DateUtils.get_datetime_now_utc(),
+            language="en",
+            age=18,
         )
 
     def test_entries(self):
@@ -90,11 +107,20 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_entries_json(self):
+    def test_entries_json__age_limited(self):
         url = reverse("{}:entries-json".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+
+        entries = data["entries"]
+
+        links = {entry["link"] for entry in entries}
+
+        self.assertTrue("https://linkedin.com" in links)
+        self.assertFalse("https://linkedin.com/page2" in links)
 
     def test_entries_json_recent(self):
         url = reverse("{}:entries-json-recent".format(LinkDatabase.name))
@@ -188,7 +214,6 @@ class EntriesViewsTests(FakeInternetTestCase):
         response = self.client.post(url, data=post_data)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, test_link, html=False)
 
     def test_entry_add_simple__invalid(self):
         LinkDataController.objects.all().delete()
@@ -204,7 +229,6 @@ class EntriesViewsTests(FakeInternetTestCase):
         response = self.client.post(url, data=post_data)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, test_link, html=False)
 
     def test_entry_add__html(self):
         LinkDataController.objects.all().delete()

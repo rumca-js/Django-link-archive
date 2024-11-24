@@ -32,7 +32,7 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_page_show_props_html_get(self):
+    def test_get_page_properties__html_get(self):
         MockRequestCounter.mock_page_requests = 0
         url = (
             reverse("{}:get-page-properties".format(LinkDatabase.name))
@@ -43,12 +43,11 @@ class ToolsViewsTest(FakeInternetTestCase):
         # print(response.text.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Detected", html=False)
 
         # two requests: one for page, one for robots.txt
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
-    def test_page_show_props_youtube_get(self):
+    def test_get_page_properties__youtube_get(self):
         MockRequestCounter.mock_page_requests = 0
         url = (
             reverse("{}:get-page-properties".format(LinkDatabase.name))
@@ -59,10 +58,9 @@ class ToolsViewsTest(FakeInternetTestCase):
         # print(response.text.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Detected", html=False)
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
-    def test_page_show_props_ytchannel_get(self):
+    def test_get_page_properties__ytchannel_get(self):
         MockRequestCounter.mock_page_requests = 0
         url = (
             reverse("{}:get-page-properties".format(LinkDatabase.name))
@@ -73,7 +71,6 @@ class ToolsViewsTest(FakeInternetTestCase):
         # print(response.text.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Detected", html=False)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 

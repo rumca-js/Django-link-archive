@@ -611,13 +611,14 @@ def func_display_data_form(request, p, data):
 
 def add_entry(request):
     def on_added_entry(request, entry):
-        # if you add a link you must have visited it?
-        UserEntryVisitHistory.visited(entry, request.user)
+        if entry.bookmarked:
+            entry = EntryWrapper(entry=entry).make_bookmarked(request)
+
+        if not entry.is_archive_entry():
+            # if you add a link you must have visited it?
+            UserEntryVisitHistory.visited(entry, request.user)
 
         BackgroundJobController.link_scan(entry=entry)
-
-        if entry.bookmarked:
-            new_entry = EntryWrapper(entry=entry).make_bookmarked(request)
 
         config = Configuration.get_object().config_entry
 

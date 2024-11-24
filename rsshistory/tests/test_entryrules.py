@@ -2,6 +2,7 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
+from ..webtools import SeleniumChromeHeadless, SeleniumChromeFull
 
 from ..controllers import (
     SourceDataController,
@@ -10,6 +11,7 @@ from ..controllers import (
 )
 from ..models import EntryRules, Browser
 from ..configuration import Configuration
+from ..pluginurl.urlhandler import UrlHandler
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -24,6 +26,11 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         self.browser = Browser.objects.create(
+            name = "RequestsCrawler",
+            crawler = "SeleniumChromeHeadless",
+            settings = '{"test_setting" : "something"}',
+        )
+        self.browser_selenium = Browser.objects.create(
             name = "SeleniumChromeHeadless",
             crawler = "SeleniumChromeHeadless",
             settings = '{"test_setting" : "something"}',
@@ -113,3 +120,18 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual( rules1[0], therule)
         self.assertEqual( rules2[0], therule)
+
+    def test_get_spotify(self):
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=False,
+            browser=self.browser_selenium,
+            rule_name="Rule1",
+            rule_url=".open.spotify.com",
+        )
+
+        handler = UrlHandler("https://open.spotify.com/somebody/episodes")
+        response = handler.get_response()
+
+        self.assertTrue(response)
+        self.assertEqual(handler.options.mode_mapping[0]["crawler"], SeleniumChromeHeadless)

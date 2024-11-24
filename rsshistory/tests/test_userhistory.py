@@ -60,7 +60,7 @@ class UserSearchHistoryTest(TestCase):
         self.assertEqual(objects[0], theobject)
 
     def test_more_than_limit(self):
-        limit = UserSearchHistory.get_choices_model_limit()
+        limit = UserSearchHistory.get_choices_limit()
 
         for index in range(1, limit + 20):
             user = "test_user{}".format(index)

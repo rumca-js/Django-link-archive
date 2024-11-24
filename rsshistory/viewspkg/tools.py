@@ -95,6 +95,11 @@ def get_page_properties(request):
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
+        
+    if "page" not in request.GET:
+        data = {}
+        data["status"] = False
+        return JsonResponse(data)
 
     page_link = request.GET["page"]
     url = UrlHandler(page_link)
@@ -158,6 +163,7 @@ def get_page_properties(request):
 
     data = {}
     data["properties"] = all_properties
+    data["status"] = True
 
     return JsonResponse(data)
 

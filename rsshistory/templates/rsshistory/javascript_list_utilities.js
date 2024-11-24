@@ -115,11 +115,12 @@ function loadSearchSuggestions(search_term, attempt = 1) {
             }
         },
         error: function(xhr, status, error) {
-            if (requestVersion === currentSearchSuggestions)
+            if (requestVersion !== currentSearchSuggestions)
             {
-                if (attempt < 3) {
-                    loadSearchSuggestions(search_term, attempt + 1); 
-                }
+                return;
+            }
+            if (attempt < 3) {
+                loadSearchSuggestions(search_term, attempt + 1); 
             }
         }
     });
@@ -139,11 +140,16 @@ function loadSearchHistory(attempt = 1) {
         type: 'GET',
         timeout: 15000,
         success: function(data) {
-            if (requestVersion === currentSearchHistory) {
-                fillSearchHistory(data.histories);
+            if (requestVersion !== currentSearchHistory) {
+                return;
             }
+            fillSearchHistory(data.histories);
         },
         error: function(xhr, status, error) {
+            if (requestVersion !== currentSearchHistory) {
+                return;
+            }
+            
             if (attempt < 3) {
                 loadSearchHistory(attempt + 1);
             }
@@ -188,22 +194,24 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
         type: 'GET',
         timeout: 15000,
         success: function(data) {
-            if (requestVersion === currentLoadRowListContentCounter) {
-               $('html, body').animate({ scrollTop: 0 }, 'slow');
-               fillListData(data);
-               $('#listStatus').html("");
-               loadSearchHistory();
+            if (requestVersion !== currentLoadRowListContentCounter) {
+               return;
             }
+            $('html, body').animate({ scrollTop: 0 }, 'slow');
+            fillListData(data);
+            $('#listStatus').html("");
+            loadSearchHistory();
         },
         error: function(xhr, status, error) {
-            if (requestVersion === currentLoadRowListContentCounter) {
-                if (attempt < 3) {
-                    loadRowListContent(search_term, page, attempt + 1);
-                    $('#listStatus').html("Error loading dynamic content, retry");
-                }
-                else {
-                    $('#listStatus').html("Cannot load data from " + url);
-                }
+            if (requestVersion !== currentLoadRowListContentCounter) {
+                return;
+            }
+            if (attempt < 3) {
+                loadRowListContent(search_term, page, attempt + 1);
+                $('#listStatus').html("Error loading dynamic content, retry");
+            }
+            else {
+                $('#listStatus').html("Cannot load data from " + url);
             }
         },
         complete: function() {
