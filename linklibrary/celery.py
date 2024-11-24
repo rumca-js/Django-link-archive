@@ -74,9 +74,7 @@ def memcache_lock(lock_id, oid):
 
 
 # define for which apps support celery
-#installed_apps = [ "catalog", "places", "private", "programming", "rsshistory", "threed", "various", "vr"]
-installed_apps = [ "catalog", "places", "private", "rsshistory", "various"]
-#installed_apps = [ "catalog", "private", "rsshistory", "various"]
+installed_apps = ["rsshistory",]
 
 
 @app.on_after_configure.connect
