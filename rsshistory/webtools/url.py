@@ -213,13 +213,13 @@ class Url(ContentInterface):
 
         handlers = Url.get_handlers()
         for handler in handlers:
-            h = handler(url=self.url, page_options=self.options)
+            h = handler(url=self.url, page_options=self.options, url_builder=self.url_builder)
             if h.is_handled_by():
                 self.url = h.url
                 return h
 
         if url.startswith("https") or url.startswith("http"):
-            return HttpPageHandler(url, page_options=self.options)
+            return HttpPageHandler(url, page_options=self.options, url_builder=self.url_builder)
         elif url.startswith("smb") or url.startswith("ftp"):
             # not yet supported
             return DefaultContentPage(url)
@@ -422,6 +422,9 @@ class Url(ContentInterface):
                 options.bring_to_front(browser)
 
     def is_selenium_browser_required(url):
+        if not url:
+            return False
+
         p = DomainAwarePage(url)
 
         require_headless_browser = [
@@ -442,6 +445,9 @@ class Url(ContentInterface):
         return False
 
     def is_crawlee_browser_required(url):
+        if not url:
+            return False
+
         p = DomainAwarePage(url)
         if p.is_link_service():
             return True

@@ -9,18 +9,25 @@ class YouTubeVideoHandlerTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         test_link = "https://www.youtube.com/watch?v=123"
+
+        # call tested function
         handler = YouTubeVideoHandler(test_link)
+
         self.assertEqual(handler.url, test_link)
 
     def test_get_channel_code(self):
         test_link = "https://www.youtube.com/watch?v=123"
         handler = YouTubeVideoHandler(test_link)
+
+        # call tested function
         self.assertEqual(handler.get_video_code(), "123")
 
     def test_get_link_embed(self):
         test_link = "https://www.youtube.com/watch?v=123"
 
         handler = YouTubeVideoHandler(test_link)
+
+        # call tested function
         link_embed = handler.get_link_embed()
         self.assertEqual(link_embed, "https://www.youtube.com/embed/123")
 
@@ -29,6 +36,7 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
     def test_constructor__rss(self):
         MockRequestCounter.mock_page_requests = 0
 
+        # call tested function
         handler = YouTubeChannelHandler(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
@@ -41,5 +49,19 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         test_link = "https://www.youtube.com/channel/1234"
+        # call tested function
         handler = YouTubeChannelHandler(test_link)
         self.assertEqual(handler.url, test_link)
+
+    def test_get_channel_name(self):
+        handler = YouTubeChannelHandler(
+            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        )
+
+        # call tested function
+        channel_name = handler.get_channel_name()
+
+        self.assertEqual(
+            channel_name,
+            "https://www.youtube.com/channel/SAMTIMESAMTIMESAMTIMESAM",
+        )

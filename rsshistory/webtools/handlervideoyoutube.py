@@ -9,19 +9,17 @@ from .defaulturlhandler import DefaultUrlHandler
 
 
 class YouTubeVideoHandler(DefaultUrlHandler):
-    def __init__(self, url=None, contents=None, page_options=None):
-        super().__init__(url, contents=contents, page_options=page_options)
+    def __init__(self, url=None, contents=None, page_options=None, url_builder=None):
+        super().__init__(url, contents=contents, page_options=page_options, url_builder=url_builder)
 
         self.url = self.input2url(url)
         self.code = self.input2code(url)
 
     def is_handled_by(self):
-        from .url import Url
-
         if not self.url:
             return False
 
-        protocol_less = Url.get_protololless(self.url)
+        protocol_less = self.url_builder.get_protololless(self.url)
 
         return (
             protocol_less.startswith("www.youtube.com/watch")
@@ -130,11 +128,11 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
     TODO Use if above in youtube.h
     """
 
-    def __init__(self, url, page_options=None):
+    def __init__(self, url, page_options=None, url_builder=None):
         """
         TODO We should , most probably call the parnet constructor
         """
-        super().__init__(url=url, page_options=page_options)
+        super().__init__(url=url, page_options=page_options, url_builder=url_builder)
 
         self.yt_text = None
         self.yt_ob = None

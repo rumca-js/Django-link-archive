@@ -145,5 +145,4 @@ def entry_rules_json(request):
 
     dict_data = {"entryrules": rule_data}
 
-    # JsonResponse
-    return JsonResponse(dict_data)
+    return JsonResponse(dict_data, json_dumps_params={"indent":4})

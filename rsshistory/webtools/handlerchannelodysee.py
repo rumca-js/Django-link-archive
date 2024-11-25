@@ -2,11 +2,13 @@ from .defaulturlhandler import DefaultChannelHandler
 
 
 class OdyseeChannelHandler(DefaultChannelHandler):
-    def __init__(self, url=None, contents=None, page_options=None):
+
+    def __init__(self, url=None, contents=None, page_options=None, url_builder=None):
         super().__init__(
             url,
             contents=contents,
             page_options=page_options,
+            url_builder=url_builder,
         )
 
         if url:

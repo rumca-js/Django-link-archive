@@ -396,7 +396,9 @@ class AddEntryForm(forms.Form):
         for browser in browsers:
             result.append([browser["id"], browser["name"]])
 
-        result.append([browser.THIS_BROWSER], ["This browser"])
+        result.append([Browser.THIS_BROWSER, "This browser"])
+        result.append([Browser.EMPTY_FORM, "Empty form"])
+        print(result)
 
         return result
 

@@ -70,7 +70,7 @@ def get_read_later_queue(request):
             json_data = read_later_to_json(user_config, read_later)
             data["queue"].append(json_data)
 
-        return JsonResponse(data)
+        return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def read_later_add(request, pk):
@@ -90,15 +90,14 @@ def read_later_add(request, pk):
             read_later = ReadLater.objects.create(entry=entry, user=request.user)
             data["message"] = "Added successfully to read queue"
             data["status"] = True
-            return JsonResponse(data)
         else:
             data["message"] = "Already in queue"
             data["status"] = True
-            return JsonResponse(data)
     else:
         data["message"] = "Cannot find such entry"
         data["status"] = False
-        return JsonResponse(data)
+
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def read_later_remove(request, pk):
@@ -120,16 +119,14 @@ def read_later_remove(request, pk):
 
             data["message"] = "Successfully removed from read queue"
             data["status"] = True
-            return JsonResponse(data)
         else:
             data["message"] = "Cannot find such entry"
             data["status"] = False
-            return JsonResponse(data)
 
     else:
         data["message"] = "Cannot find such entry"
         data["status"] = False
-        return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def read_later_clear(request):
@@ -144,4 +141,4 @@ def read_later_clear(request):
     data = {}
     data["message"] = "Successfully removed read queue"
     data["status"] = True
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})

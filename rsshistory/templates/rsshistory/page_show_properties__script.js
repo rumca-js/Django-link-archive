@@ -64,25 +64,26 @@ function fillData(properties) {
 
 function sendRequest(page_url, browser, attempt = 1) {
     let url = `{% url 'rsshistory:get-page-properties' %}?page=${page_url}&browser=${browser}`;
-    let spinner_text = getSpinnerText(`Fetching... ${page_url}`);
-    $("#formResponse").html(spinner_text);
+    let spinner_text = getSpinnerText(`Fetching... ${url}`);
+    console.log(spinner_text)
+    $("#propertiesResponse").html(spinner_text);
 
     $.ajax({
        url: url,
        type: 'GET',
-       timeout: 10000,
+       timeout: 40000, // TODO this depends on configuration
        success: function(data) {
            let text = fillData(data.properties);
-           $("#formResponse").html(text);
+           $("#propertiesResponse").html(text);
            $('.btnFilterTrigger').prop("disabled", false);
            $('.btnFilterTrigger').html("Submit")
        },
        error: function(xhr, status, error) {
            if (attempt < 3) {
-               $("#formResponse").html("Could not obtain information. Retry");
+               $("#propertiesResponse").html("Could not obtain information. Retry");
                sendRequest(page_url, browser, attempt + 1);
            } else {
-               $("#formResponse").html("Could not obtain information. Error");
+               $("#propertiesResponse").html("Could not obtain information. Error");
                $('.btnFilterTrigger').prop("disabled", false);
                $('.btnFilterTrigger').html("Submit")
            }

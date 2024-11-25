@@ -12,35 +12,119 @@ $(document).ready(function() {
    });
 });
 
-function loadFooterContent() {
-    getDynamicJsonContent('{% url 'rsshistory:get-footer-status-line' %}', "#footerLine");
+function add_text(error_line, text) {
+    if (error_line == "") {
+        error_line = text;
+    }
+    else {
+        error_line += ", " + text;
+    }
+
+    return error_line;
 }
 
-function loadMenuContent() {
-//    getDynamicContent('{% url 'rsshistory:get-menu' %}', "#blockMenu");
+function SetMenuStatusLine() {
+       if (common_indicators.read_later_queue.status) {
+           showElement(".readLaterElement");
+       }
+       else {
+           hideElement(".readLaterElement");
+       }
+       if (common_indicators.sources_error.status) {
+           showElement(".sourceErrorElement");
+       }
+       else {
+           hideElement(".sourceErrorElement");
+       }
+       if (common_indicators.threads_error.status) {
+           showElement(".configurationErrorElement");
+       }
+       else {
+           hideElement(".configurationErrorElement");
+       }
+       if (common_indicators.configuration_error.status ||
+           common_indicators.jobs_error.status) {
+           showElement(".adminErrorElement");
+       }
+       else {
+           hideElement(".adminErrorElement");
+       }
 }
 
-function getSpinnerText() {
-    return `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
+function SetFooterStatusLine() {
+   let error_line = "";
+
+   if (common_indicators.sources_error.status) {
+       error_line = add_text(error_line, "Sources");
+   }
+   if (common_indicators.threads_error.status) {
+       error_line = add_text(error_line, "Threads");
+   }
+   if (common_indicators.jobs_error.status) {
+       error_line = add_text(error_line, "Jobs");
+   }
+   if (common_indicators.configuration_error.status) {
+       error_line = add_text(error_line, "Configuration");
+   }
+
+   $("#footerLine").html(error_line);
+}
+
+let common_indicators = null;
+
+function showElement(element) {
+   $(element).show();
+   $(element).removeClass("invisible");
+}
+function hideElement(element) {
+   $(element).hide();
+   $(element).addClass("invisible");
+}
+
+let currentgetIndicators = 0;
+function getIndicators(attempt=1) {
+    let requestCurrentgetIndicators = ++currentgetIndicators;
+
+    let url = '{% url 'rsshistory:get-indicators' %}';
+    
+    $.ajax({
+       url: url,
+       type: 'GET',
+       timeout: 10000,
+       success: function(data) {
+           if (requestCurrentgetIndicators != currentgetIndicators)
+           {
+               return;
+           }
+           common_indicators = data.indicators;
+
+           SetMenuStatusLine();
+           SetFooterStatusLine();
+       },
+       error: function(xhr, status, error) {
+           if (requestCurrentgetIndicators != currentgetIndicators)
+           {
+               return;
+           }
+           
+           if (attempt < 3) {
+               getIndicators(attempt + 1);
+           } else {
+           }
+       }
+    });
 }
 
 $(document).ready(function() {
-    loadMenuContent();
-    loadFooterContent();
+    getIndicators();
 
     setInterval(function() {
-        loadMenuContent();
-        loadFooterContent();
+        getIndicators();
     }, 300000);
 });
 
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
-        loadMenuContent();
-        loadFooterContent();
+        getIndicators();
     }
-});
-
-$('#btnUpdateFooter').on('click', function() {
-    loadFooterContent();
 });

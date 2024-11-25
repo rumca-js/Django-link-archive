@@ -11,7 +11,7 @@ class YouTubeChannelHandler(DefaultChannelHandler):
     Natively since we inherit RssPage, the contents should be RssPage
     """
 
-    def __init__(self, url=None, contents=None, page_options=None):
+    def __init__(self, url=None, contents=None, page_options=None, url_builder=None):
         self.html_url = None  # channel html page contains useful info
         self.rss_url = None
 
@@ -19,18 +19,17 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             url,
             contents=contents,
             page_options=page_options,
+            url_builder=url_builder,
         )
 
         if url:
             self.code = self.input2code(url)
 
     def is_handled_by(self):
-        from .url import Url
-
         if not self.url:
             return False
 
-        short_url = Url.get_protololless(self.url)
+        short_url = self.url_builder.get_protololless(self.url)
 
         if (
             short_url.startswith("www.youtube.com/channel")
@@ -50,12 +49,10 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return True
 
     def is_channel_name(self):
-        from .url import Url
-
         if not self.url:
             return False
 
-        short_url = Url.get_protololless(self.url)
+        short_url = self.url_builder.get_protololless(self.url)
 
         if (
             short_url.startswith("www.youtube.com/@")
@@ -108,13 +105,15 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         return self.code
 
     def get_channel_name(self):
-        return self.code
+        return self.code2url(self.code)
 
     def get_channel_url(self):
         if self.code:
             return self.code2url(self.code)
 
     def get_feeds(self):
+        from .webtools import WebLogger
+
         result = []
         if self.code:
             result.append(self.code2feed(self.code))
@@ -122,7 +121,12 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         elif self.is_channel_name():
             html = self.get_html_page()
             if html:
-                result.append(html.get_rss_url())
+                if html.get_rss_url():
+                    result.append(html.get_rss_url())
+                else:
+                    WebLogger.error("Cannot obtain HTML page")
+            else:
+                WebLogger.error("Cannot obtain RSS from page {}".format(self.url))
 
         return result
 
@@ -145,7 +149,6 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return self.response.get_text()
 
     def get_response(self):
-        from .url import Url
         from .webtools import WebLogger
 
         if self.response:
@@ -154,9 +157,22 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if self.dead:
             return
 
+        if self.is_channel_name():
+            html = self.get_html_page()
+            if html:
+                rss_url = html.get_rss_url()
+                if not rss_url:
+                    WebLogger.error("Cannot obtain RSS")
+                    return
+                self.code = self.input2code(rss_url)
+                if self.code:
+                    self.url = self.get_channel_url()
+
         rss_url = self.get_rss_url()
         if rss_url:
             self.response = rss_url.get_response()
+        elif self.html_url:
+            self.response = self.html_url.get_response()
 
         if (
             not self.response
@@ -169,7 +185,6 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return self.response
 
     def get_rss_url(self):
-        from .url import Url
         from .webtools import WebLogger
 
         if self.rss_url:
@@ -180,21 +195,22 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             WebLogger.error(
                 "Url:{} Cannot read YouTube channel feed URL".format(self.url)
             )
-            self.dead = True
             return
 
         feed = feeds[0]
 
-        self.rss_url = Url(feed, handler_class=HttpPageHandler)
+        if not feed:
+            return
+
+        self.rss_url = self.url_builder(feed, handler_class=HttpPageHandler)
+        self.rss_url.get_response()
         return self.rss_url
 
     def get_html_url(self):
-        from .url import Url
-
         if self.html_url:
             return self.html_url
 
-        u = Url(self.url, handler_class=HttpPageHandler)
+        u = self.url_builder(self.url, handler_class=HttpPageHandler)
         u.get_response()
         self.html_url = u
 
@@ -202,6 +218,8 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return self.html_url
 
     def get_html_page(self):
+        from .webtools import WebLogger
+
         html_url = self.get_html_url()
         if html_url:
             handler = html_url.get_handler()
@@ -219,11 +237,17 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         rss_url = self.get_rss_url()
         if rss_url:
             return rss_url.get_title()
+        html_url = self.get_html_url()
+        if html_url:
+            return html_url.get_title()
 
     def get_description(self):
         rss_url = self.get_rss_url()
         if rss_url:
             return rss_url.get_description()
+        html_url = self.get_html_url()
+        if html_url:
+            return html_url.get_description()
 
     def get_language(self):
         rss_url = self.get_rss_url()

@@ -124,7 +124,7 @@ class JsonConverter(ItemConverterFabric):
         # if keys are not sorted, then order of keys in maps will be random
         # this can result in unnecessary export commit operations
 
-        return json.dumps(item_data, sort_keys=True)
+        return json.dumps(item_data, sort_keys=True, indent=4)
 
     def from_text(self, text):
         import json

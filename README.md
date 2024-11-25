@@ -73,11 +73,11 @@ Personal link database, link aggregator, with RSS functionality.
 
 Alternative programs for link bookmarking do exist.
 
+[Hoarder](https://hoarder.app/),
 [Grimoire](https://github.com/goniszewski/grimoire),
 [BookmarkOS](https://bookmarkos.com/),
 [Raindrop](https://raindrop.io/),
 [LinkAce](https://www.linkace.org/),
-[Hoarder](https://hoarder.app/),
 [GGather](https://web.ggather.com/),
 [Zotero](https://www.zotero.org/),
 [OneKeep](https://onekeep.com/),

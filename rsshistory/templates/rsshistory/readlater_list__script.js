@@ -13,6 +13,7 @@ function sendClearList(attempt = 1) {
           $('#clear-list').prop("disabled", false);
           $('.remove-button').prop("disabled", false);
           loadRowListContent();
+          getIndicators();
        },
        error: function(xhr, status, error) {
            if (attempt < 3) {
@@ -44,6 +45,7 @@ function sendRemoveListItem(id, attempt = 1) {
           $('#clear-list').prop("disabled", false);
           $('.remove-button').prop("disabled", false);
           loadRowListContent();
+          getIndicators();
        },
        error: function(xhr, status, error) {
            if (attempt < 3) {

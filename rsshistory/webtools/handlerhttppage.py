@@ -43,7 +43,7 @@ class HttpRequestBuilder(object):
 
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
 
-    def __init__(self, url=None, options=None, page_object=None, request=None):
+    def __init__(self, url=None, options=None, page_object=None, request=None, url_builder=None):
         """
         @param url URL
         @param contents URL page contents
@@ -312,11 +312,12 @@ class HttpRequestBuilder(object):
 class HttpPageHandler(ContentInterface):
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
 
-    def __init__(self, url=None, page_options=None):
+    def __init__(self, url=None, page_options=None, url_builder=None):
         super().__init__(url=url, contents=None)
         self.p = None
         self.response = None
         self.options = page_options
+        self.url_builder = url_builder
 
     def disable_ssl_warnings():
         disable_warnings(InsecureRequestWarning)

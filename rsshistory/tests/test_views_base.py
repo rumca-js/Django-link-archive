@@ -34,8 +34,8 @@ class BasicViewTest(FakeInternetTestCase):
         # redirect to search init
         self.assertEqual(response.status_code, 302)
 
-    def test_get_footer_status_line(self):
-        url = reverse("{}:get-footer-status-line".format(LinkDatabase.name))
+    def test_get_indicators(self):
+        url = reverse("{}:get-indicators".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

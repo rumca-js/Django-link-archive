@@ -99,7 +99,7 @@ def get_page_properties(request):
     if "page" not in request.GET:
         data = {}
         data["status"] = False
-        return JsonResponse(data)
+        return JsonResponse(data, json_dumps_params={"indent":4})
 
     page_link = request.GET["page"]
     url = UrlHandler(page_link)
@@ -112,11 +112,14 @@ def get_page_properties(request):
         if browsers.exists():
             browser = browsers[0]
             options.bring_to_front(browser.get_setup())
+            options.use_browser_promotions = False
         else:
             return
 
     page_url = UrlHandler(page_link, page_options=options)
-    page_url.get_response()
+    response = page_url.get_response()
+
+    page_handler = page_url.get_handler()
 
     is_link_allowed = DomainCache.get_object(page_link, url_builder=UrlHandler).is_allowed(page_link)
 
@@ -134,12 +137,13 @@ def get_page_properties(request):
     properties["date_published"] = page_url.get_date_published()
     properties["is_link_allowed"] = is_link_allowed
 
+    if type(page_handler) is UrlHandler.youtube_channel_handler:
+        if page_handler.get_channel_name():
+            properties["channel_name"] = page_handler.get_channel_name()
+
     all_properties.append({"name" : "Properties", "data" : properties})
+
     all_properties.append({"name" : "Contents", "data" : {"Contents" : page_url.get_contents()}})
-
-    page_handler = page_url.get_handler()
-
-    response = page_url.get_response()
 
     request_data = {}
     request_data["Options"] = str(page_url.options)
@@ -165,7 +169,7 @@ def get_page_properties(request):
     data["properties"] = all_properties
     data["status"] = True
 
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def page_show_properties(request):
@@ -625,7 +629,7 @@ def page_verify(request):
                 domain = domains[0]
                 data["domain"] = domain.get_map()
 
-        return JsonResponse(data)
+        return JsonResponse(data, json_dumps_params={"indent":4})
 
     p = ViewPage(request)
     p.set_title("Verify page")

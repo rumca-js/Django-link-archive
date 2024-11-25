@@ -66,12 +66,10 @@
            <li class="nav-item dropdown">
                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                    Global
-                   {% if is_source_error %}
-                   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger invisible sourceErrorElement">
                        !
                        <span class="visually-hidden">Source error</span>
                    </span>
-                   {% endif %}
                </a>
                <ul class="dropdown-menu">
                    <li>
@@ -102,12 +100,10 @@
                        <a href="{% url 'rsshistory:sources' %}" class="dropdown-item" title="Sources">
                            <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
                            Sources
-                           {% if is_source_error %}
-                           <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                           <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger invisible sourceErrorElement">
                                !
                                <span class="visually-hidden">Source error</span>
                            </span>
-                           {% endif %}
                        </a>
                    </li>
                </ul>
@@ -117,21 +113,17 @@
            <li class="nav-item dropdown">
                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                    Personal
-                   {% if is_read_later %}
-                   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                   <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger invisible readLaterElement">
                        !
                        <span class="visually-hidden">read later</span>
                    </span>
-                   {% endif %}
                </a>
                <ul class="dropdown-menu">
-                   {% if is_read_later %}
-                   <li class="nav-item">
+                   <li class="nav-item invisible readLaterElement">
                        <a href="{% url 'rsshistory:read-later-entries' %}" class="dropdown-item" title="Shows entries marked as later to read">
                            <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
                            Read later</a>
                    </li>
-                   {% endif %}
                    <li>
                        <a href="{% url 'rsshistory:entries-user-bookmarked' %}?show=1" class="dropdown-item" title="Shows bookmarked links. By default shows all users bookmarks.">
                            <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
@@ -238,12 +230,10 @@
           <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   User
-                  {% if is_configuration_error or is_backgroundjobs_error or is_status_error %}
-                  <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                  <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger invisible configurationErrorElement">
                       !
                       <span class="visually-hidden">Configuration error</span>
                   </span>
-                  {% endif %}
               </a>
               <ul class="dropdown-menu">
                   {% if user.is_staff %}
@@ -251,12 +241,10 @@
                       <a href="{% url 'rsshistory:admin-page' %}" class="nav-link" title="Admin">
                           <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="mainbutton-icon" />
                           Admin
-                          {% if is_configuration_error or is_backgroundjobs_error or is_status_error %}
-                          <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger">
+                          <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger invisible adminErrorElement">
                               !
                               <span class="visually-hidden">Configuration error</span>
                           </span>
-                          {% endif %}
                       </a>
                   </li>
                   {% endif %}

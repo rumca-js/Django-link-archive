@@ -87,7 +87,7 @@ def get_backgroundjobs(request):
             json_data = job_to_json(job)
             data["jobs"].append(json_data)
 
-        return JsonResponse(data)
+        return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def backgroundjob_add(request):
@@ -316,4 +316,4 @@ def is_entry_download(request, pk):
 
     json_obj = {"status": is_downloaded}
 
-    return JsonResponse(json_obj)
+    return JsonResponse(json_obj, json_dumps_params={"indent":4})

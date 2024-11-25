@@ -50,6 +50,7 @@ from ..forms import (
     OmniSearchWithArchiveForm,
     LinkInputForm,
     LinkPropertiesForm,
+    AddEntryForm,
 )
 from ..views import (
     ViewPage,
@@ -501,7 +502,7 @@ def get_entry_menu(request, pk):
 
 
 def func_display_empty_form(request, p, template_name):
-    form = LinkPropertiesForm(request=request)
+    form = AddEntryForm(request=request)
     form.method = "POST"
 
     p.context["form"] = form
@@ -749,7 +750,7 @@ def entry_is(request):
         data["status"] = False
         data["message"] = "Does not exist"
 
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def entry_update_data(request, pk):
@@ -894,7 +895,7 @@ def entry_remove(request, pk):
         data["message"] = "No source for ID: " + str(pk)
         data["status"] = False
 
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def entry_active(request, pk):
@@ -1000,8 +1001,7 @@ def entry_bookmark(request, pk):
         json_obj["status"] = True
         json_obj["message"] = "Bookmarked"
 
-    # JsonResponse
-    return JsonResponse(json_obj)
+    return JsonResponse(json_obj, json_dumps_params={"indent":4})
 
 
 def entry_unbookmark(request, pk):
@@ -1019,8 +1019,7 @@ def entry_unbookmark(request, pk):
         "message": "Unbookmarked",
     }
 
-    # JsonResponse
-    return JsonResponse(json_obj)
+    return JsonResponse(json_obj, json_dumps_params={"indent":4})
 
 
 def download_entry(request, pk):
@@ -1081,8 +1080,7 @@ def entry_json(request, pk):
     exporter = InstanceExporter()
     json_obj = exporter.export_link(link)
 
-    # JsonResponse
-    return JsonResponse(json_obj)
+    return JsonResponse(json_obj, json_dumps_params={"indent":4})
 
 
 def handle_json_view(request, view_to_use):
@@ -1118,8 +1116,7 @@ def handle_json_view(request, view_to_use):
 
             json_obj["entries"].append(entry_json)
 
-        # JsonResponse
-        return JsonResponse(json_obj)
+        return JsonResponse(json_obj, json_dumps_params={"indent":4})
 
 
 def entries_json(request):

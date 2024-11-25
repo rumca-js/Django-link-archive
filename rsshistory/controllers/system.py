@@ -100,6 +100,9 @@ class SystemOperationController(object):
     def is_threading_ok(self, thread_ids=None):
         hours_limit = 1800
 
+        if thread_ids is None:
+            return False
+
         thread_ids = SystemOperationController.threads_to_threads(thread_ids)
 
         for thread_id in thread_ids:

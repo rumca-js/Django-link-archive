@@ -724,9 +724,7 @@ class PageOptions(object):
     def __init__(self):
         self.ssl_verify = True
         self.ping = False
-        self.use_browser_promotions = (
-            True  # tries headles if normal processing does not work
-        )
+        self.use_browser_promotions = True  # tries next mode if normal processing does not work
 
         self.mode_mapping = {}
 

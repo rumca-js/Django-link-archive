@@ -355,6 +355,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         names.add("user__id")
         names.add("user__username")
 
+        names.add("date_created")
         names.add("date_dead_since")
         names.add("date_update_last")
         return sorted(list(names))

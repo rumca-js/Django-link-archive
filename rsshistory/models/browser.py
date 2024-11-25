@@ -22,6 +22,7 @@ def get_browser_choices():
 
 class Browser(models.Model):
     THIS_BROWSER = -1
+    EMPTY_FORM = -2
 
     enabled = models.BooleanField(default=True)
     priority = models.IntegerField(default=0)
@@ -104,3 +105,8 @@ class Browser(models.Model):
 
     def get_crawler_from_string(crawler_string):
         return WebConfig.get_crawler_from_string(crawler_string)
+
+    def __str__(self):
+        return "{}".format(
+            self.name,
+        )

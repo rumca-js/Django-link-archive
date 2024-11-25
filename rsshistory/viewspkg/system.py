@@ -202,8 +202,7 @@ def configuration_advanced_json(request):
 
     json_obj = model_to_dict(config)
 
-    # JsonResponse
-    return JsonResponse(json_obj)
+    return JsonResponse(json_obj, json_dumps_params={"indent":4})
 
 
 def user_config(request):
@@ -343,7 +342,7 @@ def json_table_status(request):
     data = {}
     data["tables"] = table
 
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def json_system_status(request):
@@ -407,7 +406,7 @@ def json_system_status(request):
     for thread_info in system_controller.get_thread_info(tasks):
         data["threads"].append({"name": thread_info[0], "date": thread_info[1]})
 
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def history_to_json(history):
@@ -430,7 +429,7 @@ def get_settings(request):
     configuration = Configuration.get_object()
     data = configuration.get_settings()
 
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def json_export_status(request):
@@ -447,7 +446,7 @@ def json_export_status(request):
     for history in histories:
         data["exports"].append(history_to_json(history))
 
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 class AppLoggingView(generic.ListView):
@@ -514,7 +513,7 @@ def json_logs(request):
             json_data = log_to_json(app_logging_entry)
             data["logs"].append(json_data)
 
-        return JsonResponse(data)
+        return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def truncate_log_all(request):
@@ -911,7 +910,7 @@ def get_footer_status_line(request):
         message = add_to_message(message, "Configuration")
 
     data = {"message": message}
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def get_indicators(request):
@@ -928,45 +927,55 @@ def get_indicators(request):
     configuration_entry = Configuration.get_object().config_entry
     system_controller = SystemOperationController()
 
+    from ..threadprocessors import get_tasks
+    tasks = get_tasks()
+
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
     is_internet_ok = system_controller.is_internet_ok()
-    is_threading_ok = system_controller.is_threading_ok()
+    is_threading_ok = system_controller.is_threading_ok(tasks)
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
+    read_later_queue_size = ReadLater.objects.all().count()
+    read_later = read_later_queue_size > 0
 
     indicators = {}
 
-    if sources_are_fetched:
-        indicators["is_reading"] = {}
-        indicators["is_reading"][
-            "message"
-        ] = f"Reading sources. Queue:{sources_queue_size}"
-        indicators["is_reading"]["status"] = True
-    if is_sources_error:
-        indicators["sources_error"] = {}
-        indicators["sources_error"]["message"] = f"Sources error"
-        indicators["sources_error"]["status"] = True
-    if configuration_entry.background_tasks and not is_internet_ok:
-        indicators["internet_error"] = {}
-        indicators["internet_error"]["message"] = f"Internet error"
-        indicators["internet_error"]["status"] = True
-    if configuration_entry.background_tasks and not is_threading_ok:
-        indicators["threads_error"] = {}
-        indicators["threads_error"]["message"] = f"Threads error"
-        indicators["threads_error"]["status"] = True
-    if is_backgroundjobs_error:
-        indicators["jobs_error"] = {}
-        indicators["jobs_error"]["message"] = f"Jobs error"
-        indicators["jobs_error"]["status"] = True
-    if is_configuration_error:
-        indicators["configuration_error"] = {}
-        indicators["configuration_error"]["message"] = f"Configuration error"
-        indicators["configuration_error"]["status"] = True
+    indicators["is_reading"] = {}
+    indicators["is_reading"][
+        "message"
+    ] = f"Reading sources. Queue:{sources_queue_size}"
+    indicators["is_reading"]["status"] = sources_are_fetched
+
+    indicators["read_later_queue"] = {}
+    indicators["read_later_queue"]["message"] = f"Read later queue {read_later_queue_size}"
+    indicators["read_later_queue"]["status"] = read_later
+
+    indicators["sources_error"] = {}
+    indicators["sources_error"]["message"] = f"Sources error"
+    indicators["sources_error"]["status"] = is_sources_error
+
+    is_internet_error = configuration_entry.background_tasks and not is_internet_ok
+    indicators["internet_error"] = {}
+    indicators["internet_error"]["message"] = f"Internet error"
+    indicators["internet_error"]["status"] = is_internet_error
+
+    threads_error = configuration_entry.background_tasks and not is_threading_ok
+    indicators["threads_error"] = {}
+    indicators["threads_error"]["message"] = f"Threads error"
+    indicators["threads_error"]["status"] = threads_error
+
+    indicators["jobs_error"] = {}
+    indicators["jobs_error"]["message"] = f"Jobs error"
+    indicators["jobs_error"]["status"] = is_backgroundjobs_error
+
+    indicators["configuration_error"] = {}
+    indicators["configuration_error"]["message"] = f"Configuration error"
+    indicators["configuration_error"]["status"] = is_configuration_error
 
     data = {"indicators": indicators}
-    return JsonResponse(data)
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def get_menu(request):

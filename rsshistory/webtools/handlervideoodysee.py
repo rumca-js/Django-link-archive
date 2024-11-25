@@ -2,8 +2,8 @@ from .defaulturlhandler import DefaultUrlHandler
 
 
 class OdyseeVideoHandler(DefaultUrlHandler):
-    def __init__(self, url=None, contents=None, page_options=None):
-        super().__init__(url, contents=contents, page_options=page_options)
+    def __init__(self, url=None, contents=None, page_options=None, url_builder=None):
+        super().__init__(url, contents=contents, page_options=page_options, url_builder=url_builder)
         self.channel = None
         self.video = None
         self.url = self.input2url(url)
@@ -12,9 +12,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
         if not self.url:
             return
 
-        from .url import Url
-
-        protocol_less = Url.get_protololless(self.url)
+        protocol_less = self.url_builder.get_protololless(self.url)
 
         if protocol_less.startswith("odysee.com/@"):
             wh1 = protocol_less.find("@")
@@ -29,9 +27,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
             return True
 
     def input2url(self, url):
-        from .url import Url
-
-        protocol_less = Url.get_protololless(self.url)
+        protocol_less = self.url_builder.get_protololless(self.url)
 
         if protocol_less.startswith("odysee.com/@"):
             return self.handle_channel_video_input(url)
@@ -39,9 +35,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
             return self.handle_video_input(url)
 
     def handle_channel_video_input(self, url):
-        from .url import Url
-
-        protocol_less = Url.get_protololless(self.url)
+        protocol_less = self.url_builder.get_protololless(self.url)
 
         lines = protocol_less.split("/")
         if len(lines) < 3:
@@ -59,9 +53,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
         return "https://" + protocol_less
 
     def handle_video_input(self, url):
-        from .url import Url
-
-        protocol_less = Url.get_protololless(self.url)
+        protocol_less = self.url_builder.get_protololless(self.url)
 
         lines = protocol_less.split("/")
         if len(lines) < 2:
@@ -92,13 +84,12 @@ class OdyseeVideoHandler(DefaultUrlHandler):
         return "https://odysee.com/$/embed/{0}".format(self.get_video_code())
 
     def get_response(self):
-        from .url import Url
         from .handlerhttppage import HttpPageHandler
 
         if self.response:
             return self.response
 
-        self.handler = Url(self.url, handler_class=HttpPageHandler)
+        self.handler = self.url_builder(self.url, handler_class=HttpPageHandler)
         self.response = self.handler.get_response()
 
         if self.response:

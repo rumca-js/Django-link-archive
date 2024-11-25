@@ -770,8 +770,7 @@ def source_json(request, pk):
     exporter = InstanceExporter()
     json_obj = exporter.export_source(source)
 
-    # JsonResponse
-    return JsonResponse(json_obj)
+    return JsonResponse(json_obj, json_dumps_params={"indent":4})
 
 
 def source_to_json(user_config, source):
@@ -827,8 +826,7 @@ def sources_json_view(request, view_class):
 
         json_obj["sources"].append(source_json)
 
-    # JsonResponse
-    return JsonResponse(json_obj)
+    return JsonResponse(json_obj, json_dumps_params={"indent":4})
 
 
 def sources_json_all(request):
