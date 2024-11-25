@@ -1,4 +1,5 @@
 from .defaulturlhandler import DefaultChannelHandler
+from .webtools import DomainAwarePage
 
 
 class OdyseeChannelHandler(DefaultChannelHandler):
@@ -15,12 +16,10 @@ class OdyseeChannelHandler(DefaultChannelHandler):
             self.code = self.input2code(url)
 
     def is_handled_by(self):
-        from .url import Url
-
         if not self.url:
             return False
 
-        short_url = Url.get_protololless(self.url)
+        short_url = DomainAwarePage(self.url).get_protocolless()
 
         if short_url.startswith("odysee.com/@"):
             return True
@@ -38,9 +37,7 @@ class OdyseeChannelHandler(DefaultChannelHandler):
         return "https://odysee.com/$/rss/{}".format(code)
 
     def is_channel_name(self):
-        from .url import Url
-
-        short_url = Url.get_protololless(self.url)
+        short_url = DomainAwarePage(self.url).get_protocolless()
 
         if short_url.startswith("odysee.com/@"):
             return True
@@ -56,12 +53,10 @@ class OdyseeChannelHandler(DefaultChannelHandler):
             return self.input2code_channel(url)
 
     def input2code_channel(self, url):
-        from .url import Url
-
         if not self.url:
             return False
 
-        short_url = Url.get_protololless(self.url)
+        short_url = DomainAwarePage(self.url).get_protocolless()
         lines = short_url.split("/")
         if len(lines) < 2:
             return
@@ -76,12 +71,10 @@ class OdyseeChannelHandler(DefaultChannelHandler):
         return code
 
     def input2code_feeds(self, url):
-        from .url import Url
-
         if not self.url:
             return False
 
-        short_url = Url.get_protololless(self.url)
+        short_url = DomainAwarePage(self.url).get_protocolless()
         lines = short_url.split("/")
         if len(lines) < 2:
             return

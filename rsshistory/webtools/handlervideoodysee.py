@@ -1,4 +1,5 @@
 from .defaulturlhandler import DefaultUrlHandler
+from .webtools import DomainAwarePage
 
 
 class OdyseeVideoHandler(DefaultUrlHandler):
@@ -12,7 +13,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
         if not self.url:
             return
 
-        protocol_less = self.url_builder.get_protololless(self.url)
+        protocol_less = DomainAwarePage(self.url).get_protocolless()
 
         if protocol_less.startswith("odysee.com/@"):
             wh1 = protocol_less.find("@")
@@ -27,7 +28,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
             return True
 
     def input2url(self, url):
-        protocol_less = self.url_builder.get_protololless(self.url)
+        protocol_less = DomainAwarePage(self.url).get_protocolless()
 
         if protocol_less.startswith("odysee.com/@"):
             return self.handle_channel_video_input(url)
@@ -35,7 +36,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
             return self.handle_video_input(url)
 
     def handle_channel_video_input(self, url):
-        protocol_less = self.url_builder.get_protololless(self.url)
+        protocol_less = DomainAwarePage(self.url).get_protocolless()
 
         lines = protocol_less.split("/")
         if len(lines) < 3:
@@ -53,7 +54,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
         return "https://" + protocol_less
 
     def handle_video_input(self, url):
-        protocol_less = self.url_builder.get_protololless(self.url)
+        protocol_less = DomainAwarePage(self.url).get_protocolless()
 
         lines = protocol_less.split("/")
         if len(lines) < 2:

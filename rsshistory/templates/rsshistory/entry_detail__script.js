@@ -33,7 +33,7 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1,
 
           if (data.status) {
              loadEntryMenuContent();
-             loadMenuContent();
+             getIndicators();
           }
        },
        error: function(xhr, status, error) {
