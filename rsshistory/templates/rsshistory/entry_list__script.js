@@ -1,21 +1,47 @@
 {% load static %}
 
-function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
-    let page_rating_votes = entry.page_rating_votes;
-
+function getVotesBadge(page_rating_votes) {
     let badge_text = page_rating_votes > 0 ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 30px; font-size: 1rem;">
+        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 30px; font-size: 0.8rem;">
             ${page_rating_votes}
         </span>` : '';
 
+    return badge_text;
+}
+
+function getBookmarkBadge(entry) {
     let badge_star = entry.bookmarked ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
+        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 0.8rem;">
             ★
         </span>` : '';
+    return badge_star;
+}
+
+function getAgeBadge(entry) {
+    let badge_text = entry.age > 0 ? `
+        <span class="badge text-bg-warning" style="position: absolute; top: 30px; right: 5px; font-size: 0.8rem;">
+            A
+        </span>` : '';
+    return badge_text;
+}
+
+function getDeadBadge(entry) {
+    let badge_text = entry.date_dead_since ? `
+        <span class="badge text-bg-warning" style="position: absolute; top: 30px; right: 30px; font-size: 0.8rem;">
+            D
+        </span>` : '';
+    return badge_text;
+}
+
+function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
+    let page_rating_votes = entry.page_rating_votes;
+
+    let badge_text = getVotesBadge(page_rating_votes);
+    let badge_star = getBookmarkBadge(entry);
+    let badge_age = getAgeBadge(entry);
 
     let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
     let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
-    let votes_text = page_rating_votes > 0 ? `[${page_rating_votes}]` : '';
 
     let img_text = '';
     if (show_icons) {
@@ -50,6 +76,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
 
             ${badge_text}
             ${badge_star}
+            ${badge_age}
         </a>
     `;
 }
@@ -57,20 +84,12 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
 function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
 
-    let badge_text = page_rating_votes > 0 ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 30px; font-size: 1rem;">
-            ${page_rating_votes}
-        </span>` : '';
-
-    let badge_star = entry.bookmarked ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
-            ★
-        </span>` : '';
+    let badge_text = getVotesBadge(page_rating_votes);
+    let badge_star = getBookmarkBadge(entry);
+    let badge_age = getAgeBadge(entry);
 
     let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
     let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
-
-    let votes_text = page_rating_votes > 0 ? `[${page_rating_votes}]` : '';
 
     let thumbnail_text = '';
     if (show_icons) {
@@ -95,6 +114,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                   <div class="text-reset">@ {link}</div>
                   ${badge_text}
                   ${badge_star}
+                  ${badge_age}
                </div>
             </div>
         </a>
@@ -104,15 +124,10 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
 function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
     
-    let badge_text = page_rating_votes > 0 ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 30px; font-size: 1rem;">
-            ${page_rating_votes}
-        </span>` : '';
+    let badge_text = getVotesBadge(page_rating_votes);
+    let badge_star = getBookmarkBadge(entry);
+    let badge_age = getAgeBadge(entry);
 
-    let star_badge = entry.bookmarked ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 1rem;">
-            ★
-        </span>` : '';
     let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
 
     let thumbnail = entry.thumbnail;
@@ -120,6 +135,7 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
         <img src="${thumbnail}" style="width:100%; max-height:100%; object-fit:cover"/>
         ${badge_text}
         ${star_badge}
+        ${star_age}
     `;
 
     return `
@@ -179,6 +195,7 @@ function fillEntryList(entries) {
                 .replace(/{page_rating_contents}/g, entry.page_rating_contents)
                 .replace(/{page_rating}/g, entry.page_rating)
                 .replace(/{source__title}/g, entry.source__title)
+                .replace(/{age}/g, entry.age)
                 .replace(/{date_published}/g, datePublished.toLocaleString());
 
             htmlOutput += listItem;
