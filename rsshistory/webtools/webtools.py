@@ -63,6 +63,7 @@ HTTP_STATUS_CODE_CONNECTION_ERROR = 603
 HTTP_STATUS_CODE_TIMEOUT = 604
 HTTP_STATUS_CODE_FILE_TOO_BIG = 612
 HTTP_STATUS_CODE_PAGE_UNSUPPORTED = 613
+HTTP_STATUS_CODE_SERVER_ERROR = 614
 
 
 class WebLogger(object):
@@ -1070,13 +1071,34 @@ class PageResponseObject(object):
     def add_error(self, error_text):
         self.errors.append(error_text)
 
+    def status_code_to_text(status_code):
+        if not status_code:
+            return ""
+
+        if status_code == 600:
+            return "HTTP_STATUS_CODE_EXCEPTION"
+        elif status_code == 603:
+            return "HTTP_STATUS_CODE_CONNECTION_ERROR"
+        elif status_code == 604:
+            return "HTTP_STATUS_CODE_TIMEOUT"
+        elif status_code == 612:
+            return "HTTP_STATUS_CODE_FILE_TOO_BIG"
+        elif status_code == 613:
+            return "HTTP_STATUS_CODE_PAGE_UNSUPPORTED"
+        elif status_code == 614:
+            return "HTTP_STATUS_CODE_SERVER_ERROR"
+        else:
+            return str(status_code)
+
     def __str__(self):
         has_text_data = "Yes" if self.text else "No"
         has_binary_data = "Yes" if self.binary else "No"
 
+        status_code_text = PageResponseObject.status_code_to_text(self.status_code)
+
         return "PageResponseObject: Url:{} Status code:{} Headers:{} Text:{} Binary:{}".format(
             self.url,
-            self.status_code,
+            status_code_text,
             self.headers,
             has_text_data,
             has_binary_data,

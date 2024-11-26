@@ -398,7 +398,6 @@ class AddEntryForm(forms.Form):
 
         result.append([Browser.THIS_BROWSER, "This browser"])
         result.append([Browser.EMPTY_FORM, "Empty form"])
-        print(result)
 
         return result
 

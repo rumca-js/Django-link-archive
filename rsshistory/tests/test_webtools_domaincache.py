@@ -66,3 +66,28 @@ class DomainCacheInfoTest(FakeInternetTestCase):
             )
 
         self.assertEqual(len(cache.cache), 5)
+
+    def test_cache_info__invalid_page(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        cache = DomainCache(cache_size=5, respect_robots_txt=True)
+
+        cache_info = cache.get_domain_info(
+            "https://page-with-http-status-500.com"
+        )
+
+        # call tested function
+        cache_info.is_allowed("https://page-with-http-status-500.com/test.html")
+
+        # +1 for first browser, +1 for second browser
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+
+        cache_info = cache.get_domain_info(
+            "https://page-with-http-status-500.com"
+        )
+
+        # call tested function
+        cache_info.is_allowed("https://page-with-http-status-500.com/test.html")
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)

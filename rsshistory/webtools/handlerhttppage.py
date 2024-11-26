@@ -22,6 +22,7 @@ from .webtools import (
     HTTP_STATUS_CODE_TIMEOUT,
     HTTP_STATUS_CODE_FILE_TOO_BIG,
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
+    HTTP_STATUS_CODE_SERVER_ERROR,
 )
 from .pages import (
     ContentInterface,
@@ -154,7 +155,15 @@ class HttpRequestBuilder(object):
             WebLogger.error(
                 "Url:{} Could not identify method of page capture".format(request.url)
             )
-            raise NotImplementedError("Could not identify method of page capture")
+            WebLogger.error("Could not identify method of page capture")
+
+            self.response = PageResponseObject(
+                request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_SERVER_ERROR,
+                request_url=request.url,
+            )
+            return self.response
 
         for crawler_data in mode_mapping:
             crawler = WebConfig.get_crawler_from_mapping(request, crawler_data)
@@ -179,7 +188,14 @@ class HttpRequestBuilder(object):
         WebLogger.error(
             "Url:{} No response from crawler".format(request.url)
         )
-        raise NotImplementedError("Url:{} No response from crawler".format(request.url))
+
+        self.response = PageResponseObject(
+            request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
+            request_url=request.url,
+        )
+        return self.response
 
 
     def ping(self, timeout_s=5, options=None):

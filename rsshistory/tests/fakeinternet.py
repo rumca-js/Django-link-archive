@@ -28,7 +28,7 @@ from ..models import (
     Browser,
 )
 from ..configuration import Configuration
-
+from ..pluginurl import UrlHandler
 
 from .fakeinternetdata import (
     webpage_with_real_rss_links,
@@ -312,6 +312,9 @@ class TestResponseObject(PageResponseObject):
 
         elif url == "http://page-with-https-status-500-http-status-200.com":
             self.status_code = 200
+
+        elif url == "https://page-with-http-status-500.com/robots.txt":
+            self.status_code = 500
 
     def get_text_for_url(self, url):
         if url.startswith("https://youtube.com/channel/"):
@@ -598,6 +601,7 @@ class FakeInternetTestCase(TestCase):
         # HttpRequestBuilder.get_contents_function = self.get_contents_function
 
         Url.youtube_video_handler = YouTubeJsonHandlerMock
+        UrlHandler.youtube_video_handler = YouTubeJsonHandlerMock
         # Url.youtube_video_handler = YouTubeVideoHandlerMock
 
         # channel uses RSS page to obtain data. We do not need to mock it

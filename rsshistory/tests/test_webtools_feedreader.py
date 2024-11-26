@@ -15,6 +15,9 @@ from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
 class FeedreaderTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_reddit(self):
         MockRequestCounter.mock_page_requests = 0
 

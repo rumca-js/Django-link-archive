@@ -4,6 +4,8 @@ from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
 class OdyseeVideoHandlerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
 
     def test_constructor(self):
         MockRequestCounter.mock_page_requests = 0
@@ -63,6 +65,9 @@ class OdyseeVideoHandlerTest(FakeInternetTestCase):
 
 
 class OdyseeChannelHandlerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_constructor__channel_url(self):
         MockRequestCounter.mock_page_requests = 0
 

@@ -118,15 +118,15 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if self.code:
             result.append(self.code2feed(self.code))
 
-        elif self.is_channel_name():
-            html = self.get_html_page()
-            if html:
-                if html.get_rss_url():
-                    result.append(html.get_rss_url())
-                else:
-                    WebLogger.error("Cannot obtain HTML page")
-            else:
-                WebLogger.error("Cannot obtain RSS from page {}".format(self.url))
+        #elif self.is_channel_name():
+        #    html = self.get_html_page()
+        #    if html:
+        #        if html.get_rss_url():
+        #            result.append(html.get_rss_url())
+        #        else:
+        #            WebLogger.error("Cannot obtain HTML page")
+        #    else:
+        #        WebLogger.error("Cannot obtain RSS from page {}".format(self.url))
 
         return result
 
@@ -171,8 +171,8 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         rss_url = self.get_rss_url()
         if rss_url:
             self.response = rss_url.get_response()
-        elif self.html_url:
-            self.response = self.html_url.get_response()
+        #elif self.html_url:
+        #    self.response = self.html_url.get_response()
 
         if (
             not self.response

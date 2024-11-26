@@ -112,7 +112,8 @@ class Url(ContentInterface):
         if not url:
             return
 
-        short_url = Url.get_protololless(url)
+        p = DomainAwarePage(url)
+        short_url = p.get_protocolless()
         if not short_url:
             return
 
@@ -206,7 +207,8 @@ class Url(ContentInterface):
         if not url:
             return
 
-        short_url = Url.get_protololless(url)
+        p = DomainAwarePage(url)
+        short_url = p.get_protocolless()
 
         if not short_url:
             return
@@ -393,23 +395,6 @@ class Url(ContentInterface):
             return self.response.get_status_code()
 
         return 0
-
-    def get_protololless(url):
-        url = Url.get_cleaned_link(url)
-
-        if not url:
-            return
-
-        if url.startswith("https://") >= 0:
-            return url.replace("https://", "")
-        if url.startswith("http://") >= 0:
-            return url.replace("http://", "")
-        if url.startswith("ftp://") >= 0:
-            return url.replace("ftp://", "")
-        if url.startswith("smb://") >= 0:
-            return url.replace("smb://", "")
-        if url.startswith("//") >= 0:
-            return url.replace("//", "")
 
     def override_mapping(self, options):
         if Url.is_selenium_browser_required(self.url):
@@ -684,8 +669,8 @@ class DomainCache(object):
     Url().get_domain_cache().is_allowed()
     """
 
-    object = None
-    default_cache_size = 400  # 400 domains
+    object = None               # singleton
+    default_cache_size = 400
     respect_robots_txt = True
 
     def get_object(domain_url, page_options=None, url_builder=None):
