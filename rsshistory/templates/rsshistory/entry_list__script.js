@@ -134,8 +134,8 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
     let thumbnail_text = `
         <img src="${thumbnail}" style="width:100%; max-height:100%; object-fit:cover"/>
         ${badge_text}
-        ${star_badge}
-        ${star_age}
+        ${badge_star}
+        ${badge_age}
     `;
 
     return `
