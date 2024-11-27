@@ -1,32 +1,26 @@
 from .sourcerssplugin import BaseRssPlugin
 from .sourceparseplugin import BaseParsePlugin
-from .sourceparseinternallinks import SourceParseInternalLinks
-from .domainparserplugin import DomainParserPlugin
 from .sourcejsonplugin import BaseSourceJsonPlugin
 
-from .sourceparseditigsplugin import SourceParseDigitsPlugin
 from .codeprojectplugin import CodeProjectPlugin
 from .tvn24plugin import TVN24Plugin
 from .spotifyplugin import SpotifyPlugin
 from .sourceyoutubechannel import YouTubePlugin
 from .rssparserplugin import RssParserPlugin
 from .hackernewsparserplugin import HackerNewsParserPlugin
+from ..models import AppLogging
 
 
 class SourceControllerBuilder(object):
     plugins = [
         BaseRssPlugin,
         BaseParsePlugin,
-        SourceParseInternalLinks,
-        DomainParserPlugin,
         BaseSourceJsonPlugin,
         # domain specific
-        SourceParseDigitsPlugin,
         CodeProjectPlugin,
         TVN24Plugin,
         SpotifyPlugin,
         YouTubePlugin,
-        RssParserPlugin,
         HackerNewsParserPlugin,
     ]
 
@@ -45,11 +39,11 @@ class SourceControllerBuilder(object):
             if source.source_type == plugin.PLUGIN_NAME:
                 return plugin
 
-        raise NotImplementedError(
-            "Source:{}: Unsupported source type:{}".format(
-                source.title, source.source_type
-            )
-        )
+        AppLogging.notify("Incorrectly configured source, ID:{} title:{}, type:{}. Setting it to base RSS type".format(
+                source.id, source.title, source.source_type))
+
+        source.source_type = "BaseRssPlugin"
+        source.save()
 
     def get_plugin_names():
         result = set()

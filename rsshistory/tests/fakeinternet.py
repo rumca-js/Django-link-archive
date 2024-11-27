@@ -601,13 +601,7 @@ class FakeInternetTestCase(TestCase):
         # HttpRequestBuilder.get_contents_function = self.get_contents_function
 
         Url.youtube_video_handler = YouTubeJsonHandlerMock
-        UrlHandler.youtube_video_handler = YouTubeJsonHandlerMock
-        # Url.youtube_video_handler = YouTubeVideoHandlerMock
-
-        # channel uses RSS page to obtain data. We do not need to mock it
-        # Url.youtube_channel_handler = YouTubeChannelHandlerMock
-        # Url.odysee_video_handler = YouTubeVideoHandlerMock
-        # Url.odysee_channel_handler = YouTubeVideoHandlerMock
+        # UrlHandler.youtube_video_handler = YouTubeJsonHandlerMock
 
         WebLogger.web_logger = AppLogging
         WebConfig.get_crawler_from_mapping = FakeInternetTestCase.get_crawler_from_mapping

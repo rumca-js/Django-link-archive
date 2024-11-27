@@ -22,6 +22,12 @@ contents_with_links = """
       <a href="location">This page with location</a>
       <a href="https:&#x2F;&#x2F;www.cedarpolicy.com" rel="nofollow">https:&#x2F;&#x2F;www.cedarpolicy.com</a>
       <a href="mailto:renegat@renegat0x0.ddns.net">Mailto</a>
+
+      <a href="https:&#x2F;&#x2F;encoded.link.com&#x2F;product-page&#x2F;interceptor-carrier-board">Link</a>
+
+      <a href="https:&#x2F;&#x2F;encoded.link2.com&#x22;product-page">Link</a>
+      <a href="https:&#x2F;&#x2F;encoded.link3.com&#x3c;product-page">Link</a>
+
     </body>
 </html>
 """
@@ -49,6 +55,9 @@ class ContentLinkParserTest(FakeInternetTestCase):
         self.assertTrue("https://test_get_links.com/test/location" in links)
         self.assertTrue("https://renegat0x0.ddns.net" in links)
         self.assertTrue("https://www.cedarpolicy.com" in links)
+        self.assertTrue("https://encoded.link.com/product-page/interceptor-carrier-board" in links)
+        self.assertTrue("https://encoded.link2.com" in links)
+        self.assertTrue("https://encoded.link3.com" in links)
 
     def test_get_domains(self):
         p = ContentLinkParser(
@@ -65,3 +74,6 @@ class ContentLinkParserTest(FakeInternetTestCase):
         self.assertTrue("https://www.youtube.com:443" not in domains)
         self.assertTrue("https://renegat0x0.ddns.net" in domains)
         self.assertTrue("https://www.cedarpolicy.com" in domains)
+        self.assertTrue("https://encoded.link.com" in domains)
+        self.assertTrue("https://encoded.link2.com" in domains)
+        self.assertTrue("https://encoded.link3.com" in domains)

@@ -2,6 +2,9 @@
 
 function escapeHtml(unsafe)
 {
+    if (unsafe == null)
+        return "";
+
     return unsafe
          .replace(/&/g, "&amp;")
          .replace(/</g, "&lt;")
@@ -65,7 +68,6 @@ function fillData(properties) {
 function sendRequest(page_url, browser, attempt = 1) {
     let url = `{% url 'rsshistory:get-page-properties' %}?page=${page_url}&browser=${browser}`;
     let spinner_text = getSpinnerText(`Fetching... ${url}`);
-    console.log(spinner_text)
     $("#propertiesResponse").html(spinner_text);
 
     $.ajax({

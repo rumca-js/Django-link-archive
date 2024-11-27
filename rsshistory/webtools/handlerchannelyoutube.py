@@ -141,7 +141,7 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if self.contents:
             return self.contents
 
-        if response:
+        if self.response:
             return self.response.get_text()
 
         response = self.get_response()

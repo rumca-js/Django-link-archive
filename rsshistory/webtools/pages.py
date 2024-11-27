@@ -779,6 +779,9 @@ class RssPage(ContentInterface):
 
         image = None
         if "image" in self.feed.feed:
+            if self.feed.feed.image == {}:
+                return
+
             if "href" in self.feed.feed.image:
                 try:
                     image = self.feed.feed.image["href"]
@@ -798,16 +801,7 @@ class RssPage(ContentInterface):
             elif "links" in self.feed.feed.image:
                 links = self.feed.feed.image["links"]
                 if len(links) > 0:
-                    if "type" in links[0]:
-                        if links[0]["type"] == "text/html":
-                            pass
-                            # normal scenario, no worries
-                        else:
-                            WebLogger.error(
-                                '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
-                                    self.url, self.url, str(self.feed.feed.image)
-                                )
-                            )
+                    WebLogger.error("I do not know how to process links {}".format(str(links)))
             else:
                 WebLogger.error(
                     '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
@@ -954,7 +948,23 @@ class ContentLinkParser(ContentInterface):
         # links cannot end with "."
         all_matches = [link.rstrip(".") for link in all_matches]
         all_matches = [ContentLinkParser.decode_url(link) for link in all_matches]
-        return set(all_matches)
+
+        # TODO - maybe this thing below could be made more clean, or refactored
+        result = set()
+        for item in all_matches:
+            wh = item.find('"')
+            if wh != -1:
+                item = item[:wh]
+            wh = item.find('<')
+            if wh != -1:
+                item = item[:wh]
+            wh = item.find('>')
+            if wh != -1:
+                item = item[:wh]
+
+            result.add(item)
+
+        return result
 
     def join_url_parts(self, partone, parttwo):
         if not partone.endswith("/"):

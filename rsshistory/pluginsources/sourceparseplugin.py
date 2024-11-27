@@ -64,23 +64,3 @@ class BaseParsePlugin(SourceGenericPlugin):
             self.add_link(link_str)
 
         return []
-
-    def calculate_plugin_hash(self):
-        """
-        We do not care about RSS title changing. We care only about entries
-        Generic handler uses Html as base. We need to use RSS for body hash
-        """
-
-        # this is stupid to write get contents to have contents, to pass it it
-        # to html page
-        contents = self.get_contents()
-        if not contents:
-            return
-
-        url = self.get_address()
-
-        p = HtmlPage(url, contents)
-        if p.is_valid:
-            return p.get_contents_body_hash()
-        else:
-            return self.get_contents_hash()

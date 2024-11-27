@@ -29,7 +29,7 @@ spacy = "3.7.5"
 requests = "^2.32.3"
 
 # [optional]
-# stealth_requests = "*"
+stealth_requests = "*"
 
 # [optional] use things below if you want to use selenium
 # example: crawlerseleniumfull.py, crawlerseleniumheadless.py

@@ -147,10 +147,11 @@ def get_page_properties(request):
 
     request_data = {}
     request_data["Options"] = str(page_url.options)
-    request_data["Browser"] = str(browser)
-    request_data["Page Handler"] = str(page_handler)
+    request_data["Browser"] = str(browser.name)
+    request_data["Browser Crawler"] = str(browser.crawler)
+    request_data["Page Handler"] = str(page_handler.__class__.__name__)
     if hasattr(page_handler, "p"):
-        request_data["Page Type"] = str(page_handler.p)
+        request_data["Page Type"] = str(page_handler.p.__class__.__name__)
 
     all_properties.append({"name" : "Options", "data" : request_data})
 

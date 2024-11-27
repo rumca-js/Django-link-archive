@@ -13,14 +13,15 @@ $(document).ready(function() {
 });
 
 function add_text(error_line, text) {
+    let result = "";
     if (error_line == "") {
-        error_line = text;
+        result = text;
     }
     else {
-        error_line += ", " + text;
+        result += ", " + text;
     }
 
-    return error_line;
+    return result;
 }
 
 function SetMenuStatusLine() {
@@ -55,16 +56,19 @@ function SetFooterStatusLine() {
    let error_line = "";
 
    if (common_indicators.sources_error.status) {
-       error_line = add_text(error_line, "Sources");
+       error_line += add_text(error_line, "Sources");
    }
    if (common_indicators.threads_error.status) {
-       error_line = add_text(error_line, "Threads");
+       error_line += add_text(error_line, "Threads");
    }
    if (common_indicators.jobs_error.status) {
-       error_line = add_text(error_line, "Jobs");
+       error_line += add_text(error_line, "Jobs");
    }
    if (common_indicators.configuration_error.status) {
-       error_line = add_text(error_line, "Configuration");
+       error_line += add_text(error_line, "Configuration");
+   }
+   if (common_indicators.is_reading.status) {
+       error_line += add_text(error_line, common_indicators.is_reading.message);
    }
 
    $("#footerLine").html(error_line);

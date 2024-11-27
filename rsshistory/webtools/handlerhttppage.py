@@ -372,6 +372,10 @@ class HttpPageHandler(ContentInterface):
     def get_response_implementation(self):
         self.get_response_once()
 
+        if not self.options:
+            WebLogger.error("No options passed")
+            return
+
         original_mapping = self.options.mode_mapping
 
         if len(self.options.mode_mapping) < 2:

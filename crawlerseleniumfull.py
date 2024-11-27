@@ -34,13 +34,17 @@ def main():
     if parser.args.verbose:
         print("Running request:{} with SeleniumChromeFull".format(request))
 
-    if not driver.run():
-        print("Cannot start driver")
+    response = driver.run()
+    if not response:
+        print("No response")
         sys.exit(1)
-        return
 
+    if parser.args.verbose:
+        print("Contents")
+        print(response.get_text())
+
+    print(response)
     driver.save_response()
     driver.close()
-
 
 main()

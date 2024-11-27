@@ -145,6 +145,8 @@ class BaseLinkDataModel(models.Model):
                 if p.is_domain():
                     self.domain.update(self)
 
+        self.permanent = self.should_entry_be_permanent()
+
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

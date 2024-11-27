@@ -165,12 +165,19 @@ class SourceGenericPlugin(object):
 
     def calculate_plugin_hash(self):
         self.get_contents()
-        return self.get_contents_hash()
 
-    def get_contents_hash(self):
-        if self.contents:
+        if not self.content_handler:
+            if not self.contents:
+                return calculate_hash("")
+
             return calculate_hash(self.contents)
-        return calculate_hash("")
+
+        if self.content_handler.is_valid():
+            body_hash = self.content_handler.get_contents_body_hash()
+            if not body_hash:
+                return self.content_handler.get_contents_hash()
+            else:
+                return body_hash
 
     def set_operational_info(
         self, stop_time, num_entries, total_seconds, hash_value, valid=True

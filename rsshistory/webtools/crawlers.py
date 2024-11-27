@@ -24,6 +24,7 @@ from .webtools import (
     HTTP_STATUS_CODE_TIMEOUT,
     HTTP_STATUS_CODE_FILE_TOO_BIG,
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
+    HTTP_STATUS_CODE_SERVER_ERROR,
 )
 from .pages import (
     RssPage,
@@ -358,11 +359,25 @@ class StealthRequestsCrawler(CrawlerInterface):
             stream=True,
         )
 
-        if answer and answer.content:
+        # text = answer.text_content()
+        content = answer.content
+
+        if answer and content:
             self.response = PageResponseObject(
                 self.request.url,
-                binary=answer.content,
-                status_code=200,
+                binary=content,
+                status_code=answer.status_code,
+                request_url=self.request.url,
+            )
+
+            return self.response
+
+        elif answer:
+            self.response = PageResponseObject(
+                self.request.url,
+                binary=None,
+                text=None,
+                status_code=answer.status_code,
                 request_url=self.request.url,
             )
 
@@ -374,6 +389,7 @@ class StealthRequestsCrawler(CrawlerInterface):
 
             return True
         except Exception as E:
+            print(str(E))
             return False
 
 
@@ -943,7 +959,13 @@ class ScriptCrawler(CrawlerInterface):
             )
         except subprocess.TimeoutExpired as E:
             WebLogger.exc(E, "Timeout on running script")
-            return self.response
+
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url=self.request.url,
+            )
         except ValueError as E:
             WebLogger.exc(E, "Incorrect script call {}".format(script))
             return self.response
@@ -984,6 +1006,13 @@ class ScriptCrawler(CrawlerInterface):
                 "Url:{}. Response file does not exist:{}".format(
                     self.request.url, str(response_file_location)
                 )
+            )
+
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_SERVER_ERROR,
+                request_url=self.request.url,
             )
 
     def process_input(self):

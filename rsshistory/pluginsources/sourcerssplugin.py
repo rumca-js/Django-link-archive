@@ -88,15 +88,3 @@ class BaseRssPlugin(SourceGenericPlugin):
             prop["language"] = source.language
 
         return prop
-
-    def calculate_plugin_hash(self):
-        """
-        We do not care about RSS title changing. We care only about entries
-        Generic handler uses Html as base. We need to use RSS for body hash
-        """
-        contents = self.get_contents()
-        if not contents:
-            return
-
-        reader = RssPage(self.get_address(), contents)
-        return reader.get_contents_body_hash()

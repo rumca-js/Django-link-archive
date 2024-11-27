@@ -151,3 +151,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.print_errors()
 
         self.assertTrue(plugin.hash)
+
+    def test_calculate_plugin_hash(self):
+        plugin = BaseRssPlugin(self.source_rss.id)
+        self.assertTrue(plugin.calculate_plugin_hash())

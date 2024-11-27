@@ -90,6 +90,9 @@ class OdyseeVideoHandler(DefaultUrlHandler):
         if self.response:
             return self.response
 
+        if self.dead:
+            return
+
         self.handler = self.url_builder(self.url, handler_class=HttpPageHandler)
         self.response = self.handler.get_response()
 

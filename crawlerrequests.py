@@ -28,11 +28,17 @@ def main():
     if parser.args.verbose:
         print("Running request:{} with RequestsCrawler".format(request))
 
-    if not driver.run():
+    response = driver.run()
+    if not response:
+        print("No response")
         sys.exit(1)
 
+    if parser.args.verbose:
+        print("Contents")
+        print(response.get_text())
+
+    print(response)
     driver.save_response()
     driver.close()
-
 
 main()

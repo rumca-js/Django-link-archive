@@ -506,6 +506,16 @@ class Url(ContentInterface):
 
         return result
 
+    def get_contents_hash(self):
+        handler = self.get_handler()
+        if handler:
+            return handler.get_contents_hash()
+
+    def get_contents_body_hash(self):
+        handler = self.get_handler()
+        if handler:
+            return handler.get_contents_body_hash()
+
 
 class DomainCacheInfo(object):
     """

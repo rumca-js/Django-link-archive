@@ -1,5 +1,6 @@
 from .defaulturlhandler import DefaultChannelHandler
 from .webtools import DomainAwarePage
+from .handlerhttppage import HttpPageHandler
 
 
 class OdyseeChannelHandler(DefaultChannelHandler):
@@ -106,3 +107,17 @@ class OdyseeChannelHandler(DefaultChannelHandler):
             return result
         else:
             return []
+
+    def get_response(self):
+        from .webtools import WebLogger
+
+        if self.response:
+            return self.response
+
+        if self.dead:
+            return
+
+        rss_url = self.url_builder(self.url, handler_class=HttpPageHandler)
+        self.response = rss_url.get_response()
+
+        return self.response
