@@ -233,52 +233,75 @@ class GenericJobsProcessor(CeleryTaskInterface):
             return
 
         while True:
-            items = self.get_handler_and_object()
-            if len(items) == 0:
+            should_stop = self.run_one_loop()
+            if should_stop:
                 break
 
-            try:
-                self.process_job(items)
+    def run_one_job(self, job):
+        self.start_processing_time = DateUtils.get_datetime_now_utc()
 
-                elapsed_time = (
-                    DateUtils.get_datetime_now_utc() - self.start_processing_time
-                ).total_seconds()
-                if elapsed_time >= self.timeout_s:
-                    self.on_not_safe_exit(items)
-                    break
+        c = Configuration.get_object()
 
-            except KeyboardInterrupt:
-                return
+        systemcontroller = SystemOperationController()
+        systemcontroller.refresh(self.get_name())
 
-            except Exception as E:
-                """
-                This is general exception handling - because we do not know what errors can jobs
-                generate. We do not want to stop all jobs processing.
+        handler = self.get_job_handler(job)
+        items = [job, handler]
 
-                We continue job processing
-                """
-                obj = items[0]
-                if obj:
-                    try:
-                        obj.refresh_from_db()
-                    except Exception as refresh_e:
-                        AppLogging.exc(
-                            refresh_e,
-                            info_text="Failed to refresh object from DB for Job:{}, Subject:{}".format(
-                                obj.job, obj.subject
-                            ),
-                        )
+        self.process_job(items)
 
+    def run_one_loop(self):
+        """
+        return True, if processing should stop
+        """
+        items = self.get_handler_and_object()
+        if len(items) == 0:
+            return True
+
+        try:
+            self.process_job(items)
+
+            elapsed_time = (
+                DateUtils.get_datetime_now_utc() - self.start_processing_time
+            ).total_seconds()
+            if elapsed_time >= self.timeout_s:
+                self.on_not_safe_exit(items)
+                return True
+
+        except KeyboardInterrupt:
+            return True
+
+        except Exception as E:
+            """
+            This is general exception handling - because we do not know what errors can jobs
+            generate. We do not want to stop all jobs processing.
+
+            We continue job processing
+            """
+            obj = items[0]
+            if obj:
+                try:
+                    obj.refresh_from_db()
+                except Exception as refresh_e:
                     AppLogging.exc(
-                        E,
-                        info_text="Job:{}, Subject:{}".format(obj.job, obj.subject),
+                        refresh_e,
+                        info_text="Failed to refresh object from DB for Job:{}, Subject:{}".format(
+                            obj.job, obj.subject
+                        ),
                     )
-                    obj.on_error()
-                else:
-                    AppLogging.exc(
-                        E,
-                        "Excetion",
-                    )
+
+                AppLogging.exc(
+                    E,
+                    info_text="Job:{}, Subject:{}".format(obj.job, obj.subject),
+                )
+                obj.on_error()
+            else:
+                AppLogging.exc(
+                    E,
+                    "Excetion",
+                )
+
+        return False
 
     def process_job(self, items):
         config = Configuration.get_object()
@@ -340,11 +363,14 @@ class GenericJobsProcessor(CeleryTaskInterface):
         if objs.exists():
             obj = objs.first()
 
-            for handler_class in self.get_handlers():
-                if handler_class.get_job() == obj.job:
-                    return [obj, handler_class]
-            return [obj, None]
+            handler = self.get_job_handler(obj)
+            return [obj, handler]
         return []
+
+    def get_job_handler(self, obj):
+        for handler_class in self.get_handlers():
+            if handler_class.get_job() == obj.job:
+                return handler_class
 
     def on_not_safe_exit(self, items):
         AppLogging.error("Not safe exit, adjusting job priorities.")

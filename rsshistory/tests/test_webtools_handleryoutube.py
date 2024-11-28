@@ -23,7 +23,7 @@ class YouTubeJsonHandlerTest(FakeInternetTestCase):
         self.assertEqual(handler.url, test_link)
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_get_channel_code(self):
+    def test_get_video_code(self):
         MockRequestCounter.mock_page_requests = 0
         test_link = "https://www.youtube.com/watch?v=123"
         handler = YouTubeJsonHandlerMock(test_link, url_builder=UrlHandler)
@@ -140,7 +140,7 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         # +1 - obtains channel code from HTML
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_get_channel_name(self):
+    def test_get_channel_url(self):
         MockRequestCounter.mock_page_requests = 0
 
         handler = YouTubeChannelHandler(
@@ -148,7 +148,7 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         )
 
         # call tested function
-        channel_name = handler.get_channel_name()
+        channel_name = handler.get_channel_url()
 
         self.assertEqual(
             channel_name,

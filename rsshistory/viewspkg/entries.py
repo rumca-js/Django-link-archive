@@ -687,7 +687,7 @@ def add_entry(request):
 
 def add_entry_form(request):
     p = ViewPage(request)
-    p.set_title("Checks if entry exists")
+    p.set_title("Add entry form")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
@@ -724,11 +724,6 @@ def add_simple_entry(request):
 
 
 def entry_is(request):
-    def try_link(link):
-        entries = LinkDataController.objects.filter(link = link)
-        if entries.count() != 0:
-            return entries[0]
-
     p = ViewPage(request)
     p.set_title("Checks if entry exists")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -738,7 +733,6 @@ def entry_is(request):
     link = request.GET['link']
 
     data = {}
-    entry = try_link(link)
     wrapper = EntryWrapper(link=link)
 
     entry = wrapper.get()

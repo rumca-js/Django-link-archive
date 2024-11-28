@@ -639,6 +639,8 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.respect_robots_txt = False
         c.config_entry.whats_new_days = 7
         c.config_entry.keep_domains = True
+        c.config_entry.entry_update_uses_internet = True
+
         c.config_entry.save()
 
         c.apply_robots_txt()

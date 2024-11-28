@@ -98,10 +98,6 @@ class UserTags(models.Model):
         if objs.count() == 0:
             UserTags.objects.create(entry=entry, user=user, tag=tag_name)
 
-            from ..controllers import BackgroundJobController
-
-            BackgroundJobController.entry_reset_local_data(entry)
-
     def set_tags(entry, tags_string, user=None):
         """
         Removes all other tags, sets only tags in data
@@ -165,9 +161,6 @@ class UserTags(models.Model):
         for tag in tags_set:
             UserTags.objects.create(tag=tag, entry=entry, user=user)
 
-        from ..controllers import BackgroundJobController
-
-        BackgroundJobController.entry_reset_local_data(entry)
 
     def cleanup(cfg=None):
         if cfg and "verify" in cfg:
@@ -181,13 +174,6 @@ class UserTags(models.Model):
                 except Exception as E:
                     tag.delete()
 
-        # for q in UserTags.objects.all():
-        #    try:
-        #       users = q.entry.id
-        #    except Exception as E:
-        #        q.delete()
-        pass
-
     def move_entry(source_entry, destination_entry):
         tags = UserTags.objects.filter(entry=source_entry)
         for tag in tags:
@@ -200,6 +186,20 @@ class UserTags(models.Model):
 
             tag.entry = destination_entry
             tag.save()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        UserCompactedTags.compact(self.user, self.tag)
+
+    def delete(self, *args, **kwargs):
+        tag_name = self.tag
+        entry = self.entry
+        user = self.user
+
+        super().delete(*args, **kwargs)
+
+        UserCompactedTags.compact(user, tag_name)
 
 
 class UserCompactedTags(models.Model):
@@ -216,26 +216,21 @@ class UserCompactedTags(models.Model):
     class Meta:
         ordering = ["-count"]
 
+    def compact(user, tag_name):
+        # if this is too much, then we should have a job for that
+
+        compacts = UserCompactedTags.objects.filter(user=user, tag=tag_name)
+        compacts.delete()
+
+        tags = UserTags.objects.filter(user=user, tag=tag_name)
+
+        if tags.count() > 0:
+            UserCompactedTags.objects.create(tag=tag_name, count=tags.count(), user=user)
+
+        CompactedTags.compact(tag_name)
+
     def cleanup(cfg=None):
-        UserCompactedTags.objects.all().delete()
-
-        tags = UserTags.objects.all()
-        for tag in tags:
-            compacts = UserCompactedTags.objects.filter(tag=tag.tag, user=tag.user)
-
-            if compacts.count() == 0:
-                UserCompactedTags.objects.create(tag=tag.tag, count=1, user=tag.user)
-            else:
-                compacted = compacts[0]
-                compacted.count += 1
-                compacted.save()
-
-        if cfg and "verify" in cfg:
-            for tag in UserCompactedTags.objects.all():
-                try:
-                    tag.user.id
-                except Exception as E:
-                    tag.delete()
+        pass
 
 
 class CompactedTags(models.Model):
@@ -245,19 +240,20 @@ class CompactedTags(models.Model):
     class Meta:
         ordering = ["-count"]
 
-    def cleanup(cfg=None):
-        CompactedTags.objects.all().delete()
+    def compact(tag_name):
+        compacts = CompactedTags.objects.filter(tag=tag_name)
+        compacts.delete()
 
-        tags = UserTags.objects.all()
+        tags = UserCompactedTags.objects.filter(tag=tag_name)
+        sum = 0
         for tag in tags:
-            compacts = CompactedTags.objects.filter(tag=tag.tag)
+            sum += tag.count
 
-            if compacts.count() == 0:
-                CompactedTags.objects.create(tag=tag.tag, count=1)
-            else:
-                compacted = compacts[0]
-                compacted.count += 1
-                compacted.save()
+        if tags.count() > 0:
+            CompactedTags.objects.create(tag=tag_name, count=sum)
+
+    def cleanup(cfg=None):
+        pass
 
 
 class UserVotes(models.Model):
@@ -309,7 +305,6 @@ class UserVotes(models.Model):
                 votes.delete()
 
         from ..controllers import BackgroundJobController
-
         BackgroundJobController.entry_reset_local_data(entry)
 
         return ob

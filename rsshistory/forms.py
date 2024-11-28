@@ -133,6 +133,7 @@ class ConfigForm(forms.ModelForm):
             "auto_scan_entries",
             "new_entries_merge_data",
             "new_entries_use_clean_data",
+            "entry_update_uses_internet",
             "auto_create_sources",
             "new_source_enabled_state",
             "prefer_https",

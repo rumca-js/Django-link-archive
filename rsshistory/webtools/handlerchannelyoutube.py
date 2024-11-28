@@ -105,6 +105,11 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         return self.code
 
     def get_channel_name(self):
+        url = self.get_rss_url()
+        if url:
+            return url.get_title()
+
+    def get_channel_url(self):
         return self.code2url(self.code)
 
     def get_channel_url(self):

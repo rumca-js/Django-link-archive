@@ -419,6 +419,20 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         entries[0].domain = domains[0]
 
+    def test_entry_add_form(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-add-form".format(LinkDatabase.name))
+        test_link = "https://linkedin.com"
+        url = url + "?link="+test_link
+
+        # call user action
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
     def test_edit_entry(self):
         LinkDataController.objects.all().delete()
 
@@ -1042,3 +1056,37 @@ class EntriesDetailViews(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_entry_is__exists(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        url = reverse("{}:entry-is".format(LinkDatabase.name))
+
+        url=url+"?link=https://linkedin.com"
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertTrue(data["status"])
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_entry_is__does_not_exist(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        url = reverse("{}:entry-is".format(LinkDatabase.name))
+
+        url=url+"?link=https://linkedin.does-not-exist.com"
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertFalse(data["status"])
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)

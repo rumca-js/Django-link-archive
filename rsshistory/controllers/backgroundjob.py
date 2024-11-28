@@ -127,9 +127,11 @@ class BackgroundJobController(BackgroundJob):
         return objs.count() > 0
 
     def create_single_job(job_name, subject="", args="", user=None):
+        from ..configuration import Configuration
+
         items = BackgroundJob.objects.filter(job=job_name, subject=subject)
         if items.count() == 0:
-            return BackgroundJob.objects.create(
+            job = BackgroundJob.objects.create(
                 job=job_name,
                 task=None,
                 subject=subject,
@@ -137,6 +139,18 @@ class BackgroundJobController(BackgroundJob):
                 priority=BackgroundJobController.get_job_priority(job_name),
                 user=user,
             )
+
+            config = Configuration.get_object().config_entry
+            if job and not config.background_tasks:
+                BackgroundJobController.run_single_job(job)
+
+            else:
+                return job
+
+    def run_single_job(job):
+        from ..threadprocessors import GenericJobsProcessor
+        processor = GenericJobsProcessor()
+        processor.run_one_job(job)
 
     # job functions are defined below
 
@@ -267,7 +281,12 @@ class BackgroundJobController(BackgroundJob):
             )
 
     def link_scan(url=None, entry=None, source=None):
+        from ..configuration import Configuration
         cfg = {}
+
+        config = Configuration.get_object().config_entry
+        if not config.entry_update_uses_internet:
+            return
 
         if source:
             cfg["source_id"] = source.id
@@ -403,6 +422,11 @@ class BackgroundJobController(BackgroundJob):
         """
         Do not update, if it was updated recently, or if we are missing key components
         """
+        from ..configuration import Configuration
+        config = Configuration.get_object().config_entry
+        if not config.entry_update_uses_internet:
+            return
+
         if not force:
             if not entry.is_update_time():
                 return
@@ -428,6 +452,11 @@ class BackgroundJobController(BackgroundJob):
         """
         Do not update, if it was updated recently
         """
+        from ..configuration import Configuration
+        config = Configuration.get_object().config_entry
+        if not config.entry_update_uses_internet:
+            return
+
         if not force:
             if not entry.is_reset_time():
                 return

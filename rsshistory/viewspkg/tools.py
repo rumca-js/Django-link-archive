@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.db.models import Q
 
+from collections import OrderedDict
+
 from ..webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
 
 from ..apps import LinkDatabase
@@ -125,7 +127,7 @@ def get_page_properties(request):
 
     all_properties = []
 
-    properties = {}
+    properties = OrderedDict()
     properties["link"] = page_url.url
     properties["title"] = page_url.get_title()
     properties["description"] = page_url.get_description()
@@ -137,15 +139,26 @@ def get_page_properties(request):
     properties["date_published"] = page_url.get_date_published()
     properties["is_link_allowed"] = is_link_allowed
 
+    feeds = page_url.get_feeds()
+    if len(feeds) > 0:
+        for key, feed in enumerate(feeds):
+            properties["feed_"+str(key)] = feed
+
     if type(page_handler) is UrlHandler.youtube_channel_handler:
         if page_handler.get_channel_name():
             properties["channel_name"] = page_handler.get_channel_name()
+            properties["channel_url"] = page_handler.get_channel_url()
+
+    if type(page_handler) is UrlHandler.youtube_video_handler:
+        if page_handler.get_channel_name():
+            properties["channel_name"] = page_handler.get_channel_name()
+            properties["channel_url"] = page_handler.get_channel_url()
 
     all_properties.append({"name" : "Properties", "data" : properties})
 
     all_properties.append({"name" : "Contents", "data" : {"Contents" : page_url.get_contents()}})
 
-    request_data = {}
+    request_data = OrderedDict()
     request_data["Options"] = str(page_url.options)
     request_data["Browser"] = str(browser.name)
     request_data["Browser Crawler"] = str(browser.crawler)
@@ -156,7 +169,7 @@ def get_page_properties(request):
     all_properties.append({"name" : "Options", "data" : request_data})
 
     if response:
-        response_data = {}
+        response_data = OrderedDict()
         response_data["Response"] = str(response)
         response_data["status_code"] = response.get_status_code()
         response_data["Content-Type"] = response.get_content_type()
@@ -166,7 +179,7 @@ def get_page_properties(request):
     errors = get_errors(page_url)
     all_properties.append({"name" : "Errors", "data" : errors})
 
-    data = {}
+    data = OrderedDict()
     data["properties"] = all_properties
     data["status"] = True
 

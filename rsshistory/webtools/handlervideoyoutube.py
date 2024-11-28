@@ -250,6 +250,10 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if self.get_contents():
             return self.yt_ob.get_channel_name()
 
+    def get_channel_url(self):
+        if self.get_contents():
+            return self.yt_ob.get_channel_url()
+
     def get_link_url(self):
         if self.get_contents():
             return self.yt_ob.get_link_url()

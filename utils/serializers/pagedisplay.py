@@ -69,7 +69,12 @@ class PageDisplay(object):
                 )
 
         elif type(handler) is Url.youtube_channel_handler:
-            pass
+            print("Channel name:{}".format(handler.get_channel_name()))
+            print("Channel url:{}".format(handler.get_channel_url()))
+
+        elif type(handler) is Url.youtube_video_handler:
+            print("Channel name:{}".format(handler.get_channel_name()))
+            print("Channel url:{}".format(handler.get_channel_url()))
 
         index = 0
         for entry in u.get_entries():
@@ -77,7 +82,7 @@ class PageDisplay(object):
                 print("Has entries")
                 print("Entry Link:{}".format(entry["link"]))
                 print("Entry Title:{}".format(entry["title"]))
-            index += 1
+            break
 
         if u.get_contents():
             if verbose:

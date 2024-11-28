@@ -232,6 +232,11 @@ class ConfigurationEntry(models.Model):
         help_text="Fetches clean information from the Internet for new entries",
     )
 
+    entry_update_uses_internet = models.BooleanField(
+        default=True,
+        help_text="When entry update is made internet is used to check status",
+    )
+
     auto_create_sources = models.BooleanField(
         default=False,
         help_text="Adds any new found source",

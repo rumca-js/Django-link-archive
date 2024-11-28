@@ -243,6 +243,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
         DomainsController.objects.all().delete()
 
         ob = BackgroundJobController.link_add("https://manually-added-link.com")
+        self.assertTrue(ob)
 
         handler = LinkAddJobHandler()
         handler.process(ob)
@@ -267,6 +268,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
         ob = BackgroundJobController.link_add(
             "https://manually-added-link.com", tag="demoscene"
         )
+        self.assertTrue(ob)
 
         handler = LinkAddJobHandler()
         handler.process(ob)
@@ -298,6 +300,7 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
         DomainsController.objects.all().delete()
 
         ob = BackgroundJobController.link_scan("https://manually-added-link.com")
+        self.assertTrue(ob)
 
         handler = LinkScanJobHandler()
         handler.process(ob)

@@ -28,7 +28,13 @@ from ..controllers import (
     EntryWrapper,
     SearchEngines,
 )
-from ..forms import SourceForm, ContentsForm, SourcesChoiceForm, SourceInputForm
+from ..forms import (
+    SourceForm,
+    ContentsForm,
+    SourcesChoiceForm,
+    SourceInputForm,
+    AddEntryForm,
+)
 from ..queryfilters import SourceFilter
 from ..views import ViewPage, GenericListView, get_page_num, get_search_term
 from ..configuration import Configuration
@@ -240,114 +246,115 @@ def add_source(request):
     return p.render("form_source_add.html")
 
 
-def add_source_simple(request):
-    def get_add_link_form(p, url):
-        url = UrlHandler.get_cleaned_link(url)
+def source_add_form(request):
+    p = ViewPage(request)
+    p.set_title("Add source form")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-        if not Url.is_protocolled_link(url):
-            p.context["summary_text"] = (
-                "Only protocolled links are allowed. Link:{}".format(url)
-            )
-            return p.render("summary_present.html")
+    url = None
+    if "link" in request.GET:
+        url = request.GET["link"]
 
-        ob = SourceDataController.objects.filter(url=url)
-        if ob.exists():
-            p.context["form"] = form
-            p.context["source"] = ob[0]
+    url = UrlHandler.get_cleaned_link(url)
 
-            return HttpResponseRedirect(ob[0].get_absolute_url())
+    if not Url.is_protocolled_link(url):
+        p.context["summary_text"] = (
+            "Only protocolled links are allowed. Link:{}".format(url)
+        )
+        return p.render("summary_present.html")
 
-        data = SourceDataController.get_full_information({"url": url})
-        if not data:
-            p.context["summary_text"] = "Could not obtain properties of link:{}".format(
-                url
-            )
-            return p.render("summary_present.html")
-
-        notes = []
-        warnings = []
-        errors = []
-
-        form = SourceForm(initial=data, request=request)
-        form.method = "POST"
-        form.action_url = reverse("{}:source-add".format(LinkDatabase.name))
-
+    ob = SourceDataController.objects.filter(url=url)
+    if ob.exists():
         p.context["form"] = form
+        p.context["source"] = ob[0]
 
-        link = data["url"]
+        return HttpResponseRedirect(ob[0].get_absolute_url())
 
-        page = DomainAwarePage(data["url"])
-        domain = page.get_domain()
-        config = Configuration.get_object().config_entry
-        info = DomainCache.get_object(link, url_builder=UrlHandler)
+    # TODO use browser somehow
 
-        # warnings
-        if config.prefer_https and link.find("http://") >= 0:
-            warnings.append(
-                "Detected http protocol. Choose https if possible. It is a more secure protocol"
-            )
-        if config.prefer_non_www_sites and domain.find("www.") >= 0:
-            warnings.append(
-                "Detected www in domain link name. Select non www link if possible"
-            )
-        if domain.lower() != domain:
-            warnings.append(
-                "Link domain is not lowercase. Are you sure link name is OK?"
-            )
-        if config.respect_robots_txt and info and not info.is_allowed(link):
-            warnings.append("Link is not allowed by site robots.txt")
-        if link.find("?") >= 0:
-            warnings.append("Link contains arguments. Is that intentional?")
-        if link.find("#") >= 0:
-            warnings.append("Link contains arguments. Is that intentional?")
-        if page.get_port() and page.get_port() >= 0:
-            warnings.append("Link contains port. Is that intentional?")
-        if not page.is_web_link():
-            warnings.append(
-                "Not a web link. Expecting protocol://domain.tld styled location"
-            )
+    data = SourceDataController.get_full_information({"url": url})
+    if not data:
+        p.context["summary_text"] = "Could not obtain properties of link:{}".format(
+            url
+        )
+        return p.render("summary_present.html")
 
-        # errors
-        if not page.is_protocolled_link():
-            errors.append("Not a protocolled link. Forget http:// or https:// etc.?")
-        if data["status_code"] < 200 or data["status_code"] > 300:
-            errors.append("Information about page availability could not be obtained")
-        if EntryRules.is_blocked(link):
-            errors.append("Entry is blocked by entry rules")
+    notes = []
+    warnings = []
+    errors = []
 
-        p.context["form_notes"] = notes
-        p.context["form_warnings"] = warnings
-        p.context["form_errors"] = errors
+    form = SourceForm(initial=data, request=request)
+    form.method = "POST"
+    form.action_url = reverse("{}:source-add".format(LinkDatabase.name))
 
-        return p.render("form_source_add.html")
+    p.context["form"] = form
 
+    link = data["url"]
+
+    page = DomainAwarePage(data["url"])
+    domain = page.get_domain()
+    config = Configuration.get_object().config_entry
+    info = DomainCache.get_object(link, url_builder=UrlHandler)
+
+    # warnings
+    if config.prefer_https and link.find("http://") >= 0:
+        warnings.append(
+            "Detected http protocol. Choose https if possible. It is a more secure protocol"
+        )
+    if config.prefer_non_www_sites and domain.find("www.") >= 0:
+        warnings.append(
+            "Detected www in domain link name. Select non www link if possible"
+        )
+    if domain.lower() != domain:
+        warnings.append(
+            "Link domain is not lowercase. Are you sure link name is OK?"
+        )
+    if config.respect_robots_txt and info and not info.is_allowed(link):
+        warnings.append("Link is not allowed by site robots.txt")
+    if link.find("?") >= 0:
+        warnings.append("Link contains arguments. Is that intentional?")
+    if link.find("#") >= 0:
+        warnings.append("Link contains arguments. Is that intentional?")
+    if page.get_port() and page.get_port() >= 0:
+        warnings.append("Link contains port. Is that intentional?")
+    if not page.is_web_link():
+        warnings.append(
+            "Not a web link. Expecting protocol://domain.tld styled location"
+        )
+
+    # errors
+    if not page.is_protocolled_link():
+        errors.append("Not a protocolled link. Forget http:// or https:// etc.?")
+    if data["status_code"] < 200 or data["status_code"] > 300:
+        errors.append("Information about page availability could not be obtained")
+    if EntryRules.is_blocked(link):
+        errors.append("Entry is blocked by entry rules")
+
+    p.context["form_notes"] = notes
+    p.context["form_warnings"] = warnings
+    p.context["form_errors"] = errors
+
+    return p.render("source_add__form.html")
+
+
+def add_source_simple(request):
     p = ViewPage(request)
     p.set_title("Add source")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
     if data is not None:
         return data
 
-    uc = UserConfig.get(request.user)
-    if not uc.can_add():
-        return redirect("{}:missing-rights".format(LinkDatabase.name))
-
-    if request.method == "POST":
-        form = SourceInputForm(request.POST, request=request)
-        if form.is_valid():
-            url = form.cleaned_data["url"]
-
-            return get_add_link_form(p, url)
-
-        p.context["form"] = form
-    elif request.method == "GET" and "link" in request.GET:
-        return get_add_link_form(p, request.GET["link"])
-
-    form = SourceInputForm(request=request)
+    form = AddEntryForm(request=request)
     form.method = "POST"
 
     p.context["form"] = form
+    p.context["form_description_post"] = (
+        "Internet is dangerous, so carefully select which links you add"
+    )
 
-    return p.render("form_source_add_simple.html")
+    return p.render("source__add_simple.html")
 
 
 def edit_source(request, pk):
@@ -411,6 +418,33 @@ def edit_source(request, pk):
         form.action_url = reverse("{}:source-edit".format(LinkDatabase.name), args=[pk])
         p.context["form"] = form
         return p.render("form_basic.html")
+
+
+def source_is(request):
+    def try_link(link):
+        sources = SourceDataController.objects.filter(url = link)
+        if sources.count() != 0:
+            return sources[0]
+
+    p = ViewPage(request)
+    p.set_title("Checks if source exists")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    link = request.GET['link']
+
+    data = {}
+    source = try_link(link)
+
+    if source:
+        data["status"] = True
+        data["pk"] = source.id
+    else:
+        data["status"] = False
+        data["message"] = "Does not exist"
+
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def refresh_source(request, pk):
