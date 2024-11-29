@@ -15,6 +15,7 @@ class OdyseeChannelHandler(DefaultChannelHandler):
 
         if url:
             self.code = self.input2code(url)
+            self.url = self.code2url(self.code)
 
     def is_handled_by(self):
         if not self.url:
@@ -107,17 +108,3 @@ class OdyseeChannelHandler(DefaultChannelHandler):
             return result
         else:
             return []
-
-    def get_response(self):
-        from .webtools import WebLogger
-
-        if self.response:
-            return self.response
-
-        if self.dead:
-            return
-
-        rss_url = self.url_builder(self.url, handler_class=HttpPageHandler)
-        self.response = rss_url.get_response()
-
-        return self.response

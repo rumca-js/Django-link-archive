@@ -76,7 +76,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         ob = LinkDataController.objects.create(
             source_url="https://youtube.com",
             source=source_youtube,
-            link="https://youtube.com?v=permanent",
+            link="https://youtube.com",
             title="The first link",
             permanent=True,
             language="en",
@@ -95,9 +95,12 @@ class EntriesCleanupTest(FakeInternetTestCase):
             date_published=date_to_remove,
         )
 
-    def test_cleanup_old_entries_operational(self):
+    def test_cleanup__old_entries_operational(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_remove_links = 2
+        # conf.days_to_move_to_archive = 1
+        conf.accept_domains = True # to keep up permanent flag
+        conf.keep_domains = True
         conf.save()
 
         current_time = DateUtils.get_datetime_now_utc()
@@ -106,6 +109,22 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         self.clear()
         self.create_entries(date_link_publish, date_to_remove)
+
+        bookmarked = LinkDataController.objects.filter(
+            link="https://youtube.com?v=bookmarked"
+        )
+        self.assertEqual(bookmarked.count(), 1)
+
+        permanent = LinkDataController.objects.filter(
+            link="https://youtube.com"
+        )
+        self.assertEqual(permanent.count(), 1)
+        self.assertEqual(permanent[0].permanent, True)
+
+        nonbookmarked = LinkDataController.objects.filter(
+            link="https://youtube.com?v=nonbookmarked"
+        )
+        self.assertEqual(nonbookmarked.count(), 1)
 
         # call tested function
         EntriesCleanup().cleanup()
@@ -116,7 +135,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.assertEqual(bookmarked.count(), 1)
 
         permanent = LinkDataController.objects.filter(
-            link="https://youtube.com?v=permanent"
+            link="https://youtube.com"
         )
         self.assertEqual(permanent.count(), 1)
 
@@ -148,7 +167,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.assertEqual(bookmarked.count(), 1)
 
         permanent = LinkDataController.objects.filter(
-            link="https://youtube.com?v=permanent"
+            link="https://youtube.com" # permanent
         )
         self.assertEqual(permanent.count(), 1)
 
@@ -187,7 +206,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.assertEqual(bookmarked.count(), 1)
 
         permanent = LinkDataController.objects.filter(
-            link="https://youtube.com?v=permanent"
+            link="https://youtube.com"
         )
         self.assertEqual(permanent.count(), 1)
 
@@ -217,7 +236,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source_url="https://youtube.com",
-            link="https://youtube.com?v=permanent",
+            link="https://youtube.com",
             title="The first link",
             permanent=True,
             language="en",
@@ -225,7 +244,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source_url="http://youtube.com",
-            link="http://youtube.com?v=permanent",
+            link="http://youtube.com",
             title="The second link",
             permanent=True,
             language="en",
@@ -236,13 +255,13 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         self.assertEqual(
             LinkDataController.objects.filter(
-                link="https://youtube.com?v=permanent"
+                link="https://youtube.com"
             ).count(),
             1,
         )
         self.assertEqual(
             LinkDataController.objects.filter(
-                link="http://youtube.com?v=permanent"
+                link="http://youtube.com"
             ).count(),
             0,
         )
@@ -256,7 +275,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source_url="https://youtube.com",
-            link="https://youtube.com?v=permanent",
+            link="https://youtube.com",
             title="The first link",
             permanent=True,
             language="en",
@@ -264,7 +283,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source_url="http://youtube.com",
-            link="https://www.youtube.com?v=permanent",
+            link="https://www.youtube.com",
             title="The second link",
             permanent=True,
             language="en",
@@ -275,13 +294,13 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         self.assertEqual(
             LinkDataController.objects.filter(
-                link="https://youtube.com?v=permanent"
+                link="https://youtube.com"
             ).count(),
             1,
         )
         self.assertEqual(
             LinkDataController.objects.filter(
-                link="https://www.youtube.com?v=permanent"
+                link="https://www.youtube.com"
             ).count(),
             0,
         )

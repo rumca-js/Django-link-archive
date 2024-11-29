@@ -265,35 +265,38 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://youtube.com/watch?v=1234"
 
         limited_data = self.get_link_data(test_link)
-        print(limited_data)
+        # print(limited_data)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
         # call user action
         response = self.client.post(url, data=limited_data)
 
-        # page_source = response.content.decode("utf-8")
+        page_source = response.content.decode("utf-8")
         # print("Contents: {}".format(page_source))
         # print(response)
 
         self.assertEqual(response.status_code, 200)
 
-        entries = LinkDataController.objects.filter(link=test_link)
-
+        entries = LinkDataController.objects.filter(link="https://www.youtube.com/watch?v=1234")
         self.assertEqual(entries.count(), 1)
 
         entry = entries[0]
 
-        self.assertEqual(entry.link, "https://youtube.com?v=1234")
-        expected_date_published = DateUtils.from_string("2023-11-13;00:00", "%Y-%m-%d;%H:%M")
-        expected_date_published = DateUtils.to_utc_date(expected_date_published)
-        self.assertEqual(entry.date_published, expected_date_published)
+        # adding fixes link
+        self.assertTrue(entry.title)
+        self.assertEqual(entry.link, "https://www.youtube.com/watch?v=1234")
+
+        current_date = DateUtils.get_datetime_now_utc()
+        expected_time = DateUtils.get_date_tuple(current_date)
+        self.assertTrue(DateUtils.get_date_tuple(entry.date_published) == expected_time)
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
         self.assertEqual(bookmarks.count(), 0)
 
-    def test_entry_add__rss(self):
+    def test_entry_add__youtube_rss(self):
         LinkDataController.objects.all().delete()
+        start_date_time = DateUtils.get_datetime_now_utc()
 
         self.client.login(username="testuser", password="testpassword")
 
@@ -308,15 +311,26 @@ class EntriesViewsTests(FakeInternetTestCase):
             LinkDataController.objects.filter(link=channel_name).count(), 0
         )
 
+        limited_data["link"] = test_link
+
         # call user action
         response = self.client.post(url, data=limited_data)
 
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
-        self.assertEqual(
-            LinkDataController.objects.filter(link=channel_name).count(), 1
-        )
+        entries = LinkDataController.objects.filter(link=test_link)
+        self.assertEqual(entries.count(), 1)
+
+        entry = entries[0]
+        self.assertEqual(entry.link, "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        self.assertTrue(entry.title)
+
+        current_date = DateUtils.get_datetime_now_utc()
+        expected_time = DateUtils.get_date_tuple(current_date)
+        self.assertTrue(DateUtils.get_date_tuple(entry.date_published) == expected_time)
+
+        bookmarks = UserBookmarks.get_user_bookmarks(self.user)
+        self.assertEqual(bookmarks.count(), 0)
 
     def test_entry_add__exists(self):
         LinkDataController.objects.all().delete()

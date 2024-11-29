@@ -178,6 +178,7 @@ class Gateway(models.Model):
     def populate_social_media():
         thetype = Gateway.TYPE_SOCIAL_MEDIA
 
+        Gateway.objects.create(link = "https://meta.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://reddit.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://facebook.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://stackoverflow.com", gateway_type=thetype)
@@ -185,8 +186,10 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://discord.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://messanger.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://whatsapp.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://instagram.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://quora.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://wechat.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://microsoft.com/microsoft-teams", gateway_type=thetype)
 
     def populate_ai_bot():
         thetype = Gateway.TYPE_AI_BOT

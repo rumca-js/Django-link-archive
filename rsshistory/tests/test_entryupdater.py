@@ -11,7 +11,7 @@ from ..controllers import (
 from ..models import UserTags, UserVotes
 from ..configuration import Configuration
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
 class EntryUpdaterTest(FakeInternetTestCase):
@@ -95,6 +95,8 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # self.assertEqual(entry.date_update_last, date_updated)
 
     def test_update_data__not_reset_properties(self):
+        MockRequestCounter.mock_page_requests = 0
+
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         source_youtube = SourceDataController.objects.create(
@@ -128,7 +130,11 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+
     def test_reset_data__removes_old_dead_entry(self):
+        MockRequestCounter.mock_page_requests = 0
+
         conf = Configuration.get_object().config_entry
 
         add_time = DateUtils.get_datetime_now_utc() - timedelta(
@@ -165,8 +171,10 @@ class EntryUpdaterTest(FakeInternetTestCase):
             link="https://page-with-http-status-500.com"
         )
         self.assertEqual(entries.count(), 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 4)
 
     def test_update_data__removes_old_dead_entry(self):
+        MockRequestCounter.mock_page_requests = 0
         conf = Configuration.get_object().config_entry
 
         add_time = DateUtils.get_datetime_now_utc() - timedelta(
@@ -204,8 +212,10 @@ class EntryUpdaterTest(FakeInternetTestCase):
             link="https://page-with-http-status-500.com"
         )
         self.assertEqual(entries.count(), 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_update_data__sets_stale_entry_status(self):
+        MockRequestCounter.mock_page_requests = 0
         conf = Configuration.get_object().config_entry
 
         add_time = DateUtils.get_datetime_now_utc() - timedelta(
@@ -246,7 +256,11 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].status_code, 500)
         self.assertEqual(entries[0].manual_status_code, 0)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
     def test_update_data__clears_stale_entry_status(self):
+        MockRequestCounter.mock_page_requests = 0
+
         conf = Configuration.get_object().config_entry
 
         add_time = DateUtils.get_datetime_now_utc() - timedelta(
@@ -286,7 +300,11 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].status_code, 200)
         self.assertEqual(entries[0].manual_status_code, 0)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+
     def test_reset_local_data(self):
+        MockRequestCounter.mock_page_requests = 0
+
         conf = Configuration.get_object().config_entry
 
         source_youtube = SourceDataController.objects.create(
@@ -323,7 +341,11 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].page_rating_contents, 100)
         self.assertEqual(entries[0].page_rating, 100)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_update_data__removes_casinos(self):
+        MockRequestCounter.mock_page_requests = 0
+
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         source_youtube = SourceDataController.objects.create(
@@ -353,3 +375,5 @@ class EntryUpdaterTest(FakeInternetTestCase):
         u.update_data()
 
         self.assertEqual(LinkDataController.objects.all().count(), 0)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 3)

@@ -242,12 +242,16 @@ function checkEntryExists(page_url, browser, attempt=1) {
 
 
 function onUserInput() {
-   $('#btnFetch').prop("disabled", true);
-   
-   const page_url = $('#id_link').val();
-   const browser = $('#id_browser').val();
-   
-   checkEntryExists(page_url, browser);
+    const page_url = $('#id_link').val();
+    const browser = $('#id_browser').val();
+
+    if (page_url == null) {
+        return;
+    }
+
+    $('#btnFetch').prop("disabled", true);
+
+    checkEntryExists(page_url, browser);
 }
 
 

@@ -174,9 +174,9 @@ class YouTubeJsonHandlerMock(YouTubeJsonHandler):
             "id" : "1234-id",
             "channel_id" : "1234-channel-id",
             "thumbnail" : "https://youtube.com/files/1234-thumbnail.png",
-            "upload_date" : "20231113",
+            "upload_date" : "${date}",
             "live_status" : "False"
-            }"""
+            }""".replace("${date}", self.get_now())
             return True
         if self.get_video_code() == "666":
             return False
@@ -189,9 +189,21 @@ class YouTubeJsonHandlerMock(YouTubeJsonHandler):
             "id" : "3433",
             "channel_id" : "JoYoe",
             "thumbnail" : "https://youtube.com/files/whatever.png",
+            "upload_date" : "${date}",
+            "live_status" : "True"
+            }""".replace("${date}", self.get_now())
+        if self.get_video_code() == "archived":
+            self.yt_text = """{"_filename" : "555555 live video.txt",
+            "title" : "555555 live video",
+            "description" : "555555 live video description",
+            "channel_url" : "https://youtube.com/channel/test.txt",
+            "channel" : "JoYoe",
+            "id" : "3433",
+            "channel_id" : "JoYoe",
+            "thumbnail" : "https://youtube.com/files/whatever.png",
             "upload_date" : "20231113",
             "live_status" : "True"
-            }"""
+            }""".replace("${date}", self.get_now())
         else:
             self.yt_text = """{"_filename" : "test.txt",
             "title" : "test.txt",
@@ -201,14 +213,23 @@ class YouTubeJsonHandlerMock(YouTubeJsonHandler):
             "id" : "3433",
             "channel_id" : "JoYoe",
             "thumbnail" : "https://youtube.com/files/whatever.png",
-            "upload_date" : "20231113",
+            "upload_date" : "${date}",
             "live_status" : "False"
-            }"""
+            }""".replace("${date}", self.get_now())
         return True
 
     def download_details_return_dislike(self):
         self.rd_text = """{}"""
         return True
+
+    def get_now(self):
+        """
+        format 20231113
+        """
+        date = DateUtils.get_datetime_now_utc()
+        tuple = DateUtils.get_date_tuple(date)
+
+        return str(tuple[0]) + str(tuple[1]) + str(tuple[2])
 
 
 class YouTubeChannelHandlerMock(YouTubeChannelHandler):

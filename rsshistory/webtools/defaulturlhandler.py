@@ -18,7 +18,7 @@ class DefaultUrlHandler(DefaultContentPage):
         self.dead = None
         self.code = None  # social media handle, ID of channel, etc.
         self.options = page_options
-        self.handler = None  # one handler to rule them all
+        self.handler = None  # for example rss UrlHandler
         self.url_builder = url_builder
 
     def is_handled_by(self):
@@ -105,14 +105,13 @@ class DefaultUrlHandler(DefaultContentPage):
         """
         By default we use HTML response
         """
-        from .url import Url
         from .handlerhttppage import HttpPageHandler
 
         if self.response:
             return self.response
 
         # now call url with those options
-        self.handler = Url(self.url, handler_class=HttpPageHandler)
+        self.handler = self.url_builder(self.url, handler_class=HttpPageHandler)
         self.response = self.handler.get_response()
 
         if not self.response or not self.response.is_valid():

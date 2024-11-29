@@ -35,7 +35,7 @@ class Browser(models.Model):
     )  # json map inside. script path, port etc
 
     class Meta:
-        ordering = ["-enabled", "priority"]
+        ordering = ["-enabled", "priority", "name"]
 
     def save(self, *args, **kwargs):
         browsers = WebConfig.get_browsers()
@@ -50,6 +50,8 @@ class Browser(models.Model):
         Reads default WebConfigs browser config, and applies it to model
         """
         # Browser.objects.all().delete()
+
+        start_index = Browser.objects.all().count()
 
         mapping = WebConfig.get_init_crawler_config()
         for index, browser_config in enumerate(mapping):
@@ -67,7 +69,7 @@ class Browser(models.Model):
                     enabled=enabled,
                     name=browser_config["name"],
                     crawler=browser_config["crawler"].__name__,
-                    priority=index,
+                    priority=start_index + index,
                     settings=settings,
                 )
 
@@ -102,6 +104,36 @@ class Browser(models.Model):
         }
 
         return browser_config
+
+    def prio_up(self):
+        browsers = Browser.objects.all()
+
+        if self.priority == 0:
+            return
+
+        other_browsers = Browser.objects.filter(priority = self.priority - 1)
+        if other_browsers.exists():
+            for other_browser in other_browsers:
+                other_browser.priority = self.priority
+                other_browser.save()
+
+        self.priority -= 1
+        self.save()
+
+    def prio_down(self):
+        browsers = Browser.objects.all()
+
+        if self.priority > browsers.count():
+            return
+
+        other_browsers = Browser.objects.filter(priority = self.priority + 1)
+        if other_browsers.exists():
+            for other_browser in other_browsers:
+                other_browser.priority = self.priority
+                other_browser.save()
+
+        self.priority += 1
+        self.save()
 
     def get_crawler_from_string(crawler_string):
         return WebConfig.get_crawler_from_string(crawler_string)

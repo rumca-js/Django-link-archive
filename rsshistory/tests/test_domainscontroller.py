@@ -139,5 +139,5 @@ class DomainTest(FakeInternetTestCase):
         # call tested function
         domain.delete()
 
-        entries = LinkDataController.objects.filter(link="test.com")
+        entries = LinkDataController.objects.filter(link="https://test.com")
         self.assertEqual(entries.count(), 1)

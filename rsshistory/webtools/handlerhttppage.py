@@ -695,6 +695,9 @@ class HttpPageHandler(ContentInterface):
             if feeds and len(feeds) > 0:
                 result.extend(feeds)
 
+        if not self.p:
+            return result
+
         if type(self.p) is RssPage:
             # we do not add ourselve
             pass

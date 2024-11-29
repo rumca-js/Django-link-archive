@@ -94,16 +94,25 @@ function sendRequest(page_url, browser, attempt = 1) {
 }
 
 
+function OnUserInput() {
+    $('.btnFilterTrigger').prop("disabled", true);
+
+    const link = $('#id_link').val();
+    const browser = $('#id_browser').val();
+
+    if (link == null) {
+        return;
+    }
+
+    sendRequest(link, browser);
+}
+
+
 $(document).ready(function() {
     $("#btnFetch").click(function(event) {
         event.preventDefault();
 
-        $('.btnFilterTrigger').prop("disabled", true);
-
-        const link = $('#id_link').val();
-        const browser = $('#id_browser').val();
-
-        sendRequest(link, browser);
+        OnUserInput();
     });
 });
 

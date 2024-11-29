@@ -35,41 +35,19 @@ class SourcesViewsTests(FakeInternetTestCase):
         # c.config_entry.logging_level = AppLogging.DEBUG
         # c.config_entry.save()
 
-    def test_source_add_simple__invalid(self):
+    def test_source_add_simple(self):
         SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:source-add-simple".format(LinkDatabase.name))
-        test_link = "https://page-with-http-status-500.com"
-
-        post_data = {"url": test_link}
 
         # call user action
-        response = self.client.post(url, data=post_data)
+        response = self.client.get(url)
 
         # print(response.text.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, test_link, html=False)
-
-    def test_source_add_simple__valid_html(self):
-        SourceDataController.objects.all().delete()
-
-        self.client.login(username="testuser", password="testpassword")
-
-        url = reverse("{}:source-add-simple".format(LinkDatabase.name))
-        test_link = "https://linkedin.com"
-
-        post_data = {"url": test_link}
-
-        # call user action
-        response = self.client.post(url, data=post_data)
-
-        # print(response.text.decode('utf-8'))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, test_link, html=False)
 
     def test_source_add__html(self):
         BackgroundJobController.objects.all().delete()

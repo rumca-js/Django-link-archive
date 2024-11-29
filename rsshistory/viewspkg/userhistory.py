@@ -129,6 +129,9 @@ def add_suggestion(json_obj, text):
 
 
 def get_search_suggestions_entries(request, searchstring):
+    """
+    @note This should not be ignore case - should be blazing fast
+    """
     p = ViewPage(request)
     p.set_title("Search history")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
@@ -141,7 +144,7 @@ def get_search_suggestions_entries(request, searchstring):
     suggested_texts = set()
 
     history_items = UserSearchHistory.objects.filter(
-        search_query__contains=searchstring
+        search_query__contains=searchstring, user=request.user
     )
     for item in history_items:
         text = item.search_query

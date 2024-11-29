@@ -47,7 +47,11 @@ class SourceUrlInterface(object):
         if url:
             url.get_response()
 
-            self.url = url.url
+            feeds = url.get_feeds()
+            if feeds and len(feeds) > 0:
+                self.url = feeds[0]
+            else:
+                self.url = url.url
             self.u = url
             return self.get_props_from_rss(input_props)
         else:

@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from django.http import JsonResponse
 from django.urls import reverse
 
 from ..models import Browser
@@ -9,6 +10,7 @@ from ..models import ConfigurationEntry, Browser
 from ..views import ViewPage, GenericListView
 from ..apps import LinkDatabase
 from ..forms import BrowserEditForm
+
 
 
 class BrowserListView(GenericListView):
@@ -62,6 +64,46 @@ def remove(request, pk):
     else:
         p.context["summary_text"] = "Cannot find such entry"
         return p.render("go_back.html")
+
+
+def prio_up(request, pk):
+    p = ViewPage(request)
+    p.set_title("Removes browser")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    data = {}
+    data["message"] = "Entry does not exist"
+    data["status"] = False
+
+    browsers = Browser.objects.filter(id=pk)
+    if browsers.exists():
+        browsers[0].prio_up()
+        data["status"] = True
+        data["message"] = "OK"
+
+    return JsonResponse(data, json_dumps_params={"indent":4})
+
+
+def prio_down(request, pk):
+    p = ViewPage(request)
+    p.set_title("Removes browser")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    data = {}
+    data["message"] = "Entry does not exist"
+    data["status"] = False
+
+    browsers = Browser.objects.filter(id=pk)
+    if browsers.exists():
+        browsers[0].prio_down()
+        data["status"] = True
+        data["message"] = "OK"
+
+    return JsonResponse(data, json_dumps_params={"indent":4})
 
 
 def disable(request, pk):

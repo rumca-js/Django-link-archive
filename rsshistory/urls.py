@@ -249,6 +249,8 @@ urlpatterns = [
     path("browser-disable/<int:pk>/", browsers.disable, name="browser-disable",),
     path("browser-remove/<int:pk>/", browsers.remove, name="browser-remove",),
     path("browser-edit/<int:pk>/", browsers.edit, name="browser-edit"),
+    path("browser-prio-up/<int:pk>/", browsers.prio_up, name="browser-prio-up"),
+    path("browser-prio-down/<int:pk>/", browsers.prio_down, name="browser-prio-down"),
     # other, debug forms
     path("page-show-props", tools.page_show_properties, name="page-show-props",),
     path("page-scan-link", tools.page_scan_link, name="page-scan-link",),

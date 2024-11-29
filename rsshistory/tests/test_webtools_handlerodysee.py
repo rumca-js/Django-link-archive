@@ -76,6 +76,8 @@ class OdyseeVideoHandlerTest(FakeInternetTestCase):
 
         handler = OdyseeVideoHandler(test_link, url_builder=UrlHandler)
 
+        handler.get_response()
+
         # call tested function
         hash = handler.get_contents_hash()
 
@@ -86,20 +88,12 @@ class OdyseeVideoHandlerTest(FakeInternetTestCase):
 
         handler = OdyseeVideoHandler(test_link, url_builder=UrlHandler)
 
+        handler.get_response()
+
         # call tested function
         hash = handler.get_contents_body_hash()
 
         self.assertTrue(hash)
-
-    def test_get_contents(self):
-        test_link = "https://odysee.com/ridiculous-zendesk-vulnerability-causes:01c863c36e86789070adf02eaa5c0778975507d5"
-
-        handler = OdyseeVideoHandler(test_link, url_builder=UrlHandler)
-
-        # call tested function
-        contents = handler.get_contents()
-
-        self.assertTrue(contents)
 
     def test_get_response(self):
         test_link = "https://odysee.com/ridiculous-zendesk-vulnerability-causes:01c863c36e86789070adf02eaa5c0778975507d5"
@@ -122,13 +116,14 @@ class OdyseeChannelHandlerTest(FakeInternetTestCase):
         # call tested function
         handler = OdyseeChannelHandler("https://odysee.com/@samtime:1?test", url_builder=UrlHandler)
 
-        self.assertEqual(handler.url, "https://odysee.com/@samtime:1?test")
+        self.assertEqual(handler.url, "https://odysee.com/@samtime:1")
         self.assertEqual(
             handler.code2url(handler.code), "https://odysee.com/@samtime:1"
         )
         self.assertEqual(
             handler.code2feed(handler.code), "https://odysee.com/$/rss/@samtime:1"
         )
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_constructor__feed_url(self):
         MockRequestCounter.mock_page_requests = 0
@@ -136,42 +131,91 @@ class OdyseeChannelHandlerTest(FakeInternetTestCase):
         # call tested function
         handler = OdyseeChannelHandler("https://odysee.com/$/rss/@samtime:1?test", url_builder=UrlHandler)
 
-        self.assertEqual(handler.url, "https://odysee.com/$/rss/@samtime:1?test")
+        self.assertEqual(handler.url, "https://odysee.com/@samtime:1")
         self.assertEqual(
             handler.code2url(handler.code), "https://odysee.com/@samtime:1"
         )
         self.assertEqual(
             handler.code2feed(handler.code), "https://odysee.com/$/rss/@samtime:1"
         )
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_feeds__from_rss(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        handler = OdyseeChannelHandler("https://odysee.com/$/rss/@samtime:1?test", url_builder=UrlHandler)
+
+        feeds = handler.get_feeds()
+        self.assertEqual(len(feeds), 1)
+
+        self.assertEqual(feeds[0], "https://odysee.com/$/rss/@samtime:1")
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_feeds__from_handle(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        handler = OdyseeChannelHandler("https://odysee.com/@samtime:1", url_builder=UrlHandler)
+
+        feeds = handler.get_feeds()
+        self.assertEqual(len(feeds), 1)
+
+        self.assertEqual(feeds[0], "https://odysee.com/$/rss/@samtime:1")
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_channel_url(self):
+        MockRequestCounter.mock_page_requests = 0
+        self.assertEqual(
+            OdyseeChannelHandler("1234").get_channel_url(),
+            "https://odysee.com/1234",
+        )
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_channel_feed(self):
+        MockRequestCounter.mock_page_requests = 0
+        self.assertEqual(
+            OdyseeChannelHandler("1234").get_channel_feed(),
+            "https://odysee.com/$/rss/1234",
+        ) 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_contents_hash(self):
+        MockRequestCounter.mock_page_requests = 0
         handler = OdyseeChannelHandler("https://odysee.com/@samtime:1?test", url_builder=UrlHandler)
 
         # call tested function
         hash = handler.get_contents_hash()
 
         self.assertTrue(hash)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_contents_body_hash(self):
+        MockRequestCounter.mock_page_requests = 0
         handler = OdyseeChannelHandler("https://odysee.com/@samtime:1?test", url_builder=UrlHandler)
 
         # call tested function
         hash = handler.get_contents_body_hash()
 
         self.assertTrue(hash)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_contents(self):
+        MockRequestCounter.mock_page_requests = 0
         handler = OdyseeChannelHandler("https://odysee.com/@samtime:1?test", url_builder=UrlHandler)
 
         # call tested function
         contents = handler.get_contents()
 
         self.assertTrue(contents)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_response(self):
+        MockRequestCounter.mock_page_requests = 0
         handler = OdyseeChannelHandler("https://odysee.com/@samtime:1?test", url_builder=UrlHandler)
 
         # call tested function
         response = handler.get_response()
 
         self.assertTrue(response)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
