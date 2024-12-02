@@ -39,7 +39,8 @@ function fillDomainList(domains) {
     return htmlOutput;
 }
 
-function fillListData(data) {
+function fillListData() {
+    let data = object_list_data;
     $('#listData').html("");
 
     let domains = data.domains;

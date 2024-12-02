@@ -51,7 +51,8 @@ function fillSourceList(sources) {
     return htmlOutput;
 }
 
-function fillListData(data) {
+function fillListData() {
+    let data = object_list_data;
     $('#listData').html("");
 
     let sources = data.sources;

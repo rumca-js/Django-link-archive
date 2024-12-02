@@ -1,3 +1,5 @@
+let object_list_data = null;
+
 
 function getHideButton() {
     let text = "";
@@ -158,7 +160,6 @@ function loadSearchHistory(attempt = 1) {
 }
 
 let currentLoadRowListContentCounter = 0;
-
 function loadRowListContent(search_term = '', page = '', attempt = 1) {
    $('.btnFilterTrigger').prop("disabled", true);
 
@@ -198,7 +199,8 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
                return;
             }
             $('html, body').animate({ scrollTop: 0 }, 'slow');
-            fillListData(data);
+            object_list_data = data;
+            fillListData();
             $('#listStatus').html("");
             loadSearchHistory();
         },

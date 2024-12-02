@@ -13,13 +13,19 @@
                  <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
                  Add entry
              </a>
+          </li>
 
              {% if search %}
-             <a href="{% url 'rsshistory:set-read-marker' %}?search={{search}}" class="dropdown-item" title="Marks all entries as read">
-                 <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
-                 Mark as read
-             </a>
+             <li>
+                <a href="{% url 'rsshistory:set-read-marker' %}?search={{search}}" class="dropdown-item" title="Marks all entries as read">
+                    <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
+                    Mark as read
+                </a>
+             </li>
              {% endif %}
+             <li>
+	       <button id="showPureLinks" class="dropdown-item">Show Pure Links</button>
+             </li>
           </li>
        </ul>
    </div>

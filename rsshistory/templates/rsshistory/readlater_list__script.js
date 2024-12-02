@@ -123,8 +123,10 @@ function fillQueueList(queue) {
     return htmlOutput;
 }
 
-function fillListData(data) {
+function fillListData() {
     $('#listData').html("");
+
+    let data = object_list_data;
 
     let queue = data.queue;
 

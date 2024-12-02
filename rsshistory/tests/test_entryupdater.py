@@ -27,39 +27,6 @@ class EntryUpdaterTest(FakeInternetTestCase):
             username="TestUser", password="testpassword", is_staff=True
         )
 
-    def test_reset_data__fills_properties(self):
-        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
-
-        source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
-            title="YouTube",
-            export_to_cms=True,
-            remove_after_days=1,
-        )
-
-        entry = LinkDataController.objects.create(
-            source_url="",
-            link="https://linkedin.com",
-            title=None,
-            description=None,
-            source=source_youtube,
-            bookmarked=False,
-            language=None,
-            domain=None,
-            date_published=add_time,
-        )
-
-        date_updated = entry.date_update_last
-
-        u = EntryUpdater(entry)
-        # call tested function
-        u.reset_data()
-
-        self.assertEqual(entry.title, "LinkedIn Page title")
-        self.assertEqual(entry.description, "LinkedIn Page description")
-        self.assertEqual(entry.date_published, add_time)
-        # self.assertEqual(entry.date_update_last, date_updated)
-
     def test_update_data__fills_properties(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
@@ -93,6 +60,38 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.description, "LinkedIn Page description")
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
+        
+    def test_update_data__adds_scan_job(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://linkedin.com",
+            title=None,
+            description=None,
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            thumbnail=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.update_data()
+
+        scan_jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_SCAN)
+        self.assertEqual(scan_jobs.count(), 1)
 
     def test_update_data__not_reset_properties(self):
         MockRequestCounter.mock_page_requests = 0
@@ -131,47 +130,6 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # self.assertEqual(entry.date_update_last, date_updated)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 3)
-
-    def test_reset_data__removes_old_dead_entry(self):
-        MockRequestCounter.mock_page_requests = 0
-
-        conf = Configuration.get_object().config_entry
-
-        add_time = DateUtils.get_datetime_now_utc() - timedelta(
-            days=conf.days_to_remove_stale_entries + 1
-        )
-
-        source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
-            title="YouTube",
-            export_to_cms=True,
-            remove_after_days=1,
-        )
-
-        entry = LinkDataController.objects.create(
-            source_url="",
-            link="https://page-with-http-status-500.com",
-            title=None,
-            description=None,
-            source=source_youtube,
-            bookmarked=False,
-            language=None,
-            domain=None,
-            date_published=add_time,
-            date_dead_since=add_time,
-        )
-
-        date_updated = entry.date_update_last
-
-        u = EntryUpdater(entry)
-        # call tested function
-        u.reset_data()
-
-        entries = LinkDataController.objects.filter(
-            link="https://page-with-http-status-500.com"
-        )
-        self.assertEqual(entries.count(), 0)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 4)
 
     def test_update_data__removes_old_dead_entry(self):
         MockRequestCounter.mock_page_requests = 0
@@ -301,6 +259,111 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].manual_status_code, 0)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+        
+    def test_reset_data__fills_properties(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://linkedin.com",
+            title=None,
+            description=None,
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.reset_data()
+
+        self.assertEqual(entry.title, "LinkedIn Page title")
+        self.assertEqual(entry.description, "LinkedIn Page description")
+        self.assertEqual(entry.date_published, add_time)
+        # self.assertEqual(entry.date_update_last, date_updated)
+        
+    def test_reset_data__adds_scan_job(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://linkedin.com",
+            title=None,
+            description=None,
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.reset_data()
+
+        scan_jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_SCAN)
+        self.assertEqual(scan_jobs.count(), 1)
+
+    def test_reset_data__removes_old_dead_entry(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        conf = Configuration.get_object().config_entry
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_remove_stale_entries + 1
+        )
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://page-with-http-status-500.com",
+            title=None,
+            description=None,
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            date_published=add_time,
+            date_dead_since=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.reset_data()
+
+        entries = LinkDataController.objects.filter(
+            link="https://page-with-http-status-500.com"
+        )
+        self.assertEqual(entries.count(), 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 4)
 
     def test_reset_local_data(self):
         MockRequestCounter.mock_page_requests = 0

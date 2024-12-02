@@ -572,6 +572,7 @@ class EntryUpdater(object):
         # save is performed by the above
 
         self.check_for_sources(entry, url)
+        BackgroundJobController.link_scan(entry=entry)
 
         if entry_changed:
             self.add_links_from_url(entry, url)
@@ -642,6 +643,7 @@ class EntryUpdater(object):
             self.add_links_from_url(entry, url)
 
         self.check_for_sources(entry, url)
+        BackgroundJobController.link_scan(entry=entry)
         self.store_thumbnail(entry)
 
     def store_thumbnail(self, entry):
@@ -1181,9 +1183,8 @@ class EntryWrapper(object):
 
     def check_https_http_availability(self):
         """
-        TODO - we should use EntryUrlInterface to check if we receive valid
-        information.
-        Some information might be missing in https:// version of a site
+        We verify if http site also has properties. Sometime non-www pages return 200 status, but are blank
+        TODO we do not want to fetch url interface each function like that
 
         @returns new object, or None object has not been changed
         """
@@ -1207,10 +1208,10 @@ class EntryWrapper(object):
             ping_status = p.ping()
 
             if not ping_status:
-                p = UrlHandler(url=http_url)
-                new_ping_status = p.ping()
+                url = EntryUrlInterface(http_url)
+                props = url.get_props()
 
-                if new_ping_status:
+                if props:
                     return EntryWrapper(entry=entry).move_entry_to_url(http_url)
 
             return self.entry
@@ -1218,19 +1219,18 @@ class EntryWrapper(object):
         if entry.is_http():
             https_url = entry.get_https_url()
 
-            p = UrlHandler(https_url)
-            new_ping_status = p.ping()
+            url = EntryUrlInterface(http_url)
+            props = url.get_props()
 
-            if new_ping_status:
+            if props:
                 return EntryWrapper(entry=entry).move_entry_to_url(https_url)
 
         return self.entry
 
     def check_www_nonww_availability(self):
         """
-        TODO - we should use EntryUrlInterface to check if we receive valid
-        information.
-        Some information might be missing in https:// version of a site
+        We verify if non-www site also has properties. Sometime non-www pages return 200 status, but are blank
+        TODO we do not want to fetch url interface each function like that
 
         @returns new object, or None if object has not been changed
         """
@@ -1250,13 +1250,14 @@ class EntryWrapper(object):
         p = DomainAwarePage(entry.link)
         domain_only = p.get_domain_only()
         if not domain_only.startswith("www."):
-            return
+            return self.entry
 
         destination_link = entry.link.replace("www.", "")
 
-        p = UrlHandler(url=destination_link)
-        if p.ping():
-            self.move_entry_to_url(destination_link)
+        url = EntryUrlInterface(destination_link)
+        props = url.get_props()
+        if props:
+            return self.move_entry_to_url(destination_link)
 
         return self.entry
 

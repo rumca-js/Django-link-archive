@@ -1,5 +1,9 @@
 {% load static %}
 
+
+let list_display_style = 0;
+
+
 function getVotesBadge(page_rating_votes) {
     let badge_text = page_rating_votes > 0 ? `
         <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 30px; font-size: 0.8rem;">
@@ -59,7 +63,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
 
     return `
         <a 
-            href="{link_absolute}"
+            href="{entry_link}"
             title="{title}"
             ${invalid_style}
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class}"
@@ -81,15 +85,20 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     `;
 }
 
+
+let mark_bookmarks = false;
+
 function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
 
     let badge_text = getVotesBadge(page_rating_votes);
-    let badge_star = getBookmarkBadge(entry);
+    let badge_star = mark_bookmarks ? getBookmarkBadge(entry) : "";
     let badge_age = getAgeBadge(entry);
-
+   
     let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
-    let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
+    let bookmark_class = (entry.bookmarked && mark_bookmarks) ? `list-group-item-primary` : '';
+
+    let entry_link = list_display_style ? "${link_absolute}" : "${link_absolute}";
 
     let thumbnail_text = '';
     if (show_icons) {
@@ -102,7 +111,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
 
     return `
         <a 
-            href="{link_absolute}"
+            href="{entry_link}"
             title="{title}"
             ${invalid_style}
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class}"
@@ -140,7 +149,7 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
 
     return `
         <a 
-            href="{link_absolute}"
+            href="{entry_link}"
             title="{title}"
     ${invalid_style}
             class="element_${view_display_type} list-group-item list-group-item-action"
@@ -184,10 +193,13 @@ function fillEntryList(entries) {
             let page_rating_votes = entry.page_rating_votes;
             let page_rating_contents = entry.page_rating_contents;
 
+            let entry_link = list_display_style ? entry.link : entry.link_absolute;
+
             // Replace all occurrences of the placeholders using a global regular expression
             let listItem = template_text
                 .replace(/{link_absolute}/g, entry.link_absolute)
                 .replace(/{link}/g, entry.link)
+                .replace(/{entry_link}/g, entry_link)
                 .replace(/{title}/g, entry.title)
                 .replace(/{thumbnail}/g, entry.thumbnail)
                 .replace(/{title_safe}/g, entry.title_safe)
@@ -207,7 +219,9 @@ function fillEntryList(entries) {
     return htmlOutput;
 }
 
-function fillListData(data) {
+function fillListData() {
+    let data = object_list_data;
+
     $('#listData').html("");
 
     let entries = data.entries;
@@ -225,3 +239,14 @@ function fillListData(data) {
 }
 
 {% include "rsshistory/javascript_list_utilities.js" %}
+
+$(document).on("click", '#showPureLinks', function(e) {
+   if (list_display_style == 0) {
+      list_display_style = 1;
+   }
+   else {
+      list_display_style = 0;
+   }
+
+   fillListData();
+});

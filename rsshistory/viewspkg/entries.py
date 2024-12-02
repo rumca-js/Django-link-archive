@@ -386,7 +386,6 @@ class EntryDetailView(generic.DetailView):
     def set_visited(self):
         user = self.request.user
         if user.is_authenticated:
-            BackgroundJobController.entry_update_data(self.object)
             from_entry = self.get_from_entry()
 
             UserEntryVisitHistory.visited(self.object, self.request.user, from_entry)
