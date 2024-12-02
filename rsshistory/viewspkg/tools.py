@@ -5,7 +5,13 @@ from django.db.models import Q
 
 from collections import OrderedDict
 
-from ..webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
+from ..webtools import (
+    ContentLinkParser,
+    RssPage,
+    DomainCache,
+    DomainAwarePage,
+    HttpPageHandler,
+)
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -118,7 +124,10 @@ def get_page_properties(request):
         else:
             return
 
-    page_url = UrlHandler(page_link, page_options=options)
+    if "html" in request.GET:
+        page_url = UrlHandler(page_link, page_options=options, handler_class=HttpPageHandler)
+    else:
+        page_url = UrlHandler(page_link, page_options=options)
     response = page_url.get_response()
 
     page_handler = page_url.get_handler()

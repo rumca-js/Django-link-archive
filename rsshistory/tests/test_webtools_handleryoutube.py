@@ -163,7 +163,7 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_constructor__html(self):
+    def test_constructor__channel(self):
         MockRequestCounter.mock_page_requests = 0
 
         test_link = "https://www.youtube.com/channel/1234"
@@ -270,7 +270,7 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         hash = handler.get_contents_hash()
 
         self.assertTrue(hash)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_contents_body_hash(self):
         MockRequestCounter.mock_page_requests = 0
@@ -283,7 +283,7 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         hash = handler.get_contents_body_hash()
 
         self.assertTrue(hash)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_contents(self):
         MockRequestCounter.mock_page_requests = 0
@@ -298,7 +298,7 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         contents = handler.get_contents()
 
         self.assertTrue(contents)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_response(self):
         MockRequestCounter.mock_page_requests = 0
@@ -313,7 +313,7 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         response = handler.get_response()
 
         self.assertTrue(response)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_feeds__from_rss(self):
         MockRequestCounter.mock_page_requests = 0
@@ -344,3 +344,16 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         self.assertEqual(feeds[0], "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_constructor__get_thumbnail(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        test_link = "https://www.youtube.com/channel/1234"
+        # call tested function
+        handler = YouTubeChannelHandler(test_link, url_builder=UrlHandler)
+        self.assertEqual(handler.url, test_link)
+
+        thumbnail = handler.get_thumbnail()
+
+        # +1 for RSS response +1 for channel HTML response
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)

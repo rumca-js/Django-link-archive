@@ -136,7 +136,7 @@ def read_later_clear(request):
     if data is not None:
         return data
 
-    read_laters = ReadLater.objects.all().delete()
+    ReadLater.objects.filter(user=request.user).delete()
 
     data = {}
     data["message"] = "Successfully removed read queue"

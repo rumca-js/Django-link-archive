@@ -87,10 +87,11 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return self.input2code_feeds(url)
 
     def input2code_handle(self, url):
-        html_page = self.get_html_page()
+        html_url = self.get_html_url()
 
-        if html_page:
-            return html_page.get_schema_field("identifier")
+        if html_url:
+            if html_url.p:
+                return html_url.p.get_schema_field("identifier")
 
     def input2code_channel(self, url):
         wh = url.rfind("/")
@@ -123,16 +124,6 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if self.code:
             result.append(self.code2feed(self.code))
 
-        #elif self.is_channel_name():
-        #    html = self.get_html_page()
-        #    if html:
-        #        if html.get_rss_url():
-        #            result.append(html.get_rss_url())
-        #        else:
-        #            WebLogger.error("Cannot obtain HTML page")
-        #    else:
-        #        WebLogger.error("Cannot obtain RSS from page {}".format(self.url))
-
         return result
 
     def get_contents(self):
@@ -163,21 +154,17 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return
 
         if self.is_channel_name():
-            html = self.get_html_page()
-            if html:
-                rss_url = html.get_rss_url()
-                if not rss_url:
-                    WebLogger.error("Cannot obtain RSS")
-                    return
-                self.code = self.input2code(rss_url)
-                if self.code:
-                    self.url = self.get_channel_url()
+            html_url = self.get_html_url()
+            if html_url:
+                feeds = html.get_feeds()
+                if feeds and len(feeds) > 0:
+                    self.code = self.input2code(feeds[0])
+                    if self.code:
+                        self.url = self.get_channel_url()
 
         rss_url = self.get_rss_url()
         if rss_url:
             self.response = rss_url.get_response()
-        #elif self.html_url:
-        #    self.response = self.html_url.get_response()
 
         if (
             not self.response
@@ -212,19 +199,17 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         return self.rss_url
 
     def get_html_url(self):
-        if self.html_url:
-            return self.html_url
+        return None
+        #if self.html_url:
+        #    return self.html_url
 
-        u = self.url_builder(self.url, handler_class=HttpPageHandler)
-        u.get_response()
-        self.html_url = u
+        #u = self.url_builder(self.get_channel_url(), handler_class=HttpPageHandler)
+        #u.get_response()
+        #self.html_url = u
 
-        if self.html_url:
-            return self.html_url
+        #return self.html_url
 
     def get_html_page(self):
-        from .webtools import WebLogger
-
         html_url = self.get_html_url()
         if html_url:
             handler = html_url.get_handler()
@@ -266,10 +251,9 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             if thumbnail:
                 return thumbnail
 
-        html_page = self.get_html_page()
-
-        if html_page:
-            return html_page.get_thumbnail()
+        html_url = self.get_html_url()
+        if html_url:
+            return html_url.get_thumbnail()
 
     def get_author(self):
         rss_url = self.get_rss_url()

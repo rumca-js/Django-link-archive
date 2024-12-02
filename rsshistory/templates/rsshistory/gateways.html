@@ -2,6 +2,9 @@
 {% load static %}
 {% block content %}
 
+<h1>Gateways</h1>
+A gateway is a location through which you can find useful things
+
 {% for Type_Name, items in gateways.items %}
   {% if items %}
      <h1>{{Type_Name}}</h1>

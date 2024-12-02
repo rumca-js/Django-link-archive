@@ -44,6 +44,7 @@ from .fake.youtube import (
     youtube_sitemap_sitemaps,
     youtube_sitemap_product,
     webpage_youtube_airpano_feed,
+    webpage_samtime_odysee,
     webpage_samtime_youtube_rss,
     youtube_channel_html_linus_tech_tips,
     youtube_channel_rss_linus_tech_tips,

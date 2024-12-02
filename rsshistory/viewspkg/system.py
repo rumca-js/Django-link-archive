@@ -5,6 +5,7 @@ import os
 
 from django.views import generic
 from django.urls import reverse
+from django.utils.html import escape
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
@@ -480,8 +481,9 @@ def log_to_json(applogging_entry):
     json["date"] = applogging_entry.date
     json["level"] = applogging_entry.level
     json["id"] = applogging_entry.id
-    json["info_text"] = applogging_entry.info_text
-    json["detail_text"] = applogging_entry.detail_text
+
+    json["info_text"] = escape(applogging_entry.info_text)
+    json["detail_text"] = escape(applogging_entry.detail_text)
 
     return json
 
@@ -937,7 +939,7 @@ def get_indicators(request):
     is_threading_ok = system_controller.is_threading_ok(tasks)
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
-    read_later_queue_size = ReadLater.objects.all().count()
+    read_later_queue_size = ReadLater.objects.filter(user = request.user).count()
     read_later = read_later_queue_size > 0
 
     indicators = {}

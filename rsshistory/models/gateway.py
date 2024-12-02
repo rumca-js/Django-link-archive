@@ -149,6 +149,9 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://rumble.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://odysee.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://yewtu.be", gateway_type=thetype)
+        Gateway.objects.create(link = "https://twitch.tv", gateway_type=thetype)
+        Gateway.objects.create(link = "https://dailymotion.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://vimeo.com", gateway_type=thetype)
 
     def populate_file_sharing():
         thetype = Gateway.TYPE_FILE_SHARING
@@ -172,9 +175,6 @@ class Gateway(models.Model):
     def populate_favourites():
         thetype = Gateway.TYPE_FAVOURITE
 
-        Gateway.objects.create(link = "https://hn.algolia.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://news.ycombinator.com", gateway_type=thetype)
-
     def populate_social_media():
         thetype = Gateway.TYPE_SOCIAL_MEDIA
 
@@ -189,7 +189,8 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://instagram.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://quora.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://wechat.com", gateway_type=thetype)
-        Gateway.objects.create(link = "https://microsoft.com/microsoft-teams", gateway_type=thetype)
+        Gateway.objects.create(link = "https://hn.algolia.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://news.ycombinator.com", gateway_type=thetype)
 
     def populate_ai_bot():
         thetype = Gateway.TYPE_AI_BOT
@@ -205,6 +206,7 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://aliexpress.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://ebay.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://facebook.com/marketplace", gateway_type=thetype)
+        Gateway.objects.create(link = "https://vinted.com", gateway_type=thetype)
 
     def populate_app_store():
         thetype = Gateway.TYPE_APP_STORE
@@ -224,6 +226,7 @@ class Gateway(models.Model):
         Gateway.objects.create(link = "https://office.com/", gateway_type=thetype)
         Gateway.objects.create(link = "https://apple.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://microsoft.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://microsoft.com/microsoft-teams", gateway_type=thetype)
 
     def get_types_mapping(gateway_types):
         data = OrderedDict()

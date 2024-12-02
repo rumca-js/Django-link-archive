@@ -175,7 +175,7 @@ def restore_workspace(run_info):
     tablemapping = [
        ["./instance_sources"         , ["instance_sourcedatamodel"]],
        ["./instance_domains"         , ["instance_domains"]],
-       ["./instance_entries"         , ["instance_linkdatamodel"],
+       ["./instance_entries"         , ["instance_linkdatamodel"]],
        ["./instance_tags"            , ["instance_usertags", "instance_compactedtags", "instance_usercompactedtags"]],
        ["./instance_votes"           , ["instance_uservotes"]],
        ["./instance_comments"        , ["instance_usercomments"]],
@@ -215,7 +215,7 @@ def parse_backup():
     parser.add_argument("-U", "--user", default="user")
     parser.add_argument("-d", "--database", default="db")
     parser.add_argument("-w", "--workspace")
-    parser.add_argument("-d", "--debug") # TODO implement that shit
+    parser.add_argument("-D", "--debug") # TODO implement that shit
     parser.add_argument("--host", default="127.0.0.1")
 
     return parser, parser.parse_args()
