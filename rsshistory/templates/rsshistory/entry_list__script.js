@@ -2,6 +2,7 @@
 
 
 let list_display_style = 0;
+let highlight_bookmarks = false;
 
 
 function getVotesBadge(page_rating_votes) {
@@ -13,6 +14,7 @@ function getVotesBadge(page_rating_votes) {
     return badge_text;
 }
 
+
 function getBookmarkBadge(entry) {
     let badge_star = entry.bookmarked ? `
         <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 0.8rem;">
@@ -20,6 +22,7 @@ function getBookmarkBadge(entry) {
         </span>` : '';
     return badge_star;
 }
+
 
 function getAgeBadge(entry) {
     let badge_text = entry.age > 0 ? `
@@ -29,6 +32,7 @@ function getAgeBadge(entry) {
     return badge_text;
 }
 
+
 function getDeadBadge(entry) {
     let badge_text = entry.date_dead_since ? `
         <span class="badge text-bg-warning" style="position: absolute; top: 30px; right: 30px; font-size: 0.8rem;">
@@ -36,6 +40,7 @@ function getDeadBadge(entry) {
         </span>` : '';
     return badge_text;
 }
+
 
 function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
@@ -86,17 +91,15 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
 }
 
 
-let mark_bookmarks = false;
-
 function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
 
     let badge_text = getVotesBadge(page_rating_votes);
-    let badge_star = mark_bookmarks ? getBookmarkBadge(entry) : "";
+    let badge_star = highlight_bookmarks ? getBookmarkBadge(entry) : "";
     let badge_age = getAgeBadge(entry);
    
     let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
-    let bookmark_class = (entry.bookmarked && mark_bookmarks) ? `list-group-item-primary` : '';
+    let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
 
     let entry_link = list_display_style ? "${link_absolute}" : "${link_absolute}";
 
@@ -167,6 +170,7 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
     `;
 }
 
+
 function fillEntryList(entries) {
     let htmlOutput = '';
 
@@ -219,6 +223,7 @@ function fillEntryList(entries) {
     return htmlOutput;
 }
 
+
 function fillListData() {
     let data = object_list_data;
 
@@ -238,7 +243,9 @@ function fillListData() {
     $('#pagination').html(pagination);
 }
 
+
 {% include "rsshistory/javascript_list_utilities.js" %}
+
 
 $(document).on("click", '#showPureLinks', function(e) {
    if (list_display_style == 0) {
@@ -249,4 +256,34 @@ $(document).on("click", '#showPureLinks', function(e) {
    }
 
    fillListData();
+});
+
+
+$(document).on("click", '#highlightBookmarks', function(e) {
+   if (!highlight_bookmarks) {
+      highlight_bookmarks = true;
+   }
+   else {
+      highlight_bookmarks = 0;
+   }
+
+   fillListData();
+});
+
+
+$(document).on("click", '#displayStandard', function(e) {
+    view_display_type = "standard";
+    fillListData();
+});
+
+
+$(document).on("click", '#displayGallery', function(e) {
+    view_display_type = "gallery";
+    fillListData();
+});
+
+
+$(document).on("click", '#displaySearchEngine', function(e) {
+    view_display_type = "search-engine";
+    fillListData();
 });

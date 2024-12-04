@@ -517,8 +517,10 @@ class EntryUpdater(object):
 
         w = EntryWrapper(entry=self.entry)
         w.evaluate()
-        w.check_https_http_availability()
-        w.check_www_nonww_availability()
+        if not w.is_current_entry_perfect():
+            if w.entry.link.startswith("http"):
+                w.check_https_http_availability()
+                w.check_www_nonww_availability()
 
         if not w.entry:
             return
@@ -590,8 +592,10 @@ class EntryUpdater(object):
         """
         w = EntryWrapper(entry=self.entry)
         w.evaluate()
-        w.check_https_http_availability()
-        w.check_www_nonww_availability()
+        if not w.is_current_entry_perfect():
+            if w.entry.link.startswith("http"):
+                w.check_https_http_availability()
+                w.check_www_nonww_availability()
 
         if not w.entry:
             return
@@ -1181,6 +1185,19 @@ class EntryWrapper(object):
         is_archive = BaseLinkDataController.is_archive_by_date(self.date)
         return is_archive
 
+    def is_current_entry_perfect(self):
+        from ..pluginurl import UrlHandler, EntryUrlInterface
+        entry = self.entry
+
+        if entry.is_https():
+            if entry.link.startswith("https://www"):
+                return False
+
+            p = UrlHandler(url=entry.link)
+            ping_status = p.ping()
+
+            return ping_status
+
     def check_https_http_availability(self):
         """
         We verify if http site also has properties. Sometime non-www pages return 200 status, but are blank
@@ -1188,7 +1205,7 @@ class EntryWrapper(object):
 
         @returns new object, or None object has not been changed
         """
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandler, EntryUrlInterface
 
         if not self.entry:
             return
@@ -1234,7 +1251,7 @@ class EntryWrapper(object):
 
         @returns new object, or None if object has not been changed
         """
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandler, EntryUrlInterface
 
         if not self.entry:
             return

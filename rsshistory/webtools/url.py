@@ -185,8 +185,8 @@ class Url(ContentInterface):
             return self.response
 
     def ping(self, timeout_s=5):
-        builder = HttpRequestBuilder(self.url)
-        builder.ping(timeout_s=timeout_s, options=self.options)
+        handler = self.get_handler()
+        return handler.ping(timeout_s=timeout_s)
 
     def get_init_page_options(self, initial_options=None):
         from .webconfig import WebConfig

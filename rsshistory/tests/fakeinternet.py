@@ -203,7 +203,7 @@ class YouTubeJsonHandlerMock(YouTubeJsonHandler):
             "channel_id" : "JoYoe",
             "thumbnail" : "https://youtube.com/files/whatever.png",
             "upload_date" : "20231113",
-            "live_status" : "True"
+            "live_status" : "False"
             }""".replace("${date}", self.get_now())
         else:
             self.yt_text = """{"_filename" : "test.txt",
@@ -394,7 +394,7 @@ class TestResponseObject(PageResponseObject):
             return webpage_html_favicon
 
         elif url == "https://rsspage.com/rss.xml":
-            return webpage_samtime_youtube_rss
+            return webpage_samtime_odysee
 
         elif url == "https://invalid.rsspage.com/rss.xml":
             return ""
@@ -451,6 +451,14 @@ class TestResponseObject(PageResponseObject):
             b.body_text = """Something in the way"""
             return b.build_contents()
 
+        elif url == "https://no-props-page.com":
+            b = PageBuilder()
+            b.title = None
+            b.description_meta = None
+            b.og_description = None
+            b.body_text = """Something in the way"""
+            return b.build_contents()
+
         elif url == "https://title-in-meta.com":
             b = PageBuilder()
             b.title = "Page title"
@@ -469,9 +477,36 @@ class TestResponseObject(PageResponseObject):
 
         elif url == "https://linkedin.com":
             b = PageBuilder()
-            b.title_meta = "LinkedIn Page title"
+            b.title_meta = "Https LinkedIn Page title"
             b.description_meta = "LinkedIn Page description"
-            b.og_title = "LinkedIn Page og:title"
+            b.og_title = "Https LinkedIn Page og:title"
+            b.og_description = "LinkedIn Page og:description"
+            b.body_text = """LinkedIn body"""
+            return b.build_contents()
+
+        elif url == "http://linkedin.com":
+            b = PageBuilder()
+            b.title_meta = "Http LinkedIn Page title"
+            b.description_meta = "LinkedIn Page description"
+            b.og_title = "Http LinkedIn Page og:title"
+            b.og_description = "LinkedIn Page og:description"
+            b.body_text = """LinkedIn body"""
+            return b.build_contents()
+
+        elif url == "https://www.linkedin.com":
+            b = PageBuilder()
+            b.title_meta = "Https www LinkedIn Page title"
+            b.description_meta = "LinkedIn Page description"
+            b.og_title = "Https LinkedIn Page og:title"
+            b.og_description = "LinkedIn Page og:description"
+            b.body_text = """LinkedIn body"""
+            return b.build_contents()
+
+        elif url == "http://www.linkedin.com":
+            b = PageBuilder()
+            b.title_meta = "Http www LinkedIn Page title"
+            b.description_meta = "LinkedIn Page description"
+            b.og_title = "Http www LinkedIn Page og:title"
             b.og_description = "LinkedIn Page og:description"
             b.body_text = """LinkedIn body"""
             return b.build_contents()
@@ -602,7 +637,7 @@ class DefaultCrawler(CrawlerInterface):
     def run(self):
         request = self.request
 
-        print("TestInfo:Running: {}".format(self.crawler_data["name"]))
+        print("FakeInternet:Url:{} Crawler:{}".format(self.request.url, self.crawler_data["name"]))
 
         MockRequestCounter.requested(request.url, info=self.crawler_data)
 

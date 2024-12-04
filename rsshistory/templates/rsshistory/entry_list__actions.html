@@ -15,21 +15,40 @@
              </a>
           </li>
 
-             {% if search %}
-             <li>
-                <a href="{% url 'rsshistory:set-read-marker' %}?search={{search}}" class="dropdown-item" title="Marks all entries as read">
-                    <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
+          {% if search %}
+          <li>
+             <a href="{% url 'rsshistory:set-read-marker' %}?search={{search}}" class="dropdown-item" title="Marks all entries as read">
+                 <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
                     Mark as read
-                </a>
-             </li>
-             {% endif %}
-             <li>
-	       <button id="showPureLinks" class="dropdown-item">Show Pure Links</button>
-             </li>
+             </a>
           </li>
+          {% endif %}
        </ul>
    </div>
    {% endif %}
+
+   <div class="dropdown mx-1">
+       <button class="btn btn-primary" type="button" id="#listDrop" data-bs-toggle="dropdown" aria-expanded="false">
+         View
+       </button>
+       <ul class="dropdown-menu">
+          <li>
+             <button id="showPureLinks" class="dropdown-item">Show Pure Links</button>
+          </li>
+          <li>
+             <button id="highlightBookmarks" class="dropdown-item">Highlight Bookmarks</button>
+          </li>
+          <li>
+             <button id="displayStandard" class="dropdown-item">Display standard</button>
+          </li>
+          <li>
+             <button id="displayGallery" class="dropdown-item">Display gallery</button>
+          </li>
+          <li>
+             <button id="displaySearchEngine" class="dropdown-item">Display search engine</button>
+          </li>
+       </ul>
+   </div>
    
   {% if entry_list %}
    <div class="dropdown mx-1">

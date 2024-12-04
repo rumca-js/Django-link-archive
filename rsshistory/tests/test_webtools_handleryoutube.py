@@ -1,3 +1,4 @@
+from utils.dateutils import DateUtils
 from ..webtools import (
    YouTubeVideoHandler,
    YouTubeChannelHandler,
@@ -143,6 +144,22 @@ class YouTubeJsonHandlerTest(FakeInternetTestCase):
         self.assertTrue(response)
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
+    def test_get_date_published(self):
+        MockRequestCounter.mock_page_requests = 0
+        test_link = "https://www.youtube.com/watch?v=archived"
+
+        handler = YouTubeJsonHandlerMock(test_link, url_builder=UrlHandler)
+
+        response = handler.get_response()
+        # call tested function
+        date = handler.get_date_published()
+
+        expected_date_published = DateUtils.from_string("2023-11-13;00:00", "%Y-%m-%d;%H:%M")
+        expected_date_published = DateUtils.to_utc_date(expected_date_published)
+
+        self.assertEqual(date, expected_date_published)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
 
 class YouTubeChannelHandlerTest(FakeInternetTestCase):
     def setUp(self):
@@ -182,7 +199,7 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         self.assertEqual(handler.url, test_link)
 
         # +1 - obtains channel code from HTML
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_source_input2code_channel(self):
         MockRequestCounter.mock_page_requests = 0
@@ -356,4 +373,4 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         thumbnail = handler.get_thumbnail()
 
         # +1 for RSS response +1 for channel HTML response
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)

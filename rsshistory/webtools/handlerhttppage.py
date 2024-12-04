@@ -31,6 +31,7 @@ from .pages import (
     HtmlPage,
     RssPage,
 )
+from .handlerinterface import HandlerInterface
 from .webconfig import WebConfig
 
 
@@ -198,7 +199,7 @@ class HttpRequestBuilder(object):
         return self.response
 
 
-    def ping(self, timeout_s=5, options=None):
+    def ping(self, timeout_s=5):
         url = self.url
 
         if url is None:
@@ -208,8 +209,6 @@ class HttpRequestBuilder(object):
             WebLogger.error("Passed incorrect url {}".format(stack_str))
             return
 
-        self.options = options
-
         o = PageRequestObject(
             url=url,
             headers=self.headers,
@@ -217,14 +216,9 @@ class HttpRequestBuilder(object):
             ping=True,
         )
 
-        try:
-            response = self.get_contents_internal(request=o)
+        response = self.get_contents_internal(request=o)
 
-            return response and response.is_valid()
-
-        except Exception as E:
-            WebLogger.exc(E, "Url:{}. Ping error\n".format(url))
-            return False
+        return response and response.is_valid()
 
     def get_headers_response(self, timeout_s=5):
         url = self.url
@@ -325,11 +319,11 @@ class HttpRequestBuilder(object):
         return status_code >= 200 and status_code < 300
 
 
-class HttpPageHandler(ContentInterface):
+class HttpPageHandler(HandlerInterface):
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
 
-    def __init__(self, url=None, page_options=None, url_builder=None):
-        super().__init__(url=url, contents=None)
+    def __init__(self, url=None, contents=None, page_options=None, url_builder=None):
+        super().__init__(url=url, contents=contents, page_options=page_options, url_builder =url_builder)
         self.p = None
         self.response = None
         self.options = page_options
@@ -708,3 +702,7 @@ class HttpPageHandler(ContentInterface):
                 result.extend(feeds)
 
         return result
+
+    def ping(self, timeout_s = 120):
+        builder = HttpRequestBuilder(url=self.url, options=self.options)
+        return builder.ping()

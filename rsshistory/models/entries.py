@@ -252,7 +252,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         for comment in comments:
             data = {}
             data["comment"] = comment.comment
-            data["user"] = comment.user_object.username
+            data["user_name"] = comment.user.username
+            data["user_id"] = comment.user.id
+            data["entry_id"] = comment.entry.id
             data["date_published"] = comment.date_published.isoformat()
             data["date_edited"] = comment.date_published.isoformat()
             data["reply_id"] = comment.reply_id

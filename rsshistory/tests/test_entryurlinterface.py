@@ -4,6 +4,8 @@ from ..webtools import YouTubeVideoHandler
 from ..pluginurl.entryurlinterface import EntryUrlInterface
 from ..controllers import SourceDataController
 from ..configuration import Configuration
+from ..configuration import Configuration
+
 from .fakeinternet import FakeInternetTestCase
 
 
@@ -12,15 +14,21 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_video_youtube_handler(self):
-        url = EntryUrlInterface("https://www.youtube.com/watch?v=1234")
+        conf = Configuration.get_object().config_entry
+        conf.days_to_remove_links = 0
+        conf.days_to_move_to_archive = 0
+        conf.save()
+
+        test_link = "https://www.youtube.com/watch?v=archived"
+        url = EntryUrlInterface(test_link)
 
         expected_date_published = DateUtils.from_string("2023-11-13;00:00", "%Y-%m-%d;%H:%M")
         expected_date_published = DateUtils.to_utc_date(expected_date_published)
 
         props = url.get_props()
         self.assertTrue(props)
-        self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
-        self.assertEqual(props["title"], "1234 test title")
+        self.assertEqual(props["link"], test_link)
+        self.assertEqual(props["title"], "555555 live video")
         self.assertEqual(props["status_code"], 200)
         self.assertEqual(props["page_rating"], 0)
         self.assertTrue(props["date_dead_since"] is None)
@@ -163,25 +171,3 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props)
         self.assertEqual(props["link"], "//127.0.0.1/resource")
         self.assertEqual(props["status_code"], 0)
-
-    """
-    def test_rss_old_pubdate(self):
-        url = EntryUrlInterface("https://youtube.com/channel/2020-year-channel/rss.xml")
-        props = url.get_props()
-
-        self.assertTrue(props)
-        self.assertTrue(len(props) > 0)
-
-        self.assertTrue(props["date_published"])
-        self.assertEqual(props["date_published"].year, 2020)
-
-    def test_rss_no_pubdate(self):
-        url = EntryUrlInterface("https://youtube.com/channel/no-pubdate-channel/rss.xml")
-        props = url.get_props()
-
-        self.assertTrue(props)
-        self.assertTrue(len(props) > 0)
-
-        self.assertTrue(props["date_published"])
-        self.assertEqual(props["date_published"].year, 2023)
-    """

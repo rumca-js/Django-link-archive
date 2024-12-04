@@ -7,6 +7,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
     EntryUpdater,
+    BackgroundJobController,
 )
 from ..models import UserTags, UserVotes
 from ..configuration import Configuration
@@ -56,7 +57,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         u.update_data()
 
-        self.assertEqual(entry.title, "LinkedIn Page title")
+        self.assertEqual(entry.title, "Https LinkedIn Page title")
         self.assertEqual(entry.description, "LinkedIn Page description")
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
@@ -129,7 +130,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_update_data__removes_old_dead_entry(self):
         MockRequestCounter.mock_page_requests = 0
@@ -170,7 +171,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             link="https://page-with-http-status-500.com"
         )
         self.assertEqual(entries.count(), 0)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 6)
 
     def test_update_data__sets_stale_entry_status(self):
         MockRequestCounter.mock_page_requests = 0
@@ -214,7 +215,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].status_code, 500)
         self.assertEqual(entries[0].manual_status_code, 0)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 6)
 
     def test_update_data__clears_stale_entry_status(self):
         MockRequestCounter.mock_page_requests = 0
@@ -253,13 +254,134 @@ class EntryUpdaterTest(FakeInternetTestCase):
         u.update_data()
 
         entries = LinkDataController.objects.filter(link="https://youtube.com")
-        self.assertTrue(entries.count(), 1)
+        self.assertEqual(entries.count(), 1)
         self.assertTrue(entries[0].date_dead_since is None)
         self.assertEqual(entries[0].status_code, 200)
         self.assertEqual(entries[0].manual_status_code, 0)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
-        
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+
+    def test_update_data__no_properties_does_not_delete(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        conf = Configuration.get_object().config_entry
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_remove_stale_entries - 2
+        )
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://no-props-page.com",
+            title="some title",
+            description="some description",
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            thumbnail=None,
+            date_published=add_time,
+            date_dead_since=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.update_data()
+
+        entries = LinkDataController.objects.filter(link="https://no-props-page.com")
+        self.assertEqual(entries.count(), 1)
+        self.assertTrue(entries[0].date_dead_since is None)
+        self.assertEqual(entries[0].status_code, 200)
+        self.assertEqual(entries[0].title, "some title")
+        self.assertEqual(entries[0].description, "some description")
+        self.assertEqual(entries[0].manual_status_code, 0)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+
+    def test_update_data__updates_thumbnail(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        conf = Configuration.get_object().config_entry
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_remove_stale_entries - 2
+        )
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://youtube.com/watch?v=1234",
+            title="some title",
+            description="some description",
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            thumbnail="https://some-old-thumbnail.com/thumbnail.jpg",
+            date_published=add_time,
+            date_dead_since=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.update_data()
+
+        entries = LinkDataController.objects.filter(link="https://youtube.com/watch?v=1234")
+        self.assertEqual(entries.count(), 1)
+        self.assertTrue(entries[0].thumbnail, "https://youtube.com/files/1234-thumbnail.png")
+
+    def test_update_data__removes_casinos(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://slot-casino-page.com",
+            title="Casino casino casino casino casino",
+            description=None,
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            thumbnail=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.update_data()
+
+        self.assertEqual(LinkDataController.objects.all().count(), 0)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+
     def test_reset_data__fills_properties(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
@@ -288,7 +410,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         u.reset_data()
 
-        self.assertEqual(entry.title, "LinkedIn Page title")
+        self.assertEqual(entry.title, "Https LinkedIn Page title")
         self.assertEqual(entry.description, "LinkedIn Page description")
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
@@ -363,7 +485,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             link="https://page-with-http-status-500.com"
         )
         self.assertEqual(entries.count(), 0)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 4)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 6)
 
     def test_reset_local_data(self):
         MockRequestCounter.mock_page_requests = 0
@@ -399,17 +521,21 @@ class EntryUpdaterTest(FakeInternetTestCase):
         u.reset_local_data()
 
         entries = LinkDataController.objects.filter(link="https://youtube.com")
-        self.assertTrue(entries.count(), 1)
+        self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].page_rating_votes, 100)
         self.assertEqual(entries[0].page_rating_contents, 100)
         self.assertEqual(entries[0].page_rating, 100)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_update_data__removes_casinos(self):
+    def test_reset_data__no_properties_does_not_delete(self):
         MockRequestCounter.mock_page_requests = 0
 
-        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+        conf = Configuration.get_object().config_entry
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_remove_stale_entries - 2
+        )
 
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -420,23 +546,30 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         entry = LinkDataController.objects.create(
             source_url="",
-            link="https://slot-casino-page.com",
-            title="Casino casino casino casino casino",
-            description=None,
+            link="https://no-props-page.com",
+            title="some title",
+            description="some description",
             source=source_youtube,
             bookmarked=False,
             language=None,
             domain=None,
             thumbnail=None,
             date_published=add_time,
+            date_dead_since=add_time,
         )
 
         date_updated = entry.date_update_last
 
         u = EntryUpdater(entry)
         # call tested function
-        u.update_data()
+        u.reset_data()
 
-        self.assertEqual(LinkDataController.objects.all().count(), 0)
+        entries = LinkDataController.objects.filter(link="https://no-props-page.com")
+        self.assertEqual(entries.count(), 1)
+        self.assertTrue(entries[0].date_dead_since is None)
+        self.assertEqual(entries[0].status_code, 200)
+        self.assertEqual(entries[0].title, "some title")
+        self.assertEqual(entries[0].description, "some description")
+        self.assertEqual(entries[0].manual_status_code, 0)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)

@@ -9,7 +9,7 @@ from ..controllers import (
     ArchiveLinkDataController,
     DomainsController,
 )
-from ..models import UserTags, ConfigurationEntry
+from ..models import UserTags, ConfigurationEntry, UserComments
 from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
@@ -487,3 +487,19 @@ class LinkDataControllerTest(FakeInternetTestCase):
         )
 
         self.assertFalse(entry.should_entry_be_permanent())
+
+    def test_get_comment_vec(self):
+
+        entry = LinkDataController.objects.create(
+            link="https://youtube.com?v=123",
+            title="my title",
+        )
+
+        comment = UserComments.objects.create(user = self.user,
+                entry = entry,
+                comment = "test")
+
+        comment_data = entry.get_comment_vec()
+
+        self.assertEqual(len(comment_data), 1)
+        self.assertIn("comment", comment_data[0])

@@ -112,7 +112,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["url"], "https://linkedin.com")
         self.assertTrue("title" in props)
 
-        self.assertEqual(props["title"], "LinkedIn Page title")
+        self.assertEqual(props["title"], "Https LinkedIn Page title")
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_PARSE)
 
         # checks if link is RSS
