@@ -511,9 +511,10 @@ def json_logs(request):
         data["count"] = p.count
         data["num_pages"] = p.num_pages
 
-        for app_logging_entry in page_object:
-            json_data = log_to_json(app_logging_entry)
-            data["logs"].append(json_data)
+        if page_num <= p.num_pages:
+            for app_logging_entry in page_object:
+                json_data = log_to_json(app_logging_entry)
+                data["logs"].append(json_data)
 
         return JsonResponse(data, json_dumps_params={"indent":4})
 

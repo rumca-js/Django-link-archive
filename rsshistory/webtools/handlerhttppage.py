@@ -329,9 +329,6 @@ class HttpPageHandler(HandlerInterface):
         self.options = page_options
         self.url_builder = url_builder
 
-    def disable_ssl_warnings():
-        disable_warnings(InsecureRequestWarning)
-
     def is_handled_by(url):
         if url.startswith("https") or url.startswith("http"):
             return True

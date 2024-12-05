@@ -30,6 +30,7 @@ from ..models import (
     UserSearchHistory,
     EntryRules,
     UserBookmarks,
+    AppLogging,
 )
 from ..controllers import (
     LinkDataController,
@@ -1079,6 +1080,10 @@ def entry_json(request, pk):
 def handle_json_view(request, view_to_use):
     page_num = get_page_num(request.GET)
 
+    show_tags = False
+    if "tags" in request.GET:
+        show_tags = True
+
     json_obj = {}
     json_obj["entries"] = []
     json_obj["count"] = 0
@@ -1099,15 +1104,11 @@ def handle_json_view(request, view_to_use):
         if start > 0:
             start -= 1
 
-        # json_obj["start_index"] = start
-        # json_obj["end_index"] = page_obj.end_index()
+        if page_num <= p.num_pages:
+            for entry in page_obj:
+                entry_json = entry_to_json(user_config, entry, tags=show_tags)
 
-        # limited_entries = entries[start : page_obj.end_index()]
-
-        for entry in page_obj:
-            entry_json = entry_to_json(user_config, entry)
-
-            json_obj["entries"].append(entry_json)
+                json_obj["entries"].append(entry_json)
 
         return JsonResponse(json_obj, json_dumps_params={"indent":4})
 

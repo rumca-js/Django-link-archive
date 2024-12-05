@@ -83,9 +83,10 @@ def get_backgroundjobs(request):
         data["count"] = p.count
         data["num_pages"] = p.num_pages
 
-        for job in page_object:
-            json_data = job_to_json(job)
-            data["jobs"].append(json_data)
+        if page_num <= p.num_pages:
+            for job in page_object:
+                json_data = job_to_json(job)
+                data["jobs"].append(json_data)
 
         return JsonResponse(data, json_dumps_params={"indent":4})
 

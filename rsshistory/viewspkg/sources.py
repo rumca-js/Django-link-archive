@@ -855,10 +855,11 @@ def sources_json_view(request, view_class):
 
     limited_sources = sources[start : page_obj.end_index()]
 
-    for source in limited_sources:
-        source_json = source_to_json(uc, source)
+    if page_num <= p.num_pages:
+        for source in limited_sources:
+            source_json = source_to_json(uc, source)
 
-        json_obj["sources"].append(source_json)
+            json_obj["sources"].append(source_json)
 
     return JsonResponse(json_obj, json_dumps_params={"indent":4})
 

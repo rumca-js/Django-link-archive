@@ -1,7 +1,7 @@
 {% load static %}
 
 
-let list_display_style = 0;
+let show_pure_links = 0;
 let highlight_bookmarks = false;
 
 
@@ -101,7 +101,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
 
-    let entry_link = list_display_style ? "${link_absolute}" : "${link_absolute}";
+    let entry_link = show_pure_links ? "${link_absolute}" : "${link_absolute}";
 
     let thumbnail_text = '';
     if (show_icons) {
@@ -197,7 +197,7 @@ function fillEntryList(entries) {
             let page_rating_votes = entry.page_rating_votes;
             let page_rating_contents = entry.page_rating_contents;
 
-            let entry_link = list_display_style ? entry.link : entry.link_absolute;
+            let entry_link = show_pure_links ? entry.link : entry.link_absolute;
 
             // Replace all occurrences of the placeholders using a global regular expression
             let listItem = template_text
@@ -248,11 +248,11 @@ function fillListData() {
 
 
 $(document).on("click", '#showPureLinks', function(e) {
-   if (list_display_style == 0) {
-      list_display_style = 1;
+   if (show_pure_links) {
+      show_pure_links = true;
    }
    else {
-      list_display_style = 0;
+      show_pure_links = false;
    }
 
    fillListData();
@@ -264,7 +264,7 @@ $(document).on("click", '#highlightBookmarks', function(e) {
       highlight_bookmarks = true;
    }
    else {
-      highlight_bookmarks = 0;
+      highlight_bookmarks = false;
    }
 
    fillListData();

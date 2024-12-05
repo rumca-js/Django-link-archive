@@ -259,7 +259,7 @@ class MainExporter(object):
         return entries.order_by(*self.get_order_columns())
 
 
-def entry_to_json(user_config, entry):
+def entry_to_json(user_config, entry, tags=False):
     json_entry = {}
     json_entry["id"] = entry.id
 
@@ -316,5 +316,13 @@ def entry_to_json(user_config, entry):
                 json_entry["thumbnail"] = entry.get_thumbnail()
             else:
                 json_entry["thumbnail"] = entry.get_favicon()
+
+    if hasattr(entry, "tags"):
+        tags = []
+        if entry.tags:
+            for tag in entry.tags:
+                tags.append(tag)
+
+        json_entry["tags"] = tags
 
     return json_entry

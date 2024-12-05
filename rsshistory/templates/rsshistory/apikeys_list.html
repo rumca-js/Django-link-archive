@@ -14,11 +14,11 @@
          {% for apikey_object in content_list %}
          <div class="list-group-item">
              <div>
-                 <div>{{apikey_object.key}}</div>
+                 Key: <div>{{apikey_object.key}}</div>
 
                  {% with user=apikey_object.user %}
-                 <div>{{user.id}}</div>
-                 <div>{{user.username}}</div>
+                 <span>{{user.id}}</span>
+                 <span>{{user.username}}</span>
                  {% endwith %}
 
                  <a href="{% url 'rsshistory:api-key-remove' apikey_object.id %}" title="Remove api key" class="btn btn-secondary btn-sm" role="button">

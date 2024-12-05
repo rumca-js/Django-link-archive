@@ -337,10 +337,11 @@ def domains_json(request):
 
     limited_domains = domains[start : page_obj.end_index()]
 
-    for domain in limited_domains:
-        domain_json = domain_to_json(uc, domain)
+    if page_num <= p.num_pages:
+        for domain in limited_domains:
+            domain_json = domain_to_json(uc, domain)
 
-        json_obj["domains"].append(domain_json)
+            json_obj["domains"].append(domain_json)
 
     return JsonResponse(json_obj, json_dumps_params={"indent":4})
 

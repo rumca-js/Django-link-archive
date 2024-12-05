@@ -66,9 +66,10 @@ def get_read_later_queue(request):
         data["num_pages"] = p.num_pages
         user_config = UserConfig.get(request.user)
 
-        for read_later in page_object:
-            json_data = read_later_to_json(user_config, read_later)
-            data["queue"].append(json_data)
+        if page_num <= p.num_pages:
+            for read_later in page_object:
+                json_data = read_later_to_json(user_config, read_later)
+                data["queue"].append(json_data)
 
         return JsonResponse(data, json_dumps_params={"indent":4})
 

@@ -5,6 +5,10 @@ these scripts will not work in case of multithreaded app
 
 import os
 from pathlib import Path
+
+from urllib3.exceptions import InsecureRequestWarning
+from urllib3 import disable_warnings
+
 from .webtools import WebLogger
 
 from .crawlers import (
@@ -250,3 +254,6 @@ class WebConfig(object):
         from utils.logger import PrintLogger
 
         WebLogger.web_logger = PrintLogger
+
+    def disable_ssl_warnings():
+        disable_warnings(InsecureRequestWarning)
