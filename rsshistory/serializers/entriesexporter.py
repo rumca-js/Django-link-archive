@@ -318,11 +318,11 @@ def entry_to_json(user_config, entry, tags=False):
                 json_entry["thumbnail"] = entry.get_favicon()
 
     if hasattr(entry, "tags"):
-        tags = []
+        tags = set()
         if entry.tags:
-            for tag in entry.tags:
-                tags.append(tag)
+            for tag in entry.tags.all():
+                tags.add(tag.tag)
 
-        json_entry["tags"] = tags
+        json_entry["tags"] = list(tags)
 
     return json_entry

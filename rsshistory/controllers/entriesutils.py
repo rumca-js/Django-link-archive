@@ -517,6 +517,11 @@ class EntryUpdater(object):
 
         w = EntryWrapper(entry=self.entry)
         w.evaluate()
+
+        if self.entry is None:
+            AppLogging.error("Cannot update data")
+            return
+
         if not w.is_current_entry_perfect():
             if w.entry.link.startswith("http"):
                 w.check_https_http_availability()
@@ -592,6 +597,11 @@ class EntryUpdater(object):
         """
         w = EntryWrapper(entry=self.entry)
         w.evaluate()
+
+        if self.entry is None:
+            AppLogging.error("Cannot reset data")
+            return
+
         if not w.is_current_entry_perfect():
             if w.entry.link.startswith("http"):
                 w.check_https_http_availability()

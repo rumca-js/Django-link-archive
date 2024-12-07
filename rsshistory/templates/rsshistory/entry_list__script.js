@@ -42,6 +42,16 @@ function getDeadBadge(entry) {
 }
 
 
+function getEntryTags(entry) {
+    let tags_text = "";
+    if (entry.tags && entry.tags.length > 0) {
+        tags_text = entry.tags.map(tag => `#${tag}`).join(",");
+        tags_text = `<div class="text-reset mx-2">` + tags_text + `</div>`;
+    }
+    return tags_text;
+}
+
+
 function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
 
@@ -66,6 +76,8 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
             </div>`;
     }
 
+    let tags_text = getEntryTags(entry);
+
     return `
         <a 
             href="{entry_link}"
@@ -80,6 +92,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                     <div class="text-reset">
                         {source__title} {date_published}
                     </div>
+                    ${tags_text}
                 </div>
             </div>
 
@@ -112,6 +125,8 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
             </div>`;
     }
 
+    let tags_text = getEntryTags(entry);
+
     return `
         <a 
             href="{entry_link}"
@@ -123,7 +138,8 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                ${thumbnail_text}
                <div class="mx-2">
                   <span style="font-weight:bold" class="text-reset">{title_safe}</span>
-                  <div class="text-reset">@ {link}</div>
+                  <div class="text-reset text-decoration-underline">@ {link}</div>
+                  ${tags_text}
                   ${badge_text}
                   ${badge_star}
                   ${badge_age}
@@ -150,6 +166,8 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
         ${badge_age}
     `;
 
+    let tags_text = getEntryTags(entry);
+
     return `
         <a 
             href="{entry_link}"
@@ -164,6 +182,7 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
                 <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
                     <span style="font-weight: bold" class="text-primary">{title_safe}</span>
                     <div class="link-list-item-description">{source__title}</div>
+                    ${tags_text}
                 </div>
             </div>
         </a>
@@ -173,6 +192,15 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
 
 function fillEntryList(entries) {
     let htmlOutput = '';
+
+    if (view_display_type == "gallery")
+    {
+        htmlOutput = `  <span class="d-flex flex-wrap">`;
+    }
+    else
+    {
+        htmlOutput = `  <span class="container list-group">`;
+    }
 
     if (entries && entries.length > 0) {
         entries.forEach(entry => {
@@ -219,6 +247,8 @@ function fillEntryList(entries) {
     } else {
         htmlOutput = '<li class="list-group-item">No entries found</li>';
     }
+
+    htmlOutput += `  </span`;
 
     return htmlOutput;
 }
