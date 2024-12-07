@@ -4,7 +4,7 @@ from datetime import datetime, date, timedelta
 
 from waybackpy import WaybackMachineCDXServerAPI, WaybackMachineSaveAPI
 
-from rsshistory.webtools import DomainAwarePage, HttpRequestBuilder, HttpPageHandler
+from rsshistory.webtools import UrlLocation, HttpRequestBuilder, HttpPageHandler
 from utils.logger import get_logger
 
 
@@ -90,7 +90,7 @@ class WaybackMachine(object):
             return ret
 
     def is_saved(self, url):
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
         if p.is_youtube():
             return False
 

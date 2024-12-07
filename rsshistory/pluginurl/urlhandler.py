@@ -1,6 +1,6 @@
 import traceback
 
-from ..webtools import Url, DomainAwarePage, UrlPropertyValidator
+from ..webtools import Url, UrlLocation, UrlPropertyValidator
 
 from ..apps import LinkDatabase
 from ..models import AppLogging, EntryRules, BlockEntry
@@ -77,7 +77,7 @@ class UrlHandler(Url):
         if EntryRules.is_blocked(self.url):
             return True
 
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         domain_only = p.get_domain_only()
 
         if BlockEntry.is_blocked(domain_only):

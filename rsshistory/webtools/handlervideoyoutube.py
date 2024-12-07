@@ -3,7 +3,8 @@ from urllib.parse import parse_qs
 
 from utils.dateutils import DateUtils
 
-from .webtools import PageResponseObject, WebLogger, DomainAwarePage
+from .webtools import PageResponseObject, WebLogger
+from .urllocation import UrlLocation
 from .pages import HtmlPage, ContentInterface
 from .defaulturlhandler import DefaultUrlHandler
 
@@ -19,7 +20,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         if not self.url:
             return False
 
-        protocol_less = DomainAwarePage(self.url).get_protocolless()
+        protocol_less = UrlLocation(self.url).get_protocolless()
 
         return (
             protocol_less.startswith("www.youtube.com/watch")

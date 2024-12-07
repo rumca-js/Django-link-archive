@@ -1,4 +1,4 @@
-from rsshistory.webtools import DomainAwarePage, HttpPageHandler, RssPage, Url
+from rsshistory.webtools import UrlLocation, HttpPageHandler, RssPage, Url
 
 
 class OpenRss(object):
@@ -6,7 +6,7 @@ class OpenRss(object):
         self.url = url
 
     def find_rss_link(self):
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         url_procolles = p.get_protocolless()
 
         u = Url("https://openrss.org/" + url_procolles)

@@ -1,6 +1,6 @@
 import re
 
-from ..webtools import DomainAwarePage
+from ..webtools import UrlLocation
 
 from .sourceparseplugin import BaseParsePlugin
 
@@ -14,10 +14,10 @@ class SpotifyPlugin(BaseParsePlugin):
     def is_link_valid(self, address):
         url = self.get_address()
 
-        if not DomainAwarePage(url).is_link_in_domain(address):
+        if not UrlLocation(url).is_link_in_domain(address):
             return False
 
-        search_pattern = DomainAwarePage(url).get_domain() + "/episode"
+        search_pattern = UrlLocation(url).get_domain() + "/episode"
 
         if re.search(search_pattern, address):
             return True

@@ -2,7 +2,7 @@ from utils.dateutils import DateUtils
 from ..webtools import (
     HtmlPage,
     RssPage,
-    DomainAwarePage,
+    UrlLocation,
     DefaultContentPage,
     HttpPageHandler,
     UrlAgeModerator,
@@ -108,7 +108,7 @@ class EntryUrlInterface(object):
             if source_obj:
                 input_props["source_url"] = source_obj.url
 
-        is_domain = DomainAwarePage(self.url).is_domain()
+        is_domain = UrlLocation(self.url).is_domain()
         handler = self.u.get_handler()
 
         c = Configuration.get_object().config_entry
@@ -219,7 +219,7 @@ class EntryUrlInterface(object):
          - for not domains? this is not clear cut. If entry is obtained by source, then source thumbnail should be displayed
         """
 
-        is_domain = DomainAwarePage(self.url).is_domain()
+        is_domain = UrlLocation(self.url).is_domain()
         if is_domain and not self.is_property_set(input_props, "thumbnail"):
             if type(p) is HtmlPage and self.u:
                 input_props["thumbnail"] = self.u.get_favicon()

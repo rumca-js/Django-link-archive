@@ -9,7 +9,7 @@ from ..webtools import (
     ContentLinkParser,
     RssPage,
     DomainCache,
-    DomainAwarePage,
+    UrlLocation,
     HttpPageHandler,
 )
 
@@ -45,7 +45,7 @@ def get_errors(page_url):
 
     link = page_url.url
 
-    page = DomainAwarePage(link)
+    page = UrlLocation(link)
     config = Configuration.get_object().config_entry
 
     domain = page.get_domain()
@@ -646,7 +646,7 @@ def page_verify(request):
             if c.auto_scan_entries:
                 BackgroundJobController.link_add(url)
 
-        domain_url = DomainAwarePage(url).get_domain()
+        domain_url = UrlLocation(url).get_domain()
         if domain_url != url:
             domains = LinkDataController.objects.filter(link=domain_url)
             if domains.exists():

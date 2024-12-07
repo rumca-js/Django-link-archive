@@ -3,7 +3,7 @@ import re
 import os
 import time
 
-from ..webtools import DomainAwarePage, HtmlPage
+from ..webtools import UrlLocation, HtmlPage
 from utils.dateutils import DateUtils
 
 from ..models import AppLogging
@@ -25,13 +25,13 @@ class BaseParsePlugin(SourceGenericPlugin):
     def is_link_valid(self, address):
         source = self.get_source()
 
-        # if not DomainAwarePage(self.get_address()).is_link_in_domain(address):
+        # if not UrlLocation(self.get_address()).is_link_in_domain(address):
         #    return False
 
         # if not address.startswith(source.url):
         #    return False
 
-        p = DomainAwarePage(address)
+        p = UrlLocation(address)
         ext = p.get_page_ext()
 
         if ext == "html" or ext == "htm" or ext == None:

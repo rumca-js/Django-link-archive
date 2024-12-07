@@ -10,7 +10,7 @@ from django.db.models import Q, F
 from ..webtools import (
     HttpRequestBuilder,
     ContentLinkParser,
-    DomainAwarePage,
+    UrlLocation,
     UrlPropertyValidator,
     UrlAgeModerator,
 )
@@ -901,7 +901,7 @@ class EntryWrapper(object):
 
     def get_from_db(self, objects):
         if self.link.startswith("http"):
-            p = DomainAwarePage(self.link)
+            p = UrlLocation(self.link)
 
             """
             If there are links with www. at front, and without it, return the one without it
@@ -1105,7 +1105,7 @@ class EntryWrapper(object):
         if not entry:
             return
 
-        p = DomainAwarePage(entry.link)
+        p = UrlLocation(entry.link)
         is_domain = p.is_domain()
 
         if not config.accept_not_domain_entries:
@@ -1274,7 +1274,7 @@ class EntryWrapper(object):
             return
 
         entry = self.entry
-        p = DomainAwarePage(entry.link)
+        p = UrlLocation(entry.link)
         domain_only = p.get_domain_only()
         if not domain_only.startswith("www."):
             return self.entry
@@ -1318,7 +1318,7 @@ class EntryWrapper(object):
         """
         entry = self.entry
 
-        p = DomainAwarePage(entry.link)
+        p = UrlLocation(entry.link)
 
         url_parts = p.parse_url()
         domain_only = url_parts[2].lower()
@@ -1411,7 +1411,7 @@ class EntryDataBuilder(object):
         if not self.link:
             return
 
-        p = DomainAwarePage(self.link)
+        p = UrlLocation(self.link)
         if p.is_link_service():
             return self.build_from_link_service()
         else:
@@ -1597,7 +1597,7 @@ class EntryDataBuilder(object):
 
     def is_domain_link_data(self):
         link_data = self.link_data
-        p = DomainAwarePage(link_data["link"])
+        p = UrlLocation(link_data["link"])
         return p.get_domain() == link_data["link"]
 
     def add_entry_internal(self):
@@ -1660,7 +1660,7 @@ class EntryDataBuilder(object):
         config = Configuration.get_object().config_entry
         link = self.link_data["link"]
 
-        p = DomainAwarePage(link)
+        p = UrlLocation(link)
         is_domain = p.is_domain()
         domain = p.get_domain_only()
 
@@ -1675,7 +1675,7 @@ class EntryDataBuilder(object):
                 return False
 
         # we do not store link services, we can store only what is behind those links
-        p = DomainAwarePage(link)
+        p = UrlLocation(link)
         if p.is_link_service():
             return False
 
@@ -1715,7 +1715,7 @@ class EntryDataBuilder(object):
             self.download_thumbnail(entry.thumbnail)
 
     def add_domain(self):
-        url = DomainAwarePage(self.link_data["link"]).get_domain()
+        url = UrlLocation(self.link_data["link"]).get_domain()
         entries = LinkDataController.objects.filter(link=url)
         if entries.count() == 0:
             if "source" in self.link_data:
@@ -1750,7 +1750,7 @@ class EntryDataBuilder(object):
             links = set()
 
             if config.accept_domains:
-                p = DomainAwarePage(link_data["link"])
+                p = UrlLocation(link_data["link"])
                 domain = p.get_domain()
                 links.add(domain)
 
@@ -1791,7 +1791,7 @@ class EntryDataBuilder(object):
     def read_domains_from_bookmarks():
         objs = LinkDataController.objects.filter(bookmarked=True)
         for obj in objs:
-            p = DomainAwarePage(obj.link)
+            p = UrlLocation(obj.link)
             EntryDataBuilder(link=p.get_domain())
 
 

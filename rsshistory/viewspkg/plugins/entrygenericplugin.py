@@ -3,7 +3,7 @@ import urllib.parse
 from django.urls import reverse
 from django.templatetags.static import static
 
-from ...webtools import DomainAwarePage, InputContent
+from ...webtools import UrlLocation, InputContent
 from utils.dateutils import DateUtils
 
 from ...apps import LinkDatabase
@@ -307,8 +307,8 @@ class EntryGenericPlugin(object):
         if not self.entry.source:
             return False
 
-        entry_domain = DomainAwarePage(self.entry.link).get_domain()
-        source_domain = DomainAwarePage(self.entry.source.url).get_domain()
+        entry_domain = UrlLocation(self.entry.link).get_domain()
+        source_domain = UrlLocation(self.entry.source.url).get_domain()
 
         return entry_domain == source_domain
 
@@ -352,7 +352,7 @@ class EntryGenericPlugin(object):
 
         translate_url = TranslateBuilder.get(self.entry.link).get_translate_url()
 
-        p = DomainAwarePage(self.entry.link)
+        p = UrlLocation(self.entry.link)
         p_up = p.up(skip_internal=True)
 
         if p_up:
@@ -446,7 +446,7 @@ class EntryGenericPlugin(object):
                 ),
             )
         else:
-            domain_url = DomainAwarePage(self.entry.link).get_domain()
+            domain_url = UrlLocation(self.entry.link).get_domain()
 
             buttons.append(
                 EntryButton(

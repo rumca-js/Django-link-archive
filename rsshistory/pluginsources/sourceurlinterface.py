@@ -1,4 +1,4 @@
-from ..webtools import HtmlPage, RssPage, JsonPage, HttpPageHandler, DomainAwarePage
+from ..webtools import HtmlPage, RssPage, JsonPage, HttpPageHandler, UrlLocation
 from utils.services import OpenRss
 
 from ..models import (
@@ -170,7 +170,7 @@ class SourceUrlInterface(object):
         return property in input_props and input_props[property]
 
     def is_reddit_channel(self):
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         if p.get_domain_only().find("reddit.com") >= 0:
             parts = p.split()
             if len(parts) == 5 and parts[3] == "r":
@@ -185,6 +185,6 @@ class SourceUrlInterface(object):
             return self.url + "/.rss"
 
     def get_reddit_channel_name(self):
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         parts = p.split()
         return parts[4]

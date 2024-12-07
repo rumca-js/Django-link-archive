@@ -3,7 +3,7 @@ from django.urls import reverse
 import django.utils
 import traceback
 
-from ..webtools import DomainAwarePage
+from ..webtools import UrlLocation
 
 
 class Domains(models.Model):
@@ -55,7 +55,7 @@ class Domains(models.Model):
         DomainsMains.add(self.main)
 
     def update(self, entry):
-        p = DomainAwarePage(entry.link)
+        p = UrlLocation(entry.link)
         if p.is_domain():
             domain_only = p.get_domain_only()
             self.domain = domain_only

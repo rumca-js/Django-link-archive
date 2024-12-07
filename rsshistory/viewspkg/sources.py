@@ -8,7 +8,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
-from ..webtools import Url, DomainAwarePage, HttpPageHandler, DomainCache
+from ..webtools import Url, UrlLocation, HttpPageHandler, DomainCache
 from utils.omnisearch import SingleSymbolEvaluator
 
 from ..apps import LinkDatabase
@@ -293,7 +293,7 @@ def source_add_form(request):
 
     link = data["url"]
 
-    page = DomainAwarePage(data["url"])
+    page = UrlLocation(data["url"])
     domain = page.get_domain()
     config = Configuration.get_object().config_entry
     info = DomainCache.get_object(link, url_builder=UrlHandler)
@@ -400,7 +400,7 @@ def edit_source(request, pk):
             icon = UrlHandler(ob.url).get_thumbnail()
 
             if not icon:
-                page = DomainAwarePage(ob.url)
+                page = UrlLocation(ob.url)
                 domain = page.get_domain()
                 u = UrlHandler(domain, handler_class=HttpPageHandler)
                 icon = u.get_favicon()

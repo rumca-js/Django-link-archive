@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 
-from ..webtools import DomainAwarePage
+from ..webtools import UrlLocation
 from utils.dateutils import DateUtils
 from utils.services.waybackmachine import WaybackMachine
 from utils.services import ReadingListFile
@@ -213,7 +213,7 @@ def import_reading_list_view(request):
                 )
                 continue
             else:
-                p = DomainAwarePage(entry["url"])
+                p = UrlLocation(entry["url"])
                 if not p.get_domain():
                     summary_text += (
                         entry["title"]

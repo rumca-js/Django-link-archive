@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 
 from utils.dateutils import DateUtils
-from .webtools import DomainAwarePage, Url
+from .webtools import UrlLocation, Url
 
 from utils.basictypes import fix_path_for_os
 from utils.programwrappers import ytdlp, id3v2, wget
@@ -283,7 +283,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
         AppLogging.notify("Downloading music: " + url + " " + title)
 
-        if not DomainAwarePage(url).is_youtube():
+        if not UrlLocation(url).is_youtube():
             AppLogging.error("Unsupported download operation URL:{}".format(url))
             return True
 
@@ -360,7 +360,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
         author = data["author"]
         album = data["album"]
 
-        if not DomainAwarePage(url).is_youtube():
+        if not UrlLocation(url).is_youtube():
             AppLogging.error("Unsupported download operation URL:{}".format(url))
             return True
 
@@ -432,7 +432,7 @@ class DownloadModelFileJobHandler(BaseJobHandler):
             return True
 
         file_name = obj.subject
-        p = DomainAwarePage(file_name)
+        p = UrlLocation(file_name)
         if not p.is_web_link():
             # consume
             return True
@@ -462,7 +462,7 @@ class LinkAddJobHandler(BaseJobHandler):
     def add_link(self, data):
         # Unpack if link service
         link = data["link"]
-        if DomainAwarePage(link).is_link_service():
+        if UrlLocation(link).is_link_service():
             h = UrlHandler(link)
             if h.get_contents():
                 link = h.response.url
@@ -474,7 +474,7 @@ class LinkAddJobHandler(BaseJobHandler):
         b.link = link
         b.source_is_auto = True
 
-        if not DomainAwarePage(link).is_web_link():
+        if not UrlLocation(link).is_web_link():
             AppLogging.error("Someone posted wrong link:{}".format(link))
             return
 

@@ -16,7 +16,6 @@ import urllib.robotparser
 import asyncio
 
 from .webtools import (
-    DomainAwarePage,
     PageOptions,
     WebLogger,
     URL_TYPE_RSS,
@@ -26,6 +25,7 @@ from .webtools import (
     URL_TYPE_FONT,
     URL_TYPE_UNKNOWN,
 )
+from .urllocation import UrlLocation
 from .pages import (
     ContentInterface,
     DefaultContentPage,
@@ -112,7 +112,7 @@ class Url(ContentInterface):
         if not url:
             return
 
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
         short_url = p.get_protocolless()
         if not short_url:
             return
@@ -122,7 +122,7 @@ class Url(ContentInterface):
             if handler(url).is_handled_by():
                 return handler(url)
 
-        page_type = DomainAwarePage(url).get_type()
+        page_type = UrlLocation(url).get_type()
 
         # TODO this should return HttpPageHandler?
 
@@ -207,7 +207,7 @@ class Url(ContentInterface):
         if not url:
             return
 
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
         short_url = p.get_protocolless()
 
         if not short_url:
@@ -230,14 +230,14 @@ class Url(ContentInterface):
         return True
 
     def is_domain(self):
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         return p.is_domain()
 
     def get_domain(self):
         if self.is_domain():
             return self
         else:
-            p = DomainAwarePage(self.url)
+            p = UrlLocation(self.url)
             u = self.url_builder(p.get_domain())
             u.set_config(self.options)
             return u
@@ -248,7 +248,7 @@ class Url(ContentInterface):
                 self.options.copy_config(otheroptions)
 
     def get_robots_txt_url(self):
-        return DomainAwarePage(self.url).get_robots_txt_url()
+        return UrlLocation(self.url).get_robots_txt_url()
 
     def get_favicon(self):
         self.get_response()
@@ -258,7 +258,7 @@ class Url(ContentInterface):
         if not self.url:
             return
 
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         if not p.is_web_link():
             return
 
@@ -267,7 +267,7 @@ class Url(ContentInterface):
             if favicon:
                 return favicon
 
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         if p.is_domain():
             return
 
@@ -279,11 +279,11 @@ class Url(ContentInterface):
         return url.get_favicon()
 
     def is_web_link(url):
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
         return p.is_web_link()
 
     def is_protocolled_link(url):
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
         return p.is_protocolled_link()
 
     def get_cleaned_link(url):
@@ -296,7 +296,7 @@ class Url(ContentInterface):
             url = url[:-1]
 
         # domain is lowercase
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
         domain = p.get_domain()
         if not domain:
             WebLogger.error("Could not obtain domain for:{}".format(url))
@@ -410,7 +410,7 @@ class Url(ContentInterface):
         if not url:
             return False
 
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
 
         require_headless_browser = [
             "open.spotify.com",
@@ -433,7 +433,7 @@ class Url(ContentInterface):
         if not url:
             return False
 
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
         if p.is_link_service():
             return True
 
@@ -525,7 +525,7 @@ class DomainCacheInfo(object):
     def __init__(
         self, url, respect_robots_txt=True, page_options=None, url_builder=None
     ):
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
 
         self.respect_robots_txt = respect_robots_txt
 
@@ -549,7 +549,7 @@ class DomainCacheInfo(object):
             return True
 
     def get_robots_txt_url(self):
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         return p.get_robots_txt_url()
 
     def get_robots_txt(self):
@@ -710,7 +710,7 @@ class DomainCache(object):
         self.url_builder = url_builder
 
     def get_domain_info(self, input_url):
-        domain_url = DomainAwarePage(input_url).get_domain_only()
+        domain_url = UrlLocation(input_url).get_domain_only()
 
         if not domain_url in self.cache:
             self.remove_from_cache()

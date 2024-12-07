@@ -48,23 +48,28 @@ class Processor(object):
         self.parser = parser
         self.args = args
         self.exporter = Exporter(args.file_name)
-        self.num_pages = 1
+        self.num_pages = None
 
     def process(self):
-        page = 1
+        page_num = 1
+
+        if self.args.page_limit:
+            self.num_pages = int(self.args.page_limit)
 
         while True:
-            if self.args.page_limit:
-                if page > self.args.page_limit:
-                    break
+            if self.num_pages and page_num > self.num_pages:
+                break
 
-            if page <= self.num_pages:
-                if not self.process_for_page(page):
+            if not self.num_pages or page_num <= self.num_pages:
+                status = self.process_for_page(page_num)
+                print("Done page [{}/{}]".format(page_num, self.num_pages))
+
+                if not status:
                     break
             else:
                 break
 
-            page += 1
+            page_num += 1
 
         self.exporter.close()
 
@@ -85,9 +90,8 @@ class Processor(object):
             if not self.are_entries(json):
                 return False
 
-            self.num_pages = int(json["num_pages"])
-
-            print("Done page [{}/{}]".format(page_num, json["num_pages"]))
+            if self.num_pages == None:
+                self.num_pages = int(json["num_pages"])
 
             self.process_json_entries(json["entries"])
 

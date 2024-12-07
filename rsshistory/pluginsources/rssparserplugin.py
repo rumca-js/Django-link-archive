@@ -1,7 +1,7 @@
 import os
 import re
 
-from ..webtools import ContentLinkParser, DomainAwarePage
+from ..webtools import ContentLinkParser, UrlLocation
 
 from ..models import UserTags
 from ..configuration import Configuration
@@ -42,7 +42,7 @@ class RssParserPlugin(BaseRssPlugin):
 
         domains = set()
         for link in links:
-            p = DomainAwarePage(link)
+            p = UrlLocation(link)
             domains.add(p.get_domain())
 
         links.update(domains)

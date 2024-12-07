@@ -9,7 +9,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
-from ..webtools import Url, DomainAwarePage, DomainCache
+from ..webtools import Url, UrlLocation, DomainCache
 from utils.dateutils import DateUtils
 from utils.serializers import ReturnDislike
 from utils.omnisearch import SingleSymbolEvaluator
@@ -531,7 +531,7 @@ def get_cleaned_up_entry_data(request, data):
     data["user"] = request.user
     data["bookmarked"] = True
 
-    page = DomainAwarePage(link)
+    page = UrlLocation(link)
     config = Configuration.get_object().config_entry
 
     if page.is_domain() and config.keep_domains:
@@ -560,7 +560,7 @@ def func_display_data_form(request, p, data):
 
     data = get_cleaned_up_entry_data(request, data)
 
-    page = DomainAwarePage(link)
+    page = UrlLocation(link)
     config = Configuration.get_object().config_entry
 
     form = EntryForm(initial=data, request=request)
@@ -698,7 +698,7 @@ def add_entry_form(request):
     if "link" in request.GET:
         link = request.GET["link"]
 
-        page = DomainAwarePage(link)
+        page = UrlLocation(link)
         config = Configuration.get_object().config_entry
 
         if page.is_domain() and config.keep_domains:

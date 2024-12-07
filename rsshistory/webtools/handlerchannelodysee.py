@@ -1,5 +1,5 @@
 from .defaulturlhandler import DefaultChannelHandler
-from .webtools import DomainAwarePage
+from .urllocation import UrlLocation
 from .handlerhttppage import HttpPageHandler
 
 
@@ -21,7 +21,7 @@ class OdyseeChannelHandler(DefaultChannelHandler):
         if not self.url:
             return False
 
-        short_url = DomainAwarePage(self.url).get_protocolless()
+        short_url = UrlLocation(self.url).get_protocolless()
 
         if short_url.startswith("odysee.com/@"):
             return True
@@ -39,7 +39,7 @@ class OdyseeChannelHandler(DefaultChannelHandler):
         return "https://odysee.com/$/rss/{}".format(code)
 
     def is_channel_name(self):
-        short_url = DomainAwarePage(self.url).get_protocolless()
+        short_url = UrlLocation(self.url).get_protocolless()
 
         if short_url.startswith("odysee.com/@"):
             return True
@@ -58,7 +58,7 @@ class OdyseeChannelHandler(DefaultChannelHandler):
         if not self.url:
             return False
 
-        short_url = DomainAwarePage(self.url).get_protocolless()
+        short_url = UrlLocation(self.url).get_protocolless()
         lines = short_url.split("/")
         if len(lines) < 2:
             return
@@ -76,7 +76,7 @@ class OdyseeChannelHandler(DefaultChannelHandler):
         if not self.url:
             return False
 
-        short_url = DomainAwarePage(self.url).get_protocolless()
+        short_url = UrlLocation(self.url).get_protocolless()
         lines = short_url.split("/")
         if len(lines) < 2:
             return

@@ -8,7 +8,7 @@ from django.templatetags.static import static
 from django.utils import timezone
 from django.conf import settings
 
-from ..webtools import DomainAwarePage
+from ..webtools import UrlLocation
 from utils.dateutils import DateUtils
 from utils.controllers import GenericEntryController
 
@@ -141,7 +141,7 @@ class BaseLinkDataModel(models.Model):
 
         if hasattr(self, "domain"):
             if self.domain != None:
-                p = DomainAwarePage(self.link)
+                p = UrlLocation(self.link)
                 if p.is_domain():
                     self.domain.update(self)
 
@@ -150,7 +150,7 @@ class BaseLinkDataModel(models.Model):
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        p = DomainAwarePage(self.link)
+        p = UrlLocation(self.link)
         if p.is_domain():
             domains = Domains.objects.filter(domain=p.get_domain_only())
             domains.delete()
@@ -285,10 +285,10 @@ class BaseLinkDataController(BaseLinkDataModel):
             return self.source.get_favicon()
 
         # returning real favicon from HTML is too long
-        return DomainAwarePage(self.link).get_domain() + "/favicon.ico"
+        return UrlLocation(self.link).get_domain() + "/favicon.ico"
 
     def get_domain_only(self):
-        page = DomainAwarePage(self.link)
+        page = UrlLocation(self.link)
         return page.get_domain_only()
 
     def get_thumbnail(self):
@@ -488,7 +488,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         conf = Configuration.get_object().config_entry
 
-        p = DomainAwarePage(self.link)
+        p = UrlLocation(self.link)
 
         if p.is_domain() and conf.accept_domains and conf.keep_domains:
             return True
@@ -513,11 +513,11 @@ class BaseLinkDataController(BaseLinkDataModel):
         return self.link.lower().startswith("http://")
 
     def get_http_url(self):
-        p = DomainAwarePage(self.link)
+        p = UrlLocation(self.link)
         return p.get_protocol_url("http")
 
     def get_https_url(self):
-        p = DomainAwarePage(self.link)
+        p = UrlLocation(self.link)
         return p.get_protocol_url("https")
 
     def is_valid(self):

@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
-from ..webtools import DomainAwarePage
+from ..webtools import UrlLocation
 
 from ..apps import LinkDatabase
 
@@ -161,7 +161,7 @@ class SourceDataModel(models.Model):
 
         # returning real favicon from HTML is too long
 
-        return DomainAwarePage(self.url).get_domain() + "/favicon.ico"
+        return UrlLocation(self.url).get_domain() + "/favicon.ico"
 
     def save(self, *args, **kwargs):
         self.category = SourceCategories.ensure(self.category_name)

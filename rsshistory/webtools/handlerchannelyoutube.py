@@ -1,7 +1,8 @@
 import traceback
 
 from .defaulturlhandler import DefaultChannelHandler
-from .webtools import PageResponseObject, DomainAwarePage
+from .webtools import PageResponseObject
+from .urllocation import UrlLocation
 from .pages import RssPage
 from .handlerhttppage import HttpPageHandler
 
@@ -29,7 +30,7 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if not self.url:
             return False
 
-        short_url = DomainAwarePage(self.url).get_protocolless()
+        short_url = UrlLocation(self.url).get_protocolless()
 
         if (
             short_url.startswith("www.youtube.com/channel")
@@ -52,7 +53,7 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if not self.url:
             return False
 
-        short_url = DomainAwarePage(self.url).get_protocolless()
+        short_url = UrlLocation(self.url).get_protocolless()
 
         if (
             short_url.startswith("www.youtube.com/@")

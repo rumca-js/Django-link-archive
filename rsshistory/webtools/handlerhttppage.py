@@ -15,7 +15,6 @@ from .webtools import (
     PageRequestObject,
     PageResponseObject,
     PageOptions,
-    DomainAwarePage,
     lazy_load_content,
     HTTP_STATUS_CODE_EXCEPTION,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
@@ -24,6 +23,7 @@ from .webtools import (
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
     HTTP_STATUS_CODE_SERVER_ERROR,
 )
+from .urllocation import UrlLocation
 from .pages import (
     ContentInterface,
     DefaultContentPage,
@@ -300,7 +300,7 @@ class HttpRequestBuilder(object):
         if self.url == None:
             return False
 
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         if not p.is_web_link():
             return False
 
@@ -395,7 +395,7 @@ class HttpPageHandler(HandlerInterface):
     def get_response_once(self):
         url = self.url
 
-        dap = DomainAwarePage(url)
+        dap = UrlLocation(url)
 
         if url.startswith("https") or url.startswith("http"):
             if not dap.is_media():

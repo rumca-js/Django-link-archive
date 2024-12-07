@@ -7,7 +7,7 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from ..webtools import DomainAwarePage, Url
+from ..webtools import UrlLocation, Url
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -205,7 +205,7 @@ class BackgroundJobController(BackgroundJob):
         if not url:
             return
 
-        h = DomainAwarePage(url)
+        h = UrlLocation(url)
         if h.is_analytics():
             return
 
@@ -258,7 +258,7 @@ class BackgroundJobController(BackgroundJob):
             )
             args_text = ""
 
-        p = DomainAwarePage(url)
+        p = UrlLocation(url)
         if not p.is_web_link():
             stack_lines = traceback.format_stack()
             error_lines = "".join(stack_lines[-10:])
@@ -559,7 +559,7 @@ class BackgroundJobController(BackgroundJob):
                 return reverse("{}:data-export".format(LinkDatabase.name), args=[id])
 
         if self.args and self.args != "":
-            p = DomainAwarePage(self.args)
+            p = UrlLocation(self.args)
             if p.is_web_link():
                 return self.args
 
@@ -579,7 +579,7 @@ class BackgroundJobController(BackgroundJob):
                 return
 
     def is_subject_link(self):
-        p = DomainAwarePage(self.subject)
+        p = UrlLocation(self.subject)
         if p.is_web_link():
             return True
 

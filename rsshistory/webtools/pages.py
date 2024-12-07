@@ -6,13 +6,14 @@ from datetime import datetime
 from dateutil import parser
 import html
 
+from utils.dateutils import DateUtils
+
 from .webtools import (
-    DomainAwarePage,
     calculate_hash,
     WebLogger,
     date_str_to_date,
 )
-from utils.dateutils import DateUtils
+from .urllocation import  UrlLocation
 from .feedreader import FeedReader
 
 
@@ -364,7 +365,7 @@ class ContentInterface(object):
         else:
             rating.append([0, 1])
 
-        p = DomainAwarePage(self.url)
+        p = UrlLocation(self.url)
         if p.is_domain():
             rating.append([1, 1])
 
@@ -815,7 +816,7 @@ class RssPage(ContentInterface):
         #        image = self.get_thumbnail_manual_from_youtube()
 
         if image and image.lower().find("https://") == -1:
-            image = DomainAwarePage.get_url_full(self.url, image)
+            image = UrlLocation.get_url_full(self.url, image)
 
         return image
 
@@ -897,7 +898,7 @@ class ContentLinkParser(ContentInterface):
 
     def __init__(self, url, contents):
         super().__init__(url=url, contents=contents)
-        self.url = DomainAwarePage(url).get_clean_url()
+        self.url = UrlLocation(url).get_clean_url()
 
     def get_links(self):
         links = set()
@@ -924,7 +925,7 @@ class ContentLinkParser(ContentInterface):
 
         result = set()
         for link in links:
-            if DomainAwarePage(link).is_web_link():
+            if UrlLocation(link).is_web_link():
                 result.add(link)
 
         return links
@@ -981,7 +982,7 @@ class ContentLinkParser(ContentInterface):
         links = set()
 
         url = self.url
-        domain = DomainAwarePage(self.url).get_domain()
+        domain = UrlLocation(self.url).get_domain()
 
         cont = str(self.get_contents())
 
@@ -1037,7 +1038,7 @@ class ContentLinkParser(ContentInterface):
     def filter_link_html(links):
         result = set()
         for link in links:
-            p = DomainAwarePage(link)
+            p = UrlLocation(link)
             if p.is_link():
                 result.add(link)
 
@@ -1082,7 +1083,7 @@ class ContentLinkParser(ContentInterface):
     def filter_domains(links):
         result = set()
         for link in links:
-            p = DomainAwarePage(link)
+            p = UrlLocation(link)
             new_link = p.get_domain()
             if new_link:
                 result.add(new_link)
@@ -1098,7 +1099,7 @@ class ContentLinkParser(ContentInterface):
         links = self.get_links()
         links = ContentLinkParser.filter_link_html(links)
         return ContentLinkParser.filter_link_in_domain(
-            links, DomainAwarePage(self.url).get_domain()
+            links, UrlLocation(self.url).get_domain()
         )
 
     def get_links_outer(self):
@@ -1106,7 +1107,7 @@ class ContentLinkParser(ContentInterface):
         links = ContentLinkParser.filter_link_html(links)
 
         in_domain = ContentLinkParser.filter_link_in_domain(
-            links, DomainAwarePage(self.url).get_domain()
+            links, UrlLocation(self.url).get_domain()
         )
         return links - in_domain
 
@@ -1332,7 +1333,7 @@ class HtmlPage(ContentInterface):
         # we use thumbnails in <img, but icons do not work correctly there
 
         if image and image.lower().find("https://") == -1:
-            image = DomainAwarePage.get_url_full(self.url, image)
+            image = UrlLocation.get_url_full(self.url, image)
 
         return image
 
@@ -1400,7 +1401,7 @@ class HtmlPage(ContentInterface):
                 full_favicon = link_find["href"]
                 if full_favicon.strip() == "":
                     continue
-                full_favicon = DomainAwarePage.get_url_full(self.url, full_favicon)
+                full_favicon = UrlLocation.get_url_full(self.url, full_favicon)
                 if "sizes" in link_find:
                     favicons[full_favicon] = link_find["sizes"]
                 else:
@@ -1413,7 +1414,7 @@ class HtmlPage(ContentInterface):
                 full_favicon = link_find["href"]
                 if full_favicon.strip() == "":
                     continue
-                full_favicon = DomainAwarePage.get_url_full(self.url, full_favicon)
+                full_favicon = UrlLocation.get_url_full(self.url, full_favicon)
                 if "sizes" in link_find:
                     favicons[full_favicon] = link_find["sizes"]
                 else:
@@ -1469,7 +1470,7 @@ class HtmlPage(ContentInterface):
         #    )
 
         return (
-            [DomainAwarePage.get_url_full(self.url, rss_url) for rss_url in rss_links]
+            [UrlLocation.get_url_full(self.url, rss_url) for rss_url in rss_links]
             if rss_links
             else []
         )
@@ -1532,9 +1533,9 @@ class HtmlPage(ContentInterface):
         props["rss_urls"] = self.get_rss_urls()
         # props["status_code"] = self.status_code
 
-        # if DomainAwarePage(self.url).is_domain():
+        # if UrlLocation(self.url).is_domain():
         #    if self.is_robots_txt():
-        #        props["robots_txt_url"] = DomainAwarePage(self.url).get_robots_txt_url()
+        #        props["robots_txt_url"] = UrlLocation(self.url).get_robots_txt_url()
         #        props["site_maps_urls"] = self.get_site_maps()
 
         props["links"] = self.get_links()

@@ -6,7 +6,7 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from ..webtools import DomainAwarePage
+from ..webtools import UrlLocation
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -59,7 +59,7 @@ class DomainsController(Domains):
         if not conf.accept_domains:
             return
 
-        protocol = DomainAwarePage(url).get_scheme()
+        protocol = UrlLocation(url).get_scheme()
 
         domain_text = DomainsController.get_domain_only(url)
         if (
@@ -186,7 +186,7 @@ class DomainsController(Domains):
         return ob
 
     def get_domain_only(input_url):
-        p = DomainAwarePage(input_url)
+        p = UrlLocation(input_url)
         domain_text = p.get_domain_only()
         return domain_text
 
@@ -266,7 +266,7 @@ class DomainsController(Domains):
 
         entries = LinkDataController.objects.filter(domain__isnull=True)
         for entry in entries:
-            p = DomainAwarePage(entry.link)
+            p = UrlLocation(entry.link)
             domain_url = p.get_domain()
             domain_only = p.get_domain_only()
 

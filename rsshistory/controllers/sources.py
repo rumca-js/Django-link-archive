@@ -6,7 +6,7 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from ..webtools import DomainAwarePage
+from ..webtools import UrlLocation
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -180,11 +180,11 @@ class SourceDataController(SourceDataModel):
         return dynamic_data
 
     def get_domain(self):
-        page = DomainAwarePage(self.url)
+        page = UrlLocation(self.url)
         return page.get_domain()
 
     def get_domain_only(self):
-        page = DomainAwarePage(self.url)
+        page = UrlLocation(self.url)
         return page.get_domain_only()
 
     def get_entry_url(self):
