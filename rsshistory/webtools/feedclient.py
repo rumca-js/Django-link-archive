@@ -577,6 +577,7 @@ class FeedClient(object):
         url = Url.find_rss_url(u)
         if not url:
             print("That does not seem to be a correct RSS source:{}".format(page_url))
+            return
 
         response = url.get_response()
         title = url.get_title()

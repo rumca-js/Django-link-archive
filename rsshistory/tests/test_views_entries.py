@@ -478,7 +478,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         # check that object has been changed
 
         entry = LinkDataController.objects.get(link=test_link)
-        self.assertEqual(entry.title, "LinkedIn Page title")
+        self.assertEqual(entry.title, "Https LinkedIn Page title")
         self.assertEqual(entry.description, "LinkedIn Page description")
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
@@ -516,7 +516,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         # check that object has been changed
 
         entry = LinkDataController.objects.get(link=test_link)
-        self.assertEqual(entry.title, "LinkedIn Page title")
+        self.assertEqual(entry.title, "Https LinkedIn Page title")
         self.assertEqual(entry.description, "LinkedIn Page description")
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)

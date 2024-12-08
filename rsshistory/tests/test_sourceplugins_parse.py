@@ -8,8 +8,6 @@ from ..controllers import (
 )
 
 from ..pluginsources import BaseParsePlugin
-from ..pluginsources import SourceParseInternalLinks
-from ..pluginsources import DomainParserPlugin
 from ..pluginsources import RssParserPlugin
 from ..pluginsources import HackerNewsParserPlugin
 

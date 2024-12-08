@@ -1,3 +1,11 @@
+from .webtools import (
+    URL_TYPE_RSS,
+    URL_TYPE_CSS,
+    URL_TYPE_JAVASCRIPT,
+    URL_TYPE_HTML,
+    URL_TYPE_FONT,
+    URL_TYPE_UNKNOWN,
+)
 
 class UrlLocation(object):
     def __init__(self, url):
@@ -562,5 +570,3 @@ class UrlLocation(object):
                 result = result + "/" + part
 
         return result
-
-

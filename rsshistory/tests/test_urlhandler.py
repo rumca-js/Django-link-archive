@@ -60,7 +60,7 @@ class UrlHandlerTest(FakeInternetTestCase):
 
         props = handler.get_properties()
 
-        self.assertEqual(props["title"], "LinkedIn Page title")
+        self.assertEqual(props["title"], "Https LinkedIn Page title")
         self.assertEqual(props["description"], "LinkedIn Page description")
 
     def test_youtube_channel_get_properties(self):
@@ -72,7 +72,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         props = handler.get_properties()
         print(props)
 
-        self.assertEqual(props["title"], "SAMTIME on Odysee")
+        self.assertEqual(props["title"], "SAMTIME on YouTube")
 
     def test_youtube_channel_get_title(self):
         handler = UrlHandler(
@@ -80,7 +80,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         )
         handler.get_response()
 
-        self.assertEqual(handler.get_title(), "SAMTIME on Odysee")
+        self.assertEqual(handler.get_title(), "SAMTIME on YouTube")
 
     def test_get_cleaned_link_stupid_google_link(self):
         cleaned_link = UrlHandler.get_cleaned_link(

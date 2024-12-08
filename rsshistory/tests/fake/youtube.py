@@ -160,141 +160,366 @@ webpage_samtime_odysee = """<?xml version="1.0" encoding="UTF-8"?>
 webpage_samtime_youtube_rss = """<?xml version="1.0" encoding="UTF-8"?>
 <feed>
 <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=UCUSElbgKZpE4Xdh5aFWG-Ig"/>
-<id>yt:channel:USElbgKZpE4Xdh5aFWG-Ig</id>
-<yt:channelId>USElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
-<title>AirPano VR</title>
-<link rel="alternate" href="https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig"/>
+<id>yt:channel:SAMTIMESAMTIMESAMTIME</id>
+<yt:channelId>SAMTIMESAMTIMESAMTIME</yt:channelId>
+<title>SAMTIME on YouTube</title>
+<link rel="alternate" href="https://www.youtube.com/channel/SAMTIMESAMTIMESAMTIME"/>
 <author>
 <name>AirPano VR</name>
 <uri>
-https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
+https://www.youtube.com/channel/SAMTIMESAMTIMESAMTIME
 </uri>
 </author>
 <published>{}</published>
 
 <entry>
-<id>yt:video:dWa5hJGpTN4</id>
-<yt:videoId>dWa5hJGpTN4</yt:videoId>
-<yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
-<title>
-National Park Moneron Island. 8K 360° virtual travel
-</title>
-<link rel="alternate" href="https://www.youtube.com/watch?v=dWa5hJGpTN4"/>
-<author>
-<name>AirPano VR</name>
-<uri>
-https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
-</uri>
-</author>
-<published>{}</published>
-<updated>2023-12-16T01:48:32+00:00</updated>
-<media:group>
-<media:title>
-National Park Moneron Island. 8K 360° virtual travel
-</media:title>
-<media:content url="https://www.youtube.com/v/dWa5hJGpTN4?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-<media:thumbnail url="https://i1.ytimg.com/vi/dWa5hJGpTN4/hqdefault.jpg" width="480" height="360"/>
-<media:description>
-The Eurasian mainland and Sakhalin Island are separated by the Strait of Tartary, with its largest island known as Moneron. Moneron is influenced by the Tsushima Current, so the water is not only transparent, but also very warm. Besides, the water area abounds with reefs: it is a real paradise for divers! This is not just Russia's first marine park: it is the only island nature park in the country... Don't forget that this is 360 video: you can change the angle of view. If you enjoyed this video please like, share, comment, favorite, subscribe: https://goo.gl/NZMdaz We regularly publish new 360 videos of the most beautiful places on our planet! If you have troubles with watching such videos, choose 4K or HD quality in the settings of your YouTube player. We hope that YouTube will find a solution for optimization this videoformat to make it watchable for common users. Also here is the answer for a frequently asked question about true resolution of an 8K 360° video. Unlike regular videos, while watching 360° videos YouTube show us only a specific field of view similar to human eye (by default 100 degrees out of 360). As a result, the resolution of the visible part of 8K video uploaded to our channel is around 2K (1920p). If you watch in 4K mode the resolution of the visible part would be even less - around 1080p (1K). Please note that AirPano team originally shoots its films in 16,12,10,8K resolution, depending on year and cameras used back then. But before upload to YouTube channel we downscale all our videos to 8K. 360° photos and videos, stories of our shootings, articles and FAQ you can find on our website: http://AirPano.com #Moneron #MoneronIsland #UNESCO #nature #relaxing #relaxingvideo #360video #AirpanoNature #VirtualTravel #rockformations #underwater #seals #seacollection #sea #nature #naturelovers #sakhalin
-</media:description>
-<media:community>
-<media:starRating count="182" average="5.00" min="1" max="5"/>
-<media:statistics views="54335"/>
-</media:community>
-</media:group>
+   <id>yt:video:dWa5hJGpTN4</id>
+   <yt:videoId>dWa5hJGpTN4</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>
+   National Park Moneron Island. 8K 360° virtual travel
+   </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=dWa5hJGpTN4"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri>
+   https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
+   </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-12-16T01:48:32+00:00</updated>
+   <media:group>
+   <media:title>
+   National Park Moneron Island. 8K 360° virtual travel
+   </media:title>
+   <media:content url="https://www.youtube.com/v/dWa5hJGpTN4?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/dWa5hJGpTN4/hqdefault.jpg" width="480" height="360"/>
+   <media:description>
+   The Eurasian mainland and Sakhalin Island are separated by the Strait of Tartary, with its largest island known as Moneron. Moneron is influenced by the Tsushima Current, so the water is not only transparent, but also very warm. Besides, the water area abounds with reefs: it is a real paradise for divers! This is not just Russia's first marine park: it is the only island nature park in the country... Don't forget that this is 360 video: you can change the angle of view. If you enjoyed this video please like, share, comment, favorite, subscribe: https://goo.gl/NZMdaz We regularly publish new 360 videos of the most beautiful places on our planet! If you have troubles with watching such videos, choose 4K or HD quality in the settings of your YouTube player. We hope that YouTube will find a solution for optimization this videoformat to make it watchable for common users. Also here is the answer for a frequently asked question about true resolution of an 8K 360° video. Unlike regular videos, while watching 360° videos YouTube show us only a specific field of view similar to human eye (by default 100 degrees out of 360). As a result, the resolution of the visible part of 8K video uploaded to our channel is around 2K (1920p). If you watch in 4K mode the resolution of the visible part would be even less - around 1080p (1K). Please note that AirPano team originally shoots its films in 16,12,10,8K resolution, depending on year and cameras used back then. But before upload to YouTube channel we downscale all our videos to 8K. 360° photos and videos, stories of our shootings, articles and FAQ you can find on our website: http://AirPano.com #Moneron #MoneronIsland #UNESCO #nature #relaxing #relaxingvideo #360video #AirpanoNature #VirtualTravel #rockformations #underwater #seals #seacollection #sea #nature #naturelovers #sakhalin
+   </media:description>
+   <media:community>
+   <media:starRating count="182" average="5.00" min="1" max="5"/>
+   <media:statistics views="54335"/>
+   </media:community>
+   </media:group>
 </entry>
 <entry>
-<id>yt:video:KkSzad253o0</id>
-<yt:videoId>KkSzad253o0</yt:videoId>
-<yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
-<title>
-Rio de Janeiro. The Marvelous City. Aerial 360 video in 12K
-</title>
-<link rel="alternate" href="https://www.youtube.com/watch?v=KkSzad253o0"/>
-<author>
-<name>AirPano VR</name>
-<uri>
-https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
-</uri>
-</author>
-<published>{}</published>
-<updated>2023-11-29T15:03:20+00:00</updated>
-<media:group>
-<media:title>
-Rio de Janeiro. The Marvelous City. Aerial 360 video in 12K
-</media:title>
-<media:content url="https://www.youtube.com/v/KkSzad253o0?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-<media:thumbnail url="https://i4.ytimg.com/vi/KkSzad253o0/hqdefault.jpg" width="480" height="360"/>
-<media:description>
-Don't forget that this is 360 video: you can change the angle of view. On a 700-meter high Corcovado mountain stands a giant figure of Christ, his arms are stretched out towards the city, as if blessing the land. Each year, nearly 2 million tourists and residents climb to the top of the mountain to take a photo besides the monument "for good luck". Thanks to AYRTON360 for his help in Rio de Janeiro and for the photo panorama from the top of the statue: https://www.youtube.com/user/AyrtonCamargo If you enjoyed this video please like, share, comment, favorite, subscribe: https://goo.gl/NZMdaz We regularly publish new 360 videos of the most beautiful places on our planet! 360° photos and videos, stories of our shootings, articles and FAQ you can find on our website: http://AirPano.com Nowadays you need extraordinary computer power for watching 8K 360° videos. If you have troubles with watching such videos, choose 4K or HD quality in the settings of your YouTube player. We hope that YouTube will find a solution for optimization this videoformat to make it watchable for common users. Also here is the answer for a frequently asked question about true resolution of an 8K 360° video. Unlike standard videos, in a 360° video you can see only a part of original image (approximately 30 degrees out of 360). As result, the real resolution of the part you can see isn't bigger than 1.3K. #AirPanoCities #Rio #ChristtheRedeemer #RiodeJaneiro #Brazil #AirPano #Drone #Travel #VirtualTravel #Copacabana #Ipanema #Leblon #copacabanabeach #christredemeer #rio
-</media:description>
-<media:community>
-<media:starRating count="185" average="5.00" min="1" max="5"/>
-<media:statistics views="12245"/>
-</media:community>
-</media:group>
+   <id>yt:video:KkSzad253o0</id>
+   <yt:videoId>KkSzad253o0</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>
+   Rio de Janeiro. The Marvelous City. Aerial 360 video in 12K
+   </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=KkSzad253o0"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri>
+   https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
+   </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-29T15:03:20+00:00</updated>
+   <media:group>
+   <media:title>
+   Rio de Janeiro. The Marvelous City. Aerial 360 video in 12K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/KkSzad253o0?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/KkSzad253o0/hqdefault.jpg" width="480" height="360"/>
+   <media:description>
+   Don't forget that this is 360 video: you can change the angle of view. On a 700-meter high Corcovado mountain stands a giant figure of Christ, his arms are stretched out towards the city, as if blessing the land. Each year, nearly 2 million tourists and residents climb to the top of the mountain to take a photo besides the monument "for good luck". Thanks to AYRTON360 for his help in Rio de Janeiro and for the photo panorama from the top of the statue: https://www.youtube.com/user/AyrtonCamargo If you enjoyed this video please like, share, comment, favorite, subscribe: https://goo.gl/NZMdaz We regularly publish new 360 videos of the most beautiful places on our planet! 360° photos and videos, stories of our shootings, articles and FAQ you can find on our website: http://AirPano.com Nowadays you need extraordinary computer power for watching 8K 360° videos. If you have troubles with watching such videos, choose 4K or HD quality in the settings of your YouTube player. We hope that YouTube will find a solution for optimization this videoformat to make it watchable for common users. Also here is the answer for a frequently asked question about true resolution of an 8K 360° video. Unlike standard videos, in a 360° video you can see only a part of original image (approximately 30 degrees out of 360). As result, the real resolution of the part you can see isn't bigger than 1.3K. #AirPanoCities #Rio #ChristtheRedeemer #RiodeJaneiro #Brazil #AirPano #Drone #Travel #VirtualTravel #Copacabana #Ipanema #Leblon #copacabanabeach #christredemeer #rio
+   </media:description>
+   <media:community>
+   <media:starRating count="185" average="5.00" min="1" max="5"/>
+   <media:statistics views="12245"/>
+   </media:community>
+   </media:group>
 </entry>
 <entry>
-<id>yt:video:q5GXQQo8I-k</id>
-<yt:videoId>q5GXQQo8I-k</yt:videoId>
-<yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
-<title>
-Virtual travel to Saint Petersburg, Russia. 360 video in 6K
-</title>
-<link rel="alternate" href="https://www.youtube.com/watch?v=q5GXQQo8I-k"/>
-<author>
-<name>AirPano VR</name>
-<uri>
-https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
-</uri>
-</author>
-<published>{}</published>
-<updated>2023-11-11T05:58:13+00:00</updated>
-<media:group>
-<media:title>
-Virtual travel to Saint Petersburg, Russia. 360 video in 6K
-</media:title>
-<media:content url="https://www.youtube.com/v/q5GXQQo8I-k?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-<media:thumbnail url="https://i2.ytimg.com/vi/q5GXQQo8I-k/hqdefault.jpg" width="480" height="360"/>
-<media:description>
-Don't forget that this is 360 video: you can change the angle of view. Saint Petersburg is one of the most famous and beautiful cities of the world. It is the second largest city in Russia after its capital, Moscow. But, at the same time, it is a capital in its own way — it is known as the "Cultural Capital of Russia". Let’s take a virtual journey, have a walk around and fly above this city to enjoy its majestic architectural monuments! All ground scenes in this clip have been shot with Insta360 Titan. It is the best solution for 360° professionals. If you enjoyed this video please like, share, comment, favorite, subscribe: https://goo.gl/NZMdaz We regularly publish new 360 videos of the most beautiful places on our planet! Also here is the answer for a frequently asked question about true resolution of an 6K 360° video. Unlike standard videos, in a 360° video you can see only a part of original image (approximately 60 degrees out of 360). As result, the real resolution of the part you can see isn't bigger than HD (1080p). #AirPanoCities #VirtualTravel #SaintPetersburg #AirPano #360video #Russia #city
-</media:description>
-<media:community>
-<media:starRating count="309" average="5.00" min="1" max="5"/>
-<media:statistics views="40219"/>
-</media:community>
-</media:group>
+   <id>yt:video:q5GXQQo8I-k</id>
+   <yt:videoId>q5GXQQo8I-k</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>
+   Virtual travel to Saint Petersburg, Russia. 360 video in 6K
+   </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=q5GXQQo8I-k"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri>
+   https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
+   </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-11T05:58:13+00:00</updated>
+   <media:group>
+   <media:title>
+   Virtual travel to Saint Petersburg, Russia. 360 video in 6K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/q5GXQQo8I-k?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/q5GXQQo8I-k/hqdefault.jpg" width="480" height="360"/>
+   <media:description>
+   Don't forget that this is 360 video: you can change the angle of view. Saint Petersburg is one of the most famous and beautiful cities of the world. It is the second largest city in Russia after its capital, Moscow. But, at the same time, it is a capital in its own way — it is known as the "Cultural Capital of Russia". Let’s take a virtual journey, have a walk around and fly above this city to enjoy its majestic architectural monuments! All ground scenes in this clip have been shot with Insta360 Titan. It is the best solution for 360° professionals. If you enjoyed this video please like, share, comment, favorite, subscribe: https://goo.gl/NZMdaz We regularly publish new 360 videos of the most beautiful places on our planet! Also here is the answer for a frequently asked question about true resolution of an 6K 360° video. Unlike standard videos, in a 360° video you can see only a part of original image (approximately 60 degrees out of 360). As result, the real resolution of the part you can see isn't bigger than HD (1080p). #AirPanoCities #VirtualTravel #SaintPetersburg #AirPano #360video #Russia #city
+   </media:description>
+   <media:community>
+   <media:starRating count="309" average="5.00" min="1" max="5"/>
+   <media:statistics views="40219"/>
+   </media:community>
+   </media:group>
 </entry>
 <entry>
-<id>yt:video:jqq_ZdD5Zwg</id>
-<yt:videoId>jqq_ZdD5Zwg</yt:videoId>
-<yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
-<title>
-Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
-</title>
-<link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
-<author>
-<name>AirPano VR</name>
-<uri>
-https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
-</uri>
-</author>
-<published>{}</published>
-<updated>2023-11-16T22:57:41+00:00</updated>
-<media:group>
-<media:title>
-Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
-</media:title>
-<media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-<media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
-<media:description>
-Don't forget that this is 360 video: you can change the angle of view. A gentle beat of waves, snow white sand in addition to the sun, palms and azure blue sea - that's how a perfect picture of a tropical paradise looks like. A new AirPano relaxing video offers you a break from worries, the sound of waves, birds' cries and the stunning beauty of the Maldive seascapes. If you enjoyed this video please like, share, comment, favorite, subscribe: https://goo.gl/NZMdaz We regularly publish new 360 videos of the most beautiful places on our planet! 360° photos and videos, stories of our shootings, articles and FAQ you can find on our website: http://AirPano.com Nowadays you need extraordinary computer power for watching 8K 360° videos. If you have troubles with watching such videos, choose 4K or HD quality in the settings of your YouTube player. We hope that YouTube will find a solution for optimization this video format to make it watchable for common users. Also here is the answer for a frequently asked question about true resolution of an 8K 360° video. Unlike standard videos, in a 360° video you can see only a part of original image (approximately 30 degrees out of 360). As result, the real resolution of the part you can see isn't bigger than 1.3K. Please note that AirPano team originally shoots its films in 16,12,10,8K resolution, depending on year and cameras used back then. But before upload to YouTube channel we downscale all our videos to 8K. #AirPanoNature #Maldives #360video #VR #Beach #Diving #Relax #Relaxation
-</media:description>
-<media:community>
-<media:starRating count="607" average="5.00" min="1" max="5"/>
-<media:statistics views="183218"/>
-</media:community>
-</media:group>
+   <id>yt:video:jqq_ZdD5Zwg</id>
+   <yt:videoId>jqq_ZdD5Zwg</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri>
+   https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig
+   </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description>
+   Don't forget that this is 360 video: you can change the angle of view. A gentle beat of waves, snow white sand in addition to the sun, palms and azure blue sea - that's how a perfect picture of a tropical paradise looks like. A new AirPano relaxing video offers you a break from worries, the sound of waves, birds' cries and the stunning beauty of the Maldive seascapes. If you enjoyed this video please like, share, comment, favorite, subscribe: https://goo.gl/NZMdaz We regularly publish new 360 videos of the most beautiful places on our planet! 360° photos and videos, stories of our shootings, articles and FAQ you can find on our website: http://AirPano.com Nowadays you need extraordinary computer power for watching 8K 360° videos. If you have troubles with watching such videos, choose 4K or HD quality in the settings of your YouTube player. We hope that YouTube will find a solution for optimization this video format to make it watchable for common users. Also here is the answer for a frequently asked question about true resolution of an 8K 360° video. Unlike standard videos, in a 360° video you can see only a part of original image (approximately 30 degrees out of 360). As result, the real resolution of the part you can see isn't bigger than 1.3K. Please note that AirPano team originally shoots its films in 16,12,10,8K resolution, depending on year and cameras used back then. But before upload to YouTube channel we downscale all our videos to 8K. #AirPanoNature #Maldives #360video #VR #Beach #Diving #Relax #Relaxation
+   </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
+</entry>
+<entry>
+   <id>yt:video:s1234566</id>
+   <yt:videoId>s1234566</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri> https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description> test </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
+</entry>
+<entry>
+   <id>yt:video:s1234567</id>
+   <yt:videoId>s1234567</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri> https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description> test </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
+</entry>
+<entry>
+   <id>yt:video:s1234568</id>
+   <yt:videoId>s1234568</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri> https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description> test </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
+</entry>
+<entry>
+   <id>yt:video:s1234569</id>
+   <yt:videoId>s1234569</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri> https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description> test </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
+</entry>
+<entry>
+   <id>yt:video:s1234570</id>
+   <yt:videoId>s1234570</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri> https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description> test </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
+</entry>
+<entry>
+   <id>yt:video:s1234571</id>
+   <yt:videoId>s1234571</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri> https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description> test </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
+</entry>
+<entry>
+   <id>yt:video:s1234572</id>
+   <yt:videoId>s1234572</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri> https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description> test </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
+</entry>
+<entry>
+   <id>yt:video:s1234572</id>
+   <yt:videoId>s1234572</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri> https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description> test </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
+</entry>
+<entry>
+   <id>yt:video:s1234573</id>
+   <yt:videoId>s1234573</yt:videoId>
+   <yt:channelId>UCUSElbgKZpE4Xdh5aFWG-Ig</yt:channelId>
+   <title>Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K </title>
+   <link rel="alternate" href="https://www.youtube.com/watch?v=jqq_ZdD5Zwg"/>
+   <author>
+   <name>AirPano VR</name>
+   <uri> https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig </uri>
+   </author>
+   <published>{}</published>
+   <updated>2023-11-16T22:57:41+00:00</updated>
+   <media:group>
+   <media:title>
+   Maldive Paradise. Tropical Beach Relaxation. 360 video in 16K
+   </media:title>
+   <media:content url="https://www.youtube.com/v/jqq_ZdD5Zwg?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/jqq_ZdD5Zwg/hqdefault.jpg" width="480" height="360"/>
+   <media:description> test </media:description>
+   <media:community>
+   <media:starRating count="607" average="5.00" min="1" max="5"/>
+   <media:statistics views="183218"/>
+   </media:community>
+   </media:group>
 </entry>
 </feed>
 """.replace(

@@ -297,7 +297,7 @@ class SourcesViewsTests(FakeInternetTestCase):
         # check that object has been changed
 
         source = SourceDataController.objects.get(url=test_link)
-        self.assertEqual(source.title, "LinkedIn Page title")
+        self.assertEqual(source.title, "Https LinkedIn Page title")
 
     def test_source_remove__check_if_deps_removed(self):
         SourceDataController.objects.all().delete()
