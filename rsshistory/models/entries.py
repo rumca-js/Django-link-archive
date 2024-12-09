@@ -328,6 +328,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             "description",
             "link",
             "date_published",
+            "date_dead_since",
             "permanent",
             "bookmarked",
             "author",
@@ -383,7 +384,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         for export_name in export_names:
             val = getattr(self, export_name)
             if export_name.find("date_") >= 0:
-                val = val.isoformat()
+                if val:
+                    val = val.isoformat()
             output_data[export_name] = val
 
         return output_data

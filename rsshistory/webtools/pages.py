@@ -909,6 +909,32 @@ class ContentLinkParser(ContentInterface):
         links.update(self.get_links_https_encoded("http"))
         links.update(self.get_links_href())
 
+        # TODO - maybe this thing below could be made more clean, or refactored
+        result = set()
+        for item in links:
+            wh = item.find('"')
+            if wh != -1:
+                item = item[:wh]
+            wh = item.find('<')
+            if wh != -1:
+                item = item[:wh]
+            wh = item.find('>')
+            if wh != -1:
+                item = item[:wh]
+            wh = item.find('&quot;')
+            if wh != -1:
+                item = item[:wh]
+            wh = item.find('&gt;')
+            if wh != -1:
+                item = item[:wh]
+            wh = item.find('&lt;')
+            if wh != -1:
+                item = item[:wh]
+
+            result.add(item)
+
+        links = result
+
         # This is most probably redundant
         if None in links:
             links.remove(None)
@@ -950,22 +976,7 @@ class ContentLinkParser(ContentInterface):
         all_matches = [link.rstrip(".") for link in all_matches]
         all_matches = [ContentLinkParser.decode_url(link) for link in all_matches]
 
-        # TODO - maybe this thing below could be made more clean, or refactored
-        result = set()
-        for item in all_matches:
-            wh = item.find('"')
-            if wh != -1:
-                item = item[:wh]
-            wh = item.find('<')
-            if wh != -1:
-                item = item[:wh]
-            wh = item.find('>')
-            if wh != -1:
-                item = item[:wh]
-
-            result.add(item)
-
-        return result
+        return all_matches
 
     def join_url_parts(self, partone, parttwo):
         if not partone.endswith("/"):
