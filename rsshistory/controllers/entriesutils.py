@@ -1246,7 +1246,7 @@ class EntryWrapper(object):
         if entry.is_http():
             https_url = entry.get_https_url()
 
-            url = EntryUrlInterface(http_url)
+            url = EntryUrlInterface(https_url)
             props = url.get_props()
 
             if props:
