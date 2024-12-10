@@ -94,12 +94,12 @@ class UserSearchHistory(models.Model):
     def delete_old_entries(user):
         qs = UserSearchHistory.objects.filter(user=user).order_by("date")
 
-        config_entry = Configuration.get_object().config_entry
-        if config_entry.max_number_of_searches == 0:
+        row_limit = UserSearchHistory.get_choices_limit_memory()
+
+        if row_limit == 0: # no limit
             return
 
-        limit = config_entry.max_number_of_searches
-        if qs.count() > limit:
+        if qs.count() > row_limit:
             too_many = qs.count() - limit
             entries = qs[:too_many]
             for entry in entries:
@@ -111,7 +111,17 @@ class UserSearchHistory(models.Model):
             entries.delete()
 
     def get_choices_limit():
+        """
+        Used for GUI
+        """
         return 60
+
+    def get_choices_limit_memory():
+        """
+        We may maintain more than we display in GUI
+        """
+        config_entry = Configuration.get_object().config_entry
+        return config_entry.max_number_of_searches
 
     def get_encoded_search_query(self):
         return urllib.parse.quote(self.search_query)

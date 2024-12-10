@@ -398,3 +398,7 @@ class SqlModel(object):
     def get_session(self):
         _SessionFactory = sessionmaker(bind=self.engine)
         return _SessionFactory
+
+    def close(self):
+        if self.engine:
+            self.engine.dispose()

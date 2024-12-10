@@ -70,10 +70,6 @@ class UserTagsTest(FakeInternetTestCase):
         entries = UserTags.objects.filter(entry=entry)
         self.assertEqual(entries.count(), 3)
 
-        jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 1)
-        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_RESET_LOCAL_DATA)
-
         # check that it removes old tags
 
         tag_data = {

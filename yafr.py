@@ -26,6 +26,7 @@ def main():
         WebConfig.use_print_logging()
 
     p.run()
+    p.close()
 
 
 if __name__ == "__main__":

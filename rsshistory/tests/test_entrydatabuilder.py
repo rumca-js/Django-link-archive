@@ -21,6 +21,7 @@ from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 class EntryDataBuilderTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        self.setup_configuration()
 
         LinkDataController.objects.all().delete()
         ArchiveLinkDataController.objects.all().delete()

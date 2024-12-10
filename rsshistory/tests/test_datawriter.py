@@ -44,7 +44,7 @@ class DataWriterTest(FakeInternetTestCase):
         )
         LinkDataController.objects.create(
             source_url="https://youtube.com",
-            link="https://youtube.com?v=permanent",
+            link="https://youtube.com",
             title="The first link",
             source=source_youtube,
             permanent=True,
@@ -53,8 +53,8 @@ class DataWriterTest(FakeInternetTestCase):
         )
         LinkDataController.objects.create(
             source_url="https://youtube.com",
-            link="https://youtube.com?v=permanent2",
-            title="The first link",
+            link="https://linkedin.com",
+            title="The second link",
             source=source_youtube,
             permanent=True,
             bookmarked=True,

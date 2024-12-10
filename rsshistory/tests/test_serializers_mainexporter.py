@@ -25,6 +25,7 @@ class MainExporterTest(FakeInternetTestCase):
         )
         self.create_exports()
         self.create_entries()
+        self.setup_configuration()
 
     def create_exports(self):
         self.export_bookmarks = DataExport.objects.create(
@@ -69,19 +70,22 @@ class MainExporterTest(FakeInternetTestCase):
         )
 
     def create_entries(self):
-        LinkDataController.objects.create(
-            link="https://link-1.com",
+        """
+        domains are permanent, links can be bookmarked
+        """
+        entry1 = LinkDataController.objects.create(
+            link="https://link-1.com/test",
             title="The first link",
             bookmarked=False,
             permanent=False,
         )
-        LinkDataController.objects.create(
-            link="https://link-2.com",
+        entry2 = LinkDataController.objects.create(
+            link="https://link-2.com/test",
             title="The first link",
             bookmarked=True,
             permanent=False,
         )
-        LinkDataController.objects.create(
+        entry3 = LinkDataController.objects.create(
             link="https://link-3.com",
             title="The first link",
             bookmarked=False,
