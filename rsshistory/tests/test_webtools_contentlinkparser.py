@@ -28,6 +28,9 @@ contents_with_links = """
       <a href="https:&#x2F;&#x2F;encoded.link2.com&#x22;product-page">Link</a>
       <a href="https:&#x2F;&#x2F;encoded.link3.com&#x3c;product-page">Link</a>
 
+      <a href="https://">unknown</a>
+      <a href="http://">unknown</a>
+
     </body>
 </html>
 """
@@ -58,6 +61,8 @@ class ContentLinkParserTest(FakeInternetTestCase):
         self.assertTrue("https://encoded.link.com/product-page/interceptor-carrier-board" in links)
         self.assertTrue("https://encoded.link2.com" in links)
         self.assertTrue("https://encoded.link3.com" in links)
+        self.assertTrue("https://" not in links)
+        self.assertTrue("http://" not in links)
 
     def test_get_domains(self):
         p = ContentLinkParser(
@@ -77,3 +82,5 @@ class ContentLinkParserTest(FakeInternetTestCase):
         self.assertTrue("https://encoded.link.com" in domains)
         self.assertTrue("https://encoded.link2.com" in domains)
         self.assertTrue("https://encoded.link3.com" in domains)
+        self.assertTrue("https://" not in domains)
+        self.assertTrue("http://" not in domains)

@@ -1096,6 +1096,10 @@ class ContentLinkParser(ContentInterface):
         for link in links:
             p = UrlLocation(link)
             new_link = p.get_domain()
+            if new_link == "https://" or new_link == "http://":
+                WebLogger.error("Incorrect link to add: {}".format(new_link), stack=True)
+                continue
+
             if new_link:
                 result.add(new_link)
 

@@ -100,7 +100,7 @@ class UserSearchHistory(models.Model):
             return
 
         if qs.count() > row_limit:
-            too_many = qs.count() - limit
+            too_many = qs.count() - row_limit
             entries = qs[:too_many]
             for entry in entries:
                 entry.delete()
