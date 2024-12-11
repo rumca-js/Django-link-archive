@@ -73,6 +73,7 @@ hr {
 }
 
 .mainbutton-icon {
+    /* icon used in main menu */
     width:2em;
 }
 
@@ -234,7 +235,6 @@ hr {
     width: auto; 
     aspect-ratio: 1 / 1;
     text-decoration: none;
-    margin: 5px;
     display:flex;
     flex-direction:column;
 }

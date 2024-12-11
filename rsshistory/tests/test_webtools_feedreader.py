@@ -10,6 +10,9 @@ from .fake.youtube import (
 from .fake.thehill import (
     thehill_rss,
 )
+from .fake.hackernews import (
+    webpage_hackernews_rss,
+)
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -47,3 +50,15 @@ class FeedreaderTest(FakeInternetTestCase):
         self.assertEqual(p.feed.title, "The Hill News")
         self.assertEqual(p.feed.link, "https://thehill.com")
         self.assertEqual(len(p.entries), 100)
+
+    def test_hacker_news(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # default language
+        p = FeedReader.parse(webpage_hackernews_rss)
+        self.assertEqual(p.feed.title, "Hacker News: Front Page")
+        self.assertEqual(p.feed.link, "https://news.ycombinator.com/")
+
+        self.assertEqual(len(p.entries), 20)
+
+        self.assertTrue(p.entries[0].description.find("Article URL") >= 0)

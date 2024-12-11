@@ -20,7 +20,19 @@ class FeedObject(object):
     def get_prop(self, aproperty):
         aproperty_value = self.root.find(aproperty, self.ns)
         if aproperty_value is not None:
-            return aproperty_value.text
+            if len(aproperty_value) == 0:  # No child elements
+                return aproperty_value.text.strip() if aproperty_value.text else None
+
+            parts = []
+            for child in aproperty_value:
+                if child.text:
+                    parts.append(child.text)
+                parts.append(ET.tostring(child, encoding='unicode', method='html'))
+                if child.tail:
+                    parts.append(child.tail)
+
+            inner_content = ''.join(parts).strip()
+            return inner_content
 
     def get_prop_attribute(self, aproperty, attribute):
         aproperty_value = self.root.find(aproperty, self.ns)

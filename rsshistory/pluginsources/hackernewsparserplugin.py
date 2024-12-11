@@ -23,11 +23,12 @@ class HackerNewsParserPlugin(BaseRssPlugin):
 
     def get_entries(self):
         props = super().get_entries()
+        list_props = list(props)
 
-        for prop in props:
+        for prop in list_props:
             yield prop
 
-        self.add_all_container_properties_to_queue(props)
+        self.add_all_container_properties_to_queue(list_props)
 
     def add_all_container_properties_to_queue(self, props):
         for prop in props:
@@ -39,10 +40,15 @@ class HackerNewsParserPlugin(BaseRssPlugin):
         self.get_container_element_links(entry_props)
 
     def get_container_element_links(self, entry_properties):
-        contents = self.get_container_element_contents(entry_properties)
+        url = None
+        contents = None
 
-        if contents:
-            parser = ContentLinkParser(contents)
+        if entry_properties and "description" in entry_properties:
+            contents = entry_properties["description"]
+            url = entry_properties["link"]
+
+        if contents and url:
+            parser = ContentLinkParser(url, contents)
             links = parser.get_links()
 
             for link in links:

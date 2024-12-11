@@ -1,13 +1,14 @@
 {%if transitions%}
-  <h3>Related</h3>
+<h3>Related</h3>
 
-  <div class="container">
+<ul class="list-group">
     {% for entry in transitions %}
-       <div class="my-1">
-           {% with from_entry=object %}
-           {% include "rsshistory/entry_list_display_element.html" %}
-           {% endwith %}
-       </div>
+    <div class="list-group-item list-group-item-action">
+        {% with from_entry=object %}
+        {% include "rsshistory/entry_list_display_element.html" %}
+        {% endwith %}
+    </div>
     {% endfor %}
-  </div>
+</ul>
+
 {%endif%}

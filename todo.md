@@ -1,10 +1,8 @@
-https://relisten.net/
-https://www.savethearchive.com/
-https://modelcontextprotocol.io
 places / tag dropbox as file hosting
 catalog / add https://www.youtube.com/watch?v=xDm3zdkgBZ0
 catalog / add https://www.youtube.com/watch?v=t3VWSMWOxwc
 places / add https://github.com/home-assistant/operating-system
+places / add https://github.com/pfalcon/awesome-smarthome
 
 
 

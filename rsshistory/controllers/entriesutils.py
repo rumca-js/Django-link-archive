@@ -417,9 +417,9 @@ class EntryScanner(object):
 
         contents_links = []
         if config.accept_domains:
-            contents_links = parser.get_domains()
+            contents_links.extend(parser.get_domains())
         if config.accept_not_domain_entries:
-            contents_links = parser.get_links()
+            contents_links.extend(parser.get_links())
 
         for link in contents_links:
             BackgroundJobController.link_add(link)

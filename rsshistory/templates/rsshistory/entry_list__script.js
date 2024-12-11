@@ -52,6 +52,14 @@ function getEntryTags(entry) {
 }
 
 
+function isEntryValid(entry) {
+    if (!entry.is_valid || entry.date_dead_since) {
+        return false;
+    }
+    return true;
+}
+
+
 function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
 
@@ -60,7 +68,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let badge_age = getAgeBadge(entry);
 
     let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
-    let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
+    let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
 
     let img_text = '';
     if (show_icons) {
@@ -111,10 +119,8 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let badge_star = highlight_bookmarks ? getBookmarkBadge(entry) : "";
     let badge_age = getAgeBadge(entry);
    
-    let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
+    let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
-
-    let entry_link = show_pure_links ? "${link_absolute}" : "${link_absolute}";
 
     let thumbnail_text = '';
     if (show_icons) {
@@ -149,14 +155,66 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     `;
 }
 
+
 function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
+    if (isMobile()) {
+        return entryGalleryTemplateMobile(entry, show_icons, small_icons);
+    }
+    else {
+        return entryGalleryTemplateDesktop(entry, show_icons, small_icons);
+    }
+}
+
+
+function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
     
     let badge_text = getVotesBadge(page_rating_votes);
     let badge_star = getBookmarkBadge(entry);
     let badge_age = getAgeBadge(entry);
 
-    let invalid_style = entry.is_valid ? `` : `style="opacity: 0.5"`;
+    let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
+
+    let thumbnail = entry.thumbnail;
+    let thumbnail_text = `
+        <img src="${thumbnail}" style="width:100%;max-height:100%;aspect-ratio:3/4;object-fit:cover;"/>
+        ${badge_text}
+        ${badge_star}
+        ${badge_age}
+    `;
+
+    let tags_text = getEntryTags(entry);
+
+    return `
+        <a 
+            href="{entry_link}"
+            title="{title}"
+            ${invalid_style}
+            class="element_${view_display_type} list-group-item list-group-item-action m-1"
+        >
+            <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
+                <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
+                    ${thumbnail_text}
+                </div>
+                <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    <span style="font-weight: bold" class="text-primary">{title_safe}</span>
+                    <div class="link-list-item-description">{source__title}</div>
+                    ${tags_text}
+                </div>
+            </div>
+        </a>
+    `;
+}
+
+
+function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = false) {
+    let page_rating_votes = entry.page_rating_votes;
+    
+    let badge_text = getVotesBadge(page_rating_votes);
+    let badge_star = getBookmarkBadge(entry);
+    let badge_age = getAgeBadge(entry);
+
+    let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
 
     let thumbnail = entry.thumbnail;
     let thumbnail_text = `
@@ -172,8 +230,8 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
         <a 
             href="{entry_link}"
             title="{title}"
-    ${invalid_style}
-            class="element_${view_display_type} list-group-item list-group-item-action"
+            ${invalid_style}
+            class="list-group-item list-group-item-action"
         >
             <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
                 <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
@@ -187,6 +245,64 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
             </div>
         </a>
     `;
+}
+
+
+function fillOneEntry(entry) {
+    let datePublished = new Date(entry.date_published);
+    if (isNaN(datePublished)) {
+        datePublished = new Date();
+    }
+
+    const templateMap = {
+        "standard": entryStandardTemplate,
+        "gallery": entryGalleryTemplate,
+        "search-engine": entrySearchEngineTemplate
+    };
+
+    const templateFunc = templateMap[view_display_type];
+    if (!templateFunc) {
+        return;
+    }
+    var template_text = templateFunc(entry, view_show_icons, view_small_icons);
+
+    let thumbnail = entry.thumbnail;
+    let page_rating_votes = entry.page_rating_votes;
+    let page_rating_contents = entry.page_rating_contents;
+
+    let entry_link = show_pure_links ? entry.link : entry.link_absolute;
+
+    title = escapeHtml(entry.title)
+
+    let title_safe = null;
+    if (entry.title_safe) {
+       title_safe = escapeHtml(entry.title_safe)
+    }
+    else
+    {
+       title_safe = escapeHtml(entry.title)
+    }
+    let source__title = null;
+    if (entry.source__title) {
+       source__title = escapeHtml(entry.source__title)
+    }
+
+    // Replace all occurrences of the placeholders using a global regular expression
+    let listItem = template_text
+        .replace(/{link_absolute}/g, entry.link_absolute)
+        .replace(/{link}/g, entry.link)
+        .replace(/{entry_link}/g, entry_link)
+        .replace(/{title}/g, title)
+        .replace(/{thumbnail}/g, entry.thumbnail)
+        .replace(/{title_safe}/g, title_safe)
+        .replace(/{page_rating_votes}/g, entry.page_rating_votes)
+        .replace(/{page_rating_contents}/g, entry.page_rating_contents)
+        .replace(/{page_rating}/g, entry.page_rating)
+        .replace(/{source__title}/g, source__title)
+        .replace(/{age}/g, entry.age)
+        .replace(/{date_published}/g, datePublished.toLocaleString());
+
+    return listItem;
 }
 
 
@@ -204,51 +320,17 @@ function fillEntryList(entries) {
 
     if (entries && entries.length > 0) {
         entries.forEach(entry => {
-            let datePublished = new Date(entry.date_published);
-            if (isNaN(datePublished)) {
-                datePublished = new Date();
+            const listItem = fillOneEntry(entry);
+
+            if (listItem) {
+                htmlOutput += listItem;
             }
-
-            const templateMap = {
-                "standard": entryStandardTemplate,
-                "gallery": entryGalleryTemplate,
-                "search-engine": entrySearchEngineTemplate
-            };
-
-            const templateFunc = templateMap[view_display_type];
-            if (!templateFunc) {
-                return;
-            }
-            var template_text = templateFunc(entry, view_show_icons, view_small_icons);
-
-            let thumbnail = entry.thumbnail;
-            let page_rating_votes = entry.page_rating_votes;
-            let page_rating_contents = entry.page_rating_contents;
-
-            let entry_link = show_pure_links ? entry.link : entry.link_absolute;
-
-            // Replace all occurrences of the placeholders using a global regular expression
-            let listItem = template_text
-                .replace(/{link_absolute}/g, entry.link_absolute)
-                .replace(/{link}/g, entry.link)
-                .replace(/{entry_link}/g, entry_link)
-                .replace(/{title}/g, entry.title)
-                .replace(/{thumbnail}/g, entry.thumbnail)
-                .replace(/{title_safe}/g, entry.title_safe)
-                .replace(/{page_rating_votes}/g, entry.page_rating_votes)
-                .replace(/{page_rating_contents}/g, entry.page_rating_contents)
-                .replace(/{page_rating}/g, entry.page_rating)
-                .replace(/{source__title}/g, entry.source__title)
-                .replace(/{age}/g, entry.age)
-                .replace(/{date_published}/g, datePublished.toLocaleString());
-
-            htmlOutput += listItem;
         });
     } else {
         htmlOutput = '<li class="list-group-item">No entries found</li>';
     }
 
-    htmlOutput += `  </span`;
+    htmlOutput += `</span>`;
 
     return htmlOutput;
 }

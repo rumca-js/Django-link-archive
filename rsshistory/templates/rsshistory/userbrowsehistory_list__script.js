@@ -21,18 +21,19 @@ function fillQueueListElement(entry) {
     }
 
     let text = `
-        <div class="my-1">
-         <a href="${link_absolute}" title="${title}">
+         <a
+         class="list-group-item list-group-item-action"
+         href="${link_absolute}" title="${title}">
              <div class="d-flex">
-             ${img_text}
+               ${img_text}
         
-        	 <div>
-        	     ${title_safe}
-                 Visits:${number_of_visits}
-                 Date of the last visit:${date_last_visit}
-        	 </div>
+        	   <div>
+        	       ${title_safe}
+                   Visits:${number_of_visits}
+                   Date of the last visit:${date_last_visit}
+        	   </div>
+             </div>
          </a>
-        </div>
     `;
     return text;
 }

@@ -9,12 +9,12 @@
 <div class="collapse" id="collapseExample">
    <ul class="list-group list-group-flush">
    {% for search_engine in search_engines.get %}
-      <li class="list-group-item">
-         <a href="{{search_engine.get_search_string}}" title="{{search_engine.get_title}}">
-              {% include "rsshistory/icon_external.html" %}
-              {{search_engine.get_name}}
-         </a>
-      </li>
+      <a 
+          class="list-group-item list-group-item-action"
+          href="{{search_engine.get_search_string}}" title="{{search_engine.get_title}}">
+          {% include "rsshistory/icon_external.html" %}
+          {{search_engine.get_name}}
+      </a>
    {% endfor %}
    </ul>
 </div>

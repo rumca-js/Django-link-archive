@@ -174,6 +174,10 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
                 status = True
                 WebLogger.info("YouTube video handler: {} DONE".format(self.url))
+            else:
+                WebLogger.error("Url:{} Cannot load youtube details".format(self.url))
+        else:
+            WebLogger.error("Url:{} Cannot download youtube details".format(self.url))
 
         self.response = response
         self.contents = self.response.get_text()

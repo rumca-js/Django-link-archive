@@ -137,6 +137,11 @@ function GetPaginationNav(data) {
 }
 
 
+function isMobile() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+}
+
+
 function escapeHtml(unsafe)
 {
     if (unsafe == null)

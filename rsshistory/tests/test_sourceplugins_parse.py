@@ -96,7 +96,7 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-        self.source_youtube = SourceDataController.objects.create(
+        self.source = SourceDataController.objects.create(
             url="https://hnrss.org/frontpage",
             title="YouTube",
             export_to_cms=True,
@@ -113,7 +113,7 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
         return False
 
     def test_is_props_valid(self):
-        parser = HackerNewsParserPlugin(self.source_youtube.id)
+        parser = HackerNewsParserPlugin(self.source.id)
 
         # call tested function
         props = list(parser.get_entries())
@@ -132,5 +132,5 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
         self.assertEqual(jobs.count(), len(props))
 
     def test_calculate_plugin_hash(self):
-        parse = HackerNewsParserPlugin(self.source_youtube.id)
+        parse = HackerNewsParserPlugin(self.source.id)
         self.assertTrue(parse.calculate_plugin_hash())

@@ -1,10 +1,11 @@
 let object_list_data = null;
 
 
-function getHideButton() {
+function getHideButton(input_text = "Hide") {
     let text = "";
 
-    let button_text = "<button id='hideSuggestions' type='button' class='btn btn-primary float-end'>Hide</button>";
+    let button_text = `<button id='hideSuggestions' type='button' class='btn btn-primary float-end'>${input_text}</button>`;
+
     text += '<li class="list-group-item">';
     text += button_text;
     text += '</li>';
@@ -20,17 +21,18 @@ function fillSearchSuggestions(items) {
 
     let text = "<ul class='list-group border border-secondary rounded'>";
 
-    let button_text = getHideButton();
+    let button_text = getHideButton("Hide");
     text += button_text;
 
     if (items && items.length > 0) {
         $.each(items, function(index, item) {
+            let item_escaped = escapeHtml(item);
+
             var listItem = `
-                <li class="list-group-item">
-                    <a class="btnFilterTrigger" data-search="${item}" href="?search=${encodeURIComponent(item)}">
-                        ${item}
-                    </a>
-                </li>
+                <a class="btnFilterTrigger list-group-item list-group-item-action" data-search="${item_escaped}" href="?search=${encodeURIComponent(item)}">
+                   🔍
+                    ${item_escaped}
+                </a>
             `;
 
             text += listItem;
@@ -39,6 +41,7 @@ function fillSearchSuggestions(items) {
 
     if (items.length > 10)
     {
+       let button_text = getHideButton("Hide");
        text += button_text;
     }
 
@@ -55,19 +58,19 @@ function fillSearchHistory(items) {
 
     let text = "<ul class='list-group border border-secondary rounded'>";
 
-    let button_text = getHideButton();
+    let button_text = getHideButton('Hide');
     text += button_text;
 
     if (items && items.length > 0) {
         $.each(items, function(index, item) {
             let query = item.search_query
+            let item_escaped = escapeHtml(query);
 
             var listItem = `
-                <li class="list-group-item">
-                    <a class="btnFilterTrigger" data-search="${query}" href="?search=${encodeURIComponent(query)}">
-                        ${query}
-                    </a>
-                </li>
+                <a class="btnFilterTrigger list-group-item list-group-item-action" data-search="${item_escaped}" href="?search=${encodeURIComponent(query)}">
+                🔍
+                    ${item_escaped}
+                </a>
             `;
 
             text += listItem;
@@ -76,6 +79,7 @@ function fillSearchHistory(items) {
 
     if (items.length > 10)
     {
+       let button_text = getHideButton('Hide');
        text += button_text;
     }
 
@@ -187,7 +191,8 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
 
    const requestVersion = ++currentLoadRowListContentCounter;
 
-   const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
+   // const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
+   const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ';
    $('#listStatus').html(status_text);
 
     $.ajax({
