@@ -1627,6 +1627,10 @@ class EntryDataBuilder(object):
         )
 
         entry = wrapper.create(new_link_data)
+
+        if entry:
+            BackgroundJobController.link_scan(entry=entry)
+
         return entry
 
     def set_domain_object(self):

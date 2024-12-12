@@ -277,7 +277,7 @@ class ConfigurationEntry(models.Model):
 
     days_to_remove_links = models.IntegerField(
         default=100,
-        help_text="Number of days, after which links are removed. Disabled if 0.",
+        help_text="Number of days, after which links are removed. Useful for RSS clients. Disabled if 0.",
     )
 
     days_to_remove_stale_entries = models.IntegerField(
@@ -292,6 +292,11 @@ class ConfigurationEntry(models.Model):
     days_to_check_stale_entries = models.IntegerField(
         default=35,
         help_text="Number of days after which dead entries are checked for status",
+    )
+
+    remove_entry_vote_threshold = models.IntegerField(
+        default=1,
+        help_text="If entry has reached threshold, it will not be removed. if 0 disabled",
     )
 
     number_of_update_entries = models.IntegerField(

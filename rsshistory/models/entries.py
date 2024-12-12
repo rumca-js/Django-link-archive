@@ -485,12 +485,26 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         return self.permanent or self.bookmarked
 
+    def get_days_dead(self):
+        if not self.date_dead_since:
+            return 0
+
+        current_time = DateUtils.get_datetime_now_utc() 
+
+        delta = current_time - self.date_dead_since
+        return delta.days
+
     def should_entry_be_permanent(self):
         from ..configuration import Configuration
 
         conf = Configuration.get_object().config_entry
 
         p = UrlLocation(self.link)
+
+        if self.is_dead():
+            days = self.get_days_dead()
+            if days > conf.days_to_remove_stale_entries and self.page_rating_votes > conf.remove_entry_vote_threshold:
+                return False
 
         if p.is_domain() and conf.accept_domains and conf.keep_domains:
             return True

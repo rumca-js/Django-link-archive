@@ -250,7 +250,9 @@ class UrlTest(FakeInternetTestCase):
 
         self.assertTrue(type(handler), Url.youtube_video_handler)
 
-    def test_get_properties__rss(self):
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_properties__rss__basic(self):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
@@ -261,8 +263,9 @@ class UrlTest(FakeInternetTestCase):
 
         self.assertTrue("title" in properties)
         self.assertTrue("link" in properties)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_get_properties__ytchan(self):
+    def test_get_properties__youtube_channel__basic(self):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
@@ -275,8 +278,24 @@ class UrlTest(FakeInternetTestCase):
 
         self.assertTrue("title" in properties)
         self.assertTrue("link" in properties)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_get_properties__html(self):
+    def test_get_properties__youtube_video__basic(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        url = Url(
+            "https://www.youtube.com/watch?v=1234"
+        )
+
+        url.get_response()
+        properties = url.get_properties()
+
+        self.assertTrue("title" in properties)
+        self.assertTrue("link" in properties)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_get_properties__html__basic(self):
         MockRequestCounter.mock_page_requests = 0
 
         test_link = "https://page-with-two-links.com"
@@ -289,6 +308,85 @@ class UrlTest(FakeInternetTestCase):
 
         self.assertTrue("title" in properties)
         self.assertTrue("link" in properties)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_get_properties__html__advanced(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        test_link = "https://page-with-two-links.com"
+
+        # call tested function
+        url = Url(test_link)
+
+        url.get_response()
+        all_properties = url.get_properties(full=True)
+
+        self.assertTrue(len(all_properties) > 0)
+        self.assertEqual(all_properties[0]["name"], "Properties")
+
+        properties = all_properties[0]["data"]
+
+        self.assertTrue("title" in properties)
+        self.assertTrue("link" in properties)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_get_properties__rss__advanced(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        url = Url("https://www.codeproject.com/WebServices/NewsRSS.aspx")
+
+        url.get_response()
+        all_properties = url.get_properties(full=True)
+
+        self.assertTrue(len(all_properties) > 0)
+        self.assertEqual(all_properties[0]["name"], "Properties")
+
+        properties = all_properties[0]["data"]
+
+        self.assertTrue("title" in properties)
+        self.assertTrue("link" in properties)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_get_properties__youtube_channel__advanced(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        url = Url(
+            "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
+        )
+
+        url.get_response()
+        all_properties = url.get_properties(full=True)
+
+        self.assertTrue(len(all_properties) > 0)
+        self.assertEqual(all_properties[0]["name"], "Properties")
+
+        properties = all_properties[0]["data"]
+
+        self.assertTrue("title" in properties)
+        self.assertTrue("link" in properties)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_get_properties__youtube_video__advanced(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        url = Url(
+            "https://www.youtube.com/watch?v=1234"
+        )
+
+        url.get_response()
+        all_properties = url.get_properties(full=True)
+
+        self.assertTrue(len(all_properties) > 0)
+        self.assertEqual(all_properties[0]["name"], "Properties")
+
+        properties = all_properties[0]["data"]
+
+        self.assertTrue("title" in properties)
+        self.assertTrue("link" in properties)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_cleaned_link(self):
         test_link = "https://my-server:8185/view/somethingsomething/"

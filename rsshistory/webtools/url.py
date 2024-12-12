@@ -12,6 +12,7 @@ options.mode_mapping
 """
 
 from urllib.parse import unquote
+from collections import OrderedDict
 import urllib.robotparser
 import asyncio
 
@@ -515,6 +516,82 @@ class Url(ContentInterface):
         handler = self.get_handler()
         if handler:
             return handler.get_contents_body_hash()
+
+    def get_properties(self, full=False):
+        basic_properties = super().get_properties()
+        if not full:
+            return basic_properties
+
+        response = self.get_response()
+        page_handler = self.get_handler()
+
+        all_properties = []
+
+        properties = basic_properties
+
+        feeds = self.get_feeds()
+        if len(feeds) > 0:
+            for key, feed in enumerate(feeds):
+                properties["feed_"+str(key)] = feed
+
+        if type(page_handler) is Url.youtube_channel_handler:
+            if page_handler.get_channel_name():
+                properties["channel_name"] = page_handler.get_channel_name()
+                properties["channel_url"] = page_handler.get_channel_url()
+
+        if type(page_handler) is Url.youtube_video_handler:
+            if page_handler.get_channel_name():
+                properties["channel_name"] = page_handler.get_channel_name()
+                properties["channel_url"] = page_handler.get_channel_url()
+
+        if type(page_handler) is HttpPageHandler and type(page_handler.p) is HtmlPage:
+            properties["favicon"] = page_handler.p.get_favicon()
+            properties["meta title"] = page_handler.p.get_meta_field("title")
+            properties["meta description"] = page_handler.p.get_meta_field("description")
+            properties["meta keywords"] = page_handler.p.get_meta_field("keywords")
+
+            properties["og:title"] = page_handler.p.get_og_field("title")
+            properties["og:description"] = page_handler.p.get_og_field("description")
+            properties["og:image"] = page_handler.p.get_og_field("image")
+            properties["og:site_name"] = page_handler.p.get_og_field("site_name")
+            properties["schema:thumbnailUrl"] = page_handler.p.get_schema_field("thumbnailUrl")
+
+        all_properties.append({"name" : "Properties", "data" : properties})
+
+        all_properties.append({"name" : "Contents", "data" : {"Contents" : self.get_contents()}})
+
+        request_data = OrderedDict()
+        request_data["Options SSL"] = self.options.ssl_verify
+        request_data["Options Ping"] = self.options.ping
+        request_data["Options use browser promotions"] = self.options.use_browser_promotions
+        request_data["Options mode mapping"] = str(self.options.mode_mapping)
+        request_data["Options user agent"] = str(self.options.user_agent)
+
+        request_data["Page Handler"] = str(page_handler.__class__.__name__)
+        if hasattr(page_handler, "p"):
+            request_data["Page Type"] = str(page_handler.p.__class__.__name__)
+
+        all_properties.append({"name" : "Options", "data" : request_data})
+
+        if response:
+            response_data = OrderedDict()
+            response_data["is_valid"] = response.is_valid()
+            response_data["status_code"] = response.get_status_code()
+            response_data["Content-Type"] = response.get_content_type()
+            response_data["Content-Length"] = response.get_content_length()
+            response_data["Charset"] = response.get_content_type_charset()
+            all_properties.append({"name" : "Response", "data" : response_data})
+
+        index = 0
+        for entry in self.get_entries():
+            if index == 0:
+                entry_properties = {}
+                entry_properties["link"] = entry["link"]
+                entry_properties["title"] = entry["title"]
+                all_properties.append({"name" : "Entries", "data" : entry_properties})
+            break
+
+        return all_properties
 
 
 class DomainCacheInfo(object):

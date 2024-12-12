@@ -1,20 +1,7 @@
 // TODO - make two parallel requests
-// one for form, one for data
-// when both return, then perform.
-// could be faster
+// we do not have to ping for form every time. we could be requesting it once, then only
+// replace it with new properties
 
-function escapeHtml(unsafe)
-{
-    if (unsafe == null)
-        return "";
-
-    return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
-}
 
 let submission_locked = true;
 let form_text = null;
@@ -44,44 +31,44 @@ function resetSearch(text = '') {
 }
 
 
-function fillEditForm(properties, token) {
-    if (properties[0].name != "Properties") {
+function fillEditForm(token) {
+    if (page_properties[0].name != "Properties") {
         console.error("Incorrect name 0");
-        console.error(properties[0].name);
+        console.error(page_properties[0].name);
         return;
     }
-    if (properties[1].name != "Contents") {
+    if (page_properties[1].name != "Contents") {
         console.error("Incorrect name 1");
-        console.error(properties[1].name);
+        console.error(page_properties[1].name);
         return;
     }
-    if (properties[2].name != "Options") {
+    if (page_properties[2].name != "Options") {
         console.error("Incorrect name 1");
-        console.error(properties[1].name);
+        console.error(page_properties[1].name);
         return;
     }
-    if (properties[3].name != "Response") {
+    if (page_properties[3].name != "Response") {
         console.error("Incorrect name 2");
-        console.error(properties[2].name);
+        console.error(page_properties[2].name);
         return;
     }
 
-    let link = properties[0].data.link;
-    let title = properties[0].data.title || '';
-    let description = properties[0].data.description || '';
-    let date_published = properties[0].data.date_published;
+    let link = page_properties[0].data.link;
+    let title = page_properties[0].data.title || '';
+    let description = page_properties[0].data.description || '';
+    let date_published = page_properties[0].data.date_published;
     let source_url = "";
     let bookmarked = true;
     let permanent = false;
-    let language = properties[0].data.language || '';
-    let user = properties[0].data.user;
-    let author = properties[0].data.author || '';
-    let album = properties[0].data.album || '';
-    let thumbnail = properties[0].data.thumbnail || '';
+    let language = page_properties[0].data.language || '';
+    let user = page_properties[0].data.user;
+    let author = page_properties[0].data.author || '';
+    let album = page_properties[0].data.album || '';
+    let thumbnail = page_properties[0].data.thumbnail || '';
     let manual_status_code = 0;
-    let status_code = properties[3].data.status_code;
-    let page_rating = properties[0].data.page_rating;
-    let page_rating_contents = properties[0].data.page_rating;
+    let status_code = page_properties[3].data.status_code;
+    let page_rating = page_properties[0].data.page_rating;
+    let page_rating_contents = page_properties[0].data.page_rating;
     let page_rating_votes = 0;
     let age = 0;
 
@@ -123,7 +110,7 @@ function fillEditForm(properties, token) {
 }
 
 let currentGetEditForm = 0;
-function getEditForm(page_url, properties, attempt = 1) {
+function getEditForm(page_url, attempt = 1) {
     $("#formResponse").html(`Obtaining form for link :${page_url}`);
 
     let url = `{% url 'rsshistory:entry-add-form' %}?link=${page_url}`;
@@ -147,7 +134,7 @@ function getEditForm(page_url, properties, attempt = 1) {
            let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
            $("#formDiv").html("");
 
-           fillEditForm(properties, csrfToken);
+           fillEditForm(csrfToken);
        },
        error: function(xhr, status, error) {
            if (requestCurrentGetEditForm != currentGetEditForm)
@@ -156,7 +143,7 @@ function getEditForm(page_url, properties, attempt = 1) {
            }
            
            if (attempt < 3) {
-               getEditForm(page_url, properties, attempt + 1);
+               getEditForm(page_url, attempt + 1);
            } else {
                resetSearch("Could not obtain edit form");
            }
@@ -165,11 +152,11 @@ function getEditForm(page_url, properties, attempt = 1) {
 }
 
 
-function fillData(page_url, properties) {
+function fillData(page_url) {
     let htmlOutput = "";
 
-    if (properties && properties.length > 0) {
-        getEditForm(page_url, properties);
+    if (page_properties && page_properties.length > 0) {
+        getEditForm(page_url);
     }
 
     return htmlOutput;
@@ -191,7 +178,9 @@ function sendPagePropertiesRequest(page_url, browser, attempt = 1) {
                return;
            
            if (data.status) {
-               let text = fillData(page_url, data.properties);
+               page_properties = data.properties;
+
+               let text = fillData(page_url);
                $("#formResponse").html(text);
                $('#btnFetch').prop("disabled", false);
                $('#btnFetch').html("Submit");

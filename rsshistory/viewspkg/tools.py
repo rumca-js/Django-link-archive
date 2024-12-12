@@ -134,57 +134,13 @@ def get_page_properties(request):
 
     is_link_allowed = DomainCache.get_object(page_link, url_builder=UrlHandler).is_allowed(page_link)
 
-    all_properties = []
+    all_properties = page_url.get_properties(full=True)
 
-    properties = OrderedDict()
-    properties["link"] = page_url.url
-    properties["title"] = page_url.get_title()
-    properties["description"] = page_url.get_description()
-    properties["author"] = page_url.get_author()
-    properties["album"] = page_url.get_album()
-    properties["thumbnail"] = page_url.get_thumbnail()
-    properties["language"] = page_url.get_language()
-    properties["page_rating"] = page_url.get_page_rating()
-    properties["date_published"] = page_url.get_date_published()
-    properties["is_link_allowed"] = is_link_allowed
-
-    feeds = page_url.get_feeds()
-    if len(feeds) > 0:
-        for key, feed in enumerate(feeds):
-            properties["feed_"+str(key)] = feed
-
-    if type(page_handler) is UrlHandler.youtube_channel_handler:
-        if page_handler.get_channel_name():
-            properties["channel_name"] = page_handler.get_channel_name()
-            properties["channel_url"] = page_handler.get_channel_url()
-
-    if type(page_handler) is UrlHandler.youtube_video_handler:
-        if page_handler.get_channel_name():
-            properties["channel_name"] = page_handler.get_channel_name()
-            properties["channel_url"] = page_handler.get_channel_url()
-
-    all_properties.append({"name" : "Properties", "data" : properties})
-
-    all_properties.append({"name" : "Contents", "data" : {"Contents" : page_url.get_contents()}})
-
-    request_data = OrderedDict()
-    request_data["Options"] = str(page_url.options)
     if browser:
+        request_data = {}
         request_data["Browser"] = str(browser.name)
         request_data["Browser Crawler"] = str(browser.crawler)
-    request_data["Page Handler"] = str(page_handler.__class__.__name__)
-    if hasattr(page_handler, "p"):
-        request_data["Page Type"] = str(page_handler.p.__class__.__name__)
-
-    all_properties.append({"name" : "Options", "data" : request_data})
-
-    if response:
-        response_data = OrderedDict()
-        response_data["Response"] = str(response)
-        response_data["status_code"] = response.get_status_code()
-        response_data["Content-Type"] = response.get_content_type()
-        response_data["Content-Length"] = response.get_content_length()
-        all_properties.append({"name" : "Response", "data" : response_data})
+        all_properties.append({"name" : "Browser", "data" : request_data})
 
     errors = get_errors(page_url)
     all_properties.append({"name" : "Errors", "data" : errors})

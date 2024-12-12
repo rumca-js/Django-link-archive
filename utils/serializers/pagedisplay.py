@@ -15,82 +15,47 @@ class PageDisplay(object):
         u = Url(url)
         u.get_response()
 
-        print("Handler:{}".format(type(u.get_handler())))
-        print("Title:{}".format(u.get_title()))
-        print("Description:{}".format(u.get_description()))
-        print("Language:{}".format(u.get_language()))
-        print("Author:{}".format(u.get_author()))
-        print("Album:{}".format(u.get_album()))
-        print("Thumbnail:{}".format(u.get_thumbnail()))
-        print("Options:{}".format(u.options))
+        properties = u.get_properties(full=True)
 
-        print("RSS path:{}".format(Url.find_rss_url(u)))
+        for section in properties:
+            section_name = section["name"]
+            section_properties = section["data"]
 
-        feeds = u.get_feeds()
-        for feed in feeds:
-            print("Feed URL:{}".format(feed))
+            if section_name == "Contents" and not verbose:
+                print("-------------")
+                if len(section_properties) > 0:
+                    print("There is contents")
+                else:
+                    print("Contents is empty")
+                continue
 
-        handler = u.get_handler()
-        if type(handler) is HttpPageHandler:
-            response = handler.get_response()
-            if response:
-                print("Response is valid?:{}".format(response.is_valid()))
-                print("Status code:{}".format(response.status_code))
-                print("Content-Type:{}".format(response.get_content_type()))
-                print("Charset:{}".format(response.get_content_type_charset()))
-                print("Page type:{}".format(type(handler.p)))
+            if section_name == "Headers" and not verbose:
+                continue
 
-            if type(handler.p) is RssPage:
-                pass
+            #if section_name == "Response" and not verbose:
+            #    continue
 
-            if type(handler.p) is HtmlPage:
-                if not feeds or len(feeds) == 0:
-                    rss = OpenRss(url)
-                    link = rss.find_rss_link()
-                    if link:
-                        print("Feed URL:{}".format(link))
+            print("-------------")
 
-                print("Favicon:{}".format(handler.p.get_favicon()))
-                print("meta title:{}".format(handler.p.get_meta_field("title")))
-                print(
-                    "meta description:{}".format(
-                        handler.p.get_meta_field("description")
-                    )
-                )
-                print("meta keywords:{}".format(handler.p.get_meta_field("keywords")))
+            for key in section_properties:
+                value = section_properties[key]
+                
+                if isinstance(value, str):
+                    print("{}:{}".format(key, value))
+                elif value is None:
+                    print("{}:{}".format(key, value))
+                elif isinstance(value, bool):
+                    print("{}:{}".format(key, value))
+                elif isinstance(value, int):
+                    print("{}:{}".format(key, value))
+                elif isinstance(value, dict):
+                    print(key)
+                    for inner_key, inner_value in value.items():
+                        print("  {}:{}".format(inner_key, inner_value))
+                else:
+                    print(f"{key} has an unsupported type: {type(value)}")
 
-                print("og:title:{}".format(handler.p.get_og_field("title")))
-                print("og:description:{}".format(handler.p.get_og_field("description")))
-                print("og:image:{}".format(handler.p.get_og_field("image")))
-                print("og:site_name:{}".format(handler.p.get_og_field("site_name")))
-
-                print(
-                    "schema image:{}".format(handler.p.get_schema_field("thumbnailUrl"))
-                )
-
-        elif type(handler) is Url.youtube_channel_handler:
-            print("Channel name:{}".format(handler.get_channel_name()))
-            print("Channel url:{}".format(handler.get_channel_url()))
-
-        elif type(handler) is Url.youtube_video_handler:
-            print("Channel name:{}".format(handler.get_channel_name()))
-            print("Channel url:{}".format(handler.get_channel_url()))
-
-        index = 0
-        for entry in u.get_entries():
-            if index == 0:
-                print("Has entries")
-                print("Entry Link:{}".format(entry["link"]))
-                print("Entry Title:{}".format(entry["title"]))
-            break
-
-        if u.get_contents():
-            if verbose:
-                print(u.get_contents())
-            else:
-                print("Contents?:Yes")
-        else:
-            print("Contents?:No")
+                    print("RSS path:{}".format(Url.find_rss_url(u)))
 
 
 class PageDisplayParser(object):

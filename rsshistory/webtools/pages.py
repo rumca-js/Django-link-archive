@@ -931,7 +931,7 @@ class ContentLinkParser(ContentInterface):
             if wh != -1:
                 item = item[:wh]
 
-            result.add(item)
+            result.add(item.strip())
 
         links = result
 
@@ -1100,6 +1100,9 @@ class ContentLinkParser(ContentInterface):
                 WebLogger.error("Incorrect link to add: {}".format(new_link), stack=True)
                 continue
 
+            if not p.is_web_link():
+                continue
+
             if new_link:
                 result.add(new_link)
 
@@ -1108,6 +1111,21 @@ class ContentLinkParser(ContentInterface):
     def get_domains(self):
         links = self.get_links()
         links = ContentLinkParser.filter_domains(links)
+
+        # TODO This is most probably redundant
+        if None in links:
+            links.remove(None)
+        if "" in links:
+            links.remove("")
+        if "http" in links:
+            links.remove("http")
+        if "https" in links:
+            links.remove("https")
+        if "http://" in links:
+            links.remove("http://")
+        if "https://" in links:
+            links.remove("https://")
+
         return links
 
     def get_links_inner(self):

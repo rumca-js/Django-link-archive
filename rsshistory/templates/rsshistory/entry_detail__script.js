@@ -2,27 +2,47 @@
 
 
 let entry_json_data = null;
+let is_downloading = false;
 
 
 function getEditButton() {
-  return `<button id="editTagsButton"><img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" /></button>`;
+    return `<button id="editTagsButton"><img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" /></button>`;
 }
 
 
-function loadIsEntryDownloaded(attempt = 1) {
+function getDownloadingText() {
+    return '<span class="bg-warning text-dark"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Downloading...</span>';
+}
+
+
+let currentIsDownloading = 0;
+function fillIsEntryDownloaded(attempt = 1) {
+    let requestIsDownloading = ++currentIsDownloading;
+
     $.ajax({
         url: "{% url 'rsshistory:is-entry-download' object.id %}",
         type: 'GET',
         timeout: 15000,
         success: function(data) {
-            if (data.status) {
-                const text = '<span class="bg-warning text-dark"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Downloading...</span>';
+            if (requestIsDownloading != currentIsDownloading) {
+                return;
+            }
+            is_downloading = data.status;
+
+            if (is_downloading) {
+                const text = getDownloadingText();
                 $('#entryDownloadLine').html(text);
+            }
+            else {
+                $('#entryDownloadLine').html("");
             }
         },
         error: function(xhr, status, error) {
+            if (requestIsDownloading != currentIsDownloading) {
+                return;
+            }
             if (attempt < 3) {
-                loadIsEntryDownloaded(attempt + 1);
+                fillIsEntryDownloaded(attempt + 1);
             }
         }
     });
@@ -34,22 +54,32 @@ function loadEntryDynamicDetails(attempt = 1) {
 }
 
 
+let currentgetDynamicJsonContentWithRefresh = 0;
 function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1, errorInHtml = false) {
+    let requestgetDynamicJsonContentWithRefresh = ++currentgetDynamicJsonContentWithRefresh;
+
     $.ajax({
        url: url_address,
        type: 'GET',
        timeout: 10000,
        success: function(data) {
-          $(htmlElement).html(data.message);
+           if (requestgetDynamicJsonContentWithRefresh != currentgetDynamicJsonContentWithRefresh) {
+               return;
+           }
+           $(htmlElement).html(data.message);
 
-          if (data.status) {
-             loadEntryMenuContent();
-             getIndicators();
-          }
+           if (data.status) {
+               getEntryJson();
+               loadEntryMenuContent();
+               getIndicators();
+           }
        },
        error: function(xhr, status, error) {
+           if (requestgetDynamicJsonContentWithRefresh != currentgetDynamicJsonContentWithRefresh) {
+               return;
+           }
            if (attempt < 3) {
-               getDynamicJsonContent(url, htmlElement, attempt + 1, errorInHtml);
+               getDynamicJsonContentWithRefresh(url, htmlElement, attempt + 1, errorInHtml);
                if (errorInHtml) {
                    $(htmlElement).html("Error loading dynamic content, retry");
                }
@@ -133,44 +163,6 @@ function getEntryJson(attempt = 1) {
        }
     });
 }
-
-
-$(document).on('click', '#Vote', function(event) {
-    event.preventDefault();
-    getVoteEditForm();
-});
-
-$(document).on('click', '#Bookmark', function(event) {
-    event.preventDefault();
-    getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-bookmark' object.id %}", '#entryStatusLine');
-    getEntryJson();
-    loadEntryMenuContent();
-});
-
-$(document).on('click', '#Unbookmark', function(event) {
-    event.preventDefault();
-    getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-unbookmark' object.id %}", '#entryStatusLine');
-    getEntryJson();
-    loadEntryMenuContent();
-});
-
-$(document).on('click', '#Read-later', function(event) {
-    event.preventDefault();
-    getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-add' object.id %}", '#entryStatusLine');
-    loadEntryMenuContent();
-});
-
-$(document).on('click', '#Do-not-read-later', function(event) {
-    event.preventDefault();
-    getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-remove' object.id %}", '#entryStatusLine');
-    loadEntryMenuContent();
-});
-
-$(document).on('click', '#Remove', function(event) {
-    event.preventDefault();
-
-    getDynamicJsonContent("{% url 'rsshistory:entry-remove' object.id %}", "#entryStatusLine");
-});
 
 
 let currententryVote = 0;
@@ -259,6 +251,36 @@ function tagEntry(attempt = 1) {
 }
 
 
+$(document).on('click', '#Vote', function(event) {
+    event.preventDefault();
+    getVoteEditForm();
+});
+
+$(document).on('click', '#Bookmark', function(event) {
+    event.preventDefault();
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-bookmark' object.id %}", '#entryStatusLine');
+});
+
+$(document).on('click', '#Unbookmark', function(event) {
+    event.preventDefault();
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-unbookmark' object.id %}", '#entryStatusLine');
+});
+
+$(document).on('click', '#Read-later', function(event) {
+    event.preventDefault();
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-add' object.id %}", '#entryStatusLine');
+});
+
+$(document).on('click', '#Do-not-read-later', function(event) {
+    event.preventDefault();
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-remove' object.id %}", '#entryStatusLine');
+});
+
+$(document).on('click', '#Remove', function(event) {
+    event.preventDefault();
+    getDynamicJsonContent("{% url 'rsshistory:entry-remove' object.id %}", "#entryStatusLine");
+});
+
 $(document).on('submit', '#voteEditForm', function(event) {
     event.preventDefault();
 
@@ -284,11 +306,13 @@ $(document).on('click', '#cancelTagEdit', function() {
     updateEntry();
 });
 
+
 loadEntryDynamicDetails();
-loadIsEntryDownloaded(); //TODO maybe this is not necessary. Maybe move it to entry json
+fillIsEntryDownloaded(); //TODO maybe this is not necessary. Maybe move it to entry json
 getEntryJson();
 
+
 setInterval(function() {
-    loadIsEntryDownloaded();
+    fillIsEntryDownloaded();
     getEntryJson();
 }, 300000);

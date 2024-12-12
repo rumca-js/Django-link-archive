@@ -93,7 +93,7 @@ def get_generic_search_init_context(request, form):
     context["search_term"] = search_term
     context["search_engines"] = SearchEngines(search_term)
     context["view_link"] = form.action_url
-    context["form_submit_button_name"] = "??"
+    context["form_submit_button_name"] = "🔍"
 
     context["entry_query_names"] = LinkDataController.get_query_names()
     context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()

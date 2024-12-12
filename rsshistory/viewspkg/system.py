@@ -759,6 +759,7 @@ def wizard_setup_search_engine(request):
     c.entries_order_by = "-page_rating, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_SEARCH_ENGINE
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
+    c.remove_entry_vote_threshold = 1   # do not remove everything above, or equal to 1 vote
 
     c.initialized = True
 

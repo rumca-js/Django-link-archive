@@ -1,17 +1,8 @@
 {% load static %}
 
-function escapeHtml(unsafe)
-{
-    if (unsafe == null)
-        return "";
 
-    return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
- }
+let page_properties = null;
+
 
 function fillDataProperty(property) {
     let htmlOutput = "";
@@ -53,11 +44,12 @@ function fillDataProperty(property) {
     return htmlOutput;
 }
 
-function fillData(properties) {
+
+function fillData() {
     let htmlOutput = "";
 
-    if (properties && properties.length > 0) {
-        properties.forEach(property => {
+    if (page_properties && page_properties.length > 0) {
+        page_properties.forEach(property => {
             htmlOutput += fillDataProperty(property);
         });
     }
@@ -65,7 +57,11 @@ function fillData(properties) {
     return htmlOutput;
 }
 
-function sendRequest(page_url, browser, attempt = 1) {
+
+let currentgetPageProperties = 0;
+function getPageProperties(page_url, browser, attempt = 1) {
+    let requestgetPageProperties = ++currentgetPageProperties;
+
     let url = `{% url 'rsshistory:get-page-properties' %}?page=${page_url}&browser=${browser}`;
     let spinner_text = getSpinnerText(`Fetching... ${url}`);
     $("#propertiesResponse").html(spinner_text);
@@ -75,15 +71,24 @@ function sendRequest(page_url, browser, attempt = 1) {
        type: 'GET',
        timeout: 40000, // TODO this depends on configuration
        success: function(data) {
+           if (requestgetPageProperties != currentgetPageProperties)
+           {
+               return;
+           }
+           page_properties = data.properties;
            let text = fillData(data.properties);
            $("#propertiesResponse").html(text);
            $('.btnFilterTrigger').prop("disabled", false);
            $('.btnFilterTrigger').html("Submit")
        },
        error: function(xhr, status, error) {
+           if (requestgetPageProperties != currentgetPageProperties)
+           {
+               return;
+           }
            if (attempt < 3) {
                $("#propertiesResponse").html("Could not obtain information. Retry");
-               sendRequest(page_url, browser, attempt + 1);
+               getPageProperties(page_url, browser, attempt + 1);
            } else {
                $("#propertiesResponse").html("Could not obtain information. Error");
                $('.btnFilterTrigger').prop("disabled", false);
@@ -104,7 +109,7 @@ function OnUserInput() {
         return;
     }
 
-    sendRequest(link, browser);
+    getPageProperties(link, browser);
 }
 
 

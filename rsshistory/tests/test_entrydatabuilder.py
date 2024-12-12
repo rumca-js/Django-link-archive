@@ -430,3 +430,44 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         entry = b.build_from_props()
 
         self.assertEqual(first_created_entry, entry)
+
+    def test_build_from_props__scan(self):
+        config = Configuration.get_object().config_entry
+        config.accept_not_domain_entries = True
+        config.accept_domains = False
+        config.auto_create_sources = False
+        config.save()
+
+        MockRequestCounter.mock_page_requests = 0
+
+        link_name = "https://youtube.com/v=1234"
+
+        current_time = DateUtils.get_datetime_now_utc()
+        creation_date = current_time - timedelta(days=1)
+
+        link_data = {
+            "link": link_name,
+            "source_url": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": creation_date,
+            "page_rating_contents": 23,
+            "page_rating_votes": 12,
+            "page_rating": 25,
+        }
+
+        b = EntryDataBuilder()
+        b.user = self.user
+        b.link_data = link_data
+        # call tested function
+        entry = b.build_from_props()
+
+        objs = LinkDataController.objects.filter(link=link_name)
+
+        self.assertEqual(objs.count(), 1)
+        self.assertEqual(objs[0].link, link_name)
+
+        scan_jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_SCAN)
+        self.assertEqual(scan_jobs.count(), 1)

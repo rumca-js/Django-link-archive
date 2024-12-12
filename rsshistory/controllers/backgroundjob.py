@@ -285,7 +285,8 @@ class BackgroundJobController(BackgroundJob):
         cfg = {}
 
         config = Configuration.get_object().config_entry
-        if not config.entry_update_uses_internet:
+
+        if not config.auto_scan_entries:
             return
 
         if source:

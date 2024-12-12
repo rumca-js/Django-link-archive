@@ -53,7 +53,7 @@ function getEntryTags(entry) {
 
 
 function isEntryValid(entry) {
-    if (!entry.is_valid || entry.date_dead_since) {
+    if (entry.is_valid === false || entry.date_dead_since) {
         return false;
     }
     return true;
