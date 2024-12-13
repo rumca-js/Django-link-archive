@@ -14,17 +14,16 @@ Personal link database, link aggregator, with RSS functionality.
 
 # Features
 
-## General
-
- - bookmarks management, with tags, and comment support
- - support for 'spaces'. You can define own spaces like 'music', 'videos', 'movies', etc. Manged by django apps
- - keywords entry analysis to find trends
+ - bookmarks management, tags, and comment support
  - light mode and dark mode
+ - access for multiple users
  - automatic exports
     - to directory
     - to GitHub
- - access for multiple users
+ - support for 'spaces'. You can define own spaces like 'music', 'videos', 'movies', etc. Manged by separate django apps
+ - keywords entry analysis to find trends
  - kiosk mode. Auto refresh when URL is appended with param "auto-refresh" set to millisecond value
+ - small foot-print. I am running this thing on RPI5
 
 ## Services
 
@@ -39,11 +38,12 @@ Personal link database, link aggregator, with RSS functionality.
  - link search. Simple implementation, does not use elastic search
  - does not support proxy rotation. This is ethical web scraper, it should not spam with requests
  - configurable user agents, crawlers, selenium, requests, chrome undetected, crawlee, easily extendible
+ - if you need a real web crawler, you may use scrapy, or apache nutch, etc.
 
 ## Privacy
 
  - local data, no algorithms, no advertisements, self-hosted
- - user action tracking. You can observe and analyze history of your 'views', 'searches', 'comments', 'browsing history'
+ - local user action tracking. You can observe and analyze history of your 'views', 'searches', 'comments', 'browsing history'
  
 <div align="center">
   <img alt="Django Logo" src="images/old-wild-west.jpg" width="500px">
@@ -58,6 +58,7 @@ Personal link database, link aggregator, with RSS functionality.
  - [daily RSS Git repository for the year 2022](https://github.com/rumca-js/RSS-Link-Database-2022)
  - [daily RSS Git repository for the year 2021](https://github.com/rumca-js/RSS-Link-Database-2021)
  - [daily RSS Git repository for the year 2020](https://github.com/rumca-js/RSS-Link-Database-2020)
+ - [Online domains viewer](https://rumca-js.github.io/quickstart/public/static_lists/viewerzip.html)
 
 ## Links
 

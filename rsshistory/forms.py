@@ -146,6 +146,7 @@ class ConfigForm(forms.ModelForm):
             "days_to_remove_stale_entries",
             "days_to_check_std_entries",
             "days_to_check_stale_entries",
+            "remove_entry_vote_threshold",
             "number_of_update_entries",
             # Networking
             "ssl_verification",
