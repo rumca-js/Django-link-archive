@@ -6,13 +6,13 @@ You can be one.
 
 The goal is to create personal archive database. We require small footprint. It should be able to run on SBC, like raspberry PI 5.
 
-# On web scraping
+# On web crawling
 
 Please do not make anyone live miserable. It was designed to capture information from publicly available data (for example RSS), not to exploit anybody.
 
-We should not scrape aggressively. Reads intervals should be sane. We should be reading robots.txt
+We should not crawling aggressively. Reads intervals should be sane. We should be reading robots.txt
 
-On the other hand some web pages use sofisticated barriers that prevents us from successfuly scraping the web contents.
+On the other hand some web pages use sofisticated barriers that prevents us from successfuly crawling the web contents.
 
 Most common techniques:
  - Some pages do not display contents, or provide invalid html data. You can use different user agent. Best results can be obtained if we used chrome user agent
@@ -49,19 +49,19 @@ Keep limits on user actions:
  - we use one queue to check for jobs, and processing queue. We do not need many queues, as it makes system more difficult. We do not need speed, as we are ethical scrapers
  - this program was not designed to store Internet pages, but to store Internet meta data (title, description). We should rely on other services for cooperation. We cannot store entire Internet on a hard drive. We can store some meta though
 
-# Scraping algorithm
+# Crawling algorithm
 
 Parts:
  - django application
- - scraping server (script_server.py)
- - scraping script (for example crawleebeautifulsoup.py)
+ - crawling server (script_server.py)
+ - crawling script (for example crawleebeautifulsoup.py)
 
 Scenario:
  - Django app detects it needs meta data
- - Connects to scraping server, sends request
- - scraping server starts script
- - scraping script tries to obtain info about link, returns data to scraping server
- - scraping server sends data back to caller (django app)
+ - Connects to crawling server, sends request
+ - crawling server starts script
+ - crawling script tries to obtain info about link, returns data to crawling server
+ - crawling server sends data back to caller (django app)
 
 ## Notes
 

@@ -394,10 +394,6 @@ class UrlLocationTest(FakeInternetTestCase):
         # call tested function
         self.assertTrue(p.is_web_link())
 
-        p = UrlLocation("https://com")
-        # call tested function
-        self.assertFalse(p.is_web_link())
-
         p = UrlLocation("smb://youtube.com")
         # call tested function
         self.assertTrue(p.is_web_link())
@@ -413,6 +409,18 @@ class UrlLocationTest(FakeInternetTestCase):
         p = UrlLocation("\\\\127.0.0.1")
         # call tested function
         self.assertTrue(p.is_web_link())
+
+        p = UrlLocation("http://&up_bodycolor=627c4f&up_pattern=0&up_patterncolor=000000&up_footcolor=2ba029&up_eyecolor=2ba029&up_bellysize=.5&up_backg")
+        # call tested function
+        self.assertFalse(p.is_web_link())
+
+        p = UrlLocation("https://com")
+        # call tested function
+        self.assertFalse(p.is_web_link())
+
+        p = UrlLocation("http://domain&char.com")
+        # call tested function
+        self.assertFalse(p.is_web_link())
 
     def test_get_protocolless(self):
         p = UrlLocation("https://www.youtube.com:443")

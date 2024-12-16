@@ -5,9 +5,14 @@ let show_pure_links = 0;
 let highlight_bookmarks = false;
 
 
-function getVotesBadge(page_rating_votes) {
+function getVotesBadge(page_rating_votes, overflow=false) {
+    let style = "font-size: 0.8rem;"
+    if (overflow) {
+        style = "position: absolute; top: 5px; right: 30px;" + style;
+    }
+
     let badge_text = page_rating_votes > 0 ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 30px; font-size: 0.8rem;">
+        <span class="badge text-bg-warning" style="${style}">
             ${page_rating_votes}
         </span>` : '';
 
@@ -15,28 +20,43 @@ function getVotesBadge(page_rating_votes) {
 }
 
 
-function getBookmarkBadge(entry) {
+function getBookmarkBadge(entry, overflow=false) {
+    let style = "font-size: 0.8rem;"
+    if (overflow) {
+        style = "position: absolute; top: 5px; right: 5px;" + style;
+    }
+
     let badge_star = entry.bookmarked ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 5px; right: 5px; font-size: 0.8rem;">
+        <span class="badge text-bg-warning" style="${style}">
             ★
         </span>` : '';
     return badge_star;
 }
 
 
-function getAgeBadge(entry) {
+function getAgeBadge(entry, overflow=false) {
+    let style = "font-size: 0.8rem;"
+    if (overflow) {
+        style = "position: absolute; top: 30px; right: 5px;" + style;
+    }
+
     let badge_text = entry.age > 0 ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 30px; right: 5px; font-size: 0.8rem;">
+        <span class="badge text-bg-warning" style="${style}">
             A
         </span>` : '';
     return badge_text;
 }
 
 
-function getDeadBadge(entry) {
+function getDeadBadge(entry, overflow=false) {
+    let style = "font-size: 0.8rem;"
+    if (overflow) {
+        style = "position: absolute; top: 30px; right: 30px;" + style;
+    }
+
     let badge_text = entry.date_dead_since ? `
-        <span class="badge text-bg-warning" style="position: absolute; top: 30px; right: 30px; font-size: 0.8rem;">
-            D
+        <span class="badge text-bg-warning" style="${style}">
+           💀
         </span>` : '';
     return badge_text;
 }
@@ -102,11 +122,13 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                     </div>
                     ${tags_text}
                 </div>
-            </div>
 
-            ${badge_text}
-            ${badge_star}
-            ${badge_age}
+                <div class="mx-2 ms-auto">
+                  ${badge_text}
+                  ${badge_star}
+                  ${badge_age}
+                </div>
+            </div>
         </a>
     `;
 }
@@ -146,6 +168,9 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                   <span style="font-weight:bold" class="text-reset">{title_safe}</span>
                   <div class="text-reset text-decoration-underline">@ {link}</div>
                   ${tags_text}
+               </div>
+
+               <div class="mx-2 ms-auto">
                   ${badge_text}
                   ${badge_star}
                   ${badge_age}
@@ -169,18 +194,20 @@ function entryGalleryTemplate(entry, show_icons = true, small_icons = false) {
 function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
     
-    let badge_text = getVotesBadge(page_rating_votes);
-    let badge_star = getBookmarkBadge(entry);
-    let badge_age = getAgeBadge(entry);
+    let badge_text = getVotesBadge(page_rating_votes, true);
+    let badge_star = getBookmarkBadge(entry, true);
+    let badge_age = getAgeBadge(entry, true);
 
     let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
 
     let thumbnail = entry.thumbnail;
     let thumbnail_text = `
         <img src="${thumbnail}" style="width:100%;max-height:100%;aspect-ratio:3/4;object-fit:cover;"/>
-        ${badge_text}
-        ${badge_star}
-        ${badge_age}
+        <div class="ms-auto">
+            ${badge_text}
+            ${badge_star}
+            ${badge_age}
+        </div>
     `;
 
     let tags_text = getEntryTags(entry);
@@ -210,9 +237,9 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
 function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
     
-    let badge_text = getVotesBadge(page_rating_votes);
-    let badge_star = getBookmarkBadge(entry);
-    let badge_age = getAgeBadge(entry);
+    let badge_text = getVotesBadge(page_rating_votes, true);
+    let badge_star = getBookmarkBadge(entry, true);
+    let badge_age = getAgeBadge(entry, true);
 
     let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
 
@@ -274,7 +301,7 @@ function fillOneEntry(entry) {
 
     title = escapeHtml(entry.title)
 
-    let title_safe = null;
+    let title_safe = "";
     if (entry.title_safe) {
        title_safe = escapeHtml(entry.title_safe)
     }
@@ -282,7 +309,7 @@ function fillOneEntry(entry) {
     {
        title_safe = escapeHtml(entry.title)
     }
-    let source__title = null;
+    let source__title = "";
     if (entry.source__title) {
        source__title = escapeHtml(entry.source__title)
     }

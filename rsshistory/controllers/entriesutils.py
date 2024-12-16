@@ -1199,6 +1199,9 @@ class EntryWrapper(object):
         from ..pluginurl import UrlHandler, EntryUrlInterface
         entry = self.entry
 
+        if not entry:
+            return False
+
         if entry.is_https():
             if entry.link.startswith("https://www"):
                 return False

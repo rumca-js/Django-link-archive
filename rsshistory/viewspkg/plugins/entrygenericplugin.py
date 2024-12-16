@@ -625,14 +625,19 @@ class EntryGenericPlugin(object):
         parameters.append(EntryParameter("Points", points_text, points_title))
 
         update_date = c.get_local_time(self.entry.date_update_last)
-        parameters.append(EntryParameter("Update date", update_date))
+        if update_date:
+            parameters.append(EntryParameter("Update date", update_date))
 
         modified_date = c.get_local_time(self.entry.date_last_modified)
         if modified_date:
             parameters.append(EntryParameter("Modified date", modified_date))
 
+        date_dead_since = c.get_local_time(self.entry.date_dead_since)
+        if date_dead_since:
+            parameters.append(EntryParameter("Dead since", date_dead_since))
+
         if self.entry.author:
-            parameters.append(EntryParameter("Artist", self.entry.author))
+            parameters.append(EntryParameter("Author", self.entry.author))
         if self.entry.album:
             parameters.append(EntryParameter("Album", self.entry.album))
 

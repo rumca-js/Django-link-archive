@@ -109,6 +109,7 @@ function fillEditForm(token) {
     submission_locked = false;
 }
 
+
 let currentGetEditForm = 0;
 function getEditForm(page_url, attempt = 1) {
     $("#formResponse").html(`Obtaining form for link :${page_url}`);
@@ -162,6 +163,7 @@ function fillData(page_url) {
     return htmlOutput;
 }
 
+
 let currentPageProperties = 0;
 function sendPagePropertiesRequest(page_url, browser, attempt = 1) {
     $("#formResponse").html(`Fetching link properties ${page_url} with browser:${browser}`);
@@ -203,6 +205,7 @@ function sendPagePropertiesRequest(page_url, browser, attempt = 1) {
     });
 }
 
+
 let currentsendJqueryPageProperties = 0;
 function sendJqueryPageProperties(page_url, browser, attempt = 1) {
     $("#formResponse").html(`Obtaining form for link :${page_url}`);
@@ -241,6 +244,7 @@ function sendJqueryPageProperties(page_url, browser, attempt = 1) {
        }
     });
 }
+
 
 let currentsendEmptyFrame = 0;
 function sendEmptyFrame(page_url, browser, attempt = 1) {
@@ -380,24 +384,27 @@ $(document).ready(function() {
    });
 });
 
+
 $(document).on('submit', '#theForm', function(event) {
     if (submission_locked) {
         event.preventDefault();
     }
 });
 
+
 $("#btnAddLink").click(function(event) {
    event.preventDefault();
    putSpinnerOnIt($(this));
 });
 
+
 $('#theForm input[name="link"]').on('input', function() {
-    var link = $('#theForm input[name="link"]').val();
+    let element = $('#theForm input[name="link"]');
 
-    // TODO display errors, if ends with /, or if it has # in link, or if
-    //
-    // can we decode stupid google links?
-
-    //if (link.endswith) {
-    //}
+    var search_link = element.val();
+    new_search_link = fixStupidGoogleRedirects(search_link);
+    if (new_search_link && search_link != new_search_link)
+    {
+        element.val(new_search_link);
+    }
 });

@@ -36,7 +36,7 @@ Personal link database, link aggregator, with RSS functionality.
 
  - some Internet crawling capabilities
  - link search. Simple implementation, does not use elastic search
- - does not support proxy rotation. This is ethical web scraper, it should not spam with requests
+ - does not support proxy rotation. This is ethical web crawling, it should not spam with requests
  - configurable user agents, crawlers, selenium, requests, chrome undetected, crawlee, easily extendible
  - if you need a real web crawler, you may use scrapy, or apache nutch, etc.
 
@@ -173,7 +173,7 @@ Forget about YouTube video browsing history, or subscriptions. You can control w
 
 # Scripts
 
-Web-scraping functionality can be also used without django.
+Web-crawling functionality can be also used without django.
 
 There are some scripts that can be used without Django application:
  - yafr.py - yet another feed reader, commandline client

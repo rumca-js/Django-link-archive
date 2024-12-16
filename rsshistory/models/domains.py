@@ -58,6 +58,12 @@ class Domains(models.Model):
         p = UrlLocation(entry.link)
         if p.is_domain():
             domain_only = p.get_domain_only()
+
+            if self.domain != domain_only:
+                domains = Domains.objects.filter(domain = domain_only)
+                if domains.exists():
+                    domains.delete()
+
             self.domain = domain_only
             self.save()
 

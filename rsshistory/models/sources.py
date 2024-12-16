@@ -31,6 +31,11 @@ class SourceCategories(models.Model):
         if objs.count() != 0:
             return objs[0]
 
+    def __str__(self):
+        return "{}".format(
+            self.name,
+        )
+
 
 class SourceSubCategories(models.Model):
     category_name = models.CharField(max_length=1000, default="")
@@ -82,6 +87,11 @@ class SourceSubCategories(models.Model):
         )
         if objs.count() != 0:
             return objs[0]
+
+    def __str__(self):
+        return "{}".format(
+            self.name,
+        )
 
 
 class SourceDataModel(models.Model):

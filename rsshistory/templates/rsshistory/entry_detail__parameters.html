@@ -11,4 +11,25 @@
           {{parameter.description | safe}}
       </div>
       {% endfor %}
+
+      {% if object.bookmarked %}
+      <span class="badge text-bg-warning mx-1" style="font-size: 0.8rem;">
+            ?
+      </span>
+      {% endif %}
+      {% if object.page_rating_votes %}
+      <span class="badge text-bg-warning mx-1" style="font-size: 0.8rem;">
+          {{object.page_rating_votes}}
+      </span>
+      {% endif %}
+      {% if object.age %}
+      <span class="badge text-bg-warning mx-1" style="font-size: 0.8rem;">
+          A
+      </span>
+      {% endif %}
+      {% if object.date_dead_since %}
+      <span class="badge text-bg-danger mx-1" style="font-size: 0.8rem;">
+         ??
+      </span>
+      {% endif %}
   </div>

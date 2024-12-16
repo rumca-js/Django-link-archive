@@ -121,6 +121,19 @@ $(document).ready(function() {
     });
 });
 
+
 $(document).on('submit', '#theForm', function(event) {
     event.preventDefault();
+});
+
+
+$('#theForm input[name="link"]').on('input', function() {
+    let element = $('#theForm input[name="link"]');
+
+    var search_link = element.val();
+    new_search_link = fixStupidGoogleRedirects(search_link);
+    if (new_search_link && search_link != new_search_link)
+    {
+        element.val(new_search_link);
+    }
 });

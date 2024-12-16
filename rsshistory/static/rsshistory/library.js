@@ -1,8 +1,37 @@
+function isMobile() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+}
+
+
+function escapeHtml(unsafe)
+{
+    if (unsafe == null)
+        return "";
+
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
+
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+
+function isEmpty( el ){
+    return !$.trim(el.html())
+}
 
 
 function getSpinnerText(text = 'Loading...') {
    return `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${text}`;
 }
+
 
 function putSpinnerOnIt(button) {
     button.prop("disabled", true);
@@ -13,6 +42,7 @@ function putSpinnerOnIt(button) {
 
     button.parents('form').submit();
 }
+
 
 function getDynamicContent(url_address, htmlElement, attempt = 1, errorInHtml = false) {
     $.ajax({
@@ -36,6 +66,8 @@ function getDynamicContent(url_address, htmlElement, attempt = 1, errorInHtml = 
        }
     });
 }
+
+
 function getDynamicJsonContent(url_address, htmlElement, attempt = 1, errorInHtml = false) {
     $.ajax({
        url: url_address,
@@ -59,14 +91,6 @@ function getDynamicJsonContent(url_address, htmlElement, attempt = 1, errorInHtm
     });
 }
 
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-
-function isEmpty( el ){
-    return !$.trim(el.html())
-}
 
 function GetPaginationNav(data) {
     let totalPages = data.num_pages;
@@ -137,20 +161,34 @@ function GetPaginationNav(data) {
 }
 
 
-function isMobile() {
-    return /Mobi|Android/i.test(navigator.userAgent);
-}
+function fixStupidGoogleRedirects(input_url) {
+    if (!input_url) {
+        return null;
+    }
 
+    if (input_url.includes("www.google.com")) {
+        const url = new URL(input_url);
+        const realURL = url.searchParams.get('q');
 
-function escapeHtml(unsafe)
-{
-    if (unsafe == null)
-        return "";
+        if (realURL) {
+            return realURL;
+        } else {
+            return input_url;
+        }
+    }
 
-    return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+    if (input_url.includes("www.youtube.com")) {
+        const url = new URL(input_url);
+        const redirectURL = url.searchParams.get('q');
+        const videoId = url.searchParams.get('v');
+
+        if (redirectURL) {
+            return videoId ? `${decodeURIComponent(redirectURL)}&v=${videoId}` : decodeURIComponent(redirectURL);
+        }
+        else {
+            return input_url;
+        }
+    }
+
+    return input_url;
 }

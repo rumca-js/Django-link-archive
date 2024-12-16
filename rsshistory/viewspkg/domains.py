@@ -35,7 +35,7 @@ from ..views import (
 class DomainsListView(object):
     paginate_by = 100
 
-    def __init__(self, request):
+    def __init__(self, request, user=None):
         self.request = request
         self.user = user
         if not self.user and self.request:
@@ -320,7 +320,7 @@ def domains_json(request):
     json_obj["page"] = page_num
     json_obj["num_pages"] = 0
 
-    view = DomainsListView(request)
+    view = DomainsListView(request, request.user)
 
     uc = UserConfig.get(request.user)
 

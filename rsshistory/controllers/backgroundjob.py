@@ -44,9 +44,9 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,),
         (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP),
         (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE),
+        (BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, BackgroundJob.JOB_LINK_RESET_LOCAL_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),
-        (BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, BackgroundJob.JOB_LINK_RESET_LOCAL_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
         (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),
         (BackgroundJob.JOB_LINK_SCAN, BackgroundJob.JOB_LINK_SCAN,),
@@ -207,6 +207,9 @@ class BackgroundJobController(BackgroundJob):
 
         h = UrlLocation(url)
         if h.is_analytics():
+            return
+
+        if not h.is_web_link():
             return
 
         """

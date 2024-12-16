@@ -958,7 +958,7 @@ class ScriptCrawler(CrawlerInterface):
                 timeout=self.timeout_s + 10,  # add more time for closing browser, etc
             )
         except subprocess.TimeoutExpired as E:
-            WebLogger.exc(E, "Timeout on running script")
+            WebLogger.debug(E, "Timeout on running script")
 
             self.response = PageResponseObject(
                 self.request.url,
@@ -966,6 +966,7 @@ class ScriptCrawler(CrawlerInterface):
                 status_code=HTTP_STATUS_CODE_TIMEOUT,
                 request_url=self.request.url,
             )
+            return self.response
         except ValueError as E:
             WebLogger.exc(E, "Incorrect script call {}".format(script))
             return self.response
@@ -1121,7 +1122,7 @@ class ServerCrawler(CrawlerInterface):
                 return self.response
         except Exception as E:
             WebLogger.exc(E, "Cannot connect to port{}".format(self.response_port))
-            return
+            return self.response_port
 
         bytes = get_request_to_bytes(self.request, self.script)
         self.connection.send(bytes)
@@ -1234,10 +1235,17 @@ class SeleniumBase(CrawlerInterface):
         if not self.is_valid():
             return
 
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
+
         try:
             from seleniumbase import SB
         except Exception as E:
-            return
+            return self.response
 
         with SB() as sb:
             sb.open(request.url)

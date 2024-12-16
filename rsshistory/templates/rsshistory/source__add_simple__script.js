@@ -3,18 +3,6 @@
 // when both return, then perform.
 // could be faster
 
-function escapeHtml(unsafe)
-{
-    if (unsafe == null)
-        return "";
-
-    return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
-}
 
 let submission_locked = true;
 let form_text = null;
@@ -173,6 +161,7 @@ function sendEmptyFrame(page_url, browser, attempt = 1) {
     });
 }
 
+
 function getForm(page_url, browser) {
     if (browser == -1) {
         sendJqueryPageProperties(page_url, browser);
@@ -263,24 +252,27 @@ $(document).ready(function() {
    });
 });
 
+
 $(document).on('submit', '#theForm', function(event) {
     if (submission_locked) {
         event.preventDefault();
     }
 });
 
+
 $("#btnAddLink").click(function(event) {
    event.preventDefault();
    putSpinnerOnIt($(this));
 });
 
+
 $('#theForm input[name="link"]').on('input', function() {
-    var link = $('#theForm input[name="link"]').val();
+    let element = $('#theForm input[name="link"]');
 
-    // TODO display errors, if ends with /, or if it has # in link, or if
-    //
-    // can we decode stupid google links?
-
-    //if (link.endswith) {
-    //}
+    var search_link = element.val();
+    new_search_link = fixStupidGoogleRedirects(search_link);
+    if (new_search_link && search_link != new_search_link)
+    {
+        element.val(new_search_link);
+    }
 });
