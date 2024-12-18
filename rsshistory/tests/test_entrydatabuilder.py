@@ -35,6 +35,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.accept_not_domain_entries = True
         config.accept_domains = False
         config.auto_create_sources = False
+        config.auto_scan_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -85,6 +86,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
+        config.auto_scan_entries = True
         config.save()
 
         link_name = "https://youtube.com/v=1234/"
@@ -116,6 +118,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
+        config.auto_scan_entries = True
         config.save()
 
         link_name = "HTTPS://YouTube.com/v=1234/"
@@ -185,6 +188,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = False
         config.accept_domains = True
+        config.auto_scan_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -255,6 +259,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.accept_not_domain_entries = True
         config.accept_domains = False
         config.auto_create_sources = False
+        config.auto_scan_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -291,6 +296,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.accept_domains = False
         config.auto_create_sources = False
         config.accept_ip_addresses = False
+        config.auto_scan_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -328,6 +334,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.accept_domains = False
         config.auto_create_sources = False
         config.accept_ip_addresses = True
+        config.auto_scan_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -365,6 +372,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.accept_domains = False
         config.auto_create_sources = False
         config.accept_ip_addresses = True
+        config.auto_scan_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -397,6 +405,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.accept_not_domain_entries = True
         config.accept_domains = False
         config.auto_create_sources = False
+        config.auto_scan_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -436,6 +445,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.accept_not_domain_entries = True
         config.accept_domains = False
         config.auto_create_sources = False
+        config.auto_scan_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0

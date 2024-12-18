@@ -858,10 +858,15 @@ class RssPage(ContentInterface):
         if self.feed and len(self.feed.entries) > 0:
             return True
 
+        if self.get_contents().find("<feed") >= 0:
+            return True
+        if self.get_contents().find("<rss") >= 0:
+            return True
+
         # if not self.is_contents_rss():
         #     return False
 
-        return True
+        return False
 
     def is_contents_rss(self):
         """

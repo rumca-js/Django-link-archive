@@ -5,12 +5,16 @@ let view_small_icons = "{{user_config.small_icons}}" == "True";
 let debug = "{{debug}}" == "True"
 
 
+let common_indicators = null;
+
+
 $(document).ready(function() {
    $("#btnFetch").click(function(event) {
        event.preventDefault();
        putSpinnerOnIt($(this));
    });
 });
+
 
 function add_text(error_line, text) {
     let result = "";
@@ -23,6 +27,7 @@ function add_text(error_line, text) {
 
     return result;
 }
+
 
 function SetMenuStatusLine() {
        if (common_indicators.read_later_queue.status) {
@@ -52,6 +57,7 @@ function SetMenuStatusLine() {
        }
 }
 
+
 function SetFooterStatusLine() {
    let error_line = "";
 
@@ -74,16 +80,18 @@ function SetFooterStatusLine() {
    $("#footerLine").html(error_line);
 }
 
-let common_indicators = null;
 
 function showElement(element) {
    $(element).show();
    $(element).removeClass("invisible");
 }
+
+
 function hideElement(element) {
    $(element).hide();
    $(element).addClass("invisible");
 }
+
 
 let currentgetIndicators = 0;
 function getIndicators(attempt=1) {
@@ -119,6 +127,7 @@ function getIndicators(attempt=1) {
     });
 }
 
+
 $(document).ready(function() {
     getIndicators();
 
@@ -126,6 +135,7 @@ $(document).ready(function() {
         getIndicators();
     }, 300000);
 });
+
 
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {

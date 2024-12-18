@@ -6,6 +6,7 @@ from ..controllers import (
     LinkDataController,
     BackgroundJobController,
 )
+from ..configuration import Configuration
 
 from ..pluginsources import BaseParsePlugin
 from ..pluginsources import RssParserPlugin
@@ -101,6 +102,10 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
             title="YouTube",
             export_to_cms=True,
         )
+
+        conf = Configuration.get_object().config_entry
+        conf.auto_scan_entries = True
+        conf.save()
 
     def is_domain(self, alist, value):
         if alist is None:

@@ -15,6 +15,9 @@ from .fake.youtube import (
 from .fake.geekwirecom import (
     geekwire_feed,
 )
+from .fake.warhammercommunity import (
+    warhammer_community_rss,
+)
 
 
 webpage_rss = """
@@ -183,6 +186,24 @@ class RssPageTest(FakeInternetTestCase):
 
     def test_is_valid__true(self):
         reader = RssPage("https://linkedin.com/test", webpage_old_pubdate_rss)
+        entries = reader.get_entries()
+
+        # call tested function
+        self.assertTrue(reader.is_valid())
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_is_valid__geek_false(self):
+        reader = RssPage("https://linkedin.com/test", geekwire_feed)
+        entries = reader.get_entries()
+
+        # call tested function
+        self.assertFalse(reader.is_valid())
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_is_valid__warhammer_true(self):
+        reader = RssPage("https://linkedin.com/test", warhammer_community_rss)
         entries = reader.get_entries()
 
         # call tested function

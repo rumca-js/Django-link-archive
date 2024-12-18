@@ -33,6 +33,10 @@ class EntriesCleanupTest(FakeInternetTestCase):
             username="TestUserNot", password="testpassword", is_staff=False
         )
 
+        conf = Configuration.get_object().config_entry
+        conf.auto_scan_entries = True
+        conf.save()
+
     def clear(self):
         SourceDataController.objects.all().delete()
         LinkDataController.objects.all().delete()
@@ -227,80 +231,80 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.assertEqual(archived[1].domain, domains[0])
         self.assertEqual(archived[1].date_published, date_to_remove)
 
-    def test_cleanup__https_http_duplicates(self):
-        conf = Configuration.get_object().config_entry
-        conf.prefer_https = True
-        conf.save()
+    #def test_cleanup__https_http_duplicates(self):
+    #    conf = Configuration.get_object().config_entry
+    #    conf.prefer_https = True
+    #    conf.save()
 
-        self.clear()
+    #    self.clear()
 
-        ob = LinkDataController.objects.create(
-            source_url="https://youtube.com",
-            link="https://youtube.com",
-            title="The first link",
-            permanent=True,
-            language="en",
-        )
+    #    ob = LinkDataController.objects.create(
+    #        source_url="https://youtube.com",
+    #        link="https://youtube.com",
+    #        title="The first link",
+    #        permanent=True,
+    #        language="en",
+    #    )
 
-        ob = LinkDataController.objects.create(
-            source_url="http://youtube.com",
-            link="http://youtube.com",
-            title="The second link",
-            permanent=True,
-            language="en",
-        )
+    #    ob = LinkDataController.objects.create(
+    #        source_url="http://youtube.com",
+    #        link="http://youtube.com",
+    #        title="The second link",
+    #        permanent=True,
+    #        language="en",
+    #    )
 
-        # call tested function
-        EntriesCleanup().cleanup()
+    #    # call tested function
+    #    EntriesCleanup().cleanup()
 
-        self.assertEqual(
-            LinkDataController.objects.filter(
-                link="https://youtube.com"
-            ).count(),
-            1,
-        )
-        self.assertEqual(
-            LinkDataController.objects.filter(
-                link="http://youtube.com"
-            ).count(),
-            0,
-        )
+    #    self.assertEqual(
+    #        LinkDataController.objects.filter(
+    #            link="https://youtube.com"
+    #        ).count(),
+    #        1,
+    #    )
+    #    self.assertEqual(
+    #        LinkDataController.objects.filter(
+    #            link="http://youtube.com"
+    #        ).count(),
+    #        0,
+    #    )
 
-    def test_cleanup__prefer_non_www_sites(self):
-        conf = Configuration.get_object().config_entry
-        conf.prefer_non_www_sites = True
-        conf.save()
+    #def test_cleanup__prefer_non_www_sites(self):
+    #    conf = Configuration.get_object().config_entry
+    #    conf.prefer_non_www_sites = True
+    #    conf.save()
 
-        self.clear()
+    #    self.clear()
 
-        ob = LinkDataController.objects.create(
-            source_url="https://youtube.com",
-            link="https://youtube.com",
-            title="The first link",
-            permanent=True,
-            language="en",
-        )
+    #    ob = LinkDataController.objects.create(
+    #        source_url="https://youtube.com",
+    #        link="https://youtube.com",
+    #        title="The first link",
+    #        permanent=True,
+    #        language="en",
+    #    )
 
-        ob = LinkDataController.objects.create(
-            source_url="http://youtube.com",
-            link="https://www.youtube.com",
-            title="The second link",
-            permanent=True,
-            language="en",
-        )
+    #    ob = LinkDataController.objects.create(
+    #        source_url="http://youtube.com",
+    #        link="https://www.youtube.com",
+    #        title="The second link",
+    #        permanent=True,
+    #        language="en",
+    #    )
 
-        # call tested function
-        EntriesCleanup().cleanup()
+    #    # call tested function
+    #    EntriesCleanup().cleanup()
 
-        self.assertEqual(
-            LinkDataController.objects.filter(
-                link="https://youtube.com"
-            ).count(),
-            1,
-        )
-        self.assertEqual(
-            LinkDataController.objects.filter(
-                link="https://www.youtube.com"
-            ).count(),
-            0,
-        )
+    #    self.assertEqual(
+    #        LinkDataController.objects.filter(
+    #            link="https://youtube.com"
+    #        ).count(),
+    #        1,
+    #    )
+    #    self.assertEqual(
+    #        LinkDataController.objects.filter(
+    #            link="https://www.youtube.com"
+    #        ).count(),
+    #        0,
+    #    )

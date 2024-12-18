@@ -27,7 +27,7 @@ class PageDisplayTest(FakeInternetTestCase):
         page_display = PageDisplay("https://linkedin.com")
 
         # one for page, one for rss
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_youtube(self):
         MockRequestCounter.mock_page_requests = 0

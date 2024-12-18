@@ -110,8 +110,10 @@ class BaseRssPluginTest(FakeInternetTestCase):
         config.new_entries_use_clean_data = True
         config.save()
 
+        test_link = "https://www.geekwire.com/feed"
+
         self.source_rss = SourceDataController.objects.create(
-            url="https://warhammer-community.com/feed",
+            url=test_link,
             title="Warhammer community",
             export_to_cms=True,
         )
@@ -128,7 +130,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertEqual(len(props), 5)
         self.assertEqual(
             props[0]["source"],
-            "https://warhammer-community.com/feed",
+            test_link
         )
 
     def test_check_for_data(self):

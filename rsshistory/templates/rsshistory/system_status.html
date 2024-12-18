@@ -16,7 +16,12 @@
 <ul id="tableStats" class="list-group">
 </ul>
 
-<h1>Threads</h1>
+<h1>Threads
+  <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger invisible threadErrorElement">
+      !
+      <span class="visually-hidden">Configuration error</span>
+  </span>
+</h1>
 <ul id="threadStats" class="list-group">
 </ul>
 
@@ -139,6 +144,10 @@
         $('#statusBlock').html(system_status_text);
         var threads_text = getThreadsText(data.threads);
         $('#threadStats').html(threads_text);
+
+        if (common_indicators.threads_error.status) {
+           showElement(".threadErrorElement");
+        }
     }
     function fillTableStatus(tables) {
         var text = getTableStatusText(tables);

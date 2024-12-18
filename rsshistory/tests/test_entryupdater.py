@@ -24,6 +24,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         conf.keep_domains = False
         conf.prefer_non_www_sites = True
         conf.prefer_https = True
+        conf.auto_scan_entries = True
         conf.save()
 
         self.user = User.objects.create_user(
