@@ -177,7 +177,7 @@ class HttpRequestBuilder(object):
                 continue
 
             WebLogger.debug(
-                "Url:{}: Running crawler {}".format(request.url, type(crawler))
+                "Url:{}: Running crawler {}\n{}".format(request.url, type(crawler), crawler_data)
             )
             crawler.run()
             response = crawler.get_response()
@@ -197,7 +197,6 @@ class HttpRequestBuilder(object):
             request_url=request.url,
         )
         return self.response
-
 
     def ping(self, timeout_s=5):
         url = self.url

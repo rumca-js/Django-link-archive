@@ -362,6 +362,9 @@ def json_system_status(request):
     last_internet_check = c.get_local_time(system_controller.get_last_internet_check())
     data["last_internet_check"] = last_internet_check
 
+    last_internet_status = system_controller.is_internet_ok()
+    data["last_internet_status"] = last_internet_status
+
     now = c.get_local_time(DateUtils.get_datetime_now_utc())
     data["current_time"] = now
 

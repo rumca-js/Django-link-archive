@@ -287,6 +287,10 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
+        conf = Configuration.get_object().config_entry
+        conf.auto_scan_entries = True
+        conf.save()
+
         self.user = self.get_user(
             username="test_username", password="testpassword", is_superuser=True
         )

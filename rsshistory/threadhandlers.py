@@ -1073,6 +1073,8 @@ class CleanupJobHandler(BaseJobHandler):
             except TypeError as E:
                 pass
 
+        AppLogging.notify("Cleaning up table {}".format(table))
+
         cfg["limit_s"] = limit_s
 
         if table == "all" or table == "LinkDataController":

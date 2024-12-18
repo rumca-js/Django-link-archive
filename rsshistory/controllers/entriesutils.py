@@ -58,34 +58,14 @@ class EntriesCleanup(object):
 
         @return True if successful
         """
+        AppLogging.debug("Cleanup - remove")
+
         if not self.cleanup_remove_entries():
             return False
-
-        if not self.cleanup_invalid_page_ratings():
-            return False
-
-        config = Configuration.get_object().config_entry
-        if config.prefer_https:
-            if not self.move_existing_http_to_https():
-                return False
-
-        if config.prefer_non_www_sites:
-            if not self.move_existing_www_to_nonwww():
-                return False
 
         if not self.archive_cleanup:
             if not self.move_old_links_to_archive():
                 return False
-
-        # self.cleanup_entries_with_ports()
-
-        # TODO it may take very long time, exceed time, and be correct, we should
-        # return True then. Check if everything has been done, not only exceeded time
-
-        # self.cleanup_permanent_flags()
-
-        # if self.is_time_exceeded():
-        #    return False
 
         return True
 
@@ -129,7 +109,7 @@ class EntriesCleanup(object):
     def cleanup_remove_entries(self, limit_s=0):
         sources = SourceDataController.objects.all()
         for source in sources:
-            # AppLogging.debug("Removing for source:{}".format(source.title))
+            AppLogging.debug("Removing for source:{}".format(source.title))
             entries = self.get_source_entries(source)
 
             if entries:
@@ -137,11 +117,15 @@ class EntriesCleanup(object):
                 #    AppLogging.debug("Removing source entry:{}".format(entry.link))
                 entries.delete()
 
+        AppLogging.debug("Removing general entries")
+
         entries = self.get_general_entries()
         if entries:
             # for entry in entries:
             #    AppLogging.debug("Removing general entry:{}".format(entry.link))
             entries.delete()
+
+        AppLogging.debug("Removing stale entries")
 
         if not self.archive_cleanup:
             entries = self.get_stale_entries()
@@ -261,9 +245,12 @@ class EntriesCleanup(object):
         if not entries:
             return True
 
+        AppLogging.debug("Moving link to archive")
+
         for entry in entries:
-            AppLogging.debug("Moving link to archive: {}".format(entry.link))
             EntryWrapper(entry=entry).move_to_archive()
+
+        AppLogging.debug("Moving link to archive DONE")
 
         return True
 

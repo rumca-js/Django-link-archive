@@ -757,3 +757,17 @@ class LeftOverJobsProcessorTest(FakeInternetTestCase):
         jobs = mgr.get_supported_jobs()
 
         self.assertTrue(BackgroundJob.JOB_PROCESS_SOURCE not in jobs)
+
+    def test_run__multiple_jobs(self):
+        bg_obj = BackgroundJobController.link_add(url = "https://linkedin.com")
+        bg_obj = BackgroundJobController.link_add(url = "https://test.com")
+
+        self.assertEqual(BackgroundJobController.objects.all().count(), 2)
+
+        mgr = LeftOverJobsProcessor()
+
+        mgr.run()
+
+        self.assertEqual(BackgroundJobController.objects.all().count(), 0)
+        self.assertEqual(LinkDataController.objects.filter(link = "https://linkedin.com").count(), 1)
+        self.assertEqual(LinkDataController.objects.filter(link = "https://test.com").count(), 1)

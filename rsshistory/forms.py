@@ -366,11 +366,12 @@ class LinkPropertiesForm(forms.Form):
 
     def get_browser_choices(self):
         result = []
+
+        result.append([Browser.AUTO, "Automatic"])
+
         browsers = Browser.objects.filter(enabled=True).values('id', 'name')
         for browser in browsers:
             result.append([browser["id"], browser["name"]])
-
-        result.append([Browser.THIS_BROWSER, "This browser"])
 
         return result
 
@@ -394,11 +395,12 @@ class AddEntryForm(forms.Form):
 
     def get_browser_choices(self):
         result = []
+        result.append([Browser.AUTO, "Automatic"])
+
         browsers = Browser.objects.filter(enabled=True).values('id', 'name')
         for browser in browsers:
             result.append([browser["id"], browser["name"]])
 
-        result.append([Browser.THIS_BROWSER, "This browser"])
         result.append([Browser.EMPTY_FORM, "Empty form"])
 
         return result

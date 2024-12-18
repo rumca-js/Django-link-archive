@@ -53,8 +53,12 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         self.reader = RssPage(self.get_address(), contents)
         if not self.reader.is_valid():
-            AppLogging.error("Url:{}. RSS page is not valid".format(source.url))
-            return
+            content_reader = RssContentReader(self.get_address(), contents)
+            if content_reader.contents:
+                self.reader = RssPage(self.get_address(), content_reader.contents)
+            else:
+                AppLogging.error("Url:{}. RSS page is not valid".format(source.url))
+                return
 
         all_props = self.reader.get_entries()
 

@@ -9,6 +9,7 @@ import traceback
 from pathlib import Path
 import os
 import subprocess
+import threading
 
 from utils.dateutils import DateUtils
 from utils.basictypes import fix_path_for_os
@@ -169,6 +170,14 @@ class RequestsCrawler(CrawlerInterface):
     """
     Python requests
     """
+    default_headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
+        "Accept-Encoding": "none",
+        "Accept-Language": "en-US,en;q=0.8",
+        "Connection": "keep-alive",
+    }
 
     def run(self):
         if not self.is_valid():
@@ -193,6 +202,9 @@ class RequestsCrawler(CrawlerInterface):
         try:
             request_result = self.build_requests()
 
+            if not request_result:
+                return self.response
+
             self.response = PageResponseObject(
                 url=request_result.url,
                 text="",
@@ -200,7 +212,6 @@ class RequestsCrawler(CrawlerInterface):
                 headers=dict(request_result.headers),
                 request_url=self.request.url,
             )
-
             if not self.response.is_valid():
                 return self.response
 
@@ -242,6 +253,15 @@ class RequestsCrawler(CrawlerInterface):
             )
 
         except requests.Timeout:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Page timeout".format(self.request.url))
+
+        except TimeoutException:
             self.response = PageResponseObject(
                 self.request.url,
                 text=None,
@@ -311,18 +331,54 @@ class RequestsCrawler(CrawlerInterface):
     def build_requests(self):
         """
         stream argument - will fetch page contents, when we access contents of page.
+
+        Note - sometimes timeout can not work
+        https://stackoverflow.com/questions/21965484/timeout-for-python-requests-get-entire-response
+        https://stackoverflow.com/questions/53242211/python-requests-timeout-not-working-properly
         """
         import requests
 
-        request_result = requests.get(
-            self.request.url,
-            headers=self.request.headers,
-            timeout=self.timeout_s,
-            verify=self.request.ssl_verify,
+        def request_with_timeout(url, headers, timeout, verify, stream, result):
+            try:
+                result['response'] = requests.get(
+                    url,
+                    headers=headers,
+                    timeout=timeout,
+                    verify=verify,
+                    stream=stream,
+                )
+            except Exception as e:
+                result['exception'] = e
+
+        def make_request_with_threading(url, headers, timeout_s, ssl_verify, stream):
+            result = {'response': None, 'exception': None}
+
+            thread = threading.Thread(
+                target=request_with_timeout,
+                args=(url, headers, timeout_s, ssl_verify, stream, result),
+            )
+            thread.start()
+            thread.join(timeout_s)
+            
+            if thread.is_alive():
+                raise TimeoutException("Request timed out")
+            if result['exception']:
+                raise result['exception']
+            return result['response']
+
+        headers = self.request.headers
+        if not headers:
+            headers = RequestsCrawler.default_headers
+
+        response = make_request_with_threading(
+            url=self.request.url,
+            headers=headers,
+            timeout_s=self.timeout_s,
+            ssl_verify=self.request.ssl_verify,
             stream=True,
         )
-
-        return request_result
+        if response:
+            return response
 
     def is_valid(self):
         try:

@@ -20,6 +20,7 @@ from ..models import (
     Browser,
     Gateway,
     EntryRules,
+    AppLogging,
 )
 from ..controllers import (
     LinkDataController,
@@ -116,13 +117,19 @@ def get_page_properties(request):
     browser = None
 
     if "browser" in request.GET and request.GET["browser"] != "":
-        browsers = Browser.objects.filter(pk = request.GET["browser"])
-        if browsers.exists():
-            browser = browsers[0]
-            options.bring_to_front(browser.get_setup())
-            options.use_browser_promotions = False
-        else:
-            return
+        browser_pk = int(request.GET["browser"])
+
+        if browser_pk != Browser.AUTO:
+            browsers = Browser.objects.filter(pk = browser_pk)
+            if browsers.exists():
+                browser = browsers[0]
+                options.bring_to_front(browser.get_setup())
+                # only this browser!
+                options.mode_mapping = [options.mode_mapping[0]]
+                options.use_browser_promotions = False
+            else:
+                AppLogging.error("Browser does not exist!")
+                return
 
     if "html" in request.GET:
         page_url = UrlHandler(page_link, page_options=options, handler_class=HttpPageHandler)

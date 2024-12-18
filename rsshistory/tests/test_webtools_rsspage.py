@@ -1,7 +1,7 @@
 from datetime import datetime
 import hashlib
 
-from ..webtools import RssPage, calculate_hash
+from ..webtools import RssPage, calculate_hash, RssContentReader
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 from .fakeinternetdata import (
@@ -11,6 +11,9 @@ from .fakeinternetdata import (
 from .fake.youtube import (
     webpage_samtime_youtube_rss,  # you
     youtube_channel_rss_linus_tech_tips,  # uses feed
+)
+from .fake.geekwirecom import (
+    geekwire_feed,
 )
 
 
@@ -56,32 +59,46 @@ class RssPageTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_get_title(self):
-        # default language
+    def test_get_title__rss(self):
         reader = RssPage("https://linkedin.com/test", webpage_rss)
+
+        # call tested function
         self.assertEqual(reader.get_title(), "SAMTIME on Odysee")
         self.assertTrue(reader.is_valid())
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_get_description(self):
+    def test_get_title__youtube(self):
         # default language
+        reader = RssPage(
+            "https://linkedin.com/test", youtube_channel_rss_linus_tech_tips
+        )
+        self.assertEqual(reader.get_title(), "Linus Tech Tips")
+        self.assertTrue(reader.is_valid())
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_description(self):
         reader = RssPage("https://linkedin.com/test", webpage_rss)
+
+        # call tested function
         self.assertEqual(reader.get_description(), "SAMTIME channel description")
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_language(self):
-        # default language
         reader = RssPage("https://linkedin.com/test", webpage_rss)
+
+        # call tested function
         self.assertEqual(reader.get_language(), "ci")
         self.assertTrue(reader.is_valid())
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_thumbnail(self):
-        # default language
         reader = RssPage("https://linkedin.com/test", webpage_rss)
+
+        # call tested function
         self.assertEqual(
             reader.get_thumbnail(),
             "https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw",
@@ -91,21 +108,22 @@ class RssPageTest(FakeInternetTestCase):
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_author(self):
-        # default language
         reader = RssPage("https://linkedin.com/test", webpage_rss)
+
+        # call tested function
         self.assertEqual(reader.get_author(), "SAMTIME author")
         self.assertTrue(reader.is_valid())
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_entries(self):
-        # default language
         reader = RssPage("https://linkedin.com/test", webpage_rss)
         entries = reader.get_entries()
         entries = list(entries)
         self.assertEqual(len(entries), 15)
 
         entry = entries[0]
+        # call tested function
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
         self.assertTrue(reader.is_valid())
@@ -128,7 +146,6 @@ class RssPageTest(FakeInternetTestCase):
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_entry_no_date(self):
-        # default language
         reader = RssPage("https://linkedin.com/test", webpage_no_pubdate_rss)
         entries = reader.get_entries()
         entries = list(entries)
@@ -138,6 +155,7 @@ class RssPageTest(FakeInternetTestCase):
         current_date_time = datetime.now()
 
         entry = entries[0]
+        # call tested function
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
         self.assertEqual(entry["date_published"].year, current_date_time.year)
@@ -146,7 +164,6 @@ class RssPageTest(FakeInternetTestCase):
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_entry_page_rating(self):
-        # default language
         reader = RssPage("https://linkedin.com/test", webpage_no_pubdate_rss)
         entries = reader.get_entries()
         entries = list(entries)
@@ -158,17 +175,17 @@ class RssPageTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_is_valid(self):
-        # default language
+    def test_is_valid__true_youtube(self):
         reader = RssPage("https://linkedin.com/test", webpage_samtime_youtube_rss)
         self.assertTrue(reader.is_valid())
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_rss_is_valid_true(self):
-        # default language
+    def test_is_valid__true(self):
         reader = RssPage("https://linkedin.com/test", webpage_old_pubdate_rss)
         entries = reader.get_entries()
+
+        # call tested function
         self.assertTrue(reader.is_valid())
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
@@ -176,6 +193,8 @@ class RssPageTest(FakeInternetTestCase):
     def test_get_contents_body_hash(self):
         # default language
         reader = RssPage("https://linkedin.com/test", webpage_old_pubdate_rss)
+
+        # call tested function
         hash = reader.get_contents_body_hash()
 
         entries = str(reader.feed.entries)
@@ -203,16 +222,12 @@ class RssPageTest(FakeInternetTestCase):
     """
 
 
-class RssPageYouTubeTest(FakeInternetTestCase):
+class RssContentReaderTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_get_title(self):
-        # default language
-        reader = RssPage(
-            "https://linkedin.com/test", youtube_channel_rss_linus_tech_tips
-        )
-        self.assertEqual(reader.get_title(), "Linus Tech Tips")
-        self.assertTrue(reader.is_valid())
+    def test_init(self):
+        reader = RssContentReader("https://youtube.com", geekwire_feed)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+        self.assertTrue(reader.contents.find("<?xml") >= 0)
+        self.assertTrue(reader.contents.find("</rss>") >= 0)

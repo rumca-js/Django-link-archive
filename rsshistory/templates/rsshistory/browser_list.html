@@ -32,6 +32,13 @@ Browsers are selected using this list, by priority
                    {% include "rsshistory/icon_edit.html" %}
                  </a>
 
+                 <a href="{% url 'rsshistory:browser-prio-up' browser.id %}" title="Browser prio up" class="btn btn-secondary btn-sm" role="button">
+                     <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
+                 </a>
+                 <a href="{% url 'rsshistory:browser-prio-down' browser.id %}" title="Browser prio down" class="btn btn-secondary btn-sm" role="button">
+                     <img src="{% static 'rsshistory/icons/icons8-down-100.png' %}" class="content-icon" />
+                 </a>
+
                  {% if browser.enabled %}
                  <a href="{% url 'rsshistory:browser-disable' browser.id %}" title="Disables browser" class="btn btn-secondary btn-sm" role="button">
                    {% include "rsshistory/icon_disable.html" %}

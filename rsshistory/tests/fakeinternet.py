@@ -39,6 +39,9 @@ from .fakeinternetdata import (
     webpage_with_rss_link_rss_contents,
     webpage_html_casinos,
 )
+from .fake.geekwirecom import (
+    geekwire_feed,
+)
 from .fake.youtube import (
     youtube_robots_txt,
     youtube_sitemap_sitemaps,
@@ -347,6 +350,9 @@ class TestResponseObject(PageResponseObject):
 
         if url.startswith("https://www.youtube.com/user/linustechtips"):
             return youtube_channel_html_linus_tech_tips
+
+        if url.startswith("https://www.geekwire.com/feed"):
+            return geekwire_feed
 
         if url.startswith(
             "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
