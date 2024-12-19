@@ -617,10 +617,10 @@ class EntryGenericPlugin(object):
             self.entry.page_rating_votes,
             self.entry.page_rating_contents,
         )
-        points_title = "Page rating:{} User rating:{} Content rating:{}".format(
+        points_title = "Page rating:{} Votes rating:{} Content rating:{}".format(
             self.entry.page_rating,
-            self.entry.page_rating_contents,
             self.entry.page_rating_votes,
+            self.entry.page_rating_contents,
         )
         parameters.append(EntryParameter("Points", points_text, points_title))
 

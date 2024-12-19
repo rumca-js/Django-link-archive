@@ -749,8 +749,10 @@ class SeleniumChromeFull(SeleniumDriver):
             options = webdriver.ChromeOptions()
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
-            # options.add_argument("--headless")
             options.add_argument("--lang={}".format("en-US"))
+
+            # path = "./linklibrary/rsshistory/static/extensions/chrome/ublock_1.61.2_0.crx"
+            # options.add_extension(path)
 
             options.add_argument("start-maximized")
             options.add_argument("disable-infobars")

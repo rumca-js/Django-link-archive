@@ -186,7 +186,7 @@ class HttpRequestBuilder(object):
                 return response
 
         self.dead = True
-        WebLogger.error(
+        WebLogger.debug(
             "Url:{} No response from crawler".format(request.url)
         )
 
@@ -267,7 +267,7 @@ class HttpRequestBuilder(object):
             self.dead = True
             return None
 
-        WebLogger.info("[R] Url:{}. Options:{}".format(self.url, self.options))
+        WebLogger.debug("[R] Url:{}. Options:{}".format(self.url, self.options))
 
         request = PageRequestObject(
             url=self.url,
@@ -277,7 +277,7 @@ class HttpRequestBuilder(object):
 
         self.response = self.get_contents_internal(request=request)
 
-        WebLogger.info(
+        WebLogger.debug(
             "Url:{}. Options:{} Requesting page: DONE".format(
                 self.url, self.options
             )

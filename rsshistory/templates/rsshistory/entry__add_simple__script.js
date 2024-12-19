@@ -6,6 +6,8 @@
 let submission_locked = true;
 let form_text = null;
 let page_properties = null;
+const EMPTY_FORM = -1;
+const AUTO = -2;
 
 
 function getFormattedDate(input_date) {
@@ -206,46 +208,6 @@ function sendPagePropertiesRequest(page_url, browser, attempt = 1) {
 }
 
 
-let currentsendJqueryPageProperties = 0;
-function sendJqueryPageProperties(page_url, browser, attempt = 1) {
-    $("#formResponse").html(`Obtaining form for link :${page_url}`);
-
-    let requestsendJqueryPageProperties = ++currentsendJqueryPageProperties;
-
-    let url = `{% url 'rsshistory:entry-add-form' %}?link=${page_url}`;
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestsendJqueryPageProperties != currentsendJqueryPageProperties)
-               return;
-
-           let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-           // $("#formDiv").html("");
-
-           form_text = data;
-           form_text = data.replace('btnFetch', 'btnAddLink');
-
-           // TODO - fetch using jQuery for title and other info
-           resetSearch("Feature not yet implemented.");
-
-           submission_locked = false;
-       },
-       error: function(xhr, status, error) {
-           if (requestsendJqueryPageProperties != currentsendJqueryPageProperties)
-               return;
-
-           if (attempt < 3) {
-               sendJqueryPageProperties(page_url, browser, attempt + 1);
-           } else {
-               resetSearch("Could not obtain edit form.");
-           }
-       }
-    });
-}
-
-
 let currentsendEmptyFrame = 0;
 function sendEmptyFrame(page_url, browser, attempt = 1) {
     $("#formResponse").html(`Obtaining form for link :${page_url}`);
@@ -294,10 +256,7 @@ function sendEmptyFrame(page_url, browser, attempt = 1) {
 
 
 function getPageProperties(page_url, browser) {
-    if (browser == -1) {
-        sendJqueryPageProperties(page_url, browser);
-    }
-    else if (browser == -2) {
+    if (browser == EMPTY_FORM) {
         sendEmptyFrame(page_url, browser);
     }
     else {
