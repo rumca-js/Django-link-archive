@@ -19,7 +19,7 @@ webpage_code_project_rss = """
     </image>
     <copyright>Copyright  CodeProject, 1999-2023</copyright>
     <webMaster>Webmaster@codeproject.com (Webmaster)</webMaster>
-    <lastBuildDate>Wed, 27 Dec 2023 05:00:00 GMT</lastBuildDate>
+    <lastBuildDate>{}</lastBuildDate>
     <ttl>20</ttl>
     <generator>C# Hand-coded goodness</generator>
     <item>

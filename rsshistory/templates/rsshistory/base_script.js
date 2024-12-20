@@ -77,7 +77,14 @@ function SetFooterStatusLine() {
        error_line += add_text(error_line, common_indicators.is_reading.message);
    }
 
-   $("#footerLine").html(error_line);
+   if (error_line == "") {
+       $("#footerLine").html("");
+       $("#footerLine").hide();
+   }
+   else {
+       $("#footerLine").html(error_line);
+       $("#footerLine").show();
+   }
 }
 
 

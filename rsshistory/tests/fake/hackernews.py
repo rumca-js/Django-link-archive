@@ -22,7 +22,7 @@ Deepnote (YC S19) is hiring engineers to build a better Jupyter notebook
 				<p>Points: 0</p>
 				<p># Comments: 0</p>
 			</description>
-			<pubDate>Fri, 05 Apr 2024 12:00:10 +0000</pubDate>
+			<pubDate>{date}</pubDate>
 			<link>https://deepnote.com/join-us</link>
 			<dc:creator>Equiet</dc:creator>
 			<comments>https://news.ycombinator.com/item?id=39941303</comments>
@@ -42,7 +42,7 @@ Almost no one cares if your site is not on social media
 				<p>Points: 16</p>
 				<p># Comments: 2</p>
 			</description>
-			<pubDate>Fri, 05 Apr 2024 11:04:07 +0000</pubDate>
+			<pubDate>{date}</pubDate>
 			<link>
 https://notes.ghed.in/posts/2024/no-one-cares-site-on-social-media/
 </link>
@@ -64,7 +64,7 @@ Infrastructure as Code Is Not the Answer – By Luke Shaughnessy
 				<p>Points: 12</p>
 				<p># Comments: 11</p>
 			</description>
-			<pubDate>Fri, 05 Apr 2024 10:16:38 +0000</pubDate>
+			<pubDate>{date}</pubDate>
 			<link>
 https://lukeshaughnessy.medium.com/infrastructure-as-code-is-not-the-answer-cfaf4882dcba
 </link>
@@ -89,7 +89,7 @@ Ask HN: I want to put free WiFi in schools in my city, how do I go about it?
 									<p>Points: 17</p>
 									<p># Comments: 14</p>
 								</description>
-								<pubDate>Fri, 05 Apr 2024 09:47:47 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://news.ycombinator.com/item?id=39940541</link>
 								<dc:creator>chirau</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39940541</comments>
@@ -109,7 +109,7 @@ Proton Mail says Outlook for Windows is Microsoft's new data collection service
 									<p>Points: 85</p>
 									<p># Comments: 37</p>
 								</description>
-								<pubDate>Fri, 05 Apr 2024 06:44:01 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>
 https://www.ghacks.net/2024/01/12/proton-mail-says-that-the-new-outlook-app-for-windows-is-microsofts-new-data-collection-service/
 </link>
@@ -129,7 +129,7 @@ https://www.ghacks.net/2024/01/12/proton-mail-says-that-the-new-outlook-app-for-
 									<p>Points: 260</p>
 									<p># Comments: 76</p>
 								</description>
-								<pubDate>Fri, 05 Apr 2024 04:31:04 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://ffmpeg.org//index.html#pr7.0</link>
 								<dc:creator>gyan</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39938703</comments>
@@ -147,7 +147,7 @@ https://www.ghacks.net/2024/01/12/proton-mail-says-that-the-new-outlook-app-for-
 									<p>Points: 64</p>
 									<p># Comments: 56</p>
 								</description>
-								<pubDate>Fri, 05 Apr 2024 03:37:14 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>
 https://www.nytimes.com/2024/04/04/arts/violin-italy-antonio-stradivari-ayoung-an.html
 </link>
@@ -167,7 +167,7 @@ https://www.nytimes.com/2024/04/04/arts/violin-italy-antonio-stradivari-ayoung-a
 									<p>Points: 66</p>
 									<p># Comments: 33</p>
 								</description>
-								<pubDate>Fri, 05 Apr 2024 02:31:23 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>
 https://www.404media.co/google-books-is-indexing-ai-generated-garbage/
 </link>
@@ -187,7 +187,7 @@ https://www.404media.co/google-books-is-indexing-ai-generated-garbage/
 									<p>Points: 37</p>
 									<p># Comments: 6</p>
 								</description>
-								<pubDate>Fri, 05 Apr 2024 02:31:03 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://ariasft.github.io/</link>
 								<dc:creator>indigodaddy</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39938125</comments>
@@ -205,7 +205,7 @@ https://www.404media.co/google-books-is-indexing-ai-generated-garbage/
 									<p>Points: 159</p>
 									<p># Comments: 21</p>
 								</description>
-								<pubDate>Fri, 05 Apr 2024 02:19:49 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://www.openbsd.org/75.html</link>
 								<dc:creator>SoftTalker</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39938072</comments>
@@ -225,7 +225,7 @@ Former University of Iowa hospital employee used fake identity for 35 years
 									<p>Points: 218</p>
 									<p># Comments: 212</p>
 								</description>
-								<pubDate>Fri, 05 Apr 2024 02:07:40 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>
 https://www.thegazette.com/crime-courts/former-university-of-iowa-hospital-employee-used-fake-identity-for-35-years/
 </link>
@@ -245,7 +245,7 @@ https://www.thegazette.com/crime-courts/former-university-of-iowa-hospital-emplo
 									<p>Points: 47</p>
 									<p># Comments: 34</p>
 								</description>
-								<pubDate>Fri, 05 Apr 2024 01:20:41 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>
 https://probablydance.com/2021/10/31/c-coroutines-do-not-spark-joy/
 </link>
@@ -265,7 +265,7 @@ https://probablydance.com/2021/10/31/c-coroutines-do-not-spark-joy/
 									<p>Points: 117</p>
 									<p># Comments: 94</p>
 								</description>
-								<pubDate>Thu, 04 Apr 2024 21:58:01 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://xr0.dev/</link>
 								<dc:creator>synergy20</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39936291</comments>
@@ -283,7 +283,7 @@ https://probablydance.com/2021/10/31/c-coroutines-do-not-spark-joy/
 									<p>Points: 1096</p>
 									<p># Comments: 116</p>
 								</description>
-								<pubDate>Thu, 04 Apr 2024 21:53:32 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://www.mayerowitz.io/blog/mario-meets-pareto</link>
 								<dc:creator>superMayo</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39936246</comments>
@@ -301,7 +301,7 @@ https://probablydance.com/2021/10/31/c-coroutines-do-not-spark-joy/
 									<p>Points: 147</p>
 									<p># Comments: 47</p>
 								</description>
-								<pubDate>Thu, 04 Apr 2024 21:35:17 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://docs.anthropic.com/claude/docs/tool-use</link>
 								<dc:creator>akadeb</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39936048</comments>
@@ -321,7 +321,7 @@ Language models as compilers: Simulating pseudocode execution
 									<p>Points: 145</p>
 									<p># Comments: 43</p>
 								</description>
-								<pubDate>Thu, 04 Apr 2024 19:46:44 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://arxiv.org/abs/2404.02575</link>
 								<dc:creator>milliondreams</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39934956</comments>
@@ -341,7 +341,7 @@ Understanding and managing the impact of machine learning models on the web
 									<p>Points: 108</p>
 									<p># Comments: 25</p>
 								</description>
-								<pubDate>Thu, 04 Apr 2024 19:11:41 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://www.w3.org/reports/ai-web-impact/</link>
 								<dc:creator>kaycebasques</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39934584</comments>
@@ -359,7 +359,7 @@ Understanding and managing the impact of machine learning models on the web
 									<p>Points: 416</p>
 									<p># Comments: 73</p>
 								</description>
-								<pubDate>Thu, 04 Apr 2024 18:00:28 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>
 https://posit-dev.github.io/great-tables/blog/design-philosophy/
 </link>
@@ -379,7 +379,7 @@ https://posit-dev.github.io/great-tables/blog/design-philosophy/
 									<p>Points: 80</p>
 									<p># Comments: 67</p>
 								</description>
-								<pubDate>Thu, 04 Apr 2024 17:46:43 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>
 https://mas-bandwidth.com/xdp-for-game-programmers/
 </link>
@@ -401,7 +401,7 @@ JetMoE: Reaching LLaMA2 performance with 0.1M dollars
 									<p>Points: 240</p>
 									<p># Comments: 84</p>
 								</description>
-								<pubDate>Thu, 04 Apr 2024 17:04:21 +0000</pubDate>
+								<pubDate>{date}</pubDate>
 								<link>https://research.myshell.ai/jetmoe</link>
 								<dc:creator>gyre007</dc:creator>
 								<comments>https://news.ycombinator.com/item?id=39933076</comments>
@@ -410,3 +410,5 @@ JetMoE: Reaching LLaMA2 performance with 0.1M dollars
 						</channel>
 					</rss>
 """
+    "{date}", DateUtils.get_datetime_now_iso()
+)

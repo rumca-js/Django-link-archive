@@ -43,25 +43,29 @@ class BaseLinkDataModel(models.Model):
         blank=True, null=True, help_text="Age limit to view entry"
     )
 
-    # date when link was created in DB
+    # date when entry was created in DB
     date_created = models.DateTimeField(
         auto_now_add=True,
         null=True,
         help_text="Date when entry was created in the database",
     )
-    # date when link was introduced to the internet
-    date_published = models.DateTimeField(
-        default=timezone.now, help_text="Date when page was published"
-    )
-    # date when link was accessed last by scanned
+
+    # date when entry was accessed last by scanned
     date_update_last = models.DateTimeField(
         null=True, help_text="Date when page was last checked"
     )
-    # date when link was found dead
+
+    # web page publication date
+    date_published = models.DateTimeField(
+        default=timezone.now, help_text="Date when page was published"
+    )
+
+    # web page date when link was found dead
     date_dead_since = models.DateTimeField(
         null=True, help_text="Date when page became inactive"
     )
-    # date of last modification
+
+    # web page date of last modification
     date_last_modified = models.DateTimeField(
         null=True, help_text="Date of last page modification"
     )

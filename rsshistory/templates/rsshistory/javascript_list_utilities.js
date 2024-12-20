@@ -191,9 +191,11 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
 
    const requestVersion = ++currentLoadRowListContentCounter;
 
-   // const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ' + url;
-   const status_text = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... ';
+   const status_text = '<span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span> Loading... ';
+   $('#listStatus').show();
+   $('#footerStatus').show();
    $('#listStatus').html(status_text);
+   $('#footerStatus').html(status_text);
 
     $.ajax({
         url: url,
@@ -207,18 +209,28 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
             object_list_data = data;
             fillListData();
             $('#listStatus').html("");
+            $('#footerStatus').html("");
+            $('#listStatus').hide();
+            $('#footerStatus').hide();
+
             loadSearchHistory();
         },
         error: function(xhr, status, error) {
             if (requestVersion !== currentLoadRowListContentCounter) {
                 return;
             }
+
+            $('#listStatus').show();
+            $('#footerStatus').show();
+
             if (attempt < 3) {
                 loadRowListContent(search_term, page, attempt + 1);
-                $('#listStatus').html("Error loading dynamic content, retry");
+                $('#listStatus').html("Error loading list content, retry");
+                $('#footerStatus').html("Error loading list content, retry");
             }
             else {
-                $('#listStatus').html("Cannot load data from " + url);
+                $('#listStatus').html("Error loading list content");
+                $('#footerStatus').html("Error loading list content");
             }
         },
         complete: function() {

@@ -17,7 +17,7 @@ thehill_rss = """
 	<atom:link href="https://thehill.com/feed/?feed=partnerfeed-news-feed&#038;format=rss" rel="self" type="application/rss+xml" />
 	<link>https://thehill.com</link>
 	<description>Unbiased Politics News</description>
-	<lastBuildDate>Fri, 19 Jul 2024 09:56:51 +0000</lastBuildDate>
+	<lastBuildDate>{date}</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -37,7 +37,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/race-politics/4780674-rnc-efforts-black-voters/</link>
 		
 		<dc:creator><![CDATA[Cheyanne M. Daniels]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 09:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[Race & Politics]]></category>
@@ -56,7 +56,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/education/4780008-california-transgender-student-protections-newsom/</link>
 		
 		<dc:creator><![CDATA[Lexi Lonas]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 09:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Education]]></category>
 		<category><![CDATA[State Watch]]></category>
 		<category><![CDATA[parental rights]]></category>
@@ -74,7 +74,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/healthcare/4780609-jd-vance-trump-2024-rnc-milwaukee-abortion-rights-project-2025/</link>
 		
 		<dc:creator><![CDATA[Nathaniel Weixel]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 09:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Administration]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Health Care]]></category>
@@ -92,7 +92,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/national-security/4781005-secret-service-fbi-trump-shooting/</link>
 		
 		<dc:creator><![CDATA[Ellen Mitchell]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 09:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[National Security]]></category>
 		<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4781005</guid>
@@ -109,7 +109,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/administration/4780909-biden-brink-memo/</link>
 		
 		<dc:creator><![CDATA[Niall Stanage]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 09:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Administration]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
@@ -127,7 +127,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4781271-donald-trump-rnc-joe-biden-jd-vance/</link>
 		
 		<dc:creator><![CDATA[Jared Gans]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 05:56:39 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4781271</guid>
@@ -145,7 +145,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4781264-rnc-republican-convention-memorable-moments/</link>
 		
 		<dc:creator><![CDATA[Aris Folley]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 05:43:30 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4781264</guid>
@@ -163,7 +163,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4781229-rnc-convention-trump-2024-speech-milwaukee-biden-campaign-project-2025/</link>
 		
 		<dc:creator><![CDATA[Brett Samuels]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 05:03:31 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4781229</guid>
@@ -180,7 +180,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4781238-trump-rnc-speech-memorable-moments/</link>
 		
 		<dc:creator><![CDATA[Brett Samuels]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 05:02:49 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4781238</guid>
@@ -197,7 +197,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/4779639-rnc-trump-2024-live-updates/</link>
 		
 		<dc:creator><![CDATA[]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 04:50:28 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779639</guid>
 
@@ -213,7 +213,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4781182-trump-rnc-speech-assassination-attempt/</link>
 		
 		<dc:creator><![CDATA[Brett Samuels]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 04:08:55 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4781182</guid>
@@ -230,7 +230,7 @@ thehill_rss = """
 		<link>https://thehill.com/video-clips/4781136-watch-live-republican-national-convention-post-show-analysis/</link>
 		
 		<dc:creator><![CDATA[]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 03:09:17 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[News]]></category>
 		<category><![CDATA[Video]]></category>
 		<category><![CDATA[2024 presidential election]]></category>
@@ -252,7 +252,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4781080-democratic-rep-jim-costa-calls-biden-exit-race/</link>
 		
 		<dc:creator><![CDATA[Lauren Irwin]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 02:45:07 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[2024 presidential election]]></category>
@@ -272,7 +272,7 @@ thehill_rss = """
 		<link>https://thehill.com/blogs/in-the-know/4781077-melania-trump-rnc/</link>
 		
 		<dc:creator><![CDATA[Judy Kurtz]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 02:25:28 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[In The Know]]></category>
 		<category><![CDATA[News]]></category>
@@ -290,7 +290,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4781050-trump-to-describe-assassination-attempt-in-rnc-remarks/</link>
 		
 		<dc:creator><![CDATA[Brett Samuels]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 01:55:05 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4781050</guid>
@@ -307,7 +307,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4781031-hulk-hogan-trump-rnc/</link>
 		
 		<dc:creator><![CDATA[Jared Gans]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 01:50:32 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[In The Know]]></category>
 		<category><![CDATA[News]]></category>
@@ -325,7 +325,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/education/4780971-university-florida-ben-sasse/</link>
 		
 		<dc:creator><![CDATA[Tara Suter]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 01:29:23 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Education]]></category>
 		<category><![CDATA[State Watch]]></category>
 		<category><![CDATA[Florida]]></category>
@@ -346,7 +346,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4780992-trump-not-expected-to-name-biden-in-rnc-speech/</link>
 		
 		<dc:creator><![CDATA[Brett Samuels]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 01:27:41 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780992</guid>
@@ -363,7 +363,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4780948-jon-tester-joe-biden-drop-out/</link>
 		
 		<dc:creator><![CDATA[Caroline Vakil]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 00:56:25 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Senate]]></category>
@@ -381,7 +381,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/house/4780848-mullin-says-teamsters-chief-apologized-after-confrontation-at-senate-hearing/</link>
 		
 		<dc:creator><![CDATA[Aris Folley]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 00:02:23 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[House]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780848</guid>
 
@@ -397,7 +397,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/education/4780815-appeals-court-blocks-biden-student-loan-save-plan/</link>
 		
 		<dc:creator><![CDATA[Lauren Irwin]]></dc:creator>
-		<pubDate>Fri, 19 Jul 2024 00:01:02 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Education]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[Biden administration]]></category>
@@ -419,7 +419,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4780762-biden-future-harris-running-mate/</link>
 		
 		<dc:creator><![CDATA[Alexander Bolton]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 23:21:55 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780762</guid>
@@ -437,7 +437,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/national-security/4780747-security-ramped-up-mar-a-lago-trump-shooting/</link>
 		
 		<dc:creator><![CDATA[Tara Suter]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 23:05:23 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Administration]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[National Security]]></category>
@@ -464,7 +464,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/state-watch/4780740-georgia-man-accused-threatening-fbi-director-christopher-wray/</link>
 		
 		<dc:creator><![CDATA[Lauren Irwin]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 22:56:17 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[News]]></category>
 		<category><![CDATA[State Watch]]></category>
 		<category><![CDATA[Georgia]]></category>
@@ -483,7 +483,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/technology/4780675-chip-stocks-are-falling-biden-trump/</link>
 		
 		<dc:creator><![CDATA[]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 22:32:19 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Business]]></category>
 		<category><![CDATA[Technology]]></category>
 		<category><![CDATA[AMD]]></category>
@@ -508,7 +508,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4780683-trump-expands-lead-on-biden-after-shooting-polls/</link>
 		
 		<dc:creator><![CDATA[Lauren Irwin]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 22:14:49 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[2024 presidential election]]></category>
@@ -528,7 +528,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/house/4780615-activist-group-ethics-complaint-accused-accosting-gop-lawmaker/</link>
 		
 		<dc:creator><![CDATA[Yash Roy]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 22:05:20 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[House]]></category>
 		<category><![CDATA[Derrick Van Orden]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780615</guid>
@@ -545,7 +545,7 @@ thehill_rss = """
 		<link>https://thehill.com/newsletters/defense-national-security/4780695-trump-to-accept-gop-nod-as-party-embraces-isolationist-talk/</link>
 		
 		<dc:creator><![CDATA[Brad Dress]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 22:05:17 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Defense & National Security]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[Newsletters]]></category>
@@ -563,7 +563,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/energy-environment/4780659-biden-administration-moves-to-bolster-solar-power-in-puerto-rico/</link>
 		
 		<dc:creator><![CDATA[Rachel Frazin]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 21:50:49 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Energy & Environment]]></category>
 		<category><![CDATA[Latino]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780659</guid>
@@ -580,7 +580,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/healthcare/4780620-fda-authorizes-sales-tobacco-flavored-vuse/</link>
 		
 		<dc:creator><![CDATA[Nathaniel Weixel]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 21:38:57 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Health Care]]></category>
 		<category><![CDATA[Policy]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780620</guid>
@@ -597,7 +597,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4780592-omar-calls-out-leadership-democratic-upheaval/</link>
 		
 		<dc:creator><![CDATA[Eden Teshome]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 21:38:11 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[2024 presidential election]]></category>
@@ -617,7 +617,7 @@ thehill_rss = """
 		<link>https://thehill.com/regulation/court-battles/4780563-hunter-biden-special-counsel-dismissal-request/</link>
 		
 		<dc:creator><![CDATA[Ella Lee]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 21:08:45 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Court Battles]]></category>
 		<category><![CDATA[Regulation]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780563</guid>
@@ -635,7 +635,7 @@ thehill_rss = """
 		<link>https://thehill.com/blogs/in-the-know/4780579-kid-rock-rnc-president-trump-2024-milwaukee/</link>
 		
 		<dc:creator><![CDATA[Judy Kurtz]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 21:07:44 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[In The Know]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780579</guid>
@@ -652,7 +652,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4780555-joe-biden-donald-trump-rnc-jd-vance/</link>
 		
 		<dc:creator><![CDATA[Brett Samuels]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 21:02:48 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Administration]]></category>
 		<category><![CDATA[Campaign]]></category>
@@ -670,7 +670,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/media/4780467-lou-dobbs-dead-donald-trump-announces/</link>
 		
 		<dc:creator><![CDATA[Dominick Mastrangelo]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 20:55:16 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Media]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780467</guid>
 
@@ -686,7 +686,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/race-politics/4780486-black-women-biden-harris-letter/</link>
 		
 		<dc:creator><![CDATA[Cheyanne M. Daniels]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 20:44:16 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[Race & Politics]]></category>
@@ -704,7 +704,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4780446-raskin-urges-biden-listen-democrats-letter/</link>
 		
 		<dc:creator><![CDATA[Lauren Irwin]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 20:37:29 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[2024 presidential election]]></category>
@@ -725,7 +725,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/house/4780367-jim-jordan-whistleblowers-secret-service-trump-shooting/</link>
 		
 		<dc:creator><![CDATA[Emily Brooks]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 20:21:24 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[House]]></category>
 		<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780367</guid>
@@ -742,7 +742,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779879-pelosi-biden-campaign-exit/</link>
 		
 		<dc:creator><![CDATA[Amie Parnes]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 20:08:56 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[House]]></category>
 		<category><![CDATA[News]]></category>
@@ -761,7 +761,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/healthcare/4780304-mississippi-womens-health-scorecard/</link>
 		
 		<dc:creator><![CDATA[Alejandra O'Connell-Domenech]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 19:54:46 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Health Care]]></category>
 		<category><![CDATA[Policy]]></category>
 		<category><![CDATA[abortion access]]></category>
@@ -783,7 +783,7 @@ thehill_rss = """
 		<link>https://thehill.com/video-clips/4779571-watch-live-trump-speech-rnc-day-4/</link>
 		
 		<dc:creator><![CDATA[]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 19:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[Video]]></category>
@@ -803,7 +803,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/house/4780184-mccarthy-gaetz-looks-very-unhinged/</link>
 		
 		<dc:creator><![CDATA[Miranda Nazzaro]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 19:20:04 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[House]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780184</guid>
 
@@ -819,7 +819,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4780203-project-2025-trump-campaign-rnc-2024-milwaukee/</link>
 		
 		<dc:creator><![CDATA[Brett Samuels]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 19:10:08 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780203</guid>
 
@@ -835,7 +835,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/media/4780200-michael-steele-democrats-biden-move-on/</link>
 		
 		<dc:creator><![CDATA[Tara Suter]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 19:02:41 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Administration]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Media]]></category>
@@ -860,7 +860,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4780185-harris-warns-about-vance-election-stakes-north-carolina/</link>
 		
 		<dc:creator><![CDATA[Alex Gangitano]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 18:56:16 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4780185</guid>
@@ -877,7 +877,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4778845-who-is-kai-trump-donald-trump-jr-s-daughter-set-to-speak-at-rnc/</link>
 		
 		<dc:creator><![CDATA[Lauren Sforza]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 18:54:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Kai Trump]]></category>
 		<category><![CDATA[Republican National Convention]]></category>
@@ -895,7 +895,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/administration/4780166-secret-service-defends-female-agents/</link>
 		
 		<dc:creator><![CDATA[Sarah Fortinsky]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 18:46:52 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Administration]]></category>
 		<category><![CDATA[Defense]]></category>
 		<category><![CDATA[News]]></category>
@@ -915,7 +915,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/4779188-first-amendment-social-media-laws/</link>
 		
 		<dc:creator><![CDATA[Alan B. Morrison, opinion contributor]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 18:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Judiciary]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<category><![CDATA[Dormant Commerce Clause]]></category>
@@ -939,7 +939,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/campaign/4779720-biden-nomination-controversy/</link>
 		
 		<dc:creator><![CDATA[Chris Truax, opinion contributor  ]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 18:15:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779720</guid>
@@ -956,7 +956,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/race-politics/4780093-ole-miss-racist-gestures-black-woman-video-republican-national-convention/</link>
 		
 		<dc:creator><![CDATA[Cheyanne M. Daniels]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 18:10:01 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Education]]></category>
@@ -982,7 +982,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/energy-environment/4779978-pfas-replacement-dangers/</link>
 		
 		<dc:creator><![CDATA[Saul Elbein]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 18:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Energy & Environment]]></category>
 		<category><![CDATA[Equilibrium & Sustainability]]></category>
 		<category><![CDATA[Policy]]></category>
@@ -1002,7 +1002,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/4779169-political-violence-assassination-attempt/</link>
 		
 		<dc:creator><![CDATA[Jeremy Etelson, opinion contributor]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 18:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<category><![CDATA[Ben Shapiro]]></category>
@@ -1027,7 +1027,7 @@ thehill_rss = """
 		<link>https://thehill.com/regulation/court-battles/4779927-mississippi-law-disenfranchisement-court/</link>
 		
 		<dc:creator><![CDATA[Yash Roy]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 17:50:57 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Court Battles]]></category>
 		<category><![CDATA[5th Circuit]]></category>
 		<category><![CDATA[ACLU]]></category>
@@ -1048,7 +1048,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779843-kari-lake-fumes-british-reporter-interview/</link>
 		
 		<dc:creator><![CDATA[Tiah Shepherd]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 17:45:19 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[Kari Lake]]></category>
@@ -1066,7 +1066,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/healthcare/4779975-steward-health-committee-steward-investigation/</link>
 		
 		<dc:creator><![CDATA[Nathaniel Weixel]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 17:38:40 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Health Care]]></category>
 		<category><![CDATA[Senate]]></category>
 		<category><![CDATA[Hospitals]]></category>
@@ -1085,7 +1085,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/media/4779833-mtg-greene-trump-attempted-assassination-rnc-2024-milwaukee-jd-vance/</link>
 		
 		<dc:creator><![CDATA[Miranda Nazzaro]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 17:33:47 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[House]]></category>
 		<category><![CDATA[Media]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779833</guid>
@@ -1102,7 +1102,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/international/4778945-a-view-of-americas-troubled-democracy-from-nigeria/</link>
 		
 		<dc:creator><![CDATA[Chinedu George Nnawetanma, opinion contributor]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 17:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[International]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4778945</guid>
@@ -1119,7 +1119,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/international/4779963-biden-netanyahu-covid-19/</link>
 		
 		<dc:creator><![CDATA[Laura Kelly]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 17:21:57 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Administration]]></category>
 		<category><![CDATA[International]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779963</guid>
@@ -1136,7 +1136,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/house/4779919-speaker-johnson-calls-on-biden-to-fire-kimberly-cheatle/</link>
 		
 		<dc:creator><![CDATA[Emily Brooks]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 17:16:40 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[House]]></category>
 		<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779919</guid>
@@ -1153,7 +1153,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/campaign/4778569-how-trump-could-actually-unite-the-country-tonight/</link>
 		
 		<dc:creator><![CDATA[Bernard Goldberg, opinion contributor]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 17:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4778569</guid>
@@ -1170,7 +1170,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/administration/4779902-biden-covid19-health-rnc/</link>
 		
 		<dc:creator><![CDATA[Alex Gangitano]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:57:22 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Administration]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
@@ -1188,7 +1188,7 @@ thehill_rss = """
 		<link>https://thehill.com/elections/4779834-trump-republican-convention-speech/</link>
 		
 		<dc:creator><![CDATA[Sarah Fortinsky]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:54:47 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
@@ -1208,7 +1208,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/energy-environment/4779842-energy-companies-backpedaling-climate-goals-report/</link>
 		
 		<dc:creator><![CDATA[Saul Elbein]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:51:57 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Energy & Environment]]></category>
 		<category><![CDATA[Equilibrium & Sustainability]]></category>
 		<category><![CDATA[Policy]]></category>
@@ -1226,7 +1226,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/healthcare/4773496-government-disinformation-public-trust/</link>
 		
 		<dc:creator><![CDATA[Merrill Matthews, opinion contributor]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:51:35 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Columnists]]></category>
 		<category><![CDATA[Healthcare]]></category>
 		<category><![CDATA[Opinion]]></category>
@@ -1248,7 +1248,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779848-dnc-trump-speech-milwaukee-rnc-2024/</link>
 		
 		<dc:creator><![CDATA[Alex Gangitano]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:48:50 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Health Care]]></category>
@@ -1266,7 +1266,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/energy-environment/4779844-environmental-health-prisons-act/</link>
 		
 		<dc:creator><![CDATA[Zack Budryk]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:44:52 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Energy & Environment]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779844</guid>
 
@@ -1282,7 +1282,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/4779154-misogynistic-backlash-diversity-security/</link>
 		
 		<dc:creator><![CDATA[Lauren Bean Buitta, opinion contributor ]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[National Security]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<category><![CDATA[Combat Exclusion Policy]]></category>
@@ -1304,7 +1304,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/race-politics/4779766-smith-defends-amber-rose-rnc-speech/</link>
 		
 		<dc:creator><![CDATA[Cheyanne M. Daniels]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:22:31 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Race & Politics]]></category>
 		<category><![CDATA[Amber Rose]]></category>
@@ -1323,7 +1323,7 @@ thehill_rss = """
 		<link>https://thehill.com/blogs/in-the-know/4779779-amazon-warning-the-boys-season-finale-trump-shooting/</link>
 		
 		<dc:creator><![CDATA[Lauren Sforza]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:16:01 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Blogs]]></category>
 		<category><![CDATA[In The Know]]></category>
 		<category><![CDATA[Media]]></category>
@@ -1344,7 +1344,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/media/4779730-joe-scarborough-mike-brzezinski-biden-2024-nancy-pelosi-morning-joe/</link>
 		
 		<dc:creator><![CDATA[Dominick Mastrangelo]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:12:31 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Media]]></category>
@@ -1362,7 +1362,7 @@ thehill_rss = """
 		<link>https://thehill.com/business/4779741-ai-regulation-financial-services-committee/</link>
 		
 		<dc:creator><![CDATA[Tobias Burns]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:06:52 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Business]]></category>
 		<category><![CDATA[Policy]]></category>
 		<category><![CDATA[Technology]]></category>
@@ -1380,7 +1380,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/defense/4779699-taiwan-defense-spending-trump/</link>
 		
 		<dc:creator><![CDATA[Brad Dress]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:05:23 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Defense]]></category>
 		<category><![CDATA[International]]></category>
 		<category><![CDATA[Cho Jung-tai]]></category>
@@ -1402,7 +1402,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779665-trump-health-details-shooting-friends-family/</link>
 		
 		<dc:creator><![CDATA[Brett Samuels]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:00:35 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779665</guid>
@@ -1419,7 +1419,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/national-security/4775829-defense-funding-bills/</link>
 		
 		<dc:creator><![CDATA[Elaine McCusker and John G. Ferrari, opinion contributors ]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[National Security]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4775829</guid>
@@ -1436,7 +1436,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4777844-the-switch-up-gop-strategist-sarah-chamberlain-donald-trump-assassination-attempt-election/</link>
 		
 		<dc:creator><![CDATA[Cheyanne M. Daniels]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 16:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
@@ -1455,7 +1455,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/technology/4779694-fcc-lowers-call-rates-incarcerated/</link>
 		
 		<dc:creator><![CDATA[Rebecca Klar]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 15:59:04 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Technology]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779694</guid>
 
@@ -1471,7 +1471,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779683-hickenlooper-biden-harris-2024-trump/</link>
 		
 		<dc:creator><![CDATA[Sarah Fortinsky]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 15:53:58 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Senate]]></category>
@@ -1492,7 +1492,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779645-speaker-mike-johnson-trump-impression/</link>
 		
 		<dc:creator><![CDATA[Lauren Sforza]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 15:30:36 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Republican National Convention]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779645</guid>
@@ -1509,7 +1509,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/congress-blog/4779127-congressional-review-act-disapproval/</link>
 		
 		<dc:creator><![CDATA[Don Wolfensberger, opinion contributor ]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 15:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Congress Blog]]></category>
 		<category><![CDATA[Politics]]></category>
 		<category><![CDATA[Chevron doctrine]]></category>
@@ -1533,7 +1533,7 @@ thehill_rss = """
 		<link>https://thehill.com/business/4779524-john-deere-sponsorships-culture-events-dei/</link>
 		
 		<dc:creator><![CDATA[Nick Robertson]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 15:21:21 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Business]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[DEI]]></category>
@@ -1553,7 +1553,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779562-hulk-hogan-republican-convention-donald-trump/</link>
 		
 		<dc:creator><![CDATA[Sarah Fortinsky]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 15:09:31 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Media]]></category>
@@ -1574,7 +1574,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779486-van-jones-biden-endgame/</link>
 		
 		<dc:creator><![CDATA[Nick Robertson]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 15:05:20 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Media]]></category>
 		<category><![CDATA[Presidential election]]></category>
@@ -1593,7 +1593,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/congress-blog/4775997-citizens-united-political-donations-grassroots/</link>
 		
 		<dc:creator><![CDATA[Reps. John Sarbanes (D-Md.), Yvette Clarke (D-N.Y.) and Chellie Pingree (D-Maine), opinion contributors ]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 15:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Congress Blog]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4775997</guid>
@@ -1610,7 +1610,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779563-thomas-matthew-crooks-donald-trump-assassination-attempt/</link>
 		
 		<dc:creator><![CDATA[Lauren Sforza]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 14:53:27 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
@@ -1633,7 +1633,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/media/4779561-msnbc-joy-reid-biden-covid-trump/</link>
 		
 		<dc:creator><![CDATA[Dominick Mastrangelo]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 14:49:50 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Media]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779561</guid>
 
@@ -1649,7 +1649,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/4776386-russian-attacks-ukraine-health-care/</link>
 		
 		<dc:creator><![CDATA[Uliana Poltavets, opinion contributor]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 14:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[International]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<category><![CDATA[Genocide Convention]]></category>
@@ -1671,7 +1671,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/defense/4779317-congressional-staffers-letter-protest-benjamin-netanyahu-address-congress/</link>
 		
 		<dc:creator><![CDATA[Brad Dress]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 14:26:45 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Defense]]></category>
 		<category><![CDATA[International]]></category>
 		<category><![CDATA[Policy]]></category>
@@ -1695,7 +1695,7 @@ thehill_rss = """
 		<link>https://thehill.com/blogs/in-the-know/4779484-bonnie-raitt-francis-coppola-grateful-dead-kennedy-center-honorees/</link>
 		
 		<dc:creator><![CDATA[Nick Robertson]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 14:08:09 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[In The Know]]></category>
 		<category><![CDATA[News]]></category>
 		<category><![CDATA[Bonnie Raitt]]></category>
@@ -1718,7 +1718,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/energy-environment/4778281-power-grid-climate-change/</link>
 		
 		<dc:creator><![CDATA[Tara D. Sonenshine, opinion contributor  ]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 14:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Energy and Environment]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4778281</guid>
@@ -1735,7 +1735,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/education/4779460-biden-student-loan-forgiveness-debt-relief/</link>
 		
 		<dc:creator><![CDATA[Lexi Lonas]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 13:53:24 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Administration]]></category>
 		<category><![CDATA[Education]]></category>
 		<category><![CDATA[student debt relief]]></category>
@@ -1753,7 +1753,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779414-trump-speech-rnc-preview/</link>
 		
 		<dc:creator><![CDATA[Brett Samuels]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 13:48:55 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779414</guid>
 
@@ -1769,7 +1769,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/senate/4779436-senate-democrat-bill-federal-employment-marijuana-use/</link>
 		
 		<dc:creator><![CDATA[Lauren Sforza]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 13:42:17 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Senate]]></category>
 		<category><![CDATA[Marijuana]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4779436</guid>
@@ -1786,7 +1786,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/campaign/4778425-our-unserious-media-is-not-rising-to-the-occasion/</link>
 		
 		<dc:creator><![CDATA[Steve Krakauer, opinion contributor]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 13:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4778425</guid>
@@ -1803,7 +1803,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/international/4777940-idf-gaza-civilian-harm/</link>
 		
 		<dc:creator><![CDATA[Wes J. Bryant, opinion contributor  ]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 13:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[International]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4777940</guid>
@@ -1820,7 +1820,7 @@ thehill_rss = """
 		<link>https://thehill.com/policy/energy-environment/4778682-house-senate-republicans-deny-climate-science-analysis/</link>
 		
 		<dc:creator><![CDATA[Rachel Frazin]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 13:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Energy & Environment]]></category>
 		<category><![CDATA[House]]></category>
 		<category><![CDATA[Senate]]></category>
@@ -1841,7 +1841,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779366-kamala-harris-joe-biden-withdraw-2024-survey/</link>
 		
 		<dc:creator><![CDATA[Lauren Sforza]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 12:59:01 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
@@ -1863,7 +1863,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/campaign/4775596-trump-vance-vice-presidential-pick/</link>
 		
 		<dc:creator><![CDATA[David Masci, opinion contributor]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 12:30:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<category><![CDATA[Donald Trump]]></category>
@@ -1888,7 +1888,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/senate/4779318-john-barrasso-kimberly-cheatle-donald-trump-rally-shooting-secret-service/</link>
 		
 		<dc:creator><![CDATA[Lauren Sforza]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 12:14:32 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
@@ -1911,7 +1911,7 @@ thehill_rss = """
 		<link>https://thehill.com/opinion/campaign/4778084-mindfulness-meditation-can-help-calm-american-political-anger/</link>
 		
 		<dc:creator><![CDATA[Steve Israel and Tim Ryan, Opinion Contributors]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 12:00:00 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[Opinion]]></category>
 		<guid isPermaLink="false">https://thehill.com/?p=4778084</guid>
@@ -1928,7 +1928,7 @@ thehill_rss = """
 		<link>https://thehill.com/homenews/campaign/4779278-donald-trump-leads-joe-biden-nationally-swing-states-poll/</link>
 		
 		<dc:creator><![CDATA[Lauren Sforza]]></dc:creator>
-		<pubDate>Thu, 18 Jul 2024 11:38:29 +0000</pubDate>
+		<pubDate>{date}</pubDate>
 				<category><![CDATA[2024 Elections]]></category>
 		<category><![CDATA[Campaign]]></category>
 		<category><![CDATA[News]]></category>
@@ -1944,4 +1944,6 @@ thehill_rss = """
 	</item>
 	</channel>
 </rss>
-"""
+""".replace(
+    "{date}", DateUtils.get_datetime_now_iso()
+)
