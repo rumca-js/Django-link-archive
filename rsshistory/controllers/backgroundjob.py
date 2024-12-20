@@ -220,7 +220,7 @@ class BackgroundJobController(BackgroundJob):
         """
         if not h.is_link_service():
             config = Configuration.get_object().config_entry
-            if not config.accept_not_domain_entries and config.accept_domains:
+            if not config.accept_non_domain_links and config.accept_domain_links:
                 url = h.get_domain()
         else:
             """TODO This should be configurable"""
@@ -289,7 +289,7 @@ class BackgroundJobController(BackgroundJob):
 
         config = Configuration.get_object().config_entry
 
-        if not config.auto_scan_entries:
+        if not config.auto_scan_new_entries:
             return
 
         if source:

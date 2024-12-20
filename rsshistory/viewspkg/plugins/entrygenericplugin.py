@@ -431,7 +431,7 @@ class EntryGenericPlugin(object):
                 ),
             )
 
-        if config.accept_domains and self.entry.domain:
+        if config.accept_domain_links and self.entry.domain:
             buttons.append(
                 EntryButton(
                     self.user,

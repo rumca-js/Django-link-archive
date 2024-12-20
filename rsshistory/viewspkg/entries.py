@@ -534,7 +534,7 @@ def get_cleaned_up_entry_data(request, data):
     page = UrlLocation(link)
     config = Configuration.get_object().config_entry
 
-    if page.is_domain() and config.keep_domains:
+    if page.is_domain() and config.keep_domain_links:
         data["permanent"] = True
 
     if "description" in data:
@@ -623,7 +623,7 @@ def add_entry(request):
 
         config = Configuration.get_object().config_entry
 
-        if config.link_save:
+        if config.enable_link_archiving:
             BackgroundJobController.link_save(entry.link)
 
     from ..controllers import LinkDataController
@@ -701,7 +701,7 @@ def add_entry_form(request):
         page = UrlLocation(link)
         config = Configuration.get_object().config_entry
 
-        if page.is_domain() and config.keep_domains:
+        if page.is_domain() and config.keep_domain_links:
             # if something is permanent, it does not have to be bookmarked
             init["permanent"] = True
             init["bookmarked"] = False
@@ -989,7 +989,7 @@ def entry_bookmark(request, pk):
     json_obj["message"] = "Not bookmarked"
 
     if new_entry:
-        if Configuration.get_object().config_entry.link_save:
+        if Configuration.get_object().config_entry.enable_link_archiving:
             BackgroundJobController.link_save(entry.link)
 
         json_obj["status"] = True
@@ -1040,7 +1040,7 @@ def wayback_save(request, pk):
     if data is not None:
         return data
 
-    if Configuration.get_object().config_entry.link_save:
+    if Configuration.get_object().config_entry.enable_link_archiving:
         link = LinkDataController.objects.get(id=pk)
         BackgroundJobController.link_save(subject=link.link)
 

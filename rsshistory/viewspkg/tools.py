@@ -187,9 +187,9 @@ def get_scan_contents_links(link, contents):
     c = Configuration.get_object().config_entry
 
     links = []
-    if c.accept_not_domain_entries:
+    if c.accept_non_domain_links:
         links.extend(parser.get_links())
-    if c.accept_domains:
+    if c.accept_domain_links:
         links.extend(parser.get_domains())
 
     links = set(links)
@@ -606,7 +606,7 @@ def page_verify(request):
             data["entry"] = entry.get_map()
         else:
             c = Configuration.get_object().config_entry
-            if c.auto_scan_entries:
+            if c.auto_scan_new_entries:
                 BackgroundJobController.link_add(url)
 
         domain_url = UrlLocation(url).get_domain()

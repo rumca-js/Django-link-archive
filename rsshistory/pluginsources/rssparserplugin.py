@@ -85,10 +85,10 @@ class RssParserPlugin(BaseRssPlugin):
     def get_parser_links(parser):
         links = []
         c = Configuration.get_object().conf_entry
-        if c.accept_domains:
+        if c.accept_domain_links:
             links.extend(parser.get_domains())
 
-        if c.accept_not_domain_entries:
+        if c.accept_non_domain_links:
             links.extend(parser.get_links())
         return links
 

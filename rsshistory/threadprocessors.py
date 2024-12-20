@@ -132,7 +132,7 @@ class RefreshProcessor(CeleryTaskInterface):
         c = Configuration.get_object()
         conf = c.config_entry
 
-        if conf.source_save:
+        if conf.enable_source_archiving:
             sources = SourceDataController.objects.filter(enabled=True)
             for source in sources:
                 BackgroundJobController.link_save(source.url)

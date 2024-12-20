@@ -9,8 +9,8 @@ class DomainTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
         config = Configuration.get_object().config_entry
-        config.accept_domains = True
-        config.keep_domains = True
+        config.accept_domain_links = True
+        config.keep_domain_links = True
         config.save()
         Configuration.get_object().config_entry = config
 

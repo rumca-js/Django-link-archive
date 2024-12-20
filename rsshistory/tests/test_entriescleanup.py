@@ -34,7 +34,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         )
 
         conf = Configuration.get_object().config_entry
-        conf.auto_scan_entries = True
+        conf.auto_scan_new_entries = True
         conf.save()
 
     def clear(self):
@@ -103,8 +103,8 @@ class EntriesCleanupTest(FakeInternetTestCase):
         conf = Configuration.get_object().config_entry
         conf.days_to_remove_links = 2
         # conf.days_to_move_to_archive = 1
-        conf.accept_domains = True # to keep up permanent flag
-        conf.keep_domains = True
+        conf.accept_domain_links = True # to keep up permanent flag
+        conf.keep_domain_links = True
         conf.save()
 
         current_time = DateUtils.get_datetime_now_utc()

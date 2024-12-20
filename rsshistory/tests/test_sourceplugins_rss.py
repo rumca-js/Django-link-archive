@@ -20,9 +20,9 @@ class BaseRssPluginTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
+        config.accept_non_domain_links = True
         config.auto_create_sources = True
-        config.accept_domains = False
+        config.accept_domain_links = False
         config.new_entries_merge_data = False
         config.new_entries_use_clean_data = False
         config.save()
@@ -51,9 +51,9 @@ class BaseRssPluginTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
+        config.accept_non_domain_links = True
         config.auto_create_sources = True
-        config.accept_domains = False
+        config.accept_domain_links = False
         config.new_entries_merge_data = True
         config.new_entries_use_clean_data = False
         config.save()
@@ -77,9 +77,9 @@ class BaseRssPluginTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
+        config.accept_non_domain_links = True
         config.auto_create_sources = True
-        config.accept_domains = False
+        config.accept_domain_links = False
         config.new_entries_merge_data = False
         config.new_entries_use_clean_data = True
         config.save()
@@ -103,9 +103,9 @@ class BaseRssPluginTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
+        config.accept_non_domain_links = True
         config.auto_create_sources = True
-        config.accept_domains = False
+        config.accept_domain_links = False
         config.new_entries_merge_data = False
         config.new_entries_use_clean_data = True
         config.save()
@@ -137,9 +137,9 @@ class BaseRssPluginTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
+        config.accept_non_domain_links = True
         config.auto_create_sources = True
-        config.accept_domains = False
+        config.accept_domain_links = False
         config.new_entries_merge_data = True
         config.new_entries_use_clean_data = False
         config.save()

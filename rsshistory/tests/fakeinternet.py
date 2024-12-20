@@ -685,15 +685,15 @@ class FakeInternetTestCase(TestCase):
 
         c.config_entry.enable_keyword_support = True
         c.config_entry.enable_domain_support = True
-        c.config_entry.accept_domains = True
-        c.config_entry.accept_not_domain_entries = True
+        c.config_entry.accept_domain_links = True
+        c.config_entry.accept_non_domain_links = True
         c.config_entry.new_entries_merge_data = False
         c.config_entry.new_entries_use_clean_data = False
         c.config_entry.new_source_enabled_state = False
         c.config_entry.auto_create_sources = False
-        c.config_entry.auto_scan_entries = False
-        c.config_entry.link_save = False
-        c.config_entry.source_save = False
+        c.config_entry.auto_scan_new_entries = False
+        c.config_entry.enable_link_archiving = False
+        c.config_entry.enable_source_archiving = False
         c.config_entry.track_user_actions = False
         c.config_entry.track_user_searches = False
         c.config_entry.track_user_navigation = False
@@ -701,7 +701,7 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.days_to_remove_links = 0
         c.config_entry.respect_robots_txt = False
         c.config_entry.whats_new_days = 7
-        c.config_entry.keep_domains = True
+        c.config_entry.keep_domain_links = True
         c.config_entry.entry_update_uses_internet = True
 
         c.config_entry.save()

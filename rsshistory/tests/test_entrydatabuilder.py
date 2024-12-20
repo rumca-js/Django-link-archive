@@ -32,10 +32,10 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_build_from_props__no_slash(self):
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
-        config.accept_domains = False
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
         config.auto_create_sources = False
-        config.auto_scan_entries = True
+        config.auto_scan_new_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -84,9 +84,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_build_from_props__with_slash(self):
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
-        config.accept_domains = False
-        config.auto_scan_entries = True
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
+        config.auto_scan_new_entries = True
         config.save()
 
         link_name = "https://youtube.com/v=1234/"
@@ -116,9 +116,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_build_from_props__uppercase(self):
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
-        config.accept_domains = False
-        config.auto_scan_entries = True
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
+        config.auto_scan_new_entries = True
         config.save()
 
         link_name = "HTTPS://YouTube.com/v=1234/"
@@ -151,8 +151,8 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = False
-        config.accept_domains = False
+        config.accept_non_domain_links = False
+        config.accept_domain_links = False
         config.save()
 
         objs = LinkDataController.objects.all()
@@ -186,9 +186,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = False
-        config.accept_domains = True
-        config.auto_scan_entries = True
+        config.accept_non_domain_links = False
+        config.accept_domain_links = True
+        config.auto_scan_new_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -256,10 +256,10 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_does_not_add_site_not_found(self):
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
-        config.accept_domains = False
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
         config.auto_create_sources = False
-        config.auto_scan_entries = True
+        config.auto_scan_new_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -292,11 +292,11 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_build_from_props__ipv4_rejects(self):
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
-        config.accept_domains = False
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
         config.auto_create_sources = False
-        config.accept_ip_addresses = False
-        config.auto_scan_entries = True
+        config.accept_ip_links = False
+        config.auto_scan_new_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -330,11 +330,11 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_build_from_props__ipv4_accept(self):
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
-        config.accept_domains = False
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
         config.auto_create_sources = False
-        config.accept_ip_addresses = True
-        config.auto_scan_entries = True
+        config.accept_ip_links = True
+        config.auto_scan_new_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -368,11 +368,11 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_build_from_props__adds_date_published(self):
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
-        config.accept_domains = False
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
         config.auto_create_sources = False
-        config.accept_ip_addresses = True
-        config.auto_scan_entries = True
+        config.accept_ip_links = True
+        config.auto_scan_new_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -402,10 +402,10 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_build_from_props__already_exists(self):
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
-        config.accept_domains = False
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
         config.auto_create_sources = False
-        config.auto_scan_entries = True
+        config.auto_scan_new_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -442,10 +442,10 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_build_from_props__scan(self):
         config = Configuration.get_object().config_entry
-        config.accept_not_domain_entries = True
-        config.accept_domains = False
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
         config.auto_create_sources = False
-        config.auto_scan_entries = True
+        config.auto_scan_new_entries = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0

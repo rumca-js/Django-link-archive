@@ -510,7 +510,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             if days > conf.days_to_remove_stale_entries and self.page_rating_votes > conf.remove_entry_vote_threshold:
                 return False
 
-        if p.is_domain() and conf.accept_domains and conf.keep_domains:
+        if p.is_domain() and conf.accept_domain_links and conf.keep_domain_links:
             return True
 
         if self.source:

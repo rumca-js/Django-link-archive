@@ -104,7 +104,7 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
         )
 
         conf = Configuration.get_object().config_entry
-        conf.auto_scan_entries = True
+        conf.auto_scan_new_entries = True
         conf.save()
 
     def is_domain(self, alist, value):

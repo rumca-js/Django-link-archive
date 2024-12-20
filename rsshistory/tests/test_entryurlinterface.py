@@ -150,7 +150,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
     def test_smb_ips_accepted(self):
         entry = Configuration.get_object().config_entry
-        entry.accept_ip_addresses = True
+        entry.accept_ip_links = True
         entry.save()
 
         url = EntryUrlInterface("//127.0.0.1/resource", ignore_errors=True)
@@ -162,7 +162,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
     def test_smb_ips_not_accepted(self):
         entry = Configuration.get_object().config_entry
-        entry.accept_ip_addresses = False
+        entry.accept_ip_links = False
         entry.save()
 
         url = EntryUrlInterface("//127.0.0.1/resource", ignore_errors=True)

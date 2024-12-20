@@ -314,7 +314,7 @@ class EntriesCleanup(object):
     def cleanup_permanent_flags(self):
         """
         Permaments are:
-         - if enable_domain_support & keep_domains
+         - if enable_domain_support & keep_domain_links
         """
         link_is_url = Q(source__url=F("link"))
         domain_is_notnull = Q(domain__isnull=False)
@@ -393,7 +393,7 @@ class EntryScanner(object):
     def run(self):
         c = Configuration.get_object()
         config = c.config_entry
-        if not config.auto_scan_entries:
+        if not config.auto_scan_new_entries:
             return
 
         if self.entry:
@@ -403,9 +403,9 @@ class EntryScanner(object):
         parser = ContentLinkParser(self.url, self.contents)
 
         contents_links = []
-        if config.accept_domains:
+        if config.accept_domain_links:
             contents_links.extend(parser.get_domains())
-        if config.accept_not_domain_entries:
+        if config.accept_non_domain_links:
             contents_links.extend(parser.get_links())
 
         for link in contents_links:
@@ -1082,7 +1082,7 @@ class EntryWrapper(object):
         TODO rename to update()
 
         Checks:
-         - if entry should be removed due to config accept_domains
+         - if entry should be removed due to config accept_domain_links
          - updates permanent
          - if entry should be moved to archive
         """
@@ -1095,10 +1095,10 @@ class EntryWrapper(object):
         p = UrlLocation(entry.link)
         is_domain = p.is_domain()
 
-        if not config.accept_not_domain_entries:
-            if is_domain and config.accept_domains:
+        if not config.accept_non_domain_links:
+            if is_domain and config.accept_domain_links:
                 pass
-            elif not is_domain and config.accept_domains:
+            elif not is_domain and config.accept_domain_links:
                 """
                 tags and votes, are deleted automatically
                 """
@@ -1360,7 +1360,7 @@ class EntryDataBuilder(object):
 
         self.ignore_errors = ignore_errors
         c = Configuration.get_object().config_entry
-        if c.accept_dead:
+        if c.accept_dead_links:
             self.ignore_errors = True
 
         self.result = None
@@ -1550,8 +1550,8 @@ class EntryDataBuilder(object):
         #    self.link_data["link"] = self.link_data["link"].lower()
 
         c = Configuration.get_object().config_entry
-        if self.is_domain_link_data() and c.accept_domains and c.keep_domains:
-            if c.accept_domains:
+        if self.is_domain_link_data() and c.accept_domain_links and c.keep_domain_links:
+            if c.accept_domain_links:
                 self.link_data["permanent"] = True
 
         if self.is_enabled_to_store():
@@ -1658,10 +1658,10 @@ class EntryDataBuilder(object):
         is_domain = p.is_domain()
         domain = p.get_domain_only()
 
-        if not config.accept_not_domain_entries:
-            if is_domain and config.accept_domains:
+        if not config.accept_non_domain_links:
+            if is_domain and config.accept_domain_links:
                 pass
-            elif not is_domain and config.accept_domains:
+            elif not is_domain and config.accept_domain_links:
                 return False
             elif "bookmarked" in self.link_data and self.link_data["bookmarked"]:
                 pass
@@ -1677,7 +1677,7 @@ class EntryDataBuilder(object):
         if self.is_live_video():
             return False
 
-        if not config.accept_ip_addresses:
+        if not config.accept_ip_links:
             if self.is_ipv4(domain):
                 return False
 
@@ -1740,15 +1740,15 @@ class EntryDataBuilder(object):
 
         config = Configuration.get_object().config_entry
 
-        if config.accept_not_domain_entries or config.accept_domains:
+        if config.accept_non_domain_links or config.accept_domain_links:
             links = set()
 
-            if config.accept_domains:
+            if config.accept_domain_links:
                 p = UrlLocation(link_data["link"])
                 domain = p.get_domain()
                 links.add(domain)
 
-            if config.auto_scan_entries:
+            if config.auto_scan_new_entries:
                 if "description" in link_data:
                     parser = ContentLinkParser(
                         link_data["link"], link_data["description"]

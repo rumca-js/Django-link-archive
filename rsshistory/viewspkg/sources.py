@@ -598,7 +598,7 @@ def wayback_save(request, pk):
     if data is not None:
         return data
 
-    if Configuration.get_object().config_entry.source_save:
+    if Configuration.get_object().config_entry.enable_source_archiving:
         source = SourceDataController.objects.get(id=pk)
         BackgroundJobController.link_save(subject=source.url)
 

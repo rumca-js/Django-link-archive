@@ -43,7 +43,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
     def prepare_data(self):
         # inserts old data, we will check if those will be removed
         conf = Configuration.get_object().config_entry
-        conf.accept_domains = True
+        conf.accept_domain_links = True
         conf.save()
 
         p = AppLogging.objects.create(info_text="info1", level=10, user="test")
@@ -204,8 +204,8 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         self.prepare_data()
 
         conf = Configuration.get_object().config_entry
-        conf.accept_domains = False
-        conf.keep_domains = False
+        conf.accept_domain_links = False
+        conf.keep_domain_links = False
         conf.enable_domain_support = False
         conf.save()
 
@@ -236,7 +236,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
 
     def test_add_link(self):
         conf = Configuration.get_object().config_entry
-        conf.accept_domains = True
+        conf.accept_domain_links = True
         conf.save()
 
         LinkDataController.objects.all().delete()
@@ -259,7 +259,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
 
     def test_add_link_with_props(self):
         conf = Configuration.get_object().config_entry
-        conf.accept_domains = True
+        conf.accept_domain_links = True
         conf.save()
 
         LinkDataController.objects.all().delete()
@@ -288,7 +288,7 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         conf = Configuration.get_object().config_entry
-        conf.auto_scan_entries = True
+        conf.auto_scan_new_entries = True
         conf.save()
 
         self.user = self.get_user(
@@ -297,7 +297,7 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
 
     def test_scan_link(self):
         conf = Configuration.get_object().config_entry
-        conf.accept_domains = True
+        conf.accept_domain_links = True
         conf.save()
 
         LinkDataController.objects.all().delete()

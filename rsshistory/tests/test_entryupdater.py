@@ -21,10 +21,10 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.setup_configuration()
 
         conf = Configuration.get_object().config_entry
-        conf.keep_domains = False
+        conf.keep_domain_links = False
         conf.prefer_non_www_sites = True
         conf.prefer_https = True
-        conf.auto_scan_entries = True
+        conf.auto_scan_new_entries = True
         conf.save()
 
         self.user = User.objects.create_user(

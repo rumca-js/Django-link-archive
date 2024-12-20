@@ -676,8 +676,8 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
-        conf.accept_domains = False
-        conf.accept_not_domain_entries = False
+        conf.accept_domain_links = False
+        conf.accept_non_domain_links = False
         conf.prefer_https = True
         conf.save()
 
@@ -708,8 +708,8 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
-        conf.accept_domains = False
-        conf.accept_not_domain_entries = False
+        conf.accept_domain_links = False
+        conf.accept_non_domain_links = False
         conf.prefer_https = True
         conf.save()
 
@@ -738,8 +738,8 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 5
-        conf.accept_domains = False
-        conf.accept_not_domain_entries = True
+        conf.accept_domain_links = False
+        conf.accept_non_domain_links = True
         conf.prefer_https = True
         conf.save()
 

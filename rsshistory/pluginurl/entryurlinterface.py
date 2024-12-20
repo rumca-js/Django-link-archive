@@ -114,7 +114,7 @@ class EntryUrlInterface(object):
         c = Configuration.get_object().config_entry
 
         if is_domain:
-            if c.keep_domains:
+            if c.keep_domain_links:
                 input_props["permanent"] = True
             input_props["bookmarked"] = False
 

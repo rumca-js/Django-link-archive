@@ -391,7 +391,7 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
             handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO
         )
 
-    def test_get_handler_and_object_link_save_handler(self):
+    def test_get_handler_and_object__link_save_handler(self):
         bg_obj = BackgroundJobController.objects.create(
             job=BackgroundJobController.JOB_LINK_SAVE
         )

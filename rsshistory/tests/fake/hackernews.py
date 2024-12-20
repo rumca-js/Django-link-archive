@@ -1,3 +1,5 @@
+from utils.dateutils import DateUtils
+
 webpage_hackernews_rss = """
 <rss version="2.0">
 	<channel>
@@ -409,6 +411,6 @@ JetMoE: Reaching LLaMA2 performance with 0.1M dollars
 							</item>
 						</channel>
 					</rss>
-"""
+""".replace(
     "{date}", DateUtils.get_datetime_now_iso()
 )

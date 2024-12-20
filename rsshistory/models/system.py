@@ -146,6 +146,7 @@ class ConfigurationEntry(models.Model):
         default=True,
         help_text="If disabled, background tasks and jobs are turned off.",
     )
+
     block_new_tasks = models.BooleanField(
         default=False,
         help_text="If enabled, no new tasks will be added to the queue.",
@@ -211,50 +212,41 @@ class ConfigurationEntry(models.Model):
         default=False, help_text="Enable file feature support"
     )
 
-    # TODO rename to enable_link_archiving
-    link_save = models.BooleanField(
+    enable_link_archiving = models.BooleanField(
         default=False, help_text="Enable archiving of links using archive.org."
     )
 
-    # TODO rename to enable_source_archiving
-    source_save = models.BooleanField(
+    enable_source_archiving = models.BooleanField(
         default=False, help_text="Enable archiving of sources using archive.org."
     )
 
     # database link contents
 
-    # TODO rename to accept_dead_links
-    accept_dead = models.BooleanField(
+    accept_dead_links = models.BooleanField(
         default=False,
         help_text="Allow adding inactive or broken links to the database.",
-    )  # whether dead entries can be introduced into database
+    )
 
-    # TODO rename to accept_ip_links
-    accept_ip_addresses = models.BooleanField(
+    accept_ip_links = models.BooleanField(
         default=False,
         help_text="Allow adding links that use IP addresses, such as //127.0.0.1/my/directory.",
     )
 
-    # TODO rename to accept_domain_links
-    accept_domains = models.BooleanField(
+    accept_domain_links = models.BooleanField(
         default=True, help_text="Allow adding links that are domains to the system."
     )
 
-    # TODO rename to accept_non_domain_links
-    accept_not_domain_entries = models.BooleanField(
+    accept_non_domain_links = models.BooleanField(
         default=True, help_text="Allow adding links that are not domains to the system."
     )
 
     # this option is necessary, if we want to have rss client, with option to drop old entries,
     # but which keeps domains, or other permanent entries
-
-    # TODO rename to keep_domain_links
-    keep_domains = models.BooleanField(
+    keep_domain_links = models.BooleanField(
         default=False, help_text="If enabled, domains will be treated as permanent entries in the system."
     )
 
-    # TODO rename to auto_scan_new_entries
-    auto_scan_entries = models.BooleanField(
+    auto_scan_new_entries = models.BooleanField(
         default=False,
         help_text="Automatically scan for new links in descriptions and content when a link is added.",
     )
@@ -293,6 +285,7 @@ class ConfigurationEntry(models.Model):
         help_text="Prefer HTTPS links. If updates reveal an HTTPS version, replace HTTP links with it.",
     )
 
+    # TODO rename to prefer_non_www_links
     prefer_non_www_sites = models.BooleanField(
         default=False,
         help_text="Prefer non-www links. Replace www links with cleaner versions if available during updates.",

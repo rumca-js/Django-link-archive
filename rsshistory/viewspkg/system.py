@@ -644,15 +644,15 @@ def wizard_setup_news(request):
     UserConfig.get_or_create(request.user)
 
     c = ConfigurationEntry.get()
-    c.link_save = True
-    c.source_save = False
-    c.accept_dead = False
+    c.enable_link_archiving = True
+    c.enable_source_archiving = False
+    c.accept_dead_links = False
     c.accpte_ip_addresses = False
-    c.auto_scan_entries = False
-    c.accept_not_domain_entries = True
+    c.auto_scan_new_entries = False
+    c.accept_non_domain_links = True
     c.auto_store_sources = False
-    c.accept_domains = False
-    c.keep_domains = False
+    c.accept_domain_links = False
+    c.keep_domain_links = False
     c.enable_keyword_support = True
     c.track_user_actions = True
     c.track_user_searches = True
@@ -691,15 +691,15 @@ def wizard_setup_gallery(request):
     UserConfig.get_or_create(request.user)
 
     c = ConfigurationEntry.get()
-    c.link_save = False
-    c.source_save = False
-    c.accept_dead = False
+    c.enable_link_archiving = False
+    c.enable_source_archiving = False
+    c.accept_dead_links = False
     c.accpte_ip_addresses = False
-    c.auto_scan_entries = False
-    c.accept_not_domain_entries = True
+    c.auto_scan_new_entries = False
+    c.accept_non_domain_links = True
     c.auto_store_sources = False
-    c.accept_domains = False
-    c.keep_domains = False
+    c.accept_domain_links = False
+    c.keep_domain_links = False
     c.enable_keyword_support = False
     c.track_user_actions = True
     c.track_user_searches = True
@@ -738,15 +738,15 @@ def wizard_setup_search_engine(request):
     UserConfig.get_or_create(request.user)
 
     c = ConfigurationEntry.get()
-    c.link_save = False
-    c.source_save = False
-    c.accept_dead = False
+    c.enable_link_archiving = False
+    c.enable_source_archiving = False
+    c.accept_dead_links = False
     c.accpte_ip_addresses = False
-    c.auto_scan_entries = True
-    c.accept_not_domain_entries = True
+    c.auto_scan_new_entries = True
+    c.accept_non_domain_links = True
     c.auto_store_sources = True
-    c.accept_domains = True
-    c.keep_domains = True
+    c.accept_domain_links = True
+    c.keep_domain_links = True
     c.enable_keyword_support = False
     c.track_user_actions = True
     c.track_user_searches = True

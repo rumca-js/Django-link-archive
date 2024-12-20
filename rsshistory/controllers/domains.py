@@ -56,7 +56,7 @@ class DomainsController(Domains):
         conf = Configuration.get_object().config_entry
         if not conf.enable_domain_support:
             return
-        if not conf.accept_domains:
+        if not conf.accept_domain_links:
             return
 
         protocol = UrlLocation(url).get_scheme()
@@ -261,7 +261,7 @@ class DomainsController(Domains):
         domains.delete()
 
     def create_missing_domains():
-        if not Configuration.get_object().config_entry.accept_domains:
+        if not Configuration.get_object().config_entry.accept_domain_links:
             return
 
         entries = LinkDataController.objects.filter(domain__isnull=True)
