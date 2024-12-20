@@ -71,29 +71,29 @@ class ConfigurationEntry(models.Model):
     instance_title = models.CharField(
         default="Personal Link Database",
         max_length=500,
-        help_text="Instance title",
+        help_text="Title of the application instance.",
     )
 
     instance_description = models.CharField(
         default="Personal Link Database. May work as link aggregator, may link as YouTube subscription filter.",
         max_length=500,
-        help_text="Instance description",
+        help_text="Description of the application instance.",
     )
 
     instance_internet_location = models.CharField(
         blank=True,
         max_length=200,
-        help_text="Instance location. For example https://my-domain.com/apps/rsshistory/",
+        help_text="URL where the instance is hosted. For example, https://my-domain.com/apps/rsshistory/",
     )
 
     favicon_internet_location = models.CharField(
         blank=True,
         max_length=200,
-        help_text="Instance location. For example https://my-domain.com/apps/rsshistory/static/rsshistory/icons/favicon.ico",
+        help_text="URL of the instance's favicon. For example, https://my-domain.com/static/icons/favicon.ico",
     )
 
     admin_user = models.CharField(
-        max_length=500, default="admin", blank=True, help_text="Admin user name"
+        max_length=500, default="admin", blank=True, help_text="Username of the administrator."
     )
 
     access_type = models.CharField(
@@ -101,7 +101,10 @@ class ConfigurationEntry(models.Model):
         null=False,
         choices=ACCESS_TYPES,
         default=ACCESS_TYPE_ALL,
-        help_text='There are three access types available. "All" allows anybody view contents. "Logged" allows only logged users to view contents. "Owner" means application is private, and only owner can view it\'s contents.',
+        help_text=(
+            "Defines who can view the contents of the application. "
+            "'All' allows anyone, 'Logged' restricts to logged-in users, and 'Owner' makes it private to the owner."
+        ),
     )
 
     download_access_type = models.CharField(
@@ -109,7 +112,7 @@ class ConfigurationEntry(models.Model):
         null=False,
         choices=ACCESS_TYPES,
         default=ACCESS_TYPE_LOGGED,
-        help_text="Indication which kind of users can add items to download",
+        help_text="Defines the access level required to download items.",
     )
 
     add_access_type = models.CharField(
@@ -117,48 +120,73 @@ class ConfigurationEntry(models.Model):
         null=False,
         choices=ACCESS_TYPES,
         default=ACCESS_TYPE_LOGGED,
-        help_text="Access right required to add entries. Not a role - we do not want to edit all users",
+        help_text="Defines the access level required to add entries to the database.",
     )
 
-    logging_level = models.IntegerField(default=int(logging.WARNING))
+    logging_level = models.IntegerField(
+        default=logging.WARNING,
+        choices=[
+            (logging.DEBUG, "Debug"),
+            (logging.INFO, "Info"),
+            (logging.WARNING, "Warning"),
+            (logging.ERROR, "Error"),
+            (logging.CRITICAL, "Critical"),
+        ],
+        help_text="Specifies the logging level for the application.",
+    )
 
+    # TODO rename to is_initialized
     initialized = models.BooleanField(
         default=False,
+        help_text="Indicates whether the application instance has been initialized.",
     )
 
+    # TODO rename to enable_background_tasks
     background_tasks = models.BooleanField(
         default=True,
-        help_text="If disabled, background tasks, and jobs are disabled.",
+        help_text="If disabled, background tasks and jobs are turned off.",
     )
     block_new_tasks = models.BooleanField(
         default=False,
-        help_text="If true, no new tasks will arrive",
+        help_text="If enabled, no new tasks will be added to the queue.",
     )
 
     user_internal_scripts = models.BooleanField(
         default=False,
-        help_text="If enabled internal javascript files and styles will be used, otherwise jquery and other files will be obtained from the Internet",
+        help_text=(
+            "If enabled, internal JavaScript and CSS files will be used. "
+            "Otherwise, external libraries like jQuery will be loaded from CDNs."
+        ),
     )
 
+    # TODO change null to blank
     data_import_path = models.CharField(
         default="../data/imports",
         max_length=2000,
         null=True,
+        help_text="Path to the directory for data imports.",
     )
+    # TODO change null to blank
     data_export_path = models.CharField(
         default="../data/exports",
         max_length=2000,
         null=True,
+        help_text="Path to the directory for data exports.",
     )
+    # TODO change null to blank
     download_path = models.CharField(
         max_length=2000,
         null=True,
         blank=True,
+        help_text="Path to the directory where downloaded files are stored.",
     )
 
     auto_store_thumbnails = models.BooleanField(
         default=False,
-        help_text="Automatically stores thumbnail. Available when file support is enabled",
+        help_text=(
+            "If enabled, thumbnails will be stored automatically. This feature is available "
+            "only when file support is enabled."
+        ),
     )
 
     default_search_behavior = models.CharField(
@@ -166,7 +194,7 @@ class ConfigurationEntry(models.Model):
         null=True,
         default=SEARCH_BUTTON_ALL,
         choices=SEARCH_BUTTONS,
-        help_text="Behavior of the main search icon",
+        help_text="Defines the default behavior of the main search button.",
     )
 
     # features
@@ -176,91 +204,105 @@ class ConfigurationEntry(models.Model):
     )
 
     enable_domain_support = models.BooleanField(
-        default=True, help_text="Enable domain feature support, creates additional domain objects"
+        default=True, help_text="Enable domain feature support. Creates additional domain objects when a new entry is add."
     )
 
     enable_file_support = models.BooleanField(
         default=False, help_text="Enable file feature support"
     )
 
+    # TODO rename to enable_link_archiving
     link_save = models.BooleanField(
-        default=False, help_text="Links are saved using archive.org."
+        default=False, help_text="Enable archiving of links using archive.org."
     )
 
+    # TODO rename to enable_source_archiving
     source_save = models.BooleanField(
-        default=False, help_text="Links are saved using archive.org."
+        default=False, help_text="Enable archiving of sources using archive.org."
     )
 
     # database link contents
 
+    # TODO rename to accept_dead_links
     accept_dead = models.BooleanField(
         default=False,
-        help_text="Accept rotten links, no longer active, to be added to the database",
+        help_text="Allow adding inactive or broken links to the database.",
     )  # whether dead entries can be introduced into database
 
+    # TODO rename to accept_ip_links
     accept_ip_addresses = models.BooleanField(
         default=False,
-        help_text="Accept IP addressed links, like //127.0.0.1/my/directory",
+        help_text="Allow adding links that use IP addresses, such as //127.0.0.1/my/directory.",
     )
 
+    # TODO rename to accept_domain_links
     accept_domains = models.BooleanField(
-        default=True, help_text="Domain links can be added to system"
+        default=True, help_text="Allow adding links that are domains to the system."
     )
 
+    # TODO rename to accept_non_domain_links
     accept_not_domain_entries = models.BooleanField(
-        default=True, help_text="Links that are not domains can be added to system"
+        default=True, help_text="Allow adding links that are not domains to the system."
     )
 
     # this option is necessary, if we want to have rss client, with option to drop old entries,
     # but which keeps domains, or other permanent entries
+
+    # TODO rename to keep_domain_links
     keep_domains = models.BooleanField(
-        default=False, help_text="If true domains will be made permanent"
+        default=False, help_text="If enabled, domains will be treated as permanent entries in the system."
     )
 
+    # TODO rename to auto_scan_new_entries
     auto_scan_entries = models.BooleanField(
         default=False,
-        help_text="Scans for new links, when link is added. From decription, from contents",
+        help_text="Automatically scan for new links in descriptions and content when a link is added.",
     )
 
+    # TODO rename to merge_data_for_new_entries
     new_entries_merge_data = models.BooleanField(
         default=False,
-        help_text="Tries to merge data for new entries - captures what is missing",
+        help_text="Attempt to merge missing data for newly added entries.",
     )
 
+    # TODO rename to use_clean_data_for_new_entries
     new_entries_use_clean_data = models.BooleanField(
         default=False,
-        help_text="Fetches clean information from the Internet for new entries",
+        help_text="Fetch clean and updated information from the Internet for new entries.",
     )
 
+    # TODO rename to update_entries_via_internet
     entry_update_uses_internet = models.BooleanField(
         default=True,
-        help_text="When entry update is made internet is used to check status",
+        help_text="Use the Internet to check the status of entries during updates.",
     )
 
     auto_create_sources = models.BooleanField(
         default=False,
-        help_text="Adds any new found source",
+        help_text="Automatically add newly found sources to the system.",
     )
 
+    # TODO rename to default_source_enabled
     new_source_enabled_state = models.BooleanField(
-        default=False, help_text="Default state of a new source"
+        default=False, help_text="Set the default state of newly added sources."
     )
 
+    # TODO rename to prefer_https_links
     prefer_https = models.BooleanField(
         default=True,
-        help_text="Https is preferred. If update takes place, and https is available, we upgrade link.",
+        help_text="Prefer HTTPS links. If updates reveal an HTTPS version, replace HTTP links with it.",
     )
 
     prefer_non_www_sites = models.BooleanField(
         default=False,
-        help_text="Non www sites are preferred. If update takes place www links could be replaced with clean links without it.",
+        help_text="Prefer non-www links. Replace www links with cleaner versions if available during updates.",
     )
 
     block_keywords = models.CharField(
         max_length=1000,
         blank=True,
         default="mastubat, porn",
-        help_text="Links with these keywords will be blocked",
+        help_text="Comma-separated keywords. Links containing these keywords will be blocked.",
     )
 
     # updates
@@ -272,89 +314,117 @@ class ConfigurationEntry(models.Model):
 
     days_to_move_to_archive = models.IntegerField(
         default=50,
-        help_text="Number of days, after which entries are moved to archive. Disabled if 0.",
+        help_text="Number of days after which entries are moved to archive. Disabled if 0.",
     )
 
     days_to_remove_links = models.IntegerField(
         default=100,
-        help_text="Number of days, after which links are removed. Useful for RSS clients. Disabled if 0.",
+        help_text="Number of days after which links are removed. Useful for RSS clients. Disabled if 0.",
     )
 
     days_to_remove_stale_entries = models.IntegerField(
-        default=35, help_text="Number of days after which dead entries are removed"
+        default=35,
+        help_text="Number of days after which inactive entries are removed."
     )
 
     days_to_check_std_entries = models.IntegerField(
         default=35,
-        help_text="Number of days after which normal entries are checked for status",
+        help_text="Number of days after which standard entries are checked for status.",
     )
 
     days_to_check_stale_entries = models.IntegerField(
         default=35,
-        help_text="Number of days after which dead entries are checked for status",
+        help_text="Number of days after which inactive entries are checked for status.",
     )
 
     remove_entry_vote_threshold = models.IntegerField(
         default=1,
-        help_text="If entry has reached threshold, it will not be removed. if 0 disabled",
+        help_text="Threshold for votes required to retain an entry. Disabled if set to 0.",
     )
 
     number_of_update_entries = models.IntegerField(
         default=1,
-        help_text="The amount of entries that will be updated at each refresh",
+        help_text="Number of entries that will be updated during each refresh cycle.",
     )
 
     # Networking
 
     ssl_verification = models.BooleanField(
-        default=True
+        default=True,
+        help_text="Enable SSL certificate verification for network requests. Disabling may improve speed but could result in invalid or insecure pages."
     )  # Might work faster if disabled, but might capture invalid pages
 
     user_agent = models.CharField(
         default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
         max_length=500,
-        help_text='You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>.',
+        help_text=(
+            "Custom user agent for network requests. "
+            "<a href='https://www.supermonitoring.com/blog/check-browser-http-headers/' target='_blank'>Check your user agent here</a>."
+        ),
     )
 
     user_headers = models.CharField(
         max_length=1000,
         blank=True,
-        help_text='Provide JSON configuration of headers. You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>.',
+        help_text='Provide custom JSON headers for requests. Check your user agent at <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">here</a>.',
     )
 
+    # TODO rename to internet_status_test_url 
     internet_test_page = models.CharField(
         default="https://google.com",
         max_length=2000,
         null=True,
-        help_text="Page that is pinged to check if Internet is OK",
+        help_text="URL used to test internet connectivity. It will be pinged to verify internet access.",
     )
 
     respect_robots_txt = models.BooleanField(
         default=False,
-        help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
+        help_text="Respect robots.txt rules for web scraping. Some features may not work, such as fetching YouTube channels.",
     )
 
     # User settings
 
     track_user_actions = models.BooleanField(
-        default=True, help_text="Among tracked elements: what is searched."
+        default=True,
+        help_text="Track user actions, including search queries.",
     )
 
-    track_user_searches = models.BooleanField(default=True)
+    track_user_searches = models.BooleanField(
+        default=True,
+        help_text="Enable or disable tracking of user searches.",
+    )
 
-    track_user_navigation = models.BooleanField(default=False)
+    track_user_navigation = models.BooleanField(
+        default=False,
+        help_text="Enable or disable tracking of user navigation across pages.",
+    )
 
-    max_number_of_browse = models.IntegerField(default=5000, help_text="Number of history searches. If 0, then search history is not cleared")
+    # TODO rename to max_user_entry_transitions 
+    max_number_of_browse = models.IntegerField(
+        default=5000,
+        help_text="The maximum number of search history entries. If set to 0, search history is not cleared."
+    )
 
-    max_number_of_searches = models.IntegerField(default=700, help_text="Number of history searches. If 0, then search history is not cleared")
+    # TODO rename to max_number_of_user_search
+    max_number_of_searches = models.IntegerField(
+        default=700,
+        help_text="The maximum number of searches stored in history. If set to 0, search history is not cleared."
+    )
 
-    vote_min = models.IntegerField(default=-100)
+    vote_min = models.IntegerField(
+        default=-100,
+        help_text="The minimum allowed vote value."
+    )
 
-    vote_max = models.IntegerField(default=100)
+    vote_max = models.IntegerField(
+        default=100,
+        help_text="The maximum allowed vote value."
+    )
 
+    # TODO rename to comments_per_day_limit 
     number_of_comments_per_day = models.IntegerField(
         default=1,
-        help_text="The limit is for each user. Helps in maintaining proper culture",
+        help_text="The maximum number of comments a user can post per day to maintain community culture."
     )
 
     # display
@@ -362,18 +432,19 @@ class ConfigurationEntry(models.Model):
     time_zone = models.CharField(
         max_length=50,
         default="UTC",
-        help_text="List of available timezones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. For example Europe/Warsaw",
+        help_text="Specify the time zone. Example: Europe/Warsaw. A list of time zones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones."
     )
 
+    # TODO rename to whats_new_time_range_days 
     whats_new_days = models.IntegerField(
-        default=7, help_text="What's new page time range in days"
+        default=7,
+        help_text="The number of days to show in the 'What's New' section."
     )
 
-    # TODO selectable from combo?
     entries_order_by = models.CharField(
         default="-date_published",  # TODO support for multiple columns
         max_length=1000,
-        help_text="For Google-like experience set -page_rating. By default it is set to order of publication, -date_published.",
+        help_text="Specify the sorting order for entries. For a Google-like experience, set to '-page_rating'. Default is '-date_published'."
     )
 
     display_style = models.CharField(
@@ -381,54 +452,57 @@ class ConfigurationEntry(models.Model):
         null=True,
         default=DISPLAY_STYLE_LIGHT,
         choices=STYLE_TYPES,
-        help_text="Applies to not logged users",
+        help_text="Defines the display style for users who are not logged in."
     )
     display_type = models.CharField(
         max_length=500,
         null=True,
         default=DISPLAY_TYPE_STANDARD,
         choices=DISPLAY_TYPE_CHOICES,
-        help_text="Applies to not logged users",
+        help_text="Defines the display type for users who are not logged in."
     )
     show_icons = models.BooleanField(
         default=True,
-        help_text="Applies to not logged users",
+        help_text="Whether to display icons for users who are not logged in."
     )
     thumbnails_as_icons = models.BooleanField(
         default=True,
-        help_text="If false, source favicons are used as thumbnails. Applies to not logged users",
+        help_text="If false, source favicons are used as thumbnails for users who are not logged in."
     )
     small_icons = models.BooleanField(
         default=True,
-        help_text="Applies to not logged users",
+        help_text="Whether to use small icons for users who are not logged in."
     )
     local_icons = models.BooleanField(
         default=False,
-        help_text="If true, only locally stored icons are displayed. Applies to not logged users",
+        help_text="If true, only locally stored icons are displayed for users who are not logged in."
     )
 
     links_per_page = models.IntegerField(
         default=100,
-        help_text="Number of links per page. Applies to not logged users",
+        help_text="The number of links displayed per page for users who are not logged in."
     )
     sources_per_page = models.IntegerField(
-        default=100, help_text="Number of sources per page. Applies to not logged users"
+        default=100,
+        help_text="The number of sources displayed per page for users who are not logged in."
     )
 
     max_links_per_page = models.IntegerField(
-        default=100, help_text="Maximum number of links per page"
+        default=100,
+        help_text="The maximum number of links that can be displayed per page."
     )
     max_sources_per_page = models.IntegerField(
-        default=100, help_text="Maximum number of sources per page"
+        default=100,
+        help_text="The maximum number of sources that can be displayed per page."
     )
     max_number_of_related_links = models.IntegerField(
         default=30,
-        help_text="Maximum number of entries displayed in 'entry detail related' view",
+        help_text="The maximum number of related links displayed in the 'entry detail' view."
     )
 
     debug_mode = models.BooleanField(
         default=False,
-        help_text="Debug mode allows to see errors more clearly",
+        help_text="Enable debug mode to see errors more clearly."
     )
 
     def get():
