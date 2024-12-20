@@ -184,10 +184,19 @@ class ConfigForm(forms.ModelForm):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
 
-        self.fields["user_agent"].widget.attrs.update(size=self.init.get_cols_size())
-        self.fields["block_keywords"].widget.attrs.update(
-            size=self.init.get_cols_size()
-        )
+        self.long_widget("user_agent")
+        self.long_widget("block_keywords")
+        self.long_widget("instance_title")
+        self.long_widget("instance_description")
+        self.long_widget("instance_internet_location")
+        self.long_widget("admin_user")
+        self.long_widget("favicon_internet_location")
+        self.long_widget("internet_test_page")
+        self.long_widget("time_zone")
+        self.long_widget("entries_order_by")
+        self.long_widget("data_export_path")
+        self.long_widget("data_import_path")
+        self.long_widget("download_path")
 
         if self.init.is_mobile:
             self.fields["user_headers"].widget = forms.Textarea(
@@ -197,6 +206,11 @@ class ConfigForm(forms.ModelForm):
             self.fields["user_headers"].widget = forms.Textarea(
                 attrs={"rows": 20, "cols": 75}
             )
+
+    def long_widget(self, field_name):
+        self.fields[field_name].widget.attrs.update(
+            size=self.init.get_cols_size()
+        )
 
 
 class DataExportForm(forms.ModelForm):
