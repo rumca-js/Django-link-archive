@@ -106,29 +106,30 @@ class ConfigForm(forms.ModelForm):
             "instance_internet_location",
             "admin_user",
             "logging_level",
-            "access_type",
+            "view_access_type",
             "download_access_type",
             "add_access_type",
             "default_search_behavior",
-            "background_tasks",
-            "block_new_tasks",
-            "user_internal_scripts",
+            "use_internal_scripts",
             "data_export_path",
             "data_import_path",
             "download_path",
             "auto_store_thumbnails",
-            "favicon_internet_location",
+            "favicon_internet_url",
             # features
+            "enable_background_jobs",
             "enable_domain_support",
             "enable_keyword_support",
             "enable_file_support",
             "enable_link_archiving",
             "enable_source_archiving",
             # database link contents
-            "accept_dead_links",
-            "accept_ip_links",
             "accept_domain_links",
             "accept_non_domain_links",
+            "accept_ip_links",
+            "accept_dead_links",
+            "prefer_https_links",
+            "prefer_non_www_links",
             "keep_domain_links",
             "auto_scan_new_entries",
             "new_entries_merge_data",
@@ -136,8 +137,6 @@ class ConfigForm(forms.ModelForm):
             "entry_update_via_internet",
             "auto_create_sources",
             "default_source_state",
-            "prefer_https_links",
-            "prefer_non_www_links",
             "block_keywords",
             # updates
             "sources_refresh_period",
@@ -178,6 +177,7 @@ class ConfigForm(forms.ModelForm):
             "max_sources_per_page",
             "max_number_of_related_links",
             # other
+            "block_job_queue",
             "debug_mode",
         ]
 
@@ -191,7 +191,7 @@ class ConfigForm(forms.ModelForm):
         self.long_widget("instance_description")
         self.long_widget("instance_internet_location")
         self.long_widget("admin_user")
-        self.long_widget("favicon_internet_location")
+        self.long_widget("favicon_internet_url")
         self.long_widget("internet_status_test_url")
         self.long_widget("time_zone")
         self.long_widget("entries_order_by")

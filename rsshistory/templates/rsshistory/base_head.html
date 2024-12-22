@@ -32,7 +32,7 @@
       {% endif %}
     {% endif %}
 
-    {% if config.user_internal_scripts %}
+    {% if config.use_internal_scripts %}
       <link rel="stylesheet" href="{% static 'bootstrap/bootstrap5.3.3.min.css' %}">
       <script src="{% static 'bootstrap/bootstrap.bundle5.3.3.min.js' %}"></script>
     {% else %}
@@ -42,8 +42,8 @@
 
     <script src="{% static 'rsshistory/library.js' %}"></script>
 
-    {% if config.favicon_internet_location %}
-    <link rel="shortcut icon" type="image" href="{{config.favicon_internet_location}}"/>
+    {% if config.favicon_internet_url %}
+    <link rel="shortcut icon" type="image" href="{{config.favicon_internet_url}}"/>
     {% else %}
     <link rel="shortcut icon" type="image" href="{% static 'rsshistory/icons/favicon.ico' %}"/>
     {% endif %}
@@ -52,7 +52,7 @@
     <link rel="search" href="opensearch.xml" type="application/opensearchdescription+xml" title="Django archive search">
     {% endif %}
 
-    {% if config.user_internal_scripts %}
+    {% if config.use_internal_scripts %}
         <script src="{% static 'bootstrap/jquery-3.7.1.min.js' %}"></script>
     {% else %}
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

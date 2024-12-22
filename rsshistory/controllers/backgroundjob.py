@@ -141,7 +141,7 @@ class BackgroundJobController(BackgroundJob):
             )
 
             config = Configuration.get_object().config_entry
-            if job and not config.background_tasks:
+            if job and not config.enable_background_jobs:
                 BackgroundJobController.run_single_job(job)
 
             else:

@@ -86,7 +86,7 @@ class ConfigurationEntry(models.Model):
         help_text="URL where the instance is hosted. For example, https://my-domain.com/apps/rsshistory/",
     )
 
-    favicon_internet_location = models.CharField(
+    favicon_internet_url = models.CharField(
         blank=True,
         max_length=200,
         help_text="URL of the instance's favicon. For example, https://my-domain.com/static/icons/favicon.ico",
@@ -96,7 +96,7 @@ class ConfigurationEntry(models.Model):
         max_length=500, default="admin", blank=True, help_text="Username of the administrator."
     )
 
-    access_type = models.CharField(
+    view_access_type = models.CharField(
         max_length=100,
         null=False,
         choices=ACCESS_TYPES,
@@ -140,17 +140,17 @@ class ConfigurationEntry(models.Model):
         help_text="Indicates whether the application instance has been initialized.",
     )
 
-    background_tasks = models.BooleanField(
+    enable_background_jobs = models.BooleanField(
         default=True,
-        help_text="If disabled, background tasks and jobs are turned off.",
+        help_text="If enabled other task is responsible for job processing. If disabled background jobs are immediately processed by the current thread.",
     )
 
-    block_new_tasks = models.BooleanField(
+    block_job_queue = models.BooleanField(
         default=False,
-        help_text="If enabled, no new tasks will be added to the queue.",
+        help_text="If enabled, no new jobs will be created. Calls for new jobs will be discarded",
     )
 
-    user_internal_scripts = models.BooleanField(
+    use_internal_scripts = models.BooleanField(
         default=False,
         help_text=(
             "If enabled, internal JavaScript and CSS files will be used. "
@@ -188,6 +188,7 @@ class ConfigurationEntry(models.Model):
         ),
     )
 
+    # TODO rename choices to search_behavior
     default_search_behavior = models.CharField(
         max_length=500,
         null=True,
@@ -206,6 +207,7 @@ class ConfigurationEntry(models.Model):
         default=True, help_text="Enable domain feature support. Creates additional domain objects when a new entry is add."
     )
 
+    # TODO discuss what it does in help_text
     enable_file_support = models.BooleanField(
         default=False, help_text="Enable file feature support"
     )
@@ -405,7 +407,6 @@ class ConfigurationEntry(models.Model):
         help_text="The maximum allowed vote value."
     )
 
-    # TODO rename to comments_per_day_limit 
     number_of_comments_per_day = models.IntegerField(
         default=1,
         help_text="The maximum number of comments a user can post per day to maintain community culture."

@@ -104,7 +104,7 @@ class RefreshProcessor(CeleryTaskInterface):
             return
 
         config = c.config_entry
-        if config.block_new_tasks:
+        if config.block_job_queue:
             return
 
         from .controllers import SourceDataController

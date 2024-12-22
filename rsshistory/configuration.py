@@ -21,7 +21,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "1.13.0"
+__version__ = "1.14.0"
 
 
 class Configuration(object):
@@ -52,7 +52,7 @@ class Configuration(object):
             "app_name": str(LinkDatabase.name),
             "app_title": config_entry.instance_title,
             "app_description": config_entry.instance_description,
-            "app_favicon": config_entry.favicon_internet_location,
+            "app_favicon": config_entry.favicon_internet_url,
             "admin_email": "renegat@renegat0x0.ddns.net",
             "admin_user": config_entry.admin_user,
             "app_version": __version__,

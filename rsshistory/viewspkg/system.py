@@ -907,9 +907,9 @@ def get_footer_status_line(request):
         message += f"Reading sources. Queue:{sources_queue_size}"
     if is_sources_error:
         message = add_to_message(message, "Sources")
-    if configuration_entry.background_tasks and not is_internet_ok:
+    if configuration_entry.enable_background_jobs and not is_internet_ok:
         message = add_to_message(message, "Internet")
-    if configuration_entry.background_tasks and not is_threading_ok:
+    if configuration_entry.enable_background_jobs and not is_threading_ok:
         message = add_to_message(message, "Threads")
     if is_backgroundjobs_error:
         message = add_to_message(message, "Jobs")
@@ -963,12 +963,12 @@ def get_indicators(request):
     indicators["sources_error"]["message"] = f"Sources error"
     indicators["sources_error"]["status"] = is_sources_error
 
-    is_internet_error = configuration_entry.background_tasks and not is_internet_ok
+    is_internet_error = configuration_entry.enable_background_jobs and not is_internet_ok
     indicators["internet_error"] = {}
     indicators["internet_error"]["message"] = f"Internet error"
     indicators["internet_error"]["status"] = is_internet_error
 
-    threads_error = configuration_entry.background_tasks and not is_threading_ok
+    threads_error = configuration_entry.enable_background_jobs and not is_threading_ok
     indicators["threads_error"] = {}
     indicators["threads_error"]["message"] = f"Threads error"
     indicators["threads_error"]["status"] = threads_error

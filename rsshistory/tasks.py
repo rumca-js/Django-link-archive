@@ -15,7 +15,7 @@ def process_jobs_task(Processor):
 
     try:
         c = Configuration.get_object()
-        if not c.config_entry.background_tasks:
+        if not c.config_entry.enable_background_jobs:
             logger.info("Background tasks are disabled in the configuration.")
             return
 

@@ -65,7 +65,7 @@ def get_page_num(themap):
 class ViewPage(object):
     def __init__(self, request):
         self.request = request
-        self.access_type = None
+        self.view_access_type = None
 
         self.context = None
         self.context = self.get_context()
@@ -82,7 +82,7 @@ class ViewPage(object):
 
         context["debug"] = config.debug_mode
 
-        if self.is_user_allowed(self.access_type) and config.background_tasks:
+        if self.is_user_allowed(self.view_access_type) and config.enable_background_jobs:
             context.update(c.get_context())
 
             context["is_user_allowed"] = True
@@ -130,8 +130,8 @@ class ViewPage(object):
     def set_title(self, title):
         self.context["page_title"] += " - {}".format(title)
 
-    def set_access(self, access_type):
-        self.access_type = access_type
+    def set_access(self, view_access_type):
+        self.view_access_type = view_access_type
 
         return self.check_access()
 
@@ -139,7 +139,7 @@ class ViewPage(object):
         self.context[variable_name] = variable_value
 
     def check_access(self):
-        if not self.is_user_allowed(self.access_type) and not self.is_api_key_allowed():
+        if not self.is_user_allowed(self.view_access_type) and not self.is_api_key_allowed():
             return self.render_implementation("missing_rights.html", 500)
 
     def is_api_key_allowed(self):
@@ -154,8 +154,8 @@ class ViewPage(object):
         if keys.exists():
             return True
 
-    def is_user_allowed(self, access_type):
-        if not self.is_user_allowed_on_page_level(self.access_type):
+    def is_user_allowed(self, view_access_type):
+        if not self.is_user_allowed_on_page_level(self.view_access_type):
             return False
 
         if not self.is_user_allowed_on_system_level():
@@ -163,22 +163,22 @@ class ViewPage(object):
 
         return True
 
-    def is_user_allowed_on_page_level(self, access_type):
+    def is_user_allowed_on_page_level(self, view_access_type):
         if not self.request:
             return False
 
         if (
-            access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
+            view_access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
             and not self.request.user.is_superuser
         ):
             return False
         if (
-            access_type == ConfigurationEntry.ACCESS_TYPE_STAFF
+            view_access_type == ConfigurationEntry.ACCESS_TYPE_STAFF
             and not self.request.user.is_staff
         ):
             return False
         if (
-            access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
+            view_access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
             and not self.request.user.is_authenticated
         ):
             return False
@@ -191,7 +191,7 @@ class ViewPage(object):
 
         config = ConfigurationEntry.get()
         if (
-            config.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
+            config.view_access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
             and not self.request.user.is_superuser
         ):
             return False
