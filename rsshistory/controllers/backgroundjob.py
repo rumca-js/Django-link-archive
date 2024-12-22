@@ -428,7 +428,7 @@ class BackgroundJobController(BackgroundJob):
         """
         from ..configuration import Configuration
         config = Configuration.get_object().config_entry
-        if not config.entry_update_uses_internet:
+        if not config.entry_update_via_internet:
             return
 
         if not force:
@@ -458,7 +458,7 @@ class BackgroundJobController(BackgroundJob):
         """
         from ..configuration import Configuration
         config = Configuration.get_object().config_entry
-        if not config.entry_update_uses_internet:
+        if not config.entry_update_via_internet:
             return
 
         if not force:

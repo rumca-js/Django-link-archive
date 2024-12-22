@@ -406,7 +406,7 @@ class SourceDataBuilder(object):
             # TODO if there is no title - inherit it from 'main domain'. same goes for language.
             # maybe for thumbnail
             self.link_data["export_to_cms"] = True
-            self.link_data["enabled"] = conf.new_source_enabled_state
+            self.link_data["enabled"] = conf.default_source_state
             if "source_type" not in self.link_data:
                 self.link_data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
             if "remove_after_days" not in self.link_data:

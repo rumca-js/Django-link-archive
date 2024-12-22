@@ -53,11 +53,11 @@ def get_errors(page_url):
     info = DomainCache.get_object(link, url_builder=UrlHandler)
 
     # warnings
-    if config.prefer_https and link.find("http://") >= 0:
+    if config.prefer_https_links and link.find("http://") >= 0:
         warnings.append(
             "Detected http protocol. Choose https if possible. It is a more secure protocol"
         )
-    if config.prefer_non_www_sites and domain.find("www.") >= 0:
+    if config.prefer_non_www_links and domain.find("www.") >= 0:
         warnings.append(
             "Detected www in domain link name. Select non www link if possible"
         )

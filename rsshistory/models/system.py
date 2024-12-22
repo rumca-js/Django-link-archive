@@ -135,13 +135,11 @@ class ConfigurationEntry(models.Model):
         help_text="Specifies the logging level for the application.",
     )
 
-    # TODO rename to is_initialized
     initialized = models.BooleanField(
         default=False,
         help_text="Indicates whether the application instance has been initialized.",
     )
 
-    # TODO rename to enable_background_tasks
     background_tasks = models.BooleanField(
         default=True,
         help_text="If disabled, background tasks and jobs are turned off.",
@@ -263,10 +261,9 @@ class ConfigurationEntry(models.Model):
         help_text="Fetch clean and updated information from the Internet for new entries.",
     )
 
-    # TODO rename to update_entries_via_internet
-    entry_update_uses_internet = models.BooleanField(
+    entry_update_via_internet = models.BooleanField(
         default=True,
-        help_text="Use the Internet to check the status of entries during updates.",
+        help_text="Use the Internet to check the status of entries during updates. Otherwise entriy data will not be fetched by Internet",
     )
 
     auto_create_sources = models.BooleanField(
@@ -274,19 +271,16 @@ class ConfigurationEntry(models.Model):
         help_text="Automatically add newly found sources to the system.",
     )
 
-    # TODO rename to default_source_enabled
-    new_source_enabled_state = models.BooleanField(
+    default_source_state = models.BooleanField(
         default=False, help_text="Set the default state of newly added sources."
     )
 
-    # TODO rename to prefer_https_links
-    prefer_https = models.BooleanField(
+    prefer_https_links = models.BooleanField(
         default=True,
         help_text="Prefer HTTPS links. If updates reveal an HTTPS version, replace HTTP links with it.",
     )
 
-    # TODO rename to prefer_non_www_links
-    prefer_non_www_sites = models.BooleanField(
+    prefer_non_www_links = models.BooleanField(
         default=False,
         help_text="Prefer non-www links. Replace www links with cleaner versions if available during updates.",
     )
@@ -362,8 +356,7 @@ class ConfigurationEntry(models.Model):
         help_text='Provide custom JSON headers for requests. Check your user agent at <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">here</a>.',
     )
 
-    # TODO rename to internet_status_test_url 
-    internet_test_page = models.CharField(
+    internet_status_test_url = models.CharField(
         default="https://google.com",
         max_length=2000,
         null=True,
@@ -389,17 +382,15 @@ class ConfigurationEntry(models.Model):
 
     track_user_navigation = models.BooleanField(
         default=False,
-        help_text="Enable or disable tracking of user navigation across pages.",
+        help_text="Enable or disable tracking of user navigation across pages (entry visits).",
     )
 
-    # TODO rename to max_user_entry_transitions 
-    max_number_of_browse = models.IntegerField(
+    max_user_entry_visit_history = models.IntegerField(
         default=5000,
-        help_text="The maximum number of search history entries. If set to 0, search history is not cleared."
+        help_text="The maximum number of entry visit history. If set to 0, entry visit history is not cleared."
     )
 
-    # TODO rename to max_number_of_user_search
-    max_number_of_searches = models.IntegerField(
+    max_number_of_user_search = models.IntegerField(
         default=700,
         help_text="The maximum number of searches stored in history. If set to 0, search history is not cleared."
     )

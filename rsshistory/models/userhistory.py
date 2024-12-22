@@ -121,7 +121,7 @@ class UserSearchHistory(models.Model):
         We may maintain more than we display in GUI
         """
         config_entry = Configuration.get_object().config_entry
-        return config_entry.max_number_of_searches
+        return config_entry.max_number_of_user_search
 
     def get_encoded_search_query(self):
         return urllib.parse.quote(self.search_query)
@@ -487,10 +487,10 @@ class UserEntryVisitHistory(models.Model):
         qs = UserEntryVisitHistory.objects.filter(user=user).order_by("date_last_visit")
 
         config_entry = Configuration.get_object().config_entry
-        if config_entry.max_number_of_browse == 0:
+        if config_entry.max_user_entry_visit_history == 0:
             return
 
-        limit = config_entry.max_number_of_browse
+        limit = config_entry.max_user_entry_visit_history
         if qs.count() > limit:
             too_many = qs.count() - limit
             entries = qs[:too_many]

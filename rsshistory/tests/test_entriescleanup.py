@@ -233,7 +233,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
     #def test_cleanup__https_http_duplicates(self):
     #    conf = Configuration.get_object().config_entry
-    #    conf.prefer_https = True
+    #    conf.prefer_https_links = True
     #    conf.save()
 
     #    self.clear()
@@ -270,9 +270,9 @@ class EntriesCleanupTest(FakeInternetTestCase):
     #        0,
     #    )
 
-    #def test_cleanup__prefer_non_www_sites(self):
+    #def test_cleanup__prefer_non_www_links(self):
     #    conf = Configuration.get_object().config_entry
-    #    conf.prefer_non_www_sites = True
+    #    conf.prefer_non_www_links = True
     #    conf.save()
 
     #    self.clear()

@@ -65,7 +65,7 @@ class SystemOperationController(object):
 
         config_entry = ConfigurationEntry.get()
 
-        test_page_url = config_entry.internet_test_page
+        test_page_url = config_entry.internet_status_test_url
 
         p = UrlHandler(url=test_page_url)
         # TODO fix this

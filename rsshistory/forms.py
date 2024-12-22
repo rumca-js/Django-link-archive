@@ -133,11 +133,11 @@ class ConfigForm(forms.ModelForm):
             "auto_scan_new_entries",
             "new_entries_merge_data",
             "new_entries_use_clean_data",
-            "entry_update_uses_internet",
+            "entry_update_via_internet",
             "auto_create_sources",
-            "new_source_enabled_state",
-            "prefer_https",
-            "prefer_non_www_sites",
+            "default_source_state",
+            "prefer_https_links",
+            "prefer_non_www_links",
             "block_keywords",
             # updates
             "sources_refresh_period",
@@ -152,13 +152,14 @@ class ConfigForm(forms.ModelForm):
             "ssl_verification",
             "user_agent",
             "user_headers",
-            "internet_test_page",
+            "internet_status_test_url",
             "respect_robots_txt",
             # user
             "track_user_actions",
             "track_user_searches",
             "track_user_navigation",
-            "max_number_of_searches",
+            "max_number_of_user_search",
+            "max_user_entry_visit_history",
             "vote_min",
             "vote_max",
             "number_of_comments_per_day",
@@ -191,7 +192,7 @@ class ConfigForm(forms.ModelForm):
         self.long_widget("instance_internet_location")
         self.long_widget("admin_user")
         self.long_widget("favicon_internet_location")
-        self.long_widget("internet_test_page")
+        self.long_widget("internet_status_test_url")
         self.long_widget("time_zone")
         self.long_widget("entries_order_by")
         self.long_widget("data_export_path")

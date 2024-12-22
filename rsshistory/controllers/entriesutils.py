@@ -1215,7 +1215,7 @@ class EntryWrapper(object):
         entry = self.entry
 
         c = Configuration.get_object().config_entry
-        if not c.prefer_https:
+        if not c.prefer_https_links:
             return
 
         if entry.is_https():
@@ -1260,7 +1260,7 @@ class EntryWrapper(object):
 
         c = Configuration.get_object().config_entry
 
-        if not c.prefer_non_www_sites:
+        if not c.prefer_non_www_links:
             return
 
         entry = self.entry

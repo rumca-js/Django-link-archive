@@ -140,7 +140,7 @@ class EntryGenericPlugin(object):
                 )
 
         
-        if config.entry_update_uses_internet and self.user.is_authenticated:
+        if config.entry_update_via_internet and self.user.is_authenticated:
             buttons.append(
                 EntryButton(
                     self.user,
@@ -155,7 +155,7 @@ class EntryGenericPlugin(object):
                 ),
             )
 
-        if config.entry_update_uses_internet and self.user.is_authenticated:
+        if config.entry_update_via_internet and self.user.is_authenticated:
             buttons.append(
                 EntryButton(
                     self.user,
@@ -187,7 +187,7 @@ class EntryGenericPlugin(object):
                 ),
             )
 
-        if config.entry_update_uses_internet and self.user.is_authenticated:
+        if config.entry_update_via_internet and self.user.is_authenticated:
             buttons.append(
                 EntryButton(
                     self.user,

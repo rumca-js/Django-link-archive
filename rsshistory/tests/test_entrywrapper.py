@@ -406,7 +406,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
         conf.days_to_remove_links = 2
-        conf.prefer_https = True
+        conf.prefer_https_links = True
         conf.save()
 
         LinkDataController.objects.create(
@@ -469,7 +469,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
         conf.days_to_remove_links = 2
-        conf.prefer_https = True
+        conf.prefer_https_links = True
         conf.save()
 
         ob = LinkDataController.objects.create(
@@ -527,7 +527,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
         conf.days_to_remove_links = 2
-        conf.prefer_https = True
+        conf.prefer_https_links = True
         conf.save()
 
         LinkDataController.objects.create(
@@ -578,7 +578,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
         conf.days_to_remove_links = 2
-        conf.prefer_https = True
+        conf.prefer_https_links = True
         conf.save()
 
         https_entry = LinkDataController.objects.create(
@@ -612,7 +612,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
         conf.days_to_remove_links = 2
-        conf.prefer_https = True
+        conf.prefer_https_links = True
         conf.save()
 
         https_entry = LinkDataController.objects.create(
@@ -646,7 +646,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
         conf.days_to_remove_links = 2
-        conf.prefer_https = True
+        conf.prefer_https_links = True
         conf.save()
 
         https_entry = LinkDataController.objects.create(
@@ -678,7 +678,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.days_to_remove_links = 2
         conf.accept_domain_links = False
         conf.accept_non_domain_links = False
-        conf.prefer_https = True
+        conf.prefer_https_links = True
         conf.save()
 
         https_entry = LinkDataController.objects.create(
@@ -710,7 +710,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.days_to_remove_links = 2
         conf.accept_domain_links = False
         conf.accept_non_domain_links = False
-        conf.prefer_https = True
+        conf.prefer_https_links = True
         conf.save()
 
         https_entry = LinkDataController.objects.create(
@@ -740,7 +740,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.days_to_remove_links = 5
         conf.accept_domain_links = False
         conf.accept_non_domain_links = True
-        conf.prefer_https = True
+        conf.prefer_https_links = True
         conf.save()
 
         https_entry = LinkDataController.objects.create(

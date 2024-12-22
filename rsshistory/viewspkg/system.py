@@ -662,7 +662,7 @@ def wizard_setup_news(request):
     c.days_to_remove_links = 20
     c.days_to_remove_stale_entries = 0  # do not remove bookmarks?
     c.whats_new_days = 7
-    c.prefer_https = False
+    c.prefer_https_links = False
     c.entries_order_by = "-date_published, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_STANDARD
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_RECENT
@@ -709,7 +709,7 @@ def wizard_setup_gallery(request):
     c.days_to_remove_links = 30
     c.days_to_remove_stale_entries = 0  # do not remove bookmarks?
     c.whats_new_days = 7
-    c.prefer_https = False
+    c.prefer_https_links = False
     c.entries_order_by = "-date_published, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_GALLERY
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
@@ -758,7 +758,7 @@ def wizard_setup_search_engine(request):
     c.days_to_remove_links = 30
     c.days_to_remove_stale_entries = 30
     c.whats_new_days = 7
-    c.prefer_https = True
+    c.prefer_https_links = True
     c.entries_order_by = "-page_rating, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_SEARCH_ENGINE
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
