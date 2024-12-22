@@ -196,7 +196,7 @@ class ViewPage(object):
         ):
             return False
         if (
-            config.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
+            config.view_access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
             and not self.request.user.is_authenticated
         ):
             return False
