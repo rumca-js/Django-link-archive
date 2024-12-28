@@ -1,0 +1,52 @@
+Django >= "4.2.17"
+django-user-agents >= "0.4.0"
+django-celery-results >= "2.5.1"
+pymemcache >= "4.0.0"
+celery >= "5.4.0"
+# feedparser >= "6.0.10"
+python-dateutil >= "2.8.2"
+yt-dlp >= "2024.12.6"
+waybackpy >= "3.0.6"
+sqlalchemy >= "2.0.34"
+tldextract >= "5.1.2"
+beautifulsoup4 >= "4.12.3"
+# sympy >= "1.13.2"
+pytz >= "2024.2"
+psycopg2-binary
+lxml
+
+# [optional] - at least one of methods need to be running
+# example: crawlerrequests.py
+requests >= "2.32.3"
+
+# [optional]
+# stealth_requests
+
+# [optional] use things below if you want to use selenium
+# example: crawlerseleniumfull.py, crawlerseleniumheadless.py
+selenium>="4.27.1"
+# chardet >= "5.2.0"
+pyvirtualdisplay >= "3.0"
+
+# [optional] use if you plan to use it
+# Note: does not work on raspberry pi
+# example: crawlerseleniumundetected.py
+# undetected-chromedriver >= "3.5.5"
+
+# [optional] use things below if you want to use crawlee
+# example: crawleebeautifulsoup.py, crawleeplaywright.py
+# crawlee>="0.4.5"
+
+# [optional] use things below if you want to use seleniumbase
+# example: crawlerseleniumbase.py
+# seleniumbase="^4.30.3"
+
+# [optional] use things below if you want to use botasaurus
+# example: todo
+# botasaurus-driver
+# botasaurus="*"
+
+# [optional] use things below if you want to use scrapy
+# example: todo
+# https://github.com/geekan/scrapy-examples
+# scrapy="*"

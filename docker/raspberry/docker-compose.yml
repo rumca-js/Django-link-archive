@@ -1,0 +1,70 @@
+version: '3.7'
+services:
+  djangolinkarchive:
+    image: rozbujnik/django-link-archive
+    container_name: djangolinkarchive
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 9092:8000
+    depends_on:
+      dbserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    environment:
+      # could be localhost
+      RABBIT_SERVER: rabbitmq
+      MEMCACHED_SERVER: memcached
+      MEMCACHED_PORT: 11211
+      DB_SERVER: dbserver
+      DB_DB: control
+      DB_USER: power
+      DB_PASSWORD: notexample
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: admin
+      DJANGO_INITIALIZE_SOURCES: 1
+      SECRET_KEY: "xxxxxxxxxxxxx"
+      DEBUG: 1
+    networks:
+      - shared_network
+
+  rabbitmq:
+    #image: rabbitmq 
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    depends_on:
+      dbserver:
+        condition: service_healthy
+    networks:
+      - shared_network
+
+  memcached:
+    image: memcached:latest
+    ports:
+      - "11211:11211"
+    networks:
+      - shared_network
+
+  dbserver:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: control
+      POSTGRES_USER: power
+      POSTGRES_PASSWORD: notexample
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U power -d control"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    driver: bridge
