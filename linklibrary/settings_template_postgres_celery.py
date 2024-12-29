@@ -25,7 +25,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = os.environ.get('DEBUG') == "1"
 
 # Add necessary hosts here
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", os.environ.get('ALLOWED_IP')]
 
 # Celery
 
