@@ -53,6 +53,7 @@ Personal link database, link aggregator, with RSS functionality.
 
  - [Bookmarked links](https://github.com/rumca-js/RSS-Link-Database)
  - [Internet domains, users, projects](https://github.com/rumca-js/Internet-Places-Database)
+ - [daily RSS Git repository for the year 2025](https://github.com/rumca-js/RSS-Link-Database-2025)
  - [daily RSS Git repository for the year 2024](https://github.com/rumca-js/RSS-Link-Database-2024)
  - [daily RSS Git repository for the year 2023](https://github.com/rumca-js/RSS-Link-Database-2023)
  - [daily RSS Git repository for the year 2022](https://github.com/rumca-js/RSS-Link-Database-2022)
