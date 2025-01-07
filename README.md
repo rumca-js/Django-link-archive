@@ -77,6 +77,7 @@ Alternative programs for link bookmarking do exist.
 
 [Hoarder](https://hoarder.app/),
 [Grimoire](https://github.com/goniszewski/grimoire),
+[LinkWarden](https://github.com/linkwarden/linkwarden)
 [BookmarkOS](https://bookmarkos.com/),
 [Raindrop](https://raindrop.io/),
 [LinkAce](https://www.linkace.org/),
