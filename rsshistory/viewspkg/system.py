@@ -797,7 +797,7 @@ def is_system_ok(request):
     Assumming tasks run faster than 1 hour.
     """
     p = ViewPage(request)
-    p.set_title("Is systme OK")
+    p.set_title("Is system OK")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
     if data is not None:
         return data

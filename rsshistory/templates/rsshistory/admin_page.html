@@ -67,23 +67,13 @@
                    <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
                    Browsers</a>
            </li>
-           <li class="list-group-item">
-               <a href="{% url 'rsshistory:appusers' %}" title="User administration" class="nav-link">
-                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-                   Users</a>
-           </li>
-       </ul>
-   </div>
 
-   <div class="m-2" style="flex-grow:1">
-       <h2>Import/Export</h2>
-
-       <ul class="list-group mr-auto">
            <li class="list-group-item">
                <a href="{% url 'rsshistory:data-exports' %}" title="Configured Data Exports" class="nav-link">
                    <img src="{% static 'rsshistory/icons/icons8-database-export-100.png' %}" class="content-icon" />
                    Data Exports</a>
            </li>
+           {% if 0 %}
            <li class="list-group-item">
                <a href="{% url 'rsshistory:import-from-files' %}" title="Import from a directory" class="nav-link">Import from a directory</a>
            </li>
@@ -98,6 +88,13 @@
            </li>
            <li class="list-group-item">
                <a href="{% url 'rsshistory:write-tag-form' %}" class="nav-link">Write topic data</a>
+           </li>
+           {% endif %}
+
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:appusers' %}" title="User administration" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+                   Users</a>
            </li>
        </ul>
    </div>

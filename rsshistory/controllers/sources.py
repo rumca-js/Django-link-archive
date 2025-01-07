@@ -246,7 +246,6 @@ class SourceDataController(SourceDataModel):
     def enable(self):
         if self.enabled:
             return
-        print("enabling")
 
         from .backgroundjob import BackgroundJobController
 

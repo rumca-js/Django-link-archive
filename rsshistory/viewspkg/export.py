@@ -158,6 +158,9 @@ class DataExportListView(GenericListView):
     context_object_name = "content_list"
     paginate_by = 100
 
+    def get_title(self):
+        return "Exports"
+
 
 class DataExportDetailsView(generic.DetailView):
     model = DataExport
@@ -180,6 +183,9 @@ class DataExportDetailsView(generic.DetailView):
         context["absolute_local_path"] = c.get_export_path() / self.object.local_path
 
         return context
+
+    def get_title(self):
+        return "Export"
 
 
 # TODO - analyze what we need from things below - cleanup

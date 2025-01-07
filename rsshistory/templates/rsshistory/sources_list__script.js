@@ -22,7 +22,7 @@ function getSourceTemplate(source, show_icons = true, small_icons = false) {
 
     var template = `
         <a href="${url_absolute}"
-           class="my-1 p-1 list-group-item list-group-item-action"
+           class="my-1 p-1 list-group-item list-group-item-action rounded border"
            title="${title}">
             ${thumbnail_text}
             <span class="link-list-item-title">

@@ -360,7 +360,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "[S] Parent entry",
+                    "🔍 Parent entry",
                     reverse(
                         "{}:entries".format(LinkDatabase.name),
                     )
@@ -376,7 +376,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "[S] https entry",
+                    "🔍 https entry",
                     reverse(
                         "{}:entries".format(LinkDatabase.name),
                     )
@@ -392,14 +392,13 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "[S] Source Entry",
+                    "🔍 Source Entry",
                     reverse(
                         "{}:entries".format(LinkDatabase.name),
                     )
                     + "?search=link+%3D%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Source Entry: {}".format(self.entry.source.title),
-                    static("{}/icons/icons8-link-90.png".format(LinkDatabase.name)),
                 ),
             )
 
@@ -407,7 +406,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "[S] Artist: " + self.entry.author[:20],
+                    "🔍 Artist: " + self.entry.author[:20],
                     reverse(
                         "{}:entries".format(LinkDatabase.name),
                     )
@@ -421,7 +420,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "[S] Album: " + self.entry.album[:20],
+                    "🔍 Album: " + self.entry.album[:20],
                     reverse(
                         "{}:entries".format(LinkDatabase.name),
                     )
@@ -451,14 +450,13 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "[S] Domain",
+                    "🔍 Domain",
                     reverse(
                         "{}:entries".format(LinkDatabase.name),
                     )
                     + "?search=link+%3D%3D+{}".format(domain_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Domain: {}".format(domain_url),
-                    static("{}/icons/icons8-www-64.png".format(LinkDatabase.name)),
                 ),
             )
 
@@ -484,20 +482,6 @@ class EntryGenericPlugin(object):
                 archive_link,
                 ConfigurationEntry.ACCESS_TYPE_ALL,
                 "Archive link: {}".format(archive_link),
-                "https://archive.org/offshoot_assets/favicon.ico",
-            ),
-        )
-
-        e = SearchEngineGoogleCache(self.entry.link)
-        cache_link = e.get_search_string()
-
-        buttons.append(
-            EntryButton(
-                self.user,
-                "Cached page",
-                cache_link,
-                ConfigurationEntry.ACCESS_TYPE_ALL,
-                "Cache link: {}".format(cache_link),
                 "https://archive.org/offshoot_assets/favicon.ico",
             ),
         )

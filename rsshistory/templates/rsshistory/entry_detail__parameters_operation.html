@@ -1,24 +1,27 @@
-<div class="">
-    {% for parameter in object_controller.get_parameters_operation %}
-    <div class="text-nowrap mx-1"
-        {% if parameter.title %}
-        title="{{parameter.title}}"
-        {% elif parameter.name %}
-        title="{{parameter.name}}"
-        {% endif %}
-        >
-        <strong>{{parameter.name | safe}}:</strong>
-        {{parameter.description | safe}}
-    </div>
-    {% endfor %}
-</div>
+<div class="my-2">
+  <h3>Parameters</h3>
+  
+  {% for parameter in object_controller.get_parameters_operation %}
+  <div class="text-nowrap mx-1"
+      {% if parameter.title %}
+      title="{{parameter.title}}"
+      {% elif parameter.name %}
+      title="{{parameter.name}}"
+      {% endif %}
+      >
+      <strong>{{parameter.name | safe}}:</strong>
+      {{parameter.description | safe}}
+  </div>
+  {% endfor %}
+  
+  {% if object.bookmarks.all %}
+  <div class="text-nowrap mx-1">
+      <strong>Bookmarked by:</strong>
+  
+     {% for bookmark in object.bookmarks.all %}
+        {{bookmark.user.username }}
+     {% endfor %}
+  </div>
+  {% endif %}
 
-{% if object.bookmarks.all %}
-<div class="text-nowrap mx-1">
-    <strong>Bookmarked by:</strong>
-
-   {% for bookmark in object.bookmarks.all %}
-      {{bookmark.user.username }}
-   {% endfor %}
 </div>
-{% endif %}

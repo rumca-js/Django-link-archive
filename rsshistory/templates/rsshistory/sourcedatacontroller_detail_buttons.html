@@ -57,10 +57,17 @@
    
      <ul class="dropdown-menu">
         <li>
-            <a href="{% url 'rsshistory:entries' %}?search=source__url+%3D+'{{object.url}}'" class="dropdown-item">
-              <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
-             [S] entries
+            <a href="{% url 'rsshistory:entries' %}?search=source__id+%3D+'{{object.id}}'" class="dropdown-item">
+             🔍 source ID entries
             </a>
+        </li>
+        <li>
+            <a href="{% url 'rsshistory:entries' %}?search=source__title+%3D+'{{object.title}}'" class="dropdown-item">
+             🔍 source title entries
+            </a>
+        <li>
+             <a href="{% url 'rsshistory:categories-view' %}" class="dropdown-item" title="Shows source categories">
+              Source categories</a>
         </li>
       </ul>
    </div>
@@ -72,13 +79,6 @@
    
      <ul class="dropdown-menu">
         {% if user.is_staff %}
-           <li>
-              <a href="{% url 'rsshistory:source-fix-entries' object.id %}" class="dropdown-item" title="Fixes entries for source, objects relationships, langauge">Fix entries</a>
-           </li>
-           <li>
-              <a href="{% url 'rsshistory:source-process-contents' object.id %}" class="dropdown-item" title="Processes text as if it was source contents">Process source contents</a>
-           </li>
-
            {% if handler.is_youtube %}
               <li>
                  <a href="{% url 'rsshistory:source-import-yt-links' object.id %}" class="dropdown-item" title="Fetches all the videos from source">Fetch all videos</a>
@@ -94,17 +94,5 @@
            <a href="{% url 'rsshistory:source-json' object.id %}" class="dropdown-item">Show JSON</a>
         </li>
       </ul>
-   </div>
-
-   <div class="dropdown">
-       <button class="btn btn-primary" type="button" id="#viewsDrop" data-bs-toggle="dropdown" aria-expanded="false">
-         View
-       </button>
-       <ul class="dropdown-menu">
-          <li>
-             <a href="{% url 'rsshistory:categories-view' %}" class="dropdown-item" title="Shows source categories">
-              Source categories</a>
-          </li>
-       </ul>
    </div>
 </div>

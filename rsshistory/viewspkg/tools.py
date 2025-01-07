@@ -688,6 +688,7 @@ def gateways(request):
                                          Gateway.TYPE_VIDEO_STREAMING,
                                          Gateway.TYPE_FILE_SHARING,
                                          Gateway.TYPE_MARKETPLACE,
+                                         Gateway.TYPE_BANKING,
                                          Gateway.TYPE_OTHER,
                                          ])
 

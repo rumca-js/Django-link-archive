@@ -107,6 +107,8 @@ class Gateway(models.Model):
 
         Gateway.objects.create(link = "https://google.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://bing.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://searxng.site", gateway_type=thetype)
+        Gateway.objects.create(link = "https://4get.ca", gateway_type=thetype)
         Gateway.objects.create(link = "https://duckduckgo.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://kagi.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://search.brave.com", gateway_type=thetype)
@@ -196,6 +198,7 @@ class Gateway(models.Model):
         thetype = Gateway.TYPE_AI_BOT
 
         Gateway.objects.create(link = "https://chatgpt.com", gateway_type=thetype)
+        Gateway.objects.create(link = "https://copilot.microsoft.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://bard.google.com", gateway_type=thetype)
         Gateway.objects.create(link = "https://perplexity.ai", gateway_type=thetype)
 
@@ -252,6 +255,10 @@ class Gateway(models.Model):
             data["video_streaming"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_VIDEO_STREAMING)
         if Gateway.TYPE_MARKETPLACE in gateway_types:
             data["marketplace"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_MARKETPLACE)
+        if Gateway.TYPE_FILE_SHARING in gateway_types:
+            data["file_sharing"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_FILE_SHARING)
+        if Gateway.TYPE_BANKING in gateway_types:
+            data["banking"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_BANKING)
         if Gateway.TYPE_OTHER in gateway_types:
             data["other"] = Gateway.objects.filter(gateway_type = Gateway.TYPE_OTHER)
 

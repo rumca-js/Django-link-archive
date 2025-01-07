@@ -111,7 +111,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
             href="{entry_link}"
             title="{title}"
             ${invalid_style}
-            class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class}"
+            class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
         >
             <div class="d-flex">
                 ${thumbnail_text}
@@ -160,7 +160,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
             href="{entry_link}"
             title="{title}"
             ${invalid_style}
-            class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class}"
+            class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
         >
             <div class="d-flex">
                ${thumbnail_text}
@@ -217,7 +217,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
             href="{entry_link}"
             title="{title}"
             ${invalid_style}
-            class="element_${view_display_type} list-group-item list-group-item-action m-1"
+            class="element_${view_display_type} list-group-item list-group-item-action m-1 border rounded"
         >
             <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
                 <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
@@ -258,7 +258,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
             href="{entry_link}"
             title="{title}"
             ${invalid_style}
-            class="list-group-item list-group-item-action"
+            class="list-group-item list-group-item-action border rounded"
         >
             <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
                 <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">

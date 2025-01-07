@@ -85,3 +85,21 @@ class SourceDataControllerTest(FakeInternetTestCase):
         self.assertEqual(sources.count(), 1)
         source = sources[0]
         self.assertFalse(source.enabled)
+
+    def test_disable_enable(self):
+        source = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+        )
+
+        self.assertTrue(source.enabled)
+
+        # call tested function
+        source.disable()
+
+        self.assertFalse(source.enabled)
+
+        # call tested function
+        source.enable()
+
+        self.assertTrue(source.enabled)

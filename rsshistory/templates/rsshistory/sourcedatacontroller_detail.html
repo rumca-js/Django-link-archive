@@ -56,38 +56,36 @@
    </div>
 </div>
 
-<hr/>
-
 {% include "rsshistory/sourcedatacontroller_detail_buttons.html" %}
 
-<div>
+<ul class="list-group my-2">
 {% if object.enabled %}
-    <div class="text-nowrap mx-2">Enabled: {{ object.enabled }}</div>
+    <li class="list-group-item text-nowrap mx-2">Enabled: {{ object.enabled }}</li>
 {% else %}
-    <div class="text-nowrap mx-2 fw-bold">Enabled: {{ object.enabled }}</div>
+    <li class="list-group-item text-nowrap mx-2 fw-bold">Enabled: {{ object.enabled }}</li>
 {% endif %}
-    <div class="text-nowrap mx-2">Fetch period: {{ object.fetch_period }}</div>
-    <div class="text-nowrap mx-2">Category: {{ object.category_name }}</div>
-    <div class="text-nowrap mx-2">Subcategory: {{ object.subcategory_name }}, </div>
-    <div class="text-nowrap mx-2">Category object: {{ object.category }}</div>
-    <div class="text-nowrap mx-2">Subcategory object: {{ object.subcategory }}, </div>
-    <div class="text-nowrap mx-2">Language: {{ object.language }}, </div>
-    <div class="text-nowrap mx-2">Age: {{ object.age }}, </div>
-    <div class="text-nowrap mx-2">Export to CMS: {{ object.export_to_cms }}, </div>
-    <div class="text-nowrap mx-2">Remove after days: {{ object.remove_after_days }}, </div>
-    <div class="text-nowrap mx-2">Favicon: <a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">
+    <li class="list-group-item text-nowrap mx-2">Fetch period: {{ object.fetch_period }}</li>
+    <li class="list-group-item text-nowrap mx-2">Category: {{ object.category_name }}</li>
+    <li class="list-group-item text-nowrap mx-2">Subcategory: {{ object.subcategory_name }}</li>
+    <li class="list-group-item text-nowrap mx-2">Category object: {{ object.category }}</li>
+    <li class="list-group-item text-nowrap mx-2">Subcategory object: {{ object.subcategory }}</li>
+    <li class="list-group-item text-nowrap mx-2">Language: {{ object.language }}</li>
+    <li class="list-group-item text-nowrap mx-2">Age: {{ object.age }}</li>
+    <li class="list-group-item text-nowrap mx-2">Export to CMS: {{ object.export_to_cms }}</li>
+    <li class="list-group-item text-nowrap mx-2">Remove after days: {{ object.remove_after_days }}</li>
+    <li class="list-group-item text-nowrap mx-2">Favicon: <a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">
 	   <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
-	   Link</a>, </div>
-    <div class="text-nowrap mx-2">Source type: {{ object.source_type }}</div>
+	   Link</a></li>
+    <li class="list-group-item text-nowrap mx-2">Source type: {{ object.source_type }}</li>
     {% if object.proxy_location %}
-    <div class="mx-2">Proxy location: <a href="{{ object.proxy_location }}">
+    <li class="list-group-item text-nowrap mx-2">Proxy location: <a href="{{ object.proxy_location }}">
 	     <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
-	     {{ object.proxy_location }}</a></div>
+	     {{ object.proxy_location }}</a></li>
     {% endif %}
-    <div class="text-nowrap mx-2">Fetched: {{date_fetched}}</div>
-    <div class="text-nowrap mx-2">Import seconds: {{object.dynamic_data.import_seconds}}</div>
-    <div class="text-nowrap mx-2">Consecutive Errors: {{object.dynamic_data.consecutive_errors}}</div>
-</div>
+    <li class="list-group-item text-nowrap mx-2">Fetched: {{date_fetched}}</li>
+    <li class="list-group-item text-nowrap mx-2">Import seconds: {{object.dynamic_data.import_seconds}}</li>
+    <li class="list-group-item text-nowrap mx-2">Consecutive Errors: {{object.dynamic_data.consecutive_errors}}</li>
+</ul>
 
 {% include "rsshistory/search_places_element.html" %}
 

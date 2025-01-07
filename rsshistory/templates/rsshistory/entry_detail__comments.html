@@ -1,7 +1,7 @@
 {% load static %}
 
 {% if object.comments.all %}
-<h2>Comments</h2>
+<h3>Comments</h3>
 <div class="container">
     {% for comment in object.comments.all %}
     <div>{{comment.get_comment | safe | linebreaks}}</div>
