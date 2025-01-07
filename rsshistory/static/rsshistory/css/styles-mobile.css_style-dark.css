@@ -184,7 +184,7 @@ option:hover {
 }
 
 .element_standard, .element_standard:link, .element_standard:visited {
-    color : #ececec;
+    color : black !important;
     padding: 0px 15px;
     text-align: left;
     text-decoration: none;
@@ -192,8 +192,9 @@ option:hover {
 }
 
 .element_standard:hover, .element_standard:active{
-    color: green;
-    background-color: #95ce8d;
+    color: green !important;
+    background-color: #95ce8d !important;
+    border-color:white !important;
 }
 
 .element_standard_selected, .element_standard_selected:link, .element_standard_selected:visited, .element_standard_selected:active {
@@ -203,8 +204,8 @@ option:hover {
 }
 
 .element_standard_selected:hover {
-    color: white;
-    background-color: green;
+    color: white !important;
+    background-color: green !important;
 }
 
 .element_clickable-tags, .element_clickable-tags:link, .element_clickable-tags:visited, .element_clickable-tags:active {
@@ -221,8 +222,8 @@ option:hover {
 }
 
 .element_clickable-tags:hover {
-    color: green;
-    background-color: #f4f4f4;
+    color: green !important;
+    background-color: #f4f4f4 !important;
 }
 
 .element_clickable-tags_selected, .element_clickable-tags_selected:link, .element_clickable-tags_selected:active, .element_clickable-tags_selected:visited {
@@ -242,8 +243,8 @@ option:hover {
 }
 
 .element_line-and-buttons:hover {
-    color: green;
-    background-color: #f4f4f4;
+    color: green !important;
+    background-color: #f4f4f4 !important;
 }
 
 .element_line-and-buttons_selected, .element_line-and-buttons_selected:link, .element_line-and-buttons_selected:visited, .element_line-and-buttons_selected:active {
@@ -265,8 +266,8 @@ option:hover {
 }
 
 .element_gallery:hover {
-    color: black;
-    background-color: #f4f4f4;
+    color: black !important;
+    background-color: #f4f4f4 !important;
 }
 
 .element_gallery_selected, .element_gallery_selected:link, .element_gallery_selected:active, .element_gallery_selected:visited {
@@ -275,12 +276,12 @@ option:hover {
 }
 
 .element_gallery_selected:hover {
-    color: black;
-    background-color: green;
+    color: black !important;
+    background-color: green !important;
 }
 
 .element_search-engine, .element_search-engine:link, .element_search-engine:visited {
-    color : #ececec;
+    color : #ececec !important;
     padding: 0px 15px;
     text-align: left;
     text-decoration: none;

@@ -162,7 +162,7 @@ hr {
 }
 
 .element_standard, .element_standard:link, .element_standard:visited {
-    color : black;
+    color : black; /* not inherited? */
     padding: 0px 15px;
     text-align: left;
     text-decoration: none;
@@ -171,7 +171,8 @@ hr {
 
 .element_standard:hover, .element_standard:active{
     color: blue;
-    background-color: #BFD8FF;
+    background-color: #BFD8FF !important;
+    border-color:black !important;
 }
 
 .element_standard_selected, .element_standard_selected:link, .element_standard_selected:visited, .element_standard_selected:active {
@@ -227,8 +228,7 @@ hr {
 }
 
 .element_gallery, .element_gallery:link, .element_gallery:active, .element_gallery:visited {
-    color : #373737;
-    background-color: #e9e9e9;
+    color : #373737 !important;
     text-overflow: ellipsis; 
     max-width: 18%; 
     min-width: 18%; 
@@ -245,7 +245,8 @@ hr {
 
 .element_gallery:hover {
     color: black;
-    background-color: #f4f4f4;
+    background-color: #f4f4f4 !important;
+    border-color:black !important;
 }
 
 .element_gallery_selected, .element_gallery_selected:link, .element_gallery_selected:active, .element_gallery_selected:visited {
@@ -267,8 +268,9 @@ hr {
 }
 
 .element_search-engine:hover, .element_search-engine:active{
-    color: blue;
-    background-color: #BFD8FF;
+    color: blue !important;
+    background-color: #BFD8FF !important;
+    border-color:black !important;
 }
 
 .element_search-engine_selected, .element_search-engine_selected:link, .element_search-engine_selected:visited, .element_search-engine_selected:active {

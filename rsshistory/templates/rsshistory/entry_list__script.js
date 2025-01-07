@@ -217,7 +217,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
             href="{entry_link}"
             title="{title}"
             ${invalid_style}
-            class="element_${view_display_type} list-group-item list-group-item-action m-1 border rounded"
+            class="list-group-item list-group-item-action m-1 border rounded element_${view_display_type}"
         >
             <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
                 <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
@@ -424,5 +424,35 @@ $(document).on("click", '#displayGallery', function(e) {
 
 $(document).on("click", '#displaySearchEngine', function(e) {
     view_display_type = "search-engine";
+    fillListData();
+});
+
+$(document).on("click", '#displayLight', function(e) {
+    view_display_style = "style-light";
+
+    const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
+    if (linkElement) {
+        // TODO replace rsshistory with something else
+        //linkElement.href = "/django/rsshistory/css/styles.css_style-light.css";
+    }
+
+    const htmlElement = document.documentElement;
+    htmlElement.setAttribute("data-bs-theme", "light");
+
+    fillListData();
+});
+
+
+$(document).on("click", '#displayDark', function(e) {
+    view_display_style = "style-dark";
+
+    const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
+    if (linkElement) {
+        //linkElement.href = "/django/rsshistory/css/styles.css_style-dark.css";
+    }
+
+    const htmlElement = document.documentElement;
+    htmlElement.setAttribute("data-bs-theme", "dark");
+
     fillListData();
 });

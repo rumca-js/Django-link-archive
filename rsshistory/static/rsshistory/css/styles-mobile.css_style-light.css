@@ -182,7 +182,7 @@ option:hover {
 }
 
 .element_standard, .element_standard:link, .element_standard:visited {
-    color : black;
+    color : black !important;
     padding: 0px 15px;
     text-align: left;
     text-decoration: none;
@@ -190,8 +190,9 @@ option:hover {
 }
 
 .element_standard:hover, .element_standard:active{
-    color: blue;
-    background-color: #BFD8FF;
+    color: blue !important;
+    background-color: #BFD8FF !important;
+    border-color:black !important;
 }
 
 .element_standard_selected, .element_standard_selected:link, .element_standard_selected:visited, .element_standard_selected:active {
@@ -200,8 +201,8 @@ option:hover {
 }
 
 .element_standard_selected:hover {
-    color: white;
-    background-color: green;
+    color: white !important;
+    background-color: green !important;
 }
 
 .element_clickable-tags, .element_clickable-tags:link, .element_clickable-tags:visited, .element_clickable-tags:active {
@@ -220,16 +221,16 @@ option:hover {
 }
 
 .element_clickable-tags:hover {
-    color: blue;
-    background-color: #f4f4f4;
+    color: blue !important;
+    background-color: #f4f4f4 !important;
 }
 
 .element_clickable-tags_selected, .element_clickable-tags_selected:link, .element_clickable-tags_selected:active, .element_clickable-tags_selected:visited {
 }
 
 .element_line-and-buttons, .element_line-and-buttons:link, .element_line-and-buttons:active, .element_line-and-buttons:visited {
-    color : #373737;
-    background-color: #e9e9e9;
+    color : #373737 !important;
+    background-color: #e9e9e9 !important;
     padding: 0px 15px;
     text-align: left;
     text-decoration: none;
@@ -243,16 +244,16 @@ option:hover {
 }
 
 .element_line-and-buttons:hover {
-    color: blue;
-    background-color: #f4f4f4;
+    color: blue !important;
+    background-color: #f4f4f4 !important;
 }
 
 .element_line-and-buttons_selected, .element_line-and-buttons_selected:link, .element_line-and-buttons_selected:visited, .element_line-and-buttons_selected:active {
 }
 
 .element_gallery, .element_gallery:link, .element_gallery:active, .element_gallery:visited {
-    color : #373737;
-    background-color: #e9e9e9;
+    color : #373737 !important;
+    background-color: #e9e9e9 !important;
     text-overflow: ellipsis; 
     max-width: 100%; 
     min-width: 100%;
@@ -267,8 +268,8 @@ option:hover {
 }
 
 .element_gallery:hover {
-    color: black;
-    background-color: #f4f4f4;
+    color: black !important;
+    background-color: #f4f4f4 !important;
 }
 
 .element_gallery_selected, .element_gallery_selected:link, .element_gallery_selected:active, .element_gallery_selected:visited {
@@ -277,12 +278,12 @@ option:hover {
 }
 
 .element_gallery_selected:hover {
-    color: white;
-    background-color: blue;
+    color: white !important;
+    background-color: blue !important;
 }
 
 .element_search-engine, .element_search-engine:link, .element_search-engine:visited {
-    color : black;
+    color : black !important;
     padding: 0px 15px;
     text-align: left;
     text-decoration: none;
