@@ -2,6 +2,7 @@
 
 
 let entry_json_data = null;
+let entry_dislike_data = null;
 let is_downloading = false;
 
 
@@ -51,6 +52,56 @@ function fillIsEntryDownloaded(attempt = 1) {
 
 function loadEntryDynamicDetails(attempt = 1) {
     getDynamicContent("{% url 'rsshistory:get-entry-details' object.id %}", "#bodyBlock", 1, true);
+}
+
+
+function fillDislike() {
+    let parameters = $('#entryParameters').html();
+
+    let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_view_ratio } = entry_dislike_data;
+
+    let text = [];
+
+    if (thumbs_up) text.push(`👍${thumbs_up}`);
+    if (thumbs_down) text.push(`👎${thumbs_down}`);
+    if (view_count) text.push(`👁${view_count}`);
+    if (upvote_ratio) text.push(`Ratio:${upvote_ratio}`);
+    if (upvote_view_ratio) text.push(`up-view Ratio:${upvote_view_ratio}`);
+
+    parameters = `${parameters}<div class="mx-1">${text.join(" ")}</div>`;
+
+    $('#entryParameters').html(parameters);
+}
+
+
+let currentloadDislikeData = 0;
+function loadDislikeData(attempt = 1) {
+    let requestloadDislikeData = ++currentloadDislikeData;
+    let url_address = "{% url 'rsshistory:entry-dislikes' object.id %}";
+
+    $.ajax({
+       url: url_address,
+       type: 'GET',
+       timeout: 10000,
+       success: function(data) {
+           if (requestloadDislikeData != currentloadDislikeData) {
+               return;
+           }
+           if (data) {
+               entry_dislike_data = data;
+               fillDislike();
+           }
+       },
+       error: function(xhr, status, error) {
+           if (requestloadDislikeData != currentloadDislikeData) {
+               return;
+           }
+           if (attempt < 3) {
+               loadDislikeData(attempt + 1);
+           } else {
+           }
+       }
+    });
 }
 
 
@@ -308,6 +359,7 @@ $(document).on('click', '#cancelTagEdit', function() {
 
 
 loadEntryDynamicDetails();
+loadDislikeData();
 fillIsEntryDownloaded(); //TODO maybe this is not necessary. Maybe move it to entry json
 getEntryJson();
 

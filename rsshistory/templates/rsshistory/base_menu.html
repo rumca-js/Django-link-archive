@@ -1,10 +1,12 @@
 {% load static %}
 
+<nav id="navbar"
 {% if user_config.display_style == "style-dark" %}
-<nav class="navbar sticky-top navbar-expand-sm bg-dark">
+class="navbar sticky-top navbar-expand-sm bg-dark"
 {% else %}
-<nav class="navbar sticky-top navbar-expand-sm bg-light">
+class="navbar sticky-top navbar-expand-sm bg-light"
 {% endif %}
+>
 
    <a class="navbar-brand nav-link" 
 {% if config.default_search_behavior == "search-button-all" %}

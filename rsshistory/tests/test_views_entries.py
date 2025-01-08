@@ -801,7 +801,7 @@ class EntriesDetailViews(FakeInternetTestCase):
         )
         self.entry_youtube = LinkDataController.objects.create(
             source_url="https://youtube.com",
-            link="https://youtube.com?v=bookmarked",
+            link="https://youtube.com/watch?v=bookmarked",
             title="The first link",
             source=source_youtube,
             bookmarked=True,
@@ -810,7 +810,7 @@ class EntriesDetailViews(FakeInternetTestCase):
         )
         self.entry_non_bookmarked = LinkDataController.objects.create(
             source_url="https://youtube.com",
-            link="https://youtube.com?v=nonbookmarked",
+            link="https://youtube.com/watch?v=nonbookmarked",
             title="The second link",
             source=source_youtube,
             bookmarked=False,
@@ -838,6 +838,22 @@ class EntriesDetailViews(FakeInternetTestCase):
         self.archive_entry_html = ArchiveLinkDataController.objects.create(
             source_url="https://linkedin.com/feed",
             link="https://linkedin.com?v=archived",
+            title="The second link",
+            source=source_youtube,
+            bookmarked=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+        self.reddit = LinkDataController.objects.create(
+            link="https://www.reddit.com/r/redditdev/comments/1hw8p3j/i_used_the_reddit_api_to_save_myself_time_with_my",
+            title="The second link",
+            source=source_youtube,
+            bookmarked=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+        self.github = LinkDataController.objects.create(
+            link="https://github.com/rumca-js/Django-link-archive",
             title="The second link",
             source=source_youtube,
             bookmarked=False,
@@ -1104,3 +1120,63 @@ class EntriesDetailViews(FakeInternetTestCase):
         self.assertFalse(data["status"])
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_entry_show_dislikes__youtube(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse(
+            "{}:entry-show-dislikes".format(LinkDatabase.name),
+            args=[self.entry_youtube.id],
+        )
+        # call tested function
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_entry_dislikes__youtube(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse(
+            "{}:entry-dislikes".format(LinkDatabase.name),
+            args=[self.entry_youtube.id],
+        )
+        # call tested function
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_entry_dislikes__reddit(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse(
+            "{}:entry-dislikes".format(LinkDatabase.name),
+            args=[self.reddit.id],
+        )
+        # call tested function
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_entry_dislikes__github(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse(
+            "{}:entry-dislikes".format(LinkDatabase.name),
+            args=[self.github.id],
+        )
+        # call tested function
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)

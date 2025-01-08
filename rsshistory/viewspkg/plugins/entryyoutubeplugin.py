@@ -47,24 +47,6 @@ class EntryYouTubePlugin(EntryGenericPlugin):
             ),
         )
 
-        buttons.append(
-            EntryButton(
-                self.user,
-                "Return dislike ratios",
-                reverse(
-                    "{}:entry-show-dislikes".format(LinkDatabase.name),
-                    args=[self.entry.id],
-                ),
-                ConfigurationEntry.ACCESS_TYPE_LOGGED,
-                "Shows YouTube stats",
-                static(
-                    "{}/icons/icons8-youtube-music-96.png".format(LinkDatabase.name)
-                ),
-            ),
-        )
-
-        return buttons
-
     def get_advanced_menu_buttons(self):
         buttons = super().get_advanced_menu_buttons()
 

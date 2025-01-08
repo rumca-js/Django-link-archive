@@ -328,7 +328,9 @@ class HttpPageHandler(HandlerInterface):
         self.options = page_options
         self.url_builder = url_builder
 
-    def is_handled_by(url):
+    def is_handled_by(self):
+        url = self.url
+
         if url.startswith("https") or url.startswith("http"):
             return True
         return False

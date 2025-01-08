@@ -67,7 +67,13 @@ from .fake.warhammercommunity import (
 from .fake.thehill import (
     thehill_rss,
 )
-from .fake.reddit import reddit_rss_text
+from .fake.reddit import (
+    reddit_rss_text,
+    reddit_entry_json,
+)
+from .fake.githubcom import (
+    github_json,
+)
 from .fake.firebog import (
     firebog_adguard_list,
     firebog_w3kbl_list,
@@ -362,9 +368,14 @@ class TestResponseObject(PageResponseObject):
         if url.startswith("https://www.youtube.com/feeds"):
             return webpage_samtime_youtube_rss
 
-        if url.startswith("https://www.reddit.com/r/searchengines/.rss"):
-            # providy any rss, to have data
+        if url.startswith("https://www.reddit.com/r/") and url.endswith(".rss"):
             return reddit_rss_text
+
+        if url.startswith("https://www.reddit.com") and url.endswith(".json"):
+            return reddit_entry_json
+
+        if url.startswith("https://api.github.com"):
+            return github_json
 
         if url == "https://www.youtube.com/robots.txt":
             return youtube_robots_txt

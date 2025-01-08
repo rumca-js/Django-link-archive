@@ -66,7 +66,6 @@ function getEntryTags(entry) {
     let tags_text = "";
     if (entry.tags && entry.tags.length > 0) {
         tags_text = entry.tags.map(tag => `#${tag}`).join(",");
-        tags_text = `<div class="text-reset mx-2">` + tags_text + `</div>`;
     }
     return tags_text;
 }
@@ -103,13 +102,12 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                 ${img_text}
             </div>`;
     }
-
-    let tags_text = getEntryTags(entry);
+    let tags = `<div class="text-reset mx-2">{tags_text}</div>`;
 
     return `
         <a 
             href="{entry_link}"
-            title="{title}"
+            title="{hover_title}"
             ${invalid_style}
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
         >
@@ -120,7 +118,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                     <div class="text-reset">
                         {source__title} {date_published}
                     </div>
-                    ${tags_text}
+                    ${tags}
                 </div>
 
                 <div class="mx-2 ms-auto">
@@ -152,13 +150,12 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                 <img src="{thumbnail}" class="rounded ${iconClass}"/>
             </div>`;
     }
-
-    let tags_text = getEntryTags(entry);
+    let tags = `<div class="text-reset mx-2">{tags_text}</div>`;
 
     return `
         <a 
             href="{entry_link}"
-            title="{title}"
+            title="{hover_title}"
             ${invalid_style}
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
         >
@@ -167,7 +164,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                <div class="mx-2">
                   <span style="font-weight:bold" class="text-reset">{title_safe}</span>
                   <div class="text-reset text-decoration-underline">@ {link}</div>
-                  ${tags_text}
+                  ${tags}
                </div>
 
                <div class="mx-2 ms-auto">
@@ -210,12 +207,12 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
         </div>
     `;
 
-    let tags_text = getEntryTags(entry);
+    let tags = `<div class="text-reset mx-2">{tags_text}</div>`;
 
     return `
         <a 
             href="{entry_link}"
-            title="{title}"
+            title="{hover_title}"
             ${invalid_style}
             class="list-group-item list-group-item-action m-1 border rounded element_${view_display_type}"
         >
@@ -226,7 +223,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
                 <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                     <span style="font-weight: bold" class="text-primary">{title_safe}</span>
                     <div class="link-list-item-description">{source__title}</div>
-                    ${tags_text}
+                    ${tags}
                 </div>
             </div>
         </a>
@@ -251,12 +248,12 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
         ${badge_age}
     `;
 
-    let tags_text = getEntryTags(entry);
+    let tags = `<div class="text-reset mx-2">{tags_text}</div>`;
 
     return `
         <a 
             href="{entry_link}"
-            title="{title}"
+            title="{hover_title}"
             ${invalid_style}
             class="list-group-item list-group-item-action border rounded"
         >
@@ -267,7 +264,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
                 <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
                     <span style="font-weight: bold" class="text-primary">{title_safe}</span>
                     <div class="link-list-item-description">{source__title}</div>
-                    ${tags_text}
+                    ${tags}
                 </div>
             </div>
         </a>
@@ -309,6 +306,9 @@ function fillOneEntry(entry) {
     {
        title_safe = escapeHtml(entry.title)
     }
+    let tags_text = getEntryTags(entry);
+    let hover_title = title_safe + " " + tags_text;
+
     let source__title = "";
     if (entry.source__title) {
        source__title = escapeHtml(entry.source__title)
@@ -319,9 +319,10 @@ function fillOneEntry(entry) {
         .replace(/{link_absolute}/g, entry.link_absolute)
         .replace(/{link}/g, entry.link)
         .replace(/{entry_link}/g, entry_link)
-        .replace(/{title}/g, title)
+        .replace(/{hover_title}/g, hover_title)
         .replace(/{thumbnail}/g, entry.thumbnail)
         .replace(/{title_safe}/g, title_safe)
+        .replace(/{tags_text}/g, tags_text)
         .replace(/{page_rating_votes}/g, entry.page_rating_votes)
         .replace(/{page_rating_contents}/g, entry.page_rating_contents)
         .replace(/{page_rating}/g, entry.page_rating)
@@ -428,31 +429,14 @@ $(document).on("click", '#displaySearchEngine', function(e) {
 });
 
 $(document).on("click", '#displayLight', function(e) {
-    view_display_style = "style-light";
-
-    const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
-    if (linkElement) {
-        // TODO replace rsshistory with something else
-        //linkElement.href = "/django/rsshistory/css/styles.css_style-light.css";
-    }
-
-    const htmlElement = document.documentElement;
-    htmlElement.setAttribute("data-bs-theme", "light");
+    setLightMode();
 
     fillListData();
 });
 
 
 $(document).on("click", '#displayDark', function(e) {
-    view_display_style = "style-dark";
-
-    const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
-    if (linkElement) {
-        //linkElement.href = "/django/rsshistory/css/styles.css_style-dark.css";
-    }
-
-    const htmlElement = document.documentElement;
-    htmlElement.setAttribute("data-bs-theme", "dark");
+    setDarkMode();
 
     fillListData();
 });

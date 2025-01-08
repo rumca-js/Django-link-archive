@@ -813,7 +813,7 @@ def source_to_json(user_config, source):
     json_source["title"] = source.title
     json_source["url"] = source.url
     json_source["url_absolute"] = source.get_absolute_url()
-    json_source["favicon"] = source.favicon
+    json_source["favicon"] = source.get_favicon()
     json_source["enabled"] = source.enabled
     json_source["errors"] = 0
     if hasattr(source, "dynamic_data"):

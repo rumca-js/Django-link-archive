@@ -100,6 +100,41 @@ function hideElement(element) {
 }
 
 
+function setLightMode() {
+    view_display_style = "style-light";
+
+    const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
+    if (linkElement) {
+        // TODO replace rsshistory with something else
+        //linkElement.href = "/django/rsshistory/css/styles.css_style-light.css";
+    }
+
+    const htmlElement = document.documentElement;
+    htmlElement.setAttribute("data-bs-theme", "light");
+
+    const navbar = document.getElementById('navbar');
+    navbar.classList.remove('navbar-light', 'bg-dark');
+    navbar.classList.add('navbar-dark', 'bg-light');
+}
+
+
+function setDarkMode() {
+    view_display_style = "style-dark";
+
+    const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
+    if (linkElement) {
+        //linkElement.href = "/django/rsshistory/css/styles.css_style-dark.css";
+    }
+
+    const htmlElement = document.documentElement;
+    htmlElement.setAttribute("data-bs-theme", "dark");
+
+    const navbar = document.getElementById('navbar');
+    navbar.classList.remove('navbar-light', 'bg-light');
+    navbar.classList.add('navbar-dark', 'bg-dark');
+}
+
+
 let currentgetIndicators = 0;
 function getIndicators(attempt=1) {
     let requestCurrentgetIndicators = ++currentgetIndicators;

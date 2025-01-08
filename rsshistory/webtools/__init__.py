@@ -19,6 +19,12 @@ from .handlerhttppage import (
     HttpRequestBuilder,
     HttpPageHandler,
 )
+from .handlers import (
+    RedditChannelHandler,
+    RedditUrlHandler,
+    GitHubUrlHandler,
+    ReturnDislike,
+)
 
 from .crawlers import (
     CrawlerInterface,
