@@ -360,7 +360,7 @@ $(document).on('click', '#cancelTagEdit', function() {
 
 loadEntryDynamicDetails();
 loadDislikeData();
-fillIsEntryDownloaded(); //TODO maybe this is not necessary. Maybe move it to entry json
+fillIsEntryDownloaded();
 getEntryJson();
 
 

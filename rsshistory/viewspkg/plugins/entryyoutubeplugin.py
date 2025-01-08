@@ -47,6 +47,8 @@ class EntryYouTubePlugin(EntryGenericPlugin):
             ),
         )
 
+        return buttons
+
     def get_advanced_menu_buttons(self):
         buttons = super().get_advanced_menu_buttons()
 

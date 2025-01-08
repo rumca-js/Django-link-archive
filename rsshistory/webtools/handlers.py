@@ -204,6 +204,7 @@ class ReturnDislike(DefaultUrlHandler):
         self.loads(data)
 
     def read_data(self):
+        from .url import Url
         url = "https://returnyoutubedislikeapi.com/votes?videoId=" + self.code
 
         u = Url(url)
