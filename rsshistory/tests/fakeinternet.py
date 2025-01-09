@@ -14,6 +14,9 @@ from ..webtools import (
     YouTubeVideoHandler,
     YouTubeJsonHandler,
     YouTubeChannelHandler,
+    OdyseeVideoHandler,
+    OdyseeChannelHandler,
+    HttpPageHandler,
     Url,
     HttpRequestBuilder,
     PageResponseObject,
@@ -676,6 +679,14 @@ class FakeInternetTestCase(TestCase):
 
         Url.youtube_video_handler = YouTubeJsonHandlerMock
         # UrlHandler.youtube_video_handler = YouTubeJsonHandlerMock
+
+        Url.handlers = [
+            YouTubeJsonHandlerMock,
+            YouTubeChannelHandler,
+            OdyseeVideoHandler,
+            OdyseeChannelHandler,
+            HttpPageHandler,
+        ]
 
         WebLogger.web_logger = AppLogging
         WebConfig.get_crawler_from_mapping = FakeInternetTestCase.get_crawler_from_mapping

@@ -216,7 +216,6 @@ class ReturnDislike(DefaultUrlHandler):
             self._json = json.loads(data)
             return self._json
         except ValueError as E:
-            logging.critical(E, exc_info=True)
             self._json = {}
 
     def get_json(self):
