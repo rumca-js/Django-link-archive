@@ -103,3 +103,17 @@ class SourceDataControllerTest(FakeInternetTestCase):
         source.enable()
 
         self.assertTrue(source.enabled)
+
+    def test_update_favicon(self):
+        source = SourceDataController.objects.create(
+            url="https://www.codeproject.com/WebServices/NewsRSS.aspx",
+            title="YouTube",
+            favicon="https://www.codeproject.com/favicon.ico",
+        )
+
+        new_favicon = "https://www.codeproject.com/App_Themes/Std/Img/logo100x30.gif"
+
+        # call tested function
+        source.update_favicon(new_favicon)
+
+        self.assertEqual(source.favicon, new_favicon)

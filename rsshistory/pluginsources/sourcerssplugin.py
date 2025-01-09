@@ -65,6 +65,9 @@ class BaseRssPlugin(SourceGenericPlugin):
                 AppLogging.error("Url:{}. RSS page is not valid".format(source.url))
                 return
 
+        if source:
+            source.update_favicon(new_thumbnail = self.reader.get_thumbnail())
+
         all_props = self.reader.get_entries()
 
         total_entries = 0
