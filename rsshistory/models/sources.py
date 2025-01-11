@@ -144,6 +144,7 @@ class SourceDataModel(models.Model):
         blank=True,
         null=True,
     )
+    auto_update_favicon = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["-enabled", "-dynamic_data__consecutive_errors", "title"]

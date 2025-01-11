@@ -40,14 +40,8 @@ class BaseRssPlugin(SourceGenericPlugin):
     def get_contents_size_limit(self):
         return 800
 
-    def get_entries(self):
-        """
-        We override RSS behavior
-        """
-        c = Configuration.get_object().config_entry
-
+    def get_container_reader_element(self):
         contents = self.get_contents()
-        source = self.get_source()
 
         if not contents:
             return
@@ -56,17 +50,34 @@ class BaseRssPlugin(SourceGenericPlugin):
         # but server might say it is text/html (which is not)
         # This plugin handles RssPages
 
-        self.reader = RssPage(self.get_address(), contents)
-        if not self.reader.is_valid():
+        reader = RssPage(self.get_address(), contents)
+        if not reader.is_valid():
             content_reader = RssContentReader(self.get_address(), contents)
             if content_reader.contents:
-                self.reader = RssPage(self.get_address(), content_reader.contents)
+                reader = RssPage(self.get_address(), content_reader.contents)
+                if not reader.is_valid():
+                    return
             else:
-                AppLogging.error("Url:{}. RSS page is not valid".format(source.url))
                 return
 
+        return reader
+
+    def get_entries(self):
+        """
+        We override RSS behavior
+        """
+        c = Configuration.get_object().config_entry
+
+        self.reader = self.get_container_reader_element()
+
+        source = self.get_source()
+
+        if not self.reader:
+            AppLogging.error("Url:{}. Canont read elements".format(source.url))
+            return
+
         if source:
-            source.update_favicon(new_thumbnail = self.reader.get_thumbnail())
+            source.update_data(update_with = self.reader)
 
         all_props = self.reader.get_entries()
 
@@ -85,7 +96,11 @@ class BaseRssPlugin(SourceGenericPlugin):
             total_entries += 1
 
         if total_entries == 0:
-            AppLogging.error("Url:{}. No links for rss".format(source.url))
+            contents = self.get_contents()
+            if contents:
+                AppLogging.error("Url:{}. No links for rss".format(source.url), detail_text=contents)
+            else:
+                AppLogging.error("Url:{}. No links for rss, not contents".format(source.url))
 
     def enhance(self, prop):
         prop["link"] = UrlHandler.get_cleaned_link(prop["link"])

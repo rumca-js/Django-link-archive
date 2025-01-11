@@ -121,7 +121,10 @@ class RedditUrlHandler(DefaultUrlHandler):
             return result
 
         upvote_ratio = self.get_json_value(json_text, "upvote_ratio")
-        result["upvote_ratio"] = upvote_ratio
+        try:
+            result["upvote_ratio"] = float(upvote_ratio)
+        except ValueError:
+            result["upvote_ratio"] = None
 
         return result
 
@@ -222,13 +225,17 @@ class ReturnDislike(DefaultUrlHandler):
         return self._json
 
     def get_thumbs_up(self):
-        return self._json["likes"]
+        if self._json and "likes" in self._json:
+            return self._json["likes"]
 
     def get_thumbs_down(self):
-        return self._json["dislikes"]
+        if self._json and "dislikes" in self._json:
+            return self._json["dislikes"]
 
     def get_view_count(self):
-        return self._json["viewCount"]
+        if self._json and "viewCount" in self._json:
+            return self._json["viewCount"]
 
     def get_rating(self):
-        return self._json["rating"]
+        if self._json and "rating" in self._json:
+            return self._json["rating"]

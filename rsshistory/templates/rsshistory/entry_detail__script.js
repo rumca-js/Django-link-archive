@@ -55,6 +55,19 @@ function loadEntryDynamicDetails(attempt = 1) {
 }
 
 
+// TODO move to library
+function formatNumber(num) {
+    if (num >= 1e9) {
+        return (num / 1e9).toFixed(1) + "B"; // Billions
+    } else if (num >= 1e6) {
+        return (num / 1e6).toFixed(1) + "M"; // Millions
+    } else if (num >= 1e3) {
+        return (num / 1e3).toFixed(1) + "K"; // Thousands
+    }
+    return num.toString(); // Small numbers
+}
+
+
 function fillDislike() {
     let parameters = $('#entryParameters').html();
 
@@ -62,11 +75,12 @@ function fillDislike() {
 
     let text = [];
 
-    if (thumbs_up) text.push(`👍${thumbs_up}`);
-    if (thumbs_down) text.push(`👎${thumbs_down}`);
-    if (view_count) text.push(`👁${view_count}`);
-    if (upvote_ratio) text.push(`Ratio:${upvote_ratio}`);
-    if (upvote_view_ratio) text.push(`up-view Ratio:${upvote_view_ratio}`);
+    if (thumbs_up) text.push(`👍${formatNumber(thumbs_up)}`);
+    if (thumbs_down) text.push(`👎${formatNumber(thumbs_down)}`);
+    if (view_count) text.push(`👁${formatNumber(view_count)}`);
+
+    if (upvote_ratio) text.push(`Like-Ratio:${parseFloat(upvote_ratio).toFixed(2)}`);
+    if (upvote_view_ratio) text.push(`Like-View-Ratio:${parseFloat(upvote_view_ratio).toFixed(2)}`);
 
     parameters = `${parameters}<div class="mx-1">${text.join(" ")}</div>`;
 

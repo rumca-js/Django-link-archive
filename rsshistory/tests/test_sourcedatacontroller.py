@@ -1,5 +1,5 @@
 from utils.dateutils import DateUtils
-from ..webtools import calculate_hash
+from ..webtools import calculate_hash, Url
 
 from ..models import (
     SourceCategories,
@@ -104,7 +104,7 @@ class SourceDataControllerTest(FakeInternetTestCase):
 
         self.assertTrue(source.enabled)
 
-    def test_update_favicon(self):
+    def test_update_data(self):
         source = SourceDataController.objects.create(
             url="https://www.codeproject.com/WebServices/NewsRSS.aspx",
             title="YouTube",
@@ -113,7 +113,10 @@ class SourceDataControllerTest(FakeInternetTestCase):
 
         new_favicon = "https://www.codeproject.com/App_Themes/Std/Img/logo100x30.gif"
 
+        rss = Url("https://www.codeproject.com/WebServices/NewsRSS.aspx")
+        rss.get_contents()
+
         # call tested function
-        source.update_favicon(new_favicon)
+        source.update_data(update_with = rss)
 
         self.assertEqual(source.favicon, new_favicon)

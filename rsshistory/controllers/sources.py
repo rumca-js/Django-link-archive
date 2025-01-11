@@ -342,8 +342,16 @@ class SourceDataController(SourceDataModel):
 
         self.delete()
 
-    def update_favicon(self, new_thumbnail = None):
+    def update_data(self, update_with = None):
+        if not self.auto_update_favicon:
+            return
+
         changed = False
+
+        new_thumbnail = None
+        if update_with:
+            new_thumbnail = update_with.get_thumbnail()
+
         if new_thumbnail and self.favicon != new_thumbnail:
 
             # TODO implement this. I thin Url does not support binary well yet
@@ -355,13 +363,19 @@ class SourceDataController(SourceDataModel):
             changed = True
 
             self.favicon = new_thumbnail
-            self.save()
 
         if not changed and False:
             u = Url(self.favicon)
             if not u.is_valid():
                 self.favicon = None
-                self.save()
+
+        new_title = None
+        if update_with:
+            new_title = update_with.get_title()
+        if new_title and self.title != new_title:
+            self.title = new_title
+
+        self.save()
 
 
 

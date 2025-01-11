@@ -47,6 +47,10 @@ class SourceGenericPlugin(object):
         num_entries = 0
 
         self.hash = self.calculate_plugin_hash()
+
+        if source:
+            source.update_data()
+
         if self.is_page_ok_to_read():
             num_entries = self.read_data_from_container_elements()
 

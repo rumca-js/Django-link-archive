@@ -77,6 +77,9 @@ from .fake.reddit import (
 from .fake.githubcom import (
     github_json,
 )
+from .fake.returndislike import (
+    return_dislike_json,
+)
 from .fake.firebog import (
     firebog_adguard_list,
     firebog_w3kbl_list,
@@ -379,6 +382,9 @@ class TestResponseObject(PageResponseObject):
 
         if url.startswith("https://api.github.com"):
             return github_json
+
+        if url.startswith("https://https://returnyoutubedislikeapi.com/votes?videoId"):
+            return return_dislike_json
 
         if url == "https://www.youtube.com/robots.txt":
             return youtube_robots_txt

@@ -661,6 +661,7 @@ class SourceForm(forms.ModelForm):
             "remove_after_days",
             "auto_tag",
             "favicon",
+            "auto_update_favicon",
             "proxy_location",
         ]
         widgets = {}
