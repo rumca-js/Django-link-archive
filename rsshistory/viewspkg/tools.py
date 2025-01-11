@@ -135,6 +135,7 @@ def get_page_properties(request):
         page_url = UrlHandler(page_link, page_options=options, handler_class=HttpPageHandler)
     else:
         page_url = UrlHandler(page_link, page_options=options)
+
     response = page_url.get_response()
 
     page_handler = page_url.get_handler()
