@@ -184,8 +184,7 @@ There are some scripts that can be used without Django application:
  - example_compare_crawlers.py - shows how much time it takes to execute different crawlers
  - converter.py - converts JSON files to SQLite table
  - dataanalyzer.py - analyzes data in JSON files / SQLite table. You can query the data
- - script_server.py - server that can be used to dispatch crawlers for certain URLs, to obtain meta data
- - script_client.py - client that can be used to connect to server, and debug crawler scripts
+ - script_server_flask.py - flask server that can be used as a proxy for requesting URLs
  - workspace.py - workspace management. Can be used to update project
  - backup.py - script to backup postgreSQL data
 
