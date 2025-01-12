@@ -47,7 +47,7 @@ class Browser(models.Model):
 
     def read_browser_setup():
         """
-        Reads default WebConfigs browser config, and applies it to model
+        Reads default WebConfig browser config, and applies it to model
         """
         # Browser.objects.all().delete()
 
@@ -75,7 +75,47 @@ class Browser(models.Model):
 
     def get_browser_setup():
         """
-        sets WebConfigs browser config according to model
+        sets WebConfig browser config according to model
+        """
+        from ..configuration import Configuration
+
+        config = Configuration.get_object().config_entry
+        if config.remote_webtools_server_location:
+            return Browser.get_browser_setup_remote()
+        else:
+            return Browser.get_browser_setup_standard()
+
+    def get_browser_setup_remote():
+        from ..configuration import Configuration
+
+        config = Configuration.get_object().config_entry
+        remote_crawler = WebConfig.get_crawler_from_string("RemoteServerCrawler")
+        if not remote_crawler:
+            AppLogging.error("Could not find RemoteServerCrawler")
+            return
+
+        browser_mapping = []
+        for browser in Browser.objects.all():
+            if not browser.enabled:
+                continue
+
+            browser_config = browser.get_setup(string=True)
+            original_crawler = browser_config["crawler"]
+            original_name = browser_config["name"]
+
+            browser_config["crawler"] = remote_crawler
+            browser_config["name"] = "RemoteServerCrawler"
+            browser_config["settings"]["crawler"] = original_crawler
+            browser_config["settings"]["name"] = original_name
+            browser_config["settings"]["server_url"] = config.remote_webtools_server_location
+
+            browser_mapping.append(browser_config)
+
+        return browser_mapping
+
+    def get_browser_setup_standard():
+        """
+        sets WebConfig browser config according to model
         """
         browser_mapping = []
         for browser in Browser.objects.all():
@@ -83,12 +123,11 @@ class Browser(models.Model):
                 continue
 
             browser_config = browser.get_setup()
-
             browser_mapping.append(browser_config)
 
         return browser_mapping
 
-    def get_setup(self):
+    def get_setup(self, string=False):
         settings = {}
         if self.settings != None and self.settings != "":
             try:
@@ -96,8 +135,13 @@ class Browser(models.Model):
             except ValueError as E:
                 AppLogging.exc(E, "Cannot load browser settings")
 
+        if string:
+            crawler = self.crawler
+        else:
+            crawler = Browser.get_crawler_from_string(self.crawler)
+
         browser_config = {
-            "crawler": Browser.get_crawler_from_string(self.crawler),
+            "crawler": crawler,
             "name": self.name,
             "priority": self.priority,
             "settings": settings,

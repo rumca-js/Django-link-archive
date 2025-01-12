@@ -1,5 +1,12 @@
+"""
+Example:
+http://127.0.0.1:3000/run?url=https://google.com&crawler_data={"crawler":"StealthRequestsCrawler","name"="StealthRequestsCrawler","settings":"","timeout":"20"}
+
+http://127.0.0.1:3000/run?url=https://google.com&crawler_data={%22crawler%22:%20%22StealthRequestsCrawler%22,%20%22name%22=%22StealthRequestsCrawler%22,%20%22settings%22%20:%20%22%22,%20%22timeout%22%20:%2020}
+"""
 from pathlib import Path
 from flask import Flask, request, jsonify
+import json
 import subprocess
 
 from rsshistory import webtools
@@ -103,6 +110,4 @@ def run_command():
 
 
 if __name__ == '__main__':
-    # Run the Flask app on port 3000
-    app.run(debug=True, port=3000)
-
+    app.run(debug=True, host="0.0.0.0", port=3000, threaded=True)

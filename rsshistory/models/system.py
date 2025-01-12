@@ -338,6 +338,12 @@ class ConfigurationEntry(models.Model):
 
     # Networking
 
+    remote_webtools_server_location = models.CharField(
+        blank=True,
+        max_length=200,
+        help_text="URL where the webtools server is located. If defined remote server is used for crawling.",
+    )
+
     ssl_verification = models.BooleanField(
         default=True,
         help_text="Enable SSL certificate verification for network requests. Disabling may improve speed but could result in invalid or insecure pages."

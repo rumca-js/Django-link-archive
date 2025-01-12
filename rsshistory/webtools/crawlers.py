@@ -390,6 +390,115 @@ class RequestsCrawler(CrawlerInterface):
             return False
 
 
+class RemoteServerCrawler(CrawlerInterface):
+    """
+    Server that accepts GET and POST requests, runs requests and returns data via JSON response
+    """
+    def run(self):
+        import requests
+
+        if not self.is_valid():
+            return
+
+        server_url = self.settings["server_url"]
+        self.settings["crawler"] = self.settings["crawler"].__name__
+
+        crawler_data = {
+                "crawler" : self.settings["crawler"],
+                "name" : self.settings["name"],
+                "timeout" : self.request.timeout_s,
+                "settings" : self.settings,
+        }
+
+        crawler_data = json.dumps(crawler_data)
+
+        try:
+            link = "{}?url={}&crawler_data={}".format(server_url, self.request.url, crawler_data)
+            print(link)
+
+            response = requests.get(
+                link,
+                timeout=self.request.timeout_s,
+                verify=False,
+                stream=True,
+            )
+
+            json_data = self.unpack_data(response.text)
+
+            self.response = PageResponseObject(
+                self.request.url,
+                text=json_data["contents"],
+                status_code=json_data["status_code"],
+                request_url=self.request.url,
+            )
+
+        except requests.Timeout:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Page timeout".format(self.request.url))
+
+        except TimeoutException:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Page timeout".format(self.request.url))
+
+        except requests.exceptions.ConnectionError:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Connection error".format(self.request.url))
+
+        except Exception as E:
+            WebLogger.exc(E, "Url:{} General exception".format(self.request.url))
+
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_EXCEPTION,
+                request_url=self.request.url,
+            )
+            self.response.add_error("General page exception")
+
+        return self.response
+
+    def unpack_data(self, input_data):
+        json_data = {}
+
+        data = json.loads(input_data)
+
+        # TODO make it cleaner
+        if data and len(data) > 2 and "data" in data[3]:
+            json_data["status_code"] = data[3]["data"]["status_code"]
+        if data and len(data) > 1 and "data" in data[1]:
+            json_data["contents"] = data[1]["data"]["Contents"]
+        if data and len(data) > 3 and "data" in data[3]:
+            json_data["Content-Length"] = data[3]["data"]["Content-Length"]
+        if data and len(data) > 3 and "data" in data[3]:
+            json_data["Content-Type"] = data[3]["data"]["Content-Type"]
+
+        return json_data
+
+    def is_valid(self):
+        try:
+            import requests
+
+            return True
+        except Exception as E:
+            print(str(E))
+            return False
+
+
 class StealthRequestsCrawler(CrawlerInterface):
     """
     Python steath requests

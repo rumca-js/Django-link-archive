@@ -34,7 +34,7 @@ async def main():
     if not parser.args.url:
         parser.parser.print_help()
     else:
-        display = PageDisplay(parser.args.url, verbose = parser.args.verbose)
+        display = PageDisplay(parser.args.url, parser)
 
 
 if __name__ == "__main__":

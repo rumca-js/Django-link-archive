@@ -8,7 +8,9 @@ from ..webtools import (
     ServerCrawler,
     ScriptCrawler,
     StealthRequestsCrawler,
+    RemoteServerCrawler,
 )
+from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -56,7 +58,7 @@ class BrowserTest(FakeInternetTestCase):
         setup = Browser.get_browser_setup()
         self.assertTrue(len(setup) > 0)
 
-    def test_get_setup(self):
+    def test_get_setup__standard(self):
         Browser.objects.all().delete()
 
         browser = Browser.objects.create(
@@ -116,3 +118,26 @@ class BrowserTest(FakeInternetTestCase):
 
         self.assertEqual(first.priority, 1)
         self.assertEqual(second.priority, 0)
+
+    def test_get_browser_setup__remote(self):
+        config = Configuration.get_object().config_entry
+        config.remote_webtools_server_location = "https://127.0.0.1/run"
+        config.save()
+
+        Browser.objects.all().delete()
+
+        browser = Browser.objects.create(
+                name = "test",
+                crawler = "RequestsCrawler",
+                settings = '{"test_setting" : "something"}',
+        )
+
+        # call tested function
+        setup = Browser.get_browser_setup()
+
+        self.assertTrue(setup[0]["name"], "RemoteServerCrawler")
+        self.assertTrue(setup[0]["crawler"], RemoteServerCrawler)
+        self.assertTrue(setup[0]["settings"]["name"], "test")
+        self.assertTrue(setup[0]["settings"]["crawler"], "RequestsCrawler")
+
+        self.assertTrue(setup[0]["settings"]["test_setting"], "something")

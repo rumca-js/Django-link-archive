@@ -15,7 +15,7 @@ class WebConfigTest(FakeInternetTestCase):
 
         self.assertIn("RequestsCrawler", browsers)
 
-    def test_get_init_crawler_config(self):
+    def test_get_init_crawler_config__standard(self):
         config = WebConfig.get_init_crawler_config()
         self.assertTrue(len(config) > 0)
 
@@ -28,3 +28,13 @@ class WebConfigTest(FakeInternetTestCase):
 
         crawler = WebConfig.get_crawler_from_string("StealthRequestsCrawler")
         self.assertTrue(crawler)
+
+    def test_get_init_crawler_config__remote_server(self):
+        config = WebConfig.get_init_crawler_config(remote_server = "https://google.com")
+        self.assertTrue(len(config) > 0)
+
+        self.assertEqual(config[0]["name"], "RemoteServerCrawler")
+        self.assertEqual(config[0]["crawler"], "RemoteServerCrawler")
+        self.assertIn("settings", config[0])
+        self.assertIn("name", config[0]["settings"])
+        self.assertIn("crawler", config[0]["settings"])
