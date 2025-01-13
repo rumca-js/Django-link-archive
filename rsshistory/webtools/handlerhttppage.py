@@ -179,6 +179,7 @@ class HttpRequestBuilder(object):
             WebLogger.debug(
                 "Url:{}: Running crawler {}\n{}".format(request.url, type(crawler), crawler_data)
             )
+
             crawler.run()
             response = crawler.get_response()
             crawler.close()

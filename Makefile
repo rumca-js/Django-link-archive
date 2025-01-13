@@ -1,3 +1,12 @@
+#
+# Assuming: you have python poetry installed
+# sudo apt install python3-poetry
+#
+# if poetry install takes too long
+# export PYTHON_KEYRING_BACKEND=keyring.backends.fail.Keyring
+#
+# yt-dlp needs to be callable from path https://github.com/yt-dlp/yt-dlp/wiki/Installation
+#
 .PHONY: install install-minimal
 .PHONY: createtables createtables-minimal createtables-celery createsuperuser installsysdeps configuresysdeps
 .PHONY: run run-celery run-server run-web-server run-minimal run-crawlee-server 
@@ -57,7 +66,7 @@ createsuperuser:
 # http://pont.ist/rabbit-mq/
 # xvfb is installed for full selenium to be operational
 installsysdeps:
-	apt -y install rabbitmq-server, memcached, wget, id3v2, chromium-chromedriver, xvfb
+	apt -y install rabbitmq-server memcached wget id3v2 chromium-chromedriver xvfb
 	systemctl enable rabbitmq-server
 	systemctl start rabbitmq-server
 	systemctl enable memcached.service

@@ -1,18 +1,26 @@
 """
-Example:
-http://127.0.0.1:3000/run?url=https://google.com&crawler_data={"crawler":"StealthRequestsCrawler","name"="StealthRequestsCrawler","settings":"","timeout":"20"}
+Starts flask server at the specified location.
 
-http://127.0.0.1:3000/run?url=https://google.com&crawler_data={%22crawler%22:%20%22StealthRequestsCrawler%22,%20%22name%22=%22StealthRequestsCrawler%22,%20%22settings%22%20:%20%22%22,%20%22timeout%22%20:%2020}
+Access through:
+    ip:port/run?url=.... etc.
+
+Examples:
+http://127.0.0.1:3000/run?url=https://google.com&crawler_data={"crawler":"StealthRequestsCrawler","name":"StealthRequestsCrawler","settings": {"timeout_s":20}}
+http://127.0.0.1:3000/run?url=https://google.com&crawler_data={"crawler":"SeleniumChromeFull","name":"SeleniumChromeFull","settings": {"timeout_s":50, "driver_executable" : "/usr/bin/chromedriver"}}
 """
 from pathlib import Path
 from flask import Flask, request, jsonify
 import json
 import subprocess
+import argparse
 
 from rsshistory import webtools
 
 
 app = Flask(__name__)
+
+
+url_history = []
 
 
 def run_cmd_url(url):
@@ -73,18 +81,24 @@ def run_webtools_url(url, crawler_data):
     response = page_url.get_response()
     all_properties = page_url.get_properties(full=True)
 
-    return jsonify(all_properties)
+    return all_properties
 
 
 @app.route('/')
 def home():
-    return """
+    text = """
     <h1>Run Command</h1>
     <form action="/run" method="get">
         Command: <input type="text" name="url" required>
         <button type="submit">Run</button>
     </form>
     """
+
+    text += "<h1>Url history</h1>"
+    for item in url_history:
+        text += "<div>{}</div>".format(item)
+
+    return text
 
 
 @app.route('/run', methods=['GET'])
@@ -103,11 +117,39 @@ def run_command():
     if crawler_data:
         try:
             parsed_crawler_data = json.loads(crawler_data)
-        except json.JSONDecodeError:
-            pass
+        except json.JSONDecodeError as E:
+            print(str(E))
 
-    return run_webtools_url(url, parsed_crawler_data)
+    print("Running:{}, with:{}".format(url, crawler_data))
+
+    if len(url_history) > 0:
+        url_history.pop(0)
+
+    url_history.append(url)
+
+    all_properties = run_webtools_url(url, parsed_crawler_data)
+
+    return jsonify(all_properties)
+
+
+
+class CommandLineParser(object):
+    """
+    Headers can only be passed by input binary file
+    """
+
+    def parse(self):
+        self.parser = argparse.ArgumentParser(description="Remote server options")
+        self.parser.add_argument(
+            "--port", default=3000, type=int, help="Port number to be used"
+        )
+        self.parser.add_argument("--host", default="0.0.0.0", help="Host")
+
+        self.args = self.parser.parse_args()
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=3000, threaded=True)
+    p = CommandLineParser()
+    p.parse()
+
+    app.run(debug=True, host=p.args.host, port=p.args.port, threaded=True)

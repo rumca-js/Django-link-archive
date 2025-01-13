@@ -401,7 +401,7 @@ class RemoteServerCrawler(CrawlerInterface):
             return
 
         server_url = self.settings["server_url"]
-        self.settings["crawler"] = self.settings["crawler"].__name__
+        self.settings["crawler"] = self.settings["crawler"]
 
         crawler_data = {
                 "crawler" : self.settings["crawler"],

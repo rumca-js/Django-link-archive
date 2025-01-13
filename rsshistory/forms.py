@@ -148,6 +148,7 @@ class ConfigForm(forms.ModelForm):
             "remove_entry_vote_threshold",
             "number_of_update_entries",
             # Networking
+            "remote_webtools_server_location",
             "ssl_verification",
             "user_agent",
             "user_headers",
