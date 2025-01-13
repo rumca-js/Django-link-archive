@@ -809,9 +809,10 @@ def source_json(request, pk):
 
 def source_to_json(user_config, source):
     json_source = {}
-    json_source["id"] = source.id
-    json_source["title"] = source.title
-    json_source["url"] = source.url
+
+    export_names = SourceDataController.get_export_names()
+    json_source = source.get_map_full()
+
     json_source["url_absolute"] = source.get_absolute_url()
     json_source["favicon"] = source.get_favicon()
     json_source["enabled"] = source.enabled
