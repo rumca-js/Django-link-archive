@@ -195,9 +195,9 @@ def run_command():
 
     print("Running:{}, with:{} at:{}".format(url, crawler_data, remote_server))
 
-    # all_properties = run_webtools_url(url, parsed_crawler_data)
-    all_properties = None
-    run_cmd_url(url, remote_server)
+    all_properties = run_webtools_url(url, parsed_crawler_data)
+    #all_properties = None
+    #run_cmd_url(url, remote_server)
 
     if all_properties:
         if len(url_history) > history_length:

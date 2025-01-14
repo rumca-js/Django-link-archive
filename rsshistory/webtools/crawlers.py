@@ -136,11 +136,8 @@ class CrawlerInterface(object):
         if self.response_file:
             self.save_response_file(self.response_file)
 
-        elif "remote_server" in self.settings:
+        if "remote_server" in self.settings:
             self.save_response_remote(self.settings["remote_server"])
-
-        else:
-            response = self.get_response()
 
         return True
 
