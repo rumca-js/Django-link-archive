@@ -34,7 +34,6 @@ from .pages import (
 
 from .ipc import (
     string_to_command,
-    SocketConnection,
 )
 
 selenium_feataure_enabled = True
@@ -51,16 +50,14 @@ except Exception as E:
 
 
 class CrawlerInterface(object):
-    def __init__(self, request, response_file=None, response_port=None, settings=None):
+    def __init__(self, request, response_file=None, settings=None):
         """
         @param response_file If set, response is stored in a file
-        @param response_port If set, response is sent through port
         @param settings passed settings
         """
         self.request = request
         self.response = None
         self.response_file = response_file
-        self.response_port = response_port
         self.settings = settings
 
         if self.request.timeout_s and settings and "timeout_s" in settings:
@@ -137,22 +134,54 @@ class CrawlerInterface(object):
         all_bytes = self.response_to_bytes()
 
         if self.response_file:
-            path = Path(self.response_file)
-            if not path.parent.exists():
-                path.parent.mkdir(parents=True, exist_ok=True)
+            self.save_response_file(self.response_file)
 
-            with open(self.response_file, "wb") as fh:
-                fh.write(all_bytes)
-
-        elif self.response_port:
-            con = SocketConnection()
-            con.connect(SocketConnection.gethostname(), self.response_port)
-            con.send(all_bytes)
+        elif "remote_server" in self.settings:
+            self.save_response_remote(self.settings["remote_server"])
 
         else:
             response = self.get_response()
 
         return True
+
+    def save_response_file(self, file_name):
+        if not self.file_name:
+            return
+
+        path = Path(self.response_file)
+        if not path.parent.exists():
+            path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(self.response_file, "wb") as fh:
+            fh.write(all_bytes)
+
+    def save_response_remote(self, remote_server):
+        import requests
+
+        if not self.response:
+            return
+
+        payload = {}
+        payload["url"] = self.response.url
+        payload["request_url"] = self.response.request_url
+        payload["Contents"] = self.response.get_text()
+        payload["Headers"] = self.response.get_headers()
+        payload["status_code"] = self.response.status_code
+
+        try:
+            response = requests.post(remote_server, json=payload)
+
+            if response.status_code == 200:
+                print("Response successfully sent to the remote server.")
+                return response.json()  # Assuming the server responds with JSON
+            else:
+                print(f"Failed to send response. Status code: {response.status_code}")
+                print(f"Response text: {response.text}")
+                return None
+        except requests.RequestException as e:
+            # Handle any exceptions raised by the requests library
+            print(f"An error occurred while sending the response: {e}")
+            return None
 
     def is_valid(self):
         return False
@@ -567,7 +596,6 @@ class SeleniumDriver(CrawlerInterface):
         self,
         request,
         response_file=None,
-        response_port=None,
         driver_executable=None,
         settings=None,
     ):
@@ -581,7 +609,6 @@ class SeleniumDriver(CrawlerInterface):
         super().__init__(
             request,
             response_file=response_file,
-            response_port=response_port,
             settings=settings,
         )
         self.driver = None
@@ -1050,7 +1077,6 @@ class ScriptCrawler(CrawlerInterface):
         self,
         request,
         response_file=None,
-        response_port=None,
         cwd=None,
         script=None,
         settings=None,
@@ -1061,7 +1087,6 @@ class ScriptCrawler(CrawlerInterface):
         super().__init__(
             request=request,
             response_file=response_file,
-            response_port=response_port,
             settings=settings,
         )
         self.cwd = cwd
@@ -1242,19 +1267,15 @@ class ServerCrawler(CrawlerInterface):
         self,
         request,
         response_file=None,
-        response_port=None,
         settings=None,
         script=None,
     ):
         if settings and "script" in settings and settings["script"]:
             script = settings["script"]
-        if settings and "port" in settings and settings["port"]:
-            response_port = settings["port"]
 
         super().__init__(
             request=request,
             response_file=response_file,
-            response_port=response_port,
             settings=settings,
         )
         self.script = script
@@ -1273,92 +1294,11 @@ class ServerCrawler(CrawlerInterface):
 
         script_time_start = DateUtils.get_datetime_now_utc()
 
-        self.connection = SocketConnection()
-        try:
-            if not self.connection.connect(
-                SocketConnection.gethostname(), self.response_port
-            ):
-                WebLogger.error("Cannot connect to port{}".format(self.response_port))
-
-                self.response = PageResponseObject(
-                    self.request.url,
-                    text=None,
-                    status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
-                    request_url=self.request.url,
-                )
-                return self.response
-        except Exception as E:
-            WebLogger.exc(E, "Cannot connect to port{}".format(self.response_port))
-            return self.response_port
-
-        bytes = get_request_to_bytes(self.request, self.script)
-        self.connection.send(bytes)
+        # TODO implement
 
         response = PageResponseObject(self.request.url)
         response.status_code = HTTP_STATUS_CODE_TIMEOUT
         response.request_url = self.request.url
-
-        while True:
-            command_data = self.connection.get_command_and_data()
-
-            if command_data:
-                if command_data[0] == "PageResponseObject.__init__":
-                    pass
-
-                elif command_data[0] == "PageResponseObject.url":
-                    response.url = command_data[1].decode()
-
-                elif command_data[0] == "PageResponseObject.headers":
-                    try:
-                        response.headers = json.loads(command_data[1].decode())
-                    except ValueError as E:
-                        WebLogger.exc(
-                            E, "Cannot load response headers from crawling server"
-                        )
-
-                elif command_data[0] == "PageResponseObject.status_code":
-                    try:
-                        response.status_code = int(command_data[1].decode())
-                    except ValueError as E:
-                        WebLogger.exc(E, "Cannot load status_code from crawling server")
-
-                elif command_data[0] == "PageResponseObject.text":
-                    response.set_text(command_data[1].decode())
-
-                elif command_data[0] == "PageResponseObject.request_url":
-                    response.request_url = command_data[1].decode()
-
-                elif command_data[0] == "PageResponseObject.__del__":
-                    break
-
-                elif command[0] == "commands.debug":
-                    pass
-
-                elif command[0] == "debug.requests":
-                    pass
-
-                else:
-                    WebLogger.error("Unsupported command:{}".format(command_data[0]))
-                    break
-
-            if self.connection.is_closed():
-                break
-
-            diff = DateUtils.get_datetime_now_utc() - script_time_start
-            if diff.total_seconds() > self.timeout_s + 10:
-                WebLogger.error(
-                    "Url:{} Timeout on socket connection:{}/{}".format(
-                        self.request.url, diff.total_seconds(), self.timeout_s
-                    )
-                )
-
-                response = PageResponseObject(
-                    self.request.url,
-                    text=None,
-                    status_code=HTTP_STATUS_CODE_TIMEOUT,
-                    request_url=self.request.url,
-                )
-                break
 
         self.response = response
 
@@ -1370,9 +1310,6 @@ class ServerCrawler(CrawlerInterface):
 
     def is_valid(self):
         if not self.script:
-            return False
-
-        if self.response_port == 0 or self.response_port is None:
             return False
 
         return True
@@ -1387,14 +1324,12 @@ class SeleniumBase(CrawlerInterface):
         self,
         request,
         response_file=None,
-        response_port=None,
         driver_executable=None,
         settings=None,
     ):
         super().__init__(
             request=request,
             response_file=response_file,
-            response_port=response_port,
             settings=settings,
         )
 

@@ -13,7 +13,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.templatetags.static import static
 
-from ..webtools.ipc import DEFAULT_PORT
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
