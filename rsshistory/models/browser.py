@@ -107,7 +107,7 @@ class Browser(models.Model):
             browser_config["name"] = "RemoteServerCrawler"
             browser_config["settings"]["crawler"] = original_crawler
             browser_config["settings"]["name"] = original_name
-            browser_config["settings"]["server_url"] = config.remote_webtools_server_location
+            browser_config["settings"]["remote_server"] = config.remote_webtools_server_location
 
             browser_mapping.append(browser_config)
 

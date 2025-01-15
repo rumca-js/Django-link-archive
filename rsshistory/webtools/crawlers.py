@@ -131,19 +131,19 @@ class CrawlerInterface(object):
                 WebLogger.error("Have not received response")
             return False
 
-        all_bytes = self.response_to_bytes()
-
         if self.response_file:
             self.save_response_file(self.response_file)
 
-        if "remote_server" in self.settings:
+        if self.settings and "remote_server" in self.settings:
             self.save_response_remote(self.settings["remote_server"])
 
         return True
 
     def save_response_file(self, file_name):
-        if not self.file_name:
+        if not file_name:
             return
+
+        all_bytes = self.response_to_bytes()
 
         path = Path(self.response_file)
         if not path.parent.exists():
@@ -426,7 +426,7 @@ class RemoteServerCrawler(CrawlerInterface):
         if not self.is_valid():
             return
 
-        server_url = self.settings["server_url"]
+        server_url = self.settings["remote_server"]
         self.settings["crawler"] = self.settings["crawler"]
 
         crawler_data = {
