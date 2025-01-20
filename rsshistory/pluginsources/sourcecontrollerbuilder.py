@@ -5,7 +5,6 @@ from .sourcejsonplugin import BaseSourceJsonPlugin
 from .codeprojectplugin import CodeProjectPlugin
 from .tvn24plugin import TVN24Plugin
 from .spotifyplugin import SpotifyPlugin
-from .sourceyoutubechannel import YouTubePlugin
 from .rssparserplugin import RssParserPlugin
 from .hackernewsparserplugin import HackerNewsParserPlugin
 from ..models import AppLogging
@@ -20,7 +19,6 @@ class SourceControllerBuilder(object):
         CodeProjectPlugin,
         TVN24Plugin,
         SpotifyPlugin,
-        YouTubePlugin,
         HackerNewsParserPlugin,
     ]
 

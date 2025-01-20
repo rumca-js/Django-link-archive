@@ -21,6 +21,7 @@ from ..webtools import (
     GitHubUrlHandler,
     HtmlPage,
     ReturnDislike,
+    RemoteServer,
 )
 
 from ..apps import LinkDatabase
@@ -49,6 +50,7 @@ from ..controllers import (
     BackgroundJobController,
     SearchEngines,
     EntryScanner,
+    SystemOperationController,
 )
 from ..forms import (
     EntryForm,
@@ -990,50 +992,19 @@ def entry_dislikes(request, pk):
     objs = LinkDataController.objects.filter(id=pk)
     obj = objs[0]
 
-    handler = UrlHandler.get_type(obj.link)
+    config = Configuration.get_object().config_entry
+    if config.remote_webtools_server_location:
 
-    json_obj = {}
+        controller = SystemOperationController()
+        if controller.is_remote_server_down():
+            return JsonResponse({}, json_dumps_params={"indent":4})
 
-    if type(handler) == UrlHandler.youtube_video_handler:
-        code = handler.get_video_code()
-        h = ReturnDislike(code)
-        json_obj["thumbs_up"] = h.get_thumbs_up()
-        json_obj["thumbs_down"] = h.get_thumbs_down()
-        json_obj["view_count"] = h.get_view_count()
-        json_obj["rating"] = h.get_rating()
-        json_obj["upvote_ratio"] = h.get_upvote_ratio()
-        json_obj["upvote_view_ratio"] = h.get_upvote_view_ratio()
+        link = config.remote_webtools_server_location
+        remote_server = RemoteServer(link)
 
-    elif type(handler) == HtmlPage:
-        reddit = RedditUrlHandler(handler.url)
-        github = GitHubUrlHandler(handler.url)
+        json_obj = remote_server.get_social(obj.link)
 
-        if reddit.is_handled_by():
-            print("handled by reddit")
-            handler_data = reddit.get_json_data()
-            if handler_data and "thumbs_up" in handler_data:
-                json_obj["thumbs_up"] = handler_data["thumbs_up"]
-            if handler_data and "thumbs_down" in handler_data:
-                json_obj["thumbs_down"] = handler_data["thumbs_down"]
-            if handler_data and "upvote_ratio" in handler_data:
-                json_obj["upvote_ratio"] = handler_data["upvote_ratio"]
-            if handler_data and "upvote_view_ratio" in handler_data:
-                json_obj["upvote_view_ratio"] = handler_data["upvote_view_ratio"]
-
-        elif github.is_handled_by():
-            print("handled by github")
-            handler_data = github.get_json_data()
-            if handler_data and "thumbs_up" in handler_data:
-                json_obj["thumbs_up"] = handler_data["thumbs_up"]
-            if handler_data and "thumbs_down" in handler_data:
-                json_obj["thumbs_down"] = handler_data["thumbs_down"]
-            if handler_data and "upvote_ratio" in handler_data:
-                json_obj["upvote_ratio"] = handler_data["upvote_ratio"]
-            if handler_data and "upvote_view_ratio" in handler_data:
-                json_obj["upvote_view_ratio"] = handler_data["upvote_view_ratio"]
-
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
-
+        return JsonResponse(json_obj, json_dumps_params={"indent":4})
 
 def entry_bookmark(request, pk):
     p = ViewPage(request)

@@ -53,6 +53,10 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_RESULT_BACKEND = 'django-db'
 
+CRAWLER_BUDDY_SERVER = os.environ["CRAWLER_BUDDY_SERVER"]
+CRAWLER_BUDDY_PORT = os.environ["CRAWLER_BUDDY_PORT"]
+CRAWLER_BUDDY_URL = os.environ["CRAWLER_BUDDY_SERVER"] + ":" + os.environ["CRAWLER_BUDDY_PORT"]
+
 # Application definition
 
 INSTALLED_APPS = [

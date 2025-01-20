@@ -1,9 +1,17 @@
-from ..webtools import HtmlPage, RssPage, JsonPage, HttpPageHandler, UrlLocation
+from ..webtools import (
+    HtmlPage,
+    RssPage,
+    JsonPage,
+    HttpPageHandler,
+    UrlLocation,
+    RemoteServer,
+)
 from utils.services import OpenRss
 
 from ..models import (
     SourceDataModel,
 )
+from ..configuration import Configuration
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
 from ..pluginurl.urlhandler import UrlHandler
 
@@ -21,7 +29,26 @@ class SourceUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        props = self.get_props_internal(input_props)
+        config_entry = Configuration.get_object().config_entry
+        if config_entry.remote_webtools_server_location:
+            request_server = RemoteServer(config_entry.remote_webtools_server_location)
+            all_properties = request_server.get_crawlj(self.url)
+            properties = request_server.read_properties_section("Properties", all_properties)
+            response = request_server.read_properties_section("Response", all_properties)
+            if properties:
+                props = {}
+                if "feed_0" in properties:
+                    props["url"] = properties["feed_0"]
+                else:
+                    props["url"] = self.url.url
+                props["title"] = properties["title"]
+                props["description"] = properties["description"]
+                props["language"] = properties["language"]
+                props["favicon"] = properties["thumbnail"]
+                props["status_code"] = response["status_code"]
+                props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+        else:
+            props = self.get_props_internal(input_props)
 
         if "remove_after_days" not in props:
             props["remove_after_days"] = 0
@@ -30,7 +57,8 @@ class SourceUrlInterface(object):
         if "age" not in props:
             props["age"] = 0
         if "status_code" not in props:
-            props["status_code"] = self.u.get_status_code()
+            if self.u:
+                props["status_code"] = self.u.get_status_code()
         if "language" not in props or props["language"] is None:
             props["language"] = ""
         if "category_name" not in props or props["category_name"] is None:
@@ -85,10 +113,7 @@ class SourceUrlInterface(object):
 
         input_props["url"] = self.url
 
-        if type(handler) is UrlHandler.youtube_channel_handler:
-            input_props["source_type"] = SourceDataModel.SOURCE_TYPE_YOUTUBE
-        else:
-            input_props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+        input_props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
 
         title = u.get_title()
         if title:

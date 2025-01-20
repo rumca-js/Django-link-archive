@@ -244,6 +244,7 @@ class PageRequestObject(object):
         url,
         headers=None,
         user_agent=None,
+        request_headers=None,
         timeout_s=10,
         ping=False,
         ssl_verify=True,
@@ -251,13 +252,12 @@ class PageRequestObject(object):
         self.url = url
 
         self.user_agent = user_agent
-        if headers:
-            self.headers = headers
-        else:
-            self.headers = None  # not set, use default
 
         self.timeout_s = timeout_s
-        self.ping = False
+        self.ping = ping
+        self.headers = headers
+        self.request_headers = request_headers
+
         self.ssl_verify = True
 
     def __str__(self):
@@ -288,6 +288,7 @@ class PageResponseObject(object):
         self.url = url
         self.request_url = request_url
         self.status_code = status_code
+        self.crawler_data = None
 
         self.binary = None
         self.text = None
@@ -347,6 +348,10 @@ class PageResponseObject(object):
 
     def is_headers_empty(self):
         return len(self.headers) == 0
+
+    def set_crawler(self, crawler_data):
+        self.crawler_data = dict(crawler_data)
+        self.crawler_data["crawler"] = self.crawler_data["crawler"].__name__
 
     def get_content_type(self):
         if "Content-Type" in self.headers:
@@ -423,7 +428,13 @@ class PageResponseObject(object):
         if "Content-Length" in self.headers:
             return int(self.headers["Content-Length"])
 
-        return 100
+        if self.text:
+            return len(self.text)
+
+        if self.binary:
+            return len(self.binary)
+
+        return 0
 
     def is_content_type_supported(self):
         """
@@ -586,9 +597,9 @@ def get_request_to_bytes(request, script):
         )
     else:
         bytes4 = bytearray()
-    if request.headers != None:
+    if request.request_headers != None:
         bytes5 = string_to_command(
-            "PageRequestObject.headers", json.dumps(request.headers)
+            "PageRequestObject.request_headers", json.dumps(request.request_headers)
         )
     else:
         bytes5 = bytearray()

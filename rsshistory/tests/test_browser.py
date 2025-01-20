@@ -5,7 +5,6 @@ from ..webtools import (
     SeleniumChromeHeadless,
     SeleniumChromeFull,
     SeleniumUndetected,
-    ServerCrawler,
     ScriptCrawler,
     StealthRequestsCrawler,
     RemoteServerCrawler,
@@ -121,7 +120,7 @@ class BrowserTest(FakeInternetTestCase):
 
     def test_get_browser_setup__remote(self):
         config = Configuration.get_object().config_entry
-        config.remote_webtools_server_location = "https://127.0.0.1/run"
+        config.remote_webtools_server_location = "https://127.0.0.1"
         config.save()
 
         Browser.objects.all().delete()
@@ -139,5 +138,6 @@ class BrowserTest(FakeInternetTestCase):
         self.assertTrue(setup[0]["crawler"], RemoteServerCrawler)
         self.assertTrue(setup[0]["settings"]["name"], "test")
         self.assertTrue(setup[0]["settings"]["crawler"], "RequestsCrawler")
+        self.assertTrue(setup[0]["settings"]["remote_server"], "https://127.0.0.1")
 
         self.assertTrue(setup[0]["settings"]["test_setting"], "something")

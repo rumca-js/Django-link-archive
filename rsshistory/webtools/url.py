@@ -15,6 +15,7 @@ from urllib.parse import unquote
 from collections import OrderedDict
 import urllib.robotparser
 import asyncio
+import base64
 
 from .webtools import (
     PageOptions,
@@ -193,6 +194,10 @@ class Url(ContentInterface):
                     )
 
             return self.response
+
+    def get_headers(self):
+        # TODO implement
+        pass
 
     def ping(self, timeout_s=5):
         handler = self.get_handler()
@@ -583,24 +588,48 @@ class Url(ContentInterface):
         all_properties.append({"name" : "Options", "data" : request_data})
 
         if response:
+            headers = response.get_headers()
+
             response_data = OrderedDict()
             response_data["is_valid"] = response.is_valid()
             response_data["status_code"] = response.get_status_code()
+
             response_data["Content-Type"] = response.get_content_type()
+            if response_data["Content-Type"] is None and page_handler == HttpPageHandler:
+                if page_handler.p:
+                    if type(page_handler.p) == RssPage:
+                        response_data["Content-Type"] = "application/rss+xml"
+                    if type(page_handler.p) == HtmlPage:
+                        response_data["Content-Type"] = "text/html"
+
             response_data["Content-Length"] = response.get_content_length()
+            response_data["Last-Modified"] = self.response.get_last_modified()
+
             response_data["Charset"] = response.get_content_type_charset()
+            if not response_data["Charset"]:
+                response_data["Charset"] = response.encoding
+
+            if self.get_contents_hash():
+                response_data["hash"] = base64.b64encode(self.get_contents_hash()).decode("utf-8")
+            else:
+                response_data["hash"] = ""
+            if self.get_contents_body_hash():
+                response_data["body_hash"] = base64.b64encode(self.get_contents_body_hash()).decode("utf-8")
+            else:
+                response_data["body_hash"] = ""
+            response_data["crawler_data"] = response.crawler_data
+
             all_properties.append({"name" : "Response", "data" : response_data})
 
-            all_properties.append({"name" : "Headers", "data" : response.get_headers()})
+            all_properties.append({"name" : "Headers", "data" : headers})
 
         index = 0
+        entries = []
         for entry in self.get_entries():
-            if index == 0:
-                entry_properties = {}
-                entry_properties["link"] = entry["link"]
-                entry_properties["title"] = entry["title"]
-                all_properties.append({"name" : "Entries", "data" : entry_properties})
-            break
+            if "feed_entry" in entry:
+                del entry["feed_entry"]
+            entries.append(entry)
+        all_properties.append({"name" : "Entries", "data" : entries})
 
         return all_properties
 

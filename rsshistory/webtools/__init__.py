@@ -24,6 +24,7 @@ from .handlers import (
     RedditUrlHandler,
     GitHubUrlHandler,
     ReturnDislike,
+    HackerNewsHandler,
 )
 
 from .crawlers import (
@@ -36,6 +37,7 @@ from .crawlers import (
     StealthRequestsCrawler,
     RemoteServerCrawler,
     selenium_feataure_enabled,
+    RemoteServer,
 )
 from .crawlerscript import (
     ScriptCrawlerParser,

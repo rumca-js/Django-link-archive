@@ -7,6 +7,7 @@ from ..webtools import (
   HttpPageHandler,
   YouTubeChannelHandler,
   RssContentReader,
+  RemoteServer,
 )
 
 from ..models import AppLogging
@@ -66,7 +67,14 @@ class BaseRssPlugin(SourceGenericPlugin):
         """
         We override RSS behavior
         """
+
         c = Configuration.get_object().config_entry
+
+        if c.remote_webtools_server_location:
+            for entry in super().get_entries():
+                yield entry
+
+            return
 
         self.reader = self.get_container_reader_element()
 

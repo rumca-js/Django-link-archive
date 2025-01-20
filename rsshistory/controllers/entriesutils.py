@@ -2,6 +2,7 @@ from datetime import timedelta
 import traceback
 import time
 import ipaddress
+import base64
 
 from django.db import models
 from django.urls import reverse
@@ -13,6 +14,7 @@ from ..webtools import (
     UrlLocation,
     UrlPropertyValidator,
     UrlAgeModerator,
+    RemoteServer,
 )
 from utils.dateutils import DateUtils
 
@@ -416,37 +418,48 @@ class EntryUpdater(object):
     def __init__(self, entry):
         self.entry = entry
 
-    def is_entry_changed(self, url_handler):
+    def is_entry_changed(self, all_properties):
         entry = self.entry
 
-        response = url_handler.get_response()
-        if not response:
+        if not all_properties:
             return True
 
-        last_modified_date = response.get_last_modified()
-        if last_modified_date:
-            if not entry.date_last_modified:
-                return True
+        request_server = RemoteServer("https://")
 
-            if last_modified_date > entry.date_last_modified:
-                return True
+        response = request_server.read_properties_section("Response", all_properties)
 
-            return False
+        if "Last-Modified" in response:
+            last_modified_date = properties["Last-Modified"]
+            if last_modified_date:
+                if not entry.date_last_modified:
+                    return True
 
-        body_hash = url_handler.get_contents_body_hash()
+                last_modified_date = DateUtils.parse_date(last_modified_date)
+
+                if last_modified_date > entry.date_last_modified:
+                    return True
+
+                return False
+
+        
+        body_hash = response["body_hash"]
         if body_hash:
             if not entry.body_hash:
                 return True
+
+            body_hash = base64.b64decode(body_hash)
 
             if entry.body_hash == body_hash:
                 return False
 
             return True
 
-        contents_hash = url_handler.get_contents_hash()
+        contents_hash = response["hash"]
         if contents_hash:
             if not entry.contents_hash:
                 return True
+
+            contents_hash = base64.b64decode(contents_hash)
 
             if entry.contents_hash == contents_hash:
                 return False
@@ -455,18 +468,34 @@ class EntryUpdater(object):
 
         return True
 
-    def update_entry(self, url_handler):
+    def update_entry(self, all_properties):
         entry = self.entry
 
-        response = url_handler.get_response()
-        if response:
-            entry.date_last_modified = response.get_last_modified()
-            entry.status_code = response.get_status_code()
-        entry.date_update_last = DateUtils.get_datetime_now_utc()
+        request_server = RemoteServer("https://")
 
-        entry.body_hash = url_handler.get_contents_body_hash()
-        entry.contents_hash = url_handler.get_contents_hash()
-        entry.page_rating_contents = url_handler.get_page_rating()
+        response = request_server.read_properties_section("Response", all_properties)
+        properties = request_server.read_properties_section("Properties", all_properties)
+
+        if response:
+            if "Last-Modified" in response:
+                last_modified_date = DateUtils.parse_date(response["Last-Modified"])
+                entry.date_last_modified = last_modified_date
+            else:
+                entry.date_last_modified = DateUtils.get_datetime_now_utc()
+            if "status_code" in response:
+                entry.status_code = response["status_code"]
+            if "body_hash" in response:
+                body_hash = base64.b64decode(response["body_hash"])
+                entry.body_hash = body_hash
+            if "hash" in response:
+                contents_hash = base64.b64decode(response["hash"])
+                entry.contents_hash = contents_hash
+
+        if properties:
+            if "page_rating" in properties:
+                entry.page_rating_contents = int(properties["page_rating"])
+
+        entry.date_update_last = DateUtils.get_datetime_now_utc()
 
         # if server says that entry was last modified in 2006, then it was present in 2006!
         if entry.date_last_modified:
@@ -492,6 +521,7 @@ class EntryUpdater(object):
 
     def update_data(self):
         from ..pluginurl import EntryUrlInterface
+        from ..pluginurl import UrlHandler
 
         """
         Fetches new information about page, and uses valid fields to set this object,
@@ -522,14 +552,14 @@ class EntryUpdater(object):
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
 
-        if url.u:
-            if not entry.bookmarked and not entry.permanent and url.u.is_blocked():
-                entry.delete()
-                return
+        handler = UrlHandler(url=entry.link)
+        if not entry.bookmarked and not entry.permanent and handler.is_blocked():
+            entry.delete()
+            return
 
-        entry_changed = self.is_entry_changed(url.u)
+        entry_changed = self.is_entry_changed(url.all_properties)
 
-        self.update_entry(url.u)
+        self.update_entry(url.all_properties)
 
         if not url.is_valid():
             self.handle_invalid_response(url)
@@ -575,6 +605,7 @@ class EntryUpdater(object):
 
     def reset_data(self):
         from ..pluginurl import EntryUrlInterface
+        from ..pluginurl import UrlHandler
 
         """
         Fetches new information about page, and uses valid fields to set this object.
@@ -602,14 +633,14 @@ class EntryUpdater(object):
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
 
-        if url.u:
-            if url.u.is_blocked():
-                entry.delete()
-                return
+        handler = UrlHandler(url=entry.link)
+        if not entry.bookmarked and not entry.permanent and handler.is_blocked():
+            entry.delete()
+            return
 
-        entry_changed = self.is_entry_changed(url.u)
+        entry_changed = self.is_entry_changed(url.all_properties)
 
-        self.update_entry(url.u)
+        self.update_entry(url.all_properties)
 
         if not url.is_valid():
             self.handle_invalid_response(url)
@@ -657,16 +688,16 @@ class EntryUpdater(object):
                 ModelFilesBuilder().build(file_name=entry.thumbnail)
 
     def add_links_from_url(self, entry, url_interface):
-        url_handler = url_interface.u
+        properties = url_interface.all_properties
 
-        if not url_handler:
+        if not properties:
             return
 
-        if not url_handler.get_response():
-            return
+        server = RemoteServer("https://")
+        contents = server.read_properties_section("Contents", properties)
 
         scanner = EntryScanner(
-            url=url_handler.url, entry=entry, contents=url_handler.get_contents()
+            url=entry.link, entry=entry, contents=contents
         )
         scanner.run()
 

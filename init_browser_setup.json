@@ -27,10 +27,10 @@
   },
   {
     "crawler": "SeleniumUndetected",
-    "enabled": false,
+    "enabled": true,
     "name": "SeleniumUndetected",
     "settings": {
-      "driver_executable": null,
+      "driver_executable": "/usr/bin/chromedriver",
       "timeout_s": 40
     }
   },
@@ -45,16 +45,16 @@
     "enabled": true,
     "name": "SeleniumChromeHeadless",
     "settings": {
-      "driver_executable": null,
+      "driver_executable": "/usr/bin/chromedriver",
       "timeout_s": 40
     }
   },
   {
     "crawler": "SeleniumChromeFull",
-    "enabled": false,
+    "enabled": true,
     "name": "SeleniumChromeFull",
     "settings": {
-      "driver_executable": null,
+      "driver_executable": "/usr/bin/chromedriver",
       "timeout_s": 40
     }
   },

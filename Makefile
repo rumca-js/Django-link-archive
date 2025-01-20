@@ -87,7 +87,7 @@ run-celery:
 	rm -f celerybeat-schedule.db
 	# if we do not limit celery worker memory, then it will grow indefinitely
 	poetry run celery -A linklibrary beat -l INFO &
-	poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=100000 &
+	poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=200000 &
 
 run-web-server:
 	poetry run python manage.py runserver 0.0.0.0:$(PORT)

@@ -18,7 +18,7 @@ This project uses the following technologies:
  - celery - background task processing
  - postgresql - use of SQLite is discouraged
  - rabbitmq-server
- - selenium / crawlee
+ - crawlerbuddy - project that crawls the web [GitHub](https://github.com/rumca-js/crawler-buddy)
  - spacy - for text/keyword analysis
 
 # Using the crawling system
@@ -50,7 +50,8 @@ Notes:
 
 # Prerequisites
 
-Python poetry [https://python-poetry.org/docs/](https://python-poetry.org/docs/).
+ - Python poetry [https://python-poetry.org/docs/](https://python-poetry.org/docs/).
+ - [Crawling program](https://github.com/rumca-js/crawler-buddy)
 
 # Basic installation
 

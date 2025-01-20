@@ -1,3 +1,4 @@
+import requests
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -88,6 +89,31 @@ class SystemOperationController(object):
             return status.is_internet_connection_ok
         else:
             return True
+
+    def is_remote_server_down(self):
+        config_entry = ConfigurationEntry.get()
+
+        remote_server = config_entry.remote_webtools_server_location
+
+        if not remote_server:
+            return False
+
+        try:
+            response = requests.get(url=remote_server, timeout=20)
+            if response.status_code != 200:
+                return True
+        except Exception as E:
+            print(str(E))
+            return True
+
+        #from ..pluginurl import UrlHandler
+
+        #p = UrlHandler(url=remote_server)
+        ## TODO fix this
+        ## return p.ping()
+        #return not p.get_response().is_valid()
+
+        return False
 
     def is_system_healthy(self, thread_ids):
         c = ConfigurationEntry.get()

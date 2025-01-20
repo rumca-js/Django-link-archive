@@ -248,7 +248,7 @@ def backgroundjobs_enable_all(request):
     if data is not None:
         return data
 
-    jobs = BackgroundJobController.objects.all()
+    jobs = BackgroundJobController.objects.filter(enabled=False)
     for job in jobs:
         job.enable()
 
@@ -262,7 +262,7 @@ def backgroundjobs_disable_all(request):
     if data is not None:
         return data
 
-    jobs = BackgroundJobController.objects.all()
+    jobs = BackgroundJobController.objects.filter(enabled=True)
     for job in jobs:
         job.enabled = False
         job.save()

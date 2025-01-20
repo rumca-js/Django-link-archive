@@ -49,7 +49,7 @@ mkdir -p /app/linklibrary/lesson-11/broker/queue
 echo "Starting celery"
 rm -rf celerybeat-schedule.db
 poetry run celery -A linklibrary beat -l INFO &
-poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=100000 &
+poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=200000 &
 
 echo "Starting web server"
 poetry run python manage.py runserver 0.0.0.0:8000

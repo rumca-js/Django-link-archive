@@ -1,6 +1,10 @@
 import traceback
 
-from ..webtools import Url, UrlLocation, UrlPropertyValidator
+from ..webtools import (
+    Url,
+    UrlLocation,
+    UrlPropertyValidator,
+)
 
 from ..apps import LinkDatabase
 from ..models import AppLogging, EntryRules, BlockEntry

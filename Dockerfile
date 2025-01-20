@@ -61,11 +61,3 @@ RUN ["chmod", "+x", "/app/docker-entrypoint.sh"]
 
 # TODO how to kill server?
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-
-# Run the Django application using Poetry
-#CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
-#CMD ["/app/docker-entrypoint.sh"]
-
-# can be further enhanced with
-# https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
-# https://stackoverflow.com/questions/33992867/how-do-you-perform-django-database-migrations-when-using-docker-compose

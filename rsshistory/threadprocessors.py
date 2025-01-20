@@ -103,6 +103,9 @@ class RefreshProcessor(CeleryTaskInterface):
         if not systemcontroller.is_internet_ok():
             return
 
+        if systemcontroller.is_remote_server_down():
+            return
+
         config = c.config_entry
         if config.block_job_queue:
             return
@@ -230,6 +233,9 @@ class GenericJobsProcessor(CeleryTaskInterface):
         systemcontroller.refresh(self.get_name())
 
         if not systemcontroller.is_internet_ok():
+            return
+
+        if systemcontroller.is_remote_server_down():
             return
 
         while True:

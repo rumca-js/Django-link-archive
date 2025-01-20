@@ -6,6 +6,7 @@ from ..webtools import (
     DefaultContentPage,
     HttpPageHandler,
     UrlAgeModerator,
+    RemoteServer,
 )
 
 from ..apps import LinkDatabase
@@ -38,6 +39,7 @@ class EntryUrlInterface(object):
         self.log = log
         self.ignore_errors = ignore_errors
         self.props = None
+        self.all_properties = None
 
         self.url = UrlHandler.get_cleaned_link(url)
 
@@ -59,10 +61,24 @@ class EntryUrlInterface(object):
         return self.response
 
     def get_props(self, input_props=None, source_obj=None):
-        self.make_request()
-
         if not input_props:
             input_props = {}
+
+        config_entry = Configuration.get_object().config_entry
+        if config_entry.remote_webtools_server_location:
+            request_server = RemoteServer(config_entry.remote_webtools_server_location)
+            self.all_properties = request_server.get_crawlj(self.url)
+            properties = request_server.read_properties_section("Properties", self.all_properties)
+
+            if properties:
+                properties["date_published"] = DateUtils.get_datetime_now_utc()
+
+            # TODO properties["date_dead_since"] = DateUtils.get_datetime_now_utc()
+
+            self.props = properties
+            return self.props
+
+        self.make_request()
 
         if not self.ignore_errors and not self.u.is_valid():
             return
@@ -147,13 +163,13 @@ class EntryUrlInterface(object):
         return False
 
     def is_valid(self):
-        if not self.u.is_valid():
+        if not self.all_properties:
             return False
 
-        # we support the type, but we do not provide valid properties
-        props = self.props
-        if not props and self.is_update_supported():
-            return False
+        server = RemoteServer("https://")
+        response = server.read_properties_section("Response", self.all_properties)
+        if "is_valid" in response:
+            return response["is_valid"]
 
         return True
 

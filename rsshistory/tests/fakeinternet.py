@@ -23,6 +23,7 @@ from ..webtools import (
     WebLogger,
     WebConfig,
     CrawlerInterface,
+    RemoteServer,
 )
 
 from ..models import (
@@ -273,6 +274,7 @@ class TestResponseObject(PageResponseObject):
         text = self.get_text_for_url(url)
 
         self.url = url
+        self.request_url = url
         self.text = text
         self.binary = text.encode()
         self.headers = {}
@@ -696,6 +698,13 @@ class FakeInternetTestCase(TestCase):
 
         WebLogger.web_logger = AppLogging
         WebConfig.get_crawler_from_mapping = FakeInternetTestCase.get_crawler_from_mapping
+        RemoteServer.get_crawlj = self.get_crawlj
+
+    def get_crawlj(self, url):
+        return """
+        [
+        ]
+        """
 
     def get_crawler_from_mapping(request, crawler_data):
         if "settings" in crawler_data:

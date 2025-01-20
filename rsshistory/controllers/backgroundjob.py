@@ -200,7 +200,7 @@ class BackgroundJobController(BackgroundJob):
         """
         input_url = url
 
-        url = Url.get_cleaned_link(url)  # TODO maybe urlhandler?
+        url = Url.get_cleaned_link(url)
 
         if not url:
             return

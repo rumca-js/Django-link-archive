@@ -1,7 +1,8 @@
 import traceback
 import hashlib
+import base64
 
-from ..webtools import ContentLinkParser, calculate_hash
+from ..webtools import ContentLinkParser, calculate_hash, RemoteServer
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
@@ -77,6 +78,23 @@ class SourceGenericPlugin(object):
                 valid=False,
             )
             return False
+
+    def get_entries(self):
+        """
+        We override RSS behavior
+        """
+
+        c = Configuration.get_object().config_entry
+
+        if c.remote_webtools_server_location:
+            if not self.all_properties:
+                return calculate_hash("")
+
+            request_server = RemoteServer(c.remote_webtools_server_location)
+            entries = request_server.read_properties_section("Entries", self.all_properties)
+            for entry in entries:
+                entry["date_published"] = DateUtils.parse_datetime(entry["date_published"])
+                yield entry
 
     def read_data_from_container_elements(self):
         num_entries = 0
@@ -170,18 +188,20 @@ class SourceGenericPlugin(object):
     def calculate_plugin_hash(self):
         self.get_contents()
 
-        if not self.content_handler:
-            if not self.contents:
+        if not self.contents:
+            return calculate_hash("")
+
+        c = Configuration.get_object().config_entry
+        if c.remote_webtools_server_location:
+            if not self.all_properties:
                 return calculate_hash("")
 
-            return calculate_hash(self.contents)
-
-        if self.content_handler.is_valid():
-            body_hash = self.content_handler.get_contents_body_hash()
-            if not body_hash:
-                return self.content_handler.get_contents_hash()
-            else:
-                return body_hash
+            request_server = RemoteServer(c.remote_webtools_server_location)
+            response = request_server.read_properties_section("Response", self.all_properties)
+            encoded_hash = response["body_hash"]
+            if not encoded_hash:
+                encoded_hash = response["hash"]
+            return base64.b64decode(encoded_hash)
 
     def set_operational_info(
         self, stop_time, num_entries, total_seconds, hash_value, valid=True
@@ -207,32 +227,25 @@ class SourceGenericPlugin(object):
         if self.dead:
             return
 
-        self.content_handler = UrlHandler(self.get_address())
-        self.response = self.content_handler.get_response()
-        self.contents = self.response.get_text()
+        page_link = self.get_address()
 
-        status_code = None
-        if self.response:
-            status_code = self.response.status_code
+        c = Configuration.get_object().config_entry
+        if c.remote_webtools_server_location:
+            request_server = RemoteServer(c.remote_webtools_server_location)
+            self.all_properties = request_server.get_crawlj(page_link)
 
-        source = self.get_source()
+            if not self.all_properties:
+                AppLogging.error("Url:{} Could not obtain contents".format(page_link))
+                self.dead = True
+                return
 
-        if not self.response or not self.response.is_valid():
-            AppLogging.error(
-                info_text="Url:{} Title:{}; Could not obtain contents.".format(
-                    source.url,
-                    source.title,
-                ),
-                detail_text="Status code:{}\nOptions:{}\nResponse\n{}".format(
-                    status_code,
-                    str(self.content_handler.options),
-                    self.response,
-                ),
-            )
-            self.dead = True
-            return None
+            self.contents = request_server.read_properties_section("Contents", self.all_properties)
+            if not self.contents:
+                AppLogging.error("Url:{} Could not obtain contents".format(page_link))
+                self.dead = True
+                return
 
-        return self.contents
+            return self.contents
 
     def get_address(self):
         source = self.get_source()
@@ -280,8 +293,7 @@ class SourceGenericPlugin(object):
         elif c.accept_non_domain_links:
             address = self.get_address()
 
-            u = UrlHandler(address)
-            contents = u.get_contents()
+            contents = self.get_contents()
             if not contents:
                 return result
 
@@ -297,8 +309,7 @@ class SourceGenericPlugin(object):
         """
         address = self.get_address()
 
-        u = UrlHandler(address)
-        contents = u.get_contents()
+        contents = self.get_contents()
 
         if not contents:
             return []

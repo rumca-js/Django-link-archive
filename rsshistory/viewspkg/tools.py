@@ -11,6 +11,7 @@ from ..webtools import (
     DomainCache,
     UrlLocation,
     HttpPageHandler,
+    RemoteServer,
 )
 
 from ..apps import LinkDatabase
@@ -111,8 +112,6 @@ def get_page_properties(request):
         return JsonResponse(data, json_dumps_params={"indent":4})
 
     page_link = request.GET["page"]
-    url = UrlHandler(page_link)
-    options = url.get_init_page_options()
 
     browser = None
 
@@ -123,35 +122,20 @@ def get_page_properties(request):
             browsers = Browser.objects.filter(pk = browser_pk)
             if browsers.exists():
                 browser = browsers[0]
-                options.bring_to_front(browser.get_setup())
-                # only this browser!
-                options.mode_mapping = [options.mode_mapping[0]]
-                options.use_browser_promotions = False
             else:
                 AppLogging.error("Browser does not exist!")
                 return
 
+    make_html_request = False
     if "html" in request.GET:
-        page_url = UrlHandler(page_link, page_options=options, handler_class=HttpPageHandler)
-    else:
-        page_url = UrlHandler(page_link, page_options=options)
+        make_html_request = True
 
-    response = page_url.get_response()
+    all_properties = []
 
-    page_handler = page_url.get_handler()
-
-    is_link_allowed = DomainCache.get_object(page_link, url_builder=UrlHandler).is_allowed(page_link)
-
-    all_properties = page_url.get_properties(full=True)
-
-    if browser:
-        request_data = {}
-        request_data["Browser"] = str(browser.name)
-        request_data["Browser Crawler"] = str(browser.crawler)
-        all_properties.append({"name" : "Browser", "data" : request_data})
-
-    errors = get_errors(page_url)
-    all_properties.append({"name" : "Errors", "data" : errors})
+    config_entry = Configuration.get_object().config_entry
+    if config_entry.remote_webtools_server_location:
+        request_server = RemoteServer(config_entry.remote_webtools_server_location)
+        all_properties = request_server.get_crawlj(page_link)
 
     data = OrderedDict()
     data["properties"] = all_properties
