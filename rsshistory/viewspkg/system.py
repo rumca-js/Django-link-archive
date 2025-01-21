@@ -667,7 +667,8 @@ def wizard_setup_news(request):
     c.entries_order_by = "-date_published, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_STANDARD
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_RECENT
-    c.remote_webtools_server_location = settings.CRAWLER_BUDDY_SERVER
+    if settings.CRAWLER_BUDDY_URL:
+        c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
 
     c.initialized = True
 
@@ -715,7 +716,8 @@ def wizard_setup_gallery(request):
     c.entries_order_by = "-date_published, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_GALLERY
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
-    c.remote_webtools_server_location = settings.CRAWLER_BUDDY_SERVER
+    if settings.CRAWLER_BUDDY_URL:
+        c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
 
     c.initialized = True
 
@@ -766,7 +768,8 @@ def wizard_setup_search_engine(request):
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_SEARCH_ENGINE
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
     c.remove_entry_vote_threshold = 1   # do not remove everything above, or equal to 1 vote
-    c.remote_webtools_server_location = settings.CRAWLER_BUDDY_SERVER
+    if settings.CRAWLER_BUDDY_URL:
+        c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
 
     c.initialized = True
 
