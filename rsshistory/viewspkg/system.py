@@ -674,6 +674,8 @@ def wizard_setup_news(request):
 
     c.save()
 
+    Configuration.get_object().config_entry.refresh_from_db()
+
     p.context["summary_text"] = "Set configuration for news."
     p.context["summary_text"] += get_sources_text()
 
@@ -722,6 +724,8 @@ def wizard_setup_gallery(request):
     c.initialized = True
 
     c.save()
+
+    Configuration.get_object().config_entry.refresh_from_db()
 
     p.context["summary_text"] = "Set configuration for gallery"
     p.context["summary_text"] += get_sources_text()
@@ -774,6 +778,8 @@ def wizard_setup_search_engine(request):
     c.initialized = True
 
     c.save()
+
+    Configuration.get_object().config_entry.refresh_from_db()
 
     # we want blocklist to be enabled for search engine
     BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
