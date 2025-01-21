@@ -75,6 +75,8 @@ services:
       - 3000:3000
     environment:
       CRAWLER_BUDDY_PORT: 3000
+    networks:
+      - shared_network
 
 networks:
   shared_network:
