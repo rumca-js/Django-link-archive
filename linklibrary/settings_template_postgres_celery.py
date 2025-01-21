@@ -59,7 +59,7 @@ else:
     CRAWLER_BUDDY_SERVER = None
 
 if "CRAWLER_BUDDY_PORT" in os.environ:
-    CRAWLER_BUDDY_PORT = None
+    CRAWLER_BUDDY_PORT = os.environ["CRAWLER_BUDDY_PORT"]
 else:
     CRAWLER_BUDDY_PORT = None
 
