@@ -26,7 +26,7 @@ services:
       DJANGO_SUPERUSER_USERNAME: admin
       DJANGO_SUPERUSER_PASSWORD: admin
       DJANGO_INITIALIZE_SOURCES: 1
-      CRAWLER_BUDDY_SERVER: "127.0.0.1"
+      CRAWLER_BUDDY_SERVER: crawlerbuddy
       CRAWLER_BUDDY_PORT: 3000
       SECRET_KEY: "xxxxxxxxxxxxx"
       DEBUG: 1
