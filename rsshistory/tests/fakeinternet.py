@@ -6,6 +6,7 @@ This module provides replacement for the Internet.
 """
 
 import logging
+import json
 from django.test import TestCase
 from django.contrib.auth.models import User
 
@@ -34,59 +35,10 @@ from ..models import (
 from ..configuration import Configuration
 from ..pluginurl import UrlHandler
 
-from .fakeinternetdata import (
-    webpage_with_real_rss_links,
-    webpage_simple_rss_page,
-    webpage_old_pubdate_rss,
-    webpage_no_pubdate_rss,
-    webpage_html_favicon,
-    webpage_with_rss_link_rss_contents,
-    webpage_html_casinos,
+from .fake.remoteserver import (
+    remote_server_json,
 )
-from .fake.geekwirecom import (
-    geekwire_feed,
-)
-from .fake.youtube import (
-    youtube_robots_txt,
-    youtube_sitemap_sitemaps,
-    youtube_sitemap_product,
-    webpage_youtube_airpano_feed,
-    webpage_samtime_odysee,
-    webpage_samtime_youtube_rss,
-    youtube_channel_html_linus_tech_tips,
-    youtube_channel_rss_linus_tech_tips,
-)
-from .fake.robotstxtcom import (
-    robots_txt_example_com_robots,
-)
-from .fake.codeproject import (
-    webpage_code_project_rss,
-)
-from .fake.hackernews import (
-    webpage_hackernews_rss,
-)
-from .fake.warhammercommunity import (
-    warhammer_community_rss,
-)
-from .fake.thehill import (
-    thehill_rss,
-)
-from .fake.reddit import (
-    reddit_rss_text,
-    reddit_entry_json,
-)
-from .fake.githubcom import (
-    github_json,
-)
-from .fake.returndislike import (
-    return_dislike_json,
-)
-from .fake.firebog import (
-    firebog_adguard_list,
-    firebog_w3kbl_list,
-    firebog_tick_lists,
-    firebog_malware,
-)
+
 from .fake.instance import (
     instance_entries_json,
     instance_sources_json_empty,
@@ -102,60 +54,6 @@ from .fake.instance import (
     instance_sources_page_1,
     instance_sources_page_2,
 )
-
-
-class PageBuilder(object):
-    def __init__(self):
-        self.charset = "UTF-8"
-        self.title = None
-        self.title_meta = None
-        self.description_meta = None
-        self.author = None
-        self.keywords = None
-        self.og_title = None
-        self.og_description = None
-        self.body_text = ""
-
-    def build_contents(self):
-        html = self.build_html()
-        html = self.build_head(html)
-        html = self.build_body(html)
-        return html
-
-    def build_html(self):
-        return """
-        <html>
-        ${HEAD}
-        ${BODY}
-        </html>"""
-
-    def build_body(self, html):
-        html = html.replace("${BODY}", "<body>{}</body>".format(self.body_text))
-        return html
-
-    def build_head(self, html):
-        # fmt: off
-
-        meta_info = ""
-        if self.title:
-            meta_info += '<title>{}</title>\n'.format(self.title)
-        if self.title_meta:
-            meta_info += '<meta name="title" content="{}">\n'.format(self.title_meta)
-        if self.description_meta:
-            meta_info += '<meta name="description" content="{}">\n'.format(self.description_meta)
-        if self.author:
-            meta_info += '<meta name="author" content="{}">\n'.format(self.author)
-        if self.keywords:
-            meta_info += '<meta name="keywords" content="{}">\n'.format(self.keywords)
-        if self.og_title:
-            meta_info += '<meta property=”og:title” content="{}">\n'.format(self.og_title)
-        if self.og_description:
-            meta_info += '<meta property=”og:description” content="{}">\n'.format(self.og_description)
-
-        # fmt: on
-
-        html = html.replace("${HEAD}", "<head>{}</head>".format(meta_info))
-        return html
 
 
 class MockRequestCounter(object):
@@ -174,507 +72,50 @@ class MockRequestCounter(object):
         MockRequestCounter.request_history = []
 
 
-
-class YouTubeJsonHandlerMock(YouTubeJsonHandler):
-    def __init__(self, url, page_options=None, url_builder=None):
-        super().__init__(url, page_options=page_options, url_builder=url_builder)
-
-    def download_details_youtube(self):
-        MockRequestCounter.requested(self.url)
-
-        if self.get_video_code() == "1234":
-            self.yt_text = """{"_filename" : "1234 test file name",
-            "title" : "1234 test title",
-            "description" : "1234 test description",
-            "channel_url" : "https://youtube.com/channel/1234-channel",
-            "channel" : "1234-channel",
-            "id" : "1234-id",
-            "channel_id" : "1234-channel-id",
-            "thumbnail" : "https://youtube.com/files/1234-thumbnail.png",
-            "upload_date" : "${date}",
-            "live_status" : "False"
-            }""".replace("${date}", self.get_now())
-            return True
-        if self.get_video_code() == "666":
-            return False
-        if self.get_video_code() == "555555":
-            self.yt_text = """{"_filename" : "555555 live video.txt",
-            "title" : "555555 live video",
-            "description" : "555555 live video description",
-            "channel_url" : "https://youtube.com/channel/test.txt",
-            "channel" : "JoYoe",
-            "id" : "3433",
-            "channel_id" : "JoYoe",
-            "thumbnail" : "https://youtube.com/files/whatever.png",
-            "upload_date" : "${date}",
-            "live_status" : "True"
-            }""".replace("${date}", self.get_now())
-        if self.get_video_code() == "archived":
-            self.yt_text = """{"_filename" : "555555 live video.txt",
-            "title" : "555555 live video",
-            "description" : "555555 live video description",
-            "channel_url" : "https://youtube.com/channel/test.txt",
-            "channel" : "JoYoe",
-            "id" : "3433",
-            "channel_id" : "JoYoe",
-            "thumbnail" : "https://youtube.com/files/whatever.png",
-            "upload_date" : "20231113",
-            "live_status" : "False"
-            }""".replace("${date}", self.get_now())
-        else:
-            self.yt_text = """{"_filename" : "test.txt",
-            "title" : "test.txt",
-            "description" : "test.txt",
-            "channel_url" : "https://youtube.com/channel/test.txt",
-            "channel" : "JoYoe",
-            "id" : "3433",
-            "channel_id" : "JoYoe",
-            "thumbnail" : "https://youtube.com/files/whatever.png",
-            "upload_date" : "${date}",
-            "live_status" : "False"
-            }""".replace("${date}", self.get_now())
-        return True
-
-    def download_details_return_dislike(self):
-        self.rd_text = """{}"""
-        return True
-
-    def get_now(self):
-        """
-        format 20231113
-        """
-        date = DateUtils.get_datetime_now_utc()
-        tuple = DateUtils.get_date_tuple(date)
-
-        return str(tuple[0]) + str(tuple[1]) + str(tuple[2])
-
-
-class YouTubeChannelHandlerMock(YouTubeChannelHandler):
-    def __init__(self, url=None):
-        super().__init__(url)
-
-    def get_contents(self):
-        if self.dead:
-            return
-
-
-class DjangoRequestObject(object):
-    def __init__(self, user):
-        self.user = user
-
-
-class TestResponseObject(PageResponseObject):
-    """
-    TODO maybe we should inherit from webtools/PageResponseObject?
-    """
-
-    def __init__(self, url, headers, timeout):
-        self.status_code = 200
-
-        text = self.get_text_for_url(url)
-
+class FakeInternetData(object):
+    def __init__(self, url):
         self.url = url
-        self.request_url = url
-        self.text = text
-        self.binary = text.encode()
-        self.headers = {}
-
-        # encoding = chardet.detect(contents)['encoding']
-        encoding = "utf-8"
-        self.apparent_encoding = encoding
-        self.encoding = encoding
-
-        self.set_headers(url)
-        self.set_status(url)
-
-    def set_headers(self, url):
-        if url == "https://page-with-last-modified-header.com":
-            self.headers["Last-Modified"] = "Wed, 03 Apr 2024 09:39:30 GMT"
-
-        elif url == "https://page-with-rss-link.com/feed":
-            self.headers["Content-Type"] = "application/+rss"
-
-        elif url.startswith("https://warhammer-community.com/feed"):
-            self.headers["Content-Type"] = "application/+rss"
-
-        elif url.startswith("https://thehill.com/feed"):
-            self.headers["Content-Type"] = "application/+rss"
-
-        elif url.find("instance.com") >= 0 and url.find("json") >= 0:
-            self.headers["Content-Type"] = "json"
-
-    def set_status(self, url):
-        if url.startswith("https://www.youtube.com/watch?v=666"):
-            self.status_code = 500
-
-        elif url == "https://invalid.rsspage.com/rss.xml":
-            self.status_code = 500
-
-        elif url == "https://page-with-http-status-500.com":
-            self.status_code = 500
-
-        elif url == "https://page-with-http-status-400.com":
-            self.status_code = 400
-
-        elif url == "https://page-with-http-status-300.com":
-            self.status_code = 300
-
-        elif url == "https://page-with-http-status-200.com":
-            self.status_code = 200
-
-        elif url == "https://page-with-http-status-100.com":
-            self.status_code = 100
-
-        elif url == "http://page-with-http-status-500.com":
-            self.status_code = 500
-
-        elif url == "http://page-with-http-status-400.com":
-            self.status_code = 400
-
-        elif url == "http://page-with-http-status-300.com":
-            self.status_code = 300
-
-        elif url == "http://page-with-http-status-200.com":
-            self.status_code = 200
-
-        elif url == "http://page-with-http-status-100.com":
-            self.status_code = 100
-
-        elif url == "https://page-with-https-status-200-http-status-500.com":
-            self.status_code = 200
-
-        elif url == "http://page-with-https-status-200-http-status-500.com":
-            self.status_code = 500
-
-        elif url == "https://page-with-https-status-500-http-status-200.com":
-            self.status_code = 500
-
-        elif url == "http://page-with-https-status-500-http-status-200.com":
-            self.status_code = 200
-
-        elif url == "https://page-with-http-status-500.com/robots.txt":
-            self.status_code = 500
-
-    def get_text_for_url(self, url):
-        if url.startswith("https://youtube.com/channel/"):
-            return self.get_contents_youtube_channel(url)
-
-        if url.startswith("https://www.youtube.com/watch?v=666"):
-            return webpage_no_pubdate_rss
-
-        if url.startswith("https://www.youtube.com/user/linustechtips"):
-            return youtube_channel_html_linus_tech_tips
-
-        if url.startswith("https://www.geekwire.com/feed"):
-            return geekwire_feed
-
-        if url.startswith(
-            "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
-        ):
-            return youtube_channel_rss_linus_tech_tips
-
-        if url.startswith("https://www.youtube.com/feeds"):
-            return webpage_samtime_youtube_rss
-
-        if url.startswith("https://www.reddit.com/r/") and url.endswith(".rss"):
-            return reddit_rss_text
-
-        if url.startswith("https://www.reddit.com") and url.endswith(".json"):
-            return reddit_entry_json
-
-        if url.startswith("https://api.github.com"):
-            return github_json
-
-        if url.startswith("https://https://returnyoutubedislikeapi.com/votes?videoId"):
-            return return_dislike_json
-
-        if url == "https://www.youtube.com/robots.txt":
-            return youtube_robots_txt
-
-        if url == "https://www.youtube.com/sitemaps/sitemap.xml":
-            return youtube_sitemap_sitemaps
-
-        if url == "https://www.youtube.com/product/sitemap.xml":
-            return youtube_sitemap_product
-
-        if url.startswith("https://odysee.com/$/rss"):
-            return webpage_samtime_youtube_rss
-
-        if url.startswith("https://hnrss.org"):
-            return webpage_hackernews_rss
-
-        if url.startswith("https://news.ycombinator.com/item?id=39940707"):
-            return webpage_samtime_youtube_rss
-
-        if url.startswith("https://warhammer-community.com/feed"):
-            return warhammer_community_rss
-
-        if url.startswith("https://thehill.com/feed"):
-            return thehill_rss
-
-        if url.startswith("https://isocpp.org/blog/rss/category/news"):
-            return webpage_samtime_youtube_rss
-
-        if url.startswith("https://cppcast.com/feed.rss"):
-            return webpage_samtime_youtube_rss
-
-        elif url == "https://multiple-favicons.com/page.html":
-            return webpage_html_favicon
-
-        elif url == "https://rsspage.com/rss.xml":
-            return webpage_samtime_odysee
-
-        elif url == "https://invalid.rsspage.com/rss.xml":
-            return ""
-
-        elif url == "https://simple-rss-page.com/rss.xml":
-            return webpage_simple_rss_page
-
-        elif url == "https://empty-page.com":
-            return ""
-
-        elif url == "https://www.codeproject.com/WebServices/NewsRSS.aspx":
-            return webpage_code_project_rss
-
-        elif url == "https://page-with-two-links.com":
-            b = PageBuilder()
-            b.title_meta = "Page title"
-            b.description_meta = "Page description"
-            b.og_title = "Page og_title"
-            b.og_description = "Page og_description"
-            b.body_text = """<a href="https://link1.com">Link1</a>
-                     <a href="https://link2.com">Link2</a>"""
-
-            return b.build_contents()
-
-        elif url == "https://page-with-rss-link.com":
-            return """
-              <html>
-                 <head>
-                     <link type="application/rss+xml"  href="https://page-with-rss-link.com/feed"/>
-                 </head>
-                 <body>
-                    no body
-                 </body>
-             </html>
-             """
-
-        elif url == "https://page-with-rss-link.com/feed":
-            return webpage_with_rss_link_rss_contents
-
-        elif url == "https://slot-casino-page.com":
-            return webpage_html_casinos
-
-        elif url == "https://page-with-real-rss-link.com":
-            return webpage_with_real_rss_links
-
-        elif url.startswith("https://instance.com/apps/rsshistory"):
-            return self.get_contents_instance(url)
-
-        elif url == "https://title-in-head.com":
-            b = PageBuilder()
-            b.title = "Page title"
-            b.description_meta = "Page description"
-            b.og_description = "Page og_description"
-            b.body_text = """Something in the way"""
-            return b.build_contents()
-
-        elif url == "https://no-props-page.com":
-            b = PageBuilder()
-            b.title = None
-            b.description_meta = None
-            b.og_description = None
-            b.body_text = """Something in the way"""
-            return b.build_contents()
-
-        elif url == "https://title-in-meta.com":
-            b = PageBuilder()
-            b.title = "Page title"
-            b.description_meta = "Page description"
-            b.og_description = "Page og_description"
-            b.body_text = """Something in the way"""
-            return b.build_contents()
-
-        elif url == "https://title-in-og.com":
-            b = PageBuilder()
-            b.og_title = "Page title"
-            b.description_meta = "Page description"
-            b.og_description = "Page og_description"
-            b.body_text = """Something in the way"""
-            return b.build_contents()
-
-        elif url == "https://linkedin.com":
-            b = PageBuilder()
-            b.title_meta = "Https LinkedIn Page title"
-            b.description_meta = "LinkedIn Page description"
-            b.og_title = "Https LinkedIn Page og:title"
-            b.og_description = "LinkedIn Page og:description"
-            b.body_text = """LinkedIn body"""
-            return b.build_contents()
-
-        elif url == "http://linkedin.com":
-            b = PageBuilder()
-            b.title_meta = "Http LinkedIn Page title"
-            b.description_meta = "LinkedIn Page description"
-            b.og_title = "Http LinkedIn Page og:title"
-            b.og_description = "LinkedIn Page og:description"
-            b.body_text = """LinkedIn body"""
-            return b.build_contents()
-
-        elif url == "https://www.linkedin.com":
-            b = PageBuilder()
-            b.title_meta = "Https www LinkedIn Page title"
-            b.description_meta = "LinkedIn Page description"
-            b.og_title = "Https LinkedIn Page og:title"
-            b.og_description = "LinkedIn Page og:description"
-            b.body_text = """LinkedIn body"""
-            return b.build_contents()
-
-        elif url == "http://www.linkedin.com":
-            b = PageBuilder()
-            b.title_meta = "Http www LinkedIn Page title"
-            b.description_meta = "LinkedIn Page description"
-            b.og_title = "Http www LinkedIn Page og:title"
-            b.og_description = "LinkedIn Page og:description"
-            b.body_text = """LinkedIn body"""
-            return b.build_contents()
-
-        elif url == "https://page-with-last-modified-header.com":
-            return webpage_html_favicon
-
-        elif url == "https://v.firebog.net/hosts/AdguardDNS.txt":
-            return firebog_adguard_list
-
-        elif url == "https://v.firebog.net/hosts/static/w3kbl.txt":
-            return firebog_w3kbl_list
-
-        elif url == "https://v.firebog.net/hosts/lists.php?type=tick":
-            return firebog_tick_lists
-
-        elif url == "https://v.firebog.net/hosts/RPiList-Malware.txt":
-            return firebog_malware
-
-        elif url == "https://robots-txt.com/robots.txt":
-            return robots_txt_example_com_robots
-
-        elif url.endswith("robots.txt"):
-            return """  """
-
-        elif url.endswith("sitemap.xml"):
-            return """<urlset>
-                      </urlset>"""
-
-        b = PageBuilder()
-        b.title_meta = "Page title"
-        b.description_meta = "Page description"
-        b.og_title = "Page og_title"
-        b.og_description = "Page og_description"
-
-        return b.build_contents()
-
-    def get_contents_youtube_channel(self, url):
-        if url == "https://youtube.com/channel/samtime/rss.xml":
-            return webpage_samtime_youtube_rss
-
-        elif url == "https://youtube.com/channel/2020-year-channel/rss.xml":
-            return webpage_old_pubdate_rss
-
-        elif url == "https://youtube.com/channel/no-pubdate-channel/rss.xml":
-            return webpage_no_pubdate_rss
-
-        elif url == "https://youtube.com/channel/airpano/rss.xml":
-            return webpage_youtube_airpano_feed
-
-        elif (
-            url
-            == "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
-        ):
-            return webpage_samtime_youtube_rss
-
-    def get_contents_instance(self, url):
-        if (
-            url
-            == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent"
-        ):
-            return instance_entries_json
-
-        elif (
-            url
-            == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent&source_title=Source100"
-        ):
-            return instance_entries_source_100_json
-
-        elif (
-            url
-            == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent&page=1"
-        ):
-            return """{}"""
-
-        elif url == "https://instance.com/apps/rsshistory/source-json/100":
-            return f'{{ "source": {instance_source_100_json} }}'
-
-        elif url == "https://instance.com/apps/rsshistory/source-json/101":
-            return f'{{ "source": {instance_source_101_json} }}'
-
-        elif url == "https://instance.com/apps/rsshistory/source-json/102":
-            return f'{{ "source": {instance_source_102_json} }}'
-
-        elif url == "https://instance.com/apps/rsshistory/source-json/103":
-            return f'{{ "source": {instance_source_103_json} }}'
-
-        elif url == "https://instance.com/apps/rsshistory/source-json/104":
-            return f'{{ "source": {instance_source_104_json} }}'
-
-        elif url == "https://instance.com/apps/rsshistory/source-json/105":
-            return f'{{ "source": {instance_source_105_json} }}'
-
-        elif url == "https://instance.com/apps/rsshistory/entry-json/1912018":
-            return """{}"""
-
-        elif url == "https://instance.com/apps/rsshistory/sources-json":
-            return instance_sources_page_1
-
-        elif url == "https://instance.com/apps/rsshistory/sources-json/?page=1":
-            return instance_sources_page_1
-
-        elif url == "https://instance.com/apps/rsshistory/sources-json/?page=2":
-            return instance_sources_page_2
-
-        elif url == "https://instance.com/apps/rsshistory/sources-json/?page=3":
-            return instance_sources_json_empty
-
-        elif "/sources-json/":
-            return instance_sources_json_empty
-
-        elif "/entries-json/":
-            return instance_entries_json_empty
-
+        self.properties = {
+            "link" : self.url,
+            "title" : "Title",
+            "description" : "Description",
+            "date_published" : "Description",
+            "author" : "Description",
+            "language" : "Language",
+            "album" : "Description",
+            "page_rating" : 80,
+            "thumbnail" : None,
+            }
+
+        self.response = {
+            "status_code" : 200,
+            "Content-Length" : 200,
+            "Content-Type" : "text/html",
+        }
+        self.contents_data = {
+            "Contents" : "test"}
+        self.entries = {}
+
+    def get_all_properties(self):
+        data = []
+        data.append({"name" : "Properties", "data": self.properties})
+        data.append({"name" : "Response", "data": self.response})
+        data.append({"name" : "Contents", "data": self.contents_data})
+        data.append({"name" : "Entries", "data": self.entries})
+
+        return data
+
+    def get_crawlj(self, name=""):
+        if self.url == "https://linkedin.com":
+            self.properties["title"] = "Https LinkedIn Page title"
+            self.properties["description"] = "Https LinkedIn Page description"
+            return self.get_all_properties()
+        elif self.url == "https://m.youtube.com/watch?v=1234":
+            self.properties["link"] = "https://www.youtube.com/watch?v=1234"
+        elif self.url == "https://youtu.be/1234":
+            self.properties["link"] = "https://www.youtube.com/watch?v=1234"
         else:
-            return """{}"""
-
-    def __str__(self):
-        return "TestResponseObject: Url:{} Status code:{} Headers:{}".format(
-            self.url,
-            self.status_code,
-            self.headers,
-        )
-
-
-class DefaultCrawler(CrawlerInterface):
-
-    def run(self):
-        request = self.request
-
-        print("FakeInternet:Url:{} Crawler:{}".format(self.request.url, self.crawler_data["name"]))
-
-        MockRequestCounter.requested(request.url, info=self.crawler_data)
-
-        self.response = TestResponseObject(request.url, request.headers, request.timeout_s)
-
-        return self.response
-
-    def is_valid(self):
-        return True
+            return self.get_all_properties()
 
 
 class FakeInternetTestCase(TestCase):
@@ -685,26 +126,22 @@ class FakeInternetTestCase(TestCase):
     def disable_web_pages(self):
         # HttpRequestBuilder.get_contents_function = self.get_contents_function
 
-        Url.youtube_video_handler = YouTubeJsonHandlerMock
-        # UrlHandler.youtube_video_handler = YouTubeJsonHandlerMock
-
-        Url.handlers = [
-            YouTubeJsonHandlerMock,
-            YouTubeChannelHandler,
-            OdyseeVideoHandler,
-            OdyseeChannelHandler,
-            HttpPageHandler,
-        ]
-
         WebLogger.web_logger = AppLogging
         WebConfig.get_crawler_from_mapping = FakeInternetTestCase.get_crawler_from_mapping
         RemoteServer.get_crawlj = self.get_crawlj
 
-    def get_crawlj(self, url):
-        return """
-        [
-        ]
-        """
+        c = Configuration.get_object()
+        c.config_entry = ConfigurationEntry.get()
+
+        if c.config_entry.remote_webtools_server_location == "":
+            c.config_entry.remote_webtools_server_location = "https://127.0.0.1:3000"
+            c.config_entry.save()
+
+    def get_crawlj(self, url, name=""):
+        #print("FakeInternet:get_crawlj: Url:{}".format(url))
+        #return json.loads(remote_server_json)
+        data = FakeInternetData(url)
+        return data.get_crawlj(name)
 
     def get_crawler_from_mapping(request, crawler_data):
         if "settings" in crawler_data:
@@ -740,6 +177,7 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.whats_new_days = 7
         c.config_entry.keep_domain_links = True
         c.config_entry.entry_update_via_internet = True
+        c.remote_webtools_server_location = "https://127.0.0.1:3000"
 
         c.config_entry.save()
 

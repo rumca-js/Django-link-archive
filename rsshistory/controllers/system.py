@@ -4,6 +4,7 @@ from utils.dateutils import DateUtils
 from ..models import (
    ConfigurationEntry,
    SystemOperation,
+   AppLogging,
 )
 
 class SystemOperationController(object):
@@ -62,33 +63,49 @@ class SystemOperationController(object):
     def ping_internet(self, thread_id):
         # TODO this should be done by Url. ping
 
-        from ..pluginurl import UrlHandler
-
         config_entry = ConfigurationEntry.get()
 
         test_page_url = config_entry.internet_status_test_url
 
-        p = UrlHandler(url=test_page_url)
-        # TODO fix this
-        # return p.ping()
-        return p.get_response().is_valid()
+        try:
+            response = requests.get(url=test_page_url,
+                    timeout=50,
+                    verify=False,
+                    stream=True,
+                    )
+            if response.status_code == 200:
+                return True
 
-    def is_internet_ok(self):
-        statuses = SystemOperation.objects.filter(is_internet_connection_checked=True)
-        if statuses.exists():
-            status = statuses[0]
-
-            delta = DateUtils.get_datetime_now_utc() - status.date_created
-
-            hours_limit = 3600  # TODO hardcoded refresh task should be running more often than 1 hour?
-
-            if delta.total_seconds() > hours_limit:
-                status_is_valid = False
+            else:
+                AppLogging.error("Url:{} Request status code:{}".format(test_page_url, response.status_code))
                 return False
 
-            return status.is_internet_connection_ok
-        else:
-            return True
+        except Exception as E:
+            AppLogging.exc(E)
+            return False
+
+    def is_internet_ok(self):
+        """
+        TODO - we do not know when we started APP.
+        """
+
+        #statuses = SystemOperation.objects.filter(is_internet_connection_checked=True)
+        #if statuses.exists():
+        #    status = statuses[0]
+
+        #    delta = DateUtils.get_datetime_now_utc() - status.date_created
+
+        #    hours_limit = 3600  # TODO hardcoded refresh task should be running more often than 1 hour?
+
+        #    if delta.total_seconds() > hours_limit:
+        #        status_is_valid = False
+        #        return False
+
+        #    return status.is_internet_connection_ok
+        #else:
+        #    return True
+
+        return self.ping_internet(2)
 
     def is_remote_server_down(self):
         config_entry = ConfigurationEntry.get()
@@ -99,19 +116,17 @@ class SystemOperationController(object):
             return False
 
         try:
-            response = requests.get(url=remote_server, timeout=20)
+            response = requests.get(url=remote_server,
+                    timeout=50,
+                    verify=False,
+                    stream=True,
+                    )
             if response.status_code != 200:
+                AppLogging.error("Url:{} Request status code:{}".format(remote_server, response.status_code))
                 return True
         except Exception as E:
-            print(str(E))
+            AppLogging.exc(E)
             return True
-
-        #from ..pluginurl import UrlHandler
-
-        #p = UrlHandler(url=remote_server)
-        ## TODO fix this
-        ## return p.ping()
-        #return not p.get_response().is_valid()
 
         return False
 

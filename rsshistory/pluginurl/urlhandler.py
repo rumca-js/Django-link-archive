@@ -4,6 +4,8 @@ from ..webtools import (
     Url,
     UrlLocation,
     UrlPropertyValidator,
+    RemoteServer,
+    PageOptions,
 )
 
 from ..apps import LinkDatabase
@@ -95,6 +97,111 @@ class UrlHandler(Url):
             return False
 
         return True
+
+    def __str__(self):
+        return "{}".format(self.options)
+
+
+class UrlHandlerEx(Url):
+    """
+    """
+
+    def __init__(self, url=None, page_options=None, handler_class=None):
+        self.url = url
+
+        self.options = page_options
+        if not self.options:
+            self.options = UrlHandlerEx.get_options(self.url)
+
+        self.handler_class = handler_class
+        self.all_properties = None
+
+    def get_properties(self):
+        if self.all_properties:
+            return self.all_properties
+
+        config_entry = Configuration.get_object().config_entry
+        if config_entry.remote_webtools_server_location:
+            request_server = RemoteServer(config_entry.remote_webtools_server_location)
+
+            name = ""
+            if self.options and self.options.mode_mapping and len(self.options.mode_mapping) > 0:
+                for item in self.options.mode_mapping:
+                    self.all_properties = request_server.get_crawlj(self.url, name=item["name"])
+                    if self.all_properties:
+                        return self.all_properties
+            else:
+                self.all_properties = request_server.get_crawlj(self.url)
+
+            return self.all_properties
+
+    def get_contents(self):
+        contents = self.get_section("Contents")
+        return contents["Contents"]
+
+    def get_section(self, section_name):
+        properties = self.get_properties()
+        if not properties:
+            return
+
+        request_server = RemoteServer("test")
+        return request_server.read_properties_section(section_name, properties)
+
+    def get_options(url):
+        options = PageOptions()
+
+        from ..models import Browser
+
+        browser_mapping = Browser.get_browser_setup()
+        if browser_mapping != []:
+            options.mode_mapping = browser_mapping
+
+        rules = EntryRules.get_url_rules(url)
+        if len(rules) > 0:
+            for rule in rules:
+                if rule.browser:
+                    options.bring_to_front(rule.browser.get_setup())
+
+        config = Configuration.get_object().config_entry
+        options.ssl_verify = config.ssl_verification
+
+        return options
+
+    def is_valid(self):
+        response = self.get_section("Response")
+        if not response:
+            return False
+
+        if not response["is_valid"]:
+            return False
+
+        if self.is_blocked():
+            return False
+
+        return True
+
+    def is_blocked(self):
+        keywords = Configuration.get_object().get_blocked_keywords()
+        validator = UrlPropertyValidator(
+            properties=self.get_properties(), blocked_keywords=keywords
+        )
+        if len(keywords) > 0:
+            validator.blocked_keywords = keywords
+
+        if not validator.is_valid():
+            return True
+
+        if EntryRules.is_blocked(self.url):
+            return True
+
+        p = UrlLocation(self.url)
+        domain_only = p.get_domain_only()
+
+        if BlockEntry.is_blocked(domain_only):
+            return True
+
+        if not self.is_url_valid():
+            return True
 
     def __str__(self):
         return "{}".format(self.options)

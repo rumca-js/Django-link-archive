@@ -101,9 +101,11 @@ class RefreshProcessor(CeleryTaskInterface):
         systemcontroller.refresh(self.get_name())
 
         if not systemcontroller.is_internet_ok():
+            AppLogging.error("Internet is not OK")
             return
 
         if systemcontroller.is_remote_server_down():
+            AppLogging.error("Remote server is down")
             return
 
         config = c.config_entry
@@ -233,9 +235,11 @@ class GenericJobsProcessor(CeleryTaskInterface):
         systemcontroller.refresh(self.get_name())
 
         if not systemcontroller.is_internet_ok():
+            AppLogging.error("Internet is not OK")
             return
 
         if systemcontroller.is_remote_server_down():
+            AppLogging.error("Remote server is down")
             return
 
         while True:

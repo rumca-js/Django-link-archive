@@ -14,7 +14,7 @@ from ..controllers import SourceDataController
 from ..configuration import Configuration
 from ..models import AppLogging
 
-from .urlhandler import UrlHandler
+from .urlhandler import UrlHandler, UrlHandlerEx
 
 
 class YouTubeException(Exception):
@@ -43,19 +43,8 @@ class EntryUrlInterface(object):
 
         self.url = UrlHandler.get_cleaned_link(url)
 
-        h = UrlHandler(url)
-        self.options = h.options
-
-    def make_request(self):
-        self.u = UrlHandler(self.url, page_options=self.options)
-        self.response = self.u.get_response()
-
-        if self.response:
-            self.url = self.response.url
-
-        if not self.ignore_errors and not self.u.is_valid():
-            if self.log:
-                AppLogging.error("Page is invalid:{}".format(url))
+        url_ex = UrlHandlerEx(self.url)
+        self.options = url_ex.get_options()
 
     def get_response(self):
         return self.response
@@ -64,37 +53,35 @@ class EntryUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        config_entry = Configuration.get_object().config_entry
-        if config_entry.remote_webtools_server_location:
-            request_server = RemoteServer(config_entry.remote_webtools_server_location)
-            self.all_properties = request_server.get_crawlj(self.url)
-            properties = request_server.read_properties_section("Properties", self.all_properties)
+        props = None
+
+        url_ex = UrlHandlerEx(self.url)
+
+        self.all_properties = url_ex.get_properties()
+
+        if self.all_properties:
+            properties = url_ex.get_section("Properties")
+            response = url_ex.get_section("Response")
 
             if properties:
                 properties["date_published"] = DateUtils.get_datetime_now_utc()
 
             # TODO properties["date_dead_since"] = DateUtils.get_datetime_now_utc()
 
-            self.props = properties
-            return self.props
+            props = properties
 
-        self.make_request()
-
-        if not self.ignore_errors and not self.u.is_valid():
-            return
-
-        ignore_errors = self.ignore_errors
+            if props:
+                if response and "status_code" in response:
+                    props["status_code"] = response["status_code"]
+                else:
+                    props["status_code"] = 0
 
         # we do not trim description here. We might need it later, when adding link we scan
         # description for URLs
 
-        props = self.get_props_implementation(input_props, source_obj=source_obj)
         if props:
-            self.fix_properties(props)
-        elif ignore_errors:
-            """
-            TODO should be set any part from self.u?
-            """
+            self.fix_properties(props, source_obj=source_obj)
+        elif self.ignore_errors:
             props = {}
             props["link"] = self.url
             props["title"] = None
@@ -107,7 +94,9 @@ class EntryUrlInterface(object):
             props["page_rating"] = 0
             props["dead"] = True
             props["page_rating_contents"] = 0
-            props["status_code"] = self.u.get_status_code()
+            props["status_code"] = 0
+
+            self.fix_properties(props, source_obj=source_obj)
 
         self.props = props
 
@@ -117,15 +106,37 @@ class EntryUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        if not self.u:
-            return None
+        return input_props
 
-        if not self.is_property_set(input_props, "source_url"):
-            if source_obj:
-                input_props["source_url"] = source_obj.url
+    def is_valid(self):
+        if not self.all_properties:
+            return False
+
+        server = RemoteServer("https://")
+        response = server.read_properties_section("Response", self.all_properties)
+        if "is_valid" in response:
+            return response["is_valid"]
+
+        return True
+
+    def fix_properties(self, input_props=None, source_obj=None):
+        if not input_props:
+            input_props = {}
+            # some Internet sources provide invalid publication date
+
+        if self.is_property_set(input_props, "date_published"):
+            if input_props["date_published"] > DateUtils.get_datetime_now_utc():
+                input_props["date_published"] = DateUtils.get_datetime_now_utc()
+        else:
+            input_props["date_published"] = DateUtils.get_datetime_now_utc()
+
+        if self.is_property_set(
+            input_props, "date_last_modified"
+        ) and self.is_property_set(input_props, "date_published"):
+            if input_props["date_last_modified"] < input_props["date_published"]:
+                input_props["date_published"] = input_props["date_last_modified"]
 
         is_domain = UrlLocation(self.url).is_domain()
-        handler = self.u.get_handler()
 
         c = Configuration.get_object().config_entry
 
@@ -139,76 +150,11 @@ class EntryUrlInterface(object):
             if sources.exists():
                 source_obj = sources[0]
 
-        if not self.is_property_set(input_props, "source") and source_obj:
-            input_props["source"] = source_obj
-
         if not self.is_property_set(input_props, "source_url") and source_obj:
             input_props["source_url"] = source_obj.url
 
-        input_props = self.update_info_default(input_props, source_obj)
-        return input_props
-
-    def is_update_supported(self):
-        """
-        TODO how to make this check automatically?
-        """
-        if not self.u:
-            return None
-
-        p = self.u.get_handler()
-
-        if type(p) is not DefaultContentPage:
-            return True
-
-        return False
-
-    def is_valid(self):
-        if not self.all_properties:
-            return False
-
-        server = RemoteServer("https://")
-        response = server.read_properties_section("Response", self.all_properties)
-        if "is_valid" in response:
-            return response["is_valid"]
-
-        return True
-
-    def update_info_default(self, input_props=None, source_obj=None):
-        if not input_props:
-            input_props = {}
-
-        url = self.url
-        p = self.u.get_handler()
-
-        if not self.is_property_set(input_props, "link"):
-            input_props["link"] = self.u.get_clean_url()
-        if not self.is_property_set(input_props, "title"):
-            input_props["title"] = self.u.get_title()
-        if not self.is_property_set(input_props, "description"):
-            input_props["description"] = self.u.get_description()
-        if not self.is_property_set(input_props, "language"):
-            input_props["language"] = self.u.get_language()
-        if not self.is_property_set(input_props, "thumbnail"):
-            input_props["thumbnail"] = self.u.get_thumbnail()
-        if not self.is_property_set(input_props, "author"):
-            input_props["author"] = self.u.get_author()
-        if not self.is_property_set(input_props, "album"):
-            input_props["album"] = self.u.get_album()
-        if not self.is_property_set(input_props, "page_rating_contents"):
-            input_props["page_rating_contents"] = self.u.get_page_rating()
-        if not self.is_property_set(input_props, "page_rating"):
-            input_props["page_rating"] = 0  # unset
-        if not self.is_property_set(input_props, "status_code"):
-            input_props["status_code"] = self.u.get_status_code()
-        if not self.is_property_set(input_props, "contents_hash"):
-            input_props["contents_hash"] = self.u.get_contents_hash()
-        if not self.is_property_set(input_props, "contents_body_hash"):
-            input_props["contents_body_hash"] = self.u.get_contents_body_hash()
-        if not self.is_property_set(input_props, "date_last_modified"):
-            if self.response:
-                input_props["date_last_modified"] = self.response.get_last_modified()
-        if not self.is_property_set(input_props, "date_published"):
-            input_props["date_published"] = self.u.get_date_published()
+        if not self.is_property_set(input_props, "source") and source_obj:
+            input_props["source"] = source_obj
 
         if (
             not self.is_property_set(input_props, "language")
@@ -236,33 +182,10 @@ class EntryUrlInterface(object):
         """
 
         is_domain = UrlLocation(self.url).is_domain()
-        if is_domain and not self.is_property_set(input_props, "thumbnail"):
-            if type(p) is HtmlPage and self.u:
-                input_props["thumbnail"] = self.u.get_favicon()
-
-        return input_props
-
-    def fix_properties(self, input_props=None):
-        if not input_props:
-            input_props = {}
-            # some Internet sources provide invalid publication date
-
-        if self.is_property_set(input_props, "date_published"):
-            if input_props["date_published"] > DateUtils.get_datetime_now_utc():
-                input_props["date_published"] = DateUtils.get_datetime_now_utc()
-        else:
-            input_props["date_published"] = DateUtils.get_datetime_now_utc()
-
-        if self.is_property_set(
-            input_props, "date_last_modified"
-        ) and self.is_property_set(input_props, "date_published"):
-            if input_props["date_last_modified"] < input_props["date_published"]:
-                input_props["date_published"] = input_props["date_last_modified"]
-
-        if not self.u.is_valid():
-            input_props["date_dead_since"] = DateUtils.get_datetime_now_utc()
-        else:
-            input_props["date_dead_since"] = None
+        request_server = RemoteServer(c.remote_webtools_server_location)
+        properties = request_server.read_properties_section("Properties", self.all_properties)
+        if is_domain and properties and "favicon" in properties:
+            input_props["thumbnail"] = properties["favicon"]
 
         return input_props
 

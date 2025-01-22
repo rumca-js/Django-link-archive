@@ -429,12 +429,12 @@ class EntryUpdater(object):
         response = request_server.read_properties_section("Response", all_properties)
 
         if "Last-Modified" in response:
-            last_modified_date = properties["Last-Modified"]
+            last_modified_date = response["Last-Modified"]
             if last_modified_date:
                 if not entry.date_last_modified:
                     return True
 
-                last_modified_date = DateUtils.parse_date(last_modified_date)
+                last_modified_date = DateUtils.parse_datetime(last_modified_date)
 
                 if last_modified_date > entry.date_last_modified:
                     return True
@@ -477,8 +477,8 @@ class EntryUpdater(object):
         properties = request_server.read_properties_section("Properties", all_properties)
 
         if response:
-            if "Last-Modified" in response:
-                last_modified_date = DateUtils.parse_date(response["Last-Modified"])
+            if "Last-Modified" in response and response["Last-Modified"]:
+                last_modified_date = DateUtils.parse_datetime(response["Last-Modified"])
                 entry.date_last_modified = last_modified_date
             else:
                 entry.date_last_modified = DateUtils.get_datetime_now_utc()

@@ -136,9 +136,9 @@ class BlockEntryList(models.Model):
         BlockEntryList.initialize()
 
     def read_lists_group(lists_group):
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandlerEx
 
-        url = UrlHandler(lists_group)
+        url = UrlHandlerEx(lists_group)
         contents = url.get_contents()
         if contents:
             lines = contents.split("\n")
@@ -161,9 +161,9 @@ class BlockEntryList(models.Model):
             block_list.update()
 
     def update_implementation(self):
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandlerEx
 
-        handler = UrlHandler(self.url)
+        handler = UrlHandlerEx(self.url)
         contents = handler.get_contents()
         if contents:
             reader = BlockListReader(contents)

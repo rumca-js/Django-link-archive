@@ -36,17 +36,6 @@ from .ipc import (
     string_to_command,
 )
 
-selenium_feataure_enabled = True
-try:
-    from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.common.exceptions import TimeoutException
-
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-except Exception as E:
-    print(str(E))
-    selenium_feataure_enabled = False
 
 
 class CrawlerInterface(object):
@@ -773,34 +762,60 @@ class SeleniumChromeHeadless(SeleniumDriver):
     """
 
     def get_driver(self):
+        selenium_feataure_enabled = True
         try:
-            # if not self.driver_executable:
-            #    self.driver_executable = "/usr/bin/chromedriver"
+            from selenium import webdriver
+            from selenium.webdriver.chrome.service import Service
+            from selenium.common.exceptions import TimeoutException
 
-            if self.driver_executable:
-                p = Path(self.driver_executable)
-                if not p.exists():
-                    WebLogger.error("We do not have chromedriver executable")
-                    return
-
-                service = Service(executable_path=self.driver_executable)
-            else:
-                service = Service()
-
-            options = webdriver.ChromeOptions()
-            options.add_argument("--headless")
-            options.add_argument("--lang={}".format("en-US"))
-
-            options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-
-            driver = webdriver.Chrome(service=service, options=options)
-            return driver
+            from selenium.webdriver.support.ui import WebDriverWait
+            from selenium.webdriver.support import expected_conditions as EC
         except Exception as E:
             print(str(E))
-            error_text = traceback.format_exc()
-            WebLogger.debug(
-                "Cannot obtain driver:{}\n{}".format(self.request.url, error_text)
-            )
+            selenium_feataure_enabled = False
+
+            from selenium.webdriver.common.proxy import Proxy, ProxyType
+
+        capabilities = webdriver.DesiredCapabilities.CHROME.copy()
+
+        # Proxy Configuration
+        if any(key in self.settings for key in ["http_proxy", "socks_proxy", "ssl_proxy"]):
+            prox = Proxy()
+            prox.proxy_type = ProxyType.MANUAL
+            prox.http_proxy = self.settings.get("http_proxy")
+            prox.socks_proxy = self.settings.get("socks_proxy")
+            prox.ssl_proxy = self.settings.get("ssl_proxy")
+            prox.add_to_capabilities(capabilities)
+
+        # Validate Chromedriver Executable
+        if self.driver_executable:
+            p = Path(self.driver_executable)
+            if not p.exists():
+                WebLogger.error(f"Chromedriver executable not found at: {self.driver_executable}")
+                return None
+            service = Service(executable_path=self.driver_executable)
+        else:
+            service = Service()
+
+        # Chrome Options
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless=new")
+        options.add_argument("--lang=en-US")
+
+        # options to enable performance log, to read status code
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
+        # Add Proxy Capabilities
+        for key, value in capabilities.items():
+            options.set_capability(key, value)
+
+        # Initialize WebDriver
+        try:
+            driver = webdriver.Chrome(service=service, options=options)
+            return driver
+        except Exception as e:
+            WebLogger.error(f"Failed to initialize WebDriver: {e}")
+            return None
 
     def run(self):
         """
@@ -871,6 +886,18 @@ class SeleniumChromeHeadless(SeleniumDriver):
         return self.response
 
     def is_valid(self):
+        selenium_feataure_enabled = True
+        try:
+            from selenium import webdriver
+            from selenium.webdriver.chrome.service import Service
+            from selenium.common.exceptions import TimeoutException
+
+            from selenium.webdriver.support.ui import WebDriverWait
+            from selenium.webdriver.support import expected_conditions as EC
+        except Exception as E:
+            print(str(E))
+            selenium_feataure_enabled = False
+
         return selenium_feataure_enabled
 
 
@@ -880,52 +907,79 @@ class SeleniumChromeFull(SeleniumDriver):
     """
 
     def get_driver(self):
-        """
-        https://forums.raspberrypi.com/viewtopic.php?t=129320
-        """
+        selenium_feataure_enabled = True
         try:
-            if self.driver_executable:
-                p = Path(self.driver_executable)
-                if not p.exists():
-                    WebLogger.error("We do not have chromedriver executable")
-                    return
+            from selenium import webdriver
+            from selenium.webdriver.chrome.service import Service
+            from selenium.common.exceptions import TimeoutException
 
-            if self.driver_executable:
-                service = Service(executable_path=str(self.driver_executable))
-            else:
-                service = Service()
-
-            try:
-                # requires xvfb
-                import os
-
-                os.environ["DISPLAY"] = ":10.0"
-                from pyvirtualdisplay import Display
-
-                self.display = Display(visible=0, size=(800, 600))
-                self.display.start()
-            except Exception as E:
-                print("Str: {}".format(E))
-
-            options = webdriver.ChromeOptions()
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--lang={}".format("en-US"))
-
-            # path = "./linklibrary/rsshistory/static/extensions/chrome/ublock_1.61.2_0.crx"
-            # options.add_extension(path)
-
-            options.add_argument("start-maximized")
-            options.add_argument("disable-infobars")
-            options.add_argument("--disable-extensions")
-            options.add_argument("--disable-gpu")
-
-            # options to enable performance log, to read status code
-            options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-
-            return webdriver.Chrome(service=service, options=options)
+            from selenium.webdriver.support.ui import WebDriverWait
+            from selenium.webdriver.support import expected_conditions as EC
         except Exception as E:
-            WebLogger.exc("Cannot obtain driver:{}\n{}".format(E, self.request.url))
+            print(str(E))
+            selenium_feataure_enabled = False
+        from selenium.webdriver.common.proxy import Proxy, ProxyType
+
+        capabilities = webdriver.DesiredCapabilities.CHROME.copy()
+
+        # Proxy Configuration
+        if any(key in self.settings for key in ["http_proxy", "socks_proxy", "ssl_proxy"]):
+            prox = Proxy()
+            prox.proxy_type = ProxyType.MANUAL
+            prox.http_proxy = self.settings.get("http_proxy")
+            prox.socks_proxy = self.settings.get("socks_proxy")
+            prox.ssl_proxy = self.settings.get("ssl_proxy")
+            prox.add_to_capabilities(capabilities)
+
+        # Validate Chromedriver Executable
+        if self.driver_executable:
+            p = Path(self.driver_executable)
+            if not p.exists():
+                WebLogger.error(f"Chromedriver executable not found at: {self.driver_executable}")
+                return None
+            service = Service(executable_path=self.driver_executable)
+        else:
+            service = Service()
+
+        try:
+            # requires xvfb
+            import os
+
+            os.environ["DISPLAY"] = ":10.0"
+            from pyvirtualdisplay import Display
+
+            self.display = Display(visible=0, size=(800, 600))
+            self.display.start()
+        except Exception as E:
+            print("Str: {}".format(E))
+
+        options = webdriver.ChromeOptions()
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--lang={}".format("en-US"))
+
+        # path = "./linklibrary/rsshistory/static/extensions/chrome/ublock_1.61.2_0.crx"
+        # options.add_extension(path)
+
+        # Add Proxy Capabilities
+        for key, value in capabilities.items():
+            options.set_capability(key, value)
+
+        options.add_argument("start-maximized")
+        options.add_argument("disable-infobars")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-gpu")
+
+        # options to enable performance log, to read status code
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
+        # Initialize WebDriver
+        try:
+            driver = webdriver.Chrome(service=service, options=options)
+            return driver
+        except Exception as e:
+            WebLogger.error(f"Failed to initialize WebDriver: {e}")
+            return None
 
     def run(self):
         """
@@ -995,6 +1049,17 @@ class SeleniumChromeFull(SeleniumDriver):
         return self.response
 
     def is_valid(self):
+        selenium_feataure_enabled = True
+        try:
+            from selenium import webdriver
+            from selenium.webdriver.chrome.service import Service
+            from selenium.common.exceptions import TimeoutException
+
+            from selenium.webdriver.support.ui import WebDriverWait
+            from selenium.webdriver.support import expected_conditions as EC
+        except Exception as E:
+            print(str(E))
+            selenium_feataure_enabled = False
         return selenium_feataure_enabled
 
 
@@ -1004,15 +1069,27 @@ class SeleniumUndetected(SeleniumDriver):
     """
 
     def get_driver(self):
-        try:
-            """
-            NOTE: This driver may not work on raspberry PI
-            """
-            import undetected_chromedriver as uc
+        """
+        NOTE: This driver may not work on raspberry PI
+        """
+        from selenium.webdriver.common.proxy import Proxy, ProxyType
+        import undetected_chromedriver as uc
 
-            options = uc.ChromeOptions()
-            options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-            options.add_argument("--lang={}".format("en-US"))
+        options = uc.ChromeOptions()
+
+        # Proxy Configuration
+        if any(key in self.settings for key in ["http_proxy", "socks_proxy", "ssl_proxy"]):
+            prox = Proxy()
+            prox.proxy_type = ProxyType.MANUAL
+            prox.http_proxy = self.settings.get("http_proxy")
+            prox.socks_proxy = self.settings.get("socks_proxy")
+            prox.ssl_proxy = self.settings.get("ssl_proxy")
+            prox.add_to_capabilities(options.experimental_options)
+
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+        options.add_argument("--lang={}".format("en-US"))
+
+        try:
             return uc.Chrome(options=options)
         except Exception as E:
             error_text = traceback.format_exc()
@@ -1459,11 +1536,11 @@ class RemoteServer(object):
 
         return json_obj
 
-    def get_crawlj(self, url):
+    def get_crawlj(self, url, name=""):
         import requests
 
         link = self.remote_server
-        link = link + "/crawlj?url={}".format(url)
+        link = link + "/crawlj?url={}&name={}".format(url, name)
 
         text = None
         try:

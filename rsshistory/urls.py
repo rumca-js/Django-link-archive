@@ -256,7 +256,6 @@ urlpatterns = [
     path("page-show-props", tools.page_show_properties, name="page-show-props",),
     path("page-scan-link", tools.page_scan_link, name="page-scan-link",),
     path("page-scan-contents", tools.page_scan_contents, name="page-scan-contents",),
-    path("page-process-rss-contents", tools.page_process_rss_contents, name="page-process-rss-contents",),
     path("page-verify", tools.page_verify, name="page-verify",),
     path("page-add-many-links", tools.page_add_many_links, name="page-add-many-links",),
     path("download-music-url", tools.download_music, name="download-music-url",),

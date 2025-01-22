@@ -4,7 +4,6 @@ from ..webtools import (
     JsonPage,
     HttpPageHandler,
     UrlLocation,
-    RemoteServer,
 )
 from utils.services import OpenRss
 
@@ -13,7 +12,7 @@ from ..models import (
 )
 from ..configuration import Configuration
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
-from ..pluginurl.urlhandler import UrlHandler
+from ..pluginurl.urlhandler import UrlHandler, UrlHandlerEx
 
 
 class SourceUrlInterface(object):
@@ -29,18 +28,20 @@ class SourceUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        config_entry = Configuration.get_object().config_entry
-        if config_entry.remote_webtools_server_location:
-            request_server = RemoteServer(config_entry.remote_webtools_server_location)
-            all_properties = request_server.get_crawlj(self.url)
-            properties = request_server.read_properties_section("Properties", all_properties)
-            response = request_server.read_properties_section("Response", all_properties)
+        url_ex = UrlHandlerEx(self.url)
+
+        all_properties = url_ex.get_properties()
+
+        if all_properties:
+            properties = url_ex.get_section("Properties")
+            response = url_ex.get_section("Response")
+
             if properties:
                 props = {}
                 if "feed_0" in properties:
                     props["url"] = properties["feed_0"]
                 else:
-                    props["url"] = self.url.url
+                    props["url"] = url_ex.url
                 props["title"] = properties["title"]
                 props["description"] = properties["description"]
                 props["language"] = properties["language"]
@@ -48,7 +49,7 @@ class SourceUrlInterface(object):
                 props["status_code"] = response["status_code"]
                 props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
         else:
-            props = self.get_props_internal(input_props)
+            props = {}
 
         if "remove_after_days" not in props:
             props["remove_after_days"] = 0

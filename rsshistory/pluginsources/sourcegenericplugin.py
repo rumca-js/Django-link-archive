@@ -11,7 +11,7 @@ from ..models import AppLogging, UserTags
 from ..models import BaseLinkDataController
 from ..controllers import EntryDataBuilder, SourceDataController
 from ..controllers import LinkDataController, BackgroundJobController
-from ..pluginurl.urlhandler import UrlHandler
+from ..pluginurl.urlhandler import UrlHandler, UrlHandlerEx
 
 
 class SourceGenericPlugin(object):
@@ -231,15 +231,15 @@ class SourceGenericPlugin(object):
 
         c = Configuration.get_object().config_entry
         if c.remote_webtools_server_location:
-            request_server = RemoteServer(c.remote_webtools_server_location)
-            self.all_properties = request_server.get_crawlj(page_link)
+            url_ex = UrlHandlerEx(page_link)
+            self.all_properties = url_ex.get_properties()
 
             if not self.all_properties:
                 AppLogging.error("Url:{} Could not obtain contents".format(page_link))
                 self.dead = True
                 return
 
-            self.contents = request_server.read_properties_section("Contents", self.all_properties)
+            self.contents = url_ex.get_section("Contents")
             if not self.contents:
                 AppLogging.error("Url:{} Could not obtain contents".format(page_link))
                 self.dead = True

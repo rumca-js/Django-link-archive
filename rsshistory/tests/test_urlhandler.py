@@ -1,3 +1,5 @@
+from ..models import Browser
+
 from ..webtools import (
    RssPage,
    HtmlPage,
@@ -7,7 +9,7 @@ from ..webtools import (
    SeleniumChromeFull,
 )
 
-from ..pluginurl.urlhandler import UrlHandler
+from ..pluginurl.urlhandler import UrlHandlerEx, UrlHandler
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -35,7 +37,7 @@ class UrlHandlerTest(FakeInternetTestCase):
     def test_get_youtube_video(self):
         handler = UrlHandler("https://www.youtube.com/watch?v=1234")
 
-        self.assertEqual(type(handler.get_handler()), UrlHandler.youtube_video_handler)
+        self.assertEqual(type(handler.get_handler()), UrlHandlerEx.youtube_video_handler)
 
     def test_get_youtube_channel(self):
         handler = UrlHandler(
@@ -43,7 +45,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         )
 
         self.assertEqual(
-            type(handler.get_handler()), UrlHandler.youtube_channel_handler
+            type(handler.get_handler()), UrlHandlerEx.youtube_channel_handler
         )
 
     def test_rss_get_properties(self):
@@ -109,3 +111,43 @@ class UrlHandlerTest(FakeInternetTestCase):
 
         cleaned_link = UrlHandler.get_cleaned_link("https://www.YouTube.com/Test/")
         self.assertEqual(cleaned_link, "https://www.youtube.com/Test")
+
+
+class UrlHandlerExTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_get_rss(self):
+        handler = UrlHandlerEx("https://rsspage.com/rss.xml")
+        properties = handler.get_properties()
+
+        self.assertTrue(properties)
+
+    def test_get_options(self):
+        Browser.objects.all().delete()
+
+        browser1 = Browser.objects.create(
+                name = "test1",
+                crawler = "RequestsCrawler",
+                settings = '{"test_setting" : "something"}',
+        )
+
+        browser2 = Browser.objects.create(
+                name = "test2",
+                crawler = "RequestsCrawler",
+                settings = '{"test_setting" : "something"}',
+        )
+
+        setup1 = browser1.get_setup()
+        setup2 = browser2.get_setup()
+
+        test_link = "https://rsspage.com/rss.xml"
+
+        options = UrlHandlerEx.get_options(test_link)
+
+        options.mode_mapping = [setup1, setup2]
+
+        handler = UrlHandlerEx(test_link, page_options=options)
+        properties = handler.get_properties()
+
+        self.assertTrue(properties)
