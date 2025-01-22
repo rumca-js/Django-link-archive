@@ -43,9 +43,6 @@ class EntryUrlInterface(object):
 
         self.url = UrlHandler.get_cleaned_link(url)
 
-        url_ex = UrlHandlerEx(self.url)
-        self.options = url_ex.get_options()
-
     def get_response(self):
         return self.response
 
