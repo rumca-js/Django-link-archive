@@ -13,7 +13,7 @@ from ..controllers import (
 from ..controllers import LinkDataController, ArchiveLinkDataController
 from ..configuration import Configuration
 
-from .fakeinternet import FakeInternetTestCase, DjangoRequestObject
+from .fakeinternet import FakeInternetTestCase
 
 
 class EntriesCleanupTest(FakeInternetTestCase):

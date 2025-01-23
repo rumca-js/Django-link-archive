@@ -1,4 +1,5 @@
 import traceback
+import requests
 
 from ..webtools import (
     Url,
@@ -127,13 +128,31 @@ class UrlHandlerEx(Url):
             name = ""
             if self.options and self.options.mode_mapping and len(self.options.mode_mapping) > 0:
                 for item in self.options.mode_mapping:
-                    self.all_properties = request_server.get_crawlj(self.url, name=item["name"])
+                    self.all_properties = request_server.get_crawlj(self.url, name=item["name"], settings=item["settings"])
+                    """
+                    # TODO if not valid -> we can retry using a different crawler
+                    if response is valid (or 403, or redirect?).
+                    but we have not normal properties, like title, retry using next crawler?
+                    """
+
+                    if self.is_another_request_necessary():
+                        continue
+
                     if self.all_properties:
                         return self.all_properties
             else:
                 self.all_properties = request_server.get_crawlj(self.url)
 
             return self.all_properties
+
+    def is_another_request_necessary(self):
+        """
+        Commonly, if user agent is not welcome, 403 is displayed
+        """
+        response = self.get_section("Response")
+        if "status_code" in response:
+            if response["status_code"] == 403:
+                return True
 
     def get_contents(self):
         contents = self.get_section("Contents")
@@ -205,3 +224,33 @@ class UrlHandlerEx(Url):
 
     def __str__(self):
         return "{}".format(self.options)
+
+    def ping(url):
+        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
+
+        headers = {
+            "User-Agent": user_agent,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
+            "Accept-Encoding": "none",
+            "Accept-Language": "en-US,en;q=0.8",
+            "Connection": "keep-alive",
+        }
+
+        try:
+            with requests.get(
+                url=url,
+                headers = headers,
+                timeout=20,
+                verify=False,
+                stream=True,
+            ) as response:
+                print("UrlHandler: status_code:{}".format(response.status_code))
+                if response.status_code >= 200 and response.status_code < 404:
+                    return True
+                else:
+                    return False
+
+        except Exception as E:
+            print("UrlHandler:" + str(E))
+            return False

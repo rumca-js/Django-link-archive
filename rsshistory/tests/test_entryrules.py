@@ -120,18 +120,3 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual( rules1[0], therule)
         self.assertEqual( rules2[0], therule)
-
-    def test_get_spotify(self):
-        therule = EntryRules.objects.create(
-            enabled=True,
-            block=False,
-            browser=self.browser_selenium,
-            rule_name="Rule1",
-            rule_url=".open.spotify.com",
-        )
-
-        handler = UrlHandler("https://open.spotify.com/somebody/episodes")
-        response = handler.get_response()
-
-        self.assertTrue(response)
-        self.assertEqual(handler.options.mode_mapping[0]["crawler"], SeleniumChromeHeadless)

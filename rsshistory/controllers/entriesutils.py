@@ -521,7 +521,7 @@ class EntryUpdater(object):
 
     def update_data(self):
         from ..pluginurl import EntryUrlInterface
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandlerEx
 
         """
         Fetches new information about page, and uses valid fields to set this object,
@@ -552,7 +552,7 @@ class EntryUpdater(object):
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
 
-        handler = UrlHandler(url=entry.link)
+        handler = UrlHandlerEx(url=entry.link)
         if not entry.bookmarked and not entry.permanent and handler.is_blocked():
             entry.delete()
             return
@@ -605,7 +605,7 @@ class EntryUpdater(object):
 
     def reset_data(self):
         from ..pluginurl import EntryUrlInterface
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandlerEx
 
         """
         Fetches new information about page, and uses valid fields to set this object.
@@ -633,7 +633,7 @@ class EntryUpdater(object):
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
 
-        handler = UrlHandler(url=entry.link)
+        handler = UrlHandlerEx(url=entry.link)
         if not entry.bookmarked and not entry.permanent and handler.is_blocked():
             entry.delete()
             return
@@ -814,8 +814,14 @@ class EntryUpdater(object):
             return
 
         entry.page_rating_contents = 0
-        if url_entry_interface.u:
-            entry.status_code = url_entry_interface.u.get_status_code()
+
+        if url_entry_interface.all_properties:
+            server = RemoteServer("")
+            response = server.read_properties_section("Response", url_entry_interface.all_properties)
+            if response:
+                entry.status_code = response["status_code"]
+            else:
+                entry.status_code = BaseLinkDataController.STATUS_DEAD
         else:
             entry.status_code = BaseLinkDataController.STATUS_DEAD
         entry.save()
@@ -1214,7 +1220,7 @@ class EntryWrapper(object):
         return is_archive
 
     def is_current_entry_perfect(self):
-        from ..pluginurl import UrlHandler, EntryUrlInterface
+        from ..pluginurl import UrlHandlerEx, EntryUrlInterface
         entry = self.entry
 
         if not entry:
@@ -1224,8 +1230,7 @@ class EntryWrapper(object):
             if entry.link.startswith("https://www"):
                 return False
 
-            p = UrlHandler(url=entry.link)
-            ping_status = p.ping()
+            ping_status = UrlHandlerEx.ping(entry.link)
 
             return ping_status
 
@@ -1236,7 +1241,7 @@ class EntryWrapper(object):
 
         @returns new object, or None object has not been changed
         """
-        from ..pluginurl import UrlHandler, EntryUrlInterface
+        from ..pluginurl import UrlHandlerEx, EntryUrlInterface
 
         if not self.entry:
             return
@@ -1252,8 +1257,7 @@ class EntryWrapper(object):
         if entry.is_https():
             http_url = entry.get_http_url()
 
-            p = UrlHandler(url=entry.link)
-            ping_status = p.ping()
+            ping_status = UrlHandlerEx.ping(entry.link)
 
             if not ping_status:
                 url = EntryUrlInterface(http_url)
@@ -1282,8 +1286,7 @@ class EntryWrapper(object):
 
         @returns new object, or None if object has not been changed
         """
-        from ..pluginurl import UrlHandler, EntryUrlInterface
-
+        from ..pluginurl import EntryUrlInterface
         if not self.entry:
             return
 

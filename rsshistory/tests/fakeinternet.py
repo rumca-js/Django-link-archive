@@ -33,7 +33,7 @@ from ..models import (
     Browser,
 )
 from ..configuration import Configuration
-from ..pluginurl import UrlHandler
+from ..pluginurl import UrlHandlerEx
 
 from .fake.remoteserver import (
     remote_server_json,
@@ -91,6 +91,8 @@ class FakeInternetData(object):
             "status_code" : 200,
             "Content-Length" : 200,
             "Content-Type" : "text/html",
+            "body_hash" : b"01001012",
+            "hash" : b"01001012",
         }
         self.contents_data = {
             "Contents" : "test"}
@@ -105,17 +107,27 @@ class FakeInternetData(object):
 
         return data
 
-    def get_crawlj(self, name=""):
+    def get_crawlj(self, name="", settings=None):
         if self.url == "https://linkedin.com":
             self.properties["title"] = "Https LinkedIn Page title"
             self.properties["description"] = "Https LinkedIn Page description"
-            return self.get_all_properties()
         elif self.url == "https://m.youtube.com/watch?v=1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
+            self.properties["feed_0"] = "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+        elif self.url == "https://www.youtube.com/watch?v=1234":
+            self.properties["link"] = "https://www.youtube.com/watch?v=1234"
+            self.properties["feed_0"] = "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
         elif self.url == "https://youtu.be/1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-        else:
-            return self.get_all_properties()
+            self.properties["feed_0"] = "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+        elif self.url == "https://www.reddit.com/r/searchengines/":
+            self.properties["feed_0"] = "https://www.reddit.com/r/searchengines/.rss"
+        elif self.url == "https://www.reddit.com/r/searchengines":
+            self.properties["feed_0"] = "https://www.reddit.com/r/searchengines/.rss"
+        elif self.url == "https://page-with-rss-link.com":
+            self.properties["feed_0"] = "https://page-with-rss-link.com/feed"
+
+        return self.get_all_properties()
 
 
 class FakeInternetTestCase(TestCase):
@@ -124,11 +136,11 @@ class FakeInternetTestCase(TestCase):
         MockRequestCounter.reset()
 
     def disable_web_pages(self):
-        # HttpRequestBuilder.get_contents_function = self.get_contents_function
-
         WebLogger.web_logger = AppLogging
+
         WebConfig.get_crawler_from_mapping = FakeInternetTestCase.get_crawler_from_mapping
         RemoteServer.get_crawlj = self.get_crawlj
+        UrlHandlerEx.ping = FakeInternetTestCase.ping
 
         c = Configuration.get_object()
         c.config_entry = ConfigurationEntry.get()
@@ -137,11 +149,14 @@ class FakeInternetTestCase(TestCase):
             c.config_entry.remote_webtools_server_location = "https://127.0.0.1:3000"
             c.config_entry.save()
 
-    def get_crawlj(self, url, name=""):
+    def ping(url):
+        return True
+
+    def get_crawlj(self, url, name="", settings=None):
         #print("FakeInternet:get_crawlj: Url:{}".format(url))
         #return json.loads(remote_server_json)
         data = FakeInternetData(url)
-        return data.get_crawlj(name)
+        return data.get_crawlj(name, settings)
 
     def get_crawler_from_mapping(request, crawler_data):
         if "settings" in crawler_data:

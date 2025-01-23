@@ -97,6 +97,10 @@ class RefreshProcessor(CeleryTaskInterface):
     def run(self):
         c = Configuration.get_object()
 
+        config = c.config_entry
+        if config.block_job_queue:
+            return
+
         systemcontroller = SystemOperationController()
         systemcontroller.refresh(self.get_name())
 
@@ -106,10 +110,6 @@ class RefreshProcessor(CeleryTaskInterface):
 
         if systemcontroller.is_remote_server_down():
             AppLogging.error("Remote server is down")
-            return
-
-        config = c.config_entry
-        if config.block_job_queue:
             return
 
         from .controllers import SourceDataController
@@ -230,6 +230,10 @@ class GenericJobsProcessor(CeleryTaskInterface):
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         c = Configuration.get_object()
+
+        config = c.config_entry
+        if config.block_job_queue:
+            return
 
         systemcontroller = SystemOperationController()
         systemcontroller.refresh(self.get_name())

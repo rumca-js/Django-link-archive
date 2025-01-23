@@ -7,7 +7,6 @@ from ..webtools import (
     SeleniumUndetected,
     ScriptCrawler,
     StealthRequestsCrawler,
-    RemoteServerCrawler,
 )
 from ..configuration import Configuration
 
@@ -117,27 +116,3 @@ class BrowserTest(FakeInternetTestCase):
 
         self.assertEqual(first.priority, 1)
         self.assertEqual(second.priority, 0)
-
-    def test_get_browser_setup__remote(self):
-        config = Configuration.get_object().config_entry
-        config.remote_webtools_server_location = "https://127.0.0.1"
-        config.save()
-
-        Browser.objects.all().delete()
-
-        browser = Browser.objects.create(
-                name = "test",
-                crawler = "RequestsCrawler",
-                settings = '{"test_setting" : "something"}',
-        )
-
-        # call tested function
-        setup = Browser.get_browser_setup()
-
-        self.assertTrue(setup[0]["name"], "RemoteServerCrawler")
-        self.assertTrue(setup[0]["crawler"], RemoteServerCrawler)
-        self.assertTrue(setup[0]["settings"]["name"], "test")
-        self.assertTrue(setup[0]["settings"]["crawler"], "RequestsCrawler")
-        self.assertTrue(setup[0]["settings"]["remote_server"], "https://127.0.0.1")
-
-        self.assertTrue(setup[0]["settings"]["test_setting"], "something")

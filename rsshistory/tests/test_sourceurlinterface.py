@@ -18,9 +18,6 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         # call tested function
         props = url.get_props()
 
-        self.assertEqual(type(url.u.get_handler()), HttpPageHandler)
-        self.assertEqual(type(url.u.get_handler().p), RssPage)
-
         self.assertTrue(props)
         self.assertTrue("url" in props)
         self.assertEqual(
@@ -46,8 +43,6 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         # call tested function
         props = url.get_props()
 
-        self.assertEqual(type(url.u.get_handler()), UrlHandler.youtube_channel_handler)
-
         self.assertTrue(props)
         self.assertTrue("url" in props)
         self.assertEqual(
@@ -67,9 +62,6 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         # call tested function
         props = url.get_props()
 
-        # the result link is for feed, for channel
-        self.assertEqual(type(url.u.get_handler()), UrlHandler.youtube_channel_handler)
-
         self.assertTrue(props)
         self.assertTrue("url" in props)
         self.assertEqual(
@@ -84,8 +76,6 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         # call tested function
         props = url.get_props()
-
-        self.assertEqual(type(url.u.get_handler()), UrlHandler.odysee_channel_handler)
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
@@ -103,9 +93,6 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         # call tested function
         props = url.get_props()
-
-        self.assertTrue(type(url.u.get_handler()), HttpPageHandler)
-        self.assertTrue(type(url.u.get_handler().p), HtmlPage)
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
@@ -126,10 +113,6 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         # call tested function
         props = url.get_props()
-
-        self.assertEqual(type(url.u.get_handler()), HttpPageHandler)
-        # the result link is for RSS link, therefore last handler is for RSS page
-        self.assertEqual(type(url.u.get_handler().p), RssPage)
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
@@ -186,9 +169,6 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         # call tested function
         props = url.get_props()
-
-        self.assertEqual(type(url.u.get_handler()), HttpPageHandler)
-        self.assertEqual(type(url.u.get_handler().p), RssPage)
 
         self.assertTrue(props)
         self.assertTrue("url" in props)

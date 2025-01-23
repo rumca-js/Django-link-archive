@@ -5,5 +5,5 @@ By default includes everything that extends behavior.
 We can add different site mechanisms, handlers, controllers.
 """
 
-from .urlhandler import UrlHandler
+from .urlhandler import UrlHandler, UrlHandlerEx
 from .entryurlinterface import EntryUrlInterface

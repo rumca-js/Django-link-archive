@@ -62,7 +62,7 @@ from .controllers import (
     ModelFilesBuilder,
 )
 from .configuration import Configuration
-from .pluginurl import UrlHandler
+from .pluginurl import UrlHandlerEx
 from .serializers import JsonImporter
 
 
@@ -463,9 +463,10 @@ class LinkAddJobHandler(BaseJobHandler):
         # Unpack if link service
         link = data["link"]
         if UrlLocation(link).is_link_service():
-            h = UrlHandler(link)
+            h = UrlHandlerEx(link)
             if h.get_contents():
-                link = h.response.url
+                # TODO we should use response
+                #link = h.response.url
                 data["link"] = link
 
         # Add the link
@@ -1174,7 +1175,7 @@ class LinkScanJobHandler(BaseJobHandler):
             if entries.count() > 0:
                 entry = entries[0]
 
-        p = UrlHandler(link)
+        p = UrlHandlerEx(link)
         contents = p.get_contents()
 
         if entry:

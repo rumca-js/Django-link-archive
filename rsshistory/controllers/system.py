@@ -1,4 +1,3 @@
-import requests
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -67,44 +66,17 @@ class SystemOperationController(object):
 
         test_page_url = config_entry.internet_status_test_url
 
-        try:
-            response = requests.get(url=test_page_url,
-                    timeout=50,
-                    verify=False,
-                    stream=True,
-                    )
-            if response.status_code == 200:
-                return True
+        from ..pluginurl import UrlHandlerEx
 
-            else:
-                AppLogging.error("Url:{} Request status code:{}".format(test_page_url, response.status_code))
-                return False
-
-        except Exception as E:
-            AppLogging.exc(E)
+        if not UrlHandlerEx.ping(test_page_url):
+            AppLogging.error("Cannot ping test page {}".format(test_page_url))
             return False
+        return True
 
     def is_internet_ok(self):
         """
         TODO - we do not know when we started APP.
         """
-
-        #statuses = SystemOperation.objects.filter(is_internet_connection_checked=True)
-        #if statuses.exists():
-        #    status = statuses[0]
-
-        #    delta = DateUtils.get_datetime_now_utc() - status.date_created
-
-        #    hours_limit = 3600  # TODO hardcoded refresh task should be running more often than 1 hour?
-
-        #    if delta.total_seconds() > hours_limit:
-        #        status_is_valid = False
-        #        return False
-
-        #    return status.is_internet_connection_ok
-        #else:
-        #    return True
-
         return self.ping_internet(2)
 
     def is_remote_server_down(self):
@@ -115,17 +87,10 @@ class SystemOperationController(object):
         if not remote_server:
             return False
 
-        try:
-            response = requests.get(url=remote_server,
-                    timeout=50,
-                    verify=False,
-                    stream=True,
-                    )
-            if response.status_code != 200:
-                AppLogging.error("Url:{} Request status code:{}".format(remote_server, response.status_code))
-                return True
-        except Exception as E:
-            AppLogging.exc(E)
+        from ..pluginurl import UrlHandlerEx
+
+        if not UrlHandlerEx.ping(remote_server):
+            AppLogging.error("Cannot ping remote server: {}".format(remote))
             return True
 
         return False

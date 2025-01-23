@@ -62,6 +62,11 @@
             </a>
         </li>
         <li>
+            <a href="{% url 'rsshistory:entries' %}?search=source__url+%3D+'{{object.title}}'" class="dropdown-item">
+             🔍 source url entries
+            </a>
+        <li>
+        <li>
             <a href="{% url 'rsshistory:entries' %}?search=source__title+%3D+'{{object.title}}'" class="dropdown-item">
              🔍 source title entries
             </a>
