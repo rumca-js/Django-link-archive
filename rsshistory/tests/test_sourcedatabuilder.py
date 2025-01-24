@@ -281,3 +281,14 @@ class SourceDataBuilderTest(FakeInternetTestCase):
 
         self.assertEqual(source.category_name, "New")
         self.assertEqual(source.subcategory_name, "New")
+
+    def test_build_from_link(self):
+        # call tested function
+        SourceDataBuilder(
+            link="https://linkedin.com"
+        ).build_from_link()
+
+        # automatic entry creates disabled sources, that are not fetched
+        sources = SourceDataController.objects.all()
+        self.assertEqual(sources.count(), 1)
+        self.assertEqual(sources[0].enabled, False)

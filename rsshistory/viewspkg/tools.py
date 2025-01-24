@@ -185,7 +185,7 @@ def get_scan_contents_links(link, contents):
 
 def page_scan_link(request):
     def render_page_scan_input(p, link, template="form_basic.html"):
-        h = UrlHandler(link)
+        h = UrlHandlerEx(link)
         contents = h.get_contents()
 
         links = get_scan_contents_links(link, contents)
@@ -640,7 +640,7 @@ def cleanup_link(request):
         if form.is_valid():
             link = form.cleaned_data["link"]
 
-            link = UrlHandler.get_cleaned_link(link)
+            link = UrlHandlerEx.get_cleaned_link(link)
 
             summary_text = 'Cleaned up link: <a href="{}">{}</a>'.format(link, link)
 

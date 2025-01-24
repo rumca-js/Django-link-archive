@@ -41,7 +41,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         props = url.get_props()
         self.assertTrue(props)
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
-        self.assertEqual(props["title"], "1234 test title")
+        self.assertEqual(props["title"], "YouTube 1234 video")
         self.assertEqual(props["status_code"], 200)
         self.assertEqual(props["page_rating"], 0)
 
@@ -51,7 +51,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         props = url.get_props()
         self.assertTrue(props)
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
-        self.assertEqual(props["title"], "1234 test title")
+        self.assertEqual(props["title"], "YouTube 1234 video")
         self.assertEqual(props["status_code"], 200)
         self.assertEqual(props["page_rating"], 0)
 

@@ -103,7 +103,7 @@ class UrlHandler(Url):
         return "{}".format(self.options)
 
 
-class UrlHandlerEx(Url):
+class UrlHandlerEx(object):
     """
     """
 
@@ -128,7 +128,15 @@ class UrlHandlerEx(Url):
             name = ""
             if self.options and self.options.mode_mapping and len(self.options.mode_mapping) > 0:
                 for item in self.options.mode_mapping:
+                    if self.is_remote_server_down():
+                        AppLogging.error("Cannot ping remote server: {}".format(config_entry.remote_webtools_server_location))
+                        return
+
                     self.all_properties = request_server.get_crawlj(self.url, name=item["name"], settings=item["settings"])
+                    if not self.all_properties:
+                        AppLogging.error("Url:{} Could not communicate with remote server, item:{}".format(self.url, str(item)))
+                        continue
+
                     """
                     # TODO if not valid -> we can retry using a different crawler
                     if response is valid (or 403, or redirect?).
@@ -142,8 +150,43 @@ class UrlHandlerEx(Url):
                         return self.all_properties
             else:
                 self.all_properties = request_server.get_crawlj(self.url)
+                if not self.all_properties:
+                    AppLogging.error("Url:{} Could not communicate with remote server".format(self.url))
 
-            return self.all_properties
+        if not self.all_properties:
+            self.all_properties = []
+
+        return self.all_properties
+
+    def get_title(self):
+        properties = self.get_section("Properties")
+        if "title" in properties:
+            return properties["title"]
+
+    def get_description(self):
+        properties = self.get_section("Properties")
+        if "description" in properties:
+            return properties["description"]
+
+    def get_language(self):
+        properties = self.get_section("Properties")
+        if "language" in properties:
+            return properties["language"]
+
+    def get_author(self):
+        properties = self.get_section("Properties")
+        if "author" in properties:
+            return properties["author"]
+
+    def get_album(self):
+        properties = self.get_section("Properties")
+        if "album" in properties:
+            return properties["album"]
+
+    def get_thumbnail(self):
+        properties = self.get_section("Properties")
+        if "thumbnail" in properties:
+            return properties["thumbnail"]
 
     def is_another_request_necessary(self):
         """
@@ -161,6 +204,9 @@ class UrlHandlerEx(Url):
     def get_section(self, section_name):
         properties = self.get_properties()
         if not properties:
+            return
+
+        if len(properties) == 0:
             return
 
         request_server = RemoteServer("test")
@@ -245,7 +291,7 @@ class UrlHandlerEx(Url):
                 verify=False,
                 stream=True,
             ) as response:
-                print("UrlHandler: status_code:{}".format(response.status_code))
+                # print("UrlHandler: status_code:{}".format(response.status_code))
                 if response.status_code >= 200 and response.status_code < 404:
                     return True
                 else:
@@ -254,3 +300,16 @@ class UrlHandlerEx(Url):
         except Exception as E:
             print("UrlHandler:" + str(E))
             return False
+
+    def get_cleaned_link(url):
+        u = Url(url)
+        urls_data = u.get_urls()
+        return urls_data["link"]
+
+    def is_remote_server_down(self):
+        config_entry = Configuration.get_object().config_entry
+        if config_entry.remote_webtools_server_location:
+            request_server = RemoteServer(config_entry.remote_webtools_server_location)
+
+            if not UrlHandlerEx.ping(config_entry.remote_webtools_server_location):
+                return True

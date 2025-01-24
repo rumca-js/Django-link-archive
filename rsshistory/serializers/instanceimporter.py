@@ -56,9 +56,9 @@ class InstanceImporter(object):
         self.user = user
 
     def import_all(self):
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandlerEx
 
-        u = UrlHandler(self.url)
+        u = UrlHandlerEx(self.url)
         instance_text = u.get_contents()
         if not instance_text:
             return

@@ -6,7 +6,7 @@ from ..webtools import ContentLinkParser, UrlLocation
 from ..models import UserTags
 from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
-from ..pluginurl import UrlHandler
+from ..pluginurl import UrlHandlerEx
 from ..controllers import BackgroundJobController
 
 
@@ -51,7 +51,7 @@ class RssParserPlugin(BaseRssPlugin):
 
     def get_page_links(self, entry_properties):
         url = entry_properties["link"]
-        h = UrlHandler(url)
+        h = UrlHandlerEx(url)
         contents = h.get_contents()
 
         result = set()
@@ -93,6 +93,6 @@ class RssParserPlugin(BaseRssPlugin):
         return links
 
     def find_links_in_site(self, url):
-        u = UrlHandler(url)
+        u = UrlHandlerEx(url)
         p = ContentLinkParser(url, u.get_contents())
         return set(self.get_parser_links(p))

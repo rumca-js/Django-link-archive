@@ -1,54 +1,18 @@
 {% load static %}
 
 
-function fillQueueListElement(entry) {
-    let link_absolute = entry.link_absolute;
-    let id = entry.id;
-    let title = entry.title;
-    let title_safe = entry.title_safe;
-    let link = entry.link;
-    let thumbnail = entry.thumbnail;
-    let source__title = entry.source__title;
-    let date_published = entry.date_published.toLocaleString();
-
-    let date_last_visit = entry.date_last_visit.toLocaleString();
-    let number_of_visits = entry.number_of_visits;
-
-    let img_text = '';
-    if (view_show_icons) {
-        const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
-        img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
-    }
-
-    let text = `
-         <a
-         class="list-group-item list-group-item-action"
-         href="${link_absolute}" title="${title}">
-             <div class="d-flex">
-               ${img_text}
-        
-        	   <div>
-        	       ${title_safe}
-                   Visits:${number_of_visits}
-                   Date of the last visit:${date_last_visit}
-        	   </div>
-             </div>
-         </a>
-    `;
-    return text;
-}
-
 function fillQueueList(queue) {
     let htmlOutput = '';
 
     if (queue && queue.length > 0) {
         queue.forEach(entry => {
-	   htmlOutput += fillQueueListElement(entry);
-	});
+           htmlOutput += getEntryBar(entry);
+        });
     }
 
     return htmlOutput;
 }
+
 
 function fillListData() {
     let data = object_list_data;

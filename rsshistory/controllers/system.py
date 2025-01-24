@@ -90,7 +90,7 @@ class SystemOperationController(object):
         from ..pluginurl import UrlHandlerEx
 
         if not UrlHandlerEx.ping(remote_server):
-            AppLogging.error("Cannot ping remote server: {}".format(remote))
+            AppLogging.error("Cannot ping remote server: {}".format(remote_server))
             return True
 
         return False

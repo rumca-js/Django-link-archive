@@ -39,8 +39,6 @@ class SourceGenericPlugin(object):
         if not source.enabled:
             return
 
-        AppLogging.debug("Plugin: checking source {}".format(source.url))
-
         # We do not check if data is correct. We can manually add processing to queue
         # We want the source to be processed then
 

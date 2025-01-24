@@ -56,6 +56,14 @@ from .fake.instance import (
 )
 
 
+class DjangoRequestObject(object):
+    """
+    Used to mock django request object
+    """
+    def __init__(self, user):
+        self.user = user
+
+
 class MockRequestCounter(object):
     mock_page_requests = 0
     request_history = []
@@ -93,6 +101,7 @@ class FakeInternetData(object):
             "Content-Type" : "text/html",
             "body_hash" : b"01001012",
             "hash" : b"01001012",
+            "is_valid" : True,
         }
         self.contents_data = {
             "Contents" : "test"}
@@ -114,18 +123,26 @@ class FakeInternetData(object):
         elif self.url == "https://m.youtube.com/watch?v=1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
             self.properties["feed_0"] = "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+            self.properties["title"] = "YouTube 1234 video"
+            self.properties["language"] = None
         elif self.url == "https://www.youtube.com/watch?v=1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
             self.properties["feed_0"] = "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+            self.properties["title"] = "YouTube 1234 video"
+            self.properties["language"] = None
         elif self.url == "https://youtu.be/1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
             self.properties["feed_0"] = "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+            self.properties["title"] = "YouTube 1234 video"
+            self.properties["language"] = None
         elif self.url == "https://www.reddit.com/r/searchengines/":
             self.properties["feed_0"] = "https://www.reddit.com/r/searchengines/.rss"
         elif self.url == "https://www.reddit.com/r/searchengines":
             self.properties["feed_0"] = "https://www.reddit.com/r/searchengines/.rss"
         elif self.url == "https://page-with-rss-link.com":
             self.properties["feed_0"] = "https://page-with-rss-link.com/feed"
+        elif self.url == "https://www.codeproject.com/WebServices/NewsRSS.aspx":
+            self.properties["thumbnail"] = "https://www.codeproject.com/App_Themes/Std/Img/logo100x30.gif"
 
         return self.get_all_properties()
 

@@ -13,6 +13,45 @@ function getHideButton(input_text = "Hide") {
     return text;
 }
 
+
+function getEntryBar(entry) {
+    let link_absolute = entry.link_absolute;
+    let id = entry.id;
+    let title = entry.title;
+    let title_safe = entry.title_safe;
+    let link = entry.link;
+    let thumbnail = entry.thumbnail;
+    let source__title = entry.source__title;
+    let date_published = entry.date_published.toLocaleString();
+
+    let date_last_visit = entry.date_last_visit.toLocaleString();
+    let number_of_visits = entry.number_of_visits;
+
+    let img_text = '';
+    if (view_show_icons) {
+        const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
+        img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
+    }
+
+    let text = `
+         <a
+         class="list-group-item list-group-item-action"
+         href="${link_absolute}" title="${title}">
+             <div class="d-flex">
+               ${img_text}
+        
+        	   <div class="mx-2">
+        	       ${title_safe}
+                   Visits:${number_of_visits}
+                   Date of the last visit:${date_last_visit}
+        	   </div>
+             </div>
+         </a>
+    `;
+    return text;
+}
+
+
 function fillSearchSuggestions(items) {
     if (items.length == 0) {
        $('#searchSuggestions').hide();
@@ -49,6 +88,7 @@ function fillSearchSuggestions(items) {
 
     $('#searchSuggestions').html(text);
 }
+
 
 function fillSearchHistory(items) {
     if (items.length == 0) {
@@ -87,6 +127,7 @@ function fillSearchHistory(items) {
 
     $('#searchHistory').html(text);
 }
+
 
 let currentSearchSuggestions = 0;
 let showSuggestions = true;
@@ -132,6 +173,7 @@ function loadSearchSuggestions(search_term, attempt = 1) {
     });
 }
 
+
 let currentSearchHistory = 0;
 function loadSearchHistory(attempt = 1) {
     let requestVersion = ++currentSearchHistory;
@@ -162,6 +204,7 @@ function loadSearchHistory(attempt = 1) {
         }
     });
 }
+
 
 let currentLoadRowListContentCounter = 0;
 function loadRowListContent(search_term = '', page = '', attempt = 1) {
@@ -238,6 +281,7 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
         }
     });
 }
+
 
 //-----------------------------------------------
 $(document).on('click', '.btnFilterTrigger', function(e) {
