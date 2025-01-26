@@ -26,7 +26,6 @@ COMPANION_APP = catalog
 install:
 	poetry install
 	poetry run python -m spacy download en_core_web_sm
-	poetry run playwright install
 	@$(CP) $(PROJECT_NAME)/settings_template.py $(PROJECT_NAME)/settings.py
 	@echo "*******************************************************************"
 	@echo "Please configure your django application linklibrary in settings.py"
@@ -39,7 +38,6 @@ install:
 install-minimal:
 	poetry install
 	poetry run python -m spacy download en_core_web_sm
-	poetry run playwright install
 	@$(CP) $(PROJECT_NAME)/settings_template_minimal.py $(PROJECT_NAME)/settings.py
 	@echo "*******************************************************************"
 	@echo "Please configure your django application linklibrary in settings.py"
@@ -64,9 +62,8 @@ createsuperuser:
 # - I cannot write installation commands for each Linux distro. I assume you are using debian-derivative
 # - assume you are using sudo for this command. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
 # http://pont.ist/rabbit-mq/
-# xvfb is installed for full selenium to be operational
 installsysdeps:
-	apt -y install rabbitmq-server memcached wget id3v2 chromium-chromedriver xvfb
+	apt -y install rabbitmq-server memcached wget id3v2
 	systemctl enable rabbitmq-server
 	systemctl start rabbitmq-server
 	systemctl enable memcached.service
