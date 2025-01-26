@@ -22,16 +22,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('catalog/', include('catalog.urls')),
-    path('various/', include('various.urls')),
-    path('private/', include('private.urls')),
-    path('places/', include('places.urls')),
-    path('vr/', include('vr.urls')),
-    path('programming/', include('programming.urls')),
-    path('threed/', include('threed.urls')),
-    path('', RedirectView.as_view(url='rsshistory/')),
-    path('rsshistory/', include('rsshistory.urls')),
-    path('robots.txt', RedirectView.as_view(url='rsshistory/robots.txt')),
+    path("admin/", admin.site.urls, name="admin"),
+    path("", RedirectView.as_view(url="rsshistory/")),
+    path("rsshistory/", include("rsshistory.urls")),
+    path("robots.txt", RedirectView.as_view(url="rsshistory/robots.txt")),
     path("opensearch.xml", RedirectView.as_view(url="rsshistory/opensearch.xml")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
