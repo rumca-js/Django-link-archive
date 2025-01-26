@@ -164,3 +164,7 @@ cython_debug/
 
 # Django
 migrations/
+
+linklibrary/celery.py
+linklibrary/settings.py
+linklibrary/urls.py
