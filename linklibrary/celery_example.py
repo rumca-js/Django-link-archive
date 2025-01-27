@@ -54,18 +54,24 @@ def memcache_lock(lock_id, oid):
     status = cache.add(lock_id, oid, LOCK_EXPIRE)
     
     def extend_lock(thread_lock_id, thread_oid):
+        print("extend_lock:start {}".format(thread_lock_id))
+
         """ Function to periodically extend the lock """
         while status and cache.get(thread_lock_id) == oid:
             time.sleep(LOCK_EXPIRE / 2)  # Sleep for half the lock expiration time
             try:
+                print("extend_lock:continuing {}".format(thread_lock_id))
                 cache.set(thread_lock_id, thread_oid, LOCK_EXPIRE)
             except Exception as e:
-                print("Cannot extend lock")
-            logger.info(f"Lock {lock_id} extended for {LOCK_EXPIRE} seconds")
+                print("extend_lock:cannot extend lock - race condigion {}".format(thread_lock_id))
+                break
+
+        print("extend_lock:end {}".format(thread_lock_id))
 
     # Start a background thread to extend the lock periodically
     if status:
-        logger.info(f"Starting thread for {lock_id} / {LOCK_EXPIRE} seconds")
+        print(f"Starting thread for {lock_id} / {LOCK_EXPIRE} seconds")
+        #logger.info(f"Starting thread for {lock_id} / {LOCK_EXPIRE} seconds")
         extension_thread = threading.Thread(target=extend_lock, args=(lock_id, oid), daemon=True)
         extension_thread.start()
 
@@ -73,11 +79,12 @@ def memcache_lock(lock_id, oid):
         yield status
     finally:
         if status and cache.get(lock_id) == oid:
+            print(f"Ending lock for {lock_id}")
+
             try:
                 cache.delete(lock_id)
             except Exception as e:
-                print("Cannot delete lock")
-            logger.info(f"Lock {lock_id} released")
+                print(f"Cannot delete lock {lock_id}")
 
 
 # define for which apps support celery
