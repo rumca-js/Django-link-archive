@@ -45,10 +45,13 @@ def run_backup_command(run_info):
     operating_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        subprocess.run(transformed, cwd = str(operating_dir), check=True)
+        result = subprocess.run(transformed, cwd=str(operating_dir), check=True, 
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         print("Backup completed successfully.")
     except subprocess.CalledProcessError as e:
         print("An error occurred:", e)
+        print("Standard Output:", e.stdout)
+        print("Standard Error:", e.stderr)
         return False
 
     return True
