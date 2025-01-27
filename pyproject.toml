@@ -28,6 +28,7 @@ beautifulsoup4 = "^4.12.3"
 
 requests = "^2.32.3"
 psycopg2 = "*"
+psutil="*"
 
 # TODO do we need this?
 chardet = "^5.2.0"

@@ -248,6 +248,11 @@ def parse_backup():
     parser.add_argument("-i", "--ignore-errors", action="store_true")
     parser.add_argument("--host", default="127.0.0.1")
 
+    # TODO verify integrity somehow
+    # REINDEX TABLE table_name;
+    # VACUUM FULL places_linkdatamodel;
+    # ANALYZE places_linkdatamodel;
+
     return parser, parser.parse_args()
 
 

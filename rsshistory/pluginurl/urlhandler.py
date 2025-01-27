@@ -24,9 +24,11 @@ class UrlHandler(Url):
     The controller job is to provide usefull information about link.
     """
 
-    def __init__(self, url=None, page_options=None, handler_class=None):
-        super().__init__(url, page_options=page_options, handler_class=handler_class)
-        self.url_builder = UrlHandler
+    def __init__(self, url=None, settings=None, url_builder=None):
+        if not url_builder:
+            url_builder = UrlHandler
+
+        super().__init__(url, settings=settings, url_builder=url_builder)
 
         if not url or url == "":
             lines = traceback.format_stack()

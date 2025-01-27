@@ -64,6 +64,10 @@ class DjangoRequestObject(object):
         self.user = user
 
 
+class DefaultCrawler(CrawlerInterface):
+    pass
+
+
 class MockRequestCounter(object):
     mock_page_requests = 0
     request_history = []
@@ -154,7 +158,7 @@ class FakeInternetTestCase(TestCase):
 
     def disable_web_pages(self):
         WebLogger.web_logger = AppLogging
-
+        WebConfig.get_default_crawler = FakeInternetTestCase.get_default_crawler
         WebConfig.get_crawler_from_mapping = FakeInternetTestCase.get_crawler_from_mapping
         RemoteServer.get_crawlj = self.get_crawlj
         UrlHandlerEx.ping = FakeInternetTestCase.ping
@@ -174,6 +178,19 @@ class FakeInternetTestCase(TestCase):
         #return json.loads(remote_server_json)
         data = FakeInternetData(url)
         return data.get_crawlj(name, settings)
+
+    def get_default_crawler(url):
+        crawler = DefaultCrawler(url = url)
+
+        crawler_data = {
+                "name" : "DefaultCrawler",
+                "crawler" : crawler,
+                "settings" : {
+                    "timeout_s" : 10,
+                },
+        }
+
+        return crawler_data
 
     def get_crawler_from_mapping(request, crawler_data):
         if "settings" in crawler_data:

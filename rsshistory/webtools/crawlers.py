@@ -15,6 +15,7 @@ from utils.dateutils import DateUtils
 from utils.basictypes import fix_path_for_os
 
 from .webtools import (
+    PageRequestObject,
     PageResponseObject,
     WebLogger,
     get_request_to_bytes,
@@ -45,11 +46,14 @@ class WebToolsTimeoutException(Exception):
 
 
 class CrawlerInterface(object):
-    def __init__(self, request, response_file=None, settings=None):
+    def __init__(self, request=None, url=None, response_file=None, settings=None):
         """
         @param response_file If set, response is stored in a file
         @param settings passed settings
         """
+        if not request and url:
+            request = PageRequestObject(url)
+
         self.request = request
         self.response = None
         self.response_file = response_file
@@ -63,6 +67,9 @@ class CrawlerInterface(object):
             self.timeout_s = settings["timeout_s"]
         else:
             self.timeout_s = 10
+
+    def set_settings(self, settings):
+        self.settings = settings
 
     def run(self):
         """
@@ -466,12 +473,22 @@ class StealthRequestsCrawler(CrawlerInterface):
 
         import stealth_requests as requests
 
-        answer = requests.get(
-            self.request.url,
-            timeout=self.timeout_s,
-            verify=self.request.ssl_verify,
-            #stream=True,   # does not work with it
-        )
+        try:
+            answer = requests.get(
+                self.request.url,
+                timeout=self.timeout_s,
+                verify=self.request.ssl_verify,
+                #stream=True,   # does not work with it
+            )
+        except Exception as E:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Connection error".format(self.request.url))
+            return self.response
 
         content = answer.content
         text = answer.text
@@ -527,36 +544,31 @@ class SeleniumDriver(CrawlerInterface):
 
     def __init__(
         self,
-        request,
+        request=None,
+        url=None,
         response_file=None,
         driver_executable=None,
         settings=None,
     ):
-        if (
-            settings
-            and "driver_executable" in settings
-            and settings["driver_executable"]
-        ):
-            driver_executable = settings["driver_executable"]
 
         super().__init__(
-            request,
+            request=request,
+            url=url,
             response_file=response_file,
             settings=settings,
         )
         self.driver = None
         self.driver_executable = driver_executable
 
-        try:
-            self.display = None
-            # requires xvfb
-            # import os
-            # os.environ["DISPLAY"] = ":10.0"
-            # from pyvirtualdisplay import Display
-            # self.display = Display(visible=0, size=(800, 600))
-            # self.display.start()
-        except Exception as E:
-            print("Str: {}".format(E))
+    def set_settings(self, settings):
+        if (
+            settings
+            and "driver_executable" in settings
+            and settings["driver_executable"]
+        ):
+            self.driver_executable = settings["driver_executable"]
+
+        self.settings = settings
 
     def get_driver(self):
         """
@@ -838,7 +850,7 @@ class SeleniumChromeFull(SeleniumDriver):
         capabilities = webdriver.DesiredCapabilities.CHROME.copy()
 
         # Proxy Configuration
-        if any(key in self.settings for key in ["http_proxy", "socks_proxy", "ssl_proxy"]):
+        if self.settings and any(key in self.settings for key in ["http_proxy", "socks_proxy", "ssl_proxy"]):
             prox = Proxy()
             prox.proxy_type = ProxyType.MANUAL
             prox.http_proxy = self.settings.get("http_proxy")
@@ -855,18 +867,6 @@ class SeleniumChromeFull(SeleniumDriver):
             service = Service(executable_path=self.driver_executable)
         else:
             service = Service()
-
-        try:
-            # requires xvfb
-            import os
-
-            os.environ["DISPLAY"] = ":10.0"
-            from pyvirtualdisplay import Display
-
-            self.display = Display(visible=0, size=(800, 600))
-            self.display.start()
-        except Exception as E:
-            print("Str: {}".format(E))
 
         options = webdriver.ChromeOptions()
         options.add_argument("--no-sandbox")
@@ -990,9 +990,6 @@ class SeleniumChromeFull(SeleniumDriver):
 
     def close(self):
         super().close()
-
-        if self.display:
-            self.display.stop()
 
 
 class SeleniumUndetected(SeleniumDriver):
@@ -1120,30 +1117,36 @@ class ScriptCrawler(CrawlerInterface):
 
     def __init__(
         self,
-        request,
+        request=None,
+        url=None,
         response_file=None,
         cwd=None,
         script=None,
         settings=None,
     ):
-        if settings and "script" in settings and settings["script"]:
-            script = settings["script"]
-
         super().__init__(
             request=request,
+            url=url,
             response_file=response_file,
             settings=settings,
         )
         self.cwd = cwd
         self.script = script
 
-        if "cwd" in self.settings:
-            self.cwd = self.settings["cwd"]
+    def set_settings(self, settings):
+        self.settings = settings
+        inner = self.settings["settings"]
+
+        if inner and "script" in inner and inner["script"]:
+            self.script = inner["script"]
+
+        if inner and "cwd" in inner:
+            self.cwd = inner["cwd"]
 
         if not self.cwd:
             self.cwd = self.get_main_path()
 
-        if self.settings and "remote_server" in self.settings:
+        if inner and "remote_server" in inner:
             return
 
         if not self.response_file:
@@ -1162,8 +1165,10 @@ class ScriptCrawler(CrawlerInterface):
         if not self.is_valid():
             return
 
-        if self.settings and "remote_server" in self.settings:
-            return self.run_via_server(self.settings["remote_server"])
+        inner = self.settings["settings"]
+
+        if inner and "remote_server" in inner:
+            return self.run_via_server(inner["remote_server"])
         else:
             return self.run_via_file()
 
@@ -1190,7 +1195,7 @@ class ScriptCrawler(CrawlerInterface):
                 shell=True,
                 capture_output=True,
                 cwd=self.cwd,
-                timeout=self.timeout_s + 10,  # add more time for closing browser, etc
+                timeout=self.timeout_s + 5,  # add more time for closing browser, etc
             )
         except subprocess.TimeoutExpired as E:
             WebLogger.debug(E, "Timeout on running script")
@@ -1501,6 +1506,10 @@ class RemoteServer(object):
         except TypeError as E:
             WebLogger.error(info_text = "Url:{} Cannot read response".format(link))
 
+        if "success" in json_obj and not json_obj["success"]:
+            WebLogger.error(json_obj["error"])
+            return False
+
         return json_obj
 
     def get_crawlj(self, url, name="", settings=None):
@@ -1547,6 +1556,10 @@ class RemoteServer(object):
             WebLogger.error(info_text = "Url:{} Cannot read response".format(link))
         except TypeError as E:
             WebLogger.error(info_text = "Url:{} Cannot read response".format(link))
+
+        if "success" in json_obj and not json_obj["success"]:
+            WebLogger.error(json_obj["error"])
+            return False
 
         return json_obj
 
@@ -1595,6 +1608,10 @@ class RemoteServer(object):
         except TypeError as E:
             WebLogger.error(info_text = "Url:{} Cannot read response".format(link))
 
+        if "success" in json_obj and not json_obj["success"]:
+            WebLogger.error(json_obj["error"])
+            return False
+
         if json_obj:
             return self.read_properties_section("Properties", json_obj)
 
@@ -1603,6 +1620,10 @@ class RemoteServer(object):
     def read_properties_section(self, section_name, all_properties):
         if not all_properties:
             return
+
+        if "success" in all_properties and not all_properties["success"]:
+            WebLogger.error(all_properties["error"])
+            return False
 
         for properties in all_properties:
             if section_name == properties["name"]:
