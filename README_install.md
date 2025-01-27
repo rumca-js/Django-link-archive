@@ -16,7 +16,7 @@ Notes:
 This project uses the following technologies:
  - django
  - celery - background task processing
- - postgresql - use of SQLite is discouraged
+ - database - postgresql
  - rabbitmq-server
  - crawlerbuddy - project that crawls the web [GitHub](https://github.com/rumca-js/crawler-buddy)
  - spacy - for text/keyword analysis
@@ -27,6 +27,7 @@ This project uses the following technologies:
 
  - Python poetry [https://python-poetry.org/docs/](https://python-poetry.org/docs/).
  - [Crawling program](https://github.com/rumca-js/crawler-buddy)
+ - postgresql - use of SQLite is discouraged
 
 Steps:
  - [Basic installation](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#basic-intallation)
