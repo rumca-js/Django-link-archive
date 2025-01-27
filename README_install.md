@@ -21,23 +21,14 @@ This project uses the following technologies:
  - crawlerbuddy - project that crawls the web [GitHub](https://github.com/rumca-js/crawler-buddy)
  - spacy - for text/keyword analysis
 
-# Using the crawling system
-
-You should not plan on doing anything hostile. For you it might be just web scraping. For others it could be DDOS attack.
-
-Some scraping solutions do not work on Raspberry PI out of the box: for example chrome-undetected.
-
-Links:
-
- - https://medium.com/codex/the-biggest-web-scraping-roadblocks-and-how-to-avoid-them-669125b886b9
- - https://crawlee.dev/docs/guides/avoid-blocking
- - https://docs.apify.com/academy/anti-scraping/mitigation/generating-fingerprints
- - https://docs.apify.com/academy/anti-scraping/mitigation/cloudflare-challenge.md
-
 # Manual installation
 
+## Prerequisites
+
+ - Python poetry [https://python-poetry.org/docs/](https://python-poetry.org/docs/).
+ - [Crawling program](https://github.com/rumca-js/crawler-buddy)
+
 Steps:
- - [Prerequisites](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#prerequisites)
  - [Basic installation](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#basic-intallation)
  - [Full installation](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#full-intallation)
  - [Configure](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#configure)
@@ -47,11 +38,6 @@ Steps:
 Notes:
  - it is best to use on a device with SSD
  - do not use SQLlite for production, or more advanced setups https://docs.djangoproject.com/en/5.0/ref/databases/#sqlite-notes
-
-# Prerequisites
-
- - Python poetry [https://python-poetry.org/docs/](https://python-poetry.org/docs/).
- - [Crawling program](https://github.com/rumca-js/crawler-buddy)
 
 # Basic installation
 
@@ -181,3 +167,16 @@ Demo on developement env (may, or may not be running actually):
 # Monitoring
 
  - Celery - [https://docs.celeryq.dev/en/stable/userguide/monitoring.html](https://docs.celeryq.dev/en/stable/userguide/monitoring.html)
+
+# Using the crawling system
+
+You should not plan on doing anything hostile. For you it might be just web scraping. For others it could be DDOS attack.
+
+Some scraping solutions do not work on Raspberry PI out of the box: for example chrome-undetected.
+
+Links:
+
+ - https://medium.com/codex/the-biggest-web-scraping-roadblocks-and-how-to-avoid-them-669125b886b9
+ - https://crawlee.dev/docs/guides/avoid-blocking
+ - https://docs.apify.com/academy/anti-scraping/mitigation/generating-fingerprints
+ - https://docs.apify.com/academy/anti-scraping/mitigation/cloudflare-challenge.md
