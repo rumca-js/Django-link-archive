@@ -46,6 +46,9 @@ COPY . /app
 
 # Copy the custom settings template
 COPY ./linklibrary/settings_template_postgres_celery.py /app/linklibrary/settings.py
+COPY ./linklibrary/celery_example.py /app/linklibrary/celery.py
+COPY ./linklibrary/urls_example.py /app/linklibrary/urls.py
+
 RUN mkdir -p /app/linklibrary/rsshistory/migrations
 RUN touch /app/linklibrary/rsshistory/migrations/__init__.py
 
