@@ -50,6 +50,8 @@ install-minimal:
 createtables: createtables-minimal createtables-celery
 
 createtables-minimal:
+	poetry run python manage.py makemigrations
+	poetry run python manage.py migrate
 	poetry run python manage.py migrate --run-syncdb
 
 createtables-celery:
