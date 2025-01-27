@@ -144,6 +144,9 @@ def run_restore_command(run_info):
 
 
 def backup_workspace(run_info):
+    """
+    @note table order is important
+    """
     print("--------------------")
     print(run_info["workspace"])
     print("--------------------")
@@ -151,12 +154,22 @@ def backup_workspace(run_info):
     tablemapping = {
        "./instance_entries"   : ["instance_linkdatamodel"],
        "./instance_domains"   : ["instance_domains"],
+       "./instance_sourcecategories"   : ["instance_sourcecategories"],
+       "./instance_sourcessubcategories"   : ["instance_sourcesubcategories"],
        "./instance_sources"   : ["instance_sourcedatamodel"],
        "./instance_tags"      : ["instance_usertags", "instance_compactedtags", "instance_usercompactedtags"],
        "./instance_votes"     : ["instance_uservotes"],
+       "./instance_entryrules"     : ["instance_entryrules"],
+       "./instance_dataexport"     : ["instance_dataexport"],
+       "./instance_gateway"     : ["instance_gateway"],
+       "./instance_modelfiles"     : ["instance_modelfiles"],
+       "./instance_readlater"     : ["instance_readlater"],
+       "./instance_blockentrylist"     : ["instance_blockentrylist"],
        "./instance_comments"  : ["instance_usercomments"],
        "./instance_userbookmarks" : ["instance_userbookmarks"],
        "./instance_history"   : ["instance_usersearchhistory", "instance_userentrytransitionhistory", "instance_userentryvisithistory"],
+       "./instance_userconfig" : ["instance_userconfig"],
+       "./instance_configurationentry" : ["instance_configurationentry"],
     }
 
     for key in tablemapping:
@@ -170,12 +183,17 @@ def backup_workspace(run_info):
 
 
 def restore_workspace(run_info):
+    """
+    @note table order is important
+    """
     print("--------------------")
     print(run_info["workspace"])
     print("--------------------")
 
     # order is important
     tablemapping = [
+       ["./instance_sourcecategories"         , ["instance_sourcecategories"]],
+       ["./instance_sourcessubcategories"         , ["instance_sourcesubcategories"]],
        ["./instance_sources"         , ["instance_sourcedatamodel"]],
        ["./instance_domains"         , ["instance_domains"]],
        ["./instance_entries"         , ["instance_linkdatamodel"]],
@@ -183,6 +201,14 @@ def restore_workspace(run_info):
        ["./instance_votes"           , ["instance_uservotes"]],
        ["./instance_comments"        , ["instance_usercomments"]],
        ["./instance_userbookmarks"   , ["instance_userbookmarks"]],
+       ["./instance_entryrules"   , ["instance_entryrules"]],
+       ["./instance_dataexport"   , ["instance_dataexport"]],
+       ["./instance_gateway"   , ["instance_gateway"]],
+       #["./instance_blockentrylist"   , ["instance_blockentrylist"]],
+       ["./instance_modelfiles"   , ["instance_modelfiles"]],
+       ["./instance_readlater"   , ["instance_readlater"]],
+       ["./instance_userconfig"   , ["instance_userconfig"]],
+       ["./instance_configurationentry"   , ["instance_configurationentry"]],
        ["./instance_history"         , ["instance_usersearchhistory", "instance_userentrytransitionhistory", "instance_userentryvisithistory"]],
     ]
 
@@ -219,6 +245,7 @@ def parse_backup():
     parser.add_argument("-d", "--database", default="db")
     parser.add_argument("-w", "--workspace")
     parser.add_argument("-D", "--debug") # TODO implement that shit
+    parser.add_argument("-i", "--ignore-errors", action="store_true")
     parser.add_argument("--host", default="127.0.0.1")
 
     return parser, parser.parse_args()
@@ -247,6 +274,8 @@ def main():
         run_info["user"] = args.user
         run_info["database"] = args.database
         run_info["host"] = args.host
+        if args.ignore_errors:
+            run_info["ignore_errors"] = True
 
         if args.backup and not backup_workspace(run_info):
             break

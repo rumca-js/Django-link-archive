@@ -50,6 +50,7 @@ install-minimal:
 createtables: createtables-minimal createtables-celery
 
 createtables-minimal:
+	# make sure migrations directory exist in all workspaces, and it is clear
 	poetry run python manage.py makemigrations
 	poetry run python manage.py migrate
 	poetry run python manage.py migrate --run-syncdb
