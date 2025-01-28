@@ -246,10 +246,18 @@ class GenericJobsProcessor(CeleryTaskInterface):
             AppLogging.error("Remote server is down")
             return
 
+        index = 0
+
         while True:
             should_stop = self.run_one_loop()
             if should_stop:
                 break
+
+            index += 1
+
+            if index > 2000:
+                AppLogging.error("GenericJobsProcessor:run index overflow")
+                return
 
     def run_one_job(self, job):
         self.start_processing_time = DateUtils.get_datetime_now_utc()
@@ -303,6 +311,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
                             obj.job, obj.subject
                         ),
                     )
+                    return True
 
                 AppLogging.exc(
                     E,
@@ -312,8 +321,10 @@ class GenericJobsProcessor(CeleryTaskInterface):
             else:
                 AppLogging.exc(
                     E,
-                    "Excetion",
+                    info_text = "Exception",
                 )
+
+                return True
 
         return False
 

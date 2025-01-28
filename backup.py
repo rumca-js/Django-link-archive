@@ -21,12 +21,16 @@ def run_backup_command(run_info):
     database = run_info["database"]
     host = run_info["host"]
 
+    format_args = "c"
+    if "format" in run_info and run_info["format"] == "plain":
+        format_args = "p"
+
     command_input = [
         "pg_dump",
         "-h", host,
         "-U", user,
         "-d", database,
-        "-F", "c",
+        "-F", format_args,
         "-f", output_file,
     ]
 
@@ -109,12 +113,16 @@ def run_restore_command(run_info):
     database = run_info["database"]
     host = run_info["host"]
 
+    format_args = "c"
+    if "format" in run_info and run_info["format"] == "plain":
+        format_args = "p"
+
     command_input = [
         "pg_restore",
         "-h", host,
         "-U", user,
         "-d", database,
-        "-F", "c",
+        "-F", format_args,
         "--data-only",
         output_file,
     ]
@@ -246,6 +254,7 @@ def parse_backup():
     parser.add_argument("-w", "--workspace")
     parser.add_argument("-D", "--debug") # TODO implement that shit
     parser.add_argument("-i", "--ignore-errors", action="store_true")
+    parser.add_argument("-f", "--format", default="custom")
     parser.add_argument("--host", default="127.0.0.1")
 
     # TODO verify integrity somehow
@@ -279,6 +288,7 @@ def main():
         run_info["user"] = args.user
         run_info["database"] = args.database
         run_info["host"] = args.host
+        run_info["format"] = args.format
         if args.ignore_errors:
             run_info["ignore_errors"] = True
 

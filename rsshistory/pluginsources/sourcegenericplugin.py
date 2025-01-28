@@ -39,6 +39,8 @@ class SourceGenericPlugin(object):
         if not source.enabled:
             return
 
+        print("Starting processing source:{}".format(source.url))
+
         # We do not check if data is correct. We can manually add processing to queue
         # We want the source to be processed then
 
@@ -56,6 +58,8 @@ class SourceGenericPlugin(object):
         stop_time = DateUtils.get_datetime_now_utc()
         total_time = stop_time - start_time
         total_time.total_seconds()
+
+        print("Stopping processing source:{}".format(source.url))
 
         if self.hash:
             self.set_operational_info(

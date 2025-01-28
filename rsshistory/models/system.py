@@ -912,6 +912,8 @@ class AppLogging(models.Model):
 
     def remove_old_infos():
         date_range = DateUtils.get_days_range(3)
+        index = 0
+
         while True:
             objs = AppLogging.objects.filter(date__lt=date_range[0])
 
@@ -920,6 +922,11 @@ class AppLogging(models.Model):
 
             obj = objs[0]
             obj.delete()
+
+            index += 1
+            if index > 2000:
+                print("AppLogging:remove_old_infos overflow")
+                return
 
     def is_info(self):
         return self.level == AppLogging.INFO
