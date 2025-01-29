@@ -37,54 +37,30 @@ app.autodiscover_tasks()
 
 logger = get_task_logger(__name__)
 
-LOCK_EXPIRE = 60 * 10  # 10 minutes lock expiration
+
+LOCK_EXPIRE = 60 * 60 * 60  # Lock should never expire
+
 
 @contextmanager
 def memcache_lock(lock_id, oid):
-    """
-    Memcache-based locking mechanism with automatic expiration.
+    """!
+    Memory cache lock
 
-    Args:
-        lock_id (str): The unique identifier for the lock.
-        oid (str): The unique identifier for the task or worker trying to acquire the lock.
+    @see
+    https://docs.djangoproject.com/en/4.2/topics/cache/
+    https://docs.djangoproject.com/en/4.2/ref/settings/
+    https://docs.celeryq.dev/en/stable/tutorials/task-cookbook.html#cookbook-task-serial
+    https://bobbyhadz.com/blog/operational-error-database-is-locked
 
-    Yields:
-        bool: True if the lock was successfully acquired, False otherwise.
+    Note: This requires memcached to be configured in djanog
+    https://stackoverflow.com/questions/53950548/flask-celery-task-locking
     """
     status = cache.add(lock_id, oid, LOCK_EXPIRE)
-    
-    def extend_lock(thread_lock_id, thread_oid):
-        print("extend_lock:start {}".format(thread_lock_id))
-
-        """ Function to periodically extend the lock """
-        while status and cache.get(thread_lock_id) == oid:
-            time.sleep(LOCK_EXPIRE / 2)  # Sleep for half the lock expiration time
-            try:
-                print("extend_lock:continuing {}".format(thread_lock_id))
-                cache.set(thread_lock_id, thread_oid, LOCK_EXPIRE)
-            except Exception as e:
-                print("extend_lock:cannot extend lock - race condigion {}".format(thread_lock_id))
-                break
-
-        print("extend_lock:end {}".format(thread_lock_id))
-
-    # Start a background thread to extend the lock periodically
-    if status:
-        print(f"Starting thread for {lock_id} / {LOCK_EXPIRE} seconds")
-        #logger.info(f"Starting thread for {lock_id} / {LOCK_EXPIRE} seconds")
-        extension_thread = threading.Thread(target=extend_lock, args=(lock_id, oid), daemon=True)
-        extension_thread.start()
-
     try:
         yield status
     finally:
-        if status and cache.get(lock_id) == oid:
-            print(f"Ending lock for {lock_id}")
-
-            try:
-                cache.delete(lock_id)
-            except Exception as e:
-                print(f"Cannot delete lock {lock_id}")
+        if status:
+            cache.delete(lock_id)
 
 
 # define for which apps support celery
