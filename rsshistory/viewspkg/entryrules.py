@@ -6,7 +6,8 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 
 from ..apps import LinkDatabase
-from ..models import EntryRules, BackgroundJobs, ConfigurationEntry
+from ..models import EntryRules, ConfigurationEntry
+from ..controllers import BackgroundJobController
 from ..views import ViewPage, GenericListView
 from ..forms import EntryRulesForm
 
@@ -130,7 +131,7 @@ def entry_rule_run(request, pk):
         p.context["summary_text"] = "No such object"
         return p.render("summary_present.html")
 
-    BackgroundJobs.run_rule(objs[0])
+    BackgroundJobController.run_rule(objs[0])
 
     return HttpResponseRedirect(reverse("{}:entry-rules".format(LinkDatabase.name)))
 

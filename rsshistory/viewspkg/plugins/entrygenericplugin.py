@@ -139,7 +139,6 @@ class EntryGenericPlugin(object):
                     ),
                 )
 
-        
         if config.entry_update_via_internet and self.user.is_authenticated:
             buttons.append(
                 EntryButton(

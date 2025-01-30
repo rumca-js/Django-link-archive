@@ -131,7 +131,7 @@ def get_page_properties(request):
         settings["handler_class"] = "HttpPageHandler"
 
     if browser:
-        browsers = [browser.get_setup]
+        browsers = [browser.get_setup()]
     else:
         browsers = None
 

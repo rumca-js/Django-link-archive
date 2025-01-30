@@ -22,7 +22,12 @@
   <div class="fw-bold">Enabled: {{object.enabled}}</div>
 {% endif %}
 
-<div>Rule URL: {{object.rule_url}}</div>
+<div>Rule URL:
+{% for rule_url in object.get_rule_urls %}
+    <span class="white-space: nowrap;">{{rule_url}}</span>
+{% endfor %}
+</div>
+
 <div>Block: {{object.block}}</div>
 <div>Auto tag: {{object.auto_tag}}</div>
 

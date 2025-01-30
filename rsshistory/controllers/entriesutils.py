@@ -1021,7 +1021,11 @@ class EntryWrapper(object):
                 if objs.exists():
                     return
 
-            ob = LinkDataController.objects.create(**link_data)
+            try:
+                ob = LinkDataController.objects.create(**link_data)
+            except Exception as E:
+                AppLogging.exc(E, "Cannot create link {}".format(link_data))
+                raise
 
         elif is_archive:
             if self.strict_ids and "id" in link_data:
@@ -1029,7 +1033,11 @@ class EntryWrapper(object):
                 if objs.exists():
                     return
 
-            ob = ArchiveLinkDataController.objects.create(**link_data)
+            try:
+                ob = ArchiveLinkDataController.objects.create(**link_data)
+            except Exception as E:
+                AppLogging.exc(E, "Cannot create archive link {}".format(link_data))
+                raise
 
         if ob:
             u = EntryUpdater(ob)

@@ -21,11 +21,11 @@
              <a href="{% url 'rsshistory:entry-rule' entry_rule.id %}"
                 class="my-1 p-1 list-group-item list-group-item-action"
                 title="{{entry_rule.rule_name}}">
-
-                 {{entry_rule.rule_name}}
                  {% if not entry_rule.enabled %}
                     [DISABLED]
                  {% endif %}
+
+                 {{entry_rule.rule_name}}
              </a>
          {% endfor %}
   {% else %}

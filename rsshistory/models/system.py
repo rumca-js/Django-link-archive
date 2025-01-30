@@ -756,7 +756,7 @@ class AppLogging(models.Model):
 
     info_text = models.CharField(default="", max_length=2000)
     detail_text = models.CharField(
-        blank=True, max_length=2000, help_text="Used to provide details about log event"
+        blank=True, max_length=3000, help_text="Used to provide details about log event"
     )
     level = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
@@ -801,8 +801,8 @@ class AppLogging(models.Model):
 
         if len(info_text) > 1900:
             info_text = info_text[:1900]
-        if len(detail_text) > 1900:
-            detail_text = detail_text[:1900]
+        if len(detail_text) > 2900:
+            detail_text = detail_text[:2900]
 
         AppLogging.objects.create(
             info_text=info_text,
