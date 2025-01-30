@@ -272,6 +272,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             self.save()
         else:
             from ..pluginurl import UrlHandlerEx
+
             handler = UrlHandlerEx(self.link)
             if handler.is_valid():
                 language = handler.get_language()
@@ -494,7 +495,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         if not self.date_dead_since:
             return 0
 
-        current_time = DateUtils.get_datetime_now_utc() 
+        current_time = DateUtils.get_datetime_now_utc()
 
         delta = current_time - self.date_dead_since
         return delta.days
@@ -508,7 +509,10 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         if self.is_dead():
             days = self.get_days_dead()
-            if days > conf.days_to_remove_stale_entries and self.page_rating_votes > conf.remove_entry_vote_threshold:
+            if (
+                days > conf.days_to_remove_stale_entries
+                and self.page_rating_votes > conf.remove_entry_vote_threshold
+            ):
                 return False
 
         if p.is_domain() and conf.accept_domain_links and conf.keep_domain_links:

@@ -29,7 +29,9 @@ def user_browse_history(request):
     if "search" in request.GET:
         data = {"search": request.GET["search"]}
 
-    p.context["query_page"] = reverse("{}:get-user-browse-history".format(LinkDatabase.name))
+    p.context["query_page"] = reverse(
+        "{}:get-user-browse-history".format(LinkDatabase.name)
+    )
     p.context["search_suggestions_page"] = None
     p.context["search_history_page"] = None
 
@@ -82,7 +84,7 @@ def get_user_browse_history(request):
                 json_data = visit_to_json(user_config, read_later)
                 data["queue"].append(json_data)
 
-        return JsonResponse(data, json_dumps_params={"indent":4})
+        return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def history_to_json(history):
@@ -103,7 +105,7 @@ def json_user_search_history(request):
     for history in histories[:50]:
         json_obj["histories"].append(history_to_json(history))
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def search_history_remove(request, pk):
@@ -184,7 +186,7 @@ def get_search_suggestions_entries(request, searchstring):
 
     # TODO we can search gateways though
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def get_search_suggestions_sources(request, searchstring):
@@ -197,7 +199,7 @@ def get_search_suggestions_sources(request, searchstring):
     json_obj = {}
     json_obj["items"] = []
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def history_remove_all(request):

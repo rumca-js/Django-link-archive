@@ -96,7 +96,7 @@ class UserSearchHistory(models.Model):
 
         row_limit = UserSearchHistory.get_choices_limit_memory()
 
-        if row_limit == 0: # no limit
+        if row_limit == 0:  # no limit
             return
 
         if qs.count() > row_limit:

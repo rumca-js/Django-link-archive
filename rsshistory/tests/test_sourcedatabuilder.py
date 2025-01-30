@@ -284,9 +284,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
 
     def test_build_from_link(self):
         # call tested function
-        SourceDataBuilder(
-            link="https://linkedin.com"
-        ).build_from_link()
+        SourceDataBuilder(link="https://linkedin.com").build_from_link()
 
         # automatic entry creates disabled sources, that are not fetched
         sources = SourceDataController.objects.all()

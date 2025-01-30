@@ -40,7 +40,11 @@ class Browser(models.Model):
     def save(self, *args, **kwargs):
         browsers = WebConfig.get_browsers()
         if self.crawler not in browsers:
-            AppLogging.error("Cannot add crawler {}, since it is not supported by webtools".format(self.crawler))
+            AppLogging.error(
+                "Cannot add crawler {}, since it is not supported by webtools".format(
+                    self.crawler
+                )
+            )
             return
 
         super().save(*args, **kwargs)
@@ -63,7 +67,7 @@ class Browser(models.Model):
 
             enabled = browser_config["enabled"]
 
-            browsers = Browser.objects.filter(name = browser_config["name"])
+            browsers = Browser.objects.filter(name=browser_config["name"])
             if browsers.count() == 0:
                 conf = Browser.objects.create(
                     enabled=enabled,
@@ -118,7 +122,7 @@ class Browser(models.Model):
         if self.priority == 0:
             return
 
-        other_browsers = Browser.objects.filter(priority = self.priority - 1)
+        other_browsers = Browser.objects.filter(priority=self.priority - 1)
         if other_browsers.exists():
             for other_browser in other_browsers:
                 other_browser.priority = self.priority
@@ -133,7 +137,7 @@ class Browser(models.Model):
         if self.priority > browsers.count():
             return
 
-        other_browsers = Browser.objects.filter(priority = self.priority + 1)
+        other_browsers = Browser.objects.filter(priority=self.priority + 1)
         if other_browsers.exists():
             for other_browser in other_browsers:
                 other_browser.priority = self.priority

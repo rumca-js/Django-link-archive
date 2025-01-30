@@ -20,7 +20,11 @@ class SourceEntriesDataExporter(object):
         clean_url = self._cfg.get_url_clean_name(self.source_url)
 
         ex = EntriesExporter(self.data_writer_config, entries)
-        ex.export_entries(source_url = self.source_url, export_file_name = clean_url, export_path = input_path)
+        ex.export_entries(
+            source_url=self.source_url,
+            export_file_name=clean_url,
+            export_path=input_path,
+        )
 
     def get_entries(self, day_iso):
         date_range = DateUtils.get_range4day(day_iso)
@@ -54,7 +58,7 @@ class EntryDailyDataMainExporter(MainExporter):
             if not source_id:
                 continue
 
-            sources_objs = SourceDataController.objects.filter(id = source_id)
+            sources_objs = SourceDataController.objects.filter(id=source_id)
             if not sources_objs.exists():
                 continue
 
@@ -69,10 +73,12 @@ class EntryDailyDataMainExporter(MainExporter):
     def write_sourceless_entries(self, input_path, entries):
         day_iso = self.day_iso
 
-        entries = entries.filter(Q(source_url__isnull = True) | Q(source_url = ""))
+        entries = entries.filter(Q(source_url__isnull=True) | Q(source_url=""))
 
         e = EntriesExporter(self.data_writer_config, entries)
-        e.export_entries(source_url = None, export_file_name="sourceless", export_path = input_path)
+        e.export_entries(
+            source_url=None, export_file_name="sourceless", export_path=input_path
+        )
 
     def get_configuration_filters(self):
         day_iso = self.day_iso

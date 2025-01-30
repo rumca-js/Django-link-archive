@@ -3,10 +3,10 @@ from dateutil import parser
 from bs4 import BeautifulSoup
 
 from ..webtools import (
-  RssPage,
-  HttpPageHandler,
-  YouTubeChannelHandler,
-  RssContentReader,
+    RssPage,
+    HttpPageHandler,
+    YouTubeChannelHandler,
+    RssContentReader,
 )
 
 from ..models import AppLogging
@@ -84,7 +84,7 @@ class BaseRssPlugin(SourceGenericPlugin):
             return
 
         if source:
-            source.update_data(update_with = self.reader)
+            source.update_data(update_with=self.reader)
 
         all_props = self.reader.get_entries()
 
@@ -105,9 +105,13 @@ class BaseRssPlugin(SourceGenericPlugin):
         if total_entries == 0:
             contents = self.get_contents()
             if contents:
-                AppLogging.error("Url:{}. No links for rss".format(source.url), detail_text=contents)
+                AppLogging.error(
+                    "Url:{}. No links for rss".format(source.url), detail_text=contents
+                )
             else:
-                AppLogging.error("Url:{}. No links for rss, not contents".format(source.url))
+                AppLogging.error(
+                    "Url:{}. No links for rss, not contents".format(source.url)
+                )
 
     def enhance(self, prop):
         prop["link"] = UrlHandler.get_cleaned_link(prop["link"])

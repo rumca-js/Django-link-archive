@@ -290,7 +290,7 @@ def domain_json(request, pk):
 
     domain = domains[0]
 
-    return JsonResponse(domain, json_dumps_params={'indent':4})
+    return JsonResponse(domain, json_dumps_params={"indent": 4})
 
 
 def domain_to_json(user_config, domain):
@@ -343,7 +343,7 @@ def domains_json(request):
 
             json_obj["domains"].append(domain_json)
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def domains_reset_dynamic_data(request):

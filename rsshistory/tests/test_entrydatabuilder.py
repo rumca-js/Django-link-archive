@@ -479,5 +479,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs.count(), 1)
         self.assertEqual(objs[0].link, link_name)
 
-        scan_jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_SCAN)
+        scan_jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_SCAN
+        )
         self.assertEqual(scan_jobs.count(), 1)

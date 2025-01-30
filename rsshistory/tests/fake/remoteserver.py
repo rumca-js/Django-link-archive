@@ -1,4 +1,3 @@
-
 remote_server_json = """
 [
   {

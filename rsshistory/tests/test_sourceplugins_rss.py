@@ -128,10 +128,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.print_errors()
 
         self.assertEqual(len(props), 5)
-        self.assertEqual(
-            props[0]["source"],
-            test_link
-        )
+        self.assertEqual(props[0]["source"], test_link)
 
     def test_check_for_data(self):
         LinkDataController.objects.all().delete()

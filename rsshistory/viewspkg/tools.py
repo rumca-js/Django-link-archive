@@ -105,11 +105,11 @@ def get_page_properties(request):
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
-        
+
     if "page" not in request.GET:
         data = {}
         data["status"] = False
-        return JsonResponse(data, json_dumps_params={"indent":4})
+        return JsonResponse(data, json_dumps_params={"indent": 4})
 
     page_link = request.GET["page"]
 
@@ -119,25 +119,30 @@ def get_page_properties(request):
         browser_pk = int(request.GET["browser"])
 
         if browser_pk != Browser.AUTO:
-            browsers = Browser.objects.filter(pk = browser_pk)
+            browsers = Browser.objects.filter(pk=browser_pk)
             if browsers.exists():
                 browser = browsers[0]
             else:
                 AppLogging.error("Browser does not exist!")
                 return
 
-    make_html_request = False
+    settings = {}
     if "html" in request.GET:
-        make_html_request = True
+        settings["handler_class"] = "HttpPageHandler"
 
-    url_ex = UrlHandlerEx(page_link)
+    if browser:
+        browsers = [browser.get_setup]
+    else:
+        browsers = None
+
+    url_ex = UrlHandlerEx(page_link, settings=settings, browsers=browsers)
     all_properties = url_ex.get_properties()
 
     data = OrderedDict()
     data["properties"] = all_properties
     data["status"] = True
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def page_show_properties(request):
@@ -534,7 +539,7 @@ def page_verify(request):
                 domain = domains[0]
                 data["domain"] = domain.get_map()
 
-        return JsonResponse(data, json_dumps_params={"indent":4})
+        return JsonResponse(data, json_dumps_params={"indent": 4})
 
     p = ViewPage(request)
     p.set_title("Verify page")
@@ -579,9 +584,9 @@ def search_engines(request):
 
     Gateway.check_init()
 
-    mapping = Gateway.get_types_mapping([Gateway.TYPE_SEARCH_ENGINE,
-                                         Gateway.TYPE_AI_BOT,
-                                         Gateway.TYPE_DIGITAL_LIBRARY])
+    mapping = Gateway.get_types_mapping(
+        [Gateway.TYPE_SEARCH_ENGINE, Gateway.TYPE_AI_BOT, Gateway.TYPE_DIGITAL_LIBRARY]
+    )
 
     p.context["search_engines"] = mapping
 
@@ -597,18 +602,21 @@ def gateways(request):
 
     Gateway.check_init()
 
-    mapping = Gateway.get_types_mapping([Gateway.TYPE_GATEWAY,
-                                         Gateway.TYPE_APP_STORE,
-                                         Gateway.TYPE_POPULAR,
-                                         Gateway.TYPE_FAVOURITE,
-                                         Gateway.TYPE_SOCIAL_MEDIA,
-                                         Gateway.TYPE_AUDIO_STREAMING,
-                                         Gateway.TYPE_VIDEO_STREAMING,
-                                         Gateway.TYPE_FILE_SHARING,
-                                         Gateway.TYPE_MARKETPLACE,
-                                         Gateway.TYPE_BANKING,
-                                         Gateway.TYPE_OTHER,
-                                         ])
+    mapping = Gateway.get_types_mapping(
+        [
+            Gateway.TYPE_GATEWAY,
+            Gateway.TYPE_APP_STORE,
+            Gateway.TYPE_POPULAR,
+            Gateway.TYPE_FAVOURITE,
+            Gateway.TYPE_SOCIAL_MEDIA,
+            Gateway.TYPE_AUDIO_STREAMING,
+            Gateway.TYPE_VIDEO_STREAMING,
+            Gateway.TYPE_FILE_SHARING,
+            Gateway.TYPE_MARKETPLACE,
+            Gateway.TYPE_BANKING,
+            Gateway.TYPE_OTHER,
+        ]
+    )
 
     p.context["gateways"] = mapping
 

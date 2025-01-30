@@ -204,7 +204,7 @@ def configuration_advanced_json(request):
 
     json_obj = model_to_dict(config)
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def user_config(request):
@@ -344,7 +344,7 @@ def json_table_status(request):
     data = {}
     data["tables"] = table
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def json_system_status(request):
@@ -405,13 +405,14 @@ def json_system_status(request):
     data["directory"] = c.directory
 
     from ..threadprocessors import get_tasks
+
     tasks = get_tasks()
 
     data["threads"] = []
     for thread_info in system_controller.get_thread_info(tasks):
         data["threads"].append({"name": thread_info[0], "date": thread_info[1]})
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def history_to_json(history):
@@ -434,7 +435,7 @@ def get_settings(request):
     configuration = Configuration.get_object()
     data = configuration.get_settings()
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def json_export_status(request):
@@ -451,7 +452,7 @@ def json_export_status(request):
     for history in histories:
         data["exports"].append(history_to_json(history))
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 class AppLoggingView(generic.ListView):
@@ -520,7 +521,7 @@ def json_logs(request):
                 json_data = log_to_json(app_logging_entry)
                 data["logs"].append(json_data)
 
-        return JsonResponse(data, json_dumps_params={"indent":4})
+        return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def truncate_log_all(request):
@@ -771,7 +772,9 @@ def wizard_setup_search_engine(request):
     c.entries_order_by = "-page_rating, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_SEARCH_ENGINE
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
-    c.remove_entry_vote_threshold = 1   # do not remove everything above, or equal to 1 vote
+    c.remove_entry_vote_threshold = (
+        1  # do not remove everything above, or equal to 1 vote
+    )
     if settings.CRAWLER_BUDDY_URL:
         c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
 
@@ -880,6 +883,7 @@ def get_footer_status_line(request):
     This function should only use DB access files.
     No checking if features are enabled, no checking of third-party libraries
     """
+
     def add_to_message(message, issue_text):
         if message != "":
             message += ", "
@@ -903,14 +907,14 @@ def get_footer_status_line(request):
 
     system_controller = SystemOperationController()
 
-    #from ..tasks import get_tasks
-    #tasks = get_tasks()
+    # from ..tasks import get_tasks
+    # tasks = get_tasks()
 
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
     is_internet_ok = system_controller.is_internet_ok()
-    #is_threading_ok = system_controller.is_threading_ok(thread_ids = tasks)
+    # is_threading_ok = system_controller.is_threading_ok(thread_ids = tasks)
     is_threading_ok = True
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
@@ -930,7 +934,7 @@ def get_footer_status_line(request):
         message = add_to_message(message, "Configuration")
 
     data = {"message": message}
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def get_indicators(request):
@@ -948,6 +952,7 @@ def get_indicators(request):
     system_controller = SystemOperationController()
 
     from ..threadprocessors import get_tasks
+
     tasks = get_tasks()
 
     sources_are_fetched = process_source_queue_size > 0
@@ -957,26 +962,28 @@ def get_indicators(request):
     is_threading_ok = system_controller.is_threading_ok(tasks)
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
-    read_later_queue_size = ReadLater.objects.filter(user = request.user).count()
+    read_later_queue_size = ReadLater.objects.filter(user=request.user).count()
     read_later = read_later_queue_size > 0
 
     indicators = {}
 
     indicators["is_reading"] = {}
-    indicators["is_reading"][
-        "message"
-    ] = f"Reading sources. Queue:{sources_queue_size}"
+    indicators["is_reading"]["message"] = f"Reading sources. Queue:{sources_queue_size}"
     indicators["is_reading"]["status"] = sources_are_fetched
 
     indicators["read_later_queue"] = {}
-    indicators["read_later_queue"]["message"] = f"Read later queue {read_later_queue_size}"
+    indicators["read_later_queue"][
+        "message"
+    ] = f"Read later queue {read_later_queue_size}"
     indicators["read_later_queue"]["status"] = read_later
 
     indicators["sources_error"] = {}
     indicators["sources_error"]["message"] = f"Sources error"
     indicators["sources_error"]["status"] = is_sources_error
 
-    is_internet_error = configuration_entry.enable_background_jobs and not is_internet_ok
+    is_internet_error = (
+        configuration_entry.enable_background_jobs and not is_internet_ok
+    )
     indicators["internet_error"] = {}
     indicators["internet_error"]["message"] = f"Internet error"
     indicators["internet_error"]["status"] = is_internet_error
@@ -995,7 +1002,7 @@ def get_indicators(request):
     indicators["configuration_error"]["status"] = is_configuration_error
 
     data = {"indicators": indicators}
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def get_menu(request):

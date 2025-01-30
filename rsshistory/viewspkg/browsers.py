@@ -12,7 +12,6 @@ from ..apps import LinkDatabase
 from ..forms import BrowserEditForm
 
 
-
 class BrowserListView(GenericListView):
     model = Browser
     context_object_name = "content_list"
@@ -83,7 +82,7 @@ def prio_up(request, pk):
         data["status"] = True
         data["message"] = "OK"
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def prio_down(request, pk):
@@ -103,7 +102,7 @@ def prio_down(request, pk):
         data["status"] = True
         data["message"] = "OK"
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def disable(request, pk):

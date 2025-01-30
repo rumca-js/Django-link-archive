@@ -21,7 +21,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.0.17"
+__version__ = "2.0.18"
 
 
 class Configuration(object):
@@ -72,6 +72,7 @@ class Configuration(object):
         https://stackoverflow.com/questions/43554124/is-possible-to-keep-spacy-in-memory-to-reduce-the-load-time
         """
         from .models import AppLogging
+
         try:
             if not language or language == "":
                 return

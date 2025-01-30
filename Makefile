@@ -98,7 +98,6 @@ run-web-server:
 reformat:
 	poetry run black $(APP_NAME)
 	poetry run black utils
-	poetry run black webtools
 
 static:
 	poetry run python -m manage collectstatic

@@ -466,7 +466,7 @@ class LinkAddJobHandler(BaseJobHandler):
             h = UrlHandlerEx(link)
             if h.get_contents():
                 # TODO we should use response
-                #link = h.response.url
+                # link = h.response.url
                 data["link"] = link
 
         # Add the link
@@ -1097,6 +1097,7 @@ class CleanupJobHandler(BaseJobHandler):
         if table == "all" or table == "SystemOperation":
             from .controllers import SystemOperationController
             from .threadprocessors import get_tasks
+
             SystemOperationController.cleanup(cfg, get_tasks())
         if table == "all" or table == "Gateway":
             Gateway.cleanup(cfg)

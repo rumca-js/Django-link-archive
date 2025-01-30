@@ -1,10 +1,11 @@
 from utils.dateutils import DateUtils
 
 from ..models import (
-   ConfigurationEntry,
-   SystemOperation,
-   AppLogging,
+    ConfigurationEntry,
+    SystemOperation,
+    AppLogging,
 )
+
 
 class SystemOperationController(object):
 

@@ -69,7 +69,7 @@ class SourceDataControllerTest(FakeInternetTestCase):
             title="YouTube",
         )
 
-        SourceOperationalData.objects.create(source_obj = source, consecutive_errors = 30)
+        SourceOperationalData.objects.create(source_obj=source, consecutive_errors=30)
 
         date_fetched = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         ahash = calculate_hash("test")
@@ -117,6 +117,6 @@ class SourceDataControllerTest(FakeInternetTestCase):
         rss = UrlHandlerEx("https://www.codeproject.com/WebServices/NewsRSS.aspx")
 
         # call tested function
-        source.update_data(update_with = rss)
+        source.update_data(update_with=rss)
 
         self.assertEqual(source.favicon, new_favicon)

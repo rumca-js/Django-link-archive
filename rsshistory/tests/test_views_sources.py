@@ -254,7 +254,7 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:source-add-form".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
-        url = url + "?link="+test_link
+        url = url + "?link=" + test_link
 
         # call user action
         response = self.client.get(url)

@@ -210,9 +210,7 @@ class ConfigForm(forms.ModelForm):
             )
 
     def long_widget(self, field_name):
-        self.fields[field_name].widget.attrs.update(
-            size=self.init.get_cols_size()
-        )
+        self.fields[field_name].widget.attrs.update(size=self.init.get_cols_size())
 
 
 class DataExportForm(forms.ModelForm):
@@ -378,14 +376,14 @@ class LinkPropertiesForm(forms.Form):
         self.fields["link"].widget.attrs["autofocus"] = True
 
         browsers = self.get_browser_choices()
-        self.fields["browser"].widget = forms.Select(choices=browsers) 
+        self.fields["browser"].widget = forms.Select(choices=browsers)
 
     def get_browser_choices(self):
         result = []
 
         result.append([Browser.AUTO, "Automatic"])
 
-        browsers = Browser.objects.filter(enabled=True).values('id', 'name')
+        browsers = Browser.objects.filter(enabled=True).values("id", "name")
         for browser in browsers:
             result.append([browser["id"], browser["name"]])
 
@@ -407,13 +405,13 @@ class AddEntryForm(forms.Form):
         self.fields["link"].widget.attrs["autofocus"] = True
 
         browsers = self.get_browser_choices()
-        self.fields["browser"].widget = forms.Select(choices=browsers) 
+        self.fields["browser"].widget = forms.Select(choices=browsers)
 
     def get_browser_choices(self):
         result = []
         result.append([Browser.AUTO, "Automatic"])
 
-        browsers = Browser.objects.filter(enabled=True).values('id', 'name')
+        browsers = Browser.objects.filter(enabled=True).values("id", "name")
         for browser in browsers:
             result.append([browser["id"], browser["name"]])
 

@@ -87,7 +87,7 @@ class FeedClientTest(FakeInternetTestCase):
 
         self.teardown()
 
-    #def test_follow_url__youtube_channel(self):
+    # def test_follow_url__youtube_channel(self):
     #    self.teardown()
 
     #    engine = self.get_engine()

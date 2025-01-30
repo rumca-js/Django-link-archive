@@ -127,18 +127,18 @@ def entry_tags(request, pk):
     if not entries.exists():
         operation_data["message"] = "Entry does not exist"
         operation_data["status"] = False
-        return JsonResponse(operation_data, json_dumps_params={"indent":4})
+        return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
     entry = entries[0]
     if not entry.is_taggable():
         operation_data["message"] = "Cannot tag entry"
         operation_data["status"] = False
-        return JsonResponse(operation_data, json_dumps_params={"indent":4})
+        return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
     operation_data["tags"] = entry.get_tag_map()  # vector
     operation_data["status"] = True
 
-    return JsonResponse(operation_data, json_dumps_params={"indent":4})
+    return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
 
 def entry_tag(request, pk):
@@ -157,13 +157,13 @@ def entry_tag(request, pk):
     if not entries.exists():
         operation_data["message"] = "Entry does not exist"
         operation_data["status"] = False
-        return JsonResponse(operation_data, json_dumps_params={"indent":4})
+        return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
     entry = entries[0]
     if not entry.is_taggable():
         operation_data["message"] = "Cannot tag entry"
         operation_data["status"] = False
-        return JsonResponse(operation_data, json_dumps_params={"indent":4})
+        return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
     if request.method == "POST":
         method = "POST"
@@ -177,7 +177,7 @@ def entry_tag(request, pk):
             operation_data["message"] = "Tagged entry"
             operation_data["tags"] = entry.get_tag_map()  # vector
             operation_data["status"] = True
-            return JsonResponse(operation_data, json_dumps_params={"indent":4})
+            return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
         else:
             summary_text = "Cannot add tag due to errors: "
@@ -188,9 +188,9 @@ def entry_tag(request, pk):
 
             operation_data["message"] = summary_text
             operation_data["status"] = False
-            return JsonResponse(operation_data, json_dumps_params={"indent":4})
+            return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
-    return JsonResponse(operation_data, json_dumps_params={"indent":4})
+    return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
 
 def entry_tag_form(request, pk):
@@ -464,13 +464,13 @@ def entry_vote(request, pk):
     if not entries.exists():
         operation_data["message"] = "Entry does not exist"
         operation_data["status"] = False
-        return JsonResponse(operation_data, json_dumps_params={"indent":4})
+        return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
     entry = entries[0]
     if not entry.is_taggable():
         operation_data["message"] = "Cannot vote on entry"
         operation_data["status"] = False
-        return JsonResponse(operation_data, json_dumps_params={"indent":4})
+        return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
     if request.method == "POST":
         method = "POST"
@@ -487,7 +487,7 @@ def entry_vote(request, pk):
             operation_data["message"] = "Voted"
             operation_data["vote"] = data["vote"]
             operation_data["status"] = True
-            return JsonResponse(operation_data, json_dumps_params={"indent":4})
+            return JsonResponse(operation_data, json_dumps_params={"indent": 4})
         else:
             summary_text = "Cannot add tag due to errors: "
             errors = form.errors
@@ -497,7 +497,7 @@ def entry_vote(request, pk):
 
             operation_data["message"] = summary_text
             operation_data["status"] = False
-            return JsonResponse(operation_data, json_dumps_params={"indent":4})
+            return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
 
 def entry_vote_form(request, pk):

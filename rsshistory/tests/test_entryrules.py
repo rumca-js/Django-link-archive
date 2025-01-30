@@ -26,14 +26,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         self.browser = Browser.objects.create(
-            name = "RequestsCrawler",
-            crawler = "SeleniumChromeHeadless",
-            settings = '{"test_setting" : "something"}',
+            name="RequestsCrawler",
+            crawler="SeleniumChromeHeadless",
+            settings='{"test_setting" : "something"}',
         )
         self.browser_selenium = Browser.objects.create(
-            name = "SeleniumChromeHeadless",
-            crawler = "SeleniumChromeHeadless",
-            settings = '{"test_setting" : "something"}',
+            name="SeleniumChromeHeadless",
+            crawler="SeleniumChromeHeadless",
+            settings='{"test_setting" : "something"}',
         )
         self.browser.refresh_from_db()
 
@@ -113,10 +113,10 @@ class EntryUpdaterTest(FakeInternetTestCase):
         rules3 = EntryRules.get_url_rules("https://www.test3.com")
 
         # call tested function
-        self.assertEqual( len(rules0), 0)
-        self.assertEqual( len(rules1), 1)
-        self.assertEqual( len(rules2), 1)
-        self.assertEqual( len(rules3), 0)
+        self.assertEqual(len(rules0), 0)
+        self.assertEqual(len(rules1), 1)
+        self.assertEqual(len(rules2), 1)
+        self.assertEqual(len(rules3), 0)
 
-        self.assertEqual( rules1[0], therule)
-        self.assertEqual( rules2[0], therule)
+        self.assertEqual(rules1[0], therule)
+        self.assertEqual(rules2[0], therule)

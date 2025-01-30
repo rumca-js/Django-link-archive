@@ -149,6 +149,7 @@ class BackgroundJobController(BackgroundJob):
 
     def run_single_job(job):
         from ..threadprocessors import GenericJobsProcessor
+
         processor = GenericJobsProcessor()
         processor.run_one_job(job)
 
@@ -285,6 +286,7 @@ class BackgroundJobController(BackgroundJob):
 
     def link_scan(url=None, entry=None, source=None):
         from ..configuration import Configuration
+
         cfg = {}
 
         config = Configuration.get_object().config_entry
@@ -427,6 +429,7 @@ class BackgroundJobController(BackgroundJob):
         Do not update, if it was updated recently, or if we are missing key components
         """
         from ..configuration import Configuration
+
         config = Configuration.get_object().config_entry
         if not config.entry_update_via_internet:
             return
@@ -457,6 +460,7 @@ class BackgroundJobController(BackgroundJob):
         Do not update, if it was updated recently
         """
         from ..configuration import Configuration
+
         config = Configuration.get_object().config_entry
         if not config.entry_update_via_internet:
             return

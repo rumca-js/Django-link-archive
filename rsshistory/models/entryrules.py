@@ -65,7 +65,7 @@ class EntryRules(models.Model):
 
     def get_url_rules(url):
         result = []
-        
+
         rules = EntryRules.objects.filter(enabled=True)
         for rule in rules:
             rule_urls = rule.get_rule_urls()

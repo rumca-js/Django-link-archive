@@ -46,18 +46,15 @@ from .threadhandlers import (
     InitializeJobHandler,
     InitializeBlockListJobHandler,
     ExportDataJobHandler,
-
     WriteDailyDataJobHandler,
     WriteYearDataJobHandler,
     WriteNoTimeDataJobHandler,
     WriteTopicJobHandler,
-
     ImportSourcesJobHandler,
     ImportBookmarksJobHandler,
     ImportDailyDataJobHandler,
     ImportInstanceJobHandler,
     ImportFromFilesJobHandler,
-
     CleanupJobHandler,
     MoveToArchiveJobHandler,
     ProcessSourceJobHandler,
@@ -321,7 +318,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
             else:
                 AppLogging.exc(
                     E,
-                    info_text = "Exception",
+                    info_text="Exception",
                 )
 
                 return True

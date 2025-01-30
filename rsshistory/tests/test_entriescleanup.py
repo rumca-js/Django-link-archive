@@ -103,7 +103,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         conf = Configuration.get_object().config_entry
         conf.days_to_remove_links = 2
         # conf.days_to_move_to_archive = 1
-        conf.accept_domain_links = True # to keep up permanent flag
+        conf.accept_domain_links = True  # to keep up permanent flag
         conf.keep_domain_links = True
         conf.save()
 
@@ -119,9 +119,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         )
         self.assertEqual(bookmarked.count(), 1)
 
-        permanent = LinkDataController.objects.filter(
-            link="https://youtube.com"
-        )
+        permanent = LinkDataController.objects.filter(link="https://youtube.com")
         self.assertEqual(permanent.count(), 1)
         self.assertEqual(permanent[0].permanent, True)
 
@@ -138,9 +136,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         )
         self.assertEqual(bookmarked.count(), 1)
 
-        permanent = LinkDataController.objects.filter(
-            link="https://youtube.com"
-        )
+        permanent = LinkDataController.objects.filter(link="https://youtube.com")
         self.assertEqual(permanent.count(), 1)
 
         nonbookmarked = LinkDataController.objects.filter(
@@ -171,7 +167,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.assertEqual(bookmarked.count(), 1)
 
         permanent = LinkDataController.objects.filter(
-            link="https://youtube.com" # permanent
+            link="https://youtube.com"  # permanent
         )
         self.assertEqual(permanent.count(), 1)
 
@@ -209,9 +205,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         )
         self.assertEqual(bookmarked.count(), 1)
 
-        permanent = LinkDataController.objects.filter(
-            link="https://youtube.com"
-        )
+        permanent = LinkDataController.objects.filter(link="https://youtube.com")
         self.assertEqual(permanent.count(), 1)
 
         nonbookmarked = LinkDataController.objects.filter(
@@ -231,7 +225,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.assertEqual(archived[1].domain, domains[0])
         self.assertEqual(archived[1].date_published, date_to_remove)
 
-    #def test_cleanup__https_http_duplicates(self):
+    # def test_cleanup__https_http_duplicates(self):
     #    conf = Configuration.get_object().config_entry
     #    conf.prefer_https_links = True
     #    conf.save()
@@ -270,7 +264,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
     #        0,
     #    )
 
-    #def test_cleanup__prefer_non_www_links(self):
+    # def test_cleanup__prefer_non_www_links(self):
     #    conf = Configuration.get_object().config_entry
     #    conf.prefer_non_www_links = True
     #    conf.save()

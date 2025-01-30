@@ -6,8 +6,7 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 
 from ..apps import LinkDatabase
-from ..models import EntryRules
-from ..models import ConfigurationEntry
+from ..models import EntryRules, BackgroundJobs, ConfigurationEntry
 from ..views import ViewPage, GenericListView
 from ..forms import EntryRulesForm
 
@@ -149,4 +148,4 @@ def entry_rules_json(request):
 
     dict_data = {"entryrules": rule_data}
 
-    return JsonResponse(dict_data, json_dumps_params={"indent":4})
+    return JsonResponse(dict_data, json_dumps_params={"indent": 4})

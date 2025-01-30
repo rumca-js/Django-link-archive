@@ -276,9 +276,7 @@ def source_add_form(request):
 
     data = SourceDataController.get_full_information({"url": url})
     if not data:
-        p.context["summary_text"] = "Could not obtain properties of link:{}".format(
-            url
-        )
+        p.context["summary_text"] = "Could not obtain properties of link:{}".format(url)
         return p.render("summary_present.html")
 
     notes = []
@@ -308,9 +306,7 @@ def source_add_form(request):
             "Detected www in domain link name. Select non www link if possible"
         )
     if domain.lower() != domain:
-        warnings.append(
-            "Link domain is not lowercase. Are you sure link name is OK?"
-        )
+        warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
     if config.respect_robots_txt and info and not info.is_allowed(link):
         warnings.append("Link is not allowed by site robots.txt")
     if link.find("?") >= 0:
@@ -422,7 +418,7 @@ def edit_source(request, pk):
 
 def source_is(request):
     def try_link(link):
-        sources = SourceDataController.objects.filter(url = link)
+        sources = SourceDataController.objects.filter(url=link)
         if sources.count() != 0:
             return sources[0]
 
@@ -432,7 +428,7 @@ def source_is(request):
     if data is not None:
         return data
 
-    link = request.GET['link']
+    link = request.GET["link"]
 
     data = {}
     source = try_link(link)
@@ -444,7 +440,7 @@ def source_is(request):
         data["status"] = False
         data["message"] = "Does not exist"
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def refresh_source(request, pk):
@@ -804,7 +800,7 @@ def source_json(request, pk):
     exporter = InstanceExporter()
     json_obj = exporter.export_source(source)
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def source_to_json(user_config, source):
@@ -862,7 +858,7 @@ def sources_json_view(request, view_class):
 
             json_obj["sources"].append(source_json)
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def sources_json_all(request):

@@ -1,12 +1,12 @@
-from ..models import Browser
+from ..models import Browser, EntryRules
 
 from ..webtools import (
-   RssPage,
-   HtmlPage,
-   HttpPageHandler,
-   YouTubeVideoHandler,
-   ScriptCrawler,
-   SeleniumChromeFull,
+    RssPage,
+    HtmlPage,
+    HttpPageHandler,
+    YouTubeVideoHandler,
+    ScriptCrawler,
+    SeleniumChromeFull,
 )
 
 from ..pluginurl.urlhandler import UrlHandlerEx, UrlHandler
@@ -37,7 +37,7 @@ class UrlHandlerTest(FakeInternetTestCase):
     def test_get_youtube_video(self):
         handler = UrlHandler("https://www.youtube.com/watch?v=1234")
 
-        self.assertEqual(type(handler.get_handler()), UrlHandlerEx.youtube_video_handler)
+        self.assertEqual(type(handler.get_handler()), UrlHandler.youtube_video_handler)
 
     def test_get_youtube_channel(self):
         handler = UrlHandler(
@@ -45,7 +45,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         )
 
         self.assertEqual(
-            type(handler.get_handler()), UrlHandlerEx.youtube_channel_handler
+            type(handler.get_handler()), UrlHandler.youtube_channel_handler
         )
 
     def test_rss_get_properties(self):
@@ -117,13 +117,42 @@ class UrlHandlerExTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_get_rss(self):
+    def test_get_properties(self):
         handler = UrlHandlerEx("https://rsspage.com/rss.xml")
         properties = handler.get_properties()
 
         self.assertTrue(properties)
 
-    def test_get_options(self):
+    def test_constructor__default_browsers(self):
+        Browser.objects.all().delete()
+
+        browser1 = Browser.objects.create(
+            name="test1",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        browser2 = Browser.objects.create(
+            name="test2",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        setup1 = browser1.get_setup()
+        setup2 = browser2.get_setup()
+
+        test_link = "https://rsspage.com/rss.xml"
+
+        # call tested function
+        handler = UrlHandlerEx(test_link)
+
+        mapping = handler.browsers
+
+        self.assertEqual(len(mapping), 2)
+        self.assertEqual(mapping[0]["name"], "test1")
+        self.assertEqual(mapping[1]["name"], "test2")
+
+    def test_constructor__default_browsers__entry_rules(self):
         Browser.objects.all().delete()
 
         browser1 = Browser.objects.create(
@@ -138,16 +167,111 @@ class UrlHandlerExTest(FakeInternetTestCase):
                 settings = '{"test_setting" : "something"}',
         )
 
+        # browser 2 is more important
+        EntryRules.objects.create(
+                rule_url = "rsspage.com",
+                browser = browser2,
+        )
+
         setup1 = browser1.get_setup()
         setup2 = browser2.get_setup()
 
         test_link = "https://rsspage.com/rss.xml"
 
-        options = UrlHandlerEx.get_options(test_link)
+        # call tested function
+        handler = UrlHandlerEx(test_link)
 
-        options.mode_mapping = [setup1, setup2]
+        mapping = handler.browsers
 
-        handler = UrlHandlerEx(test_link, page_options=options)
-        properties = handler.get_properties()
+        self.assertEqual(len(mapping), 2)
+        self.assertEqual(mapping[0]["name"], "test2")
+        self.assertEqual(mapping[1]["name"], "test1")
 
-        self.assertTrue(properties)
+    def test_constructor__arg_browsers(self):
+        Browser.objects.all().delete()
+
+        browser1 = Browser.objects.create(
+            name="test1",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        browser2 = Browser.objects.create(
+            name="test2",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        setup1 = browser1.get_setup()
+        setup2 = browser2.get_setup()
+
+        test_link = "https://rsspage.com/rss.xml"
+
+        # call tested function
+        handler = UrlHandlerEx(test_link, browsers=[setup1])
+
+        mapping = handler.browsers
+
+        self.assertEqual(len(mapping), 1)
+        self.assertEqual(mapping[0]["name"], "test1")
+
+    def test_get_browsers(self):
+        Browser.objects.all().delete()
+
+        browser1 = Browser.objects.create(
+            name="test1",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        browser2 = Browser.objects.create(
+            name="test2",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        setup1 = browser1.get_setup()
+        setup2 = browser2.get_setup()
+
+        test_link = "https://rsspage.com/rss.xml"
+
+        handler = UrlHandlerEx(test_link)
+
+        # call tested function
+        mapping = handler.get_browsers()
+
+        self.assertEqual(len(mapping), 2)
+        self.assertEqual(mapping[0]["name"], "test1")
+        self.assertEqual(mapping[1]["name"], "test2")
+
+    def test_get_ready_browser(self):
+        Browser.objects.all().delete()
+
+        browser1 = Browser.objects.create(
+            name="test1",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        browser2 = Browser.objects.create(
+            name="test2",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        setup1 = browser1.get_setup()
+        setup2 = browser2.get_setup()
+
+        test_link = "https://rsspage.com/rss.xml"
+
+        handler = UrlHandlerEx(
+            test_link,
+            browsers=[setup1, setup2],
+            settings={"handler_class": "HttpPageHandler"},
+        )
+
+        # call tested function
+        browser = handler.get_ready_browser(setup1)
+
+        self.assertEqual(browser["name"], "test1")
+        self.assertEqual(browser["settings"]["handler_class"], "HttpPageHandler")

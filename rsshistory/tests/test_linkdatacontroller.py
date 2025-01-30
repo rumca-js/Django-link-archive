@@ -495,9 +495,9 @@ class LinkDataControllerTest(FakeInternetTestCase):
             title="my title",
         )
 
-        comment = UserComments.objects.create(user = self.user,
-                entry = entry,
-                comment = "test")
+        comment = UserComments.objects.create(
+            user=self.user, entry=entry, comment="test"
+        )
 
         comment_data = entry.get_comment_vec()
 

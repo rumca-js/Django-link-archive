@@ -22,7 +22,9 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         test_link = "https://www.youtube.com/watch?v=archived"
         url = EntryUrlInterface(test_link)
 
-        expected_date_published = DateUtils.from_string("2023-11-13;00:00", "%Y-%m-%d;%H:%M")
+        expected_date_published = DateUtils.from_string(
+            "2023-11-13;00:00", "%Y-%m-%d;%H:%M"
+        )
         expected_date_published = DateUtils.to_utc_date(expected_date_published)
 
         props = url.get_props()

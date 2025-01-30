@@ -60,6 +60,7 @@ class DjangoRequestObject(object):
     """
     Used to mock django request object
     """
+
     def __init__(self, user):
         self.user = user
 
@@ -88,35 +89,34 @@ class FakeInternetData(object):
     def __init__(self, url):
         self.url = url
         self.properties = {
-            "link" : self.url,
-            "title" : "Title",
-            "description" : "Description",
-            "date_published" : "Description",
-            "author" : "Description",
-            "language" : "Language",
-            "album" : "Description",
-            "page_rating" : 80,
-            "thumbnail" : None,
-            }
+            "link": self.url,
+            "title": "Title",
+            "description": "Description",
+            "date_published": "Description",
+            "author": "Description",
+            "language": "Language",
+            "album": "Description",
+            "page_rating": 80,
+            "thumbnail": None,
+        }
 
         self.response = {
-            "status_code" : 200,
-            "Content-Length" : 200,
-            "Content-Type" : "text/html",
-            "body_hash" : b"01001012",
-            "hash" : b"01001012",
-            "is_valid" : True,
+            "status_code": 200,
+            "Content-Length": 200,
+            "Content-Type": "text/html",
+            "body_hash": b"01001012",
+            "hash": b"01001012",
+            "is_valid": True,
         }
-        self.contents_data = {
-            "Contents" : "test"}
+        self.contents_data = {"Contents": "test"}
         self.entries = {}
 
     def get_all_properties(self):
         data = []
-        data.append({"name" : "Properties", "data": self.properties})
-        data.append({"name" : "Response", "data": self.response})
-        data.append({"name" : "Contents", "data": self.contents_data})
-        data.append({"name" : "Entries", "data": self.entries})
+        data.append({"name": "Properties", "data": self.properties})
+        data.append({"name": "Response", "data": self.response})
+        data.append({"name": "Contents", "data": self.contents_data})
+        data.append({"name": "Entries", "data": self.entries})
 
         return data
 
@@ -126,17 +126,23 @@ class FakeInternetData(object):
             self.properties["description"] = "Https LinkedIn Page description"
         elif self.url == "https://m.youtube.com/watch?v=1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-            self.properties["feed_0"] = "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+            self.properties["feed_0"] = (
+                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+            )
             self.properties["title"] = "YouTube 1234 video"
             self.properties["language"] = None
         elif self.url == "https://www.youtube.com/watch?v=1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-            self.properties["feed_0"] = "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+            self.properties["feed_0"] = (
+                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+            )
             self.properties["title"] = "YouTube 1234 video"
             self.properties["language"] = None
         elif self.url == "https://youtu.be/1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-            self.properties["feed_0"] = "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+            self.properties["feed_0"] = (
+                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+            )
             self.properties["title"] = "YouTube 1234 video"
             self.properties["language"] = None
         elif self.url == "https://www.reddit.com/r/searchengines/":
@@ -146,7 +152,9 @@ class FakeInternetData(object):
         elif self.url == "https://page-with-rss-link.com":
             self.properties["feed_0"] = "https://page-with-rss-link.com/feed"
         elif self.url == "https://www.codeproject.com/WebServices/NewsRSS.aspx":
-            self.properties["thumbnail"] = "https://www.codeproject.com/App_Themes/Std/Img/logo100x30.gif"
+            self.properties["thumbnail"] = (
+                "https://www.codeproject.com/App_Themes/Std/Img/logo100x30.gif"
+            )
 
         return self.get_all_properties()
 
@@ -159,7 +167,9 @@ class FakeInternetTestCase(TestCase):
     def disable_web_pages(self):
         WebLogger.web_logger = AppLogging
         WebConfig.get_default_crawler = FakeInternetTestCase.get_default_crawler
-        WebConfig.get_crawler_from_mapping = FakeInternetTestCase.get_crawler_from_mapping
+        WebConfig.get_crawler_from_mapping = (
+            FakeInternetTestCase.get_crawler_from_mapping
+        )
         RemoteServer.get_crawlj = self.get_crawlj
         UrlHandlerEx.ping = FakeInternetTestCase.ping
 
@@ -174,29 +184,29 @@ class FakeInternetTestCase(TestCase):
         return True
 
     def get_crawlj(self, url, name="", settings=None):
-        #print("FakeInternet:get_crawlj: Url:{}".format(url))
-        #return json.loads(remote_server_json)
+        # print("FakeInternet:get_crawlj: Url:{}".format(url))
+        # return json.loads(remote_server_json)
         data = FakeInternetData(url)
         return data.get_crawlj(name, settings)
 
     def get_default_crawler(url):
-        crawler = DefaultCrawler(url = url)
+        crawler = DefaultCrawler(url=url)
 
         crawler_data = {
-                "name" : "DefaultCrawler",
-                "crawler" : crawler,
-                "settings" : {
-                    "timeout_s" : 10,
-                },
+            "name": "DefaultCrawler",
+            "crawler": crawler,
+            "settings": {
+                "timeout_s": 10,
+            },
         }
 
         return crawler_data
 
     def get_crawler_from_mapping(request, crawler_data):
         if "settings" in crawler_data:
-            crawler = DefaultCrawler(request = request, settings = crawler_data["settings"])
+            crawler = DefaultCrawler(request=request, settings=crawler_data["settings"])
         else:
-            crawler = DefaultCrawler(request = request)
+            crawler = DefaultCrawler(request=request)
         crawler.crawler_data = crawler_data
 
         return crawler

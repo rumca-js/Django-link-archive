@@ -68,7 +68,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # self.assertEqual(entry.date_update_last, date_updated)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)
-        
+
     def test_update_data__adds_scan_job(self):
         MockRequestCounter.mock_page_requests = 0
 
@@ -100,7 +100,9 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         u.update_data()
 
-        scan_jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_SCAN)
+        scan_jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_SCAN
+        )
         self.assertEqual(scan_jobs.count(), 1)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)
@@ -426,9 +428,13 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         u.update_data()
 
-        entries = LinkDataController.objects.filter(link="https://youtube.com/watch?v=1234")
+        entries = LinkDataController.objects.filter(
+            link="https://youtube.com/watch?v=1234"
+        )
         self.assertEqual(entries.count(), 1)
-        self.assertTrue(entries[0].thumbnail, "https://youtube.com/files/1234-thumbnail.png")
+        self.assertTrue(
+            entries[0].thumbnail, "https://youtube.com/files/1234-thumbnail.png"
+        )
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
@@ -503,7 +509,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # self.assertEqual(entry.date_update_last, date_updated)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)
-        
+
     def test_reset_data__adds_scan_job(self):
         MockRequestCounter.mock_page_requests = 0
 
@@ -534,7 +540,9 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         u.reset_data()
 
-        scan_jobs = BackgroundJobController.objects.filter(job = BackgroundJobController.JOB_LINK_SCAN)
+        scan_jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_SCAN
+        )
         self.assertEqual(scan_jobs.count(), 1)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)

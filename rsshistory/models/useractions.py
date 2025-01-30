@@ -161,7 +161,6 @@ class UserTags(models.Model):
         for tag in tags_set:
             UserTags.objects.create(tag=tag, entry=entry, user=user)
 
-
     def cleanup(cfg=None):
         if cfg and "verify" in cfg:
             for tag in UserTags.objects.all():
@@ -225,7 +224,9 @@ class UserCompactedTags(models.Model):
         tags = UserTags.objects.filter(user=user, tag=tag_name)
 
         if tags.count() > 0:
-            UserCompactedTags.objects.create(tag=tag_name, count=tags.count(), user=user)
+            UserCompactedTags.objects.create(
+                tag=tag_name, count=tags.count(), user=user
+            )
 
         CompactedTags.compact(tag_name)
 
@@ -305,6 +306,7 @@ class UserVotes(models.Model):
                 votes.delete()
 
         from ..controllers import BackgroundJobController
+
         BackgroundJobController.entry_reset_local_data(entry)
 
         return ob

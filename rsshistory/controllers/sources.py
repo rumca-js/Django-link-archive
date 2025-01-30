@@ -138,7 +138,9 @@ class SourceDataController(SourceDataModel):
             if dynamic_data.consecutive_errors > 20:
                 id = self.id
                 url = self.url
-                AppLogging.notify("Disabling source ID:{} URL:{} because of errors".format(id, url))
+                AppLogging.notify(
+                    "Disabling source ID:{} URL:{} because of errors".format(id, url)
+                )
                 self.enabled = False
                 self.save()
 
@@ -342,7 +344,7 @@ class SourceDataController(SourceDataModel):
 
         self.delete()
 
-    def update_data(self, update_with = None):
+    def update_data(self, update_with=None):
         if not self.auto_update_favicon:
             return
 

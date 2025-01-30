@@ -469,7 +469,9 @@ class EntryArchivedDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
-        context["object_controller"] = EntryPreviewBuilder.get(self.object, self.request.user)
+        context["object_controller"] = EntryPreviewBuilder.get(
+            self.object, self.request.user
+        )
 
         m = WaybackMachine()
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
@@ -702,7 +704,7 @@ def add_entry_form(request):
     if data is not None:
         return data
 
-    init = {"user":request.user}
+    init = {"user": request.user}
 
     link = None
     if "link" in request.GET:
@@ -716,7 +718,7 @@ def add_entry_form(request):
             init["permanent"] = True
             init["bookmarked"] = False
 
-    form = EntryForm(initial = init, request=request)
+    form = EntryForm(initial=init, request=request)
     p.context["form"] = form
 
     return p.render("entry_add__form.html")
@@ -740,7 +742,7 @@ def entry_is(request):
     if data is not None:
         return data
 
-    link = request.GET['link']
+    link = request.GET["link"]
 
     data = {}
     wrapper = EntryWrapper(link=link)
@@ -754,7 +756,7 @@ def entry_is(request):
         data["status"] = False
         data["message"] = "Does not exist"
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def entry_update_data(request, pk):
@@ -899,7 +901,7 @@ def entry_remove(request, pk):
         data["message"] = "No source for ID: " + str(pk)
         data["status"] = False
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def entry_active(request, pk):
@@ -997,23 +999,32 @@ def entry_dislikes(request, pk):
 
         controller = SystemOperationController()
         if controller.is_remote_server_down():
-            return JsonResponse({}, json_dumps_params={"indent":4})
+            return JsonResponse({}, json_dumps_params={"indent": 4})
 
         link = config.remote_webtools_server_location
         remote_server = RemoteServer(link)
 
         json_obj = remote_server.get_social(obj.link)
         if not json_obj:
-            AppLogging.error("Url:{} Could not obtain social properties".format(obj.link))
-            p.context["summary_text"] = "Url:{} Could not obtain social properties".format(obj.link)
+            AppLogging.error(
+                "Url:{} Could not obtain social properties".format(obj.link)
+            )
+            p.context["summary_text"] = (
+                "Url:{} Could not obtain social properties".format(obj.link)
+            )
             return p.render("go_back.html")
 
         try:
-            return JsonResponse(json_obj, json_dumps_params={"indent":4})
+            return JsonResponse(json_obj, json_dumps_params={"indent": 4})
         except Exception as E:
-            AppLogging.error("Url:{} Could not dump social properties".format(obj.link, json_obj))
-            p.context["summary_text"] = "Url:{} Could not dump social properties".format(obj.link, json_obj)
+            AppLogging.error(
+                "Url:{} Could not dump social properties".format(obj.link, json_obj)
+            )
+            p.context["summary_text"] = (
+                "Url:{} Could not dump social properties".format(obj.link, json_obj)
+            )
             return p.render("go_back.html")
+
 
 def entry_bookmark(request, pk):
     p = ViewPage(request)
@@ -1038,7 +1049,7 @@ def entry_bookmark(request, pk):
         json_obj["status"] = True
         json_obj["message"] = "Bookmarked"
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def entry_unbookmark(request, pk):
@@ -1056,7 +1067,7 @@ def entry_unbookmark(request, pk):
         "message": "Unbookmarked",
     }
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def download_entry(request, pk):
@@ -1117,7 +1128,7 @@ def entry_json(request, pk):
     exporter = InstanceExporter()
     json_obj = exporter.export_link(link)
 
-    return JsonResponse(json_obj, json_dumps_params={"indent":4})
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def handle_json_view(request, view_to_use):
@@ -1153,7 +1164,7 @@ def handle_json_view(request, view_to_use):
 
                 json_obj["entries"].append(entry_json)
 
-        return JsonResponse(json_obj, json_dumps_params={"indent":4})
+        return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def entries_json(request):

@@ -8,9 +8,8 @@ from ..webtools import (
     RemoteServer,
     PageOptions,
 )
-
 from ..apps import LinkDatabase
-from ..models import AppLogging, EntryRules, BlockEntry
+from ..models import AppLogging, EntryRules, BlockEntry, Browser
 from ..configuration import Configuration
 
 
@@ -44,9 +43,6 @@ class UrlHandler(Url):
 
     def get_init_page_options(self, init_options=None):
         o = super().get_init_page_options(init_options)
-
-        # TODO this is reading overhead. We might cache something?
-        from ..models import Browser
 
         browser_mapping = Browser.get_browser_setup()
         if browser_mapping != []:
@@ -106,17 +102,20 @@ class UrlHandler(Url):
 
 
 class UrlHandlerEx(object):
-    """
-    """
+    """ """
 
-    def __init__(self, url=None, page_options=None, handler_class=None):
+    def __init__(self, url=None, settings=None, browsers=None):
         self.url = url
 
-        self.options = page_options
-        if not self.options:
-            self.options = UrlHandlerEx.get_options(self.url)
+        self.settings = settings
+        if not self.settings:
+            self.settings = {}
 
-        self.handler_class = handler_class
+        self.browsers = browsers
+        if not browsers:
+            self.browsers = Browser.get_browser_setup()
+            self.browsers = self.get_browsers()
+
         self.all_properties = None
 
     def get_properties(self):
@@ -127,16 +126,30 @@ class UrlHandlerEx(object):
         if config_entry.remote_webtools_server_location:
             request_server = RemoteServer(config_entry.remote_webtools_server_location)
 
+            mode_mapping = self.browsers
+
             name = ""
-            if self.options and self.options.mode_mapping and len(self.options.mode_mapping) > 0:
-                for item in self.options.mode_mapping:
+            if mode_mapping and len(mode_mapping) > 0:
+                for item in mode_mapping:
+                    item = self.get_ready_browser(item)
+
                     if self.is_remote_server_down():
-                        AppLogging.error("Cannot ping remote server: {}".format(config_entry.remote_webtools_server_location))
+                        AppLogging.error(
+                            "Cannot ping remote server: {}".format(
+                                config_entry.remote_webtools_server_location
+                            )
+                        )
                         return
 
-                    self.all_properties = request_server.get_crawlj(self.url, name=item["name"], settings=item["settings"])
+                    self.all_properties = request_server.get_crawlj(
+                        self.url, name=item["name"], settings=item["settings"]
+                    )
                     if not self.all_properties:
-                        AppLogging.error("Url:{} Could not communicate with remote server, item:{}".format(self.url, str(item)))
+                        AppLogging.error(
+                            "Url:{} Could not communicate with remote server, item:{}".format(
+                                self.url, str(item)
+                            )
+                        )
                         continue
 
                     """
@@ -153,12 +166,48 @@ class UrlHandlerEx(object):
             else:
                 self.all_properties = request_server.get_crawlj(self.url)
                 if not self.all_properties:
-                    AppLogging.error("Url:{} Could not communicate with remote server".format(self.url))
+                    AppLogging.error(
+                        "Url:{} Could not communicate with remote server".format(
+                            self.url
+                        )
+                    )
 
         if not self.all_properties:
             self.all_properties = []
 
         return self.all_properties
+
+    def get_ready_browser(self, crawler_data):
+        config_entry = Configuration.get_object().config_entry
+
+        for settings_key in self.settings:
+            crawler_data["settings"][settings_key] = self.settings[settings_key]
+
+        if "ssl_verify" not in crawler_data["settings"]:
+            crawler_data["settings"]["ssl_verify"] = config_entry.ssl_verification
+
+        return crawler_data
+
+    def get_browsers(self):
+        browsers = self.browsers
+
+        rules = EntryRules.get_url_rules(self.url)
+        if len(rules) > 0:
+            for rule in rules:
+                if rule.browser:
+                    browsers = self.bring_to_front(browsers, rule.browser.get_setup())
+
+        return browsers
+
+    def bring_to_front(self, browsers, input_data):
+        result = [input_data]
+        for mode_data in browsers:
+            if mode_data == input_data:
+                continue
+
+            result.append(mode_data)
+
+        return result
 
     def get_title(self):
         properties = self.get_section("Properties")
@@ -214,26 +263,6 @@ class UrlHandlerEx(object):
         request_server = RemoteServer("test")
         return request_server.read_properties_section(section_name, properties)
 
-    def get_options(url):
-        options = PageOptions()
-
-        from ..models import Browser
-
-        browser_mapping = Browser.get_browser_setup()
-        if browser_mapping != []:
-            options.mode_mapping = browser_mapping
-
-        rules = EntryRules.get_url_rules(url)
-        if len(rules) > 0:
-            for rule in rules:
-                if rule.browser:
-                    options.bring_to_front(rule.browser.get_setup())
-
-        config = Configuration.get_object().config_entry
-        options.ssl_verify = config.ssl_verification
-
-        return options
-
     def is_valid(self):
         response = self.get_section("Response")
         if not response:
@@ -288,7 +317,7 @@ class UrlHandlerEx(object):
         try:
             with requests.get(
                 url=url,
-                headers = headers,
+                headers=headers,
                 timeout=20,
                 verify=False,
                 stream=True,

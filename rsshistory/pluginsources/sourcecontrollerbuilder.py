@@ -37,8 +37,11 @@ class SourceControllerBuilder(object):
             if source.source_type == plugin.PLUGIN_NAME:
                 return plugin
 
-        AppLogging.notify("Incorrectly configured source, ID:{} title:{}, type:{}. Setting it to base RSS type".format(
-                source.id, source.title, source.source_type))
+        AppLogging.notify(
+            "Incorrectly configured source, ID:{} title:{}, type:{}. Setting it to base RSS type".format(
+                source.id, source.title, source.source_type
+            )
+        )
 
         source.source_type = "BaseRssPlugin"
         source.save()

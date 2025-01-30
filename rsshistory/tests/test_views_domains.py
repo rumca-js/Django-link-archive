@@ -30,9 +30,7 @@ class DomainsViewsTest(FakeInternetTestCase):
             language="en",
         )
 
-        DomainsController.objects.create(
-                domain = "https://linkedin.com"
-        )
+        DomainsController.objects.create(domain="https://linkedin.com")
 
         self.client.login(username="testuser", password="testpassword")
 
@@ -50,9 +48,7 @@ class DomainsViewsTest(FakeInternetTestCase):
             language="en",
         )
 
-        DomainsController.objects.create(
-                domain = "https://linkedin.com"
-        )
+        DomainsController.objects.create(domain="https://linkedin.com")
 
         self.client.login(username="testuser", password="testpassword")
 

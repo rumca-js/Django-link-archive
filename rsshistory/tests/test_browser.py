@@ -60,9 +60,9 @@ class BrowserTest(FakeInternetTestCase):
         Browser.objects.all().delete()
 
         browser = Browser.objects.create(
-                name = "test",
-                crawler = "RequestsCrawler",
-                settings = '{"test_setting" : "something"}',
+            name="test",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
         )
 
         # call tested function

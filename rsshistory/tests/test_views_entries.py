@@ -278,7 +278,9 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        entries = LinkDataController.objects.filter(link="https://www.youtube.com/watch?v=1234")
+        entries = LinkDataController.objects.filter(
+            link="https://www.youtube.com/watch?v=1234"
+        )
         self.assertEqual(entries.count(), 1)
 
         entry = entries[0]
@@ -322,7 +324,10 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
 
         entry = entries[0]
-        self.assertEqual(entry.link, "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        self.assertEqual(
+            entry.link,
+            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
+        )
         self.assertTrue(entry.title)
 
         current_date = DateUtils.get_datetime_now_utc()
@@ -440,7 +445,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:entry-add-form".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
-        url = url + "?link="+test_link
+        url = url + "?link=" + test_link
 
         # call user action
         response = self.client.get(url)
@@ -1092,7 +1097,7 @@ class EntriesDetailViews(FakeInternetTestCase):
 
         url = reverse("{}:entry-is".format(LinkDatabase.name))
 
-        url=url+"?link=https://linkedin.com"
+        url = url + "?link=https://linkedin.com"
 
         # call tested function
         response = self.client.get(url)
@@ -1109,7 +1114,7 @@ class EntriesDetailViews(FakeInternetTestCase):
 
         url = reverse("{}:entry-is".format(LinkDatabase.name))
 
-        url=url+"?link=https://linkedin.does-not-exist.com"
+        url = url + "?link=https://linkedin.does-not-exist.com"
 
         # call tested function
         response = self.client.get(url)
@@ -1148,7 +1153,7 @@ class EntriesDetailViews(FakeInternetTestCase):
         # call tested function
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        
+
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_entry_dislikes__reddit(self):

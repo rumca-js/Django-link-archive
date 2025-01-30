@@ -92,7 +92,10 @@ class ConfigurationEntry(models.Model):
     )
 
     admin_user = models.CharField(
-        max_length=500, default="admin", blank=True, help_text="Username of the administrator."
+        max_length=500,
+        default="admin",
+        blank=True,
+        help_text="Username of the administrator.",
     )
 
     view_access_type = models.CharField(
@@ -203,7 +206,8 @@ class ConfigurationEntry(models.Model):
     )
 
     enable_domain_support = models.BooleanField(
-        default=True, help_text="Enable domain feature support. Creates additional domain objects when a new entry is add."
+        default=True,
+        help_text="Enable domain feature support. Creates additional domain objects when a new entry is add.",
     )
 
     # TODO discuss what it does in help_text
@@ -242,7 +246,8 @@ class ConfigurationEntry(models.Model):
     # this option is necessary, if we want to have rss client, with option to drop old entries,
     # but which keeps domains, or other permanent entries
     keep_domain_links = models.BooleanField(
-        default=False, help_text="If enabled, domains will be treated as permanent entries in the system."
+        default=False,
+        help_text="If enabled, domains will be treated as permanent entries in the system.",
     )
 
     auto_scan_new_entries = models.BooleanField(
@@ -311,8 +316,7 @@ class ConfigurationEntry(models.Model):
     )
 
     days_to_remove_stale_entries = models.IntegerField(
-        default=35,
-        help_text="Number of days after which inactive entries are removed."
+        default=35, help_text="Number of days after which inactive entries are removed."
     )
 
     days_to_check_std_entries = models.IntegerField(
@@ -345,7 +349,7 @@ class ConfigurationEntry(models.Model):
 
     ssl_verification = models.BooleanField(
         default=True,
-        help_text="Enable SSL certificate verification for network requests. Disabling may improve speed but could result in invalid or insecure pages."
+        help_text="Enable SSL certificate verification for network requests. Disabling may improve speed but could result in invalid or insecure pages.",
     )  # Might work faster if disabled, but might capture invalid pages
 
     user_agent = models.CharField(
@@ -394,27 +398,25 @@ class ConfigurationEntry(models.Model):
 
     max_user_entry_visit_history = models.IntegerField(
         default=5000,
-        help_text="The maximum number of entry visit history. If set to 0, entry visit history is not cleared."
+        help_text="The maximum number of entry visit history. If set to 0, entry visit history is not cleared.",
     )
 
     max_number_of_user_search = models.IntegerField(
         default=700,
-        help_text="The maximum number of searches stored in history. If set to 0, search history is not cleared."
+        help_text="The maximum number of searches stored in history. If set to 0, search history is not cleared.",
     )
 
     vote_min = models.IntegerField(
-        default=-100,
-        help_text="The minimum allowed vote value."
+        default=-100, help_text="The minimum allowed vote value."
     )
 
     vote_max = models.IntegerField(
-        default=100,
-        help_text="The maximum allowed vote value."
+        default=100, help_text="The maximum allowed vote value."
     )
 
     number_of_comments_per_day = models.IntegerField(
         default=1,
-        help_text="The maximum number of comments a user can post per day to maintain community culture."
+        help_text="The maximum number of comments a user can post per day to maintain community culture.",
     )
 
     # display
@@ -422,19 +424,18 @@ class ConfigurationEntry(models.Model):
     time_zone = models.CharField(
         max_length=50,
         default="UTC",
-        help_text="Specify the time zone. Example: Europe/Warsaw. A list of time zones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones."
+        help_text="Specify the time zone. Example: Europe/Warsaw. A list of time zones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.",
     )
 
-    # TODO rename to whats_new_time_range_days 
+    # TODO rename to whats_new_time_range_days
     whats_new_days = models.IntegerField(
-        default=7,
-        help_text="The number of days to show in the 'What's New' section."
+        default=7, help_text="The number of days to show in the 'What's New' section."
     )
 
     entries_order_by = models.CharField(
         default="-date_published",  # TODO support for multiple columns
         max_length=1000,
-        help_text="Specify the sorting order for entries. For a Google-like experience, set to '-page_rating'. Default is '-date_published'."
+        help_text="Specify the sorting order for entries. For a Google-like experience, set to '-page_rating'. Default is '-date_published'.",
     )
 
     display_style = models.CharField(
@@ -442,57 +443,56 @@ class ConfigurationEntry(models.Model):
         null=True,
         default=DISPLAY_STYLE_LIGHT,
         choices=STYLE_TYPES,
-        help_text="Defines the display style for users who are not logged in."
+        help_text="Defines the display style for users who are not logged in.",
     )
     display_type = models.CharField(
         max_length=500,
         null=True,
         default=DISPLAY_TYPE_STANDARD,
         choices=DISPLAY_TYPE_CHOICES,
-        help_text="Defines the display type for users who are not logged in."
+        help_text="Defines the display type for users who are not logged in.",
     )
     show_icons = models.BooleanField(
         default=True,
-        help_text="Whether to display icons for users who are not logged in."
+        help_text="Whether to display icons for users who are not logged in.",
     )
     thumbnails_as_icons = models.BooleanField(
         default=True,
-        help_text="If false, source favicons are used as thumbnails for users who are not logged in."
+        help_text="If false, source favicons are used as thumbnails for users who are not logged in.",
     )
     small_icons = models.BooleanField(
         default=True,
-        help_text="Whether to use small icons for users who are not logged in."
+        help_text="Whether to use small icons for users who are not logged in.",
     )
     local_icons = models.BooleanField(
         default=False,
-        help_text="If true, only locally stored icons are displayed for users who are not logged in."
+        help_text="If true, only locally stored icons are displayed for users who are not logged in.",
     )
 
     links_per_page = models.IntegerField(
         default=100,
-        help_text="The number of links displayed per page for users who are not logged in."
+        help_text="The number of links displayed per page for users who are not logged in.",
     )
     sources_per_page = models.IntegerField(
         default=100,
-        help_text="The number of sources displayed per page for users who are not logged in."
+        help_text="The number of sources displayed per page for users who are not logged in.",
     )
 
     max_links_per_page = models.IntegerField(
         default=100,
-        help_text="The maximum number of links that can be displayed per page."
+        help_text="The maximum number of links that can be displayed per page.",
     )
     max_sources_per_page = models.IntegerField(
         default=100,
-        help_text="The maximum number of sources that can be displayed per page."
+        help_text="The maximum number of sources that can be displayed per page.",
     )
     max_number_of_related_links = models.IntegerField(
         default=30,
-        help_text="The maximum number of related links displayed in the 'entry detail' view."
+        help_text="The maximum number of related links displayed in the 'entry detail' view.",
     )
 
     debug_mode = models.BooleanField(
-        default=False,
-        help_text="Enable debug mode to see errors more clearly."
+        default=False, help_text="Enable debug mode to see errors more clearly."
     )
 
     def get():

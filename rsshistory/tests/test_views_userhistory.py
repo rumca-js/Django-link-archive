@@ -107,9 +107,7 @@ class UserHistoryViewsTest(FakeInternetTestCase):
         UserEntryVisitHistory.visited(self.entry_youtube, self.user)
         UserEntryVisitHistory.visited(self.entry_linkedin, self.user)
 
-        url = reverse(
-            "{}:user-browse-history".format(LinkDatabase.name)
-        )
+        url = reverse("{}:user-browse-history".format(LinkDatabase.name))
 
         # call tested function
         response = self.client.get(url)
@@ -124,9 +122,7 @@ class UserHistoryViewsTest(FakeInternetTestCase):
         UserEntryVisitHistory.visited(self.entry_youtube, self.user)
         UserEntryVisitHistory.visited(self.entry_linkedin, self.user)
 
-        url = reverse(
-            "{}:get-user-browse-history".format(LinkDatabase.name)
-        )
+        url = reverse("{}:get-user-browse-history".format(LinkDatabase.name))
 
         # call tested function
         response = self.client.get(url)

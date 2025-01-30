@@ -60,7 +60,7 @@ class Domains(models.Model):
             domain_only = p.get_domain_only()
 
             if self.domain != domain_only:
-                domains = Domains.objects.filter(domain = domain_only)
+                domains = Domains.objects.filter(domain=domain_only)
                 if domains.exists():
                     domains.delete()
 

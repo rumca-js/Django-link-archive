@@ -441,7 +441,6 @@ class EntryUpdater(object):
 
                 return False
 
-        
         body_hash = response["body_hash"]
         if body_hash:
             if not entry.body_hash:
@@ -474,7 +473,9 @@ class EntryUpdater(object):
         request_server = RemoteServer("https://")
 
         response = request_server.read_properties_section("Response", all_properties)
-        properties = request_server.read_properties_section("Properties", all_properties)
+        properties = request_server.read_properties_section(
+            "Properties", all_properties
+        )
 
         if response:
             if "Last-Modified" in response and response["Last-Modified"]:
@@ -537,6 +538,9 @@ class EntryUpdater(object):
 
         if self.entry is None:
             AppLogging.error("Cannot update data")
+            return
+
+        if not w.entry:
             return
 
         if not w.is_current_entry_perfect():
@@ -696,9 +700,7 @@ class EntryUpdater(object):
         server = RemoteServer("https://")
         contents = server.read_properties_section("Contents", properties)
 
-        scanner = EntryScanner(
-            url=entry.link, entry=entry, contents=contents
-        )
+        scanner = EntryScanner(url=entry.link, entry=entry, contents=contents)
         scanner.run()
 
     def reset_local_data(self):
@@ -817,7 +819,9 @@ class EntryUpdater(object):
 
         if url_entry_interface.all_properties:
             server = RemoteServer("")
-            response = server.read_properties_section("Response", url_entry_interface.all_properties)
+            response = server.read_properties_section(
+                "Response", url_entry_interface.all_properties
+            )
             if response:
                 entry.status_code = response["status_code"]
             else:
@@ -1051,7 +1055,7 @@ class EntryWrapper(object):
             try:
                 if hasattr(entry_obj, "domain"):
                     if entry_obj.domain:
-                            themap["domain"] = entry_obj.domain
+                        themap["domain"] = entry_obj.domain
             except Exception as E:
                 AppLogging.exc(E)
 
@@ -1077,7 +1081,7 @@ class EntryWrapper(object):
             try:
                 if hasattr(archive_obj, "domain"):
                     if archive_obj.domain:
-                            themap["domain"] = archive_obj.domain
+                        themap["domain"] = archive_obj.domain
             except Exception as E:
                 AppLogging.exc(E)
             new_obj = LinkDataController.objects.create(**themap)
@@ -1221,6 +1225,7 @@ class EntryWrapper(object):
 
     def is_current_entry_perfect(self):
         from ..pluginurl import UrlHandlerEx, EntryUrlInterface
+
         entry = self.entry
 
         if not entry:
@@ -1287,6 +1292,7 @@ class EntryWrapper(object):
         @returns new object, or None if object has not been changed
         """
         from ..pluginurl import EntryUrlInterface
+
         if not self.entry:
             return
 

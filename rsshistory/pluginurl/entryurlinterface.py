@@ -180,7 +180,9 @@ class EntryUrlInterface(object):
 
         is_domain = UrlLocation(self.url).is_domain()
         request_server = RemoteServer(c.remote_webtools_server_location)
-        properties = request_server.read_properties_section("Properties", self.all_properties)
+        properties = request_server.read_properties_section(
+            "Properties", self.all_properties
+        )
         if is_domain and properties and "favicon" in properties:
             input_props["thumbnail"] = properties["favicon"]
 

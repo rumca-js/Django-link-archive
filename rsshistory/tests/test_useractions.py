@@ -290,8 +290,6 @@ class CompactedTagsTest(TestCase):
         self.assertTrue("tag2" in compact_list)
 
 
-
-
 class UserVotesTest(TestCase):
     def setUp(self):
         c = Configuration.get_object()
@@ -486,5 +484,3 @@ class UserBookmarksTest(TestCase):
 
         self.entry.refresh_from_db()
         self.assertTrue(self.entry.bookmarked, False)
-
-

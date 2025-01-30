@@ -27,7 +27,9 @@ def read_later_entries(request):
     if "search" in request.GET:
         data = {"search": request.GET["search"]}
 
-    p.context["query_page"] = reverse("{}:get-read-later-queue".format(LinkDatabase.name))
+    p.context["query_page"] = reverse(
+        "{}:get-read-later-queue".format(LinkDatabase.name)
+    )
     p.context["search_suggestions_page"] = None
     p.context["search_history_page"] = None
 
@@ -71,7 +73,7 @@ def get_read_later_queue(request):
                 json_data = read_later_to_json(user_config, read_later)
                 data["queue"].append(json_data)
 
-        return JsonResponse(data, json_dumps_params={"indent":4})
+        return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def read_later_add(request, pk):
@@ -98,7 +100,7 @@ def read_later_add(request, pk):
         data["message"] = "Cannot find such entry"
         data["status"] = False
 
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def read_later_remove(request, pk):
@@ -127,7 +129,7 @@ def read_later_remove(request, pk):
     else:
         data["message"] = "Cannot find such entry"
         data["status"] = False
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def read_later_clear(request):
@@ -142,4 +144,4 @@ def read_later_clear(request):
     data = {}
     data["message"] = "Successfully removed read queue"
     data["status"] = True
-    return JsonResponse(data, json_dumps_params={"indent":4})
+    return JsonResponse(data, json_dumps_params={"indent": 4})

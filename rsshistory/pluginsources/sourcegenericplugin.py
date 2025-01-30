@@ -93,9 +93,13 @@ class SourceGenericPlugin(object):
                 return calculate_hash("")
 
             request_server = RemoteServer(c.remote_webtools_server_location)
-            entries = request_server.read_properties_section("Entries", self.all_properties)
+            entries = request_server.read_properties_section(
+                "Entries", self.all_properties
+            )
             for entry in entries:
-                entry["date_published"] = DateUtils.parse_datetime(entry["date_published"])
+                entry["date_published"] = DateUtils.parse_datetime(
+                    entry["date_published"]
+                )
                 yield entry
 
     def read_data_from_container_elements(self):
@@ -199,7 +203,9 @@ class SourceGenericPlugin(object):
                 return calculate_hash("")
 
             request_server = RemoteServer(c.remote_webtools_server_location)
-            response = request_server.read_properties_section("Response", self.all_properties)
+            response = request_server.read_properties_section(
+                "Response", self.all_properties
+            )
             encoded_hash = response["body_hash"]
             if not encoded_hash:
                 encoded_hash = response["hash"]

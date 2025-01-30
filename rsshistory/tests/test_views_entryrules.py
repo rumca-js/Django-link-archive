@@ -77,6 +77,25 @@ class EntryRulesTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_entry_rule_run(self):
+        entry_rule = EntryRules.objects.create(
+            enabled=True,
+            rule_name="test_rule",
+            rule_url="https://neocities.com",
+            auto_tag="personal",
+        )
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse(
+            "{}:entry-rule-run".format(LinkDatabase.name), args=[entry_rule.id]
+        )
+
+        # call user action
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
     def test_entry_rule_remove(self):
         entry_rule = EntryRules.objects.create(
             enabled=True,
