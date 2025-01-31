@@ -46,6 +46,10 @@ class BaseRssPlugin(SourceGenericPlugin):
         if not contents:
             return
 
+        if not isinstance(contents, str):
+            AppLogging.error("Contents is not string {}".format(contents))
+            return
+
         # we could check if content-type suggests it is a RSS page
         # but server might say it is text/html (which is not)
         # This plugin handles RssPages
@@ -70,10 +74,14 @@ class BaseRssPlugin(SourceGenericPlugin):
         c = Configuration.get_object().config_entry
 
         if c.remote_webtools_server_location:
+            remote_entries = 0
             for entry in super().get_entries():
                 yield entry
+                remote_entries += 1
 
-            return
+            # if remote cannot process entries correctly, we retry manually to process it
+            if remote_entries > 0:
+                return
 
         self.reader = self.get_container_reader_element()
 

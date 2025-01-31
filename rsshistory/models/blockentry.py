@@ -130,6 +130,16 @@ class BlockEntryList(models.Model):
         for item in BlockEntryList.objects.all():
             item.update()
 
+    def update_lists():
+        from ..controllers import BackgroundJobController
+
+        # this creates new lists
+        BlockEntryList.read_lists_group(
+            "https://v.firebog.net/hosts/lists.php?type=tick"
+        )
+
+        # TODO check lists, if outdated (not 200) then remove?
+
     def reset():
         BlockEntry.objects.all().delete()
         BlockEntryList.objects.all().delete()

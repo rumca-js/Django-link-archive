@@ -31,9 +31,9 @@ def block_lists_update(request):
     if data is not None:
         return data
 
-    BlockEntryList.update_all()
+    BlockEntryList.update_lists()
 
-    p.context["summary_text"] = "Added update block lists job"
+    p.context["summary_text"] = "Updated lists"
 
     return p.render("go_back.html")
 
@@ -87,9 +87,15 @@ class BlockEntryListListView(GenericListView):
     paginate_by = 100
     template_name = str(ViewPage.get_full_template("blockentrylist_list.html"))
 
+    def get_title(self):
+        return "Block lists"
+
 
 class BlockEntryListView(GenericListView):
     model = BlockEntry
     context_object_name = "blockentries"
     paginate_by = 100
     template_name = str(ViewPage.get_full_template("blockentry_list.html"))
+
+    def get_title(self):
+        return "Block list entries"

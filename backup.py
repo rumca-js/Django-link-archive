@@ -1,7 +1,13 @@
 """
-POSTGRES script.
+POSTGRES backup script.
 
-Creates and restores backups
+ - Creates and restores backups.
+ - Check against data corruption with analyze, vacuum and reindex
+
+What to do:
+ - run vacuum, which shows problems with data
+ - if any table is affected run reindex on it
+ - run reindex from time to time
 """
 import subprocess
 import argparse
@@ -82,6 +88,31 @@ def truncate_table(run_info, table):
     try:
         subprocess.run(command, check=True)
         print("Table truncated successfully.")
+    except subprocess.CalledProcessError as e:
+        print("An error occurred:", e)
+        return False
+
+    return True
+
+
+def run_table_sql(run_info, table, sql):
+    user = run_info["user"]
+    database = run_info["database"]
+    host = run_info["host"]
+
+    print("Call {} initiating".format(table))
+
+    command = [
+       'psql',
+       "-h", host,
+       "-U", user,
+       "-d", database,
+       '-c', sql,
+    ]
+
+    try:
+        subprocess.run(command, check=True)
+        print("Call {} successful.".format(sql))
     except subprocess.CalledProcessError as e:
         print("An error occurred:", e)
         return False
@@ -244,11 +275,59 @@ def restore_workspace(run_info):
     return True
 
 
+def run_sql_for_workspaces(run_info, sql_command):
+    print("--------------------")
+    print(run_info["workspace"])
+    print("--------------------")
+
+    # order is important
+    tablemapping = [
+       "instance_apikeys",
+       "instance_applogging",
+       "instance_backgroundjob",
+       "instance_blockentry",
+       "instance_blockentrylist",
+       "instance_browser",
+       "instance_configurationentry",
+       "instance_domains",
+       "instance_dataexport",
+       "instance_entryrules",
+       "instance_gateway",
+       "instance_keywords",
+       "instance_linkdatamodel",
+       "instance_modelfiles",
+       "instance_readlater",
+       "instance_sourcecategories",
+       "instance_sourcesubcategories",
+       "instance_sourcedatamodel",
+       "instance_userconfig",
+       "instance_usercomments",
+       "instance_userbookmarks",
+       "instance_usersearchhistory", "instance_userentrytransitionhistory", "instance_userentryvisithistory",
+       "instance_usertags", "instance_compactedtags", "instance_usercompactedtags",
+       "instance_uservotes",
+    ]
+
+    workspace = run_info["workspace"]
+
+    for table in tablemapping:
+        call_table = table.replace("instance", workspace)
+        call_sql_command = sql_command.replace("{table}", call_table)
+
+        if not run_table_sql(run_info, call_table, call_sql_command):
+            return False
+
+    return True
+
+
 def parse_backup():
     parser = argparse.ArgumentParser(prog="Backup", description="Backup manager. To pass password define .pgpass file, and define password there.")
 
     parser.add_argument("-b", "--backup", action="store_true")
     parser.add_argument("-r", "--restore", action="store_true")
+    parser.add_argument("-a", "--analyze", action="store_true")
+    parser.add_argument("--vacuum", action="store_true")
+    parser.add_argument("--reindex", action="store_true")
     parser.add_argument("-U", "--user", default="user")
     parser.add_argument("-d", "--database", default="db")
     parser.add_argument("-w", "--workspace")
@@ -257,18 +336,13 @@ def parse_backup():
     parser.add_argument("-f", "--format", default="custom")
     parser.add_argument("--host", default="127.0.0.1")
 
-    # TODO verify integrity somehow
-    # REINDEX TABLE table_name;
-    # VACUUM FULL places_linkdatamodel;
-    # ANALYZE places_linkdatamodel;
-
     return parser, parser.parse_args()
 
 
 def main():
     parser, args = parse_backup()
 
-    if not args.backup and not args.restore:
+    if not args.backup and not args.restore and not args.analyze and not args.vacuum and not args.reindex:
         parser.print_help()
 
     workspaces = []
@@ -282,6 +356,9 @@ def main():
     else:
         workspaces = get_workspaces()
 
+
+    errors = False
+
     for workspace in workspaces:
         run_info = {}
         run_info["workspace"] = workspace
@@ -293,10 +370,34 @@ def main():
             run_info["ignore_errors"] = True
 
         if args.backup and not backup_workspace(run_info):
+            print("Leaving because of errors")
+            errors = True
             break
 
         if args.restore and not restore_workspace(run_info):
+            print("Leaving because of errors")
+            errors = True
             break
+
+        if args.analyze and not run_sql_for_workspaces(run_info, "ANALYZE {table};"):
+            print("Leaving because of errors")
+            errors = True
+            break
+
+        if args.vacuum and not run_sql_for_workspaces(run_info, "VACUUM {table};"):
+            print("Leaving because of errors")
+            errors = True
+            break
+
+        if args.reindex and not run_sql_for_workspaces(run_info, "REINDEX TABLE {table};"):
+            print("Leaving because of errors")
+            errors = True
+            break
+
+    if errors:
+        print("There were errors")
+    else:
+        print("All calls were successful")
 
 
 if __name__ == "__main__":

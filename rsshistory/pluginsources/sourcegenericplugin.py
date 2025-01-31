@@ -85,6 +85,7 @@ class SourceGenericPlugin(object):
         """
         We override RSS behavior
         """
+        self.get_contents()
 
         c = Configuration.get_object().config_entry
 
@@ -247,7 +248,12 @@ class SourceGenericPlugin(object):
                 self.dead = True
                 return
 
-            self.contents = url_ex.get_section("Contents")
+            contents = url_ex.get_section("Contents")
+            if contents and "Contents" in contents:
+                self.contents = contents["Contents"]
+            else:
+                self.contents = contents
+
             if not self.contents:
                 AppLogging.error("Url:{} Could not obtain contents".format(page_link))
                 self.dead = True

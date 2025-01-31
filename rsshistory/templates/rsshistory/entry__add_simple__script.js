@@ -169,7 +169,10 @@ function fillData(page_url) {
 let currentPageProperties = 0;
 function sendPagePropertiesRequest(page_url, browser, attempt = 1) {
     $("#formResponse").html(`Fetching link properties ${page_url} with browser:${browser}`);
-    let url = `{% url 'rsshistory:get-page-properties' %}?page=${page_url}&browser=${browser}`;
+
+    let encodedPageUrl = encodeURIComponent(page_url);
+
+    let url = `{% url 'rsshistory:get-page-properties' %}?page=${encodedPageUrl}&browser=${browser}`;
 
     const requestCurrentPageProperties = ++currentPageProperties;
 
