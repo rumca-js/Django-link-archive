@@ -244,6 +244,9 @@ class UrlHandlerEx(object):
         Commonly, if user agent is not welcome, 403 is displayed
         """
         response = self.get_section("Response")
+        if not response:
+            return False
+            
         if "status_code" in response:
             if response["status_code"] == 403:
                 return True

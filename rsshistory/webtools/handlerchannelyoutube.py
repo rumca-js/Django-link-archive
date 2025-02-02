@@ -211,10 +211,7 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if not feed:
             return
 
-        if self.settings:
-            settings = dict(self.settings)
-        else:
-            settings = {}
+        settings = {}
         settings["handler_class"] = HttpPageHandler
 
         self.rss_url = self.url_builder(feed, settings=settings)

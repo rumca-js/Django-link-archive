@@ -212,6 +212,7 @@ class Gateway(models.Model):
             link="https://copilot.microsoft.com", gateway_type=thetype
         )
         Gateway.objects.create(link="https://bard.google.com", gateway_type=thetype)
+        Gateway.objects.create(link="https://chat.deepseek.com", gateway_type=thetype)
         Gateway.objects.create(link="https://perplexity.ai", gateway_type=thetype)
 
     def populate_marketplaces():
