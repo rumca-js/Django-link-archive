@@ -103,14 +103,8 @@ class SourceGenericPlugin(object):
                 )
                 yield entry
 
-    def read_data_from_container_elements(self):
-        num_entries = 0
-
-        start_time = DateUtils.get_datetime_now_utc()
-        source = self.get_source()
-
+    def get_enhanced_entries(self):
         for link_data in self.get_entries():
-            # LinkDatabase.info("Generic plugin item start:{}".format(link_data["link"]))
             if not link_data:
                 continue
 
@@ -125,12 +119,15 @@ class SourceGenericPlugin(object):
                 continue
 
             link_data = self.enhance_properties(link_data)
+            yield link_data
 
-            if "page_rating" in link_data:
-                link_data["page_rating_contents"] = link_data["page_rating"]
+    def read_data_from_container_elements(self):
+        num_entries = 0
 
-            # LinkDatabase.info("Generic plugin item add:{}".format(link_data["link"]))
+        start_time = DateUtils.get_datetime_now_utc()
+        source = self.get_source()
 
+        for link_data in self.get_enhanced_entries():
             b = EntryDataBuilder()
             b.link_data = link_data
             b.source_is_auto = True
@@ -171,6 +168,9 @@ class SourceGenericPlugin(object):
             properties["source"] = source
             if source.age > 0:
                 properties["age"] = source.age
+
+        if "page_rating" in properties:
+            properties["page_rating_contents"] = properties["page_rating"]
 
         return properties
 

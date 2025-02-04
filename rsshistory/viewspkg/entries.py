@@ -955,35 +955,6 @@ def entry_clear_status(request, pk):
     return HttpResponseRedirect(obj.get_absolute_url())
 
 
-def entry_show_dislikes(request, pk):
-    p = ViewPage(request)
-    p.set_title("Show entry likes/dislikes")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
-
-    objs = LinkDataController.objects.filter(id=pk)
-    obj = objs[0]
-
-    handler = UrlHandler.get_type(obj.link)
-
-    if type(handler) == UrlHandler.youtube_video_handler:
-        code = handler.get_video_code()
-        h = ReturnDislike(code)
-        up = h.get_thumbs_up()
-        down = h.get_thumbs_down()
-        view_count = h.get_view_count()
-        rating = h.get_rating()
-        p.context["summary_text"] = "Likes:{}\nDislikes:{}\nViews:{}\nRating:{}".format(
-            up, down, view_count, rating
-        )
-
-    else:
-        p.context["summary_text"] = "It is not a youtube link"
-
-    return p.render("go_back.html")
-
-
 def entry_dislikes(request, pk):
     p = ViewPage(request)
     p.set_title("Show entry likes/dislikes")
@@ -1004,7 +975,7 @@ def entry_dislikes(request, pk):
         link = config.remote_webtools_server_location
         remote_server = RemoteServer(link)
 
-        json_obj = remote_server.get_social(obj.link)
+        json_obj = remote_server.get_socialj(obj.link)
         if not json_obj:
             AppLogging.error(
                 "Url:{} Could not obtain social properties".format(obj.link)

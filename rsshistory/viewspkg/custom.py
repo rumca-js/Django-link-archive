@@ -34,7 +34,7 @@ from ..forms import (
 )
 from ..views import ViewPage
 from ..forms import LinkInputForm, OmniSearchForm
-from ..pluginurl.urlhandler import UrlHandler
+from ..pluginurl.urlhandler import UrlHandlerEx
 
 
 def test_page(request):
@@ -171,10 +171,8 @@ def data_errors_page(request):
     def fix_incorrect_youtube_links_links(entries):
         for entry in entries:
             print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
-            h = UrlHandler(entry.link)
-            h = h.p
-
-            chan_url = h.get_channel_feed_url()
+            h = UrlHandlerEx(entry.link)
+            chan_url = h.get_feeds()[0]
             link_valid = h.get_link_url()
             if chan_url:
                 entry.source = chan_url

@@ -38,6 +38,9 @@ from ..pluginurl import UrlHandlerEx
 from .fake.remoteserver import (
     remote_server_json,
 )
+from .fake.geekwirecom import (
+    geekwire_feed,
+)
 
 from .fake.instance import (
     instance_entries_json,
@@ -109,54 +112,121 @@ class FakeInternetData(object):
             "is_valid": True,
         }
         self.contents_data = {"Contents": "test"}
-        self.entries = {}
+        self.entries = []
 
     def get_all_properties(self):
         data = []
         data.append({"name": "Properties", "data": self.properties})
-        data.append({"name": "Response", "data": self.response})
         data.append({"name": "Contents", "data": self.contents_data})
+        data.append({"name": "Options", "data": None})
+        data.append({"name": "Response", "data": self.response})
+        data.append({"name": "Headers", "data": {})
         data.append({"name": "Entries", "data": self.entries})
 
         return data
 
-    def get_crawlj(self, name="", settings=None):
+    def get_getj(self, name="", settings=None):
         if self.url == "https://linkedin.com":
             self.properties["title"] = "Https LinkedIn Page title"
             self.properties["description"] = "Https LinkedIn Page description"
         elif self.url == "https://m.youtube.com/watch?v=1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-            self.properties["feed_0"] = (
-                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
-            )
+            self.properties["feeds"] = [
+                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id",
+            ]
             self.properties["title"] = "YouTube 1234 video"
             self.properties["language"] = None
         elif self.url == "https://www.youtube.com/watch?v=1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-            self.properties["feed_0"] = (
-                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
-            )
+            self.properties["feeds"] = [
+                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id",
+            ]
             self.properties["title"] = "YouTube 1234 video"
             self.properties["language"] = None
         elif self.url == "https://youtu.be/1234":
             self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-            self.properties["feed_0"] = (
-                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
-            )
+            self.properties["feeds"] = [
+                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id",
+            ]
             self.properties["title"] = "YouTube 1234 video"
             self.properties["language"] = None
         elif self.url == "https://www.reddit.com/r/searchengines/":
-            self.properties["feed_0"] = "https://www.reddit.com/r/searchengines/.rss"
+            self.properties["feeds"] = ["https://www.reddit.com/r/searchengines/.rss"]
         elif self.url == "https://www.reddit.com/r/searchengines":
-            self.properties["feed_0"] = "https://www.reddit.com/r/searchengines/.rss"
+            self.properties["feeds"] = ["https://www.reddit.com/r/searchengines/.rss"]
+        elif self.url == "https://www.reddit.com/r/searchengines/.rss":
+            self.set_entries(10)
         elif self.url == "https://page-with-rss-link.com":
-            self.properties["feed_0"] = "https://page-with-rss-link.com/feed"
+            self.properties["title"] = "Page with RSS link"
+            self.properties["feeds"] = ["https://page-with-rss-link.com/feed"]
+        elif self.url == "https://page-with-rss-link.com/feed":
+            self.set_entries(10)
+            self.response["Content-Type"] = "application/rss+xml"
+            self.properties["title"] = "Page with RSS link - RSS contents"
         elif self.url == "https://www.codeproject.com/WebServices/NewsRSS.aspx":
+            self.set_entries(13)
+            self.response["Content-Type"] = "application/rss+xml"
             self.properties["thumbnail"] = (
                 "https://www.codeproject.com/App_Themes/Std/Img/logo100x30.gif"
             )
+        elif self.url == "https://no-props-page.com":
+            self.properties["title"] = None
+            self.properties["description"] = None
+            self.properties["date_published"] = None
+            self.properties["author"] = None
+            self.properties["language"] = None
+            self.properties["album"] = None
+            self.properties["page_rating"] = 0
+            self.properties["thumbnail"] = None
+        elif self.url == "https://page-with-http-status-500.com":
+            self.response["status_code"] = 500
+        elif self.url == "https://page-with-http-status-400.com":
+            self.response["status_code"] = 400
+        elif self.url == "https://page-with-http-status-300.com":
+            self.response["status_code"] = 300
+        elif self.url == "https://page-with-http-status-200.com":
+            self.response["status_code"] = 200
+        elif self.url == "https://page-with-http-status-100.com":
+            self.response["status_code"] = 100
+        elif self.url == "https://www.youtube.com/watch?v=666":
+            self.response["status_code"] = 500
+        elif self.url == "https://invalid.rsspage.com/rss.xml":
+            self.response["status_code"] = 500
+        elif self.url == "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM":
+            self.set_entries(13)
+            self.response["Content-Type"] = "application/rss+xml"
+            self.properties["feeds"] = [self.url]
+        elif self.url.startswith("https://odysee.com/$/rss"):
+            self.set_entries(13)
+            self.response["Content-Type"] = "application/rss+xml"
+            self.properties["feeds"] = [self.url]
+        elif self.url == "https://www.geekwire.com/feed":
+            self.contents_data = geekwire_feed
+            self.response["Content-Type"] = "application/rss+xml"
+            self.properties["feeds"] = [self.url]
+        elif self.url == "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id":
+            self.set_entries(13)
+            self.response["Content-Type"] = "application/rss+xml"
+            self.properties["feeds"] = [self.url]
+        elif self.url == "https://instance.com/apps/rsshistory/sources-json":
+            self.properties["title"] = "Instance Proxy"
 
         return self.get_all_properties()
+
+    def set_entries(self, number = 1):
+        for item in range(0, number):
+            properties  = {}
+            properties["link"] = self.url + str(item)
+            properties["title"] = "Title" + str(item)
+            properties["description"] = "Description" + str(item)
+            properties["date_published"] = DateUtils.get_datetime_now_iso()
+            properties["author"] = "Description"
+            properties["language"] = "Language"
+            properties["album"] = "Description"
+            properties["page_rating"] = 80
+            properties["thumbnail"] = None
+
+            self.entries.append(properties)
 
 
 class FakeInternetTestCase(TestCase):
@@ -170,7 +240,8 @@ class FakeInternetTestCase(TestCase):
         WebConfig.get_crawler_from_mapping = (
             FakeInternetTestCase.get_crawler_from_mapping
         )
-        RemoteServer.get_crawlj = self.get_crawlj
+        RemoteServer.get_getj = self.get_getj
+        RemoteServer.get_socialj = self.get_socialj
         UrlHandlerEx.ping = FakeInternetTestCase.ping
 
         c = Configuration.get_object()
@@ -183,11 +254,17 @@ class FakeInternetTestCase(TestCase):
     def ping(url):
         return True
 
-    def get_crawlj(self, url, name="", settings=None):
-        # print("FakeInternet:get_crawlj: Url:{}".format(url))
+    def get_getj(self, url, name="", settings=None):
+        # print("FakeInternet:get_getj: Url:{}".format(url))
         # return json.loads(remote_server_json)
+        MockRequestCounter.requested(url=url)
+
         data = FakeInternetData(url)
-        return data.get_crawlj(name, settings)
+        return data.get_getj(name, settings)
+
+    def get_socialj(self, url):
+        MockRequestCounter.requested(url=url)
+        return None
 
     def get_default_crawler(url):
         crawler = DefaultCrawler(url=url)

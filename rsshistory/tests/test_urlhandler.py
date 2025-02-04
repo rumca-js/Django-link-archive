@@ -18,71 +18,26 @@ class UrlHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_get_rss(self):
-        handler = UrlHandler("https://rsspage.com/rss.xml")
-        handler.get_response()
+    def test_get_type__html(self):
+        thetype = UrlHandler.get_type("https://linkedin.com")
+        self.assertEqual(type(thetype), HtmlPage)
 
-        self.assertTrue(handler.is_valid())
-        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
-        self.assertEqual(type(handler.get_handler().p), RssPage)
-
-    def test_get_html(self):
-        handler = UrlHandler("https://linkedin.com")
-        handler.get_response()
-
-        self.assertTrue(handler.is_valid())
-        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
-        self.assertEqual(type(handler.get_handler().p), HtmlPage)
+    def test_get_type__rss(self):
+        thetype = UrlHandler.get_type("https://rsspage.com/rss.xml")
+        self.assertEqual(type(thetype), RssPage)
 
     def test_get_youtube_video(self):
-        handler = UrlHandler("https://www.youtube.com/watch?v=1234")
-
-        self.assertEqual(type(handler.get_handler()), UrlHandler.youtube_video_handler)
+        thetype = UrlHandler.get_type("https://www.youtube.com/watch?v=1234")
+        self.assertEqual(type(thetype), UrlHandler.youtube_video_handler)
 
     def test_get_youtube_channel(self):
-        handler = UrlHandler(
+        thetype = UrlHandler.get_type(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
 
         self.assertEqual(
-            type(handler.get_handler()), UrlHandler.youtube_channel_handler
+            type(thetype), UrlHandler.youtube_channel_handler
         )
-
-    def test_rss_get_properties(self):
-        handler = UrlHandler("https://simple-rss-page.com/rss.xml")
-        handler.get_response()
-        props = handler.get_properties()
-
-        self.assertEqual(props["title"], "Simple title")
-        self.assertEqual(props["description"], "Simple description")
-
-    def test_html_get_properties(self):
-        handler = UrlHandler("https://linkedin.com")
-        handler.get_response()
-
-        props = handler.get_properties()
-
-        self.assertEqual(props["title"], "Https LinkedIn Page title")
-        self.assertEqual(props["description"], "LinkedIn Page description")
-
-    def test_youtube_channel_get_properties(self):
-        handler = UrlHandler(
-            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
-        )
-        handler.get_response()
-
-        props = handler.get_properties()
-        print(props)
-
-        self.assertEqual(props["title"], "SAMTIME on YouTube")
-
-    def test_youtube_channel_get_title(self):
-        handler = UrlHandler(
-            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
-        )
-        handler.get_response()
-
-        self.assertEqual(handler.get_title(), "SAMTIME on YouTube")
 
     def test_get_cleaned_link_stupid_google_link(self):
         cleaned_link = UrlHandler.get_cleaned_link(

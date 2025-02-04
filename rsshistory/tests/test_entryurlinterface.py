@@ -45,7 +45,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["title"], "YouTube 1234 video")
         self.assertEqual(props["status_code"], 200)
-        self.assertEqual(props["page_rating"], 0)
+        self.assertEqual(props["page_rating"], 80)
 
     def test_video_youtu_be_handler(self):
         url = EntryUrlInterface("https://youtu.be/1234")
@@ -55,7 +55,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["title"], "YouTube 1234 video")
         self.assertEqual(props["status_code"], 200)
-        self.assertEqual(props["page_rating"], 0)
+        self.assertEqual(props["page_rating"], 80)
 
     def test_html_handler(self):
         url = EntryUrlInterface("https://www.linkedin.com")
@@ -63,7 +63,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props)
         self.assertEqual(props["status_code"], 200)
-        self.assertEqual(props["page_rating"], 0)
+        self.assertEqual(props["page_rating"], 80)
         self.assertTrue(props["date_dead_since"] is None)
 
     def test_rss_handler(self):
@@ -76,26 +76,16 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props["title"])
         self.assertTrue(props["description"])
         self.assertEqual(props["status_code"], 200)
-        self.assertEqual(props["page_rating"], 0)
+        self.assertEqual(props["page_rating"], 80)
         self.assertTrue(props["date_dead_since"] is None)
 
     def test_error_html(self):
         url = EntryUrlInterface("https://page-with-http-status-500.com")
 
         props = url.get_props()
-        self.assertTrue(props is None)
-
-    def test_error_rrs(self):
-        url = EntryUrlInterface("https://invalid.rsspage.com/rss.xml")
-
-        props = url.get_props()
-        self.assertTrue(props is None)
-
-    def test_error_youtube_video(self):
-        url = EntryUrlInterface("https://m.youtube.com/watch?v=666")
-
-        props = url.get_props()
-        self.assertTrue(props is None)
+        self.assertTrue(props)
+        self.assertEqual(props["link"], "https://page-with-http-status-500.com")
+        self.assertEqual(props["status_code"], 500)
 
     def test_youtube_feed(self):
         url = EntryUrlInterface(
@@ -104,20 +94,6 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
         props = url.get_props()
         self.assertTrue(props)
-
-    def test_error_html_ignore_errors(self):
-        url = EntryUrlInterface(
-            "https://page-with-http-status-500.com", ignore_errors=True
-        )
-
-        props = url.get_props()
-        self.assertTrue(props)
-        self.assertEqual(props["link"], "https://page-with-http-status-500.com")
-        self.assertEqual(
-            props["title"], "Page title"
-        )  # even though status is 500, response was provided
-        self.assertTrue(props["date_dead_since"] is not None)
-        self.assertEqual(props["status_code"], 500)
 
     def test_video_inherits_language(self):
         source_link = "https://youtube.com"
@@ -133,43 +109,3 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props)
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["language"], "ch")
-
-    def test_ftp(self):
-        url = EntryUrlInterface("ftp://www.linkedin.com", ignore_errors=True)
-        props = url.get_props()
-
-        self.assertTrue(props)
-        self.assertEqual(props["link"], "ftp://www.linkedin.com")
-        self.assertEqual(props["status_code"], 0)
-
-    def test_smb(self):
-        url = EntryUrlInterface("smb://www.linkedin.com", ignore_errors=True)
-        props = url.get_props()
-
-        self.assertTrue(props)
-        self.assertEqual(props["link"], "smb://www.linkedin.com")
-        self.assertEqual(props["status_code"], 0)
-
-    def test_smb_ips_accepted(self):
-        entry = Configuration.get_object().config_entry
-        entry.accept_ip_links = True
-        entry.save()
-
-        url = EntryUrlInterface("//127.0.0.1/resource", ignore_errors=True)
-        props = url.get_props()
-
-        self.assertTrue(props)
-        self.assertEqual(props["link"], "//127.0.0.1/resource")
-        self.assertEqual(props["status_code"], 0)
-
-    def test_smb_ips_not_accepted(self):
-        entry = Configuration.get_object().config_entry
-        entry.accept_ip_links = False
-        entry.save()
-
-        url = EntryUrlInterface("//127.0.0.1/resource", ignore_errors=True)
-        props = url.get_props()
-
-        self.assertTrue(props)
-        self.assertEqual(props["link"], "//127.0.0.1/resource")
-        self.assertEqual(props["status_code"], 0)

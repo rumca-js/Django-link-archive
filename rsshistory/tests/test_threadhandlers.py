@@ -363,7 +363,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         BackgroundJobController.objects.all().delete()
 
         source = SourceDataController.objects.create(
-            url="https://www.youtube.com/feeds/channel=samtime"
+            url="https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
 
         ob = BackgroundJobController.objects.create(

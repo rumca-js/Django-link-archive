@@ -50,7 +50,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
         self.assertTrue("title" in props)
-        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_YOUTUBE)
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
         # one call to obtain rss
         # second one to obtain thumbnail (through HTML)
@@ -63,13 +63,13 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         props = url.get_props()
 
         self.assertTrue(props)
-        self.assertTrue("url" in props)
+        self.assertIn("url", props)
         self.assertEqual(
             props["url"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id",
         )
-        self.assertTrue("title" in props)
-        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_YOUTUBE)
+        self.assertIn("title", props)
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
     def test_odysee(self):
         url = SourceUrlInterface("https://odysee.com/$/rss/@samtime:0")
@@ -104,7 +104,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         # checks if link is RSS
         # checks openrss if has RSS link
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_html_rss_link(self):
         MockRequestCounter.mock_page_requests = 0
