@@ -53,7 +53,7 @@ RUN mkdir -p /app/linklibrary/rsshistory/migrations
 RUN touch /app/linklibrary/rsshistory/migrations/__init__.py
 
 # TODO Copy chromedriver to /usr/local/bin
-RUN apt-get -y update && apt-get -y upgrade && apt-get install -y --no-install-recommends ffmpeg id3v2 wget xvfb
+RUN apt-get -y update && apt-get -y upgrade && apt-get install -y --no-install-recommends ffmpeg id3v2 wget
 
 # Expose the port that Django will run on
 EXPOSE 8000
