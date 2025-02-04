@@ -15,6 +15,7 @@ class RemoteServer(object):
         """
         @returns None in case of error
         """
+        url = url.strip()
 
         encoded_url = urllib.parse.quote(url, safe="")
 
@@ -44,9 +45,11 @@ class RemoteServer(object):
             with requests.get(url=link, timeout=timeout_s, verify=False) as result:
                 text = result.text
         except Exception as E:
+            print(str(E))
             return
 
         if not text:
+            print("No text")
             return
 
         print("Calling:{}".format(link))
@@ -55,23 +58,27 @@ class RemoteServer(object):
         try:
             json_obj = json.loads(text)
         except ValueError as E:
+            print("Url:{} Cannot read response".format(link, text))
             # WebLogger.error(info_text="Url:{} Cannot read response".format(link), detail_text=text)
             return
         except TypeError as E:
+            print("Url:{} Cannot read response".format(link, text))
             # WebLogger.error(info_text="Url:{} Cannot read response".format(link), detail_text=text)
             return
 
         if "success" in json_obj and not json_obj["success"]:
+            print("Not a success")
             # WebLogger.error(json_obj["error"])
             return False
 
         return json_obj
 
-    def get_crawlj(self, url, name="", settings=None):
+    def get_getj(self, url, name="", settings=None):
         """
         @returns None in case of error
         """
         import requests
+        url = url.strip()
 
         encoded_url = urllib.parse.quote(url, safe="")
 
@@ -83,16 +90,16 @@ class RemoteServer(object):
             encoded_crawler_data = urllib.parse.quote(crawler_data, safe="")
 
             link = self.remote_server
-            link = f"{link}/crawlj?url={encoded_url}&crawler_data={encoded_crawler_data}"
+            link = f"{link}/getj?url={encoded_url}&crawler_data={encoded_crawler_data}"
             # WebLogger.debug("RemoteServer: calling:{}".format(link))
         elif name != "":
             link = self.remote_server
-            link = f"{link}/crawlj?url={encoded_url}&name={name}"
+            link = f"{link}/getj?url={encoded_url}&name={name}"
 
             # WebLogger.debug("RemoteServer: calling:{}".format(link))
         else:
             link = self.remote_server
-            link = f"{link}/crawlj?url={encoded_url}"
+            link = f"{link}/getj?url={encoded_url}"
 
             # WebLogger.debug("RemoteServer: calling:{}".format(link))
 
@@ -105,34 +112,41 @@ class RemoteServer(object):
         # we make request longer - for the server to be able to respond in time
         timeout_s += 5
 
+        print("Calling:{}".format(link))
+
         text = None
         try:
             with requests.get(url=link, timeout=timeout_s, verify=False) as result:
                 text = result.text
         except Exception as E:
+            print(str(E))
             return
 
         if not text:
+            print("No text")
             return
 
         json_obj = None
         try:
             json_obj = json.loads(text)
         except ValueError as E:
+            print("Url:{} Cannot read response".format(link, text))
             # WebLogger.error(info_text="Url:{} Cannot read response".format(link), detail_text=text)
             return
         except TypeError as E:
+            print("Url:{} Cannot read response".format(link, text))
             # WebLogger.error(info_text="Url:{} Cannot read response".format(link), detail_text=text)
             return
 
         if "success" in json_obj and not json_obj["success"]:
+            print("Not a success")
             # WebLogger.error(json_obj["error"])
             return False
 
         return json_obj
 
     def get_properties(self, url, name = "", settings=None):
-        json_obj = self.crawlj(url=url, name=name, settings=settings)
+        json_obj = self.get_getj(url=url, name=name, settings=settings)
 
         if json_obj:
             return self.read_properties_section("Properties", json_obj)
@@ -144,6 +158,7 @@ class RemoteServer(object):
             return
 
         if "success" in all_properties and not all_properties["success"]:
+            print("Not a success")
             # WebLogger.error(all_properties["error"])
             return False
 

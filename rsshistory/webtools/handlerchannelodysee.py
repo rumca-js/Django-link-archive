@@ -15,7 +15,6 @@ class OdyseeChannelHandler(DefaultChannelHandler):
 
         if url:
             self.code = self.input2code(url)
-            self.url = self.code2url(self.code)
 
         self.rss_url = None
 
@@ -49,7 +48,7 @@ class OdyseeChannelHandler(DefaultChannelHandler):
     def input2code(self, url):
         wh = url.find("odysee.com")
         if wh == -1:
-            return url
+            return None
 
         if url.find("https://odysee.com/$/rss/") >= 0:
             return self.input2code_feeds(url)

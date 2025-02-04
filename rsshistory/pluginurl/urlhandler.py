@@ -141,7 +141,18 @@ class UrlHandlerEx(object):
                         )
                         return
 
-                    self.all_properties = request_server.get_crawlj(
+                    if config_entry.respect_robots_txt:
+                        item["settings"]["respect_robots_txt"] = True
+                    else:
+                        item["settings"]["respect_robots_txt"] = False
+                    if config_entry.ssl_verification:
+                        item["settings"]["ssl_verify"] = True
+                    else:
+                        item["settings"]["ssl_verify"] = False
+
+                    AppLogging.debug("Url:{} Calling with name {} and settings {}".format(self.url, name, item["settings"]))
+
+                    self.all_properties = request_server.get_getj(
                         self.url, name=item["name"], settings=item["settings"]
                     )
                     if not self.all_properties:
@@ -164,7 +175,7 @@ class UrlHandlerEx(object):
                     if self.all_properties:
                         return self.all_properties
             else:
-                self.all_properties = request_server.get_crawlj(self.url)
+                self.all_properties = request_server.get_getj(self.url)
                 if not self.all_properties:
                     AppLogging.error(
                         "Url:{} Could not communicate with remote server".format(

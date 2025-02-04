@@ -68,7 +68,8 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         return self.code2url(code)
 
     def code2url(self, code):
-        return "https://www.youtube.com/channel/{}".format(code)
+        if code:
+            return "https://www.youtube.com/channel/{}".format(code)
 
     def code2feed(self, code):
         return "https://www.youtube.com/feeds/videos.xml?channel_id={}".format(code)
@@ -76,7 +77,7 @@ class YouTubeChannelHandler(DefaultChannelHandler):
     def input2code(self, url):
         wh = url.find("www.youtube.com")
         if wh == -1:
-            return url
+            return None
 
         if self.is_channel_name():
             return self.input2code_handle(url)
@@ -170,15 +171,6 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if self.dead:
             return
 
-        if self.is_channel_name():
-            html_url = self.get_html_url()
-            if html_url:
-                feeds = html.get_feeds()
-                if feeds and len(feeds) > 0:
-                    self.code = self.input2code(feeds[0])
-                    if self.code:
-                        self.url = self.get_channel_url()
-
         rss_url = self.get_rss_url()
         if rss_url:
             self.response = rss_url.get_response()
@@ -207,34 +199,18 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return
 
         feed = feeds[0]
-
         if not feed:
             return
 
         settings = {}
         settings["handler_class"] = HttpPageHandler
 
-        self.rss_url = self.url_builder(feed, settings=settings)
+        self.rss_url = self.url_builder(url=feed, settings=settings)
         self.rss_url.get_response()
         return self.rss_url
 
     def get_html_url(self):
         return None
-        # if self.html_url:
-        #    return self.html_url
-
-        # u = self.url_builder(self.get_channel_url(), handler_class=HttpPageHandler)
-        # u.get_response()
-        # self.html_url = u
-
-        # return self.html_url
-
-    def get_html_page(self):
-        html_url = self.get_html_url()
-        if html_url:
-            handler = html_url.get_handler()
-            if handler.p:
-                return handler.p
 
     def get_entries(self):
         rss_url = self.get_rss_url()

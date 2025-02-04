@@ -105,7 +105,7 @@ class Url(ContentInterface):
         if self.settings and "handler_class" in self.settings:
             handler_class = self.settings["handler_class"]
             self.handler = handler_class(
-                self.url, settings=self.settings, url_builder=url_builder
+                url=self.url, settings=self.settings, url_builder=url_builder
             )
 
         self.response = None
@@ -216,6 +216,10 @@ class Url(ContentInterface):
             self.handler = self.get_handler_implementation()
 
         if self.handler:
+            if "respect_robots_txt" in self.settings and self.settings["respect_robots_txt"]:
+                if not self.is_allowed():
+                    return
+
             self.response = self.handler.get_response()
 
             if self.response:
@@ -256,11 +260,10 @@ class Url(ContentInterface):
 
         if url.startswith("https") or url.startswith("http"):
             return HttpPageHandler(
-                url, settings=self.settings, url_builder=self.url_builder
+                url=url, settings=self.settings, url_builder=self.url_builder
             )
         elif url.startswith("smb") or url.startswith("ftp"):
-            # not yet supported
-            return DefaultContentPage(url)
+            raise NotImplementedError("Protocol has not been implemented")
 
     def is_url_valid(self):
         return True
@@ -320,6 +323,8 @@ class Url(ContentInterface):
     def get_cleaned_link(url):
         if not url:
             return
+
+        url = url.strip()
 
         if url.endswith("/"):
             url = url[:-1]
@@ -617,8 +622,7 @@ class Url(ContentInterface):
             response_data["status_code"] = response.get_status_code()
 
             if check_robots:
-                domain_info = self.get_domain_info()
-                response_data["is_allowed"] = domain_info.is_allowed(self.url)
+                response_data["is_allowed"] = self.is_allowed()
 
             response_data["Content-Type"] = response.get_content_type()
             if (
@@ -650,14 +654,6 @@ class Url(ContentInterface):
                 ).decode("utf-8")
             else:
                 response_data["body_hash"] = ""
-            response_data["crawler_data"] = response.crawler_data
-            if (
-                response_data["crawler_data"]
-                and "handler_class" in response_data["crawler_data"]
-            ):
-                response_data["crawler_data"]["handler_class"] = response_data[
-                    "crawler_data"
-                ]["handler_class"].__name__
 
             all_properties.append({"name": "Response", "data": response_data})
 
@@ -677,6 +673,10 @@ class Url(ContentInterface):
         all_properties.append({"name": "Entries", "data": entries})
 
         return all_properties
+
+    def is_allowed(self):
+        domain_info = self.get_domain_info()
+        return domain_info.is_allowed(self.url)
 
     def get_social_properties(self):
         url = self.url

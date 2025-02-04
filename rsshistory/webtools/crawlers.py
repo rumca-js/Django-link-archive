@@ -54,6 +54,8 @@ class CrawlerInterface(object):
         """
         if not request and url:
             request = PageRequestObject(url)
+        elif not request and not url:
+            raise TypeError("Incorrect crawler use")
 
         self.request = request
         self.response = None
