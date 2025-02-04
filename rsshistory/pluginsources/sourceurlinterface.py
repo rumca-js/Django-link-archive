@@ -34,27 +34,52 @@ class SourceUrlInterface(object):
 
         if all_properties:
             properties = url_ex.get_section("Properties")
+            entries = url_ex.get_section("Entries")
+
+            if len(entries) > 0:
+                return self.get_props_internal(url_ex)
+            else:
+                if "feeds" in properties:
+                    for feed in properties["feeds"]:
+                        url_ex_new = UrlHandlerEx(feed)
+                        all_properties = url_ex_new.get_properties()
+                        if all_properties:
+                            entries = url_ex_new.get_section("Entries")
+                            if len(entries) > 0:
+                                return self.get_props_internal(url_ex_new)
+
+            return self.get_props_internal(url_ex)
+
+    def get_props_internal(self, url_ex, input_props=None):
+        if not input_props:
+            input_props = {}
+
+        all_properties = url_ex.get_properties()
+
+        if all_properties:
+            properties = url_ex.get_section("Properties")
             response = url_ex.get_section("Response")
+            entries = url_ex.get_section("Entries")
 
             if properties:
                 props = {}
-                if "feed_0" in properties:
-                    props["url"] = properties["feed_0"]
-                else:
-                    props["url"] = url_ex.url
+                props["url"] = url_ex.url
                 props["title"] = properties["title"]
                 props["description"] = properties["description"]
                 props["language"] = properties["language"]
                 props["favicon"] = properties["thumbnail"]
                 props["status_code"] = response["status_code"]
 
-                props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
-                if "Content-Type":
-                    content_type = response["Content-Type"]
-                    if content_type.find("html") >= 1:
-                        props["source_type"] = SourceDataModel.SOURCE_TYPE_PARSE
-                    if content_type.find("json") >= 1:
-                        props["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
+                if len(entries) > 0:
+                    props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+                else:
+                    props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+                    if "Content-Type":
+                        content_type = response["Content-Type"]
+                        if content_type.find("html") >= 1:
+                            props["source_type"] = SourceDataModel.SOURCE_TYPE_PARSE
+                        if content_type.find("json") >= 1:
+                            props["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
         else:
             props = {}
 

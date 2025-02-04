@@ -170,6 +170,11 @@ class Url(ContentInterface):
                     if page_type == URL_TYPE_RSS:
                         return RssPage(url, "")
 
+                    if url.find("rss") >= 0:
+                        return RssPage(url, "")
+                    if url.find("feed") >= 0:
+                        return RssPage(url, "")
+
                     return
 
                 return handler(url)
@@ -381,9 +386,9 @@ class Url(ContentInterface):
 
     def get_urls(self):
         properties = {}
-        properties["link"] = page_url.url
-        properties["link_request"] = page_url.request_url
-        properties["link_canonical"] = page_url.get_canonical_url()
+        properties["link"] = self.url
+        properties["link_request"] = self.request_url
+        properties["link_canonical"] = self.get_canonical_url()
         return properties
 
     def get_domain_info(self):

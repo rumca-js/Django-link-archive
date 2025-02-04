@@ -45,7 +45,7 @@ class ToolsViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
         # two requests: one for page, one for robots.txt
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_page_properties__youtube_get(self):
         MockRequestCounter.mock_page_requests = 0
@@ -58,7 +58,7 @@ class ToolsViewsTest(FakeInternetTestCase):
         # print(response.text.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_page_properties__ytchannel_get(self):
         MockRequestCounter.mock_page_requests = 0

@@ -91,6 +91,9 @@ class UrlHandler(Url):
         if not self.is_url_valid():
             return True
 
+        if not self.is_allowed():
+            return False
+
     def is_url_valid(self):
         if not super().is_url_valid():
             return False
@@ -111,6 +114,12 @@ class UrlHandlerEx(object):
         if not self.settings:
             self.settings = {}
 
+            config_entry = Configuration.get_object().config_entry
+            if config_entry.respect_robots_txt:
+                self.settings["respect_robots_txt"] = True
+            if config_entry.ssl_verification:
+                self.settings["ssl_verify"] = True
+
         self.browsers = browsers
         if not browsers:
             self.browsers = Browser.get_browser_setup()
@@ -122,71 +131,90 @@ class UrlHandlerEx(object):
         if self.all_properties:
             return self.all_properties
 
+        return self.get_properties_internal()
+
+    def get_properties_internal(self):
         config_entry = Configuration.get_object().config_entry
         if config_entry.remote_webtools_server_location:
             request_server = RemoteServer(config_entry.remote_webtools_server_location)
 
+            if self.is_remote_server_down():
+                AppLogging.error(
+                    "Cannot ping remote server: {}".format(
+                        config_entry.remote_webtools_server_location
+                    )
+                )
+                return
+
             mode_mapping = self.browsers
 
-            name = ""
-            if mode_mapping and len(mode_mapping) > 0:
-                for item in mode_mapping:
-                    item = self.get_ready_browser(item)
+            return self.get_properties_internal_mode_mapping(request_server, mode_mapping)
 
-                    if self.is_remote_server_down():
-                        AppLogging.error(
-                            "Cannot ping remote server: {}".format(
-                                config_entry.remote_webtools_server_location
-                            )
-                        )
-                        return
+    def get_properties_internal_mode_mapping(self, request_server, mode_mapping):
+        config_entry = Configuration.get_object().config_entry
+        name = ""
+        if mode_mapping and len(mode_mapping) > 0:
+            for crawler_data in mode_mapping:
+                crawler_data = self.get_ready_crawler_data(crawler_data)
 
-                    if config_entry.respect_robots_txt:
-                        item["settings"]["respect_robots_txt"] = True
-                    else:
-                        item["settings"]["respect_robots_txt"] = False
-                    if config_entry.ssl_verification:
-                        item["settings"]["ssl_verify"] = True
-                    else:
-                        item["settings"]["ssl_verify"] = False
+                AppLogging.debug("Url:{} Calling with name {} and settings {}".format(self.url, name, crawler_data["settings"]))
 
-                    AppLogging.debug("Url:{} Calling with name {} and settings {}".format(self.url, name, item["settings"]))
-
-                    self.all_properties = request_server.get_getj(
-                        self.url, name=item["name"], settings=item["settings"]
-                    )
-                    if not self.all_properties:
-                        AppLogging.error(
-                            "Url:{} Could not communicate with remote server, item:{}".format(
-                                self.url, str(item)
-                            )
-                        )
-                        continue
-
-                    """
-                    # TODO if not valid -> we can retry using a different crawler
-                    if response is valid (or 403, or redirect?).
-                    but we have not normal properties, like title, retry using next crawler?
-                    """
-
-                    if self.is_another_request_necessary():
-                        continue
-
-                    if self.all_properties:
-                        return self.all_properties
-            else:
-                self.all_properties = request_server.get_getj(self.url)
+                self.all_properties = request_server.get_getj(
+                    self.url, name=crawler_data["name"], settings=crawler_data["settings"]
+                )
                 if not self.all_properties:
                     AppLogging.error(
-                        "Url:{} Could not communicate with remote server".format(
-                            self.url
+                        "Url:{} Could not communicate with remote server, crawler_data:{}".format(
+                            self.url, str(crawler_data)
                         )
                     )
+                    continue
+
+                """
+                # TODO if not valid -> we can retry using a different crawler
+                if response is valid (or 403, or redirect?).
+                but we have not normal properties, like title, retry using next crawler?
+                """
+
+                if self.is_another_request_necessary():
+                    continue
+
+                if self.all_properties:
+                    return self.all_properties
+        else:
+            self.all_properties = request_server.get_getj(self.url)
+            if not self.all_properties:
+                AppLogging.error(
+                    "Url:{} Could not communicate with remote server".format(
+                        self.url
+                    )
+                )
 
         if not self.all_properties:
             self.all_properties = []
 
         return self.all_properties
+
+    def get_ready_crawler_data(self, crawler_data):
+        config_entry = Configuration.get_object().config_entry
+
+        crawler_data = self.get_ready_browser(crawler_data)
+        if not crawler_data:
+            return
+
+        if config_entry.respect_robots_txt:
+            crawler_data["settings"]["respect_robots_txt"] = True
+        else:
+            crawler_data["settings"]["respect_robots_txt"] = False
+        if config_entry.ssl_verification:
+            crawler_data["settings"]["ssl_verify"] = True
+        else:
+            crawler_data["settings"]["ssl_verify"] = False
+        # TODO add proxy support
+        # TODO add user agent
+        # TODO add headers?
+
+        return crawler_data
 
     def get_ready_browser(self, crawler_data):
         config_entry = Configuration.get_object().config_entry
@@ -313,6 +341,11 @@ class UrlHandlerEx(object):
         if not self.is_url_valid():
             return True
 
+        if not self.is_allowed():
+            return True
+
+        return False
+
     def __str__(self):
         return "{}".format(self.options)
 
@@ -358,3 +391,20 @@ class UrlHandlerEx(object):
 
             if not UrlHandlerEx.ping(config_entry.remote_webtools_server_location):
                 return True
+
+    def is_url_valid(self):
+        return True
+
+    def is_allowed(self):
+        config_entry = Configuration.get_object().config_entry
+        if config_entry.respect_robots_txt:
+            u = Url(self.url)
+            return u.is_allowed()
+        else:
+            return True
+
+    def get_response(self):
+        self.get_properties()
+        config_entry = Configuration.get_object().config_entry
+        server = RemoteServer(config_entry.remote_webtools_server_location)
+        return server.get_response(self.all_properties)

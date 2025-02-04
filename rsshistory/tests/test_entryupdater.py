@@ -63,7 +63,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         u.update_data()
 
         self.assertEqual(entry.title, "Https LinkedIn Page title")
-        self.assertEqual(entry.description, "LinkedIn Page description")
+        self.assertEqual(entry.description, "Https LinkedIn Page description")
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 
@@ -504,7 +504,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         u.reset_data()
 
         self.assertEqual(entry.title, "Https LinkedIn Page title")
-        self.assertEqual(entry.description, "LinkedIn Page description")
+        self.assertEqual(entry.description, "Https LinkedIn Page description")
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 

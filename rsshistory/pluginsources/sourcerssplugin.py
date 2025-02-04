@@ -71,24 +71,24 @@ class BaseRssPlugin(SourceGenericPlugin):
         We override RSS behavior
         """
 
-        c = Configuration.get_object().config_entry
+        remote_entries = 0
+        for item in self.get_entries_standard():
+            yield item
+            remote_entries += 1
 
-        if c.remote_webtools_server_location:
-            remote_entries = 0
-            for entry in super().get_entries():
-                yield entry
-                remote_entries += 1
+        if remote_entries > 0:
+            return True
 
-            # if remote cannot process entries correctly, we retry manually to process it
-            if remote_entries > 0:
-                return
+        for item in self.get_entries_manual():
+            yield item
 
+    def get_entries_manual(self):
         self.reader = self.get_container_reader_element()
 
         source = self.get_source()
 
         if not self.reader:
-            AppLogging.error("Url:{}. Canont read elements".format(source.url))
+            AppLogging.error("Url:{}. Cannot read elements".format(source.url))
             return
 
         if source:
@@ -106,7 +106,6 @@ class BaseRssPlugin(SourceGenericPlugin):
                 )
                 continue
 
-            prop = self.enhance(prop)
             yield prop
             total_entries += 1
 
@@ -121,16 +120,6 @@ class BaseRssPlugin(SourceGenericPlugin):
                     "Url:{}. No links for rss, not contents".format(source.url)
                 )
 
-    def enhance(self, prop):
-        prop["link"] = UrlHandler.get_cleaned_link(prop["link"])
-
-        source = self.get_source()
-
-        if (
-            self.is_property_set(prop, "language")
-            and source.language != None
-            and source.language != ""
-        ):
-            prop["language"] = source.language
-
-        return prop
+    def get_entries_standard(self):
+        for data in super().get_entries():
+            yield data

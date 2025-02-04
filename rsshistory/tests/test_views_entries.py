@@ -1126,21 +1126,6 @@ class EntriesDetailViews(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_entry_show_dislikes__youtube(self):
-        MockRequestCounter.mock_page_requests = 0
-
-        self.client.login(username="testuser", password="testpassword")
-
-        url = reverse(
-            "{}:entry-show-dislikes".format(LinkDatabase.name),
-            args=[self.entry_youtube.id],
-        )
-        # call tested function
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
-
     def test_entry_dislikes__youtube(self):
         MockRequestCounter.mock_page_requests = 0
 

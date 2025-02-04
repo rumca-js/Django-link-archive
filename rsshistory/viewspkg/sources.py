@@ -38,7 +38,7 @@ from ..forms import (
 from ..queryfilters import SourceFilter
 from ..views import ViewPage, GenericListView, get_page_num, get_search_term
 from ..configuration import Configuration
-from ..pluginurl import UrlHandler
+from ..pluginurl import UrlHandlerEx, UrlHandler
 from ..pluginsources import SourceControllerBuilder
 from ..serializers import InstanceExporter, JsonImporter
 
@@ -93,14 +93,14 @@ class SourceDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context = ViewPage(self.request).init_context(context)
 
-        handler = UrlHandler(self.object.url)
+        handler = UrlHandlerEx(self.object.url)
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.favicon
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
-        context["page_handler"] = handler.get_handler()
+        context["page_handler"] = UrlHandler(self.object.url)
 
-        ViewPage.fill_context_type(context, urlhandler=handler)
+        ViewPage.fill_context_type(context, urlhandler=UrlHandler.get_type(self.object.url))
 
         c = Configuration.get_object()
         if hasattr(self.object, "dynamic_data"):
@@ -114,8 +114,6 @@ class SourceDetailView(generic.DetailView):
         else:
             entry = self.create_entry(self.object.url)
             context["entry_object"] = entry
-
-        ViewPage.fill_context_type(context, url=self.object.url)
 
         context["handler"] = SourceControllerBuilder.get(self.object.id)
 
@@ -257,7 +255,7 @@ def source_add_form(request):
     if "link" in request.GET:
         url = request.GET["link"]
 
-    url = UrlHandler.get_cleaned_link(url)
+    url = UrlHandlerEx.get_cleaned_link(url)
 
     if not Url.is_protocolled_link(url):
         p.context["summary_text"] = (
@@ -294,7 +292,7 @@ def source_add_form(request):
     page = UrlLocation(data["url"])
     domain = page.get_domain()
     config = Configuration.get_object().config_entry
-    info = DomainCache.get_object(link, url_builder=UrlHandler)
+    info = DomainCache.get_object(link, url_builder=UrlHandlerEx)
 
     # warnings
     if config.prefer_https_links and link.find("http://") >= 0:
@@ -393,12 +391,12 @@ def edit_source(request, pk):
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
-            icon = UrlHandler(ob.url).get_thumbnail()
+            icon = UrlHandlerEx(ob.url).get_thumbnail()
 
             if not icon:
                 page = UrlLocation(ob.url)
                 domain = page.get_domain()
-                u = UrlHandler(domain, handler_class=HttpPageHandler)
+                u = UrlHandlerEx(domain, handler_class=HttpPageHandler)
                 icon = u.get_favicon()
 
             if icon:

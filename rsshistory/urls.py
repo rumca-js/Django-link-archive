@@ -65,7 +65,6 @@ urlpatterns = [
     path("entry-add-simple", entries.add_simple_entry, name="entry-add-simple"),
     path("entry-edit/<int:pk>/", entries.edit_entry, name="entry-edit"),
     path("entry-remove/<int:pk>/", entries.entry_remove, name="entry-remove"),
-    path("entry-show-dislikes/<int:pk>/", entries.entry_show_dislikes, name="entry-show-dislikes"),
     path("entry-dislikes/<int:pk>/", entries.entry_dislikes, name="entry-dislikes"),
     path("entry-dead/<int:pk>/", entries.entry_dead, name="entry-dead"),
     path("entry-active/<int:pk>/", entries.entry_active, name="entry-active"),
