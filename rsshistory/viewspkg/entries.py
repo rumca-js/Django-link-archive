@@ -977,13 +977,7 @@ def entry_dislikes(request, pk):
 
         json_obj = remote_server.get_socialj(obj.link)
         if not json_obj:
-            AppLogging.error(
-                "Url:{} Could not obtain social properties".format(obj.link)
-            )
-            p.context["summary_text"] = (
-                "Url:{} Could not obtain social properties".format(obj.link)
-            )
-            return p.render("go_back.html")
+            return JsonResponse({}, json_dumps_params={"indent": 4})
 
         try:
             return JsonResponse(json_obj, json_dumps_params={"indent": 4})
@@ -991,10 +985,7 @@ def entry_dislikes(request, pk):
             AppLogging.error(
                 "Url:{} Could not dump social properties".format(obj.link, json_obj)
             )
-            p.context["summary_text"] = (
-                "Url:{} Could not dump social properties".format(obj.link, json_obj)
-            )
-            return p.render("go_back.html")
+            return JsonResponse({}, json_dumps_params={"indent": 4})
 
 
 def entry_bookmark(request, pk):

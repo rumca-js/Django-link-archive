@@ -422,6 +422,9 @@ class HttpPageHandler(HandlerInterface):
         return self.p.get_date_published()
 
     def get_canonical_url(self):
+        if not self.get_response():
+            self.get_response()
+
         if not self.p:
             return self.url
         return self.p.get_canonical_url()
@@ -529,8 +532,9 @@ class HttpPageHandler(HandlerInterface):
             return result
 
         if type(self.p) is RssPage:
-            # we do not add ourselve
-            pass
+            feeds = self.p.get_feeds()
+            if feeds and len(feeds) > 0:
+                result.extend(feeds)
 
         if type(self.p) is HtmlPage:
             feeds = self.p.get_feeds()

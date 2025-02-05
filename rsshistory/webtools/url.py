@@ -11,7 +11,7 @@ options.mode_mapping
 
 """
 
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse, parse_qs
 from collections import OrderedDict
 import urllib.robotparser
 import asyncio
@@ -349,23 +349,24 @@ class Url(ContentInterface):
 
         stupid_google_string = "https://www.google.com/url"
         if url.find(stupid_google_string) >= 0:
-            wh = url.find("http", len(stupid_google_string))
-            if wh >= 0:
-                url = url[wh:]
-                wh = url.find("&")
-                if wh >= 0:
-                    url = url[:wh]
-                    url = Url.get_cleaned_link(url)
+            parsed_url = urlparse(url)
+            query_params = parse_qs(parsed_url.query)
+            param_value = query_params.get("url", [None])[0]
+            if param_value:
+                return param_value
+            param_value = query_params.get("q", [None])[0]
+            if param_value:
+                return param_value
 
         stupid_youtube_string = "https://www.youtube.com/redirect"
         if url.find(stupid_youtube_string) >= 0:
-            wh = url.rfind("&q=")
-            if wh >= 0:
-                wh = url.find("http", wh)
-                if wh >= 0:
-                    url = url[wh:]
-                    url = unquote(url)
-                    url = Url.get_cleaned_link(url)
+            parsed_url = urlparse(url)
+            query_params = parse_qs(parsed_url.query)
+            param_value = query_params.get("q", [None])[0]
+
+            param_value = unquote(param_value)
+            param_value = Url.get_cleaned_link(param_value)
+            return param_value
 
         return url
 
@@ -376,6 +377,9 @@ class Url(ContentInterface):
             return self.url
 
     def get_canonical_url(self):
+        if self.handler:
+            return self.handler.get_canonical_url()
+
         handlers = Url.get_handlers()
         for handler_class in handlers:
             handler = handler_class(url=self.url)
@@ -579,8 +583,9 @@ class Url(ContentInterface):
 
         feeds = self.get_feeds()
         if len(feeds) > 0:
+            properties["feeds"] = []
             for key, feed in enumerate(feeds):
-                properties["feed_" + str(key)] = feed
+                properties["feeds"].append(feed)
 
         if type(page_handler) is Url.youtube_channel_handler:
             if page_handler.get_channel_name():

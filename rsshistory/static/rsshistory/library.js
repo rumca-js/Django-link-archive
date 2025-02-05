@@ -166,24 +166,25 @@ function fixStupidGoogleRedirects(input_url) {
         return null;
     }
 
-    if (input_url.includes("www.google.com")) {
+    if (input_url.includes("www.google.com/url")) {
         const url = new URL(input_url);
-        const realURL = url.searchParams.get('q');
-
+        let realURL = url.searchParams.get('q');
         if (realURL) {
             return realURL;
-        } else {
-            return input_url;
         }
+        realURL = url.searchParams.get('url');
+        if (realURL) {
+            return realURL;
+        }
+        return input_url;
     }
 
-    if (input_url.includes("www.youtube.com")) {
+    if (input_url.includes("www.youtube.com/redirect")) {
         const url = new URL(input_url);
-        const redirectURL = url.searchParams.get('q');
-        const videoId = url.searchParams.get('v');
+        let redirectURL = url.searchParams.get('q');
 
         if (redirectURL) {
-            return videoId ? `${decodeURIComponent(redirectURL)}&v=${videoId}` : decodeURIComponent(redirectURL);
+            return decodeURIComponent(redirectURL);
         }
         else {
             return input_url;

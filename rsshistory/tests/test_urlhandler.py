@@ -72,12 +72,6 @@ class UrlHandlerExTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_get_properties(self):
-        handler = UrlHandlerEx("https://rsspage.com/rss.xml")
-        properties = handler.get_properties()
-
-        self.assertTrue(properties)
-
     def test_constructor__default_browsers(self):
         Browser.objects.all().delete()
 
@@ -230,3 +224,33 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         self.assertEqual(browser["name"], "test1")
         self.assertEqual(browser["settings"]["handler_class"], "HttpPageHandler")
+
+    def test_get_properties__no_browser(self):
+        Browser.objects.all().delete()
+        handler = UrlHandlerEx("https://rsspage.com/rss.xml")
+
+        # call tested function
+        properties = handler.get_properties()
+
+        self.assertTrue(properties)
+
+    def test_get_properties__browsers(self):
+        browser1 = Browser.objects.create(
+            name="test1",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        browser2 = Browser.objects.create(
+            name="test2",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        handler = UrlHandlerEx("https://rsspage.com/rss.xml")
+
+        # call tested function
+        properties = handler.get_properties()
+
+        self.assertTrue(properties)
+

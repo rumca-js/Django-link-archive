@@ -17,6 +17,8 @@ function initializeSources(button_element, button_text) {
   let success_icon = getSuccessIcon();
   let error_icon = getErrorIcon();
 
+  let source_link = "{% url 'rsshistory:sources' %}";
+
   $("#setupSpace").append(`<p id="source-line">${spinner_container} Creating sources...</p>`);
 
   $.ajax({
@@ -26,7 +28,7 @@ function initializeSources(button_element, button_text) {
       if (xhr.status === 200) {
         $("#source-line").html(`${success_icon} Creating sources... OK`);
 
-        $("#setupSpace").append("<p>You can navigate now to sources to enable some RSS sources in 'Global'->'Source'.</p>");
+        $("#setupSpace").append(`<p>You can enable some sources <a href=${source_link}>Sources</a></p>`);
       }
     },
     error: function() {
