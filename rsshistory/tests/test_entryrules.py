@@ -120,3 +120,17 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual(rules1[0], therule)
         self.assertEqual(rules2[0], therule)
+
+    def test_entry_rule__is_valid(self):
+
+        self.browser.save()
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=False,
+            browser=self.browser,
+            rule_name="Rule1",
+            rule_url=".test1.com, .test2.com",
+        )
+
+        self.assertTrue(therule.is_valid())

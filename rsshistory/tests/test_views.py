@@ -47,6 +47,55 @@ class ViewPageTest(FakeInternetTestCase):
         self.assertTrue(context["user_config"])
         self.assertTrue(context["config"])
 
+    def test_fill_context_type__youtube_channel(self):
+        test_url = "https://www.youtube.com/channel/SAMTIMESAMTIMESAMTIMESAM"
+
+        context = {}
+        ViewPage.fill_context_type(context, url=test_url, urlhandler=None)
+
+        self.assertIn("is_youtube_channel", context)
+
+    def test_fill_context_type__youtube_video(self):
+        test_url = "https://youtube.com/watch?v=1234"
+
+        context = {}
+        ViewPage.fill_context_type(context, url=test_url, urlhandler=None)
+
+        self.assertIn("is_youtube_channel", context)
+
+    def test_fill_context_type__odysee_channel(self):
+        test_url = "https://odysee.com/@samtime:1"
+
+        context = {}
+        ViewPage.fill_context_type(context, url=test_url, urlhandler=None)
+
+        self.assertIn("is_youtube_channel", context)
+
+    def test_fill_context_type__odysee_video(self):
+        test_url = "https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1?test"
+
+        context = {}
+        ViewPage.fill_context_type(context, url=test_url, urlhandler=None)
+
+        self.assertIn("is_youtube_channel", context)
+
+    def test_fill_context_type__html(self):
+        test_url = "https://linkedin.com"
+
+        context = {}
+        ViewPage.fill_context_type(context, url=test_url, urlhandler=None)
+
+        self.assertIn("is_youtube_channel", context)
+
+    def test_fill_context_type__rss(self):
+        test_url = "https://linkedin.com"
+
+        context = {}
+        ViewPage.fill_context_type(context, url=test_url, urlhandler=None)
+
+        self.assertIn("is_youtube_channel", context)
+
+
 
 class ViewsTest(FakeInternetTestCase):
     def setUp(self):

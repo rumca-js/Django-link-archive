@@ -98,9 +98,13 @@ class SourceDetailView(generic.DetailView):
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.favicon
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
-        context["page_handler"] = UrlHandler(self.object.url)
 
-        ViewPage.fill_context_type(context, urlhandler=UrlHandler.get_type(self.object.url))
+        context["additional_links"] = []
+        handler = UrlHandler.get_type(self.object.url)
+        if type(handler) == UrlHandler.youtube_channel_handler:
+            context["additional_links"].append(handler.get_channel_url())
+        if type(handler) == UrlHandler.odysee_channel_handler:
+            context["additional_links"].append(handler.get_channel_url())
 
         c = Configuration.get_object()
         if hasattr(self.object, "dynamic_data"):

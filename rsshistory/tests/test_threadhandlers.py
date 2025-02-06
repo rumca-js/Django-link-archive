@@ -23,6 +23,7 @@ from ..configuration import Configuration
 from ..threadhandlers import (
     CleanupJobHandler,
     LinkAddJobHandler,
+    SourceAddJobHandler,
     LinkScanJobHandler,
     WriteDailyDataJobHandler,
     ExportDataJobHandler,
@@ -226,7 +227,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         self.assertEqual(DomainsController.objects.all().count(), 0)
 
 
-class AddJobHandlerTest(FakeInternetTestCase):
+class LinkAddJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -275,12 +276,44 @@ class AddJobHandlerTest(FakeInternetTestCase):
 
         persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
-        for persistent_object in persistent_objects:
-            print("Persisten object info:{}".format(persistent_object.info))
+        self.assertTrue(self.no_errors())
 
         self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(LinkDataController.objects.all().count(), 1)
         self.assertEqual(DomainsController.objects.all().count(), 1)
+
+
+class SourceAddJobHandlerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
+
+    def test_add_link(self):
+        conf = Configuration.get_object().config_entry
+        conf.accept_domain_links = True
+        conf.save()
+
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+
+        ob = BackgroundJobController.source_add("https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        self.assertTrue(ob)
+
+        handler = SourceAddJobHandler()
+        handler.process(ob)
+
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
+
+
+        self.assertTrue(self.no_errors())
+
+        self.assertEqual(persistent_objects.count(), 0)
+        self.assertEqual(LinkDataController.objects.all().count(), 0)
+        self.assertEqual(SourceDataController.objects.all().count(), 1)
+        self.assertEqual(DomainsController.objects.all().count(), 0)
 
 
 class ScanLinkJobHandlerTest(FakeInternetTestCase):

@@ -46,10 +46,12 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE),
         (BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, BackgroundJob.JOB_LINK_RESET_LOCAL_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),
+        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),
         (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
         (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),
         (BackgroundJob.JOB_LINK_SCAN, BackgroundJob.JOB_LINK_SCAN,),
+        (BackgroundJob.JOB_SOURCE_ADD, BackgroundJob.JOB_SOURCE_ADD,),
         (BackgroundJob.JOB_LINK_DOWNLOAD, BackgroundJob.JOB_LINK_DOWNLOAD),
         (BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC),
         (BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO),
@@ -283,6 +285,26 @@ class BackgroundJobController(BackgroundJob):
                 BackgroundJob.JOB_LINK_ADD,
                 url,
             )
+
+    def source_add(url, properties=None):
+        cfg = {}
+        cfg["url"] = url
+
+        if properties:
+            cfg["properties"] = properties
+
+        if cfg != {}:
+            args_text = json.dumps(cfg)
+
+            return BackgroundJobController.create_single_job(
+                BackgroundJob.JOB_SOURCE_ADD, url, args_text
+            )
+        else:
+            return BackgroundJobController.create_single_job(
+                BackgroundJob.JOB_SOURCE_ADD,
+                url,
+            )
+
 
     def link_scan(url=None, entry=None, source=None):
         from ..configuration import Configuration

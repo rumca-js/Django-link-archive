@@ -50,6 +50,7 @@ from .handlers import (
     ReturnDislike,
     GitHubUrlHandler,
     HackerNewsHandler,
+    InternetArchive,
 )
 
 from utils.dateutils import DateUtils
@@ -395,6 +396,19 @@ class Url(ContentInterface):
         properties["link_canonical"] = self.get_canonical_url()
         return properties
 
+    def get_urls_archive(self):
+        p = UrlLocation(self.url)
+        short_url = p.get_protocolless()
+
+        properties = []
+
+        archive = InternetArchive(self.url)
+        properties.append(archive.get_archive_url())
+
+        properties.append("https://archive.ph/" + short_url)
+
+        return properties
+
     def get_domain_info(self):
         return DomainCache.get_object(self.url)
 
@@ -612,6 +626,8 @@ class Url(ContentInterface):
             properties["schema:thumbnailUrl"] = page_handler.p.get_schema_field(
                 "thumbnailUrl"
             )
+
+        properties["link_archives"] = self.get_urls_archive()
 
         all_properties.append({"name": "Properties", "data": properties})
 

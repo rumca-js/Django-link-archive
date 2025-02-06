@@ -334,8 +334,16 @@ class SourceDetailTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
+            url="https://www.youtube.com/channel/SAMTIMESAMTIMESAMTIMESAM",
             title="YouTube",
+            category_name="No",
+            subcategory_name="No",
+            export_to_cms=True,
+        )
+
+        self.source_odysee = SourceDataController.objects.create(
+            url="https://odysee.com/@samtime:1",
+            title="Odysee",
             category_name="No",
             subcategory_name="No",
             export_to_cms=True,
@@ -376,7 +384,7 @@ class SourceDetailTest(FakeInternetTestCase):
 
         self.entry_youtube = LinkDataController.objects.create(
             source_url="https://youtube.com",
-            link="https://youtube.com?v=bookmarked",
+            link="https://youtube.com/watch?v=bookmarked",
             title="The first link",
             source=self.source_youtube,
             bookmarked=True,
@@ -385,7 +393,7 @@ class SourceDetailTest(FakeInternetTestCase):
         )
         LinkDataController.objects.create(
             source_url="https://youtube.com",
-            link="https://youtube.com?v=nonbookmarked",
+            link="https://youtube.com/watch?v=nonbookmarked",
             title="The second link",
             source=self.source_youtube,
             bookmarked=False,
@@ -401,6 +409,15 @@ class SourceDetailTest(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+        self.entry_odysee = LinkDataController.objects.create(
+            source_url="https://youtube.com",
+            link="https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1?test",
+            title="The first link",
+            source=self.source_youtube,
+            bookmarked=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
 
         self.user = User.objects.create_user(
             username="testuser",
@@ -409,7 +426,7 @@ class SourceDetailTest(FakeInternetTestCase):
         )
         self.client.login(username="testuser", password="testpassword")
 
-    def test_source_detail_youtube(self):
+    def test_source_detail__youtube_channel(self):
         MockRequestCounter.mock_page_requests = 0
         url = reverse(
             "{}:source-detail".format(LinkDatabase.name),
@@ -417,10 +434,23 @@ class SourceDetailTest(FakeInternetTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.no_errors())
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_source_detail_html(self):
+    def test_source_detail__odysee(self):
+        MockRequestCounter.mock_page_requests = 0
+        url = reverse(
+            "{}:source-detail".format(LinkDatabase.name),
+            args=[self.source_odysee.id],
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.no_errors())
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_source_detail__html(self):
         MockRequestCounter.mock_page_requests = 0
         url = reverse(
             "{}:source-detail".format(LinkDatabase.name),

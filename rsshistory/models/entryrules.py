@@ -55,6 +55,13 @@ class EntryRules(models.Model):
 
         return False
 
+    def is_valid(self):
+        if self.browser:
+            if not self.browser.is_valid():
+                return False
+
+        return True
+
     def is_blocked_by_rule(self, url):
         rule_urls = self.get_rule_urls()
         for rule_url in rule_urls:

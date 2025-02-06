@@ -47,7 +47,24 @@ class Browser(models.Model):
             )
             return
 
+        if not self.is_valid():
+            AppLogging.error(
+                "Browser cannot be saved due to errors".format(
+                    self.crawler
+                )
+            )
+            return
+
         super().save(*args, **kwargs)
+
+    def is_valid(self):
+        if self.settings != None and self.settings != "":
+            try:
+                settings = json.loads(self.settings)
+            except ValueError as E:
+                return False
+
+        return True
 
     def read_browser_setup():
         """

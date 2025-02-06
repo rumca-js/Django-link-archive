@@ -1405,6 +1405,7 @@ class EntryDataBuilder(object):
         self.allow_recursion = allow_recursion
         self.user = user
         self.strict_ids = strict_ids
+        self.errors = []
 
         self.ignore_errors = ignore_errors
         c = Configuration.get_object().config_entry
@@ -1462,6 +1463,8 @@ class EntryDataBuilder(object):
         link_data = url.get_props()
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:
+                self.errors.append(
+                    "Url:{}. Could not obtain link service properties".format(self.link))
                 AppLogging.debug(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.get_absolute_url(), self.link
@@ -1492,12 +1495,16 @@ class EntryDataBuilder(object):
         # we do not want to obtain properties for non-domain entries, if we capture only
         # domains
         if not self.is_enabled_to_store():
+            self.errors.append(
+                    "Url:{}. Not enabled to store".format(self.link))
             return
 
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
         link_data = url.get_props()
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:
+                self.errors.append(
+                    "Url:{}. Could not obtain properties".format(self.link))
                 AppLogging.debug(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.link, self.link
@@ -1507,6 +1514,8 @@ class EntryDataBuilder(object):
 
         # we obtain links from various places. We do not want technical links with no data, redirect, CDN or other
         if not self.is_link_data_valid_for_auto_add(link_data):
+            self.errors.append(
+                "Url:{}. Link is not valid for auto add".format(self.link))
             return
 
         self.merge_link_data(link_data)
@@ -1515,6 +1524,8 @@ class EntryDataBuilder(object):
             return self.build_from_props_internal()
         else:
             if Configuration.get_object().config_entry.debug_mode:
+                self.errors.append(
+                    "Url:{}. Could not obtain properties for link.".format(self.link))
                 AppLogging.debug(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.link, self.link
@@ -1544,8 +1555,6 @@ class EntryDataBuilder(object):
 
     def is_link_data_valid_for_auto_add(self, link_data):
         if not self.is_property_set(link_data, "title"):
-            return False
-        if not self.is_property_set(link_data, "description"):
             return False
 
         return True
@@ -1587,6 +1596,8 @@ class EntryDataBuilder(object):
                 properties=self.link_data, blocked_keywords=keywords
             )
             if not v.is_valid():
+                self.errors.append(
+                    "Url:{}. Link was rejected due to validation.".format(self.link))
                 AppLogging.debug(
                     "Rejecting:{}\nData:{}\n".format(
                         self.link_data["link"], self.link_data["description"]

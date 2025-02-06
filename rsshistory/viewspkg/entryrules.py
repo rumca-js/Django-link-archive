@@ -45,6 +45,9 @@ class EntryRulesDetailView(generic.DetailView):
 
         context["page_title"] += " {} entry rule".format(self.object.rule_name)
 
+        if not self.object.is_valid():
+            context["errors"] = "Rule is not OK"
+
         return context
 
 
@@ -91,6 +94,8 @@ def entry_rule_edit(request, pk):
         form = EntryRulesForm(request.POST, instance=objs[0])
         if form.is_valid():
             form.save()
+
+            return HttpResponseRedirect(reverse("{}:entry-rule".format(LinkDatabase.name), args=[pk]))
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")

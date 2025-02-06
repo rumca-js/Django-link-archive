@@ -60,6 +60,7 @@ from .controllers import (
     EntriesUpdater,
     EntryScanner,
     ModelFilesBuilder,
+    SourceDataBuilder,
 )
 from .configuration import Configuration
 from .pluginurl import UrlHandlerEx
@@ -92,7 +93,7 @@ class BaseJobHandler(object):
                     result.append(os.path.join(root, afile))
         return result
 
-    def get_input_cfg(self, in_object=None):
+    def get_args_cfg(self, in_object=None):
         cfg = {}
 
         if in_object.args and len(in_object.args) > 0:
@@ -454,36 +455,26 @@ class LinkAddJobHandler(BaseJobHandler):
         """
         Object is obligatory
         """
-        data = self.get_data_for_add(obj)
-        self.add_link(data)
+        properties = self.get_properties(obj)
+        self.add_link(properties)
 
         return True
 
     def add_link(self, data):
         # Unpack if link service
         link = data["link"]
-        if UrlLocation(link).is_link_service():
-            h = UrlHandlerEx(link)
-            if h.get_contents():
-                # TODO we should use response
-                # link = h.response.url
-                data["link"] = link
-
-        # Add the link
-        b = EntryDataBuilder()
-        b.link_data = data
-        b.link = link
-        b.source_is_auto = True
 
         if not UrlLocation(link).is_web_link():
             AppLogging.error("Someone posted wrong link:{}".format(link))
             return
 
-        entry = b.build_from_link()
+        # Add the link
+        b = EntryDataBuilder()
+        entry = b.build(link = link, source_is_auto = True)
 
         if not entry:
-            # TODO send notification?
-            LinkDatabase.info("Could not add link: {}".format(data["link"]))
+            errors = "\n".join(b.errors)
+            AppLogging.error("LinkAddJobHandler. Could not add link: {}. Errors:{}".format(data["link"], errors))
             return True
 
         current_time = DateUtils.get_datetime_now_utc()
@@ -494,10 +485,10 @@ class LinkAddJobHandler(BaseJobHandler):
                 if "tags" in data:
                     UserTags.set_tags(entry, tag=data["tags"], user=data["user_object"])
 
-    def get_data_for_add(self, in_object=None):
+    def get_properties(self, in_object=None):
         link = in_object.subject
 
-        cfg = self.get_input_cfg(in_object)
+        cfg = self.get_args_cfg(in_object)
 
         data = {"link": link, "bookmarked": False}
 
@@ -533,6 +524,46 @@ class LinkAddJobHandler(BaseJobHandler):
             data["tag"] = cfg["tag"]
 
         return data
+
+
+class SourceAddJobHandler(BaseJobHandler):
+    """!
+    Adds entry to database
+    """
+
+    def get_job():
+        return BackgroundJob.JOB_SOURCE_ADD
+
+    def process(self, obj=None):
+        """
+        Object is obligatory
+        """
+        properties = self.get_properties(obj)
+        self.add_source(properties)
+
+        return True
+
+    def add_source(self, properties):
+        if "url" not in properties:
+            AppLogging.error("SourceAddJobHandler: No url in properties")
+            return
+
+        # Unpack if link service
+        link = properties["url"]
+
+        b = SourceDataBuilder()
+        source = b.build(link_data = properties, manual_entry=False)
+
+        if not source:
+            errors = "\n".join(b.errors)
+            AppLogging.error("LinkAddJobHandler. Could not add source: {}".format(properties["url"], errors))
+            return True
+
+    def get_properties(self, in_object=None):
+        link = in_object.subject
+
+        cfg = self.get_args_cfg(in_object)
+        return cfg
 
 
 class LinkSaveJobHandler(BaseJobHandler):
@@ -1148,7 +1179,7 @@ class LinkScanJobHandler(BaseJobHandler):
     def process(self, obj=None):
         link = obj.subject
 
-        cfg = self.get_input_cfg(obj)
+        cfg = self.get_args_cfg(obj)
         source = None
         entry = None
 

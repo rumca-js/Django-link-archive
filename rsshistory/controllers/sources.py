@@ -386,6 +386,7 @@ class SourceDataBuilder(object):
         self.link_data = link_data
         self.manual_entry = manual_entry
         self.strict_ids = strict_ids
+        self.errors = []
 
         if self.link:
             self.build_from_link()
@@ -413,11 +414,15 @@ class SourceDataBuilder(object):
 
         h = UrlHandlerEx(rss_url)
         if not h.is_valid():
+            self.errors.append("Url:{}. Link is not valid".format(self.link))
             return
 
         properties = h.get_section("Properties")
 
         self.link_data = properties
+        if not self.link_data:
+            self.errors.append("Url:{}. Could not obtain data".format(self.link))
+            return
 
         return self.build_from_props()
 

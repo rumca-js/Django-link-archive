@@ -961,6 +961,7 @@ class BackgroundJob(models.Model):
     JOB_LINK_DOWNLOAD_VIDEO = "download-video"
     JOB_DOWNLOAD_FILE = "download-file"  # TODO stor file, should mention DB
     JOB_LINK_SCAN = "link-scan"
+    JOB_SOURCE_ADD = "source-add"
     JOB_MOVE_TO_ARCHIVE = "move-to-archive"
     JOB_WRITE_DAILY_DATA = "write-daily-data"
     JOB_WRITE_YEAR_DATA = "write-year-data"
@@ -993,6 +994,7 @@ class BackgroundJob(models.Model):
         (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),     #
         (JOB_DOWNLOAD_FILE, JOB_DOWNLOAD_FILE),     #
         (JOB_LINK_SCAN, JOB_LINK_SCAN,),
+        (JOB_SOURCE_ADD, JOB_SOURCE_ADD,),
         (JOB_MOVE_TO_ARCHIVE, JOB_MOVE_TO_ARCHIVE),
         (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),
         (JOB_WRITE_TOPIC_DATA, JOB_WRITE_TOPIC_DATA),

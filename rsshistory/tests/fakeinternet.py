@@ -120,7 +120,7 @@ class FakeInternetData(object):
         data.append({"name": "Contents", "data": self.contents_data})
         data.append({"name": "Options", "data": None})
         data.append({"name": "Response", "data": self.response})
-        data.append({"name": "Headers", "data": {})
+        data.append({"name": "Headers", "data": {}})
         data.append({"name": "Entries", "data": self.entries})
 
         return data

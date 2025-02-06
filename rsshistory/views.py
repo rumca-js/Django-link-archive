@@ -223,9 +223,11 @@ class ViewPage(object):
 
     def fill_context_type(context, url=None, fast_check=True, urlhandler=None):
         if urlhandler is None and url:
-            handler = UrlHandler.get_type(obj.link)
+            handler = UrlHandler.get_type(url)
         elif urlhandler:
             handler = urlhandler
+        else:
+            return
 
         context["is_youtube_video"] = (
             type(handler) == UrlHandler.youtube_video_handler

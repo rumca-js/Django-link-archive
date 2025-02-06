@@ -619,6 +619,9 @@ class EntryGenericPlugin(object):
         if date_dead_since:
             parameters.append(EntryParameter("Dead since", date_dead_since))
 
+        if self.entry.age:
+            parameters.append(EntryParameter("Age", self.entry.age))
+
         if self.entry.author:
             parameters.append(EntryParameter("Author", self.entry.author))
         if self.entry.album:
@@ -627,6 +630,7 @@ class EntryGenericPlugin(object):
         parameters.append(EntryParameter("Status code", self.entry.status_code))
 
         parameters.append(EntryParameter("Language", self.entry.language))
+
         if self.entry.is_dead():
             parameters.append(
                 EntryParameter("Manual status", self.entry.manual_status_code)

@@ -62,6 +62,8 @@ class CrawlerInterface(object):
         self.response_file = response_file
         if settings:
             self.set_settings(settings)
+        else:
+            self.settings = settings
 
         if self.request.timeout_s and settings and "timeout_s" in settings:
             self.timeout_s = max(self.request.timeout_s, settings["timeout_s"])

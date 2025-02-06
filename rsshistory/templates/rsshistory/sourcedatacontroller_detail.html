@@ -35,15 +35,6 @@
 		</div>
 		{% endif %}
 
-		{% if is_youtube_channel %}
-		<div>
-			  <a href="{{ page_handler.get_channel_url }}">
-				{% include "rsshistory/icon_external.html" %}
-				YouTube Channel
-			  </a>
-		</div>
-		{% endif %}
-
 		{% if entry_object %}
 		<div>
 		  <a href="{{ object.url }}">
@@ -52,6 +43,15 @@
 		  </a>
 		</div>
 		{% endif %}
+
+		{% for additional_link in additional_links %}
+		<div>
+			  <a href="{{additional_link}}">
+				{% include "rsshistory/icon_external.html" %}
+                {{additional_link}}
+			  </a>
+		</div>
+		{% endfor %}
 
    </div>
 </div>

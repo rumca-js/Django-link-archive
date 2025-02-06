@@ -17,6 +17,18 @@ class BrowserTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
+    def test_constructor__invalid(self):
+        Browser.objects.all().delete()
+
+        browser = Browser.objects.create(
+            name="test",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something',  # invalid
+        )
+
+        browsers = Browser.objects.all()
+        self.assertEqual(browsers.count(), 0)
+
     def test_read_browser_setup__empty(self):
         Browser.objects.all().delete()
 
@@ -70,6 +82,18 @@ class BrowserTest(FakeInternetTestCase):
         self.assertTrue(setup["name"], "test")
         self.assertTrue(setup["crawler"], RequestsCrawler)
         self.assertTrue(setup["settings"]["test_setting"], "something")
+
+    def test_is_valid(self):
+        Browser.objects.all().delete()
+
+        browser = Browser.objects.create(
+            name="test",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        # call tested function
+        self.assertTrue(browser.is_valid())
 
     def test_prio_up(self):
         Browser.read_browser_setup()
