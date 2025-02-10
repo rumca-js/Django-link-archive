@@ -31,7 +31,7 @@ remote_server_json = """
       "Page Handler": "HttpPageHandler",
       "Page Type": "RssPage"
     },
-    "name": "Options"
+    "name": "Settings"
   },
   {
     "data": {
@@ -136,7 +136,7 @@ remote_server_json_last_modified = """
       "Page Handler": "HttpPageHandler",
       "Page Type": "RssPage"
     },
-    "name": "Options"
+    "name": "Settings"
   },
   {
     "data": {

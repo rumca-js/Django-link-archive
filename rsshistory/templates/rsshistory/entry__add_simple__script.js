@@ -35,22 +35,22 @@ function resetSearch(text = '') {
 
 function fillEditForm(token) {
     if (page_properties[0].name != "Properties") {
-        console.error("Incorrect name 0");
+        console.error("fillEditForm function problem 0");
         console.error(page_properties[0].name);
         return;
     }
-    if (page_properties[1].name != "Contents") {
-        console.error("Incorrect name 1");
+    if (page_properties[1].name != "Text") {
+        console.error("fillEditForm function problem 1");
         console.error(page_properties[1].name);
         return;
     }
-    if (page_properties[2].name != "Options") {
-        console.error("Incorrect name 1");
+    if (page_properties[2].name != "Settings") {
+        console.error("fillEditForm function problem 2");
         console.error(page_properties[1].name);
         return;
     }
     if (page_properties[3].name != "Response") {
-        console.error("Incorrect name 2");
+        console.error("fillEditForm function problem 3");
         console.error(page_properties[2].name);
         return;
     }
