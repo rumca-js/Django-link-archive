@@ -248,7 +248,7 @@ class SourceGenericPlugin(object):
                 self.dead = True
                 return
 
-            contents = url_ex.get_section("Contents")
+            contents = url_ex.get_section("Text")
             if contents and "Contents" in contents:
                 self.contents = contents["Contents"]
             else:

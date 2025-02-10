@@ -8,7 +8,6 @@ from collections import OrderedDict
 from ..webtools import (
     ContentLinkParser,
     RssPage,
-    DomainCache,
     UrlLocation,
     HttpPageHandler,
     RemoteServer,
@@ -51,7 +50,8 @@ def get_errors(page_url):
     config = Configuration.get_object().config_entry
 
     domain = page.get_domain()
-    info = DomainCache.get_object(link, url_builder=UrlHandler)
+    u = UrlHandlerEx(link)
+    is_allowed = u.is_allowed()
 
     # warnings
     if config.prefer_https_links and link.find("http://") >= 0:
@@ -64,7 +64,7 @@ def get_errors(page_url):
         )
     if domain.lower() != domain:
         warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
-    if config.respect_robots_txt and info and not info.is_allowed(link):
+    if config.respect_robots_txt and not is_allowed:
         warnings.append("Link is not allowed by site robots.txt")
     if link.find("?") >= 0:
         warnings.append("Link contains arguments. Is that intentional?")
@@ -477,8 +477,8 @@ def download_video_pk(request, pk):
 
 def is_url_allowed(request):
     def is_url_allowed_internal(p, url):
-        c = DomainCache.get_object(url, url_builder=UrlHandler)
-        status = c.is_allowed(url)
+        u = UrlHandler(url)
+        status = u.is_allowed()
 
         if status:
             p.context["summary_text"] = (

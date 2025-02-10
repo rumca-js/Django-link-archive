@@ -16,7 +16,6 @@ from utils.services import WaybackMachine
 from ..webtools import (
     Url,
     UrlLocation,
-    DomainCache,
     RedditUrlHandler,
     GitHubUrlHandler,
     HtmlPage,
@@ -581,7 +580,10 @@ def func_display_data_form(request, p, data):
     p.context["form"] = form
 
     domain = page.get_domain()
-    info = DomainCache.get_object(link, url_builder=UrlHandler)
+
+    u = UrlHandlerEx(link)
+
+    is_allowed = u.is_allowed()
 
     # warnings
     if config.prefer_https_links and link.find("http://") >= 0:
@@ -594,7 +596,7 @@ def func_display_data_form(request, p, data):
         )
     if domain.lower() != domain:
         warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
-    if config.respect_robots_txt and info and not info.is_allowed(link):
+    if config.respect_robots_txt and not is_allowed:
         warnings.append("Link is not allowed by site robots.txt")
     if link.find("?") >= 0:
         warnings.append("Link contains arguments. Is that intentional?")

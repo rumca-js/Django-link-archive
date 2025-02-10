@@ -6,6 +6,7 @@ Some crawlers / scrapers cannot be easily called from a thread, etc, because of 
 
 import json
 import traceback
+import time
 from pathlib import Path
 import os
 import subprocess
@@ -237,12 +238,13 @@ class RequestsCrawler(CrawlerInterface):
         try:
             request_result = self.build_requests()
 
-            if not request_result:
+            if request_result is None:
+                self.response.add_error("Could not build response")
                 return self.response
 
             self.response = PageResponseObject(
                 url=request_result.url,
-                text="",
+                text=None,
                 status_code=request_result.status_code,
                 headers=dict(request_result.headers),
                 request_url=self.request.url,
@@ -254,7 +256,6 @@ class RequestsCrawler(CrawlerInterface):
 
             content_length = self.response.get_content_length()
             if content_length > PAGE_TOO_BIG_BYTES:
-                self.response.status_code = status_code = HTTP_STATUS_CODE_FILE_TOO_BIG
                 self.response.add_error("Page is too big")
                 request_result.close()
                 return self.response
@@ -268,31 +269,28 @@ class RequestsCrawler(CrawlerInterface):
             content_type = self.response.get_content_type()
 
             if content_type and not self.response.is_content_type_supported():
-                self.response.status_code = HTTP_STATUS_CODE_PAGE_UNSUPPORTED
-                self.response.add_error(
-                    "Url:{} is not supported {}".format(self.request.url, content_type)
-                )
+                self.response.binary = request_result.content
                 request_result.close()
                 return self.response
+            else:
+                """
+                IF we do not know the content type, or content type is supported
+                """
+                encoding = self.get_encoding(request_result, self.response)
+                if encoding:
+                    request_result.encoding = encoding
 
-            """
-            IF we do not know the content type, or content type is supported
-            """
-            encoding = self.get_encoding(request_result, self.response)
-            if encoding:
-                request_result.encoding = encoding
+                self.response = PageResponseObject(
+                    url=request_result.url,
+                    text=request_result.text,
+                    status_code=request_result.status_code,
+                    encoding=request_result.encoding,
+                    headers=dict(request_result.headers),
+                    binary=request_result.content,
+                    request_url=self.request.url,
+                )
 
-            self.response = PageResponseObject(
-                url=request_result.url,
-                text=request_result.text,
-                status_code=request_result.status_code,
-                encoding=request_result.encoding,
-                headers=dict(request_result.headers),
-                binary=request_result.content,
-                request_url=self.request.url,
-            )
-
-            request_result.close()
+                request_result.close()
 
         except requests.Timeout:
             self.response = PageResponseObject(
@@ -330,7 +328,7 @@ class RequestsCrawler(CrawlerInterface):
                 status_code=HTTP_STATUS_CODE_EXCEPTION,
                 request_url=self.request.url,
             )
-            self.response.add_error("General page exception")
+            self.response.add_error("General page exception: {}".format(str(E)))
 
         return self.response
 
@@ -419,7 +417,7 @@ class RequestsCrawler(CrawlerInterface):
             ssl_verify=self.request.ssl_verify,
             stream=True,
         )
-        if response:
+        if response is not None:
             return response
 
     def is_valid(self):

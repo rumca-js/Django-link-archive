@@ -4,6 +4,17 @@
 let page_properties = null;
 
 
+function getCollapsedPropertyItem(name, data) {
+    htmlOutput = `
+    <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse${name}" role="button" aria-expanded="false" aria-controls="collapse${name}">
+        Show Details
+    </a>
+    <div class="collapse" id="collapse${name}"><pre>${data}</pre></div>`;
+
+    return htmlOutput;
+}
+
+
 function fillDataProperty(property) {
     let htmlOutput = "";
 
@@ -11,25 +22,23 @@ function fillDataProperty(property) {
 
     htmlOutput += `<h1>${property_name}</h1>`;
 
-    if (property.name == "Contents") {
+    if (property.name == "Text") {
         let contents = property.data.Contents;
         let escapedContents = escapeHtml(contents);
 
-        htmlOutput += `
-        <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseContents" role="button" aria-expanded="false" aria-controls="collapseContents">
-            Show Details
-        </a>
-        <div class="collapse" id="collapseContents"><pre>${escapedContents}</pre></div>`;
+        htmlOutput += getCollapsedPropertyItem("Contents", escapedContents);
+    }
+    else if (property.name == "Binary") {
+        let contents = property.data.Binary;
+        let escapedContents = escapeHtml(contents);
+
+        htmlOutput += getCollapsedPropertyItem("Binary", escapedContents);
     }
     else if (property.name == "Headers") {
         let contents = property.data.Headers;
         let escapedHeaders = escapeHtml(contents);
 
-        htmlOutput += `
-        <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseHeaders" role="button" aria-expanded="false" aria-controls="collapseHeaders">
-            Show Details
-        </a>
-        <div class="collapse" id="collapseHeaders"><pre>${escapedHeaders}</pre></div>`;
+        htmlOutput += getCollapsedPropertyItem("Headers", escapedHeaders);
     }
     else {
         for (const [key, value] of Object.entries(property.data)) {

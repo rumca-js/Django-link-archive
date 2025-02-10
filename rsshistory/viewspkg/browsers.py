@@ -176,4 +176,8 @@ def edit(request, pk):
             "{}:browser-edit".format(LinkDatabase.name), args=[pk]
         )
         p.context["form"] = form
+
+        if not browser.is_valid():
+            p.context["form_description_post"] = "<b>Browser is not valid</b>"
+
         return p.render("form_basic.html")

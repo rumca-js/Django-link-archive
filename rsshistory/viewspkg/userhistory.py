@@ -60,6 +60,9 @@ def get_user_browse_history(request):
     if data is not None:
         return data
 
+    if not request.user.is_authenticated:
+        return JsonResponse({}, json_dumps_params={"indent": 4})
+
     page_num = p.get_page_num()
 
     data = {}
@@ -97,6 +100,9 @@ def history_to_json(history):
 
 
 def json_user_search_history(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({}, json_dumps_params={"indent": 4})
+
     histories = UserSearchHistory.objects.filter(user=request.user).order_by("-date")
 
     json_obj = {}
@@ -140,6 +146,9 @@ def get_search_suggestions_entries(request, searchstring):
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
     if data is not None:
         return data
+
+    if not request.user.is_authenticated:
+        return JsonResponse({}, json_dumps_params={"indent": 4})
 
     json_obj = {}
     json_obj["items"] = []

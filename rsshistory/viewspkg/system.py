@@ -955,6 +955,11 @@ def get_indicators(request):
 
     tasks = get_tasks()
 
+    if not request.user.is_authenticated:
+        indicators = {}
+        data = {"indicators": indicators}
+        return JsonResponse(data, json_dumps_params={"indent": 4})
+
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0

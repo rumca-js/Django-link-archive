@@ -291,7 +291,7 @@ class UrlHandlerEx(object):
                 return True
 
     def get_contents(self):
-        contents = self.get_section("Contents")
+        contents = self.get_section("Text")
         return contents["Contents"]
 
     def get_section(self, section_name):
@@ -398,8 +398,12 @@ class UrlHandlerEx(object):
     def is_allowed(self):
         config_entry = Configuration.get_object().config_entry
         if config_entry.respect_robots_txt:
-            u = Url(self.url)
-            return u.is_allowed()
+            response = self.get_section("Response")
+            if response:
+                if "is_allowed" in response and not response["is_allowed"]:
+                    return False
+
+            return True
         else:
             return True
 

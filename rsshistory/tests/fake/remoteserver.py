@@ -17,7 +17,7 @@ remote_server_json = """
   },
   {
     "data": {
-      "Contents": "dataatatatatatat"
+      "Text": "dataatatatatatat"
     },
     "name": "Contents"
   },
@@ -124,7 +124,7 @@ remote_server_json_last_modified = """
     "data": {
       "Contents": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss/\"><channel></rss>"
     },
-    "name": "Contents"
+    "name": "Text"
   },
   {
     "data": {

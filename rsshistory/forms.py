@@ -264,7 +264,9 @@ class EntryRulesForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
+        self.fields["rule_url"].widget.attrs.update(size=self.init.get_cols_size())
 
 
 class ApiKeysForm(forms.ModelForm):

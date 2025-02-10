@@ -8,7 +8,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
-from ..webtools import Url, UrlLocation, HttpPageHandler, DomainCache
+from ..webtools import Url, UrlLocation, HttpPageHandler
 from utils.omnisearch import SingleSymbolEvaluator
 
 from ..apps import LinkDatabase
@@ -296,7 +296,9 @@ def source_add_form(request):
     page = UrlLocation(data["url"])
     domain = page.get_domain()
     config = Configuration.get_object().config_entry
-    info = DomainCache.get_object(link, url_builder=UrlHandlerEx)
+
+    h = UrlHandlerEx(link)
+    is_allowed = h.is_allowed()
 
     # warnings
     if config.prefer_https_links and link.find("http://") >= 0:
@@ -309,7 +311,7 @@ def source_add_form(request):
         )
     if domain.lower() != domain:
         warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
-    if config.respect_robots_txt and info and not info.is_allowed(link):
+    if config.respect_robots_txt and not is_allowed:
         warnings.append("Link is not allowed by site robots.txt")
     if link.find("?") >= 0:
         warnings.append("Link contains arguments. Is that intentional?")
@@ -400,7 +402,7 @@ def edit_source(request, pk):
             if not icon:
                 page = UrlLocation(ob.url)
                 domain = page.get_domain()
-                u = UrlHandlerEx(domain, handler_class=HttpPageHandler)
+                u = UrlHandlerEx(domain, settings={"handler_class" : "HttpPageHandler"})
                 icon = u.get_favicon()
 
             if icon:

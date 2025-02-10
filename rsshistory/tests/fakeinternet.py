@@ -111,13 +111,13 @@ class FakeInternetData(object):
             "hash": b"01001012",
             "is_valid": True,
         }
-        self.contents_data = {"Contents": "test"}
+        self.contents_data = {"Text": "test"}
         self.entries = []
 
     def get_all_properties(self):
         data = []
         data.append({"name": "Properties", "data": self.properties})
-        data.append({"name": "Contents", "data": self.contents_data})
+        data.append({"name": "Text", "data": self.contents_data})
         data.append({"name": "Options", "data": None})
         data.append({"name": "Response", "data": self.response})
         data.append({"name": "Headers", "data": {}})

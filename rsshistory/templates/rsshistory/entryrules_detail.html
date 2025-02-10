@@ -39,4 +39,12 @@
 
 <div>ID: {{object.id}}</div>
 
+{% if not object.is_valid %}
+<b>Rule is not valid</b>
+{% endif %}
+
+{% for error in errors %}
+   <div>{{error}}</div>
+{% endfor %}
+
 {% endblock %}
