@@ -221,33 +221,6 @@ class ViewPage(object):
 
         return self.render_implementation(template, status_code)
 
-    def fill_context_type(context, url=None, fast_check=True, urlhandler=None):
-        if urlhandler is None and url:
-            handler = UrlHandler.get_type(url)
-        elif urlhandler:
-            handler = urlhandler
-        else:
-            return
-
-        context["is_youtube_video"] = (
-            type(handler) == UrlHandler.youtube_video_handler
-        )
-        context["is_youtube_channel"] = (
-            type(handler) == UrlHandler.youtube_channel_handler
-        )
-        context["is_odysee_video"] = (
-            type(handler) == UrlHandler.odysee_video_handler
-        )
-        context["is_odysee_channel"] = (
-            type(handler) == UrlHandler.odysee_channel_handler
-        )
-        context["is_html"] = (
-            type(handler) == HtmlPage
-        )
-        context["is_rss"] = (
-            type(handler) == RssPage
-        )
-
     def get_pagination_args(self):
         infilters = self.request.GET
 

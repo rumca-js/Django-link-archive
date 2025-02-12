@@ -464,7 +464,7 @@ class SourceDetailTest(FakeInternetTestCase):
 
     def test_source_json(self):
         MockRequestCounter.mock_page_requests = 0
-        sources = SourceDataController.objects.filter(url__icontains="https://youtube")
+        sources = SourceDataController.objects.filter(url__icontains="https://www.youtube")
 
         url = reverse("{}:source-json".format(LinkDatabase.name), args=[sources[0].id])
         response = self.client.get(url)
@@ -473,7 +473,7 @@ class SourceDetailTest(FakeInternetTestCase):
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_sources_json_all(self):
-        sources = SourceDataController.objects.filter(url__icontains="https://youtube")
+        sources = SourceDataController.objects.filter(url__icontains="https://www.youtube")
 
         url = reverse("{}:sources-json-all".format(LinkDatabase.name))
         response = self.client.get(url)
@@ -481,7 +481,7 @@ class SourceDetailTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_sources_json_enabled(self):
-        sources = SourceDataController.objects.filter(url__icontains="https://youtube")
+        sources = SourceDataController.objects.filter(url__icontains="https://www.youtube")
 
         url = reverse("{}:sources-json-enabled".format(LinkDatabase.name))
         response = self.client.get(url)

@@ -11,7 +11,6 @@ from ..webtools import (
 
 from ..models import AppLogging
 from ..apps import LinkDatabase
-from ..pluginurl import UrlHandler
 from ..configuration import Configuration
 
 from .sourcegenericplugin import SourceGenericPlugin

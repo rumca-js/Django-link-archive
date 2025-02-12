@@ -11,7 +11,6 @@ from ..controllers import (
 )
 from ..models import EntryRules, Browser
 from ..configuration import Configuration
-from ..pluginurl.urlhandler import UrlHandler
 
 from .fakeinternet import FakeInternetTestCase
 

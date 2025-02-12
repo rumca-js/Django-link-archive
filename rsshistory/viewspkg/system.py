@@ -967,20 +967,12 @@ def get_indicators(request):
     is_threading_ok = system_controller.is_threading_ok(tasks)
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
-    read_later_queue_size = ReadLater.objects.filter(user=request.user).count()
-    read_later = read_later_queue_size > 0
 
     indicators = {}
 
     indicators["is_reading"] = {}
-    indicators["is_reading"]["message"] = f"Reading sources. Queue:{sources_queue_size}"
+    indicators["is_reading"]["message"] = f"Sources queue:{sources_queue_size}"
     indicators["is_reading"]["status"] = sources_are_fetched
-
-    indicators["read_later_queue"] = {}
-    indicators["read_later_queue"][
-        "message"
-    ] = f"Read later queue {read_later_queue_size}"
-    indicators["read_later_queue"]["status"] = read_later
 
     indicators["sources_error"] = {}
     indicators["sources_error"]["message"] = f"Sources error"
@@ -992,6 +984,11 @@ def get_indicators(request):
     indicators["internet_error"] = {}
     indicators["internet_error"]["message"] = f"Internet error"
     indicators["internet_error"]["status"] = is_internet_error
+
+    is_remote_server_down = system_controller.is_remote_server_down()
+    indicators["remote_server_error"] = {}
+    indicators["remote_server_error"]["message"] = f"Remote server error"
+    indicators["remote_server_error"]["status"] = is_remote_server_down
 
     threads_error = configuration_entry.enable_background_jobs and not is_threading_ok
     indicators["threads_error"] = {}

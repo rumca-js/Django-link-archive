@@ -41,6 +41,12 @@ from .fake.remoteserver import (
 from .fake.geekwirecom import (
     geekwire_feed,
 )
+from .fake.firebog import (
+    firebog_adguard_list,
+    firebog_w3kbl_list,
+    firebog_tick_lists,
+    firebog_malware,
+)
 
 from .fake.instance import (
     instance_entries_json,
@@ -111,13 +117,15 @@ class FakeInternetData(object):
             "hash": b"01001012",
             "is_valid": True,
         }
-        self.contents_data = {"Text": "test"}
+        self.text_data = None
+        self.binary_data = None
         self.entries = []
 
     def get_all_properties(self):
         data = []
         data.append({"name": "Properties", "data": self.properties})
-        data.append({"name": "Text", "data": self.contents_data})
+        data.append({"name": "Text", "data": {"Contents" : self.text_data}})
+        data.append({"name": "Binary", "data": {"Contents" : self.binary_data}})
         data.append({"name": "Settings", "data": None})
         data.append({"name": "Response", "data": self.response})
         data.append({"name": "Headers", "data": {}})
@@ -201,7 +209,7 @@ class FakeInternetData(object):
             self.response["Content-Type"] = "application/rss+xml"
             self.properties["feeds"] = [self.url]
         elif self.url == "https://www.geekwire.com/feed":
-            self.contents_data = geekwire_feed
+            self.text_data = geekwire_feed
             self.response["Content-Type"] = "application/rss+xml"
             self.properties["feeds"] = [self.url]
         elif self.url == "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id":
@@ -210,6 +218,14 @@ class FakeInternetData(object):
             self.properties["feeds"] = [self.url]
         elif self.url == "https://instance.com/apps/rsshistory/sources-json":
             self.properties["title"] = "Instance Proxy"
+        elif self.url == "https://v.firebog.net/hosts/AdguardDNS.txt":
+            self.text_data = firebog_adguard_list
+        elif self.url == "https://v.firebog.net/hosts/static/w3kbl.txt":
+            self.text_data = firebog_w3kbl_list
+        elif self.url == "https://v.firebog.net/hosts/lists.php?type=tick":
+            self.text_data = firebog_tick_lists
+        elif self.url == "https://v.firebog.net/hosts/RPiList-Malware.txt":
+            self.text_data = firebog_malware
 
         return self.get_all_properties()
 

@@ -12,7 +12,6 @@ from ..webtools import (
 )
 from utils.sqlmodel import SqlModel, EntriesTable, SourcesTable
 from utils.serializers import PageDisplay
-from ..pluginurl.urlhandler import UrlHandler
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 

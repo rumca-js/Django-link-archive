@@ -14,7 +14,7 @@ from ..controllers import SourceDataController
 from ..configuration import Configuration
 from ..models import AppLogging
 
-from .urlhandler import UrlHandler, UrlHandlerEx
+from .urlhandler import UrlHandlerEx
 
 
 class YouTubeException(Exception):
@@ -41,7 +41,7 @@ class EntryUrlInterface(object):
         self.props = None
         self.all_properties = None
 
-        self.url = UrlHandler.get_cleaned_link(url)
+        self.url = UrlHandlerEx.get_cleaned_link(url)
 
     def get_response(self):
         return self.response
@@ -90,7 +90,6 @@ class EntryUrlInterface(object):
             props["date_dead_since"] = DateUtils.get_datetime_now_utc()
             props["page_rating"] = 0
             props["dead"] = True
-            props["page_rating_contents"] = 0
             props["status_code"] = 0
 
             self.fix_properties(props, source_obj=source_obj)
@@ -185,6 +184,15 @@ class EntryUrlInterface(object):
         )
         if is_domain and properties and "favicon" in properties:
             input_props["thumbnail"] = properties["favicon"]
+
+        if not self.is_property_set(input_props, "page_rating_contents"):
+            if self.is_property_set(input_props, "page_rating"):
+                input_props["page_rating_contents"] = input_props["page_rating"]
+            else:
+                input_props["page_rating_contents"] = 0
+
+        if not self.is_property_set(input_props, "date_dead_since"):
+            input_props["date_dead_since"] = None
 
         return input_props
 

@@ -1440,13 +1440,13 @@ class EntryDataBuilder(object):
             return self.build_from_props(ignore_errors=self.ignore_errors)
 
     def build_from_link(self, ignore_errors=False):
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandlerEx
 
         """
         TODO extract this to a separate class?
         """
         self.ignore_errors = ignore_errors
-        self.link = UrlHandler.get_cleaned_link(self.link)
+        self.link = UrlHandlerEx.get_cleaned_link(self.link)
         if not self.link:
             return
 
@@ -1560,7 +1560,7 @@ class EntryDataBuilder(object):
         return True
 
     def build_from_props(self, ignore_errors=False):
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandlerEx
 
         self.ignore_errors = ignore_errors
 
@@ -1570,7 +1570,7 @@ class EntryDataBuilder(object):
 
         obj = None
 
-        self.link_data["link"] = UrlHandler.get_cleaned_link(self.link_data["link"])
+        self.link_data["link"] = UrlHandlerEx.get_cleaned_link(self.link_data["link"])
         self.link = self.link_data["link"]
 
         wrapper = EntryWrapper(link=self.link)

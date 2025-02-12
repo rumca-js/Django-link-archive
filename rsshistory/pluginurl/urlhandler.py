@@ -291,8 +291,20 @@ class UrlHandlerEx(object):
                 return True
 
     def get_contents(self):
-        contents = self.get_section("Text")
-        return contents["Contents"]
+        """
+        @depricated
+        """
+        return self.get_text()
+
+    def get_text(self):
+        contents_data = self.get_section("Text")
+        if "Contents" in contents_data:
+            return contents_data["Contents"]
+
+    def get_binary(self):
+        contents_data = self.get_section("Binary")
+        if "Contents" in contents_data:
+            return contents_data["Contents"]
 
     def get_section(self, section_name):
         properties = self.get_properties()
@@ -350,34 +362,8 @@ class UrlHandlerEx(object):
         return "{}".format(self.options)
 
     def ping(url):
-        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
-
-        headers = {
-            "User-Agent": user_agent,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
-            "Accept-Encoding": "none",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Connection": "keep-alive",
-        }
-
-        try:
-            with requests.get(
-                url=url,
-                headers=headers,
-                timeout=20,
-                verify=False,
-                stream=True,
-            ) as response:
-                # print("UrlHandler: status_code:{}".format(response.status_code))
-                if response.status_code >= 200 and response.status_code < 404:
-                    return True
-                else:
-                    return False
-
-        except Exception as E:
-            print("UrlHandler:" + str(E))
-            return False
+        u = Url(url)
+        return u.ping()
 
     def get_cleaned_link(url):
         u = Url(url)

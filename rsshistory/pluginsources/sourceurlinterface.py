@@ -12,7 +12,7 @@ from ..models import (
 )
 from ..configuration import Configuration
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
-from ..pluginurl.urlhandler import UrlHandler, UrlHandlerEx
+from ..pluginurl.urlhandler import UrlHandlerEx
 
 
 class SourceUrlInterface(object):
@@ -21,7 +21,7 @@ class SourceUrlInterface(object):
     """
 
     def __init__(self, url, use_headless_browser=False):
-        self.url = UrlHandler.get_cleaned_link(url)
+        self.url = UrlHandlerEx.get_cleaned_link(url)
         self.use_headless_browser = use_headless_browser
 
     def get_props(self, input_props=None):

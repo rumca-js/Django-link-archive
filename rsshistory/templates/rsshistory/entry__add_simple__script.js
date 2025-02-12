@@ -33,44 +33,35 @@ function resetSearch(text = '') {
 }
 
 
-function fillEditForm(token) {
-    if (page_properties[0].name != "Properties") {
-        console.error("fillEditForm function problem 0");
-        console.error(page_properties[0].name);
-        return;
+function getSection(section_name) {
+    if (page_properties && page_properties.length > 0) {
+        let section = page_properties.find(properties => properties.name == section_name);
+        return section ? section.data : null;
     }
-    if (page_properties[1].name != "Text") {
-        console.error("fillEditForm function problem 1");
-        console.error(page_properties[1].name);
-        return;
-    }
-    if (page_properties[2].name != "Settings") {
-        console.error("fillEditForm function problem 2");
-        console.error(page_properties[1].name);
-        return;
-    }
-    if (page_properties[3].name != "Response") {
-        console.error("fillEditForm function problem 3");
-        console.error(page_properties[2].name);
-        return;
-    }
+    return null;
+}
 
-    let link = page_properties[0].data.link;
-    let title = page_properties[0].data.title || '';
-    let description = page_properties[0].data.description || '';
-    let date_published = page_properties[0].data.date_published;
+
+function fillEditForm(token) {
+    let page_properties = getSection("Properties");
+    let response_data = getSection("Response");
+
+    let link = page_properties.link;
+    let title = page_properties.title || '';
+    let description = page_properties.description || '';
+    let date_published = page_properties.date_published;
     let source_url = "";
     let bookmarked = true;
     let permanent = false;
-    let language = page_properties[0].data.language || '';
-    let user = page_properties[0].data.user;
-    let author = page_properties[0].data.author || '';
-    let album = page_properties[0].data.album || '';
-    let thumbnail = page_properties[0].data.thumbnail || '';
+    let language = page_properties.language || '';
+    let user = page_properties.user;
+    let author = page_properties.author || '';
+    let album = page_properties.album || '';
+    let thumbnail = page_properties.thumbnail || '';
     let manual_status_code = 0;
-    let status_code = page_properties[3].data.status_code;
-    let page_rating = page_properties[0].data.page_rating;
-    let page_rating_contents = page_properties[0].data.page_rating;
+    let status_code = response_data.status_code;
+    let page_rating = page_properties.page_rating;
+    let page_rating_contents = page_properties.page_rating;
     let page_rating_votes = 0;
     let age = 0;
 

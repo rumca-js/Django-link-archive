@@ -9,7 +9,6 @@ from utils.dateutils import DateUtils
 from ..models import AppLogging
 from ..controllers import LinkDataController, BackgroundJobController
 from ..apps import LinkDatabase
-from ..pluginurl.urlhandler import UrlHandler
 from ..pluginurl.entryurlinterface import EntryUrlInterface
 from ..configuration import Configuration
 

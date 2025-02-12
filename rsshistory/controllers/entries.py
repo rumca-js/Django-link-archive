@@ -113,7 +113,7 @@ class LinkDataController(LinkDataModel):
         return info
 
     def get_clean_data(props):
-        from ..pluginurl import UrlHandler
+        from ..pluginurl import UrlHandlerEx
 
         result = {}
         test = LinkDataController()
@@ -123,7 +123,7 @@ class LinkDataController(LinkDataModel):
                 result[key] = props[key]
 
         if "link" in result:
-            result["link"] = UrlHandler.get_cleaned_link(result["link"])
+            result["link"] = UrlHandlerEx.get_cleaned_link(result["link"])
 
         if "tags" in result:
             del result["tags"]
@@ -159,6 +159,10 @@ class LinkDataController(LinkDataModel):
         )
 
         return self.date_published < day_to_remove
+
+    def is_bookmarked(self):
+        from ..models import UserBookmarks
+        return UserBookmarks.is_bookmarked(self)
 
 
 class ArchiveLinkDataController(ArchiveLinkDataModel):

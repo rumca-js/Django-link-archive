@@ -1,4 +1,4 @@
-from ..pluginurl.urlhandler import UrlHandler, UrlPropertyValidator
+from ..pluginurl.urlhandler import UrlPropertyValidator
 from ..webtools.handlervideoyoutube import YouTubeVideoHandler
 
 from .fakeinternet import FakeInternetTestCase

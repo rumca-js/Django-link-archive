@@ -262,7 +262,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:entry-add".format(LinkDatabase.name))
-        test_link = "https://youtube.com/watch?v=1234"
+        test_link = "https://www.youtube.com/watch?v=1234"
 
         limited_data = self.get_link_data(test_link)
         # print(limited_data)
@@ -477,6 +477,10 @@ class EntriesViewsTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=limited_data)
 
+        if response.status_code != 302:
+            page_source = response.content.decode("utf-8")
+            print("Contents: {}".format(page_source))
+
         # redirection
         self.assertEqual(response.status_code, 302)
 
@@ -484,7 +488,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         entry = LinkDataController.objects.get(link=test_link)
         self.assertEqual(entry.title, "Https LinkedIn Page title")
-        self.assertEqual(entry.description, "LinkedIn Page description")
+        self.assertEqual(entry.description, "Https LinkedIn Page description")
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
         self.assertEqual(bookmarks.count(), 0)
@@ -522,7 +526,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         entry = LinkDataController.objects.get(link=test_link)
         self.assertEqual(entry.title, "Https LinkedIn Page title")
-        self.assertEqual(entry.description, "LinkedIn Page description")
+        self.assertEqual(entry.description, "Https LinkedIn Page description")
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
         self.assertEqual(bookmarks.count(), 1)

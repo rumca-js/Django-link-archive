@@ -11,7 +11,7 @@ from ..models import AppLogging, UserTags
 from ..models import BaseLinkDataController
 from ..controllers import EntryDataBuilder, SourceDataController
 from ..controllers import LinkDataController, BackgroundJobController
-from ..pluginurl.urlhandler import UrlHandler, UrlHandlerEx
+from ..pluginurl.urlhandler import UrlHandlerEx
 
 
 class SourceGenericPlugin(object):

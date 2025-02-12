@@ -36,7 +36,7 @@ from ..forms import (
     LinkPropertiesForm,
 )
 from ..views import ViewPage
-from ..pluginurl.urlhandler import UrlHandler, UrlHandlerEx
+from ..pluginurl.urlhandler import UrlHandlerEx
 
 
 def get_errors(page_url):
@@ -477,7 +477,7 @@ def download_video_pk(request, pk):
 
 def is_url_allowed(request):
     def is_url_allowed_internal(p, url):
-        u = UrlHandler(url)
+        u = UrlHandlerEx(url)
         status = u.is_allowed()
 
         if status:

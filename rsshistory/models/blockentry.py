@@ -114,31 +114,34 @@ class BlockEntryList(models.Model):
         ordering = ["-processed", "url"]
 
     def initialize():
-        BlockEntryList.read_lists_group(
-            "https://v.firebog.net/hosts/lists.php?type=tick"
-        )
+        BlockEntryList.update_all()
 
     def update_all():
-        from ..controllers import BackgroundJobController
+        from ..pluginurl import UrlHandlerEx
 
         # this creates new lists
         BlockEntryList.read_lists_group(
             "https://v.firebog.net/hosts/lists.php?type=tick"
         )
 
-        # update existing
-        for item in BlockEntryList.objects.all():
-            item.update()
+        for alist in BlockEntryList.objects.all():
+            if not UrlHandlerEx.ping(alist.url):
+                alist.delete()
+            else:
+                alist.update()
 
-    def update_lists():
+    def update(self):
+        from ..pluginurl import UrlHandlerEx
         from ..controllers import BackgroundJobController
 
-        # this creates new lists
-        BlockEntryList.read_lists_group(
-            "https://v.firebog.net/hosts/lists.php?type=tick"
-        )
+        if not UrlHandlerEx.ping(self.url):
+            return
 
-        # TODO check lists, if outdated (not 200) then remove?
+        self.processed = False
+
+        BackgroundJobController.create_single_job(
+            BackgroundJobController.JOB_INITIALIZE_BLOCK_LIST, self.url
+        )
 
     def reset():
         BlockEntry.objects.all().delete()
@@ -149,7 +152,7 @@ class BlockEntryList(models.Model):
         from ..pluginurl import UrlHandlerEx
 
         url = UrlHandlerEx(lists_group)
-        contents = url.get_contents()
+        contents = url.get_text()
         if contents:
             lines = contents.split("\n")
             BlockEntryList.add_lists(lines)
@@ -171,6 +174,9 @@ class BlockEntryList(models.Model):
             block_list.update()
 
     def update_implementation(self):
+        """
+        @note Called from initialize block list
+        """
         from ..pluginurl import UrlHandlerEx
 
         handler = UrlHandlerEx(self.url)
@@ -184,13 +190,6 @@ class BlockEntryList(models.Model):
 
         self.processed = True
         self.save()
-
-    def update(self):
-        from ..controllers import BackgroundJobController
-
-        BackgroundJobController.create_single_job(
-            BackgroundJobController.JOB_INITIALIZE_BLOCK_LIST, self.url
-        )
 
 
 class BlockEntry(models.Model):

@@ -70,7 +70,6 @@ from ..views import (
 )
 from ..queryfilters import EntryFilter, OmniSearchFilter
 from ..configuration import Configuration
-from ..pluginurl import UrlHandler
 from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
 
@@ -854,11 +853,8 @@ def edit_entry(request, pk):
             obs = LinkDataController.objects.filter(id=pk)
             entry = obs[0]
 
-            w = EntryWrapper(entry=entry)
-            if entry.bookmarked:
-                new_entry = w.make_bookmarked(request)
-            else:
-                new_entry = w.make_not_bookmarked(request)
+            entry.bookmarked = UserBookmarks.is_bookmarked(entry)
+            entry.save()
 
             return HttpResponseRedirect(ob.get_absolute_url())
 
