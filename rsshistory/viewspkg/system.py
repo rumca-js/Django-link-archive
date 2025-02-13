@@ -967,12 +967,20 @@ def get_indicators(request):
     is_threading_ok = system_controller.is_threading_ok(tasks)
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
+    read_later_queue_size = ReadLater.objects.filter(user=request.user).count()
+    read_later = read_later_queue_size > 0
 
     indicators = {}
 
     indicators["is_reading"] = {}
     indicators["is_reading"]["message"] = f"Sources queue:{sources_queue_size}"
     indicators["is_reading"]["status"] = sources_are_fetched
+
+    indicators["read_later_queue"] = {}
+    indicators["read_later_queue"][
+        "message"
+    ] = f"Read later queue {read_later_queue_size}"
+    indicators["read_later_queue"]["status"] = read_later
 
     indicators["sources_error"] = {}
     indicators["sources_error"]["message"] = f"Sources error"
