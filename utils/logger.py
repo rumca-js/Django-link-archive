@@ -26,11 +26,23 @@ class PrintLogger(object):
         if detail_text:
             print(detail_text)
 
+        if stack:
+            stack_lines = traceback.format_stack()
+            stack_string = "".join(stack_lines)
+            print("Stack:")
+            print("".join(stack_lines))
+
     def debug(self, info_text, detail_text="", user=None, stack=False):
         if info_text:
             print(info_text)
         if detail_text:
             print(detail_text)
+
+        if stack:
+            stack_lines = traceback.format_stack()
+            stack_string = "".join(stack_lines)
+            print("Stack:")
+            print("".join(stack_lines))
 
     def warning(self, info_text, detail_text="", user=None, stack=False):
         if info_text:
@@ -38,11 +50,23 @@ class PrintLogger(object):
         if detail_text:
             print(detail_text)
 
+        if stack:
+            stack_lines = traceback.format_stack()
+            stack_string = "".join(stack_lines)
+            print("Stack:")
+            print("".join(stack_lines))
+
     def error(self, info_text, detail_text="", user=None, stack=False):
         if info_text:
             print(info_text)
         if detail_text:
             print(detail_text)
+
+        if stack:
+            stack_lines = traceback.format_stack()
+            stack_string = "".join(stack_lines)
+            print("Stack:")
+            print("".join(stack_lines))
 
     def notify(self, info_text, detail_text="", user=None):
         if info_text:
