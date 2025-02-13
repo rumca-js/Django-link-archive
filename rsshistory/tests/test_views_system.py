@@ -171,3 +171,20 @@ class SystemViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_get_indicators(self):
+        url = reverse("{}:get-indicators".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+
+        self.assertIn("is_reading", data)  # source reading indication
+        self.assertIn("read_later_queue", data)  # used by menu
+        self.assertIn("sources_error", data)
+        self.assertIn("internet_error", data)
+        self.assertIn("remote_server_error", data)
+        self.assertIn("threads_error", data)
+        self.assertIn("jobs_error", data)
+        self.assertIn("configuration_error", data)

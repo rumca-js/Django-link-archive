@@ -366,9 +366,7 @@ class UrlHandlerEx(object):
         return u.ping()
 
     def get_cleaned_link(url):
-        u = Url(url)
-        urls_data = u.get_urls()
-        return urls_data["link"]
+        return Url.get_cleaned_link(url)
 
     def is_remote_server_down(self):
         config_entry = Configuration.get_object().config_entry

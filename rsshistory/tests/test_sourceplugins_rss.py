@@ -17,6 +17,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         )
 
     def test_get_entries(self):
+        MockRequestCounter.mock_page_requests = 0
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -43,10 +44,10 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertTrue(props[0]["title"])
         self.assertNotIn("source", props[0])
 
-        # 1 rss parent, we do not make additional requests
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_entries__use_all_data(self):
+        MockRequestCounter.mock_page_requests = 0
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -67,8 +68,10 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.print_errors()
 
         self.assertEqual(len(props), 13)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_entries__use_clean_page_info(self):
+        MockRequestCounter.mock_page_requests = 0
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -89,8 +92,10 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.print_errors()
 
         self.assertEqual(len(props), 13)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_entries__encoded(self):
+        MockRequestCounter.mock_page_requests = 0
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -119,8 +124,10 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.print_errors()
 
         self.assertEqual(len(props), 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_enhanced_entries(self):
+        MockRequestCounter.mock_page_requests = 0
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -156,6 +163,8 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_check_for_data(self):
+        MockRequestCounter.mock_page_requests = 0
+
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -175,6 +184,8 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.print_errors()
 
         self.assertTrue(plugin.hash)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_calculate_plugin_hash(self):
         plugin = BaseRssPlugin(self.source_rss.id)

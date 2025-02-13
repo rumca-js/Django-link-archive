@@ -74,10 +74,6 @@ class DjangoRequestObject(object):
         self.user = user
 
 
-class DefaultCrawler(CrawlerInterface):
-    pass
-
-
 class MockRequestCounter(object):
     mock_page_requests = 0
     request_history = []
@@ -92,6 +88,12 @@ class MockRequestCounter(object):
     def reset():
         MockRequestCounter.mock_page_requests = 0
         MockRequestCounter.request_history = []
+
+
+class DefaultCrawler(CrawlerInterface):
+
+    def run(self):
+        MockRequestCounter.requested(self.request.url)
 
 
 class FakeInternetData(object):
@@ -117,7 +119,7 @@ class FakeInternetData(object):
             "hash": b"01001012",
             "is_valid": True,
         }
-        self.text_data = None
+        self.text_data = "Something"
         self.binary_data = None
         self.entries = []
 

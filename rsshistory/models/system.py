@@ -794,11 +794,11 @@ class AppLogging(models.Model):
                 detail_text += ". "
             detail_text += stack_string
 
-        # TODO replace hardcoded values with something better
-        LinkDatabase.info("AppLogging::{}:{}".format(level, info_text))
+        LinkDatabase.info("AppLogging::{}:{}\n{}\n".format(level, info_text, detail_text))
 
         AppLogging.cleanup_overflow()
 
+        # TODO replace hardcoded values with something better
         if len(info_text) > 1900:
             info_text = info_text[:1900]
         if len(detail_text) > 2900:

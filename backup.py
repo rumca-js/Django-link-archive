@@ -28,7 +28,7 @@ def run_backup_command(run_info):
     host = run_info["host"]
 
     format_args = "c"
-    if "format" in run_info and run_info["format"] == "plain":
+    if "format" in run_info and (run_info["format"] == "plain" or run_info["format"] == "sql"):
         format_args = "p"
 
     command_input = [
@@ -38,7 +38,11 @@ def run_backup_command(run_info):
         "-d", database,
         "-F", format_args,
         "-f", output_file,
+        "--data-only",
     ]
+
+    if "format" in run_info and run_info["format"] == "sql":
+        command_input.append("--inserts")
 
     for table in tables:
         command_input.append("-t")
@@ -321,20 +325,22 @@ def run_sql_for_workspaces(run_info, sql_command):
 
 
 def parse_backup():
-    parser = argparse.ArgumentParser(prog="Backup", description="Backup manager. To pass password define .pgpass file, and define password there.")
+    parser = argparse.ArgumentParser(prog="Backup", description="Backup manager. Please provide .pgpass file, and define your password there.")
 
-    parser.add_argument("-b", "--backup", action="store_true")
-    parser.add_argument("-r", "--restore", action="store_true")
-    parser.add_argument("-a", "--analyze", action="store_true")
-    parser.add_argument("--vacuum", action="store_true")
-    parser.add_argument("--reindex", action="store_true")
-    parser.add_argument("-U", "--user", default="user")
-    parser.add_argument("-d", "--database", default="db")
-    parser.add_argument("-w", "--workspace")
-    parser.add_argument("-D", "--debug") # TODO implement that shit
-    parser.add_argument("-i", "--ignore-errors", action="store_true")
-    parser.add_argument("-f", "--format", default="custom")
-    parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument("-b", "--backup", action="store_true", help="Perform a backup")
+    parser.add_argument("-r", "--restore", action="store_true", help="Restore from a backup")
+    parser.add_argument("-a", "--analyze", action="store_true", help="Analyze the database")
+    parser.add_argument("--vacuum", action="store_true", help="Vacuum the database")
+    parser.add_argument("--reindex", action="store_true", help="Reindex the database. Useful to detect errors in consistency")
+    parser.add_argument("-U", "--user", default="user", help="Username for the database (default: 'user')")
+    parser.add_argument("-d", "--database", default="db", help="Database name (default: 'db')")
+    parser.add_argument("-w", "--workspace", help="Workspace for which to perform backup/restore. If not specified - all")
+    parser.add_argument("-D", "--debug", help="Enable debug output")  # TODO implement debug
+    parser.add_argument("-i", "--ignore-errors", action="store_true", help="Ignore errors during the operation")
+    parser.add_argument("-f", "--format", default="custom", choices=["custom", "plain", "sql"],
+                        help="Format of the backup (default: 'custom'). Choices: 'custom', 'plain', or 'sql'.")
+
+    parser.add_argument("--host", default="127.0.0.1", help="Host address for the database (default: 127.0.0.1)")
 
     return parser, parser.parse_args()
 

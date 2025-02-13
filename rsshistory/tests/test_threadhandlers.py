@@ -30,7 +30,7 @@ from ..threadhandlers import (
     ProcessSourceJobHandler,
 )
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
 class CleanJobHandlerTest(FakeInternetTestCase):
@@ -390,6 +390,8 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         self.assertEqual(job.enabled, False)
 
     def test_process__source_known(self):
+        MockRequestCounter.mock_page_requests = 0
+
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
@@ -423,6 +425,8 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         self.assertTrue("process-source" in subjects)
         # add link job odysee
         self.assertTrue("link-add" in subjects)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
 
 class WriteDailyDataJobHandlerTest(FakeInternetTestCase):

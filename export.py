@@ -1,5 +1,6 @@
 """
 This program uses API key from webpage, and uses it to produce static lists
+Might be slow.
 
 ./data/export/static_lists/
 

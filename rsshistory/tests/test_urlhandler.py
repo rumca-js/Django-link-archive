@@ -11,7 +11,7 @@ from ..webtools import (
 
 from ..pluginurl.urlhandler import UrlHandlerEx, UrlHandler
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
 class UrlHandlerTest(FakeInternetTestCase):
@@ -227,30 +227,53 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         self.assertTrue(properties)
 
-    def test_get_cleaned_link_stupid_google_link(self):
+    def test_get_cleaned_link__linkedin(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        cleaned_link = UrlHandlerEx.get_cleaned_link(
+            "https://linkedin.com"
+        )
+
+        self.assertEqual(cleaned_link, "https://linkedin.com")
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_cleaned_link__stupid_google_link(self):
+        MockRequestCounter.mock_page_requests = 0
+
         cleaned_link = UrlHandlerEx.get_cleaned_link(
             "https://www.google.com/url?q=https://forum.ddopl.com/&sa=Udupa"
         )
 
         self.assertEqual(cleaned_link, "https://forum.ddopl.com/")
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_get_cleaned_link_stupid_google_link2(self):
+    def test_get_cleaned_link__stupid_google_link2(self):
+        MockRequestCounter.mock_page_requests = 0
+
         cleaned_link = UrlHandlerEx.get_cleaned_link(
             "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://worldofwarcraft.blizzard.com/&ved=2ahUKEwjtx56Pn5WFAxU2DhAIHYR1CckQFnoECCkQAQ&usg=AOvVaw1pDkx5K7B5loKccvg_079-"
         )
 
         self.assertEqual(cleaned_link, "https://worldofwarcraft.blizzard.com/")
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_get_cleaned_link_stupid_youtube_link(self):
+    def test_get_cleaned_link__stupid_youtube_link(self):
+        MockRequestCounter.mock_page_requests = 0
+
         cleaned_link = UrlHandlerEx.get_cleaned_link(
             "https://www.youtube.com/redirect?event=lorum&redir_token=ipsum&q=https%3A%2F%2Fcorridordigital.com%2F&v=LeB9DcFT810"
         )
 
         self.assertEqual(cleaned_link, "https://corridordigital.com")
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_get_cleaned_link(self):
+    def test_get_cleaned_link__youtube(self):
+        MockRequestCounter.mock_page_requests = 0
+
         cleaned_link = UrlHandlerEx.get_cleaned_link("https://www.YouTube.com/Test")
         self.assertEqual(cleaned_link, "https://www.youtube.com/Test")
 
         cleaned_link = UrlHandlerEx.get_cleaned_link("https://www.YouTube.com/Test/")
         self.assertEqual(cleaned_link, "https://www.youtube.com/Test")
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
