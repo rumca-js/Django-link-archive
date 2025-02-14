@@ -77,14 +77,14 @@ class SearchInterface(object):
         level = self.parser.get_verbosity_level()
 
         if level >= 1:
-            print("{}".format(entry["link"]))
+            print("{}".format(entry.link))
         elif level >= 2:
             description = ""
             if "description" in entry:
-                description = entry["description"]
-            print("{}\n{}".format(entry["link"], description))
+                description = entry.description
+            print("{}\n{}".format(entry.link, description))
         else:
-            print("{}".format(entry["link"]))
+            print("{}".format(entry.link))
 
     def read_file(self, afile):
         text = read_file_contents(afile)
@@ -114,8 +114,7 @@ class SearchInterface(object):
         """
         Row is to be expected a 'dict', eg. row["link"]
         """
-        print(row)
-        link = row["link"]
+        link = row.link
 
         level = self.parser.get_verbosity_level()
 

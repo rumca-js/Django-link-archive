@@ -121,7 +121,7 @@ class Base(DeclarativeBase):
 
 
 class EntriesTable(Base):
-    __tablename__ = "entries"
+    __tablename__ = "linkdatamodel"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     link: Mapped[str] = mapped_column(String(30), unique=True)
@@ -130,24 +130,21 @@ class EntriesTable(Base):
     thumbnail: Mapped[Optional[str]]
     language: Mapped[Optional[str]]
     age: Mapped[int] = mapped_column(default=0)
-    date_created = mapped_column(DateTime, nullable=True)
-    date_published = mapped_column(DateTime, nullable=True)
-    date_update_last = mapped_column(DateTime, nullable=True)
-    date_dead_since = mapped_column(DateTime, nullable=True)
-    date_last_modified = mapped_column(DateTime, nullable=True)
+    #date_created = mapped_column(DateTime(timezone=True), nullable=True)
+    #date_published = mapped_column(DateTime(timezone=True), nullable=True)
+    #date_update_last = mapped_column(DateTime(timezone=True), nullable=True)
+    #date_dead_since = mapped_column(DateTime(timezone=True), nullable=True)
+    #date_last_modified = mapped_column(DateTime(timezone=True), nullable=True)
     status_code: Mapped[int] = mapped_column(default=0)
     page_rating: Mapped[int] = mapped_column(default=0)
     page_rating_votes: Mapped[int] = mapped_column(default=0)
     page_rating_contents: Mapped[int] = mapped_column(default=0)
-    dead: Mapped[bool] = mapped_column(default=False)
     bookmarked: Mapped[bool] = mapped_column(default=False)
     permanent: Mapped[bool] = mapped_column(default=False)
-    source: Mapped[Optional[str]]
     author: Mapped[Optional[str]]
     album: Mapped[Optional[str]]
     # advanced / foreign
-    source_obj__id: Mapped[Optional[int]]
-    tags: Mapped[Optional[str]]
+    source_id: Mapped[Optional[int]]
 
 
 class EntriesTableController(object):
@@ -199,7 +196,7 @@ class EntriesTableController(object):
 
 
 class SourcesTable(Base):
-    __tablename__ = "sources"
+    __tablename__ = "sourcedatamodel"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     enabled: Mapped[bool] = mapped_column(default=True)
@@ -322,7 +319,7 @@ class SourceOperationalDataController(object):
 
 
 class UserTags(Base):
-    __tablename__ = "UserTags"
+    __tablename__ = "usertags"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     date = mapped_column(DateTime)
@@ -333,7 +330,7 @@ class UserTags(Base):
 
 
 class UserBookmarks(Base):
-    __tablename__ = "UserBookmarks"
+    __tablename__ = "userbookmarks"
     id: Mapped[int] = mapped_column(primary_key=True)
 
     date_bookmarked = mapped_column(DateTime)
@@ -343,7 +340,7 @@ class UserBookmarks(Base):
 
 
 class UserVotes(Base):
-    __tablename__ = "UserVotes"
+    __tablename__ = "uservotes"
     id: Mapped[int] = mapped_column(primary_key=True)
 
     user: Mapped[str] = mapped_column(String(1000))
@@ -354,7 +351,7 @@ class UserVotes(Base):
 
 
 class ReadMarkers(Base):
-    __tablename__ = "ReadMarkers"
+    __tablename__ = "readmarkers"
     id: Mapped[int] = mapped_column(primary_key=True)
     read_date = mapped_column(DateTime)
     source_object: Mapped[Optional[int]]

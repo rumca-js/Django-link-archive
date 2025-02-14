@@ -195,6 +195,12 @@ tables = [
 ]
 
 
+def replace_statement(statement):
+    statement = statement.replace("public.places_", "")
+    statement = statement.replace("public.auth", "auth")
+    return statement
+
+
 def find_inserts(file_contents):
     # Use a regular expression to match all INSERT statements
     insert_pattern = r"INSERT INTO.*?VALUES.*?\);\n"
@@ -202,7 +208,7 @@ def find_inserts(file_contents):
 
     # Print all the matched INSERT statements
     for statement in insert_statements:
-        statement = statement.replace("public.", "")
+        statement = replace_statement(statement)
         yield statement
 
 
@@ -223,7 +229,7 @@ class RunningChar(object):
 def create_tables(connection):
     for table in tables:
         table_create = table["create"]
-        table_create = table_create.replace("public.", "")
+        table_create = replace_statement(table_create)
         table_create = text(table_create)
 
         connection.execute(table_create)
@@ -245,7 +251,7 @@ def write_parsed_data():
 
     with engine.connect() as connection:
         global user_inserts
-        user_inserts = user_inserts.replace("public.", "")
+        user_inserts = replace_statement(user_inserts)
         user_inserts_text = text(user_inserts)
         connection.execute(user_inserts_text)
         connection.commit()

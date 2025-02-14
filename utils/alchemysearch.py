@@ -26,19 +26,19 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
             return self.table.__table__.c[condition_data[0]] == condition_data[2]
 
         if condition_data[1] == "!=":
-            return self.table.__table__c[condition_data[0]] != condition_data[2]
+            return self.table.__table__.c[condition_data[0]] != condition_data[2]
 
         if condition_data[1] == ">":
-            return self.table.__table__c[condition_data[0]] > condition_data[2]
+            return self.table.__table__.c[condition_data[0]] > condition_data[2]
 
         if condition_data[1] == "<":
-            return self.table.__table__c[condition_data[0]] < condition_data[2]
+            return self.table.__table__.c[condition_data[0]] < condition_data[2]
 
         if condition_data[1] == ">=":
-            return self.table.__table__c[condition_data[0]] >= condition_data[2]
+            return self.table.__table__.c[condition_data[0]] >= condition_data[2]
 
         if condition_data[1] == "<=":
-            return self.table.__table__c[condition_data[0]] <= condition_data[2]
+            return self.table.__table__.c[condition_data[0]] <= condition_data[2]
 
         if condition_data[1] == "=":
             symbol = condition_data[2]
