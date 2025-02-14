@@ -1,22 +1,4 @@
 """
-usage: dataanalyzer.py [-h] [--dir DIR] [--count] [--summary] [--find-tag find_tag] [--find find] [--find-tags] [-i]
-                       [-v VERBOSITY]
-
-Data analyzer program
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --dir DIR             Directory path
-  --count               Counts entries
-  --summary             Displays summary
-  --daily               Displays daily
-  --find-tag find_tag   Find entries with a specific tag
-  --find find           Find entries with text
-  --show-tags           Find all available tags
-  -i, --ignore-case     Ignores case
-  -v VERBOSITY, --verbosity VERBOSITY
-                        Verbosity level
-
 TODO
  - datanalayze --source-url hackernews = search from particular source
  - Output formats? (md)?
@@ -39,7 +21,7 @@ from utils.sqlmodel import SqlModel
 from utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
 from utils.alchemysearch import AlchemySymbolEvaluator, AlchemyEquationEvaluator, AlchemySearch
 
-from webtools import (
+from rsshistory.webtools import (
    Url,
    WebConfig,
    HttpPageHandler,
