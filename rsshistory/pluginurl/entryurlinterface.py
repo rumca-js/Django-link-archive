@@ -85,6 +85,7 @@ class EntryUrlInterface(object):
             props["description"] = None
             props["author"] = None
             props["language"] = None
+            props["age"] = None
             props["thumbnail"] = None
             props["date_published"] = DateUtils.get_datetime_now_utc()
             props["date_dead_since"] = DateUtils.get_datetime_now_utc()
@@ -119,6 +120,12 @@ class EntryUrlInterface(object):
         if not input_props:
             input_props = {}
             # some Internet sources provide invalid publication date
+
+        moderator = UrlAgeModerator(properties=input_props)
+        age = moderator.get_age()
+        if age:
+            if not self.is_property_set(input_props, "age"):
+                input_props["age"] = age
 
         if self.is_property_set(input_props, "date_published"):
             if input_props["date_published"] > DateUtils.get_datetime_now_utc():

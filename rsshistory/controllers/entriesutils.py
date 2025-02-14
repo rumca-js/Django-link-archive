@@ -512,10 +512,11 @@ class EntryUpdater(object):
                 entry.date_published = entry.date_update_last
 
         properties = {"title": entry.title, "description": entry.description}
+
         moderator = UrlAgeModerator(properties=properties)
         age = moderator.get_age()
 
-        if not entry.age or not age or entry.age < age:
+        if (not entry.age and age) or (age and entry.age < age):
             entry.age = age
 
         entry.save()
@@ -1665,6 +1666,12 @@ class EntryDataBuilder(object):
         ):
             if "page_rating_contents" in new_link_data:
                 new_link_data["page_rating"] = new_link_data["page_rating_contents"]
+
+        if "age" not in new_link_data:
+            moderator = UrlAgeModerator(properties=new_link_data)
+            age = moderator.get_age()
+            if age:
+                new_link_data["age"] = age
 
         AppLogging.debug("Adding link: {}".format(new_link_data["link"]))
 

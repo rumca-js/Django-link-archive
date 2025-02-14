@@ -54,6 +54,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             domain=None,
             thumbnail=None,
             date_published=add_time,
+            age=None,
         )
 
         date_updated = entry.date_update_last
@@ -65,6 +66,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.title, "Https LinkedIn Page title")
         self.assertEqual(entry.description, "Https LinkedIn Page description")
         self.assertEqual(entry.date_published, add_time)
+        self.assertEqual(entry.age, None)
         # self.assertEqual(entry.date_update_last, date_updated)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)
@@ -470,6 +472,86 @@ class EntryUpdaterTest(FakeInternetTestCase):
         u.update_data()
 
         self.assertEqual(LinkDataController.objects.all().count(), 0)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+
+    def test_update_data__leaves_age(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://linkedin.com",
+            title=None,
+            description=None,
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            thumbnail=None,
+            date_published=add_time,
+            age=15,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.update_data()
+
+        self.assertEqual(entry.title, "Https LinkedIn Page title")
+        self.assertEqual(entry.description, "Https LinkedIn Page description")
+        self.assertEqual(entry.date_published, add_time)
+        self.assertEqual(entry.age, 15)
+        # self.assertEqual(entry.date_update_last, date_updated)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+
+    def test_update_data__sets_age(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://linkedin.com",
+            title="Sex porn",
+            description="Sex porn",
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            thumbnail=None,
+            date_published=add_time,
+            age=None,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.update_data()
+
+        self.assertEqual(entry.title, "Sex porn")
+        self.assertEqual(entry.description, "Sex porn")
+        self.assertEqual(entry.date_published, add_time)
+        self.assertEqual(entry.age, 15)
+        # self.assertEqual(entry.date_update_last, date_updated)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
