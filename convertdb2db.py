@@ -115,16 +115,15 @@ def main():
     # Database credentials
     USER = args.user
     PASSWORD = args.password
-    PASSWORD = "O0mpaLO0mpa"
 
     HOST = args.host
     DATABASE = args.database
 
     file_name = args.output
 
-    #path = Path(file_name)
-    #if path.exists():
-    #    path.unlink()
+    path = Path(file_name)
+    if path.exists():
+        path.unlink()
 
     # Create the database engine
     SOURCE_DATABASE_URL = f"postgresql://{USER}:{PASSWORD}@{HOST}/{DATABASE}"
@@ -147,10 +146,10 @@ def main():
 
     workspace = args.workspace
 
-    #for table in tables:
-    #    copy_table(workspace, table, source_engine, destination_engine)
+    for table in tables:
+        copy_table(workspace, table, source_engine, destination_engine)
 
-    #copy_table("auth", "user", source_engine, destination_engine)
+    copy_table("auth", "user", source_engine, destination_engine)
     obfuscate("auth", "user", destination_engine)
 
     elapsed_time_seconds = time.time() - start_time
