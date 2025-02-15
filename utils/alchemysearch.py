@@ -75,10 +75,13 @@ class AlchemyRowHandler(object):
 
 
 class AlchemySearch(object):
-    def __init__(self, db, search_term, row_handler=None):
+    def __init__(self, db, search_term, row_handler=None, order_by = None, asc=False, desc=True):
         self.db = db
         self.search_term = search_term
         self.alchemy_row_handler = row_handler
+        self.order_by = order_by
+        self.asc = asc
+        self.desc = desc
 
     def search(self):
         symbol_evaluator = AlchemySymbolEvaluator(EntriesTable)
@@ -93,7 +96,25 @@ class AlchemySearch(object):
 
         rows = []
         with Session() as session:
-            rows = session.query(EntriesTable).filter(combined_query_conditions).all()
+            order_by_column = getattr(EntriesTable, self.order_by, None)
+
+            if order_by_column is None:
+                raise AttributeError(f"Invalid order_by column: {self.order_by}")
+
+            # Determine sorting order based on self.asc and self.desc
+            if self.asc:
+                order_by_clause = order_by_column.asc()
+            elif self.desc:
+                order_by_clause = order_by_column.desc()
+            else:
+                order_by_clause = order_by_column.asc()  # Default to ascending if no direction is provided
+
+            rows = (
+                session.query(EntriesTable)
+                .filter(combined_query_conditions)
+                .order_by(order_by_clause)
+                .all()
+            )
 
         for key, row in enumerate(rows):
             self.alchemy_row_handler.handle_row(row)

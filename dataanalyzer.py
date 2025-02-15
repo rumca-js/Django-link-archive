@@ -77,14 +77,14 @@ class SearchInterface(object):
         level = self.parser.get_verbosity_level()
 
         if level >= 1:
-            print("{}".format(entry.link))
+            print("[{:03d}] {}".format(entry.page_rating_votes, entry.link))
         elif level >= 2:
             description = ""
             if "description" in entry:
                 description = entry.description
-            print("{}\n{}".format(entry.link, description))
+            print("[{:03d}] {}\n{}".format(entry.page_rating_votes, entry.link, description))
         else:
-            print("{}".format(entry.link))
+            print("[{:03d}] {}".format(entry.page_rating_votes, entry.link))
 
     def read_file(self, afile):
         text = read_file_contents(afile)
@@ -395,7 +395,13 @@ class DataAnalyzer(object):
         if self.is_db_scan():
             db = SqlModel(database_file=self.parser.args.db)
             row_handler = SearchInterface(self.parser)
-            searcher = AlchemySearch(db, self.parser.args.search, row_handler = row_handler)
+            searcher = AlchemySearch(db,
+                    self.parser.args.search,
+                    row_handler = row_handler,
+                    order_by = self.parser.args.order_by,
+                    asc=self.parser.args.asc,
+                    desc=self.parser.args.desc,
+            )
             searcher.search()
             #searcher.print_time_diff()
 
@@ -454,6 +460,9 @@ class Parser(object):
         self.parser.add_argument("--dir", help="Directory to be scanned")
         self.parser.add_argument("--db", help="DB to be scanned")
         self.parser.add_argument("--search", help="Search, with syntax same as the main program / site.")
+        self.parser.add_argument("--order-by", default="page_rating_votes", help="order by column.")
+        self.parser.add_argument("--asc", action="store_true", help="order ascending")
+        self.parser.add_argument("--desc", action="store_true", help="order descending")
 
         self.parser.add_argument("--summary", action="store_true", help="Displays summary at the end")
         self.parser.add_argument("--daily", action="store_true", help="Displays daily summary at the end")
