@@ -72,24 +72,29 @@ def index(request):
             return redirect("{}:wizard-init".format(LinkDatabase.name))
         else:
             if config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_ALL:
-                return redirect("{}:entries".format(LinkDatabase.name))
+                url = reverse(f"{LinkDatabase.name}:entries") + "?show=0"
+                return HttpResponseRedirect(url)
             elif (
                 config.default_search_behavior
                 == ConfigurationEntry.SEARCH_BUTTON_RECENT
             ):
-                return redirect("{}:entries-recent".format(LinkDatabase.name))
+                url = reverse(f"{LinkDatabase.name}:entries-recent") + "?show=0"
+                return HttpResponseRedirect(url)
             elif (
                 config.default_search_behavior
                 == ConfigurationEntry.SEARCH_BUTTON_GLOBAL_BOOKMARKS
             ):
-                return redirect("{}:entries-bookmarks".format(LinkDatabase.name))
+                url = reverse(f"{LinkDatabase.name}:entries-bookmarks") + "?show=0"
+                return HttpResponseRedirect(url)
             elif (
                 config.default_search_behavior
                 == ConfigurationEntry.SEARCH_BUTTON_USER_BOOKMARKS
             ):
-                return redirect("{}:entries-user-bookmarks".format(LinkDatabase.name))
+                url = reverse(f"{LinkDatabase.name}:entries-bookmarks") + "?show=0"
+                return HttpResponseRedirect(url)
             else:
-                return redirect("{}:entries".format(LinkDatabase.name))
+                url = reverse(f"{LinkDatabase.name}:entries") + "?show=0"
+                return HttpResponseRedirect(url)
     else:
         exports = DataExport.get_public_export_names()
         p.context["public_exports"] = exports

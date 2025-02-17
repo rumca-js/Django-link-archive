@@ -114,12 +114,19 @@ class BaseLinkDataModel(models.Model):
         We can trim title and description. No harm done.
         We cannot trim thumbnails, or link, it will not work after adding.
         """
+        link_length = BaseLinkDataModel._meta.get_field("link").max_length
         title_length = BaseLinkDataModel._meta.get_field("title").max_length
         description_length = BaseLinkDataModel._meta.get_field("description").max_length
         author_length = BaseLinkDataModel._meta.get_field("author").max_length
         album_length = BaseLinkDataModel._meta.get_field("album").max_length
         thumbnail_length = BaseLinkDataModel._meta.get_field("thumbnail").max_length
         language_length = BaseLinkDataModel._meta.get_field("language").max_length
+
+        if len(self.link) >= link_length:
+            AppLogging.error(
+                "URL:{} URL is too long, cannot save such link".format(self.link)
+            )
+            return
 
         # Trim the input string to fit within max_length
         if self.title and len(self.title) > title_length:
@@ -152,6 +159,10 @@ class BaseLinkDataModel(models.Model):
         self.permanent = self.should_entry_be_permanent()
 
         super().save(*args, **kwargs)
+
+    def get_field_length(field):
+        length = BaseLinkDataModel._meta.get_field(field).max_length
+        return length
 
     def delete(self, *args, **kwargs):
         p = UrlLocation(self.link)

@@ -483,3 +483,29 @@ class EntryDataBuilderTest(FakeInternetTestCase):
             job=BackgroundJobController.JOB_LINK_SCAN
         )
         self.assertEqual(scan_jobs.count(), 1)
+
+    def test_build_from_props__too_long(self):
+        config = Configuration.get_object().config_entry
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
+        config.auto_scan_new_entries = True
+        config.save()
+
+        link_name = "https://youtube.com/v=1234/" + "0" * 1000
+
+        link_data = {
+            "link": link_name,
+            "source_url": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": DateUtils.get_datetime_now_utc(),
+        }
+
+        b = EntryDataBuilder()
+        b.link_data = link_data
+        # call tested function
+        entry = b.build_from_props()
+
+        self.assertFalse(entry)
