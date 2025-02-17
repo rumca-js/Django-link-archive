@@ -156,6 +156,8 @@ class UrlHandlerEx(object):
         if mode_mapping and len(mode_mapping) > 0:
             for crawler_data in mode_mapping:
                 crawler_data = self.get_ready_crawler_data(crawler_data)
+                if "name" in crawler_data:
+                    name = crawler_data["name"]
 
                 AppLogging.debug("Url:{} Calling with name {} and settings {}".format(self.url, name, crawler_data["settings"]))
 

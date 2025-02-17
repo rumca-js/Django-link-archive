@@ -1,13 +1,9 @@
-from sqlalchemy import and_, or_, not_
+from sqlalchemy import and_, or_, not_, func, MetaData, Table, select
 
 from .omnisearch import (
     SingleSymbolEvaluator,
     EquationEvaluator,
     OmniSearch,
-)
-from .sqlmodel import (
-    EntriesTable,
-    SourcesTable,
 )
 
 
@@ -16,33 +12,45 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
     return 1 if true
     """
 
-    def __init__(self, table):
+    def __init__(self, table, ignore_case = False):
         self.table = table
+        self.ignore_case = ignore_case
 
     def evaluate_complex_symbol(self, symbol, condition_data):
         # TODO make todo check if symbol exists in table?
 
         if condition_data[1] == "==":
-            return self.table.__table__.c[condition_data[0]] == condition_data[2]
+            if self.ignore_case:
+                column = self.table.c[condition_data[0]]
+                return func.lower(column) == condition_data[2].lower()
+            else:
+                return self.table.c[condition_data[0]] == condition_data[2]
 
         if condition_data[1] == "!=":
-            return self.table.__table__.c[condition_data[0]] != condition_data[2]
+            if self.ignore_case:
+                column = self.table.c[condition_data[0]]
+                return func.lower(column) != condition_data[2].lower()
+            else:
+                return self.table.c[condition_data[0]] != condition_data[2]
 
         if condition_data[1] == ">":
-            return self.table.__table__.c[condition_data[0]] > condition_data[2]
+            return self.table.c[condition_data[0]] > condition_data[2]
 
         if condition_data[1] == "<":
-            return self.table.__table__.c[condition_data[0]] < condition_data[2]
+            return self.table.c[condition_data[0]] < condition_data[2]
 
         if condition_data[1] == ">=":
-            return self.table.__table__.c[condition_data[0]] >= condition_data[2]
+            return self.table.c[condition_data[0]] >= condition_data[2]
 
         if condition_data[1] == "<=":
-            return self.table.__table__.c[condition_data[0]] <= condition_data[2]
+            return self.table.c[condition_data[0]] <= condition_data[2]
 
         if condition_data[1] == "=":
             symbol = condition_data[2]
-            return self.table.__table__.c[condition_data[0]].like(f"%{symbol}%")
+            if self.ignore_case:
+                return self.table.c[condition_data[0]].ilike(f"%{symbol}%")
+            else:
+                return self.table.c[condition_data[0]].like(f"%{symbol}%")
 
         raise IOError("Unsupported operator")
 
@@ -50,11 +58,18 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
         """
         TODO we could check by default if entry link == symbol, or sth
         """
-        return or_(
-            self.table.c["link"].like(f"%{symbol}%"),
-            self.table.c["title"].like(f"%{symbol}%"),
-            self.table.c["description"].like(f"%{symbol}%"),
-        )
+        if self.ignore_case:
+            return or_(
+                self.table.c["link"].ilike(f"%{symbol}%"),
+                self.table.c["title"].ilike(f"%{symbol}%"),
+                self.table.c["description"].ilike(f"%{symbol}%"),
+            )
+        else:
+            return or_(
+                self.table.c["link"].like(f"%{symbol}%"),
+                self.table.c["title"].like(f"%{symbol}%"),
+                self.table.c["description"].like(f"%{symbol}%"),
+            )
 
 
 class AlchemyEquationEvaluator(EquationEvaluator):
@@ -75,46 +90,44 @@ class AlchemyRowHandler(object):
 
 
 class AlchemySearch(object):
-    def __init__(self, db, search_term, row_handler=None, order_by = None, asc=False, desc=True):
+    def __init__(self, db, search_term, row_handler=None, args=None):
         self.db = db
         self.search_term = search_term
         self.alchemy_row_handler = row_handler
-        self.order_by = order_by
-        self.asc = asc
-        self.desc = desc
+
+        self.args = args
 
     def search(self):
-        symbol_evaluator = AlchemySymbolEvaluator(EntriesTable)
-        equation_evaluator = AlchemyEquationEvaluator(
-            self.search_term, symbol_evaluator
-        )
+        destination_metadata = MetaData()
+        destination_table = Table("linkdatamodel", destination_metadata, autoload_with=self.db)
+
+        symbol_evaluator = AlchemySymbolEvaluator(destination_table, self.args.ignore_case)
+        equation_evaluator = AlchemyEquationEvaluator(self.search_term, symbol_evaluator)
 
         search = OmniSearch(self.search_term, equation_evaluator=equation_evaluator)
         combined_query_conditions = search.get_combined_query()
 
-        Session = self.db.get_session()
-
         rows = []
-        with Session() as session:
-            order_by_column = getattr(EntriesTable, self.order_by, None)
+        with self.db.connect() as connection:
+            order_by_column = getattr(destination_table.c, self.args.order_by, None)
 
             if order_by_column is None:
-                raise AttributeError(f"Invalid order_by column: {self.order_by}")
+                raise AttributeError(f"Invalid order_by column: {self.args.order_by}")
 
-            # Determine sorting order based on self.asc and self.desc
-            if self.asc:
-                order_by_clause = order_by_column.asc()
-            elif self.desc:
-                order_by_clause = order_by_column.desc()
-            else:
-                order_by_clause = order_by_column.asc()  # Default to ascending if no direction is provided
-
-            rows = (
-                session.query(EntriesTable)
-                .filter(combined_query_conditions)
-                .order_by(order_by_clause)
-                .all()
+            # Determine sorting order
+            order_by_clause = (
+                order_by_column.asc() if self.args.asc else order_by_column.desc()
+                if self.args.desc else order_by_column.asc()
             )
 
-        for key, row in enumerate(rows):
+            # Use select() for SQLAlchemy Core
+            stmt = select(destination_table).where(combined_query_conditions).order_by(order_by_clause)
+
+            # Execute the query
+            result = connection.execute(stmt)
+            
+            # Fetch all results
+            rows = result.fetchall()
+
+        for row in rows:
             self.alchemy_row_handler.handle_row(row)

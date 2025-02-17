@@ -1599,11 +1599,11 @@ class EntryDataBuilder(object):
             if not v.is_valid():
                 self.errors.append(
                     "Url:{}. Link was rejected due to validation.".format(self.link))
-                AppLogging.debug(
-                    "Rejecting:{}\nData:{}\n".format(
-                        self.link_data["link"], self.link_data["description"]
-                    )
-                )
+                return
+                
+            if len(self.link_data["link"]) > LinkDataController.get_field_length("link"):
+                self.errors.append(
+                    "Url:{}. Link too long".format(self.link))
                 return
 
         # if self.source_is_auto:

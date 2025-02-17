@@ -1,73 +1,35 @@
 """
+Provides information about archive
+
+Examples:
+ - What was said about Musk
+  $ --search "title=Musk"
+ - What was said about Musk (title, link, description, etc)
+  $ --search "Musk"
+
 TODO
- - datanalayze --source-url hackernews = search from particular source
  - Output formats? (md)?
  - Maybe it could produce a chart?
 
-Scenario of operation:
- - What was said about Musk, daily
-  $ --find "Musk" --title --daily
-
- - 2023-10-26 was DOJ hearing in which he participated, I would like see news
-  $ --find "Musk" --title --date 2023-10-26
 """
 import argparse
 import time
-from dateutil import parser
 import os
 import json
 
-from utils.sqlmodel import SqlModel
 from utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
 from utils.alchemysearch import AlchemySymbolEvaluator, AlchemyEquationEvaluator, AlchemySearch
-
-from rsshistory.webtools import (
-   Url,
-   WebConfig,
-   HttpPageHandler,
-)
-
-
-class DirReader(object):
-
-    def __init__(self, source_files_directory, accepted_extensions = None):
-        self.dir = source_files_directory
-        if accepted_extensions is None:
-            self.accepted_extensions = [".json"]
-
-    def get_files(self):
-        """
-        Should we sort the files? It might be important for some reason
-        for example to search using date, etc.
-        """
-        for root, dirs, files in os.walk(self.dir):
-            for file in files:
-                file_split = os.path.splitext(file)
-                if file_split[1] in self.accepted_extensions:
-                    file_name = os.path.join(root, file)
-                    yield file_name
-
-
-
-def read_file_contents(file_path):
-    with open(file_path, "r") as f:
-        return f.read()
-
-def date_from_string(string_input):
-    return parser.parse(string_input)
+from sqlalchemy import create_engine, MetaData, Table, select
 
 
 class SearchInterface(object):
 
-    def __init__(self, parser=None):
+    def __init__(self, parser=None, engine=None):
         self.parser = parser
         self.start_time = time.time()
+        self.engine = engine
 
-        if self.parser.dir:
-            reader = DirReader(self.parser.dir)
-            self.files = reader.get_files()
-        else:
-            self.files = []
+        self.files = []
 
         self.total_entries = 0
         self.good_entries = 0
@@ -76,15 +38,40 @@ class SearchInterface(object):
     def print_entry(self, entry):
         level = self.parser.get_verbosity_level()
 
-        if level >= 1:
-            print("[{:03d}] {}".format(entry.page_rating_votes, entry.link))
-        elif level >= 2:
-            description = ""
-            if "description" in entry:
-                description = entry.description
-            print("[{:03d}] {}\n{}".format(entry.page_rating_votes, entry.link, description))
-        else:
-            print("[{:03d}] {}".format(entry.page_rating_votes, entry.link))
+        text = ""
+
+        text = "[{:03d}] {}".format(entry.page_rating_votes, entry.link)
+
+        if self.parser.args.title:
+            text += " " + entry.title
+
+        print(text)
+
+        if self.parser.args.description:
+            description = entry.description
+            if description:
+                print(description)
+
+        if self.parser.args.tags:
+            tags = self.get_tags(entry.id)
+            if tags and tags != "":
+                print(tags)
+
+    def get_tags(self, entry_id):
+        destination_metadata = MetaData()
+        destination_table = Table("usertags", destination_metadata, autoload_with=self.engine)
+
+        stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
+
+        tags = ""
+
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            rows = result.fetchall()
+            for row in rows:
+                tags += row.tag + ", "
+
+        return tags
 
     def read_file(self, afile):
         text = read_file_contents(afile)
@@ -118,21 +105,7 @@ class SearchInterface(object):
 
         level = self.parser.get_verbosity_level()
 
-        if self.parser.args.verify:
-            url = Url(link)
-            if level >= 2:
-                print("Checking link:{}".format(link))
-
-            if url.is_valid():
-                print("{}: Valid".format(link))
-                self.good_entries += 1
-            else:
-                print("{}: Dead".format(link))
-                self.dead_entries += 1
-
-            time.sleep(self.parser.args.request_sleep)
-        else:
-            self.print_entry(row)
+        self.print_entry(row)
 
         self.total_entries += 1
 
@@ -207,244 +180,24 @@ class EntrySymbolEvaluator(SingleSymbolEvaluator):
         return False
 
 
-class OmniDirSearcher(SearchInterface):
-
-    def process(self):
-        self.omni = OmniSearch(self.parser.args.search, EntrySymbolEvaluator())
-
-        reader = DirReader(source_files_directory = self.parser.dir)
-
-        for afile in reader.get_files():
-            entries = self.read_file(afile)
-            if not entries:
-                continue
-
-            for entry in entries:
-                if self.is_omni_match(entry):
-                    self.handle_row(entry)
-
-    def is_omni_match(self, entry):
-        self.omni.set_symbol_evaluator(EntrySymbolEvaluator(entry))
-        search = self.omni.reevaluate()
-        return self.omni.get_query_result()
-
-
-class StdDirSearcher(SearchInterface):
-
-    def process(self):
-        raise NotImplementedError("No condition to search")
-
-    def print_daily_summary(self, entry, date, daily_counter):
-        print("{};{}".format(date, daily_counter))
-
-    def get_next_entry(self):
-        """
-        Generator
-        """
-        for afile in self.files:
-            if not afile.endswith(".json"):
-                continue
-
-            entries = self.read_file(afile)
-            if not entries:
-                continue
-
-            for entry in entries:
-                if self.is_entry_found(entry):
-                    yield entry
-
-    def is_entry_found(self, entry):
-        text = None
-
-        if self.parser.args.find:
-            text = self.parser.args.find
-        elif self.parser.args.find_tag:
-            text = self.parser.args.find_tag
-
-        elements = []
-        if self.parser.args.find:
-            elements.extend(self.get_searchable_fields())
-        elif self.parser.args.find_tag:
-            eleemnts.append("tags")
-        else:
-            print("Cannot find condition to find")
-            return
-
-        ignore_case = False
-        if self.parser.args.ignore_case:
-            ignore_case = self.parser.args.ignore_case
-
-        for element in elements:
-            if element == "tags":
-                if "tags" in entry and text in entry["tags"]:
-                    if "link" in entry:
-                        return entry
-            if element == "title" or element == "description" or element == "link":
-                if element in entry:
-                    entry_text = entry[element]
-
-                    if not entry_text:
-                        continue
-
-                    if ignore_case:
-                        if entry_text.lower().find(text.lower()) >= 0:
-                            if "link" in entry:
-                                return entry
-                    else:
-                        if entry_text.find(text) >= 0:
-                            if "link" in entry:
-                                return entry
-
-
-    def get_searchable_fields(self):
-        if self.parser.args.title:
-            return ["title"]
-
-        if self.parser.args.description:
-            return ["description"]
-
-        return [
-                "title",
-                "link",
-                "description",
-                "tags",
-                ]
-
-
-class IndividualDirSearcher(StdDirSearcher):
-    def process(self):
-        total_count = 0
-
-        if self.parser.args.summary:
-            print("Entering dir:{}".format(self.parser.dir))
-
-        for entry in self.get_next_entry():
-            self.print_entry(entry)
-            total_count += 1
-
-        if self.parser.args.summary:
-            print("Leaving dir:{}".format(self.parser.dir))
-
-        if self.parser.args.summary:
-            print("Finished with count:{}".format(count))
-
-
-class DailyDirSearcher(StdDirSearcher):
-    """
-    Same as individual searcher, but provides daily summary of search
-    """
-
-    def process(self):
-        if self.parser.args.summary:
-            print("Entering dir:{}".format(self.parser.dir))
-
-        total_count = 0
-
-        current_date = None
-        daily_counter = 0
-        for entry in self.get_next_entry():
-            date_published = date_from_string(entry["date_published"]).date()
-            if date_published != current_date:
-                if not (current_date == None and daily_counter == 0):
-                    self.print_daily_summary(entry, current_date, daily_counter)
-
-                current_date = date_published
-                daily_counter = 0
-
-            daily_counter += 1
-            total_count += 1
-
-        if self.parser.args.summary:
-            print("Leaving dir:{}".format(self.parser.dir))
-
-        if self.parser.args.summary:
-            print("Finished with count:{}".format(total_count))
-
-
-
-class TagsSearcher(SearchInterface):
-
-    def process(self):
-        tags = {}
-        for afile in self.files:
-            if not afile.endswith(".json"):
-                continue
-
-            items = self.read_file(afile)
-            if not items:
-                continue
-
-            for item in items:
-                if "tags" in item and len(item["tags"]) > 0:
-                    for tag in item["tags"]:
-                        if tag in tags:
-                            tags[tag] += 1
-                        else:
-                            tags[tag] = 1
-
-        for tag in tags:
-            print("Tag:{} Count:{}".format(tag, tags[tag]))
-
-
 class DataAnalyzer(object):
     def __init__(self, parser):
         self.parser = parser
         self.result = None
+        self.engine = None
 
     def process(self):
         if self.is_db_scan():
-            db = SqlModel(database_file=self.parser.args.db)
-            row_handler = SearchInterface(self.parser)
-            searcher = AlchemySearch(db,
+            self.engine = create_engine("sqlite:///" + self.parser.args.db)
+
+            row_handler = SearchInterface(self.parser, self.engine)
+
+            searcher = AlchemySearch(self.engine,
                     self.parser.args.search,
                     row_handler = row_handler,
-                    order_by = self.parser.args.order_by,
-                    asc=self.parser.args.asc,
-                    desc=self.parser.args.desc,
+                    args=self.parser.args,
             )
             searcher.search()
-            #searcher.print_time_diff()
-
-            #if self.parser.args.summary:
-            #    searcher.summary()
-
-        elif self.is_omni_search():
-            # it is too slow?
-            searcher = OmniDirSearcher(self.parser)
-            searcher.process()
-            searcher.print_time_diff()
-
-            if self.parser.args.summary:
-                searcher.summary()
-
-        elif self.parser.args.show_tags:
-            tags = TagsSearcher(self.parser)
-            count = tags.process()
-            searcher.print_time_diff()
-        elif self.is_individual_entry_search():
-            searcher = IndividualDirSearcher(self.parser)
-            count = searcher.process()
-            searcher.print_time_diff()
-        elif self.is_daily_entry_search():
-            searcher = DailyDirSearcher(self.parser)
-            searcher.process()
-            searcher.print_time_diff()
-        else:
-            print("No condition to search")
-
-    def is_omni_search(self):
-        if self.parser.args.search:
-            return True
-
-    def is_individual_entry_search(self):
-        if not self.parser.args.daily:
-            return True
-        return False
-
-    def is_daily_entry_search(self):
-        if self.parser.args.daily:
-            return True
-        return False
 
     def is_db_scan(self):
         if self.parser.args.db:
@@ -464,14 +217,9 @@ class Parser(object):
         self.parser.add_argument("--asc", action="store_true", help="order ascending")
         self.parser.add_argument("--desc", action="store_true", help="order descending")
 
-        self.parser.add_argument("--summary", action="store_true", help="Displays summary at the end")
-        self.parser.add_argument("--daily", action="store_true", help="Displays daily summary at the end")
-        self.parser.add_argument("--show-tags", action="store_true", help="Find all available tags")
-
-        self.parser.add_argument("--verify", action="store_true", help="verifies link, if are active")
-        self.parser.add_argument("--timeout_s", default=10, help="Timeout for validating page")
-        self.parser.add_argument("--request-sleep", default=1, help="Sleep between page requests. We do not want to flood servers with too many requests")
-        self.parser.add_argument("--relative", action="store_true", help="All counters are against the number of all links") # TODO implement this below
+        self.parser.add_argument("--title", action="store_true", help="displays title")
+        self.parser.add_argument("--description", action="store_true", help="displays description")
+        self.parser.add_argument("--tags", action="store_true", help="displays tags")
 
         self.parser.add_argument("-i", "--ignore-case", action="store_true", help="Ignores case")
         self.parser.add_argument("-v", "--verbosity", help="Verbosity level")
@@ -497,14 +245,6 @@ class Parser(object):
 
 
 def main():
-    WebConfig.use_print_logging()
-
-    # scraping server is not running, we do not use port
-    HttpPageHandler.crawling_server_port = 0
-    # when python requests cannot handle a scenario, we run crawlee
-    HttpPageHandler.crawling_headless_script = None
-    HttpPageHandler.crawling_full_script = None
-
     p = Parser()
     if not p.parse():
         print("Could not parse options")

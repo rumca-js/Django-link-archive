@@ -9,9 +9,17 @@ What to do:
  - if any table is affected run reindex on it
  - run reindex from time to time
 """
+import sys
+import os
 import subprocess
 import argparse
 from pathlib import Path
+import time
+from datetime import datetime
+
+from sqlalchemy import create_engine, Column, String, Integer, MetaData, Table, text, LargeBinary, DateTime
+from sqlalchemy.dialects.postgresql.types import BYTEA
+from sqlalchemy.orm import sessionmaker
 
 from workspace import get_workspaces
 
@@ -19,7 +27,7 @@ from workspace import get_workspaces
 parent_directory = Path(__file__).parents[1]
 
 
-def run_backup_command(run_info):
+def run_pg_dump_backup(run_info):
     workspace = run_info["workspace"]
     tables = run_info["tables"]
     output_file = run_info["output_file"]
@@ -48,18 +56,13 @@ def run_backup_command(run_info):
         command_input.append("-t")
         command_input.append(table)
 
-    transformed = []
-    for item in command_input:
-        transformed.append( item.replace("instance_", workspace+"_") )
-
     operating_dir = parent_directory / "data" / "backup" / workspace
-
-    print("Running: {} @ {}".format(transformed, operating_dir))
-
     operating_dir.mkdir(parents=True, exist_ok=True)
 
+    print("Running: {} @ {}".format(command_input, operating_dir))
+
     try:
-        result = subprocess.run(transformed, cwd=str(operating_dir), check=True, 
+        result = subprocess.run(command_input, cwd=str(operating_dir), check=True, 
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         print("Backup completed successfully.")
     except subprocess.CalledProcessError as e:
@@ -140,7 +143,7 @@ def truncate_all(run_info):
     return True
 
 
-def run_restore_command(run_info):
+def run_pg_restore(run_info):
     workspace = run_info["workspace"]
     tables = run_info["tables"]
     output_file = run_info["output_file"]
@@ -166,18 +169,13 @@ def run_restore_command(run_info):
         command_input.append("-t")
         command_input.append(table)
 
-    transformed = []
-    for item in command_input:
-        transformed.append( item.replace("instance_", workspace+"_") )
-
     operating_dir = parent_directory / "data" / "backup" / workspace
-
-    print("Running: {} @ {}".format(transformed, operating_dir))
-
     operating_dir.mkdir(parents=True, exist_ok=True)
 
+    print("Running: {} @ {}".format(command_input, operating_dir))
+
     try:
-        subprocess.run(transformed, cwd = str(operating_dir), check=True)
+        subprocess.run(command_input, cwd = str(operating_dir), check=True)
         print("Restore completed successfully.")
     except subprocess.CalledProcessError as e:
         print("An error occurred:", e)
@@ -186,9 +184,154 @@ def run_restore_command(run_info):
     return True
 
 
+### NOSQL code
+
+def create_destionation_table(table_name, source_table, destination_engine):
+    """
+    Copy columns from postgres to nosql
+    BYTEA is not represented in nosql
+    """
+    with destination_engine.connect() as connection:
+        if not destination_engine.dialect.has_table(connection, table_name):
+            columns = []
+            for column in source_table.columns:
+                # Mapping bytea to LargeBinary (or appropriate type)
+                if column.type.__class__ == BYTEA:
+                    columns.append(Column(column.name, LargeBinary, nullable=column.nullable))
+                else:
+                    columns.append(Column(column.name, column.type, nullable=column.nullable))
+
+                # For debugging purposes, you can print column details
+                # print(column.name)
+                # print(column.type.__class__)
+                # print(f"Nullable: {column.nullable}")
+
+            destination_metadata = MetaData()
+            destination_table = Table(table_name, destination_metadata, *columns)
+            destination_table.create(destination_engine)
+
+
+def copy_table(instance, table_name, source_engine, destination_engine):
+    """
+    Copies table from postgres to destination
+    """
+    Session = sessionmaker(bind=source_engine)
+    session = Session()
+
+    print("{} Creating table".format(table_name))
+
+    # Reflect the table using SQLAlchemy metadata
+    source_metadata = MetaData()
+    source_table = Table("{}_{}".format(instance, table_name), source_metadata, autoload_with=source_engine)
+
+    create_destionation_table(table_name, source_table, destination_engine)
+
+    # Reflect the destination table after ensuring it exists
+    destination_metadata = MetaData()
+    destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
+
+    print("{} Copying table".format(table_name))
+
+    with destination_engine.connect() as destination_connection:
+        with source_engine.connect() as connection:
+            result = connection.execute(source_table.select())
+
+            index = 0
+            for row in result:
+                index += 1
+
+                data = {}
+                
+                for column in source_table.columns:
+                    value = getattr(row, column.name)
+                    data[column.name] = value
+                
+                destination_connection.execute(destination_table.insert(), data)
+
+                sys.stdout.write("{}\r".format(index))
+
+            destination_connection.commit()
+
+    session.close()
+
+
+def obfuscate(workspace, table_name, destination_engine):
+    destination_metadata = MetaData()
+    destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
+
+    with destination_engine.connect() as destination_connection:
+        result = destination_connection.execute(destination_table.select())
+
+        for row in result:
+            update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(password='')
+            destination_connection.execute(update_stmt)
+
+        destination_connection.commit()
+
+
+#### NOSQL
+
+
+def run_db_copy_backup(run_info):
+    workspace = run_info["workspace"]
+    user = run_info["user"]
+    database = run_info["database"]
+    host = run_info["host"]
+    password = run_info["password"]
+    tables = run_info["tables"]
+
+    file_name = workspace+".db"
+
+    # Create the database engine
+    SOURCE_DATABASE_URL = f"postgresql://{user}:{password}@{host}/{database}"
+    source_engine = create_engine(SOURCE_DATABASE_URL)
+
+    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir.mkdir(parents=True, exist_ok=True)
+    os.chdir(operating_dir)
+
+    DESTINATION_DATABASE_URL = "sqlite:///" + file_name
+    destination_engine = create_engine(DESTINATION_DATABASE_URL)
+
+    for table in tables:
+        table = table.replace(workspace + "_", "")
+        copy_table(workspace, table, source_engine, destination_engine)
+
+    return True
+
+
+def run_db_copy_backup_auth(run_info):
+    workspace = run_info["workspace"]
+    user = run_info["user"]
+    database = run_info["database"]
+    host = run_info["host"]
+    password = run_info["password"]
+
+    file_name = workspace+".db"
+
+    # Create the database engine
+    SOURCE_DATABASE_URL = f"postgresql://{user}:{password}@{host}/{database}"
+    source_engine = create_engine(SOURCE_DATABASE_URL)
+
+    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir.mkdir(parents=True, exist_ok=True)
+    os.chdir(operating_dir)
+
+    DESTINATION_DATABASE_URL = "sqlite:///" + file_name
+    destination_engine = create_engine(DESTINATION_DATABASE_URL)
+
+    copy_table("auth", "user", source_engine, destination_engine)
+    obfuscate("auth", "user", destination_engine)
+
+    return True
+
+
 def backup_workspace(run_info):
     """
     @note table order is important
+
+    mapping:
+      file : tables
     """
     print("--------------------")
     print(run_info["workspace"])
@@ -200,7 +343,12 @@ def backup_workspace(run_info):
        "./instance_sourcecategories"   : ["instance_sourcecategories"],
        "./instance_sourcessubcategories"   : ["instance_sourcesubcategories"],
        "./instance_sources"   : ["instance_sourcedatamodel"],
-       "./instance_tags"      : ["instance_usertags", "instance_compactedtags", "instance_usercompactedtags"],
+       "./instance_usertags"      : ["instance_usertags"],
+       "./instance_compactedtags"      : ["instance_compactedtags"],
+       "./instance_usercompactedtags"      : ["instance_usercompactedtags"],
+       "./instance_usertags"           : ["instance_usertags"],
+       "./instance_compactedtags"      : ["instance_compactedtags"],
+       "./instance_usercompactedtags"  : ["instance_usercompactedtags"],
        "./instance_votes"     : ["instance_uservotes"],
        "./instance_entryrules"     : ["instance_entryrules"],
        "./instance_dataexport"     : ["instance_dataexport"],
@@ -210,17 +358,36 @@ def backup_workspace(run_info):
        "./instance_blockentrylist"     : ["instance_blockentrylist"],
        "./instance_comments"  : ["instance_usercomments"],
        "./instance_userbookmarks" : ["instance_userbookmarks"],
-       "./instance_history"   : ["instance_usersearchhistory", "instance_userentrytransitionhistory", "instance_userentryvisithistory"],
+       "./instance_usersearchhistory"   : ["instance_usersearchhistory"],
+       "./instance_userentrytransitionhistory"   : ["instance_userentrytransitionhistory"],
+       "./instance_userentryvisithistory"   : ["instance_userentryvisithistory"],
        "./instance_userconfig" : ["instance_userconfig"],
        "./instance_configurationentry" : ["instance_configurationentry"],
     }
 
-    for key in tablemapping:
-        run_info["output_file"] = key
-        run_info["tables"] = tablemapping[key]
+    workspace = run_info["workspace"]
 
-        if not run_backup_command(run_info):
-            return False
+    for key in tablemapping:
+        new_run_info = dict(run_info)
+
+        new_key = key.replace("instance", workspace)
+
+        new_run_info["tables"] = []
+        new_run_info["output_file"] = new_key
+
+        for item in tablemapping[key]:
+            table_name = item.replace("instance", workspace)
+            new_run_info["tables"].append(table_name)
+
+        if new_run_info["format"] == "nosql":
+            if not run_db_copy_backup(new_run_info):
+                return False
+        else:
+            if not run_pg_dump_backup(new_run_info):
+                return False
+
+    if new_run_info["format"] == "nosql":
+        run_db_copy_backup_auth(run_info)
 
     return True
 
@@ -236,23 +403,27 @@ def restore_workspace(run_info):
     # order is important
     tablemapping = [
        ["./instance_sourcecategories"         , ["instance_sourcecategories"]],
-       ["./instance_sourcessubcategories"         , ["instance_sourcesubcategories"]],
+       ["./instance_sourcessubcategories"     , ["instance_sourcesubcategories"]],
        ["./instance_sources"         , ["instance_sourcedatamodel"]],
        ["./instance_domains"         , ["instance_domains"]],
        ["./instance_entries"         , ["instance_linkdatamodel"]],
-       ["./instance_tags"            , ["instance_usertags", "instance_compactedtags", "instance_usercompactedtags"]],
+       ["./instance_usertags"        , ["instance_usertags"]],
+       ["./instance_compactedtags"   , ["instance_compactedtags"]],
+       ["./instance_usercompactedtags" , ["instance_usercompactedtags"]],
        ["./instance_votes"           , ["instance_uservotes"]],
        ["./instance_comments"        , ["instance_usercomments"]],
        ["./instance_userbookmarks"   , ["instance_userbookmarks"]],
-       ["./instance_entryrules"   , ["instance_entryrules"]],
-       ["./instance_dataexport"   , ["instance_dataexport"]],
-       ["./instance_gateway"   , ["instance_gateway"]],
+       ["./instance_entryrules"     , ["instance_entryrules"]],
+       ["./instance_dataexport"     , ["instance_dataexport"]],
+       ["./instance_gateway"        , ["instance_gateway"]],
        #["./instance_blockentrylist"   , ["instance_blockentrylist"]],
        ["./instance_modelfiles"   , ["instance_modelfiles"]],
-       ["./instance_readlater"   , ["instance_readlater"]],
+       ["./instance_readlater"    , ["instance_readlater"]],
        ["./instance_userconfig"   , ["instance_userconfig"]],
        ["./instance_configurationentry"   , ["instance_configurationentry"]],
-       ["./instance_history"         , ["instance_usersearchhistory", "instance_userentrytransitionhistory", "instance_userentryvisithistory"]],
+       ["./instance_usersearchhistory"         , ["instance_usersearchhistory"]],
+       ["./instance_userentrytransitionhistory" , ["instance_userentrytransitionhistory"]],
+       ["./instance_userentryvisithistory"      , ["instance_userentryvisithistory"]],
     ]
 
     for item in tablemapping:
@@ -270,10 +441,17 @@ def restore_workspace(run_info):
         key = item[0]
         tables = item[1]
 
-        run_info["output_file"] = key
-        run_info["tables"] = tables
+        new_run_info = dict(run_info)
 
-        if not run_restore_command(run_info):
+        new_key = key.replace("instance", workspace)
+        new_run_info["output_file"] = new_key
+        new_run_info["tables"] = []
+
+        for item in tables:
+            table_name = item.replace("instance", workspace)
+            new_run_info["tables"].append(table_name)
+
+        if not run_pg_restore(run_info):
             return False
 
     return True
@@ -307,8 +485,12 @@ def run_sql_for_workspaces(run_info, sql_command):
        "instance_userconfig",
        "instance_usercomments",
        "instance_userbookmarks",
-       "instance_usersearchhistory", "instance_userentrytransitionhistory", "instance_userentryvisithistory",
-       "instance_usertags", "instance_compactedtags", "instance_usercompactedtags",
+       "instance_usersearchhistory",
+       "instance_userentrytransitionhistory",
+       "instance_userentryvisithistory",
+       "instance_usertags",
+       "instance_compactedtags",
+       "instance_usercompactedtags",
        "instance_uservotes",
     ]
 
@@ -334,10 +516,11 @@ def parse_backup():
     parser.add_argument("--reindex", action="store_true", help="Reindex the database. Useful to detect errors in consistency")
     parser.add_argument("-U", "--user", default="user", help="Username for the database (default: 'user')")
     parser.add_argument("-d", "--database", default="db", help="Database name (default: 'db')")
+    parser.add_argument("-p", "--password", default="", help="Password. Necessary for nosql format")
     parser.add_argument("-w", "--workspace", help="Workspace for which to perform backup/restore. If not specified - all")
     parser.add_argument("-D", "--debug", help="Enable debug output")  # TODO implement debug
     parser.add_argument("-i", "--ignore-errors", action="store_true", help="Ignore errors during the operation")
-    parser.add_argument("-f", "--format", default="custom", choices=["custom", "plain", "sql"],
+    parser.add_argument("-f", "--format", default="custom", choices=["custom", "plain", "sql", "nosql"],
                         help="Format of the backup (default: 'custom'). Choices: 'custom', 'plain', or 'sql'.")
 
     parser.add_argument("--host", default="127.0.0.1", help="Host address for the database (default: 127.0.0.1)")
@@ -362,6 +545,7 @@ def main():
     else:
         workspaces = get_workspaces()
 
+    start_time = time.time()
 
     errors = False
 
@@ -372,6 +556,8 @@ def main():
         run_info["database"] = args.database
         run_info["host"] = args.host
         run_info["format"] = args.format
+        run_info["password"] = args.password
+
         if args.ignore_errors:
             run_info["ignore_errors"] = True
 
@@ -404,6 +590,11 @@ def main():
         print("There were errors")
     else:
         print("All calls were successful")
+
+    elapsed_time_seconds = time.time() - start_time
+    elapsed_minutes = int(elapsed_time_seconds // 60)
+    elapsed_seconds = int(elapsed_time_seconds % 60)
+    print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
 
 
 if __name__ == "__main__":
