@@ -270,6 +270,13 @@ class FakeInternetTestCase(TestCase):
             c.config_entry.save()
 
     def ping(url):
+        if url == "https://page-with-http-status-500.com":
+            return False
+        elif url == "https://page-with-http-status-400.com":
+            return False
+        elif url == "https://page-with-http-status-100.com":
+            return False
+
         return True
 
     def get_getj(self, url, name="", settings=None):

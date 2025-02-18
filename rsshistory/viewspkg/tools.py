@@ -138,12 +138,12 @@ def get_page_properties(request):
     url_ex = UrlHandlerEx(page_link, settings=settings, browsers=browsers)
     all_properties = url_ex.get_properties()
 
-    # TODO remove hardcoded value
-    if len(all_properties) > 3:
-        if "data" in all_properties[3]:
-            if "hash" in all_properties[3]["data"]:
-                all_properties[3]["data"]["body_hash"] = str(all_properties[3]["data"]["body_hash"])
-                all_properties[3]["data"]["hash"] = str(all_properties[3]["data"]["hash"])
+    for item in all_properties:
+        if item["name"] == "Response":
+            if "data" in item:
+                if "hash" in item["data"]:
+                    item["data"]["body_hash"] = str(item["data"]["body_hash"])
+                    item["data"]["hash"] = str(item["data"]["hash"])
 
     data = OrderedDict()
     data["properties"] = all_properties

@@ -94,7 +94,8 @@ class EntryRulesTests(FakeInternetTestCase):
         # call user action
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        # redirect to list
+        self.assertEqual(response.status_code, 302)
 
     def test_entry_rule_remove(self):
         entry_rule = EntryRules.objects.create(

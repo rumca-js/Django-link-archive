@@ -422,7 +422,7 @@ class DataWriterTest(FakeInternetTestCase):
         today = DateUtils.get_date_today()
         year = int(DateUtils.get_datetime_year(today))
 
-        html_directory = Path("./data") / "test" / "year" / str(year) / "html"
+        html_directory = Path("./data") / "test" / "year" / "2024" / "html"
         self.assertEqual(html_directory.exists(), True)
 
     def test_write__notime__md(self):

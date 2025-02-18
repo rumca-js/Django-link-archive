@@ -179,12 +179,14 @@ class SystemViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
         data = response.json()
+        print(data)
 
-        self.assertIn("is_reading", data)  # source reading indication
-        self.assertIn("read_later_queue", data)  # used by menu
-        self.assertIn("sources_error", data)
-        self.assertIn("internet_error", data)
-        self.assertIn("remote_server_error", data)
-        self.assertIn("threads_error", data)
-        self.assertIn("jobs_error", data)
-        self.assertIn("configuration_error", data)
+        self.assertIn("indicators", data)
+        self.assertIn("is_reading", data["indicators"])  # source reading indication
+        self.assertIn("read_later_queue", data["indicators"])  # used by menu
+        self.assertIn("sources_error", data["indicators"])
+        self.assertIn("internet_error", data["indicators"])
+        self.assertIn("remote_server_error", data["indicators"])
+        self.assertIn("threads_error", data["indicators"])
+        self.assertIn("jobs_error", data["indicators"])
+        self.assertIn("configuration_error", data["indicators"])

@@ -19,7 +19,7 @@ import json
 
 from utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
 from utils.alchemysearch import AlchemySymbolEvaluator, AlchemyEquationEvaluator, AlchemySearch
-from sqlalchemy import create_engine, MetaData, Table, select
+from sqlalchemy import create_engine
 
 
 class SearchInterface(object):
@@ -53,25 +53,10 @@ class SearchInterface(object):
                 print(description)
 
         if self.parser.args.tags:
-            tags = self.get_tags(entry.id)
+            entry_table = ReflectedEntryTable(self.engine)
+            tags = entry_table.get_tags_string(entry.id)
             if tags and tags != "":
                 print(tags)
-
-    def get_tags(self, entry_id):
-        destination_metadata = MetaData()
-        destination_table = Table("usertags", destination_metadata, autoload_with=self.engine)
-
-        stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
-
-        tags = ""
-
-        with self.engine.connect() as connection:
-            result = connection.execute(stmt)
-            rows = result.fetchall()
-            for row in rows:
-                tags += row.tag + ", "
-
-        return tags
 
     def read_file(self, afile):
         text = read_file_contents(afile)
