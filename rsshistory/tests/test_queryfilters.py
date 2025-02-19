@@ -332,6 +332,8 @@ class OmniSearchWithDefaultTest(FakeInternetTestCase):
         self.assertTrue("link" in conditions)
         self.assertEqual(conditions["link"], "https://test.com")
 
+        self.assertEqual(len(c.get_errors()), 1)
+
     def test_get_query_result__processor_evaluator__eq(self):
         LinkDataController.objects.create(link="https://test.com")
 
@@ -477,3 +479,23 @@ class OmniSearchFilterTest(FakeInternetTestCase):
         print("Query set length: {}".format(qs.count()))
 
         self.assertEqual(qs.count(), 1)
+
+    def test_get_filtered_objects__with_error_search(self):
+        LinkDataController.objects.create(
+            link="https://test.com", author="Sombody Anybody"
+        )
+
+        qs = LinkDataController.objects.all()
+        print("Query set length: {}".format(qs.count()))
+
+        # incorrect property
+        args = {"search": "linkx==test.com"}
+        processor = OmniSearchFilter(args, init_objects=qs)
+
+        processor.set_translation_mapping(["link", "author"])
+
+        qs = processor.get_filtered_objects()
+        print("Query set length: {}".format(qs.count()))
+
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(len(processor.get_errors()), 1)

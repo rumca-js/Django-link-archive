@@ -35,6 +35,20 @@ class SourcesViewsTests(FakeInternetTestCase):
         # c.config_entry.logging_level = AppLogging.DEBUG
         # c.config_entry.save()
 
+    def test_sources(self):
+        SourceDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:sources".format(LinkDatabase.name))
+
+        # call user action
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+
     def test_source_add_simple(self):
         SourceDataController.objects.all().delete()
 
@@ -320,6 +334,36 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         # call tested function
         url = reverse("{}:source-remove".format(LinkDatabase.name), args=[source.id])
+
+        # call user action
+        response = self.client.get(url)
+
+        self.assertEqual(SourceDataController.objects.count(), 0)
+        self.assertEqual(SourceOperationalData.objects.count(), 0)
+        self.assertEqual(BackgroundJobController.objects.count(), 0)
+
+    def test_sources_remove_all(self):
+        SourceDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        # call tested function
+        url = reverse("{}:sources-remove-all".format(LinkDatabase.name))
+
+        # call user action
+        response = self.client.get(url)
+
+        self.assertEqual(SourceDataController.objects.count(), 0)
+        self.assertEqual(SourceOperationalData.objects.count(), 0)
+        self.assertEqual(BackgroundJobController.objects.count(), 0)
+
+    def test_sources_remove_disabled(self):
+        SourceDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        # call tested function
+        url = reverse("{}:sources-remove-disabled".format(LinkDatabase.name))
 
         # call user action
         response = self.client.get(url)

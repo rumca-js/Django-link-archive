@@ -93,3 +93,6 @@
 {% if query_filter.is_error %}
 <div class="error-text">There errors with your query</div>
 {% endif %}
+{% for error in query_filter.get_errors %}
+    <div class="error-text">{{error}}</div>
+{% endfor %}

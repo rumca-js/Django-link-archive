@@ -30,14 +30,17 @@ class DjangoSingleSymbolEvaluator(SingleSymbolEvaluator):
         self.django_operators.append("lt")
         self.django_operators.append("range")
 
-    def evaluate_complex_symbol(self, symbol, condition_data):
-        condition_data = super().evaluate_complex_symbol(symbol, condition_data)
+    def evaluate_complex_translated_symbol(self, symbol, condition_data):
+        condition_data = super().evaluate_complex_translated_symbol(symbol, condition_data)
 
         if condition_data:
             LinkDatabase.info(
                 "Symbol evaluator condition data:{}".format(condition_data)
             )
             return Q(**condition_data)
+
+    def evaluate_complex_not_translated_symbol(self, symbol, condition_data):
+        self.add_error("Cannot evaluate symbol:{}".format(symbol))
 
     def evaluate_simple_symbol(self, symbol):
         result = None
@@ -51,14 +54,12 @@ class DjangoSingleSymbolEvaluator(SingleSymbolEvaluator):
 
         return result
 
-    def enhance_condition_data(self, condition_data):
-        if condition_data[0].find("__isnull") >= 0:
-            condition_data[2] = condition_data[2] == "True"
-
     def translate_condition(self, condition_data):
         """
         https://docs.djangoproject.com/en/4.2/ref/models/querysets/#field-lookups
         """
+        if condition_data[0].find("__isnull") >= 0:
+            condition_data[2] = condition_data[2] == "True"
 
         if condition_data[1] == "===":
             return {condition_data[0] + "__iexact": condition_data[2]}
@@ -83,6 +84,9 @@ class DjangoSingleSymbolEvaluator(SingleSymbolEvaluator):
         return condition_data
 
     def is_translatable(self, condition):
+        if not condition:
+            return False
+
         if len(self.translatable_names) == 0:
             return True
 
@@ -150,7 +154,7 @@ class BaseQueryFilter(object):
 
     def get_filtered_objects_internal(self):
         conditions = self.get_conditions()
-        LinkDatabase.info("Filter conditions: {}".format(conditions))
+        #LinkDatabase.info("Filter conditions: {}".format(conditions))
 
         objects = self.get_init_objects()
 
@@ -218,6 +222,10 @@ class BaseQueryFilter(object):
             for not_translated in not_translateds:
                 self.errors.append("Not translated: {}".format(not_translated))
 
+        errors = query_filter.get_errors()
+        if errors:
+            self.errors.extend(errors)
+
         return conditions
 
     def get_translateable_fields(self):
@@ -284,9 +292,9 @@ class BaseQueryFilter(object):
     def time_stop(self):
         from datetime import datetime
 
-        LinkDatabase.info(
-            "Page display time delta:{}".format(datetime.now() - self.time_start)
-        )
+        #LinkDatabase.info(
+        #    "Page display time delta:{}".format(datetime.now() - self.time_start)
+        #)
         return ""
 
 
@@ -441,6 +449,9 @@ class OmniSearchWithDefault(OmniSearch):
 
         return result
 
+    def get_errors(self):
+        return self.symbol_evaluator.errors
+
 
 class OmniSearchFilter(BaseQueryFilter):
     def __init__(self, args, user=None, init_objects=None):
@@ -478,3 +489,6 @@ class OmniSearchFilter(BaseQueryFilter):
 
     def get_not_translated_conditions(self):
         return self.parser.get_not_translated_conditions()
+
+    def get_errors(self):
+        return self.parser.get_errors()

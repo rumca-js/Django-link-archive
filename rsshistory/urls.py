@@ -104,6 +104,7 @@ urlpatterns = [
     path("source-fix-entries/<int:source_pk>/", sources.source_fix_entries, name="source-fix-entries",),
     path("source-process-contents/<int:pk>/", sources.source_process_contents, name="source-process-contents",),
     path("sources-remove-all/", sources.remove_all_sources, name="sources-remove-all"),
+    path("sources-remove-disabled/", sources.remove_disabled, name="sources-remove-disabled"),
     path("sources-enable-all/", sources.enable_all_sources, name="sources-enable-all"),
     path("sources-disable-all/", sources.disable_all_sources, name="sources-disable-all"),
     path("sources-manual-refresh/", sources.sources_manual_refresh, name="sources-manual-refresh"),

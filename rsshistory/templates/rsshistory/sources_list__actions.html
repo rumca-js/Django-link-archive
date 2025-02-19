@@ -16,7 +16,6 @@
           </li>
          {% endif %}
 
-          {% if source_list %}
           <li>
              <a href="{% url 'rsshistory:sources-enable-all' %}" class="dropdown-item" title="Enable all sources">
               {% include "rsshistory/icon_enable.html" %}
@@ -27,12 +26,15 @@
               {% include "rsshistory/icon_disable.html" %}
               Disable all</a>
           </li>
-          {% endif %}
+          <li>
+             <a href="{% url 'rsshistory:sources-remove-disabled' %}" class="dropdown-item" title="Removes disabled sources">
+              {% include "rsshistory/icon_disable.html" %}
+              Remove disabled</a>
+          </li>
        </ul>
    </div>
    {% endif %}
    
-   {% if source_list %}
    <div class="dropdown">
        <button class="btn btn-primary" type="button" id="#filtersDrop" data-bs-toggle="dropdown" aria-expanded="false">
          Filters
@@ -53,7 +55,6 @@
           </li>
        </ul>
    </div>
-   {% endif %}
 
    <div class="dropdown">
        <button class="btn btn-primary" type="button" id="#viewsDrop" data-bs-toggle="dropdown" aria-expanded="false">

@@ -330,7 +330,7 @@ class UserVotesTest(TestCase):
                 username="test_username2", password="testpassword", is_superuser=True
             )
 
-    def test_add(self):
+    def test_add__nonzero(self):
         self.create_entry()
 
         UserVotes.objects.all().delete()
@@ -342,6 +342,17 @@ class UserVotesTest(TestCase):
         self.assertEqual(votes.count(), 1)
         self.assertEqual(votes[0].vote, 50)
         self.assertEqual(votes[0].entry, self.entry)
+
+    def test_add__zero(self):
+        self.create_entry()
+
+        UserVotes.objects.all().delete()
+
+        # call tested function
+        UserVotes.add(self.user, self.entry, 0)
+
+        votes = UserVotes.objects.all()
+        self.assertEqual(votes.count(), 0)
 
     def test_get_user_vote(self):
         self.create_entry()

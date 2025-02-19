@@ -557,6 +557,25 @@ def remove_all_sources(request):
     return p.render("summary_present.html")
 
 
+def remove_disabled(request):
+    p = ViewPage(request)
+    p.set_title("Remove disabled sources")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    sources = SourceDataController.objects.filter(enabled=False)
+    if sources.exists():
+        for source in sources:
+            source.custom_remove()
+
+        return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
+    else:
+        p.context["summary_text"] = "No source to remove"
+
+    return p.render("summary_present.html")
+
+
 def enable_all_sources(request):
     p = ViewPage(request)
     p.set_title("Enable all sources")

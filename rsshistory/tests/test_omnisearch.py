@@ -8,7 +8,7 @@ from utils.omnisearch import (
 from .fakeinternet import FakeInternetTestCase
 
 
-class SymbolEvaluator(object):
+class SymbolEvaluator(SingleSymbolEvaluator):
     def evaluate_symbol(self, symbol):
         if symbol == "title == test":
             return 5
@@ -78,6 +78,16 @@ class EquationTranslatorTest(FakeInternetTestCase):
         self.assertEqual(conditions["A"], "title == test")
         self.assertEqual(conditions["B"], "tag == 'something'")
 
+    def test_symbol__no_equation(self):
+        text = "title == test & tag"
+
+        tok = EquationTranslator(text)
+        string, conditions = tok.process()
+
+        self.assertEqual(string, "A&B")
+        self.assertEqual(conditions["A"], "title == test")
+        self.assertEqual(conditions["B"], "tag")
+
 
 class EquationEvaluatorTest(FakeInternetTestCase):
     def setUp(self):
@@ -121,4 +131,17 @@ class EquationEvaluatorTest(FakeInternetTestCase):
         self.assertEqual(tok.conditions["B"], "tag == something")
 
         # 1 | 5 == 1
+        self.assertEqual(value, 5)
+
+    def test_omni_search__noequal(self):
+        args = "title == test | tag"
+
+        tok = EquationEvaluator(args, SymbolEvaluator())
+        value = tok.process()
+
+        self.assertEqual(tok.eq_string, "A|B")
+        self.assertEqual(tok.conditions["A"], "title == test")
+        self.assertEqual(tok.conditions["B"], "tag")
+
+        # 1 | 0 == 1
         self.assertEqual(value, 5)
