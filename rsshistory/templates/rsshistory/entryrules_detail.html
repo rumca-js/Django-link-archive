@@ -28,6 +28,12 @@
 {% endfor %}
 </div>
 
+<div>Trigger text:
+{% if object.trigger_text %}
+    <span class="white-space: nowrap;">{{object.trigger_text}}</span>
+{% endif %}
+</div>
+
 <div>Block: {{object.block}}</div>
 <div>Auto tag: {{object.auto_tag}}</div>
 

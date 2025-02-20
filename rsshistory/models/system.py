@@ -291,13 +291,6 @@ class ConfigurationEntry(models.Model):
         help_text="Prefer non-www links. Replace www links with cleaner versions if available during updates.",
     )
 
-    block_keywords = models.CharField(
-        max_length=1000,
-        blank=True,
-        default="mastubat, porn",
-        help_text="Comma-separated keywords. Links containing these keywords will be blocked.",
-    )
-
     # updates
 
     sources_refresh_period = models.IntegerField(

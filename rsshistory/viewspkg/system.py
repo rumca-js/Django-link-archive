@@ -681,11 +681,32 @@ def wizard_setup_news(request):
     c.save()
 
     Configuration.get_object().config_entry.refresh_from_db()
+    common_initialization()
 
     p.context["summary_text"] = "Set configuration for news."
     p.context["summary_text"] += get_sources_text()
 
     return p.render("summary_present.html")
+
+
+def common_initialization():
+    EntryRules.objects.create(
+      rule_name = "casinos-block",
+      trigger_text = "casino, lotter, jackpot, bingo, poker, slot, betting, togel, gacor, bandar judi, pagcor, slotlara kadar, canli bahis, terpopuler, deposit, g2gbet, terpercaya, maxtoto, Gampang, bonus giveaway, pg slot, cashback rewards, situs slot, slot situs",
+      block = True,
+    )
+
+    EntryRules.objects.create(
+      rule_name = "sexual-block",
+      trigger_text = "mastubat, porn, sexseite, zoophilia, chaturbat",
+      block = True,
+    )
+
+    ## set browser
+    #EntryRules.objects.create(
+    #  rule_name = "selenium-full",
+    #  trigger_text = "politico.com, barrons.com, reuters.com,  techcrunch.com, .yahoo.com, engadget.com, phys.org, youtube.com/channel, wsj.com, open.spotify.com/show, washingtontimes.com, feedpress.me, axios.com, nytimes.com, reutersagency.com",
+    #)
 
 
 def wizard_setup_gallery(request):
@@ -732,6 +753,7 @@ def wizard_setup_gallery(request):
     c.save()
 
     Configuration.get_object().config_entry.refresh_from_db()
+    common_initialization()
 
     p.context["summary_text"] = "Set configuration for gallery"
     p.context["summary_text"] += get_sources_text()
@@ -788,6 +810,7 @@ def wizard_setup_search_engine(request):
     c.save()
 
     Configuration.get_object().config_entry.refresh_from_db()
+    common_initialization()
 
     # we want blocklist to be enabled for search engine
     BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)

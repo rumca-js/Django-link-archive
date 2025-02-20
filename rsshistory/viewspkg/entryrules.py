@@ -7,7 +7,7 @@ from django.forms.models import model_to_dict
 
 from ..apps import LinkDatabase
 from ..models import EntryRules, ConfigurationEntry
-from ..controllers import BackgroundJobController
+from ..controllers import BackgroundJobController, LinkDataController
 from ..views import ViewPage, GenericListView
 from ..forms import EntryRulesForm
 
@@ -139,6 +139,35 @@ def entry_rule_run(request, pk):
     BackgroundJobController.run_rule(objs[0])
 
     return HttpResponseRedirect(reverse("{}:entry-rules".format(LinkDatabase.name)))
+
+
+def entry_rule_check(request, pk):
+    p = ViewPage(request)
+    p.set_title("Check entry against rules")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    entries = LinkDataController.objects.filter(id=pk)
+    if entries.count() == 0:
+        p.context["summary_text"] = "No such object"
+        return p.render("go_back.html")
+
+    entry = entries[0]
+
+    if EntryRules.is_blocked(entry.link):
+        p.context["summary_text"] = "Yes"
+        return p.render("go_back.html")
+
+    pulp = str(entry.title) + str(entry.description)
+    pulp = pulp.lower()
+
+    if EntryRules.is_blocked_by_text(pulp):
+        p.context["summary_text"] = "Yes"
+        return p.render("go_back.html")
+
+    p.context["summary_text"] = "No"
+    return p.render("go_back.html")
 
 
 def entry_rules_json(request):

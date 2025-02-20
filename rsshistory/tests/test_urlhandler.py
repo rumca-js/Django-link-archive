@@ -40,7 +40,6 @@ class UrlHandlerTest(FakeInternetTestCase):
         )
 
 
-
 class UrlHandlerExTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
@@ -91,7 +90,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         # browser 2 is more important
         EntryRules.objects.create(
-                rule_url = "rsspage.com",
+                trigger_rule_url = "rsspage.com",
                 browser = browser2,
         )
 
@@ -230,6 +229,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
     def test_get_cleaned_link__linkedin(self):
         MockRequestCounter.mock_page_requests = 0
 
+        # call tested function
         cleaned_link = UrlHandlerEx.get_cleaned_link(
             "https://linkedin.com"
         )
@@ -240,6 +240,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
     def test_get_cleaned_link__stupid_google_link(self):
         MockRequestCounter.mock_page_requests = 0
 
+        # call tested function
         cleaned_link = UrlHandlerEx.get_cleaned_link(
             "https://www.google.com/url?q=https://forum.ddopl.com/&sa=Udupa"
         )
@@ -250,6 +251,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
     def test_get_cleaned_link__stupid_google_link2(self):
         MockRequestCounter.mock_page_requests = 0
 
+        # call tested function
         cleaned_link = UrlHandlerEx.get_cleaned_link(
             "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://worldofwarcraft.blizzard.com/&ved=2ahUKEwjtx56Pn5WFAxU2DhAIHYR1CckQFnoECCkQAQ&usg=AOvVaw1pDkx5K7B5loKccvg_079-"
         )
@@ -260,6 +262,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
     def test_get_cleaned_link__stupid_youtube_link(self):
         MockRequestCounter.mock_page_requests = 0
 
+        # call tested function
         cleaned_link = UrlHandlerEx.get_cleaned_link(
             "https://www.youtube.com/redirect?event=lorum&redir_token=ipsum&q=https%3A%2F%2Fcorridordigital.com%2F&v=LeB9DcFT810"
         )
@@ -270,10 +273,38 @@ class UrlHandlerExTest(FakeInternetTestCase):
     def test_get_cleaned_link__youtube(self):
         MockRequestCounter.mock_page_requests = 0
 
+        # call tested function
         cleaned_link = UrlHandlerEx.get_cleaned_link("https://www.YouTube.com/Test")
         self.assertEqual(cleaned_link, "https://www.youtube.com/Test")
 
+        # call tested function
         cleaned_link = UrlHandlerEx.get_cleaned_link("https://www.YouTube.com/Test/")
         self.assertEqual(cleaned_link, "https://www.youtube.com/Test")
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_is_blocked__entry_rule(self):
+        # browser 2 is more important
+        EntryRules.objects.create(
+                trigger_text = "casino",
+                block = True,
+        )
+
+
+        url = UrlHandlerEx("https://linkedin.com")
+        # call tested function
+        self.assertFalse(url.is_blocked())
+
+        url = UrlHandlerEx("https://casino.com")
+        # call tested function
+        self.assertTrue(url.is_blocked())
+
+    def test_get_text(self):
+        url = UrlHandlerEx("https://linkedin.com")
+        # call tested function
+        self.assertTrue(url.get_text())
+
+    def test_get_binary(self):
+        url = UrlHandlerEx("https://linkedin.com")
+        # call tested function
+        self.assertTrue(url.get_binary())

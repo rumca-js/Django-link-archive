@@ -4,7 +4,6 @@ import requests
 from ..webtools import (
     Url,
     UrlLocation,
-    UrlPropertyValidator,
     RemoteServer,
     PageOptions,
 )
@@ -68,18 +67,16 @@ class UrlHandler(Url):
 
         return True
 
-    def is_blocked(self):
-        keywords = Configuration.get_object().get_blocked_keywords()
-        validator = UrlPropertyValidator(
-            properties=self.get_properties(), blocked_keywords=keywords
-        )
-        if len(keywords) > 0:
-            validator.blocked_keywords = keywords
+    def get_properties_pulp(self):
+        properties = self.get_properties()
+        return str(properties["title"]) + str(properties["description"])
 
-        if not validator.is_valid():
+    def is_blocked(self):
+        if EntryRules.is_blocked(self.url):
             return True
 
-        if EntryRules.is_blocked(self.url):
+        contents = self.get_properties_pulp()
+        if EntryRules.is_blocked_by_text(contents):
             return True
 
         p = UrlLocation(self.url)
@@ -300,11 +297,17 @@ class UrlHandlerEx(object):
 
     def get_text(self):
         contents_data = self.get_section("Text")
+        if not contents_data:
+            return
+
         if "Contents" in contents_data:
             return contents_data["Contents"]
 
     def get_binary(self):
         contents_data = self.get_section("Binary")
+        if not contents_data:
+            return
+
         if "Contents" in contents_data:
             return contents_data["Contents"]
 
@@ -332,18 +335,18 @@ class UrlHandlerEx(object):
 
         return True
 
-    def is_blocked(self):
-        keywords = Configuration.get_object().get_blocked_keywords()
-        validator = UrlPropertyValidator(
-            properties=self.get_properties(), blocked_keywords=keywords
-        )
-        if len(keywords) > 0:
-            validator.blocked_keywords = keywords
+    def get_properties_pulp(self):
+        properties = self.get_section("Properties")
+        return str(properties["title"]) + str(properties["description"])
 
-        if not validator.is_valid():
-            return True
+    def is_blocked(self):
+        properties = self.get_section("Properties")
 
         if EntryRules.is_blocked(self.url):
+            return True
+
+        contents = self.get_properties_pulp()
+        if EntryRules.is_blocked_by_text(contents):
             return True
 
         p = UrlLocation(self.url)

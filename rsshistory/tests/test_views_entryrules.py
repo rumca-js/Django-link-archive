@@ -57,7 +57,7 @@ class EntryRulesTests(FakeInternetTestCase):
         entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
-            rule_url="https://neocities.com",
+            trigger_rule_url="https://neocities.com",
             auto_tag="personal",
         )
 
@@ -81,7 +81,7 @@ class EntryRulesTests(FakeInternetTestCase):
         entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
-            rule_url="https://neocities.com",
+            trigger_rule_url="https://neocities.com",
             auto_tag="personal",
         )
 
@@ -101,7 +101,7 @@ class EntryRulesTests(FakeInternetTestCase):
         entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
-            rule_url="https://neocities.com",
+            trigger_rule_url="https://neocities.com",
             auto_tag="personal",
         )
 
@@ -122,7 +122,7 @@ class EntryRulesTests(FakeInternetTestCase):
         entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
-            rule_url="https://neocities.com",
+            trigger_rule_url="https://neocities.com",
             auto_tag="personal",
         )
 
@@ -139,7 +139,7 @@ class EntryRulesTests(FakeInternetTestCase):
         entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
-            rule_url="https://neocities.com",
+            trigger_rule_url="https://neocities.com",
             auto_tag="personal",
         )
 
@@ -156,7 +156,7 @@ class EntryRulesTests(FakeInternetTestCase):
         entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
-            rule_url="https://neocities.com",
+            trigger_rule_url="https://neocities.com",
             auto_tag="personal",
         )
 

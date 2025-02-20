@@ -238,6 +238,7 @@ urlpatterns = [
     path("entry-rules-json/", entryrules.entry_rules_json, name="entry-rules-json",),
     path("entry-rule/<int:pk>/", entryrules.EntryRulesDetailView.as_view(), name="entry-rule",),
     path("entry-rule-run/<int:pk>/", entryrules.entry_rule_run, name="entry-rule-run",),
+    path("entry-rule-check/<int:pk>/", entryrules.entry_rule_check, name="entry-rule-check",),
     # API keys
     path("api-key-add", apikeys.add, name="api-key-add"),
     path("api-key-remove/<int:pk>/", apikeys.remove, name="api-key-remove"),

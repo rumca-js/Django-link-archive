@@ -137,7 +137,6 @@ class ConfigForm(forms.ModelForm):
             "entry_update_via_internet",
             "auto_create_sources",
             "default_source_state",
-            "block_keywords",
             # updates
             "sources_refresh_period",
             "days_to_move_to_archive",
@@ -257,7 +256,8 @@ class EntryRulesForm(forms.ModelForm):
         fields = [
             "enabled",
             "rule_name",
-            "rule_url",
+            "trigger_rule_url",
+            "trigger_text",
             "block",
             "auto_tag",
             "browser",
@@ -266,7 +266,8 @@ class EntryRulesForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
-        self.fields["rule_url"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["trigger_rule_url"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["trigger_text"].widget.attrs.update(size=self.init.get_cols_size())
 
 
 class ApiKeysForm(forms.ModelForm):

@@ -160,7 +160,8 @@ class UrlPropertyValidator(UrlContentsModerator):
 
         text = title + "\n" + description
 
-        keywords = ["casino", "lotter", "bingo", "slot", "poker", "jackpot", "gacor"]
+        keywords = ["casino", "lotter", "bingo", "slot", "poker", "jackpot",
+                "gacor", "bandar judi", "pagcor", "slotlara kadar", "canli bahis", "terpopuler", "deposit"]
 
         sum = 0
         for keyword in keywords:

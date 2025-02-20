@@ -12,7 +12,6 @@ from ..webtools import (
     HttpRequestBuilder,
     ContentLinkParser,
     UrlLocation,
-    UrlPropertyValidator,
     UrlAgeModerator,
     RemoteServer,
 )
@@ -25,6 +24,7 @@ from ..models import (
     UserBookmarks,
     ModelFiles,
     ConfigurationEntry,
+    EntryRules,
 )
 from ..configuration import Configuration
 from ..apps import LinkDatabase
@@ -1592,11 +1592,9 @@ class EntryDataBuilder(object):
         # TODO - what if there are many places and we do not want people to insert
         # bad stuff?
         if self.source_is_auto:
-            keywords = Configuration.get_object().get_blocked_keywords()
-            v = UrlPropertyValidator(
-                properties=self.link_data, blocked_keywords=keywords
-            )
-            if not v.is_valid():
+            text = str(self.link_data["title"]) + str(self.link_data["description"])
+
+            if EntryRules.is_blocked_by_text(text):
                 self.errors.append(
                     "Url:{}. Link was rejected due to validation.".format(self.link))
                 return

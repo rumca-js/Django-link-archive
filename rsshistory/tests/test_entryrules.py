@@ -41,13 +41,13 @@ class EntryUpdaterTest(FakeInternetTestCase):
             enabled=True,
             block=True,
             rule_name="Rule1",
-            rule_url=".test1.com, .test2.com",
+            trigger_rule_url=".test1.com, .test2.com",
         )
         EntryRules.objects.create(
             enabled=True,
             block=True,
             rule_name="Rule2",
-            rule_url=".test3.com, .test4.com",
+            trigger_rule_url=".test3.com, .test4.com",
         )
 
         # call tested function
@@ -68,13 +68,13 @@ class EntryUpdaterTest(FakeInternetTestCase):
             enabled=True,
             block=False,
             rule_name="Rule1",
-            rule_url=".test1.com, .test2.com",
+            trigger_rule_url=".test1.com, .test2.com",
         )
         EntryRules.objects.create(
             enabled=True,
             block=False,
             rule_name="Rule2",
-            rule_url=".test3.com, .test4.com",
+            trigger_rule_url=".test3.com, .test4.com",
         )
 
         # call tested function
@@ -90,6 +90,24 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         self.assertFalse(EntryRules.is_blocked("https://www.test5.com"))
 
+    def test_entry_rule_is_blocked_by_text(self):
+        EntryRules.objects.create(
+            enabled=True,
+            block=True,
+            rule_name="Rule1",
+            trigger_text="casino",
+        )
+
+        text = "casino casino casino"
+
+        # call tested function
+        self.assertFalse(EntryRules.is_blocked_by_text(text))
+
+        text = "casino casino casino casino"
+
+        # call tested function
+        self.assertTrue(EntryRules.is_blocked_by_text(text))
+
     def test_entry_rule__get_url_rules(self):
 
         self.browser.save()
@@ -99,7 +117,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             block=False,
             browser=self.browser,
             rule_name="Rule1",
-            rule_url=".test1.com, .test2.com",
+            trigger_rule_url=".test1.com, .test2.com",
         )
 
         # call tested function
@@ -129,7 +147,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             block=False,
             browser=self.browser,
             rule_name="Rule1",
-            rule_url=".test1.com, .test2.com",
+            trigger_rule_url=".test1.com, .test2.com",
         )
 
         self.assertTrue(therule.is_valid())

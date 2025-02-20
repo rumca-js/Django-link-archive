@@ -13,9 +13,17 @@ from ..apps import LinkDatabase
 class EntryRules(models.Model):
     enabled = models.BooleanField(default=True)
 
-    rule_url = models.CharField(
-        max_length=1000, help_text="New entries can added using colon"
+    trigger_rule_url = models.CharField(
+        max_length=1000,
+        blank=True,
+        help_text="New entries can added using colon"
     )  # url syntax
+
+    trigger_text = models.CharField(
+        max_length=1000,
+        blank = True,
+        help_text="Text that triggers the rule",
+    )
 
     rule_name = models.CharField(max_length=1000, blank=True, help_text="Rule name")
 
@@ -39,7 +47,7 @@ class EntryRules(models.Model):
     def get_rule_urls(self):
         result = set()
 
-        urls = self.rule_url.split(",")
+        urls = self.trigger_rule_url.split(",")
         for url in urls:
             result.add(url.strip())
 
@@ -50,8 +58,9 @@ class EntryRules(models.Model):
         for rule in rules:
             rule_urls = rule.get_rule_urls()
             for rule_url in rule_urls:
-                if url.find(rule_url) >= 0:
-                    return True
+                if rule_url != "":
+                    if url.find(rule_url) >= 0:
+                        return True
 
         return False
 
@@ -69,6 +78,25 @@ class EntryRules(models.Model):
                 return True
 
         return False
+
+    def is_blocked_by_text(text):
+        sum = 0
+
+        # ignore case
+        text = text.lower()
+
+        rules = EntryRules.objects.filter(block=True, enabled=True).exclude(trigger_text = "")
+        for rule in rules:
+            trigger_texts = rule.trigger_text
+            trigger_split = trigger_texts.split(",")
+
+            for trigger_text in trigger_split:
+                # ignore case
+                trigger_text = trigger_text.lower()
+
+                sum += text.count(trigger_text)
+
+        return sum > 3
 
     def get_url_rules(url):
         result = []
