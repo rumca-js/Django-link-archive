@@ -186,7 +186,6 @@ class ConfigForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.long_widget("user_agent")
-        self.long_widget("block_keywords")
         self.long_widget("instance_title")
         self.long_widget("instance_description")
         self.long_widget("instance_internet_location")

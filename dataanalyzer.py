@@ -19,6 +19,7 @@ import json
 
 from utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
 from utils.alchemysearch import AlchemySymbolEvaluator, AlchemyEquationEvaluator, AlchemySearch
+from utils.reflected import ReflectedEntryTable
 from sqlalchemy import create_engine
 
 
@@ -71,7 +72,6 @@ class SearchInterface(object):
         """
         Row is to be expected a 'dict', eg. row["link"]
         """
-        #print(row.domain)
         link = row.link
 
         level = self.parser.get_verbosity_level()
@@ -124,7 +124,7 @@ class Parser(object):
         self.parser.add_argument("--order-by", default="page_rating_votes", help="order by column.")
         self.parser.add_argument("--asc", action="store_true", help="order ascending")
         self.parser.add_argument("--desc", action="store_true", help="order descending")
-        self.parser.add_argument("--table", help="Table name")
+        self.parser.add_argument("--table", default="linkdatamode", help="Table name")
 
         self.parser.add_argument("--title", action="store_true", help="displays title")
         self.parser.add_argument("--description", action="store_true", help="displays description")

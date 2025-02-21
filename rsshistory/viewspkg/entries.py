@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
 
 from utils.dateutils import DateUtils
 from utils.omnisearch import SingleSymbolEvaluator
@@ -734,6 +735,29 @@ def add_simple_entry(request):
         return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     return func_display_empty_form(request, p, "entry__add_simple.html")
+
+
+@csrf_exempt
+def entry_add_ext(request):
+    p = ViewPage(request)
+    p.set_title("Add entry")
+
+    if not p.is_api_key_allowed():
+        p.context["summary_text"] = "Cannot add anything"
+        return p.render("summary_present.html")
+
+    if request.method == "POST":
+        link = request.POST.get("link")
+        tag = request.POST.get("tag")
+
+        BackgroundJobController.link_add(link)
+
+        p.context["summary_text"] = "Added link {}".format(link)
+
+        return p.render("summary_present.html")
+    else:
+        p.context["summary_text"] = "Cannot add anything"
+        return p.render("summary_present.html")
 
 
 def entry_is(request):

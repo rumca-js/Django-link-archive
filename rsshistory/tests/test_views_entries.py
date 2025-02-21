@@ -452,6 +452,23 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_entry_add_ext(self):
+        LinkDataController.objects.all().delete()
+
+        key = ApiKeys.objects.create(key = "test")
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-add-ext".format(LinkDatabase.name)) + "key=test"
+        test_link = "https://linkedin.com"
+
+        post_data = {"link": test_link, "tag":""}
+
+        # call user action
+        response = self.client.post(url, data=post_data)
+
+        self.assertEqual(response.status_code, 200)
+
     def test_edit_entry(self):
         LinkDataController.objects.all().delete()
 

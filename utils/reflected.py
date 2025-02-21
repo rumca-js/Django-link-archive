@@ -44,7 +44,7 @@ class ReflectedEntryTable(object):
                 if tags:
                     tags += ", "
 
-                tags += row.tag
+                tags += "#"+row.tag
 
         return tags
 
