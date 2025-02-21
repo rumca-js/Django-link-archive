@@ -124,7 +124,7 @@ class Parser(object):
         self.parser.add_argument("--order-by", default="page_rating_votes", help="order by column.")
         self.parser.add_argument("--asc", action="store_true", help="order ascending")
         self.parser.add_argument("--desc", action="store_true", help="order descending")
-        self.parser.add_argument("--table", default="linkdatamode", help="Table name")
+        self.parser.add_argument("--table", default="linkdatamodel", help="Table name")
 
         self.parser.add_argument("--title", action="store_true", help="displays title")
         self.parser.add_argument("--description", action="store_true", help="displays description")

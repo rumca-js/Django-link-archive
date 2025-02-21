@@ -68,6 +68,7 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
                 self.table.c["description"].ilike(symbol),
             )
         else:
+            symbol = symbol.replace("*", "%")
             return or_(
                 self.table.c["link"].like(symbol),
                 self.table.c["title"].like(symbol),
