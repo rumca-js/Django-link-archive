@@ -80,8 +80,12 @@ class EntriesCleanup(object):
             urls = rule.get_rule_urls()
 
             for url in urls:
-                entries = LinkDataController.objects.filter(link__icontains = url)
-                entries.delete()
+                if url != "":
+                    entries = LinkDataController.objects.filter(link__icontains = url)
+                    entries.delete()
+
+                    domains = DomainsController.objects.filter(domain__icontains = url)
+                    domains.delete()
 
     def cleanup_entries_with_ports(self):
         """
