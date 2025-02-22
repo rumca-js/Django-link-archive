@@ -70,7 +70,18 @@ class EntriesCleanup(object):
             if not self.move_old_links_to_archive():
                 return False
 
+        self.cleanup_entries__invalid_rules()
+
         return True
+
+    def cleanup_entries__invalid_rules(self):
+        rules = EntryRules.objects.filter(block=True, enabled=True)
+        for rule in rules:
+            urls = rule.get_rule_urls()
+
+            for url in urls:
+                entries = LinkDataController.objects.filter(link__icontains = url)
+                entries.delete()
 
     def cleanup_entries_with_ports(self):
         """

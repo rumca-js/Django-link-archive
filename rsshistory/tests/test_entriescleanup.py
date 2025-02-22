@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
 
-from ..models import UserBookmarks
+from ..models import UserBookmarks, EntryRules
 from ..controllers import (
     EntryWrapper,
     SourceDataController,
@@ -224,3 +224,26 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         self.assertEqual(archived[1].domain, domains[0])
         self.assertEqual(archived[1].date_published, date_to_remove)
+
+    def test_cleanup__entry_rules(self):
+        conf = Configuration.get_object().config_entry
+        conf.days_to_remove_links = 2
+        # conf.days_to_move_to_archive = 1
+        conf.accept_domain_links = True  # to keep up permanent flag
+        conf.keep_domain_links = True
+        conf.save()
+
+        EntryRules.objects.create(block=True, trigger_rule_url = "youtube.com")
+
+        bookmarked = LinkDataController.objects.create(
+            link="https://youtube.com?v=bookmarked"
+        )
+
+        # call tested function
+        EntriesCleanup().cleanup()
+
+        bookmarked = LinkDataController.objects.filter(
+            link="https://youtube.com?v=bookmarked"
+        )
+
+        EntryRules.objects.all().delete()
