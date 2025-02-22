@@ -20,6 +20,7 @@ from ..models import (
     DataExport,
     UserBookmarks,
     UserConfig,
+    ApiKeys,
 )
 from ..configuration import Configuration
 

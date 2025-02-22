@@ -581,7 +581,7 @@ class FeedClient(object):
         title = url.get_title()
 
         if not title:
-            title = input("Specify title of URL")
+            title = input("{}. Specify title of URL".format(page_url))
 
         source["url"] = url.url
         source["title"] = title

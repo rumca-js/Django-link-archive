@@ -24,13 +24,13 @@
 
 <div>Rule URL:
 {% for rule_url in object.get_rule_urls %}
-    <span class="white-space: nowrap;">{{rule_url}}</span>
+    <span class="white-space: nowrap;">{{rule_url}},</span>
 {% endfor %}
 </div>
 
 <div>Trigger text:
 {% if object.trigger_text %}
-    <span class="white-space: nowrap;">{{object.trigger_text}}</span>
+    <span class="white-space: nowrap;">{{object.trigger_text}},</span>
 {% endif %}
 </div>
 

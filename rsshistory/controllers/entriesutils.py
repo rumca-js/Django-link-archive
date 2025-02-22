@@ -14,6 +14,7 @@ from ..webtools import (
     UrlLocation,
     UrlAgeModerator,
     RemoteServer,
+    UrlPropertyValidator,
 )
 from utils.dateutils import DateUtils
 
@@ -554,6 +555,10 @@ class EntryUpdater(object):
 
         entry = w.entry
 
+        if EntryRules.is_blocked(entry.link):
+            entry.delete()
+            return
+
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
 
@@ -631,6 +636,10 @@ class EntryUpdater(object):
                 w.check_www_nonww_availability()
 
         if not w.entry:
+            return
+
+        if EntryRules.is_blocked(entry.link):
+            entry.delete()
             return
 
         entry = w.entry
@@ -1500,6 +1509,11 @@ class EntryDataBuilder(object):
                     "Url:{}. Not enabled to store".format(self.link))
             return
 
+        if EntryRules.is_blocked(self.link_data["link"]):
+            self.errors.append(
+                "Url:{}. Link was rejected because of a rule.".format(self.link))
+            return
+
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
         link_data = url.get_props()
         if not link_data:
@@ -1588,6 +1602,16 @@ class EntryDataBuilder(object):
         entry = None
 
         self.link_data = self.get_clean_link_data()
+        if EntryRules.is_blocked(self.link_data["link"]):
+            self.errors.append(
+                "Url:{}. Link was rejected because of a rule.".format(self.link))
+            return
+
+        validator = UrlPropertyValidator(properties = self.link_data)
+        if not validator.is_valid():
+            self.errors.append(
+                "Url:{}. Link was rejected because of validator.".format(self.link))
+            return
 
         # TODO - what if there are many places and we do not want people to insert
         # bad stuff?
@@ -1596,7 +1620,7 @@ class EntryDataBuilder(object):
 
             if EntryRules.is_blocked_by_text(text):
                 self.errors.append(
-                    "Url:{}. Link was rejected due to validation.".format(self.link))
+                    "Url:{}. Link was rejected due contents rule.".format(self.link))
                 return
                 
             if len(self.link_data["link"]) > LinkDataController.get_field_length("link"):
