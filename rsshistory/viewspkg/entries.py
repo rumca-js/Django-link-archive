@@ -675,7 +675,11 @@ def add_entry(request):
             entry = b.build_from_props_internal()
 
             if not entry:
-                p.context["summary_text"] = "Link was not saved"
+                text = "Link was not saved\n"
+                for error in b.errors:
+                    text += f"{error}\n"
+
+                p.context["summary_text"] = text
                 return p.render("summary_present.html")
 
             p.context["entry"] = entry
@@ -873,12 +877,6 @@ def edit_entry(request, pk):
 
         if form.is_valid():
             form.save()
-
-            obs = LinkDataController.objects.filter(id=pk)
-            entry = obs[0]
-
-            entry.bookmarked = UserBookmarks.is_bookmarked(entry)
-            entry.save()
 
             return HttpResponseRedirect(ob.get_absolute_url())
 

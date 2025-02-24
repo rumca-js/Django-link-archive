@@ -653,11 +653,10 @@ class EntryUpdater(object):
         if not w.entry:
             return
 
+        entry = w.entry
         if EntryRules.is_blocked(entry.link):
             entry.delete()
             return
-
-        entry = w.entry
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
@@ -1077,7 +1076,7 @@ class EntryWrapper(object):
         objs = ArchiveLinkDataController.objects.filter(link=entry_obj.link)
 
         if objs.count() == 0:
-            themap = entry_obj.get_map()
+            themap = entry_obj.get_map(stringify=False)
             try:
                 if hasattr(entry_obj, "source"):
                     if entry_obj.source:
@@ -1104,7 +1103,7 @@ class EntryWrapper(object):
 
         objs = LinkDataController.objects.filter(link=archive_obj.link)
         if objs.count() == 0:
-            themap = archive_obj.get_map()
+            themap = archive_obj.get_map(stringify=False)
             try:
                 if hasattr(archive_obj, "source"):
                     if archive_obj.source:

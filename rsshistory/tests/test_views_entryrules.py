@@ -23,7 +23,7 @@ class EntryRulesTests(FakeInternetTestCase):
             username="testuser", password="testpassword", is_staff=True
         )
 
-    def test_entry_rule_add_form(self):
+    def test_entry_rule_add__show_form(self):
         EntryRules.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -36,7 +36,7 @@ class EntryRulesTests(FakeInternetTestCase):
         # redirect to view the link again
         self.assertEqual(response.status_code, 200)
 
-    def test_entry_rule_add_form(self):
+    def test_entry_rule_add__post_form(self):
         EntryRules.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -51,9 +51,10 @@ class EntryRulesTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=form_data)
 
-        self.assertEqual(response.status_code, 200)
+        # redirect to rules
+        self.assertEqual(response.status_code, 302)
 
-    def test_entry_rule_edit(self):
+    def test_entry_rule_edit__post(self):
         entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
@@ -75,7 +76,7 @@ class EntryRulesTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=form_data)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_entry_rule_run(self):
         entry_rule = EntryRules.objects.create(

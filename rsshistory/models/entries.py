@@ -394,15 +394,18 @@ class BaseLinkDataController(BaseLinkDataModel):
         names.add("vote")  # TODO is this used?
         return list(names)
 
-    def get_map(self):
+    def get_map(self, stringify=True):
         output_data = {}
 
         export_names = BaseLinkDataController.get_export_names()
         for export_name in export_names:
             val = getattr(self, export_name)
-            if export_name.find("date_") >= 0:
-                if val:
-                    val = val.isoformat()
+
+            if stringify:
+                if export_name.find("date_") >= 0:
+                    if val:
+                        val = val.isoformat()
+
             output_data[export_name] = val
 
         return output_data

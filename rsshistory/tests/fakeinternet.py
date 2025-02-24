@@ -231,9 +231,10 @@ class FakeInternetData(object):
         if self.url == "https://casino.com":
             self.properties["title"] = "Casino Casino Casino"
             self.properties["description"] = "Casino Casino Casino"
-        if self.url == "https://binary.com":
+        if self.url == "https://binary.com/file":
             self.properties["title"] = ""
             self.properties["description"] = ""
+            self.binary_data = "text".encode()
 
         return self.get_all_properties()
 

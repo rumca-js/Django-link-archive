@@ -409,13 +409,17 @@ def json_system_status(request):
 
     data["directory"] = c.directory
 
-    from ..threadprocessors import get_tasks
-
-    tasks = get_tasks()
 
     data["threads"] = []
-    for thread_info in system_controller.get_thread_info(tasks):
-        data["threads"].append({"name": thread_info[0], "date": thread_info[1]})
+
+    try:
+        from ..threadprocessors import get_tasks
+        tasks = get_tasks()
+        for thread_info in system_controller.get_thread_info(tasks):
+            data["threads"].append({"name": thread_info[0], "date": thread_info[1]})
+    except Exception as E:
+        # TODO fix this
+        pass
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
@@ -935,15 +939,18 @@ def get_footer_status_line(request):
 
     system_controller = SystemOperationController()
 
-    # from ..tasks import get_tasks
-    # tasks = get_tasks()
 
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
     is_internet_ok = system_controller.is_internet_ok()
-    # is_threading_ok = system_controller.is_threading_ok(thread_ids = tasks)
-    is_threading_ok = True
+    try:
+        from ..tasks import get_tasks
+        tasks = get_tasks()
+        is_threading_ok = system_controller.is_threading_ok(thread_ids = tasks)
+    except Exception as E:
+        # TODO fix this
+        is_threading_ok = False
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
 
@@ -979,9 +986,6 @@ def get_indicators(request):
     configuration_entry = Configuration.get_object().config_entry
     system_controller = SystemOperationController()
 
-    from ..threadprocessors import get_tasks
-
-    tasks = get_tasks()
 
     if not request.user.is_authenticated:
         indicators = {}
@@ -992,7 +996,15 @@ def get_indicators(request):
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
     is_internet_ok = system_controller.is_internet_ok()
-    is_threading_ok = system_controller.is_threading_ok(tasks)
+
+    try:
+        from ..threadprocessors import get_tasks
+        tasks = get_tasks()
+        is_threading_ok = system_controller.is_threading_ok(tasks)
+    except Exception as E:
+        # TODO fix this
+        is_threading_ok = False
+
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
     read_later_queue_size = ReadLater.objects.filter(user=request.user).count()

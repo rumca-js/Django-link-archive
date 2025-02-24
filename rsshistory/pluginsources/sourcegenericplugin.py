@@ -101,6 +101,7 @@ class SourceGenericPlugin(object):
                 entry["date_published"] = DateUtils.parse_datetime(
                     entry["date_published"]
                 )
+                entry["source"] = self
                 yield entry
 
     def get_enhanced_entries(self):

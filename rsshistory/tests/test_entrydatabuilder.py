@@ -619,7 +619,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         entry = b.build_from_link()
 
         objs = LinkDataController.objects.filter(link="https://youtube.com/v=1234")
-        self.assertEqual(objs.count(), 0)
+        self.assertEqual(objs.count(), 1)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 

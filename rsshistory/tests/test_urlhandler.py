@@ -299,12 +299,17 @@ class UrlHandlerExTest(FakeInternetTestCase):
         # call tested function
         self.assertTrue(url.is_blocked())
 
-    def test_get_text(self):
+    def test_get_text__valid(self):
         url = UrlHandlerEx("https://linkedin.com")
         # call tested function
         self.assertTrue(url.get_text())
 
-    def test_get_binary(self):
+    def test_get_binary__invalid(self):
         url = UrlHandlerEx("https://linkedin.com")
+        # call tested function
+        self.assertFalse(url.get_binary())
+
+    def test_get_binary__valid(self):
+        url = UrlHandlerEx("https://binary.com/file")
         # call tested function
         self.assertTrue(url.get_binary())

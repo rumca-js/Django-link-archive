@@ -564,7 +564,6 @@ class EntryForm(forms.ModelForm):
             "description",
             "date_published",
             "source_url",
-            "bookmarked",
             "permanent",
             "language",
             "user",
@@ -600,7 +599,6 @@ class EntryForm(forms.ModelForm):
         self.fields["title"].required = False
         self.fields["author"].required = False
         self.fields["album"].required = False
-        self.fields["bookmarked"].initial = True
         self.fields["user"].widget.attrs["readonly"] = True
         self.fields["age"].required = False
         self.fields["thumbnail"].required = False
@@ -628,7 +626,6 @@ class EntryArchiveForm(forms.ModelForm):
             "description",
             "date_published",
             "source_url",
-            "bookmarked",
             "language",
             "user",
             "author",

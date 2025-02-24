@@ -390,29 +390,6 @@ class EntriesViewsTests(FakeInternetTestCase):
         )
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
-    def test_entry_add__bookmarked(self):
-        LinkDataController.objects.all().delete()
-
-        self.client.login(username="testuser", password="testpassword")
-
-        url = reverse("{}:entry-add".format(LinkDatabase.name))
-        test_link = "https://linkedin.com"
-
-        limited_data = self.get_link_data(test_link)
-        limited_data["bookmarked"] = True
-
-        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
-
-        # call user action
-        response = self.client.post(url, data=limited_data)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
-
-        bookmarks = UserBookmarks.get_user_bookmarks(self.user)
-        self.assertEqual(bookmarks.count(), 1)
-
     def test_entry_add__domain(self):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
@@ -460,13 +437,17 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-add-ext".format(LinkDatabase.name)) + "key=test"
+        url = reverse("{}:entry-add-ext".format(LinkDatabase.name)) + "?key=test"
         test_link = "https://linkedin.com"
 
         post_data = {"link": test_link, "tag":""}
 
         # call user action
         response = self.client.post(url, data=post_data)
+
+        if response.status_code != 200:
+            page_source = response.content.decode("utf-8")
+            print("Contents: {}".format(page_source))
 
         self.assertEqual(response.status_code, 200)
 
@@ -510,44 +491,6 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
         self.assertEqual(bookmarks.count(), 0)
-
-    def test_edit_entry_bookmarked(self):
-        LinkDataController.objects.all().delete()
-
-        self.client.login(username="testuser", password="testpassword")
-
-        test_link = "https://linkedin.com"
-
-        entry = LinkDataController.objects.create(
-            source_url="https://linkedin.com",
-            link=test_link,
-            title="The first link",
-            description="the first link description",
-            source=None,
-            bookmarked=False,
-            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
-            language="en",
-        )
-
-        url = reverse("{}:entry-edit".format(LinkDatabase.name), args=[entry.id])
-
-        limited_data = self.get_link_data(test_link)
-        limited_data["bookmarked"] = True
-
-        # call user action
-        response = self.client.post(url, data=limited_data)
-
-        # redirection
-        self.assertEqual(response.status_code, 302)
-
-        # check that object has been changed
-
-        entry = LinkDataController.objects.get(link=test_link)
-        self.assertEqual(entry.title, "Https LinkedIn Page title")
-        self.assertEqual(entry.description, "Https LinkedIn Page description")
-
-        bookmarks = UserBookmarks.get_user_bookmarks(self.user)
-        self.assertEqual(bookmarks.count(), 1)
 
     def test_entry_download(self):
         LinkDataController.objects.all().delete()

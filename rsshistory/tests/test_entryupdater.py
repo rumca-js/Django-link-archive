@@ -9,7 +9,7 @@ from ..controllers import (
     EntryUpdater,
     BackgroundJobController,
 )
-from ..models import UserTags, UserVotes
+from ..models import UserTags, UserVotes, EntryRules
 from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
@@ -452,6 +452,11 @@ class EntryUpdaterTest(FakeInternetTestCase):
             title="YouTube",
             export_to_cms=True,
             remove_after_days=1,
+        )
+
+        EntryRules.objects.create(
+                trigger_text = "casino",
+                block = True
         )
 
         entry = LinkDataController.objects.create(

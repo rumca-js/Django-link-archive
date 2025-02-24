@@ -294,13 +294,26 @@ class CodeProjectPluginTest(FakeInternetTestCase):
             export_to_cms=True,
         )
 
-    def test_parse(self):
+    def test_get_entries(self):
         parser = CodeProjectPlugin(self.source_codeproject.id)
         BackgroundJobController.objects.all().delete()
 
-        props = list(parser.get_entries())
+        # call tested function
+        props = list(parser.get_enhanced_entries())
 
         self.assertTrue(len(props) > 0)
-        self.assertEqual(
-            props[0]["source"], "https://www.codeproject.com/WebServices/NewsRSS.aspx"
-        )
+        self.assertIn("link", props[0])
+        self.assertIn("title", props[0])
+
+    def test_get_enhanced_entries(self):
+        parser = CodeProjectPlugin(self.source_codeproject.id)
+        BackgroundJobController.objects.all().delete()
+
+        # call tested function
+        props = list(parser.get_enhanced_entries())
+
+        self.assertTrue(len(props) > 0)
+        self.assertIn("link", props[0])
+        self.assertIn("title", props[0])
+        self.assertIn("source", props[0])
+        self.assertTrue(props[0]["source"])
