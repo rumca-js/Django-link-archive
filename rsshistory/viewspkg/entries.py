@@ -682,6 +682,9 @@ def add_entry(request):
                 p.context["summary_text"] = text
                 return p.render("summary_present.html")
 
+            if UserBookmarks.add(request.user, entry):
+                entry.make_bookmarked()
+
             p.context["entry"] = entry
             p.context["form"] = form
 

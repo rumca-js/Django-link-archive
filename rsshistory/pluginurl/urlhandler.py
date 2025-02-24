@@ -249,31 +249,49 @@ class UrlHandlerEx(object):
 
     def get_title(self):
         properties = self.get_section("Properties")
+        if not properties:
+            return
+
         if "title" in properties:
             return properties["title"]
 
     def get_description(self):
         properties = self.get_section("Properties")
+        if not properties:
+            return
+
         if "description" in properties:
             return properties["description"]
 
     def get_language(self):
         properties = self.get_section("Properties")
+        if not properties:
+            return
+
         if "language" in properties:
             return properties["language"]
 
     def get_author(self):
         properties = self.get_section("Properties")
+        if not properties:
+            return
+
         if "author" in properties:
             return properties["author"]
 
     def get_album(self):
         properties = self.get_section("Properties")
+        if not properties:
+            return
+
         if "album" in properties:
             return properties["album"]
 
     def get_thumbnail(self):
         properties = self.get_section("Properties")
+        if not properties:
+            return
+
         if "thumbnail" in properties:
             return properties["thumbnail"]
 

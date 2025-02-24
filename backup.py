@@ -188,8 +188,8 @@ def run_pg_restore(run_info):
 
 def create_destionation_table(table_name, source_table, destination_engine):
     """
-    Copy columns from postgres to nosql
-    BYTEA is not represented in nosql
+    Copy columns from postgres to sqlite
+    BYTEA is not represented in sqlite
     """
     with destination_engine.connect() as connection:
         if not destination_engine.dialect.has_table(connection, table_name):
@@ -379,14 +379,14 @@ def backup_workspace(run_info):
             table_name = item.replace("instance", workspace)
             new_run_info["tables"].append(table_name)
 
-        if new_run_info["format"] == "nosql":
+        if new_run_info["format"] == "sqlite":
             if not run_db_copy_backup(new_run_info):
                 return False
         else:
             if not run_pg_dump_backup(new_run_info):
                 return False
 
-    if new_run_info["format"] == "nosql":
+    if new_run_info["format"] == "sqlite":
         run_db_copy_backup_auth(run_info)
 
     return True
@@ -516,11 +516,11 @@ def parse_backup():
     parser.add_argument("--reindex", action="store_true", help="Reindex the database. Useful to detect errors in consistency")
     parser.add_argument("-U", "--user", default="user", help="Username for the database (default: 'user')")
     parser.add_argument("-d", "--database", default="db", help="Database name (default: 'db')")
-    parser.add_argument("-p", "--password", default="", help="Password. Necessary for nosql format")
+    parser.add_argument("-p", "--password", default="", help="Password. Necessary for sqlite format")
     parser.add_argument("-w", "--workspace", help="Workspace for which to perform backup/restore. If not specified - all")
     parser.add_argument("-D", "--debug", help="Enable debug output")  # TODO implement debug
     parser.add_argument("-i", "--ignore-errors", action="store_true", help="Ignore errors during the operation")
-    parser.add_argument("-f", "--format", default="custom", choices=["custom", "plain", "sql", "nosql"],
+    parser.add_argument("-f", "--format", default="custom", choices=["custom", "plain", "sql", "sqlite"],
                         help="Format of the backup (default: 'custom'). Choices: 'custom', 'plain', or 'sql'.")
 
     parser.add_argument("--host", default="127.0.0.1", help="Host address for the database (default: 127.0.0.1)")

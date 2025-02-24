@@ -403,7 +403,7 @@ def edit_source(request, pk):
                 page = UrlLocation(ob.url)
                 domain = page.get_domain()
                 u = UrlHandlerEx(domain, settings={"handler_class" : "HttpPageHandler"})
-                icon = u.get_favicon()
+                icon = u.get_thumbnail()
 
             if icon:
                 form = SourceForm(
