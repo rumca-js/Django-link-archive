@@ -667,6 +667,7 @@ def add_entry(request):
 
         if valid:
             data = form.get_information()
+            data["bookmarked"] = True
 
             b = EntryDataBuilder()
             b.link_data = data

@@ -647,7 +647,7 @@ class EntryGenericPlugin(object):
             parameters.append(EntryParameter("User", self.entry.user.username))
 
         parameters.append(EntryParameter("Bookmarked", self.entry.bookmarked))
-        parameters.append(EntryParameter("UserBookmarked", self.entry.is_bookmarked))
+        parameters.append(EntryParameter("UserBookmarked", self.entry.is_bookmarked()))
 
         return parameters
 

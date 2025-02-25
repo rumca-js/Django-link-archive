@@ -212,3 +212,6 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
         return reverse(
             "{}:entry-archive-remove".format(LinkDatabase.name), args=[str(self.id)]
         )
+
+    def is_bookmarked(self):
+        return False
