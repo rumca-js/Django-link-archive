@@ -80,9 +80,8 @@ def read_source(db, source):
             return result
 
         for item in entries:
-            item["source"] = source_url
-            item["source_title"] = source_title
-            item["source_obj__id"] = source_id
+            item["source_url"] = source_url
+            item["source"] = source_id
             result.append(item)
 
     print("\rRead:{}".format(source_url), end="")
@@ -681,19 +680,8 @@ class FeedClient(object):
             print("Cannot obtain link properties")
             return False
 
-        Session = db.get_session()
-        entry = EntriesTable(**properties)
-
-        with Session() as session:
-            if (
-                session.query(EntriesTable).filter(EntriesTable.link == url).count()
-                != 0
-            ):
-                print("Link is already present in the database")
-                return False
-
-            session.add(entry)
-            session.commit()
+        ec = EntriesTableController(db)
+        ec.add_entry(properties)
 
         return True
 

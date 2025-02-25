@@ -130,11 +130,11 @@ class EntriesTable(Base):
     thumbnail: Mapped[Optional[str]]
     language: Mapped[Optional[str]]
     age: Mapped[int] = mapped_column(default=0)
-    #date_created = mapped_column(DateTime(timezone=True), nullable=True)
-    #date_published = mapped_column(DateTime(timezone=True), nullable=True)
-    #date_update_last = mapped_column(DateTime(timezone=True), nullable=True)
-    #date_dead_since = mapped_column(DateTime(timezone=True), nullable=True)
-    #date_last_modified = mapped_column(DateTime(timezone=True), nullable=True)
+    date_created = mapped_column(DateTime(timezone=True), nullable=True)
+    date_published = mapped_column(DateTime(timezone=True), nullable=True)
+    date_update_last = mapped_column(DateTime(timezone=True), nullable=True)
+    date_dead_since = mapped_column(DateTime(timezone=True), nullable=True)
+    date_last_modified = mapped_column(DateTime(timezone=True), nullable=True)
     status_code: Mapped[int] = mapped_column(default=0)
     page_rating: Mapped[int] = mapped_column(default=0)
     page_rating_votes: Mapped[int] = mapped_column(default=0)
@@ -144,7 +144,7 @@ class EntriesTable(Base):
     author: Mapped[Optional[str]]
     album: Mapped[Optional[str]]
     # advanced / foreign
-    source_id: Mapped[Optional[int]]
+    source : Mapped[Optional[int]]
 
 
 class EntriesTableController(object):
@@ -174,21 +174,14 @@ class EntriesTableController(object):
             session.commit()
 
     def add_entry(self, entry):
-        if "tags" in entry:
-            try:
-                if entry["tags"]:
-                    entry["tags"] = ", ".join(entry["tags"])
-            except Exception as E:
-                data["tags"] = None
-
-        if "feed_entry" in entry:
-            del entry["feed_entry"]
-
-        if "source_title" in entry:
-            del entry["source_title"]
-
+        # Get the set of column names from EntriesTable
+        valid_columns = {column.name for column in EntriesTable.__table__.columns}
+        
+        # Remove keys that are not in EntriesTable
+        entry = {key: value for key, value in entry.items() if key in valid_columns}
+        
         entry_obj = EntriesTable(**entry)
-
+        
         Session = self.get_session()
         with Session() as session:
             session.add(entry_obj)
@@ -212,6 +205,8 @@ class SourcesTable(Base):
     proxy_location: Mapped[Optional[str]]
     remove_after_days: Mapped[Optional[int]]
     source_type: Mapped[Optional[str]]
+    category_name: Mapped[Optional[str]]
+    subcategory_name: Mapped[Optional[str]]
 
 
 class SourcesTableController(object):
@@ -256,13 +251,27 @@ class SourcesTableController(object):
 
         return is_source
 
+    def add(self, source):
+        # Get the set of column names from EntriesTable
+        valid_columns = {column.name for column in SourcesTable.__table__.columns}
+        
+        # Remove keys that are not in EntriesTable
+        source = {key: value for key, value in source.items() if key in valid_columns}
+        
+        source_obj = SourcesTable(**source)
+        
+        Session = self.get_session()
+        with Session() as session:
+            session.add(source_obj)
+            session.commit()
+
 
 class SourceOperationalData(Base):
     __tablename__ = "sourceoperationaldata"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     date_fetched = mapped_column(DateTime, nullable=True)
-    source_obj_id: Mapped[int]
+    source : Mapped[int]
 
 
 class SourceOperationalDataController(object):
@@ -281,7 +290,7 @@ class SourceOperationalDataController(object):
         with Session() as session:
             rows = (
                 session.query(SourceOperationalData)
-                .filter(SourceOperationalData.source_obj_id == source.id)
+                .filter(SourceOperationalData.source== source.id)
                 .all()
             )
 
@@ -303,12 +312,12 @@ class SourceOperationalDataController(object):
         with Session() as session:
             op_data = (
                 session.query(SourceOperationalData)
-                .filter(SourceOperationalData.source_obj_id == source.id)
+                .filter(SourceOperationalData.source == source.id)
                 .all()
             )
             if len(op_data) == 0:
                 obj = SourceOperationalData(
-                    date_fetched=date_now, source_obj_id=source.id
+                    date_fetched=date_now, source=source.id
                 )
                 session.add(obj)
                 session.commit()

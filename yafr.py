@@ -6,7 +6,6 @@ from rsshistory.webtools import (
    HttpPageHandler,
    FeedClientParser,
    FeedClient,
-   ScrapingClient,
 )
 from sqlalchemy import (
     create_engine,
@@ -14,6 +13,7 @@ from sqlalchemy import (
 
 def main():
     WebConfig.init()
+    #WebConfig.use_print_logging()
 
     parser = FeedClientParser()
     parser.parse()
