@@ -304,7 +304,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].status_code, 500)
         self.assertEqual(entries[0].manual_status_code, 0)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 6)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
 
     def test_update_data__clears_stale_entry_status(self):
         MockRequestCounter.mock_page_requests = 0
@@ -442,21 +442,22 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
-    def test_update_data__removes_casinos(self):
+    def test_update_data__removes_by_url__casinos(self):
         MockRequestCounter.mock_page_requests = 0
 
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
+            url="https://casino.com",
             title="YouTube",
             export_to_cms=True,
             remove_after_days=1,
         )
 
         EntryRules.objects.create(
-                trigger_text = "casino",
-                block = True
+                trigger_rule_url = "slot-casino-page.com",
+                block = True,
+                enabled=True,
         )
 
         entry = LinkDataController.objects.create(
@@ -480,7 +481,48 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual(LinkDataController.objects.all().count(), 0)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_update_data__removes_by_text__casinos(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        EntryRules.objects.create(
+                trigger_text = "casino",
+                block = True,
+                enabled=True,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://slot-casino-page.com",
+            title="Casino casino casino casino casino",
+            description=None,
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            thumbnail=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.update_data()
+
+        self.assertEqual(LinkDataController.objects.all().count(), 0)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_update_data__leaves_age(self):
         MockRequestCounter.mock_page_requests = 0

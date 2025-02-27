@@ -549,6 +549,12 @@ class EntryUpdater(object):
          - title and description could have been set manually, we do not want to change that
          - some other fields should be set only if present in props
         """
+        if not self.entry:
+            return
+
+        if EntryRules.is_entry_blocked(self.entry):
+            self.entry.delete()
+            return
 
         w = EntryWrapper(entry=self.entry)
         w.evaluate()
@@ -569,10 +575,6 @@ class EntryUpdater(object):
             return
 
         entry = w.entry
-
-        if EntryRules.is_blocked(entry.link):
-            entry.delete()
-            return
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
@@ -632,6 +634,13 @@ class EntryUpdater(object):
         from ..pluginurl import EntryUrlInterface
         from ..pluginurl import UrlHandlerEx
 
+        if not self.entry:
+            return
+
+        if EntryRules.is_entry_blocked(self.entry):
+            self.entry.delete()
+            return
+
         """
         Fetches new information about page, and uses valid fields to set this object.
 
@@ -654,9 +663,6 @@ class EntryUpdater(object):
             return
 
         entry = w.entry
-        if EntryRules.is_blocked(entry.link):
-            entry.delete()
-            return
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
@@ -1300,7 +1306,7 @@ class EntryWrapper(object):
                 url = EntryUrlInterface(http_url)
                 props = url.get_props()
 
-                if props:
+                if url.is_valid() and props:
                     return EntryWrapper(entry=entry).move_entry_to_url(http_url)
 
             return self.entry
@@ -1311,7 +1317,7 @@ class EntryWrapper(object):
             url = EntryUrlInterface(https_url)
             props = url.get_props()
 
-            if props:
+            if url.is_valid() and props:
                 return EntryWrapper(entry=entry).move_entry_to_url(https_url)
 
         return self.entry
@@ -1345,7 +1351,7 @@ class EntryWrapper(object):
 
         url = EntryUrlInterface(destination_link)
         props = url.get_props()
-        if props:
+        if url.is_valid() and props:
             return self.move_entry_to_url(destination_link)
 
         return self.entry

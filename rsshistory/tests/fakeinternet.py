@@ -190,16 +190,35 @@ class FakeInternetData(object):
             self.properties["thumbnail"] = None
         elif self.url == "https://page-with-http-status-500.com":
             self.response["status_code"] = 500
+            self.response["is_valid"] = False
         elif self.url == "https://page-with-http-status-400.com":
             self.response["status_code"] = 400
+            self.response["is_valid"] = False
         elif self.url == "https://page-with-http-status-300.com":
             self.response["status_code"] = 300
+            self.response["is_valid"] = True
         elif self.url == "https://page-with-http-status-200.com":
             self.response["status_code"] = 200
+            self.response["is_valid"] = True
         elif self.url == "https://page-with-http-status-100.com":
             self.response["status_code"] = 100
+            self.response["is_valid"] = False
+        elif self.url == "http://page-with-http-status-500.com":
+            self.response["status_code"] = 500
+            self.response["is_valid"] = False
+        elif self.url == "http://page-with-http-status-400.com":
+            self.response["status_code"] = 400
+            self.response["is_valid"] = False
+        elif self.url == "http://page-with-http-status-300.com":
+            self.response["status_code"] = 300
+        elif self.url == "http://page-with-http-status-200.com":
+            self.response["status_code"] = 200
+        elif self.url == "http://page-with-http-status-100.com":
+            self.response["status_code"] = 100
+            self.response["is_valid"] = False
         elif self.url == "https://www.youtube.com/watch?v=666":
             self.response["status_code"] = 500
+            self.response["is_valid"] = False
         elif self.url == "https://invalid.rsspage.com/rss.xml":
             self.response["status_code"] = 500
         elif self.url == "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM":
@@ -282,6 +301,12 @@ class FakeInternetTestCase(TestCase):
         elif url == "https://page-with-http-status-400.com":
             return False
         elif url == "https://page-with-http-status-100.com":
+            return False
+        elif url == "http://page-with-http-status-500.com":
+            return False
+        elif url == "http://page-with-http-status-400.com":
+            return False
+        elif url == "http://page-with-http-status-100.com":
             return False
 
         return True

@@ -535,7 +535,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         self.assertFalse(entry)
 
     def test_build_from_props__entry_rule__url_rejects(self):
-        MockRequestCounter.mock_page_requests == 0
+        MockRequestCounter.mock_page_requests = 0
 
         config = Configuration.get_object().config_entry
         config.accept_non_domain_links = True
@@ -568,7 +568,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_build_from_props__entry_rule__contents_rejects(self):
-        MockRequestCounter.mock_page_requests == 0
+        MockRequestCounter.mock_page_requests = 0
 
         config = Configuration.get_object().config_entry
         config.accept_non_domain_links = True
@@ -601,7 +601,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_build_from_link__valid(self):
-        MockRequestCounter.mock_page_requests == 0
+        MockRequestCounter.mock_page_requests = 0
 
         config = Configuration.get_object().config_entry
         config.accept_non_domain_links = True
@@ -621,10 +621,10 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         objs = LinkDataController.objects.filter(link="https://youtube.com/v=1234")
         self.assertEqual(objs.count(), 1)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_build_from_link__entry_rule__url_rejects(self):
-        MockRequestCounter.mock_page_requests == 0
+        MockRequestCounter.mock_page_requests = 0
 
         config = Configuration.get_object().config_entry
         config.accept_non_domain_links = True

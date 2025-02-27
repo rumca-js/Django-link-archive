@@ -151,3 +151,18 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         self.assertTrue(therule.is_valid())
+
+    def test_is_entry_blocked(self):
+
+        self.browser.save()
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=True,
+            rule_name="Rule1",
+            trigger_rule_url=".test1.com, .test2.com",
+        )
+
+        entry = LinkDataController.objects.create(link = "https://something.test1.com")
+
+        self.assertTrue(EntryRules.is_entry_blocked(entry))

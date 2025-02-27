@@ -79,6 +79,18 @@ class EntryRules(models.Model):
 
         return False
 
+    def is_entry_blocked(entry):
+        if EntryRules.is_blocked(entry.link):
+            return True
+
+        pulp = str(entry.title) + str(entry.description)
+        pulp = pulp.lower()
+
+        if EntryRules.is_blocked_by_text(pulp):
+            return True
+
+        return False
+
     def is_blocked_by_text(text):
         sum = 0
 

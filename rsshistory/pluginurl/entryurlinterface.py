@@ -42,6 +42,7 @@ class EntryUrlInterface(object):
         self.all_properties = None
 
         self.url = UrlHandlerEx.get_cleaned_link(url)
+        self.handle = None
 
     def get_response(self):
         return self.response
@@ -53,6 +54,7 @@ class EntryUrlInterface(object):
         props = None
 
         url_ex = UrlHandlerEx(self.url)
+        self.handler = url_ex
 
         self.all_properties = url_ex.get_properties()
 
@@ -107,6 +109,9 @@ class EntryUrlInterface(object):
 
     def is_valid(self):
         if not self.all_properties:
+            return False
+
+        if not self.handler.is_valid():
             return False
 
         server = RemoteServer("https://")

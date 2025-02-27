@@ -155,18 +155,11 @@ def entry_rule_check(request, pk):
 
     entry = entries[0]
 
-    if EntryRules.is_blocked(entry.link):
-        p.context["summary_text"] = "Yes"
+    if EntryRules.is_entry_blocked(entry):
+        p.context["summary_text"] = "It is blocked"
         return p.render("go_back.html")
 
-    pulp = str(entry.title) + str(entry.description)
-    pulp = pulp.lower()
-
-    if EntryRules.is_blocked_by_text(pulp):
-        p.context["summary_text"] = "Yes"
-        return p.render("go_back.html")
-
-    p.context["summary_text"] = "No"
+    p.context["summary_text"] = "No, it is not blocked"
     return p.render("go_back.html")
 
 
