@@ -24,7 +24,6 @@ class SourceGenericPlugin(object):
 
     def __init__(self, source_id, options=None):
         self.source_id = source_id
-        self.source = None
         self.contents = None
         self.content_handler = None
         self.response = None
@@ -223,12 +222,9 @@ class SourceGenericPlugin(object):
         )
 
     def get_source(self):
-        if self.source is None:
-            sources = SourceDataController.objects.filter(id=self.source_id)
-            if sources.count() > 0:
-                self.source = sources[0]
-
-        return self.source
+        sources = SourceDataController.objects.filter(id=self.source_id)
+        if sources.exists():
+            return sources[0]
 
     def get_contents(self):
         if self.contents:

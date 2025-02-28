@@ -92,6 +92,9 @@ class RefreshProcessor(CeleryTaskInterface):
     Mostly it should only add background jobs, and nothing more!
     """
 
+    def __init__(self, tasks_info = None):
+        self.tasks_info = tasks_info
+
     def run(self):
         c = Configuration.get_object()
 
@@ -172,18 +175,22 @@ class RefreshProcessor(CeleryTaskInterface):
             for index in range(jobs_to_add):
                 BackgroundJobController.entry_update_data(entries[index])
 
+    def get_supported_jobs(self):
+        return []
+
 
 class GenericJobsProcessor(CeleryTaskInterface):
     """!
     @note Uses handler priority when processing jobs.
     """
 
-    def __init__(self, timeout_s=60 * 10):
+    def __init__(self, timeout_s=60 * 10, tasks_info = None):
         """
         Default timeout is 10 minutes
         """
         self.timeout_s = timeout_s
         self.start_processing_time = None
+        self.tasks_info = tasks_info
 
     def get_handlers(self):
         """
@@ -462,8 +469,8 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
     This processor handles jobs that are not handled by other queues
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, tasks_info = None):
+        super().__init__(tasks_info = tasks_info)
 
     def get_supported_jobs(self):
         jobs = []
@@ -472,7 +479,7 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
         for choice in choices:
             jobs.append(choice[0])
 
-        for processor in get_processors():
+        for processor in self.get_processors():
             if processor.__name__ == LeftOverJobsProcessor.__name__:
                 continue
 
@@ -485,6 +492,25 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
 
         return jobs
 
+    def get_processors(self):
+        """
+        TODO remove hardcoded code
+        """
+        processors = []
+        for task_info in self.tasks_info:
+            if task_info[1] == "RefreshProcessor":
+                processors.append(RefreshProcessor)
+            if task_info[1] == "SourceJobsProcessor":
+                processors.append(SourceJobsProcessor)
+            if task_info[1] == "WriteJobsProcessor":
+                processors.append(WriteJobsProcessor)
+            if task_info[1] == "ImportJobsProcessor":
+                processors.append(ImportJobsProcessor)
+            if task_info[1] == "LeftOverJobsProcessor":
+                processors.append(LeftOverJobsProcessor)
+
+        return processors
+
 
 class OneTaskProcessor(GenericJobsProcessor):
     """
@@ -496,7 +522,7 @@ class OneTaskProcessor(GenericJobsProcessor):
         super().__init__()
 
     def run(self):
-        for processor in get_processors():
+        for processor in self.get_processors():
             processor_object = processor()
             processor_object.run()
 
@@ -504,27 +530,16 @@ class OneTaskProcessor(GenericJobsProcessor):
         leftover_processor.run()
 
 
-def get_processors():
-    """
-    Each processor will have each own dedicated queue.
-    Write block will not affect source processing.
-    """
-    return [
-        # if you are bottlenecked by resources,
-        # you can leave only leftover processor
-        # less queues, less CPU overhead
-        SourceJobsProcessor,
-        WriteJobsProcessor,
-        ImportJobsProcessor,
-        LeftOverJobsProcessor,
-    ]
-
-
 def get_tasks():
-    tasks = [[300.0, RefreshProcessor]]
-    processors = get_processors()
-
-    for processor in processors:
-        tasks.append([60.0, processor])
+    """
+    TODO replace with what is passed
+    """
+    tasks = [
+        [300.0, RefreshProcessor],
+        [60.0, SourceJobsProcessor],
+        [60.0, WriteJobsProcessor],
+        [60.0, ImportJobsProcessor],
+        [60.0, LeftOverJobsProcessor],
+    ]
 
     return tasks

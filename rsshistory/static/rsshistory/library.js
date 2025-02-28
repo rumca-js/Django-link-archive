@@ -44,49 +44,69 @@ function putSpinnerOnIt(button) {
 }
 
 
-function getDynamicContent(url_address, htmlElement, attempt = 1, errorInHtml = false) {
+const getDynamicContentRequestTracker = {};
+function getDynamicContent(url_address, htmlElement, errorInHtml = false) {
+    if (!getDynamicContentRequestTracker[url_address]) {
+        getDynamicContentRequestTracker[url_address] = 0;
+    }
+    const requestId = ++getDynamicContentRequestTracker[url_address];
+
     $.ajax({
-       url: url_address,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           $(htmlElement).html(data);
-       },
-       error: function(xhr, status, error) {
-           if (attempt < 3) {
-               getDynamicContent(url_address, htmlElement, attempt + 1, errorInHtml);
-               if (errorInHtml) {
-                   $(htmlElement).html("Error loading dynamic content, retry");
-               }
-           } else {
-               if (errorInHtml) {
-                   $(htmlElement).html("Error loading dynamic content");
-               }
-           }
-       }
+        url: url_address,
+        type: 'GET',
+        timeout: 10000,
+        success: function(data) {
+            if (getDynamicContentRequestTracker[url_address] === requestId) {
+                $(htmlElement).html(data);
+            }
+        },
+        error: function(xhr, status, error) {
+            if (getDynamicContentRequestTracker[url_address] === requestId) {
+                if (requestId < getDynamicContentRequestTracker[url_address] + 3) {
+                    getDynamicContent(url_address, htmlElement, errorInHtml);
+                    if (errorInHtml) {
+                        $(htmlElement).html("Error loading dynamic content, retry");
+                    }
+                } else {
+                    if (errorInHtml) {
+                        $(htmlElement).html("Error loading dynamic content");
+                    }
+                }
+            }
+        }
     });
 }
 
 
-function getDynamicJsonContent(url_address, htmlElement, attempt = 1, errorInHtml = false) {
+const getDynamicJsonContentRequestTracker = {};
+function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
+    if (!getDynamicJsonContentRequestTracker[url_address]) {
+        getDynamicJsonContentRequestTracker[url_address] = 0;
+    }
+    const requestId = ++getDynamicJsonContentRequestTracker[url_address];
+
     $.ajax({
        url: url_address,
        type: 'GET',
        timeout: 10000,
        success: function(data) {
-         $(htmlElement).html(data.message);
+         if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
+             $(htmlElement).html(data.message);
+         }
        },
        error: function(xhr, status, error) {
-           if (attempt < 3) {
-               getDynamicJsonContent(url_address, htmlElement, attempt + 1, errorInHtml);
-               if (errorInHtml) {
-                   $(htmlElement).html("Error loading dynamic content, retry");
-               }
-           } else {
-               if (errorInHtml) {
-                   $(htmlElement).html("Error loading dynamic content");
-               }
-           }
+            if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
+                if (requestId < getDynamicJsonContentRequestTracker[url_address] + 3) {
+                    getDynamicJsonContent(url_address, htmlElement, errorInHtml);
+                    if (errorInHtml) {
+                        $(htmlElement).html("Error loading dynamic content, retry");
+                    }
+                } else {
+                    if (errorInHtml) {
+                        $(htmlElement).html("Error loading dynamic content");
+                    }
+                }
+            }
        }
     });
 }
@@ -158,6 +178,66 @@ function GetPaginationNav(data) {
     `;
 
     return paginationText;
+}
+
+
+const getTextContentRequestTracker = {};
+function getTextContent(url_address, callback, errorInHtml = false) {
+    /*
+    Allows to return data via callback
+    */
+    if (!getTextContentRequestTracker[url_address]) {
+        getTextContentRequestTracker[url_address] = 0;
+    }
+    const requestId = ++getTextContentRequestTracker[url_address];
+
+    $.ajax({
+        url: url_address,
+        type: 'GET',
+        timeout: 10000,
+        success: function(data) {
+            if (getTextContentRequestTracker[url_address] === requestId) {
+                callback(data);
+            }
+        },
+        error: function(xhr, status, error) {
+            if (getTextContentRequestTracker[url_address] === requestId) {
+                if (requestId < getTextContentRequestTracker[url_address] + 3) {
+                    getTextContent(url_address, callback, errorInHtml);
+                }
+            }
+        }
+    });
+}
+
+
+const getTextJsonRequestTracker = {};
+function getTextJson(url_address, callback, errorInHtml = false) {
+    /*
+    Allows to return data via callback
+    */
+    if (!getTextJsonRequestTracker[url_address]) {
+        getTextJsonRequestTracker[url_address] = 0;
+    }
+    const requestId = ++getTextJsonRequestTracker[url_address];
+
+    $.ajax({
+        url: url_address,
+        type: 'GET',
+        timeout: 10000,
+        success: function(data) {
+            if (getTextJsonRequestTracker[url_address] === requestId) {
+                callback(data.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            if (getTextJsonRequestTracker[url_address] === requestId) {
+                if (requestId < getTextJsonRequestTracker[url_address] + 3) {
+                    getTextJson(url_address, callback, errorInHtml);
+                }
+            }
+        }
+    });
 }
 
 

@@ -25,11 +25,18 @@ class SystemOperationController(object):
         else:
             SystemOperation.add_by_thread(thread_id)
 
-    def cleanup(cfg=None, thread_ids=None):
-        if not thread_ids:
+    def cleanup(cfg=None, thread_ids = None):
+        if thread_ids:
+            # delete any obsolte
+            current_thread_ids = SystemOperationController.get_threads()
+
+            diff_elements = current_thread_ids - set(thread_ids)
+            for diff in diff_elements:
+                rows = SystemOperation.objects.filter(thread_id = diff)
+                rows.delete()
             return
 
-        thread_ids = SystemOperationController.threads_to_threads(thread_ids)
+        thread_ids = SystemOperationController.get_threads()
 
         for thread_id in thread_ids:
             # leave one entry with time check
@@ -101,18 +108,15 @@ class SystemOperationController(object):
         if c.enable_background_jobs:
             if not self.is_internet_ok():
                 return False
-            if not self.is_threading_ok(thread_ids):
+            if not self.is_threading_ok():
                 return False
 
-    def is_threading_ok(self, thread_ids=None):
+    def is_threading_ok(self):
         hours_limit = 1800
 
-        if thread_ids is None:
-            return False
+        threads = SystemOperationController.get_threads()
 
-        thread_ids = SystemOperationController.threads_to_threads(thread_ids)
-
-        for thread_id in thread_ids:
+        for thread_id in threads:
             date = self.get_last_thread_signal(thread_id)
             if not date:
                 return False
@@ -142,24 +146,18 @@ class SystemOperationController(object):
         if entries.exists():
             return entries[0].is_internet_connection_ok
 
-    def get_thread_info(self, thread_ids=None):
+    def get_thread_info(self, thread):
         """
         @display If true, then provide dates meant for display (local time)
         """
-        result = []
+        date = self.get_last_thread_signal(thread)
+        return [thread, date]
 
-        thread_ids = SystemOperationController.threads_to_threads(thread_ids)
+    def get_threads():
+        result = set()
 
-        for thread in thread_ids:
-            date = self.get_last_thread_signal(thread)
-            result.append([thread, date])
+        rows = SystemOperation.objects.all()
+        for row in rows:
+            result.add(row.thread_id)
 
         return result
-
-    def threads_to_threads(threads):
-        thread_ids = []
-
-        for thread in threads:
-            thread_ids.append(thread[1].__name__)
-
-        return thread_ids

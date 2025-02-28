@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Django = "^4.2.17"
+Django = "^4.2.19"
 django-user-agents = "^0.4.0"
 django-celery-results = "^2.5.1"
 pymemcache = "^4.0.0"
@@ -16,7 +16,7 @@ celery = "^5.4.0"
 python-dateutil = "^2.8.2"
 yt-dlp = "^2024.12.23"
 waybackpy = "^3.0.6"
-sqlalchemy = "^2.0.37"
+sqlalchemy = "^2.0.38"
 tldextract = "^5.1.2"
 sympy = "^1.13.2"
 spacy = "3.7.5"
@@ -24,7 +24,7 @@ spacy = "3.7.5"
 # Do we need this?
 pytz = "^2024.2"
 # Do we need this?
-beautifulsoup4 = "^4.12.3"
+beautifulsoup4 = "^4.13.3"
 
 requests = "^2.32.3"
 psycopg2 = "*"
@@ -33,7 +33,7 @@ psutil="*"
 # TODO do we need this?
 chardet = "^5.2.0"
 # TODO do we need this?
-lxml="^5.2.2"
+lxml="^5.3.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"

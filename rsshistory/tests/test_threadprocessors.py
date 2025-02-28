@@ -752,11 +752,21 @@ class LeftOverJobsProcessorTest(FakeInternetTestCase):
             job=BackgroundJobController.JOB_PROCESS_SOURCE
         )
 
-        mgr = LeftOverJobsProcessor()
+        tasks_info = [
+                [300.0, "RefreshProcessor"],
+                #[30.0, "RefreshProcessor"],
+                [60.0, "SourceJobsProcessor"],
+                [60.0, "WriteJobsProcessor"],
+                [60.0, "ImportJobsProcessor"],
+                [60.0, "LeftOverJobsProcessor"],
+        ]
+
+        mgr = LeftOverJobsProcessor(tasks_info = tasks_info)
 
         jobs = mgr.get_supported_jobs()
 
         self.assertTrue(BackgroundJob.JOB_PROCESS_SOURCE not in jobs)
+        self.assertTrue(BackgroundJob.JOB_LINK_ADD in jobs)
 
     def test_run__multiple_jobs(self):
         bg_obj = BackgroundJobController.link_add(url="https://linkedin.com")
@@ -764,7 +774,16 @@ class LeftOverJobsProcessorTest(FakeInternetTestCase):
 
         self.assertEqual(BackgroundJobController.objects.all().count(), 2)
 
-        mgr = LeftOverJobsProcessor()
+        tasks_info = [
+                [300.0, "RefreshProcessor"],
+                #[30.0, "RefreshProcessor"],
+                [60.0, "SourceJobsProcessor"],
+                [60.0, "WriteJobsProcessor"],
+                [60.0, "ImportJobsProcessor"],
+                [60.0, "LeftOverJobsProcessor"],
+        ]
+
+        mgr = LeftOverJobsProcessor(tasks_info = tasks_info)
 
         mgr.run()
 

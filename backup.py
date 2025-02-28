@@ -256,6 +256,9 @@ def copy_table(instance, table_name, source_engine, destination_engine):
 
 
 def obfuscate(workspace, table_name, destination_engine):
+    """
+    Remove passwords from the database
+    """
     destination_metadata = MetaData()
     destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
 

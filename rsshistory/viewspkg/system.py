@@ -413,14 +413,10 @@ def json_system_status(request):
 
     data["threads"] = []
 
-    try:
-        from ..threadprocessors import get_tasks
-        tasks = get_tasks()
-        for thread_info in system_controller.get_thread_info(tasks):
-            data["threads"].append({"name": thread_info[0], "date": thread_info[1]})
-    except Exception as E:
-        # TODO fix this
-        pass
+    threads = SystemOperationController.get_threads()
+    for thread in threads:
+        thread_info = system_controller.get_thread_info(thread)
+        data["threads"].append({"name": thread, "date": thread_info[1]})
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
@@ -851,11 +847,8 @@ def is_system_ok(request):
     if data is not None:
         return data
 
-    from ..threadprocessors import get_tasks
-
     system_controller = SystemOperationController()
-    tasks = get_tasks()
-    system_is_ok = system_controller.is_system_healthy(tasks)
+    system_is_ok = system_controller.is_system_healthy()
 
     text = "YES" if system_is_ok else "NO"
     status_code = 200 if system_is_ok else 500
@@ -926,6 +919,11 @@ def get_footer_status_line(request):
 
         return message
 
+    p = ViewPage(request)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
     process_source_queue_size = BackgroundJobController.get_number_of_jobs(
         BackgroundJobController.JOB_PROCESS_SOURCE
     )
@@ -945,13 +943,7 @@ def get_footer_status_line(request):
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
     is_internet_ok = system_controller.is_internet_ok()
-    try:
-        from ..tasks import get_tasks
-        tasks = get_tasks()
-        is_threading_ok = system_controller.is_threading_ok(thread_ids = tasks)
-    except Exception as E:
-        # TODO fix this
-        is_threading_ok = False
+    is_threading_ok = system_controller.is_threading_ok()
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
 
@@ -974,6 +966,11 @@ def get_footer_status_line(request):
 
 
 def get_indicators(request):
+    p = ViewPage(request)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
     process_source_queue_size = BackgroundJobController.get_number_of_jobs(
         BackgroundJobController.JOB_PROCESS_SOURCE
     )
@@ -998,13 +995,7 @@ def get_indicators(request):
     is_sources_error = sources.count() > 0
     is_internet_ok = system_controller.is_internet_ok()
 
-    try:
-        from ..threadprocessors import get_tasks
-        tasks = get_tasks()
-        is_threading_ok = system_controller.is_threading_ok(tasks)
-    except Exception as E:
-        # TODO fix this
-        is_threading_ok = False
+    is_threading_ok = system_controller.is_threading_ok()
 
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False

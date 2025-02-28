@@ -785,7 +785,7 @@ def source_fix_entries(request, source_pk):
 
 def init_sources(request):
     if "noinitialize" not in request.GET:
-        path = Path("init_sources.json")
+        path = Path("init_sources_news.json")
         if path.exists():
             i = JsonImporter(path)
             i.import_all()

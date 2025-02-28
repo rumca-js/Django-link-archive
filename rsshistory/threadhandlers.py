@@ -61,6 +61,7 @@ from .controllers import (
     EntryScanner,
     ModelFilesBuilder,
     SourceDataBuilder,
+    SystemOperationController,
 )
 from .configuration import Configuration
 from .pluginurl import UrlHandlerEx
@@ -1126,10 +1127,7 @@ class CleanupJobHandler(BaseJobHandler):
         if table == "all" or table == "ModelFiles":
             ModelFiles.cleanup(cfg)
         if table == "all" or table == "SystemOperation":
-            from .controllers import SystemOperationController
-            from .threadprocessors import get_tasks
-
-            SystemOperationController.cleanup(cfg, get_tasks())
+            SystemOperationController.cleanup(cfg)
         if table == "all" or table == "Gateway":
             Gateway.cleanup(cfg)
 
