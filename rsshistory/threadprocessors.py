@@ -404,7 +404,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
                 return handler_class
 
     def on_not_safe_exit(self, items):
-        AppLogging.error("Not safe exit, adjusting job priorities.")
+        AppLogging.debug("Not safe exit, adjusting job priorities.")
 
         blocker = items[0]
         if not blocker:

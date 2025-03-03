@@ -162,7 +162,7 @@ class UrlHandlerEx(object):
                     self.url, name=crawler_data["name"], settings=crawler_data["settings"]
                 )
                 if not self.all_properties:
-                    AppLogging.error(
+                    AppLogging.warning(
                         "Url:{} Could not communicate with remote server, crawler_data:{}".format(
                             self.url, str(crawler_data)
                         )
@@ -183,7 +183,7 @@ class UrlHandlerEx(object):
         else:
             self.all_properties = request_server.get_getj(self.url)
             if not self.all_properties:
-                AppLogging.error(
+                AppLogging.warning(
                     "Url:{} Could not communicate with remote server".format(
                         self.url
                     )

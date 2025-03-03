@@ -475,7 +475,7 @@ class LinkAddJobHandler(BaseJobHandler):
 
         if not entry:
             errors = "\n".join(b.errors)
-            AppLogging.error("LinkAddJobHandler. Could not add link: {}. Errors:{}".format(data["link"], errors))
+            AppLogging.warning("LinkAddJobHandler. Could not add link: {}. Errors:{}".format(data["link"], errors))
             return True
 
         current_time = DateUtils.get_datetime_now_utc()
