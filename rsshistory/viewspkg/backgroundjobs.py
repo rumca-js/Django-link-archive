@@ -74,7 +74,27 @@ def get_backgroundjobs(request):
     data["num_pages"] = 0
 
     if page_num:
-        objects = BackgroundJobController.objects.all()
+        conditions = Q()
+        if "job" in request.GET:
+            value = request.GET["job"]
+            conditions &= Q(job=value)
+        if "task" in request.GET:
+            value = request.GET["task"]
+            conditions &= Q(task=value)
+        if "subject" in request.GET:
+            value = request.GET["subject"]
+            conditions &= Q(subject=value)
+        if "priority" in request.GET:
+            value = request.GET["priority"]
+            conditions &= Q(priority=value)
+        if "enabled" in request.GET:
+            value = request.GET["enabled"]
+            conditions &= Q(enabled=True)
+        if "disabled" in request.GET:
+            value = request.GET["disabled"]
+            conditions &= Q(enabled=False)
+
+        objects = BackgroundJobController.objects.filter(conditions)
 
         items_per_page = 300
         p = Paginator(objects, items_per_page)

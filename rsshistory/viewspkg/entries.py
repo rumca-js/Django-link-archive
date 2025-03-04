@@ -75,25 +75,6 @@ from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
 
 
-def get_query_args(themap):
-    """
-    display type is not required
-    search is added by filter form, so we do not want it to be here
-
-    # TODO - add argument, to pass all keys that should be rejected
-    """
-    arg_data = {}
-    for arg in themap:
-        if arg == "display_type":
-            continue
-        if arg == "search":
-            continue
-
-        arg_data[arg] = themap[arg]
-
-    return "&" + urlencode(arg_data)
-
-
 def get_generic_search_init_context(request, form):
     context = {}
     context["form"] = form
@@ -130,7 +111,6 @@ def entries_generic(request, link, data_scope):
     context = get_generic_search_init_context(request, filter_form)
 
     p.context.update(context)
-    p.context["query_args"] = get_query_args(request.GET)
     p.context["query_page"] = link
     p.context["search_suggestions_page"] = reverse(
         "{}:get-search-suggestions-entries".format(LinkDatabase.name),

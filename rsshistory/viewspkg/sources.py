@@ -124,14 +124,12 @@ class SourceDetailView(generic.DetailView):
         return context
 
     def create_entry(self, url):
-        builder = EntryDataBuilder(link=url)
-        if builder.result:
-            entry = builder.result
+        builder = EntryDataBuilder()
+        entry = builder.build(link=url)
+
+        if entry:
             if entry.is_archive_entry():
                 entry = EntryWrapper(entry=entry).move_from_archive()
-
-            entry.permanent = True
-            entry.save()
 
             return entry
 

@@ -1131,17 +1131,6 @@ class CleanupJobHandler(BaseJobHandler):
         if table == "all" or table == "Gateway":
             Gateway.cleanup(cfg)
 
-        self.user_tables_cleanup(cfg, obj)
-
-        status = True
-
-        elapsed_sec = self.get_time_diff()
-        AppLogging.notify("Successfully cleaned database. Time:{}".format(elapsed_sec))
-        return status
-
-    def user_tables_cleanup(self, cfg, obj):
-        table = obj.subject
-
         if table == "all" or table == "UserTags":
             UserTags.cleanup(cfg)
             CompactedTags.cleanup(cfg)
@@ -1158,6 +1147,13 @@ class CleanupJobHandler(BaseJobHandler):
             UserEntryTransitionHistory.cleanup(cfg)
         if table == "all" or table == "UserEntryVisitHistory":
             UserEntryVisitHistory.cleanup(cfg)
+
+        status = True
+
+        elapsed_sec = self.get_time_diff()
+        AppLogging.notify("Successfully cleaned database. Time:{}".format(elapsed_sec))
+        return status
+
 
 
 class CheckDomainsJobHandler(BaseJobHandler):

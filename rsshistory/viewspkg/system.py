@@ -14,6 +14,7 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.conf import settings
+from django.db.models import Q
 
 
 from utils.dateutils import DateUtils
@@ -513,7 +514,26 @@ def json_logs(request):
 
     page_num = p.get_page_num()
     if page_num:
-        objects = AppLogging.objects.all()
+        conditions = Q()
+
+        if "errors" in request.GET:
+            conditions &= Q(level = AppLogging.ERROR)
+        if "warnings" in request.GET:
+            conditions &= Q(level = AppLogging.WARNING)
+        if "infos" in request.GET:
+            conditions &= Q(level = AppLogging.INFO)
+        if "debugs" in request.GET:
+            conditions &= Q(level = AppLogging.DEBUG)
+        if "notification" in request.GET:
+            conditions &= Q(level = AppLogging.NOTIFICATION)
+        if "info_text" in request.GET:
+            value = request.GET["info_text"]
+            conditions &= Q(info_text__icontains = value)
+        if "detail_text" in request.GET:
+            value = request.GET["detail_text"]
+            conditions &= Q(detail_text__icontains = value)
+
+        objects = AppLogging.objects.filter(conditions)
 
         items_per_page = 500
         p = Paginator(objects, items_per_page)

@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.db.models import Q
 
 from utils.dateutils import DateUtils
 
@@ -133,7 +134,6 @@ def fix_entry_tags(request, entrypk):
 
 
 def get_incorrect_youtube_links():
-    from django.db.models import Q
 
     criterion1 = Q(link__contains="m.youtube")
     criterion1a = Q(link__contains="youtu.be")

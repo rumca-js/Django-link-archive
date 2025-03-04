@@ -183,3 +183,37 @@ class BackgroundJobsViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 302)
 
         self.assertEqual(bj.enabled, True)
+
+    def test_get_backgroundjobs__no_args(self):
+        bj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_UPDATE_DATA,
+            task=None,
+            subject="https://youtube.com?v=1234",
+            args="",
+            enabled=False,
+        )
+
+        url = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
+        # call tested function
+        response = self.client.get(url)
+
+        # redirect to see all jobs
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_backgroundjobs__job(self):
+        bj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_UPDATE_DATA,
+            task=None,
+            subject="https://youtube.com?v=1234",
+            args="",
+            enabled=False,
+        )
+
+        url = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
+        url = url + "?job="+BackgroundJobController.JOB_LINK_UPDATE_DATA
+
+        # call tested function
+        response = self.client.get(url)
+
+        # redirect to see all jobs
+        self.assertEqual(response.status_code, 200)

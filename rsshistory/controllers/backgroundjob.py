@@ -45,10 +45,9 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP),
         (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE),
         (BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, BackgroundJob.JOB_LINK_RESET_LOCAL_DATA),           # update data, recalculate
-        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),
-        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),
         (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
+        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),
         (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),
         (BackgroundJob.JOB_LINK_SCAN, BackgroundJob.JOB_LINK_SCAN,),
         (BackgroundJob.JOB_SOURCE_ADD, BackgroundJob.JOB_SOURCE_ADD,),
