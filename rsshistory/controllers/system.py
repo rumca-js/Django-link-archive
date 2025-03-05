@@ -1,9 +1,12 @@
+from datetime import datetime
 from utils.dateutils import DateUtils
 
 from ..models import (
     ConfigurationEntry,
     SystemOperation,
     AppLogging,
+    BackgroundJob,
+    BackgroundJobHistory,
 )
 
 
@@ -161,3 +164,12 @@ class SystemOperationController(object):
             result.add(row.thread_id)
 
         return result
+
+    def is_time_to_cleanup(self):
+        today_midnight = datetime.now().date()
+
+        jobs = BackgroundJobHistory.objects.filter(job = BackgroundJob.JOB_CLEANUP, subject="", date_created__gt = today_midnight)
+        if jobs.exists():
+            return False
+
+        return True

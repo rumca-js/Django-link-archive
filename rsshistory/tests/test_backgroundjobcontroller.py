@@ -3,7 +3,11 @@ from ..controllers import (
     LinkDataController,
     SourceDataController,
 )
-from ..models import BackgroundJob, DataExport
+from ..models import (
+    BackgroundJob,
+    BackgroundJobHistory,
+    DataExport
+)
 from .fakeinternet import FakeInternetTestCase
 
 
@@ -78,7 +82,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         # call tested function
         self.assertEqual(
             BackgroundJobController.get_job_priority(BackgroundJob.JOB_LINK_ADD),
-            16,
+            18,
         )
 
     def test_truncate_invalid_jobs(self):
@@ -390,3 +394,18 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
 
         job = jobs[0]
         self.assertEqual(job.job, BackgroundJobController.JOB_LINK_RESET_DATA)
+
+
+class BackgroundJobHistoryTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+        self.setup_configuration()
+
+    def test_mark_done(self):
+        BackgroundJobHistory.objects.all().delete()
+
+        BackgroundJobHistory.mark_done(job = BackgroundJobController.JOB_CLEANUP)
+
+        jobs = BackgroundJobHistory.objects.all()
+
+        self.assertEqual(len(jobs), 1)

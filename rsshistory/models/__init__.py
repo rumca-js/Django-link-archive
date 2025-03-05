@@ -10,9 +10,11 @@ from .system import (
     UserConfig,
     AppLogging,
     AppLoggingController,
-    BackgroundJob,
 )
-
+from .backgroundjob import (
+    BackgroundJob,
+    BackgroundJobHistory,
+)
 from .entries import (
     LinkDataModel,
     ArchiveLinkDataModel,

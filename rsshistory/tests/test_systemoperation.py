@@ -1,4 +1,6 @@
-from ..models import SystemOperation
+from datetime import datetime, timedelta
+
+from ..models import SystemOperation, BackgroundJob, BackgroundJobHistory
 from ..controllers import SystemOperationController
 from ..configuration import Configuration
 
@@ -108,3 +110,44 @@ class SystemOperationTest(FakeInternetTestCase):
 
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0].thread_id, "RefreshProcessor")
+
+    def test_is_time_to_cleanup__yes(self):
+        SystemOperation.objects.all().delete()
+
+        BackgroundJobHistory.objects.all().delete()
+
+        controller = SystemOperationController()
+
+        # call tested function
+        is_time = controller.is_time_to_cleanup()
+
+        self.assertTrue(is_time)
+
+    def test_is_time_to_cleanup__no(self):
+        SystemOperation.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
+
+        BackgroundJobHistory.objects.create(job = BackgroundJob.JOB_CLEANUP, subject="")
+
+        controller = SystemOperationController()
+
+        # call tested function
+        is_time = controller.is_time_to_cleanup()
+
+        self.assertFalse(is_time)
+
+    def test_is_time_to_cleanup__yes__realy_old(self):
+        SystemOperation.objects.all().delete()
+
+        date = datetime.now() - timedelta(days=1)
+
+        job = BackgroundJobHistory.objects.create(job = BackgroundJob.JOB_CLEANUP, subject="", date_created=date)
+        job.date_created = date
+        job.save()
+
+        controller = SystemOperationController()
+
+        # call tested function
+        is_time = controller.is_time_to_cleanup()
+
+        self.assertTrue(is_time)

@@ -30,11 +30,11 @@ from .apps import LinkDatabase
 from .models import (
     AppLogging,
     BackgroundJob,
+    BackgroundJobHistory,
     SourceExportHistory,
     DataExport,
     ConfigurationEntry,
 )
-
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .controllers import (
     BackgroundJobController,
@@ -113,14 +113,17 @@ class RefreshProcessor(CeleryTaskInterface):
             AppLogging.error("Remote server is down")
             return
 
-        from .controllers import SourceDataController
-
         self.check_sources()
 
         for export in DataExport.objects.filter(enabled=True):
             if SourceExportHistory.is_update_required(export):
                 self.do_update(export)
                 SourceExportHistory.confirm(export)
+
+        if systemcontroller.is_time_to_cleanup():
+            BackgroundJobHistory.mark_done(job = BackgroundJob.JOB_CLEANUP, subject="")
+
+            CleanupJobHandler.cleanup_all()
 
         self.update_entries()
 
@@ -142,8 +145,6 @@ class RefreshProcessor(CeleryTaskInterface):
             sources = SourceDataController.objects.filter(enabled=True)
             for source in sources:
                 BackgroundJobController.link_save(source.url)
-
-        CleanupJobHandler.cleanup_all()
 
     def update_entries(self):
         c = Configuration.get_object()
