@@ -93,7 +93,11 @@
     }
 
     function loadBodyContent() {
-        let url_address = '{% url 'rsshistory:json-logs' %}?page=1';
+        const currentUrl = new URL(window.location);
+
+        let query_page = '{% url 'rsshistory:json-logs' %}';
+
+        const url_address = `${query_page}?${currentUrl.searchParams.toString()}`;
 
         $("#logList").html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`);
 

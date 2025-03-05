@@ -106,7 +106,7 @@ class SystemOperationController(object):
 
         return False
 
-    def is_system_healthy(self, thread_ids):
+    def is_system_healthy(self):
         c = ConfigurationEntry.get()
         if c.enable_background_jobs:
             if not self.is_internet_ok():

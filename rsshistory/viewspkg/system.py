@@ -24,6 +24,7 @@ from ..models import (
     ConfigurationEntry,
     UserConfig,
     BackgroundJob,
+    BackgroundJobHistory,
     AppLogging,
     Domains,
     UserTags,
@@ -282,11 +283,13 @@ def json_table_status(request):
 
     table = []
 
+    table.append({"name": "LinkDataModel", "count": LinkDataController.objects.count()})
     table.append(
-        {"name": "ConfigurationEntry", "count": ConfigurationEntry.objects.count()}
+        {
+            "name": "ArchiveLinkDataModel",
+            "count": ArchiveLinkDataController.objects.count(),
+        }
     )
-    table.append({"name": "UserConfig", "count": UserConfig.objects.count()})
-    table.append({"name": "SystemOperation", "count": SystemOperation.objects.count()})
 
     table.append(
         {"name": "SourceDataModel", "count": SourceDataController.objects.count()}
@@ -297,30 +300,29 @@ def json_table_status(request):
             "count": SourceOperationalData.objects.count(),
         }
     )
-    table.append({"name": "LinkDataModel", "count": LinkDataController.objects.count()})
+
     table.append(
-        {
-            "name": "ArchiveLinkDataModel",
-            "count": ArchiveLinkDataController.objects.count(),
-        }
+        {"name": "ConfigurationEntry", "count": ConfigurationEntry.objects.count()}
     )
+
+    table.append({"name": "BackgroundJob", "count": BackgroundJob.objects.count()})
+    table.append({"name": "BackgroundJobHistory", "count": BackgroundJobHistory.objects.count()})
+    table.append({"name": "AppLogging", "count": AppLogging.objects.count()})
+
+    table.append({"name": "UserConfig", "count": UserConfig.objects.count()})
+    table.append({"name": "SystemOperation", "count": SystemOperation.objects.count()})
+
     table.append({"name": "KeyWords", "count": KeyWords.objects.count()})
     table.append({"name": "BlockEntry", "count": BlockEntry.objects.count()})
     table.append({"name": "BlockEntryList", "count": BlockEntryList.objects.count()})
 
     table.append({"name": "UserTags", "count": UserTags.objects.count()})
-    table.append(
-        {"name": "UserCompactedTags", "count": UserCompactedTags.objects.count()}
-    )
+    table.append({"name": "UserCompactedTags", "count": UserCompactedTags.objects.count()})
     table.append({"name": "CompactedTags", "count": CompactedTags.objects.count()})
     table.append({"name": "UserVotes", "count": UserVotes.objects.count()})
     table.append({"name": "UserBookmarks", "count": UserBookmarks.objects.count()})
-    table.append(
-        {"name": "UserComments", "count": UserCommentsController.objects.count()}
-    )
-    table.append(
-        {"name": "UserSearchHistory", "count": UserSearchHistory.objects.count()}
-    )
+    table.append( {"name": "UserComments", "count": UserCommentsController.objects.count()})
+    table.append( {"name": "UserSearchHistory", "count": UserSearchHistory.objects.count()})
     table.append(
         {
             "name": "UserEntryVisitHistory",
@@ -334,13 +336,9 @@ def json_table_status(request):
         }
     )
 
-    table.append({"name": "BackgroundJob", "count": BackgroundJob.objects.count()})
     table.append({"name": "DataExport", "count": DataExport.objects.count()})
-    table.append(
-        {"name": "SourceExportHistory", "count": SourceExportHistory.objects.count()}
-    )
+    table.append( {"name": "SourceExportHistory", "count": SourceExportHistory.objects.count()})
     table.append({"name": "ModelFiles", "count": ModelFiles.objects.count()})
-    table.append({"name": "AppLogging", "count": AppLogging.objects.count()})
     table.append({"name": "Domains", "count": Domains.objects.count()})
 
     # u = EntriesUpdater()
@@ -408,6 +406,9 @@ def json_system_status(request):
         data["days_to_check_stale_entries"] = days_before
     else:
         data["days_to_check_stale_entries"] = 0
+
+    #is_remote_server_down = system_controller.is_remote_server_down()
+    #data["remote_server_status"] = is_remote_server_down
 
     data["directory"] = c.directory
 

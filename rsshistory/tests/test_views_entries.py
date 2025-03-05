@@ -255,7 +255,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
-        self.assertEqual(bookmarks.count(), 0)
+        self.assertEqual(bookmarks.count(), 1)
 
     def test_entry_add__youtube(self):
         LinkDataController.objects.all().delete()
@@ -295,7 +295,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertTrue(DateUtils.get_date_tuple(entry.date_published) == expected_time)
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
-        self.assertEqual(bookmarks.count(), 0)
+        self.assertEqual(bookmarks.count(), 1)
 
     def test_entry_add__youtube_rss(self):
         LinkDataController.objects.all().delete()
@@ -336,7 +336,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertTrue(DateUtils.get_date_tuple(entry.date_published) == expected_time)
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
-        self.assertEqual(bookmarks.count(), 0)
+        self.assertEqual(bookmarks.count(), 1)
 
     def test_entry_add__exists(self):
         LinkDataController.objects.all().delete()

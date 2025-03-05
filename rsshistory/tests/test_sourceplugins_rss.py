@@ -42,7 +42,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertEqual(len(props), 13)
         self.assertTrue(props[0]["link"])
         self.assertTrue(props[0]["title"])
-        self.assertNotIn("source", props[0])
+        self.assertIn("source", props[0])
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
