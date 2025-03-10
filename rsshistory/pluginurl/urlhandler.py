@@ -72,17 +72,11 @@ class UrlHandler(Url):
         return str(properties["title"]) + str(properties["description"])
 
     def is_blocked(self):
-        if EntryRules.is_blocked(self.url):
+        if EntryRules.is_url_blocked(self.url):
             return True
 
         contents = self.get_properties_pulp()
         if EntryRules.is_blocked_by_text(contents):
-            return True
-
-        p = UrlLocation(self.url)
-        domain_only = p.get_domain_only()
-
-        if BlockEntry.is_blocked(domain_only):
             return True
 
         if not self.is_url_valid():
@@ -360,17 +354,11 @@ class UrlHandlerEx(object):
     def is_blocked(self):
         properties = self.get_section("Properties")
 
-        if EntryRules.is_blocked(self.url):
+        if EntryRules.is_url_blocked(self.url):
             return True
 
         contents = self.get_properties_pulp()
         if EntryRules.is_blocked_by_text(contents):
-            return True
-
-        p = UrlLocation(self.url)
-        domain_only = p.get_domain_only()
-
-        if BlockEntry.is_blocked(domain_only):
             return True
 
         if not self.is_url_valid():

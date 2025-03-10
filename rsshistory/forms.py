@@ -257,8 +257,10 @@ class EntryRulesForm(forms.ModelForm):
             "rule_name",
             "trigger_rule_url",
             "trigger_text",
+            "trigger_text_hits",
             "block",
             "auto_tag",
+            "apply_age_limit",
             "browser",
         ]
 

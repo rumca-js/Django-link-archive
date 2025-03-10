@@ -36,7 +36,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
         self.browser.refresh_from_db()
 
-    def test_entry_rule_is_blocked__not_filed(self):
+    def test_is_url_blocked__not_filed(self):
         EntryRules.objects.create(
             enabled=True,
             block=True,
@@ -51,19 +51,19 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         # call tested function
-        self.assertFalse(EntryRules.is_blocked("https://www.test0.com"))
+        self.assertFalse(EntryRules.is_url_blocked("https://www.test0.com"))
         # call tested function
-        self.assertTrue(EntryRules.is_blocked("https://www.test1.com"))
+        self.assertTrue(EntryRules.is_url_blocked("https://www.test1.com"))
         # call tested function
-        self.assertTrue(EntryRules.is_blocked("https://www.test2.com"))
+        self.assertTrue(EntryRules.is_url_blocked("https://www.test2.com"))
         # call tested function
-        self.assertTrue(EntryRules.is_blocked("https://www.test3.com"))
+        self.assertTrue(EntryRules.is_url_blocked("https://www.test3.com"))
         # call tested function
-        self.assertTrue(EntryRules.is_blocked("https://www.test4.com"))
+        self.assertTrue(EntryRules.is_url_blocked("https://www.test4.com"))
         # call tested function
-        self.assertFalse(EntryRules.is_blocked("https://www.test5.com"))
+        self.assertFalse(EntryRules.is_url_blocked("https://www.test5.com"))
 
-    def test_entry_rule_is_blocked__rules_disabled(self):
+    def test_is_url_blocked__rules_disabled(self):
         EntryRules.objects.create(
             enabled=True,
             block=False,
@@ -78,37 +78,57 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         # call tested function
-        self.assertFalse(EntryRules.is_blocked("https://www.test0.com"))
+        self.assertFalse(EntryRules.is_url_blocked("https://www.test0.com"))
         # call tested function
-        self.assertFalse(EntryRules.is_blocked("https://www.test1.com"))
+        self.assertFalse(EntryRules.is_url_blocked("https://www.test1.com"))
         # call tested function
-        self.assertFalse(EntryRules.is_blocked("https://www.test2.com"))
+        self.assertFalse(EntryRules.is_url_blocked("https://www.test2.com"))
         # call tested function
-        self.assertFalse(EntryRules.is_blocked("https://www.test3.com"))
+        self.assertFalse(EntryRules.is_url_blocked("https://www.test3.com"))
         # call tested function
-        self.assertFalse(EntryRules.is_blocked("https://www.test4.com"))
+        self.assertFalse(EntryRules.is_url_blocked("https://www.test4.com"))
         # call tested function
-        self.assertFalse(EntryRules.is_blocked("https://www.test5.com"))
+        self.assertFalse(EntryRules.is_url_blocked("https://www.test5.com"))
 
-    def test_entry_rule_is_blocked_by_text(self):
-        EntryRules.objects.create(
+    def test_is_text_triggered(self):
+        rule = EntryRules.objects.create(
             enabled=True,
             block=True,
             rule_name="Rule1",
             trigger_text="casino",
+            trigger_text_hits = 4,
         )
 
         text = "casino casino casino"
 
         # call tested function
-        self.assertFalse(EntryRules.is_blocked_by_text(text))
+        self.assertFalse(rule.is_text_triggered(text))
 
         text = "casino casino casino casino"
 
         # call tested function
-        self.assertTrue(EntryRules.is_blocked_by_text(text))
+        self.assertTrue(rule.is_text_triggered(text))
 
-    def test_entry_rule__get_url_rules(self):
+    def test_is_blocked_by_text(self):
+        rule = EntryRules.objects.create(
+            enabled=True,
+            block=True,
+            rule_name="Rule1",
+            trigger_text="casino",
+            trigger_text_hits = 4,
+        )
+
+        text = "casino casino casino"
+
+        # call tested function
+        self.assertFalse(rule.is_text_triggered(text))
+
+        text = "casino casino casino casino"
+
+        # call tested function
+        self.assertTrue(rule.is_text_triggered(text))
+
+    def test_get_url_rules(self):
 
         self.browser.save()
 
@@ -138,7 +158,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(rules1[0], therule)
         self.assertEqual(rules2[0], therule)
 
-    def test_entry_rule__is_valid(self):
+    def test_is_valid(self):
 
         self.browser.save()
 
@@ -166,3 +186,47 @@ class EntryUpdaterTest(FakeInternetTestCase):
         entry = LinkDataController.objects.create(link = "https://something.test1.com")
 
         self.assertTrue(EntryRules.is_entry_blocked(entry))
+
+    def test_get_age_for_dictionary(self):
+
+        self.browser.save()
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=False,
+            rule_name="Rule1",
+            trigger_text="nsfw",
+            trigger_text_hits = 1,
+            apply_age_limit = 15,
+        )
+
+        dictionary = {
+                "title" : "AI girlfriend NSFW",
+                "description" : "",
+        }
+
+        self.assertEqual(EntryRules.get_age_for_dictionary(dictionary), 15)
+
+    def test_apply_entry_rule(self):
+
+        self.browser.save()
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=False,
+            rule_name="Rule1",
+            trigger_text="nsfw",
+            trigger_text_hits = 1,
+            apply_age_limit = 15,
+        )
+
+        entry = LinkDataController.objects.create(link = "https://nsfw.com",
+                title = "NFSW AI girlfriend",
+                description = "NSFW AI girlfriend",
+        )
+
+        EntryRules.apply_entry_rule(entry)
+
+        entry.refresh_from_db()
+
+        self.assertEqual(entry.age, 15)

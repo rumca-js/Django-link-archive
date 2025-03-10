@@ -529,12 +529,6 @@ class EntryUpdater(object):
 
         properties = {"title": entry.title, "description": entry.description}
 
-        moderator = UrlAgeModerator(properties=properties)
-        age = moderator.get_age()
-
-        if (not entry.age and age) or (age and entry.age < age):
-            entry.age = age
-
         entry.save()
 
     def update_data(self):
@@ -552,8 +546,11 @@ class EntryUpdater(object):
         if not self.entry:
             return
 
-        if EntryRules.is_entry_blocked(self.entry):
-            self.entry.delete()
+        EntryRules.apply_entry_rule(self.entry)
+
+        try:
+            self.entry.refresh_from_db()
+        except Exception as E:
             return
 
         w = EntryWrapper(entry=self.entry)
@@ -637,8 +634,11 @@ class EntryUpdater(object):
         if not self.entry:
             return
 
-        if EntryRules.is_entry_blocked(self.entry):
-            self.entry.delete()
+        EntryRules.apply_entry_rule(self.entry)
+
+        try:
+            self.entry.refresh_from_db()
+        except Exception as E:
             return
 
         """
@@ -823,9 +823,7 @@ class EntryUpdater(object):
             error_text = traceback.format_exc()
 
             AppLogging.error(
-                'Cannot access link:<a href="{}">{}</a>\n{}'.format(
-                    entry.get_absolute_url(), entry.link, error_text
-                )
+                'Cannot access link:{}\n{}'.format(entry.link, error_text)
             )
             entry.date_dead_since = DateUtils.get_datetime_now_utc()
             entry.save()
@@ -1529,7 +1527,7 @@ class EntryDataBuilder(object):
                     "Url:{}. Not enabled to store".format(self.link))
             return
 
-        if EntryRules.is_blocked(self.link_data["link"]):
+        if EntryRules.is_url_blocked(self.link_data["link"]):
             self.errors.append(
                 "Url:{}. Link was rejected because of a rule.".format(self.link))
             return
@@ -1622,7 +1620,7 @@ class EntryDataBuilder(object):
         entry = None
 
         self.link_data = self.get_clean_link_data()
-        if EntryRules.is_blocked(self.link_data["link"]):
+        if EntryRules.is_url_blocked(self.link_data["link"]):
             self.errors.append(
                 "Url:{}. Link was rejected because of a rule.".format(self.link))
             return
@@ -1710,8 +1708,7 @@ class EntryDataBuilder(object):
                 new_link_data["page_rating"] = new_link_data["page_rating_contents"]
 
         if "age" not in new_link_data:
-            moderator = UrlAgeModerator(properties=new_link_data)
-            age = moderator.get_age()
+            age = EntryRules.get_age_for_dictionary(new_link_data)
             if age:
                 new_link_data["age"] = age
 

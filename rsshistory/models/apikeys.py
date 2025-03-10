@@ -13,3 +13,6 @@ class ApiKeys(models.Model):
         related_name=str(LinkDatabase.name) + "_apikeys",
         null=True,
     )
+
+    class Meta:
+        ordering = ["user"]

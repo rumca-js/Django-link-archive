@@ -16,6 +16,7 @@ from ..models import (
     BackgroundJob,
     AppLogging,
     ModelFiles,
+    EntryRules,
 )
 from ..apps import LinkDatabase
 
@@ -206,6 +207,9 @@ class BackgroundJobController(BackgroundJob):
 
         if not url:
             return
+            
+        if EntryRules.is_url_blocked(url):
+            return
 
         h = UrlLocation(url)
         if h.is_analytics():
@@ -326,6 +330,9 @@ class BackgroundJobController(BackgroundJob):
 
         if url is None:
             AppLogging.error("URL is NULL")
+            return
+
+        if EntryRules.is_url_blocked(url):
             return
 
         args_text = json.dumps(cfg)

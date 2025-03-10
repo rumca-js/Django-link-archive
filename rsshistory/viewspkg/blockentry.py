@@ -1,5 +1,7 @@
 from django.urls import reverse
 from django.shortcuts import redirect
+from django.forms.models import model_to_dict
+from django.http import JsonResponse
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -99,3 +101,19 @@ class BlockEntryListView(GenericListView):
 
     def get_title(self):
         return "Block list entries"
+
+
+def blocklists_json(request):
+    p = ViewPage(request)
+    p.set_title("Block List JSON")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    rule_data = []
+    for data in BlockEntryList.objects.all():
+        rule_data.append(model_to_dict(data))
+
+    dict_data = {"blocklists": rule_data}
+
+    return JsonResponse(dict_data, json_dumps_params={"indent": 4})

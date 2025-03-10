@@ -21,6 +21,8 @@ from sqlalchemy import create_engine, Column, String, Integer, MetaData, Table, 
 from sqlalchemy.dialects.postgresql.types import BYTEA
 from sqlalchemy.orm import sessionmaker
 
+from utils import ReflectedTable
+
 from workspace import get_workspaces
 
 
@@ -255,7 +257,7 @@ def copy_table(instance, table_name, source_engine, destination_engine):
     session.close()
 
 
-def obfuscate(workspace, table_name, destination_engine):
+def obfuscate_table(table_name, destination_engine):
     """
     Remove passwords from the database
     """
@@ -270,6 +272,18 @@ def obfuscate(workspace, table_name, destination_engine):
             destination_connection.execute(update_stmt)
 
         destination_connection.commit()
+
+
+def obfuscate_all(run_info):
+    workspace = run_info["workspace"]
+    file_name = workspace+".db"
+    DESTINATION_DATABASE_URL = "sqlite:///" + file_name
+    destination_engine = create_engine(DESTINATION_DATABASE_URL)
+
+    r = ReflectedTable(destination_engine)
+    obfuscate_table("user", destination_engine)
+    r.truncate_table("dataexport")
+    #truncate_table(run_info, "dataexport")
 
 
 #### NOSQL
@@ -324,7 +338,6 @@ def run_db_copy_backup_auth(run_info):
     destination_engine = create_engine(DESTINATION_DATABASE_URL)
 
     copy_table("auth", "user", source_engine, destination_engine)
-    obfuscate("auth", "user", destination_engine)
 
     return True
 
@@ -391,6 +404,7 @@ def backup_workspace(run_info):
 
     if new_run_info["format"] == "sqlite":
         run_db_copy_backup_auth(run_info)
+        obfuscate_all(run_info)
 
     return True
 

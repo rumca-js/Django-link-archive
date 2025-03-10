@@ -590,6 +590,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
             age=None,
         )
 
+        EntryRules.objects.create(
+                trigger_text = "sex, porn",
+                trigger_text_hits = 1,
+                block = False,
+                enabled=True,
+                apply_age_limit = 15,
+        )
+
         date_updated = entry.date_update_last
 
         u = EntryUpdater(entry)

@@ -16,34 +16,13 @@
 
 <h1>{{object.rule_name}}</h1>
 
+<div>ID: {{object.id}}</div>
+
 {% if object.enabled %}
   <div>Enabled: {{object.enabled}}</div>
 {% else %}
   <div class="fw-bold">Enabled: {{object.enabled}}</div>
 {% endif %}
-
-<div>Rule URL:
-{% for rule_url in object.get_rule_urls %}
-    <span class="white-space: nowrap;">{{rule_url}},</span>
-{% endfor %}
-</div>
-
-<div>Trigger text:
-{% if object.trigger_text %}
-    <span class="white-space: nowrap;">{{object.trigger_text}},</span>
-{% endif %}
-</div>
-
-<div>Block: {{object.block}}</div>
-<div>Auto tag: {{object.auto_tag}}</div>
-
-{% if object.browser %}
-  <div>Browser name: {{object.browser.name}}</div>
-  <div>Crawler: {{object.browser.crawler}}</div>
-  <div>Settings: {{object.browser.settings}}</div>
-{% endif %}
-
-<div>ID: {{object.id}}</div>
 
 {% if not object.is_valid %}
 <b>Rule is not valid</b>
@@ -52,5 +31,41 @@
 {% for error in errors %}
    <div>{{error}}</div>
 {% endfor %}
+
+<h2>Triggers</h2>
+
+<div>Rule URL:
+{% for rule_url in object.get_rule_urls %}
+    <span class="white-space: nowrap;">{{rule_url}},</span>
+{% endfor %}
+</div>
+
+{% if object.trigger_text %}
+    <div>Trigger text:
+    <span class="white-space: nowrap;">{{object.trigger_text}},</span>
+    <span class="white-space: nowrap;">Hits required:{{object.trigger_text_hits}}</span>
+    </div>
+{% endif %}
+
+<h2>Actions</h2>
+
+{% if object.block %}
+<div>Block: {{object.block}}</div>
+{% endif %}
+
+{% if not object.block and object.auto_tag %}
+<div>Apply tag: {{object.auto_tag}}</div>
+{% endif %}
+
+{% if object.apply_age_limit %}
+<div>Apply age limit: {{object.apply_age_limit}}</div>
+{% endif %}
+
+{% if object.browser %}
+Use browser
+  <div>Browser name: {{object.browser.name}}</div>
+  <div>Crawler: {{object.browser.crawler}}</div>
+  <div>Settings: {{object.browser.settings}}</div>
+{% endif %}
 
 {% endblock %}

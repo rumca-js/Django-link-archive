@@ -191,7 +191,7 @@ class UrlAgeModerator(UrlContentsModerator):
     def get_age__sexual(self):
         text = self.get_descriptive_pulp()
 
-        keywords = ["sexua", "lesbian", "bisexual", "queer ", "drag quee", "fuck", "porn"]
+        keywords = ["sexua", "lesbian", "bisexual", "queer ", "drag quee", "fuck", "porn", "nsfw"]
 
         sum = 0
         for keyword in keywords:

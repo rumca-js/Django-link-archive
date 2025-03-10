@@ -247,10 +247,13 @@ class FakeInternetData(object):
             self.text_data = firebog_tick_lists
         elif self.url == "https://v.firebog.net/hosts/RPiList-Malware.txt":
             self.text_data = firebog_malware
-        if self.url == "https://casino.com":
+        elif self.url == "https://casino.com":
             self.properties["title"] = "Casino Casino Casino"
             self.properties["description"] = "Casino Casino Casino"
-        if self.url == "https://binary.com/file":
+        elif self.url == "https://nfsw.com":
+            self.properties["title"] = "AI NSFW girlfriend"
+            self.properties["description"] = "AI NSFW girlfriend"
+        elif self.url == "https://binary.com/file":
             self.properties["title"] = ""
             self.properties["description"] = ""
             self.binary_data = "text".encode()

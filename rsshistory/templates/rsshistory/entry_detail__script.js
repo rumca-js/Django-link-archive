@@ -75,14 +75,14 @@ function fillDislike() {
 
     let text = [];
 
-    if (thumbs_up) text.push(`👍${formatNumber(thumbs_up)}`);
-    if (thumbs_down) text.push(`👎${formatNumber(thumbs_down)}`);
-    if (view_count) text.push(`👁${formatNumber(view_count)}`);
+    if (thumbs_up) text.push(`<div class="text-nowrap mx-1">👍${formatNumber(thumbs_up)}</div>`);
+    if (thumbs_down) text.push(`<div class="text-nowrap mx-1">👎${formatNumber(thumbs_down)}</div>`);
+    if (view_count) text.push(`<div class="text-nowrap mx-1">👁${formatNumber(view_count)}</div>`);
 
-    if (upvote_ratio) text.push(`Like-Ratio:${parseFloat(upvote_ratio).toFixed(2)}`);
-    if (upvote_view_ratio) text.push(`Like-View-Ratio:${parseFloat(upvote_view_ratio).toFixed(2)}`);
+    if (upvote_ratio) text.push(`<div class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</div>`);
+    if (upvote_view_ratio) text.push(`<div class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</div>`);
 
-    parameters = `${parameters}<div class="mx-1">${text.join(" ")}</div>`;
+    parameters = `${parameters} ${text.join(" ")}`;
 
     $('#entryParameters').html(parameters);
 }

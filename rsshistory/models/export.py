@@ -99,7 +99,7 @@ class DataExport(models.Model):
     )
 
     class Meta:
-        ordering = ["-enabled"]
+        ordering = ["-enabled", "export_type", "export_data"]
 
     def is_daily_data(self):
         return self.export_data == DataExport.EXPORT_DAILY_DATA

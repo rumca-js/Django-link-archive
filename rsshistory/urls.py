@@ -270,6 +270,7 @@ urlpatterns = [
     path("cleanup-link", tools.cleanup_link, name="cleanup-link",),
     path("initialize-block-lists", blockentry.initialize_block_lists, name="initialize-block-lists",),
     path("block-lists", blockentry.BlockEntryListListView.as_view(), name="block-lists",),
+    path("block-lists-json", blockentry.blocklists_json, name="block-lists-json",),
     path("block-entries", blockentry.BlockEntryListView.as_view(), name="block-entries",),
     path("block-lists-update", blockentry.block_lists_update, name="block-lists-update",),
     path("block-list-update/<int:pk>/", blockentry.block_list_update, name="block-list-update",),
