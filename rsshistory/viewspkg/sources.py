@@ -327,7 +327,7 @@ def source_add_form(request):
         errors.append("Not a protocolled link. Forget http:// or https:// etc.?")
     if data["status_code"] < 200 or data["status_code"] > 300:
         errors.append("Information about page availability could not be obtained")
-    if EntryRules.is_blocked(link):
+    if EntryRules.is_url_blocked(link):
         errors.append("Entry is blocked by entry rules")
 
     p.context["form_notes"] = notes
