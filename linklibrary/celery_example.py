@@ -66,6 +66,15 @@ def memcache_lock(lock_id, oid):
 # define for which apps support celery
 installed_apps = ["rsshistory",]
 
+tasks_info = [
+        [300.0, "RefreshProcessor"],
+        [60.0, "SourceJobsProcessor"],
+        [60.0, "WriteJobsProcessor"],
+        [60.0, "ImportJobsProcessor"],
+        [60.0, "LeftOverJobsProcessor"],
+]
+
+
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
@@ -77,31 +86,23 @@ def setup_periodic_tasks(sender, **kwargs):
     """
 
     try:
-        logger.info("Clearing cache")
         cache.clear()
 
-        tasks_info = [
-                [300.0, "RefreshProcessor"],
-                [60.0, "SourceJobsProcessor"],
-                [60.0, "WriteJobsProcessor"],
-                [60.0, "ImportJobsProcessor"],
-                [60.0, "LeftOverJobsProcessor"],
-        ]
+        app = "None"
 
-        for app in installed_apps:
-            for task_info in tasks_info:
-                time_s = task_info[0]
-                task_processor = task_info[1]
+        for task_info in tasks_info:
+            time_s = task_info[0]
+            task_processor = task_info[1]
 
-                logger.info("Tasks. {} Adding {} {}".format(app, time_s, task_processor))
+            logger.info("Tasks. {} Adding {} {}".format(app, time_s, task_processor))
 
-                sender.add_periodic_task(
-                    time_s,
-                    process_all_jobs.s(app + ".threadprocessors." + task_processor),
-                    name=app + " " + task_processor + " task",
-                )
+            sender.add_periodic_task(
+                time_s,
+                process_all_jobs.s(app + ".threadprocessors." + task_processor),
+                name=app + " " + task_processor + " task",
+            )
 
-                logger.info("Tasks. {} Adding {} {} DONE".format(app, time_s, task_processor))
+            logger.info("Tasks. {} Adding {} {} DONE".format(app, time_s, task_processor))
 
         logger.info("Defined all tasks successfully")
     except Exception as E:
@@ -117,7 +118,41 @@ def process_all_jobs(self, processor):
     """
     lock_id = "{}{}-lock".format(self.name, processor)
 
+    def process_app(input_app_name):
+        # Parsing the processor string
+        try:
+            app_name, processor_file_name, processor_class_name = processor.split(".")
+        except ValueError as e:
+            logger.error("Processor string format error: %s", processor, exc_info=True)
+            return
+
+        app_name = input_app_name
+
+        # Importing tasks and processor modules
+        try:
+            tasks_module = importlib.import_module(f"{app_name}.tasks")
+            threadprocessors_module = importlib.import_module(f"{app_name}.threadprocessors")
+        except ModuleNotFoundError as e:
+            logger.error("Module import failed for app: %s", app_name, exc_info=True)
+            return
+        
+        # Retrieving the processor class
+        try:
+            processor_class = getattr(threadprocessors_module, processor_class_name)
+        except AttributeError as e:
+            logger.error("Processor class not found: %s", processor_class_name, exc_info=True)
+            return
+
+        # Call the task with the processor class
+        try:
+            tasks_module.process_jobs_task(processor_class, tasks_info)
+            logger.info("Task processed successfully for: %s", processor)
+        except Exception as e:
+            logger.error("Error while processing jobs for: %s", processor, exc_info=True)
+
     # Using a context manager to acquire a lock
+    print("process_all_jobs: Entering lock {}".format(lock_id))
+
     with memcache_lock(lock_id, self.app.oid) as acquired:
         try:
             logger.info("Attempting to acquire lock for: %s", processor)
@@ -125,37 +160,14 @@ def process_all_jobs(self, processor):
             if acquired:
                 logger.info("Lock acquired for: %s", processor)
 
-                # Parsing the processor string
-                try:
-                    app_name, processor_file_name, processor_class_name = processor.split(".")
-                except ValueError as e:
-                    logger.error("Processor string format error: %s", processor, exc_info=True)
-                    return
-
-                # Importing tasks and processor modules
-                try:
-                    tasks_module = importlib.import_module(f"{app_name}.tasks")
-                    threadprocessors_module = importlib.import_module(f"{app_name}.threadprocessors")
-                except ModuleNotFoundError as e:
-                    logger.error("Module import failed for app: %s", app_name, exc_info=True)
-                    return
-                
-                # Retrieving the processor class
-                try:
-                    processor_class = getattr(threadprocessors_module, processor_class_name)
-                except AttributeError as e:
-                    logger.error("Processor class not found: %s", processor_class_name, exc_info=True)
-                    return
-
-                # Call the task with the processor class
-                try:
-                    tasks_module.process_jobs_task(processor_class)
-                    logger.info("Task processed successfully for: %s", processor)
-                except Exception as e:
-                    logger.error("Error while processing jobs for: %s", processor, exc_info=True)
+                for app_name in installed_apps:
+                    process_app(app_name)
 
             else:
                 logger.info("Lock not acquired for: %s, another task is already running.", processor)
 
         except Exception as e:
             logger.error("Unexpected error occurred in process_all_jobs: %s", processor, exc_info=True)
+
+    print("process_all_jobs: Leaving lock {}".format(lock_id))
+    #logger.info("Lock should be released for: %s", processor)
