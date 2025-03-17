@@ -29,6 +29,14 @@ from workspace import get_workspaces
 parent_directory = Path(__file__).parents[1]
 
 
+def get_backup_directory(export_type):
+    return parent_directory / "data" / ("backup_" + export_type)
+
+
+def get_workspace_backup_directory(export_type, workspace):
+    return get_backup_directory(export_type) / workspace
+
+
 def run_pg_dump_backup(run_info):
     workspace = run_info["workspace"]
     tables = run_info["tables"]
@@ -37,8 +45,12 @@ def run_pg_dump_backup(run_info):
     database = run_info["database"]
     host = run_info["host"]
 
-    format_args = "c"
-    if "format" in run_info and (run_info["format"] == "plain" or run_info["format"] == "sql"):
+    if "format" not in run_info:
+        run_info["format"] = "custom"
+
+    if run_info["format"] == "custom":
+        format_args = "c"
+    elif run_info["format"] == "plain" or run_info["format"] == "sql":
         format_args = "p"
 
     command_input = [
@@ -58,7 +70,7 @@ def run_pg_dump_backup(run_info):
         command_input.append("-t")
         command_input.append(table)
 
-    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
 
     print("Running: {} @ {}".format(command_input, operating_dir))
@@ -153,8 +165,12 @@ def run_pg_restore(run_info):
     database = run_info["database"]
     host = run_info["host"]
 
-    format_args = "c"
-    if "format" in run_info and run_info["format"] == "plain":
+    if "format" not in run_info:
+        run_info["format"] = "custom"
+
+    if run_info["format"] == "custom":
+        format_args = "c"
+    elif run_info["format"] == "plain":
         format_args = "p"
 
     command_input = [
@@ -171,7 +187,7 @@ def run_pg_restore(run_info):
         command_input.append("-t")
         command_input.append(table)
 
-    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
 
     print("Running: {} @ {}".format(command_input, operating_dir))
@@ -283,7 +299,7 @@ def obfuscate_all(run_info):
     r = ReflectedTable(destination_engine)
     obfuscate_table("user", destination_engine)
     r.truncate_table("dataexport")
-    #truncate_table(run_info, "dataexport")
+    r.truncate_table("usersearchhistory")
 
 
 #### NOSQL
@@ -303,7 +319,7 @@ def run_db_copy_backup(run_info):
     SOURCE_DATABASE_URL = f"postgresql://{user}:{password}@{host}/{database}"
     source_engine = create_engine(SOURCE_DATABASE_URL)
 
-    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(operating_dir)
 
@@ -330,7 +346,7 @@ def run_db_copy_backup_auth(run_info):
     SOURCE_DATABASE_URL = f"postgresql://{user}:{password}@{host}/{database}"
     source_engine = create_engine(SOURCE_DATABASE_URL)
 
-    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(operating_dir)
 

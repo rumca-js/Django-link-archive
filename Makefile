@@ -140,3 +140,7 @@ clear-crawlee-files:
 
 backfiles:
 	find . -type f -name "*.bak" -exec rm -f {} +
+
+celery-status:
+	poetry run celery -A linklibrary inspect active
+	poetry run celery -A linklibrary inspect active_queues

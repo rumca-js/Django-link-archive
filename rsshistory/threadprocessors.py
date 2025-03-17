@@ -390,7 +390,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
             query_conditions &= jobs_conditions
 
         objs = BackgroundJobController.objects.filter(query_conditions).order_by(
-            "priority", "date_created"
+            "date_created"
         )
         if objs.exists():
             obj = objs.first()
@@ -410,17 +410,6 @@ class GenericJobsProcessor(CeleryTaskInterface):
         blocker = items[0]
         if not blocker:
             return
-
-        jobs = BackgroundJobController.objects.filter(
-            enabled=True, date_created__lt=self.start_processing_time
-        )
-        for job in jobs:
-            if job != blocker and job.priority > 0:
-                if job.priority > blocker.priority:
-                    job.priority = blocker.priority - 1
-                else:
-                    job.priority -= 1
-                    job.save()
 
 
 class SourceJobsProcessor(GenericJobsProcessor):
