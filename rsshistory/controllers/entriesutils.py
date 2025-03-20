@@ -1634,9 +1634,7 @@ class EntryDataBuilder(object):
         # TODO - what if there are many places and we do not want people to insert
         # bad stuff?
         if self.source_is_auto:
-            text = str(self.link_data["title"]) + str(self.link_data["description"])
-
-            if EntryRules.is_blocked_by_text(text):
+            if EntryRules.is_dict_blocked(self.link_data):
                 self.errors.append(
                     "Url:{}. Link was rejected due contents rule.".format(self.link))
                 return

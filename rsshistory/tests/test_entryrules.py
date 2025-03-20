@@ -109,25 +109,6 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         self.assertTrue(rule.is_text_triggered(text))
 
-    def test_is_blocked_by_text(self):
-        rule = EntryRules.objects.create(
-            enabled=True,
-            block=True,
-            rule_name="Rule1",
-            trigger_text="casino",
-            trigger_text_hits = 4,
-        )
-
-        text = "casino casino casino"
-
-        # call tested function
-        self.assertFalse(rule.is_text_triggered(text))
-
-        text = "casino casino casino casino"
-
-        # call tested function
-        self.assertTrue(rule.is_text_triggered(text))
-
     def test_get_url_rules(self):
 
         self.browser.save()
@@ -230,3 +211,48 @@ class EntryUpdaterTest(FakeInternetTestCase):
         entry.refresh_from_db()
 
         self.assertEqual(entry.age, 15)
+
+    def test_get_entry_pulp(self):
+
+        self.browser.save()
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=False,
+            rule_name="Rule1",
+            trigger_text="nsfw",
+            trigger_text_hits = 1,
+            apply_age_limit = 15,
+        )
+
+        entry = LinkDataController.objects.create(link = "https://nsfw.com",
+                title = "NFSW AI girlfriend - title",
+                description = "NSFW AI girlfriend - description",
+        )
+
+        pulp = therule.get_entry_pulp(entry)
+
+        self.assertEqual(pulp, "nfsw ai girlfriend - titlensfw ai girlfriend - description")
+
+    def test_get_dict_pulp(self):
+
+        self.browser.save()
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=False,
+            rule_name="Rule1",
+            trigger_text="nsfw",
+            trigger_text_hits = 1,
+            apply_age_limit = 15,
+        )
+
+        dictionary = {
+                "link" : "https://test.com",
+                "title" : "Title",
+                "description" : "Description",
+        }
+
+        pulp = therule.get_dict_pulp(dictionary)
+
+        self.assertEqual(pulp, "titledescription")

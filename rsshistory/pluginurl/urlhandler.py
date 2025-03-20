@@ -67,16 +67,12 @@ class UrlHandler(Url):
 
         return True
 
-    def get_properties_pulp(self):
-        properties = self.get_properties()
-        return str(properties["title"]) + str(properties["description"])
-
     def is_blocked(self):
         if EntryRules.is_url_blocked(self.url):
             return True
 
-        contents = self.get_properties_pulp()
-        if EntryRules.is_blocked_by_text(contents):
+        properties = self.get_properties()
+        if EntryRules.is_dict_blocked(properties):
             return True
 
         if not self.is_url_valid():
@@ -347,18 +343,14 @@ class UrlHandlerEx(object):
 
         return True
 
-    def get_properties_pulp(self):
-        properties = self.get_section("Properties")
-        return str(properties["title"]) + str(properties["description"])
-
     def is_blocked(self):
         properties = self.get_section("Properties")
 
         if EntryRules.is_url_blocked(self.url):
             return True
 
-        contents = self.get_properties_pulp()
-        if EntryRules.is_blocked_by_text(contents):
+        properties = self.get_section("Properties")
+        if EntryRules.is_dict_blocked(properties):
             return True
 
         if not self.is_url_valid():

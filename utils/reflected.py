@@ -20,7 +20,7 @@ class ReflectedTable(object):
         with self.engine.connect() as connection:
             connection.execute(text("VACUUM"))
 
-    def print_summary(self):
+    def print_summary(self, print_columns=False):
         inspector = inspect(self.engine)
         tables = inspector.get_table_names()
 
@@ -28,6 +28,11 @@ class ReflectedTable(object):
             for table in tables:
                 row_count = connection.execute(text(f"SELECT COUNT(*) FROM {table}")).scalar()
                 print(f"Table: {table}, Row count: {row_count}")
+                
+                if print_columns:
+                    columns = inspector.get_columns(table)
+                    column_names = [column['name'] for column in columns]
+                    print(f"Columns in {table}: {', '.join(column_names)}")
 
 
 class ReflectedEntryTable(ReflectedTable):

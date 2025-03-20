@@ -34,17 +34,23 @@
 
 <h2>Triggers</h2>
 
+{% if object.get_rule_urls %}
 <div>Rule URL:
-{% for rule_url in object.get_rule_urls %}
-    <span class="white-space: nowrap;">{{rule_url}},</span>
-{% endfor %}
-</div>
+   {% for rule_url in object.get_rule_urls %}
+       <span class="white-space: nowrap;">{{rule_url}},</span>
+   {% endfor %}
+   </div>
+{% endif %}
 
 {% if object.trigger_text %}
     <div>Trigger text:
     <span class="white-space: nowrap;">{{object.trigger_text}},</span>
     <span class="white-space: nowrap;">Hits required:{{object.trigger_text_hits}}</span>
     </div>
+{% endif %}
+
+{% if object.trigger_text_fields %}
+   <span>{{object.trigger_text_fields}}</span>
 {% endif %}
 
 <h2>Actions</h2>

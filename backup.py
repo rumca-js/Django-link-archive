@@ -238,7 +238,6 @@ def copy_table(instance, table_name, source_engine, destination_engine):
 
     print("{} Creating table".format(table_name))
 
-    # Reflect the table using SQLAlchemy metadata
     source_metadata = MetaData()
     source_table = Table("{}_{}".format(instance, table_name), source_metadata, autoload_with=source_engine)
 
@@ -273,12 +272,15 @@ def copy_table(instance, table_name, source_engine, destination_engine):
     session.close()
 
 
-def obfuscate_table(table_name, destination_engine):
+def obfuscate_user_table(table_name, destination_engine):
     """
     Remove passwords from the database
     """
     destination_metadata = MetaData()
     destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
+
+    columns = destination_table.columns.keys()
+    is_superuser_index = columns.index('is_superuser')
 
     with destination_engine.connect() as destination_connection:
         result = destination_connection.execute(destination_table.select())
@@ -286,6 +288,9 @@ def obfuscate_table(table_name, destination_engine):
         for row in result:
             update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(password='')
             destination_connection.execute(update_stmt)
+
+            if is_superuser_index and row[is_superuser_index]:
+                update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(username='admin')
 
         destination_connection.commit()
 
@@ -297,7 +302,7 @@ def obfuscate_all(run_info):
     destination_engine = create_engine(DESTINATION_DATABASE_URL)
 
     r = ReflectedTable(destination_engine)
-    obfuscate_table("user", destination_engine)
+    obfuscate_user_table("user", destination_engine)
     r.truncate_table("dataexport")
     r.truncate_table("usersearchhistory")
 
@@ -418,7 +423,7 @@ def backup_workspace(run_info):
             if not run_pg_dump_backup(new_run_info):
                 return False
 
-    if new_run_info["format"] == "sqlite":
+    if run_info["format"] == "sqlite":
         run_db_copy_backup_auth(run_info)
         obfuscate_all(run_info)
 
