@@ -108,6 +108,12 @@ class BaseLinkDataModel(models.Model):
         abstract = True
         ordering = ["-date_published", "source_url", "title"]
 
+        indexes = [
+            models.Index(fields=['title']),
+            models.Index(fields=['link']),
+            models.Index(fields=['date_published']),
+        ]
+
     def save(self, *args, **kwargs):
         """
         We can fix some database errors here.

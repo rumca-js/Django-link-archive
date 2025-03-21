@@ -116,8 +116,12 @@ class BackgroundJobHistory(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def mark_done(job, subject="", args="", task=None):
-        jobs = BackgroundJobHistory.objects.filter(job = job, subject=subject, task=task, args=args)
+        jobs = BackgroundJobHistory.objects.filter(
+            job=job, subject=subject, task=task, args=args
+        )
         if jobs.exists():
-           jobs.delete()
+            jobs.delete()
 
-        BackgroundJobHistory.objects.create(job = job, subject=subject, task=task, args=args)
+        BackgroundJobHistory.objects.create(
+            job=job, subject=subject, task=task, args=args
+        )

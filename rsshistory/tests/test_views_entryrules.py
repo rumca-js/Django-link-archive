@@ -46,9 +46,9 @@ class EntryRulesTests(FakeInternetTestCase):
         form_data = {
             "enabled": "False",
             "rule_name": "test_rule_edited",
-            "trigger_text" : "",
-            "trigger_text_hits" : 1,
-            "trigger_text_fields" : "",
+            "trigger_text": "",
+            "trigger_text_hits": 1,
+            "trigger_text_fields": "",
         }
 
         # call user action
@@ -78,9 +78,9 @@ class EntryRulesTests(FakeInternetTestCase):
         form_data = {
             "enabled": False,
             "rule_name": "test_rule_edited",
-            "trigger_text" : "",
-            "trigger_text_hits" : 1,
-            "trigger_text_fields" : "",
+            "trigger_text": "",
+            "trigger_text_hits": 1,
+            "trigger_text_fields": "",
         }
 
         # call user action

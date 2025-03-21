@@ -202,7 +202,7 @@ def run_pg_restore(run_info):
     return True
 
 
-### NOSQL code
+### SQLite code
 
 def create_destionation_table(table_name, source_table, destination_engine):
     """
@@ -295,19 +295,24 @@ def obfuscate_user_table(table_name, destination_engine):
         destination_connection.commit()
 
 
-def obfuscate_all(run_info):
-    workspace = run_info["workspace"]
-    file_name = workspace+".db"
-    DESTINATION_DATABASE_URL = "sqlite:///" + file_name
-    destination_engine = create_engine(DESTINATION_DATABASE_URL)
+def create_index(destination_engine, table_name, column_name):
+    destination_metadata = MetaData()
+    destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
 
+    r = ReflectedTable(destination_engine)
+    r.create_index(destination_table, "link")
+    r.create_index(destination_table, "title")
+    r.create_index(destination_table, "date_published")
+
+
+def obfuscate_all(destination_engine):
     r = ReflectedTable(destination_engine)
     obfuscate_user_table("user", destination_engine)
     r.truncate_table("dataexport")
     r.truncate_table("usersearchhistory")
 
 
-#### NOSQL
+#### SQLite
 
 
 def run_db_copy_backup(run_info):
@@ -425,7 +430,17 @@ def backup_workspace(run_info):
 
     if run_info["format"] == "sqlite":
         run_db_copy_backup_auth(run_info)
-        obfuscate_all(run_info)
+
+        workspace = run_info["workspace"]
+        file_name = workspace+".db"
+        DESTINATION_DATABASE_URL = "sqlite:///" + file_name
+        destination_engine = create_engine(DESTINATION_DATABASE_URL)
+
+        create_index(destination_engine, "linkdatamodel", "link")
+        create_index(destination_engine, "linkdatamodel", "title")
+        create_index(destination_engine, "linkdatamodel", "date_published")
+
+        obfuscate_all(destination_engine)
 
     return True
 

@@ -753,15 +753,14 @@ class LeftOverJobsProcessorTest(FakeInternetTestCase):
         )
 
         tasks_info = [
-                [300.0, "RefreshProcessor"],
-                #[30.0, "RefreshProcessor"],
-                [60.0, "SourceJobsProcessor"],
-                [60.0, "WriteJobsProcessor"],
-                [60.0, "ImportJobsProcessor"],
-                [60.0, "LeftOverJobsProcessor"],
+            [300.0, "RefreshProcessor"],
+            [60.0, "SourceJobsProcessor"],
+            [60.0, "WriteJobsProcessor"],
+            [60.0, "ImportJobsProcessor"],
+            [60.0, "LeftOverJobsProcessor"],
         ]
 
-        mgr = LeftOverJobsProcessor(tasks_info = tasks_info)
+        mgr = LeftOverJobsProcessor(tasks_info=tasks_info)
 
         jobs = mgr.get_supported_jobs()
 
@@ -775,15 +774,14 @@ class LeftOverJobsProcessorTest(FakeInternetTestCase):
         self.assertEqual(BackgroundJobController.objects.all().count(), 2)
 
         tasks_info = [
-                [300.0, "RefreshProcessor"],
-                #[30.0, "RefreshProcessor"],
-                [60.0, "SourceJobsProcessor"],
-                [60.0, "WriteJobsProcessor"],
-                [60.0, "ImportJobsProcessor"],
-                [60.0, "LeftOverJobsProcessor"],
+            [300.0, "RefreshProcessor"],
+            [60.0, "SourceJobsProcessor"],
+            [60.0, "WriteJobsProcessor"],
+            [60.0, "ImportJobsProcessor"],
+            [60.0, "LeftOverJobsProcessor"],
         ]
 
-        mgr = LeftOverJobsProcessor(tasks_info = tasks_info)
+        mgr = LeftOverJobsProcessor(tasks_info=tasks_info)
 
         mgr.run()
 

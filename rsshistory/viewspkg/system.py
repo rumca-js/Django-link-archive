@@ -407,11 +407,10 @@ def json_system_status(request):
     else:
         data["days_to_check_stale_entries"] = 0
 
-    #is_remote_server_down = system_controller.is_remote_server_down()
-    #data["remote_server_status"] = is_remote_server_down
+    # is_remote_server_down = system_controller.is_remote_server_down()
+    # data["remote_server_status"] = is_remote_server_down
 
     data["directory"] = c.directory
-
 
     data["threads"] = []
 
@@ -518,21 +517,21 @@ def json_logs(request):
         conditions = Q()
 
         if "errors" in request.GET:
-            conditions &= Q(level = AppLogging.ERROR)
+            conditions &= Q(level=AppLogging.ERROR)
         if "warnings" in request.GET:
-            conditions &= Q(level = AppLogging.WARNING)
+            conditions &= Q(level=AppLogging.WARNING)
         if "infos" in request.GET:
-            conditions &= Q(level = AppLogging.INFO)
+            conditions &= Q(level=AppLogging.INFO)
         if "debugs" in request.GET:
-            conditions &= Q(level = AppLogging.DEBUG)
+            conditions &= Q(level=AppLogging.DEBUG)
         if "notification" in request.GET:
-            conditions &= Q(level = AppLogging.NOTIFICATION)
+            conditions &= Q(level=AppLogging.NOTIFICATION)
         if "info_text" in request.GET:
             value = request.GET["info_text"]
-            conditions &= Q(info_text__icontains = value)
+            conditions &= Q(info_text__icontains=value)
         if "detail_text" in request.GET:
             value = request.GET["detail_text"]
-            conditions &= Q(detail_text__icontains = value)
+            conditions &= Q(detail_text__icontains=value)
 
         objects = AppLogging.objects.filter(conditions)
 
@@ -713,22 +712,22 @@ def wizard_setup_news(request):
 
 def common_initialization():
     EntryRules.objects.create(
-      rule_name = "casinos-block",
-      trigger_text = "casino, lotter, jackpot, bingo, poker, slot, betting, togel, gacor, bandar judi, pagcor, slotlara kadar, canli bahis, terpopuler, deposit, g2gbet, terpercaya, maxtoto, Gampang, bonus giveaway, pg slot, cashback rewards, situs slot, slot situs",
-      block = True,
+        rule_name="casinos-block",
+        trigger_text="casino, lotter, jackpot, bingo, poker, slot, betting, togel, gacor, bandar judi, pagcor, slotlara kadar, canli bahis, terpopuler, deposit, g2gbet, terpercaya, maxtoto, Gampang, bonus giveaway, pg slot, cashback rewards, situs slot, slot situs",
+        block=True,
     )
 
     EntryRules.objects.create(
-      rule_name = "sexual-block",
-      trigger_text = "mastubat, porn, sexseite, zoophilia, chaturbat",
-      block = True,
+        rule_name="sexual-block",
+        trigger_text="mastubat, porn, sexseite, zoophilia, chaturbat",
+        block=True,
     )
 
     ## set browser
-    #EntryRules.objects.create(
+    # EntryRules.objects.create(
     #  rule_name = "selenium-full",
     #  trigger_text = "politico.com, barrons.com, reuters.com,  techcrunch.com, .yahoo.com, engadget.com, phys.org, youtube.com/channel, wsj.com, open.spotify.com/show, washingtontimes.com, feedpress.me, axios.com, nytimes.com, reutersagency.com",
-    #)
+    # )
 
 
 def wizard_setup_gallery(request):
@@ -959,7 +958,6 @@ def get_footer_status_line(request):
 
     system_controller = SystemOperationController()
 
-
     sources_are_fetched = process_source_queue_size > 0
     sources_queue_size = process_source_queue_size
     is_sources_error = sources.count() > 0
@@ -1004,7 +1002,6 @@ def get_indicators(request):
 
     configuration_entry = Configuration.get_object().config_entry
     system_controller = SystemOperationController()
-
 
     if not request.user.is_authenticated:
         indicators = {}

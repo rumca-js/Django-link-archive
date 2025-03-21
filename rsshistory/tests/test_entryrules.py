@@ -96,7 +96,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             block=True,
             rule_name="Rule1",
             trigger_text="casino",
-            trigger_text_hits = 4,
+            trigger_text_hits=4,
         )
 
         text = "casino casino casino"
@@ -164,7 +164,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             trigger_rule_url=".test1.com, .test2.com",
         )
 
-        entry = LinkDataController.objects.create(link = "https://something.test1.com")
+        entry = LinkDataController.objects.create(link="https://something.test1.com")
 
         self.assertTrue(EntryRules.is_entry_blocked(entry))
 
@@ -177,13 +177,13 @@ class EntryUpdaterTest(FakeInternetTestCase):
             block=False,
             rule_name="Rule1",
             trigger_text="nsfw",
-            trigger_text_hits = 1,
-            apply_age_limit = 15,
+            trigger_text_hits=1,
+            apply_age_limit=15,
         )
 
         dictionary = {
-                "title" : "AI girlfriend NSFW",
-                "description" : "",
+            "title": "AI girlfriend NSFW",
+            "description": "",
         }
 
         self.assertEqual(EntryRules.get_age_for_dictionary(dictionary), 15)
@@ -197,13 +197,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
             block=False,
             rule_name="Rule1",
             trigger_text="nsfw",
-            trigger_text_hits = 1,
-            apply_age_limit = 15,
+            trigger_text_hits=1,
+            apply_age_limit=15,
         )
 
-        entry = LinkDataController.objects.create(link = "https://nsfw.com",
-                title = "NFSW AI girlfriend",
-                description = "NSFW AI girlfriend",
+        entry = LinkDataController.objects.create(
+            link="https://nsfw.com",
+            title="NFSW AI girlfriend",
+            description="NSFW AI girlfriend",
         )
 
         EntryRules.apply_entry_rule(entry)
@@ -221,18 +222,21 @@ class EntryUpdaterTest(FakeInternetTestCase):
             block=False,
             rule_name="Rule1",
             trigger_text="nsfw",
-            trigger_text_hits = 1,
-            apply_age_limit = 15,
+            trigger_text_hits=1,
+            apply_age_limit=15,
         )
 
-        entry = LinkDataController.objects.create(link = "https://nsfw.com",
-                title = "NFSW AI girlfriend - title",
-                description = "NSFW AI girlfriend - description",
+        entry = LinkDataController.objects.create(
+            link="https://nsfw.com",
+            title="NFSW AI girlfriend - title",
+            description="NSFW AI girlfriend - description",
         )
 
         pulp = therule.get_entry_pulp(entry)
 
-        self.assertEqual(pulp, "nfsw ai girlfriend - titlensfw ai girlfriend - description")
+        self.assertEqual(
+            pulp, "nfsw ai girlfriend - titlensfw ai girlfriend - description"
+        )
 
     def test_get_dict_pulp(self):
 
@@ -243,14 +247,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
             block=False,
             rule_name="Rule1",
             trigger_text="nsfw",
-            trigger_text_hits = 1,
-            apply_age_limit = 15,
+            trigger_text_hits=1,
+            apply_age_limit=15,
         )
 
         dictionary = {
-                "link" : "https://test.com",
-                "title" : "Title",
-                "description" : "Description",
+            "link": "https://test.com",
+            "title": "Title",
+            "description": "Description",
         }
 
         pulp = therule.get_dict_pulp(dictionary)

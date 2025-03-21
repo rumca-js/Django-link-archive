@@ -82,7 +82,10 @@ class ViewPage(object):
 
         context["debug"] = config.debug_mode
 
-        if self.is_user_allowed(self.view_access_type) and config.enable_background_jobs:
+        if (
+            self.is_user_allowed(self.view_access_type)
+            and config.enable_background_jobs
+        ):
             context.update(c.get_context())
 
             context["is_user_allowed"] = True
@@ -139,7 +142,10 @@ class ViewPage(object):
         self.context[variable_name] = variable_value
 
     def check_access(self):
-        if not self.is_user_allowed(self.view_access_type) and not self.is_api_key_allowed():
+        if (
+            not self.is_user_allowed(self.view_access_type)
+            and not self.is_api_key_allowed()
+        ):
             return self.render_implementation("missing_rights.html", 500)
 
     def is_api_key_allowed(self):

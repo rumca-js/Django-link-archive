@@ -400,7 +400,7 @@ def edit_source(request, pk):
             if not icon:
                 page = UrlLocation(ob.url)
                 domain = page.get_domain()
-                u = UrlHandlerEx(domain, settings={"handler_class" : "HttpPageHandler"})
+                u = UrlHandlerEx(domain, settings={"handler_class": "HttpPageHandler"})
                 icon = u.get_thumbnail()
 
             if icon:

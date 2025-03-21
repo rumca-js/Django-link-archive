@@ -233,7 +233,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         conf.keep_domain_links = True
         conf.save()
 
-        EntryRules.objects.create(block=True, trigger_rule_url = "youtube.com")
+        EntryRules.objects.create(block=True, trigger_rule_url="youtube.com")
 
         bookmarked = LinkDataController.objects.create(
             link="https://youtube.com?v=bookmarked"

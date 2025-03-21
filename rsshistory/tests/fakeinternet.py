@@ -126,8 +126,8 @@ class FakeInternetData(object):
     def get_all_properties(self):
         data = []
         data.append({"name": "Properties", "data": self.properties})
-        data.append({"name": "Text", "data": {"Contents" : self.text_data}})
-        data.append({"name": "Binary", "data": {"Contents" : self.binary_data}})
+        data.append({"name": "Text", "data": {"Contents": self.text_data}})
+        data.append({"name": "Binary", "data": {"Contents": self.binary_data}})
         data.append({"name": "Settings", "data": None})
         data.append({"name": "Response", "data": self.response})
         data.append({"name": "Headers", "data": {}})
@@ -260,9 +260,9 @@ class FakeInternetData(object):
 
         return self.get_all_properties()
 
-    def set_entries(self, number = 1):
+    def set_entries(self, number=1):
         for item in range(0, number):
-            properties  = {}
+            properties = {}
             properties["link"] = self.url + str(item)
             properties["title"] = "Title" + str(item)
             properties["description"] = "Description" + str(item)

@@ -135,7 +135,9 @@ class UrlHandlerEx(object):
 
             mode_mapping = self.browsers
 
-            return self.get_properties_internal_mode_mapping(request_server, mode_mapping)
+            return self.get_properties_internal_mode_mapping(
+                request_server, mode_mapping
+            )
 
     def get_properties_internal_mode_mapping(self, request_server, mode_mapping):
         config_entry = Configuration.get_object().config_entry
@@ -146,10 +148,16 @@ class UrlHandlerEx(object):
                 if "name" in crawler_data:
                     name = crawler_data["name"]
 
-                AppLogging.debug("Url:{} Calling with name {} and settings {}".format(self.url, name, crawler_data["settings"]))
+                AppLogging.debug(
+                    "Url:{} Calling with name {} and settings {}".format(
+                        self.url, name, crawler_data["settings"]
+                    )
+                )
 
                 self.all_properties = request_server.get_getj(
-                    self.url, name=crawler_data["name"], settings=crawler_data["settings"]
+                    self.url,
+                    name=crawler_data["name"],
+                    settings=crawler_data["settings"],
                 )
                 if not self.all_properties:
                     AppLogging.warning(
@@ -174,9 +182,7 @@ class UrlHandlerEx(object):
             self.all_properties = request_server.get_getj(self.url)
             if not self.all_properties:
                 AppLogging.warning(
-                    "Url:{} Could not communicate with remote server".format(
-                        self.url
-                    )
+                    "Url:{} Could not communicate with remote server".format(self.url)
                 )
 
         if not self.all_properties:
@@ -292,7 +298,7 @@ class UrlHandlerEx(object):
         response = self.get_section("Response")
         if not response:
             return False
-            
+
         if "status_code" in response:
             if response["status_code"] == 403:
                 return True

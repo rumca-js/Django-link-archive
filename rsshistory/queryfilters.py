@@ -154,7 +154,7 @@ class BaseQueryFilter(object):
 
     def get_filtered_objects_internal(self):
         conditions = self.get_conditions()
-        #LinkDatabase.info("Filter conditions: {}".format(conditions))
+        # LinkDatabase.info("Filter conditions: {}".format(conditions))
 
         objects = self.get_init_objects()
 
@@ -292,9 +292,9 @@ class BaseQueryFilter(object):
     def time_stop(self):
         from datetime import datetime
 
-        #LinkDatabase.info(
+        # LinkDatabase.info(
         #    "Page display time delta:{}".format(datetime.now() - self.time_start)
-        #)
+        # )
         return ""
 
 

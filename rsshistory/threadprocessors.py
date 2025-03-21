@@ -92,7 +92,7 @@ class RefreshProcessor(CeleryTaskInterface):
     Mostly it should only add background jobs, and nothing more!
     """
 
-    def __init__(self, tasks_info = None):
+    def __init__(self, tasks_info=None):
         self.tasks_info = tasks_info
 
     def run(self):
@@ -121,7 +121,7 @@ class RefreshProcessor(CeleryTaskInterface):
                 SourceExportHistory.confirm(export)
 
         if systemcontroller.is_time_to_cleanup():
-            BackgroundJobHistory.mark_done(job = BackgroundJob.JOB_CLEANUP, subject="")
+            BackgroundJobHistory.mark_done(job=BackgroundJob.JOB_CLEANUP, subject="")
 
             CleanupJobHandler.cleanup_all()
 
@@ -185,7 +185,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
     @note Uses handler priority when processing jobs.
     """
 
-    def __init__(self, timeout_s=60 * 10, tasks_info = None):
+    def __init__(self, timeout_s=60 * 10, tasks_info=None):
         """
         Default timeout is 10 minutes
         """
@@ -459,8 +459,8 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
     This processor handles jobs that are not handled by other queues
     """
 
-    def __init__(self, tasks_info = None):
-        super().__init__(tasks_info = tasks_info)
+    def __init__(self, tasks_info=None):
+        super().__init__(tasks_info=tasks_info)
 
     def get_supported_jobs(self):
         jobs = []

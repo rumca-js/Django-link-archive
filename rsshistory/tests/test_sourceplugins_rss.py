@@ -154,10 +154,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertTrue(props[0]["title"])
         self.assertIn("source", props[0])
 
-        self.assertEqual(
-            props[0]["source"],
-            self.source_rss
-        )
+        self.assertEqual(props[0]["source"], self.source_rss)
 
         # 1 rss parent, we do not make additional requests
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)

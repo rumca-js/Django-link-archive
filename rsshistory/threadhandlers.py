@@ -471,11 +471,15 @@ class LinkAddJobHandler(BaseJobHandler):
 
         # Add the link
         b = EntryDataBuilder()
-        entry = b.build(link = link, source_is_auto = True)
+        entry = b.build(link=link, source_is_auto=True)
 
         if not entry:
             errors = "\n".join(b.errors)
-            AppLogging.warning("LinkAddJobHandler. Could not add link: {}. Errors:{}".format(data["link"], errors))
+            AppLogging.warning(
+                "LinkAddJobHandler. Could not add link: {}. Errors:{}".format(
+                    data["link"], errors
+                )
+            )
             return True
 
         current_time = DateUtils.get_datetime_now_utc()
@@ -553,11 +557,15 @@ class SourceAddJobHandler(BaseJobHandler):
         link = properties["url"]
 
         b = SourceDataBuilder()
-        source = b.build(link_data = properties, manual_entry=False)
+        source = b.build(link_data=properties, manual_entry=False)
 
         if not source:
             errors = "\n".join(b.errors)
-            AppLogging.error("LinkAddJobHandler. Could not add source: {}".format(properties["url"], errors))
+            AppLogging.error(
+                "LinkAddJobHandler. Could not add source: {}".format(
+                    properties["url"], errors
+                )
+            )
             return True
 
     def get_properties(self, in_object=None):
@@ -1153,7 +1161,6 @@ class CleanupJobHandler(BaseJobHandler):
         elapsed_sec = self.get_time_diff()
         AppLogging.notify("Successfully cleaned database. Time:{}".format(elapsed_sec))
         return status
-
 
 
 class CheckDomainsJobHandler(BaseJobHandler):

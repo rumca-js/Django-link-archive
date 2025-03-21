@@ -207,7 +207,7 @@ class BackgroundJobController(BackgroundJob):
 
         if not url:
             return
-            
+
         if EntryRules.is_url_blocked(url):
             return
 
@@ -307,7 +307,6 @@ class BackgroundJobController(BackgroundJob):
                 BackgroundJob.JOB_SOURCE_ADD,
                 url,
             )
-
 
     def link_scan(url=None, entry=None, source=None):
         from ..configuration import Configuration

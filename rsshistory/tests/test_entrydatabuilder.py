@@ -543,7 +543,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.auto_scan_new_entries = True
         config.save()
 
-        EntryRules.objects.create(trigger_rule_url = "youtube.com", block = True)
+        EntryRules.objects.create(trigger_rule_url="youtube.com", block=True)
 
         link_name = "https://youtube.com/v=1234"
 
@@ -576,7 +576,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.auto_scan_new_entries = True
         config.save()
 
-        EntryRules.objects.create(trigger_text = "test", block = True)
+        EntryRules.objects.create(trigger_text="test", block=True)
 
         link_name = "https://youtube.com/v=1234"
 
@@ -632,7 +632,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.auto_scan_new_entries = True
         config.save()
 
-        EntryRules.objects.create(trigger_rule_url = "youtube.com", block = True)
+        EntryRules.objects.create(trigger_rule_url="youtube.com", block=True)
 
         link_name = "https://youtube.com/v=1234"
 
