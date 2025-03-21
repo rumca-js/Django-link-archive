@@ -29,6 +29,14 @@ from workspace import get_workspaces
 parent_directory = Path(__file__).parents[1]
 
 
+def get_backup_directory(export_type):
+    return parent_directory / "data" / ("backup_" + export_type)
+
+
+def get_workspace_backup_directory(export_type, workspace):
+    return get_backup_directory(export_type) / workspace
+
+
 def run_pg_dump_backup(run_info):
     workspace = run_info["workspace"]
     tables = run_info["tables"]
@@ -37,8 +45,12 @@ def run_pg_dump_backup(run_info):
     database = run_info["database"]
     host = run_info["host"]
 
-    format_args = "c"
-    if "format" in run_info and (run_info["format"] == "plain" or run_info["format"] == "sql"):
+    if "format" not in run_info:
+        run_info["format"] = "custom"
+
+    if run_info["format"] == "custom":
+        format_args = "c"
+    elif run_info["format"] == "plain" or run_info["format"] == "sql":
         format_args = "p"
 
     command_input = [
@@ -58,7 +70,7 @@ def run_pg_dump_backup(run_info):
         command_input.append("-t")
         command_input.append(table)
 
-    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
 
     print("Running: {} @ {}".format(command_input, operating_dir))
@@ -153,8 +165,12 @@ def run_pg_restore(run_info):
     database = run_info["database"]
     host = run_info["host"]
 
-    format_args = "c"
-    if "format" in run_info and run_info["format"] == "plain":
+    if "format" not in run_info:
+        run_info["format"] = "custom"
+
+    if run_info["format"] == "custom":
+        format_args = "c"
+    elif run_info["format"] == "plain":
         format_args = "p"
 
     command_input = [
@@ -171,7 +187,7 @@ def run_pg_restore(run_info):
         command_input.append("-t")
         command_input.append(table)
 
-    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
 
     print("Running: {} @ {}".format(command_input, operating_dir))
@@ -186,7 +202,7 @@ def run_pg_restore(run_info):
     return True
 
 
-### NOSQL code
+### SQLite code
 
 def create_destionation_table(table_name, source_table, destination_engine):
     """
@@ -222,7 +238,6 @@ def copy_table(instance, table_name, source_engine, destination_engine):
 
     print("{} Creating table".format(table_name))
 
-    # Reflect the table using SQLAlchemy metadata
     source_metadata = MetaData()
     source_table = Table("{}_{}".format(instance, table_name), source_metadata, autoload_with=source_engine)
 
@@ -257,12 +272,15 @@ def copy_table(instance, table_name, source_engine, destination_engine):
     session.close()
 
 
-def obfuscate_table(table_name, destination_engine):
+def obfuscate_user_table(table_name, destination_engine):
     """
     Remove passwords from the database
     """
     destination_metadata = MetaData()
     destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
+
+    columns = destination_table.columns.keys()
+    is_superuser_index = columns.index('is_superuser')
 
     with destination_engine.connect() as destination_connection:
         result = destination_connection.execute(destination_table.select())
@@ -271,22 +289,30 @@ def obfuscate_table(table_name, destination_engine):
             update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(password='')
             destination_connection.execute(update_stmt)
 
+            if is_superuser_index and row[is_superuser_index]:
+                update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(username='admin')
+
         destination_connection.commit()
 
 
-def obfuscate_all(run_info):
-    workspace = run_info["workspace"]
-    file_name = workspace+".db"
-    DESTINATION_DATABASE_URL = "sqlite:///" + file_name
-    destination_engine = create_engine(DESTINATION_DATABASE_URL)
+def create_index(destination_engine, table_name, column_name):
+    destination_metadata = MetaData()
+    destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
 
     r = ReflectedTable(destination_engine)
-    obfuscate_table("user", destination_engine)
+    r.create_index(destination_table, "link")
+    r.create_index(destination_table, "title")
+    r.create_index(destination_table, "date_published")
+
+
+def obfuscate_all(destination_engine):
+    r = ReflectedTable(destination_engine)
+    obfuscate_user_table("user", destination_engine)
     r.truncate_table("dataexport")
-    #truncate_table(run_info, "dataexport")
+    r.truncate_table("usersearchhistory")
 
 
-#### NOSQL
+#### SQLite
 
 
 def run_db_copy_backup(run_info):
@@ -303,7 +329,7 @@ def run_db_copy_backup(run_info):
     SOURCE_DATABASE_URL = f"postgresql://{user}:{password}@{host}/{database}"
     source_engine = create_engine(SOURCE_DATABASE_URL)
 
-    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(operating_dir)
 
@@ -330,7 +356,7 @@ def run_db_copy_backup_auth(run_info):
     SOURCE_DATABASE_URL = f"postgresql://{user}:{password}@{host}/{database}"
     source_engine = create_engine(SOURCE_DATABASE_URL)
 
-    operating_dir = parent_directory / "data" / "backup" / workspace
+    operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(operating_dir)
 
@@ -402,9 +428,19 @@ def backup_workspace(run_info):
             if not run_pg_dump_backup(new_run_info):
                 return False
 
-    if new_run_info["format"] == "sqlite":
+    if run_info["format"] == "sqlite":
         run_db_copy_backup_auth(run_info)
-        obfuscate_all(run_info)
+
+        workspace = run_info["workspace"]
+        file_name = workspace+".db"
+        DESTINATION_DATABASE_URL = "sqlite:///" + file_name
+        destination_engine = create_engine(DESTINATION_DATABASE_URL)
+
+        create_index(destination_engine, "linkdatamodel", "link")
+        create_index(destination_engine, "linkdatamodel", "title")
+        create_index(destination_engine, "linkdatamodel", "date_published")
+
+        obfuscate_all(destination_engine)
 
     return True
 

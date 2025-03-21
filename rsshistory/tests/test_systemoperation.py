@@ -99,8 +99,8 @@ class SystemOperationTest(FakeInternetTestCase):
         controller.refresh("NotRefreshProcessor")
 
         thread_ids = [
-                'RefreshProcessor',
-                'XRefreshProcessor',
+            "RefreshProcessor",
+            "XRefreshProcessor",
         ]
 
         # call tested function
@@ -127,7 +127,7 @@ class SystemOperationTest(FakeInternetTestCase):
         SystemOperation.objects.all().delete()
         BackgroundJobHistory.objects.all().delete()
 
-        BackgroundJobHistory.objects.create(job = BackgroundJob.JOB_CLEANUP, subject="")
+        BackgroundJobHistory.objects.create(job=BackgroundJob.JOB_CLEANUP, subject="")
 
         controller = SystemOperationController()
 
@@ -141,7 +141,9 @@ class SystemOperationTest(FakeInternetTestCase):
 
         date = datetime.now() - timedelta(days=1)
 
-        job = BackgroundJobHistory.objects.create(job = BackgroundJob.JOB_CLEANUP, subject="", date_created=date)
+        job = BackgroundJobHistory.objects.create(
+            job=BackgroundJob.JOB_CLEANUP, subject="", date_created=date
+        )
         job.date_created = date
         job.save()
 

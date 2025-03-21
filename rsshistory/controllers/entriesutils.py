@@ -81,10 +81,10 @@ class EntriesCleanup(object):
 
             for url in urls:
                 if url != "":
-                    entries = LinkDataController.objects.filter(link__icontains = url)
+                    entries = LinkDataController.objects.filter(link__icontains=url)
                     entries.delete()
 
-                    domains = DomainsController.objects.filter(domain__icontains = url)
+                    domains = DomainsController.objects.filter(domain__icontains=url)
                     domains.delete()
 
     def cleanup_entries_with_ports(self):
@@ -822,9 +822,7 @@ class EntryUpdater(object):
         if not entry.date_dead_since:
             error_text = traceback.format_exc()
 
-            AppLogging.error(
-                'Cannot access link:{}\n{}'.format(entry.link, error_text)
-            )
+            AppLogging.error("Cannot access link:{}\n{}".format(entry.link, error_text))
             entry.date_dead_since = DateUtils.get_datetime_now_utc()
             entry.save()
 
@@ -1492,7 +1490,8 @@ class EntryDataBuilder(object):
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:
                 self.errors.append(
-                    "Url:{}. Could not obtain link service properties".format(self.link))
+                    "Url:{}. Could not obtain link service properties".format(self.link)
+                )
                 AppLogging.debug(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.get_absolute_url(), self.link
@@ -1523,13 +1522,13 @@ class EntryDataBuilder(object):
         # we do not want to obtain properties for non-domain entries, if we capture only
         # domains
         if not self.is_enabled_to_store():
-            self.errors.append(
-                    "Url:{}. Not enabled to store".format(self.link))
+            self.errors.append("Url:{}. Not enabled to store".format(self.link))
             return
 
         if EntryRules.is_url_blocked(self.link_data["link"]):
             self.errors.append(
-                "Url:{}. Link was rejected because of a rule.".format(self.link))
+                "Url:{}. Link was rejected because of a rule.".format(self.link)
+            )
             return
 
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
@@ -1537,7 +1536,8 @@ class EntryDataBuilder(object):
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:
                 self.errors.append(
-                    "Url:{}. Could not obtain properties".format(self.link))
+                    "Url:{}. Could not obtain properties".format(self.link)
+                )
                 AppLogging.debug(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.link, self.link
@@ -1548,7 +1548,8 @@ class EntryDataBuilder(object):
         # we obtain links from various places. We do not want technical links with no data, redirect, CDN or other
         if not self.is_link_data_valid_for_auto_add(link_data):
             self.errors.append(
-                "Url:{}. Link is not valid for auto add".format(self.link))
+                "Url:{}. Link is not valid for auto add".format(self.link)
+            )
             return
 
         self.merge_link_data(link_data)
@@ -1558,7 +1559,8 @@ class EntryDataBuilder(object):
         else:
             if Configuration.get_object().config_entry.debug_mode:
                 self.errors.append(
-                    "Url:{}. Could not obtain properties for link.".format(self.link))
+                    "Url:{}. Could not obtain properties for link.".format(self.link)
+                )
                 AppLogging.debug(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.link, self.link
@@ -1622,28 +1624,30 @@ class EntryDataBuilder(object):
         self.link_data = self.get_clean_link_data()
         if EntryRules.is_url_blocked(self.link_data["link"]):
             self.errors.append(
-                "Url:{}. Link was rejected because of a rule.".format(self.link))
+                "Url:{}. Link was rejected because of a rule.".format(self.link)
+            )
             return
 
-        validator = UrlPropertyValidator(properties = self.link_data)
+        validator = UrlPropertyValidator(properties=self.link_data)
         if not validator.is_valid():
             self.errors.append(
-                "Url:{}. Link was rejected because of validator.".format(self.link))
+                "Url:{}. Link was rejected because of validator.".format(self.link)
+            )
             return
 
         # TODO - what if there are many places and we do not want people to insert
         # bad stuff?
         if self.source_is_auto:
-            text = str(self.link_data["title"]) + str(self.link_data["description"])
-
-            if EntryRules.is_blocked_by_text(text):
+            if EntryRules.is_dict_blocked(self.link_data):
                 self.errors.append(
-                    "Url:{}. Link was rejected due contents rule.".format(self.link))
+                    "Url:{}. Link was rejected due contents rule.".format(self.link)
+                )
                 return
-                
-            if len(self.link_data["link"]) > LinkDataController.get_field_length("link"):
-                self.errors.append(
-                    "Url:{}. Link too long".format(self.link))
+
+            if len(self.link_data["link"]) > LinkDataController.get_field_length(
+                "link"
+            ):
+                self.errors.append("Url:{}. Link too long".format(self.link))
                 return
 
         # if self.source_is_auto:

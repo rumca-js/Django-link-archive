@@ -95,7 +95,9 @@ def entry_rule_edit(request, pk):
         if form.is_valid():
             form.save()
 
-            return HttpResponseRedirect(reverse("{}:entry-rule".format(LinkDatabase.name), args=[pk]))
+            return HttpResponseRedirect(
+                reverse("{}:entry-rule".format(LinkDatabase.name), args=[pk])
+            )
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")

@@ -49,9 +49,7 @@ class Browser(models.Model):
 
         if not self.is_valid():
             AppLogging.error(
-                "Browser cannot be saved due to errors".format(
-                    self.crawler
-                )
+                "Browser cannot be saved due to errors".format(self.crawler)
             )
             return
 

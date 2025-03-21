@@ -28,14 +28,14 @@ class SystemOperationController(object):
         else:
             SystemOperation.add_by_thread(thread_id)
 
-    def cleanup(cfg=None, thread_ids = None):
+    def cleanup(cfg=None, thread_ids=None):
         if thread_ids:
             # delete any obsolte
             current_thread_ids = SystemOperationController.get_threads()
 
             diff_elements = current_thread_ids - set(thread_ids)
             for diff in diff_elements:
-                rows = SystemOperation.objects.filter(thread_id = diff)
+                rows = SystemOperation.objects.filter(thread_id=diff)
                 rows.delete()
             return
 
@@ -168,7 +168,9 @@ class SystemOperationController(object):
     def is_time_to_cleanup(self):
         today_midnight = datetime.now().date()
 
-        jobs = BackgroundJobHistory.objects.filter(job = BackgroundJob.JOB_CLEANUP, subject="", date_created__gt = today_midnight)
+        jobs = BackgroundJobHistory.objects.filter(
+            job=BackgroundJob.JOB_CLEANUP, subject="", date_created__gt=today_midnight
+        )
         if jobs.exists():
             return False
 

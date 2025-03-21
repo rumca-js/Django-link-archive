@@ -210,7 +210,7 @@ class BackgroundJobsViewsTest(FakeInternetTestCase):
         )
 
         url = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
-        url = url + "?job="+BackgroundJobController.JOB_LINK_UPDATE_DATA
+        url = url + "?job=" + BackgroundJobController.JOB_LINK_UPDATE_DATA
 
         # call tested function
         response = self.client.get(url)

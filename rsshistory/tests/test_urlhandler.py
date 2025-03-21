@@ -35,9 +35,7 @@ class UrlHandlerTest(FakeInternetTestCase):
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
 
-        self.assertEqual(
-            type(thetype), UrlHandler.youtube_channel_handler
-        )
+        self.assertEqual(type(thetype), UrlHandler.youtube_channel_handler)
 
 
 class UrlHandlerExTest(FakeInternetTestCase):
@@ -77,21 +75,21 @@ class UrlHandlerExTest(FakeInternetTestCase):
         Browser.objects.all().delete()
 
         browser1 = Browser.objects.create(
-                name = "test1",
-                crawler = "RequestsCrawler",
-                settings = '{"test_setting" : "something"}',
+            name="test1",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
         )
 
         browser2 = Browser.objects.create(
-                name = "test2",
-                crawler = "RequestsCrawler",
-                settings = '{"test_setting" : "something"}',
+            name="test2",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
         )
 
         # browser 2 is more important
         EntryRules.objects.create(
-                trigger_rule_url = "rsspage.com",
-                browser = browser2,
+            trigger_rule_url="rsspage.com",
+            browser=browser2,
         )
 
         setup1 = browser1.get_setup()
@@ -230,9 +228,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cleaned_link = UrlHandlerEx.get_cleaned_link(
-            "https://linkedin.com"
-        )
+        cleaned_link = UrlHandlerEx.get_cleaned_link("https://linkedin.com")
 
         self.assertEqual(cleaned_link, "https://linkedin.com")
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
@@ -286,10 +282,9 @@ class UrlHandlerExTest(FakeInternetTestCase):
     def test_is_blocked__entry_rule(self):
         # browser 2 is more important
         EntryRules.objects.create(
-                trigger_text = "casino",
-                block = True,
+            trigger_text="casino",
+            block=True,
         )
-
 
         url = UrlHandlerEx("https://linkedin.com")
         # call tested function

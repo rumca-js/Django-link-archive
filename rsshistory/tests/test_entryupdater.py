@@ -455,9 +455,9 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         EntryRules.objects.create(
-                trigger_rule_url = "slot-casino-page.com",
-                block = True,
-                enabled=True,
+            trigger_rule_url="slot-casino-page.com",
+            block=True,
+            enabled=True,
         )
 
         entry = LinkDataController.objects.create(
@@ -496,9 +496,9 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         EntryRules.objects.create(
-                trigger_text = "casino",
-                block = True,
-                enabled=True,
+            trigger_text="casino",
+            block=True,
+            enabled=True,
         )
 
         entry = LinkDataController.objects.create(
@@ -591,11 +591,11 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         EntryRules.objects.create(
-                trigger_text = "sex, porn",
-                trigger_text_hits = 1,
-                block = False,
-                enabled=True,
-                apply_age_limit = 15,
+            trigger_text="sex, porn",
+            trigger_text_hits=1,
+            block=False,
+            enabled=True,
+            apply_age_limit=15,
         )
 
         date_updated = entry.date_update_last

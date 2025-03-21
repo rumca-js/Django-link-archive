@@ -3,11 +3,7 @@ from ..controllers import (
     LinkDataController,
     SourceDataController,
 )
-from ..models import (
-    BackgroundJob,
-    BackgroundJobHistory,
-    DataExport
-)
+from ..models import BackgroundJob, BackgroundJobHistory, DataExport
 from .fakeinternet import FakeInternetTestCase
 
 
@@ -404,7 +400,7 @@ class BackgroundJobHistoryTest(FakeInternetTestCase):
     def test_mark_done(self):
         BackgroundJobHistory.objects.all().delete()
 
-        BackgroundJobHistory.mark_done(job = BackgroundJobController.JOB_CLEANUP)
+        BackgroundJobHistory.mark_done(job=BackgroundJobController.JOB_CLEANUP)
 
         jobs = BackgroundJobHistory.objects.all()
 

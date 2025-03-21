@@ -92,7 +92,7 @@ class RefreshProcessor(CeleryTaskInterface):
     Mostly it should only add background jobs, and nothing more!
     """
 
-    def __init__(self, tasks_info = None):
+    def __init__(self, tasks_info=None):
         self.tasks_info = tasks_info
 
     def run(self):
@@ -121,7 +121,7 @@ class RefreshProcessor(CeleryTaskInterface):
                 SourceExportHistory.confirm(export)
 
         if systemcontroller.is_time_to_cleanup():
-            BackgroundJobHistory.mark_done(job = BackgroundJob.JOB_CLEANUP, subject="")
+            BackgroundJobHistory.mark_done(job=BackgroundJob.JOB_CLEANUP, subject="")
 
             CleanupJobHandler.cleanup_all()
 
@@ -185,7 +185,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
     @note Uses handler priority when processing jobs.
     """
 
-    def __init__(self, timeout_s=60 * 10, tasks_info = None):
+    def __init__(self, timeout_s=60 * 10, tasks_info=None):
         """
         Default timeout is 10 minutes
         """
@@ -390,7 +390,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
             query_conditions &= jobs_conditions
 
         objs = BackgroundJobController.objects.filter(query_conditions).order_by(
-            "priority", "date_created"
+            "date_created"
         )
         if objs.exists():
             obj = objs.first()
@@ -410,17 +410,6 @@ class GenericJobsProcessor(CeleryTaskInterface):
         blocker = items[0]
         if not blocker:
             return
-
-        jobs = BackgroundJobController.objects.filter(
-            enabled=True, date_created__lt=self.start_processing_time
-        )
-        for job in jobs:
-            if job != blocker and job.priority > 0:
-                if job.priority > blocker.priority:
-                    job.priority = blocker.priority - 1
-                else:
-                    job.priority -= 1
-                    job.save()
 
 
 class SourceJobsProcessor(GenericJobsProcessor):
@@ -470,8 +459,8 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
     This processor handles jobs that are not handled by other queues
     """
 
-    def __init__(self, tasks_info = None):
-        super().__init__(tasks_info = tasks_info)
+    def __init__(self, tasks_info=None):
+        super().__init__(tasks_info=tasks_info)
 
     def get_supported_jobs(self):
         jobs = []

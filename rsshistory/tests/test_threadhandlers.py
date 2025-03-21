@@ -299,14 +299,15 @@ class SourceAddJobHandlerTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
-        ob = BackgroundJobController.source_add("https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        ob = BackgroundJobController.source_add(
+            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        )
         self.assertTrue(ob)
 
         handler = SourceAddJobHandler()
         handler.process(ob)
 
         persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
-
 
         self.assertTrue(self.no_errors())
 

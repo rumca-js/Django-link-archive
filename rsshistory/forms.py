@@ -258,6 +258,7 @@ class EntryRulesForm(forms.ModelForm):
             "trigger_rule_url",
             "trigger_text",
             "trigger_text_hits",
+            "trigger_text_fields",
             "block",
             "auto_tag",
             "apply_age_limit",
@@ -269,6 +270,9 @@ class EntryRulesForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["trigger_rule_url"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["trigger_text"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["trigger_text_fields"].widget.attrs.update(
+            size=self.init.get_cols_size()
+        )
 
 
 class ApiKeysForm(forms.ModelForm):

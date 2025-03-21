@@ -787,7 +787,9 @@ class AppLogging(models.Model):
                 detail_text += ". "
             detail_text += stack_string
 
-        LinkDatabase.info("AppLogging::{}:{}\n{}\n".format(level, info_text, detail_text))
+        LinkDatabase.info(
+            "AppLogging::{}:{}\n{}\n".format(level, info_text, detail_text)
+        )
 
         AppLogging.cleanup_overflow()
 

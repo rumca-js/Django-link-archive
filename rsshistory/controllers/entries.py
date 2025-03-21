@@ -162,6 +162,7 @@ class LinkDataController(LinkDataModel):
 
     def is_bookmarked(self):
         from ..models import UserBookmarks
+
         return UserBookmarks.is_bookmarked(self)
 
 

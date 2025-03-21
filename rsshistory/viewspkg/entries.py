@@ -288,7 +288,7 @@ class EntriesRecentListView(EntriesOmniListView):
         return query_set.filter(date_published__range=self.get_default_range())
 
     def get_order_by(self):
-        return ["-date_published"]
+        return ["-date_created"]
 
     def get_default_range(self):
         config = Configuration.get_object().config_entry

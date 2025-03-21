@@ -20,18 +20,22 @@ class EntryRules(models.Model):
     rule_name = models.CharField(max_length=1000, blank=True, help_text="Rule name")
 
     trigger_rule_url = models.CharField(
-        max_length=1000,
-        blank=True,
-        help_text="New entries can added using colon"
+        max_length=1000, blank=True, help_text="New entries can added using colon"
     )  # url syntax
 
     trigger_text = models.CharField(
         max_length=1000,
-        blank = True,
+        blank=True,
         help_text="Text that triggers the rule",
     )
 
     trigger_text_hits = models.IntegerField(default=1)
+
+    trigger_text_fields = models.CharField(
+        max_length=1000,
+        blank=True,
+        help_text="fields that will be used for rule triggering. For example title, description.",
+    )  # url syntax
 
     block = models.BooleanField(
         default=False,
@@ -67,7 +71,9 @@ class EntryRules(models.Model):
 
         urls = self.trigger_rule_url.split(",")
         for url in urls:
-            result.add(url.strip())
+            stripped = url.strip()
+            if stripped != "":
+                result.add(stripped)
 
         return result
 
@@ -110,8 +116,37 @@ class EntryRules(models.Model):
 
         return False
 
-    def get_entry_pulp(entry):
-        pulp = str(entry.title) + str(entry.description)
+    def get_entry_pulp(self, entry):
+        pulp = ""
+
+        if not self.trigger_text_fields or self.trigger_text_fields == "":
+            pulp = str(entry.title) + str(entry.description)
+
+        if self.trigger_text_fields.find("title") >= 0:
+            pulp += str(entry.title)
+
+        if self.trigger_text_fields.find("description") >= 0:
+            pulp += str(entry.description)
+
+        # ignore case
+        return pulp.lower()
+
+    def get_dict_pulp(self, dictionary):
+        pulp = ""
+
+        if not self.trigger_text_fields or self.trigger_text_fields == "":
+            if "title" in dictionary:
+                pulp = str(dictionary["title"])
+            if "description" in dictionary:
+                pulp += str(dictionary["description"])
+
+        if self.trigger_text_fields.find("title") >= 0:
+            if "title" in dictionary:
+                pulp += str(dictionary["title"])
+
+        if self.trigger_text_fields.find("description") >= 0:
+            if "description" in dictionary:
+                pulp += str(dictionary["description"])
 
         # ignore case
         return pulp.lower()
@@ -133,9 +168,16 @@ class EntryRules(models.Model):
 
         return False
 
-    def is_blocked_by_text(text):
-        rules = EntryRules.objects.filter(enabled=True, block=True).exclude(trigger_text = "")
+    def is_dict_blocked(dictionary):
+        if "link" in dictionary:
+            if EntryRules.is_url_blocked(dictionary["link"]):
+                return True
+
+        rules = EntryRules.objects.filter(enabled=True, block=True).exclude(
+            trigger_text=""
+        )
         for rule in rules:
+            text = rule.get_dict_pulp(dictionary)
             if rule.is_text_triggered(text):
                 return True
 
@@ -145,8 +187,15 @@ class EntryRules(models.Model):
         if EntryRules.is_url_blocked(entry.link):
             return True
 
-        text = EntryRules.get_entry_pulp(entry)
-        return EntryRules.is_blocked_by_text(text)
+        rules = EntryRules.objects.filter(enabled=True, block=True).exclude(
+            trigger_text=""
+        )
+        for rule in rules:
+            text = rule.get_entry_pulp(entry)
+            if rule.is_text_triggered(text):
+                return True
+
+        return False
 
     def apply_entry_rule(entry):
         if EntryRules.is_url_blocked(entry.link):
@@ -155,26 +204,14 @@ class EntryRules(models.Model):
 
         EntryRules.check_entry_text_rules(entry)
 
-    def get_dict_pulp(dictionary):
-        title = ""
-        if "title" in dictionary:
-            title = dictionary["title"]
-        description = ""
-        if "description" in dictionary:
-            description = dictionary["description"]
-
-        pulp = str(title) + str(description)
-
-        # ignore case
-        return pulp.lower()
-
     def get_age_for_dictionary(dictionary):
-        text = EntryRules.get_dict_pulp(dictionary)
-
         age = None
 
-        rules = EntryRules.objects.filter(enabled=True, apply_age_limit__gt = 0).exclude(trigger_text = "")
+        rules = EntryRules.objects.filter(enabled=True, apply_age_limit__gt=0).exclude(
+            trigger_text=""
+        )
         for rule in rules:
+            text = rule.get_dict_pulp(dictionary)
             if rule.is_text_triggered(text):
                 if not age:
                     age = rule.apply_age_limit
@@ -185,10 +222,9 @@ class EntryRules(models.Model):
         return age
 
     def check_entry_text_rules(entry):
-        text = EntryRules.get_entry_pulp(entry)
-
-        rules = EntryRules.objects.filter(enabled=True).exclude(trigger_text = "")
+        rules = EntryRules.objects.filter(enabled=True).exclude(trigger_text="")
         for rule in rules:
+            text = rule.get_entry_pulp(entry)
             if rule.is_text_triggered(text):
                 rule.apply_entry_rule_action(entry)
 
