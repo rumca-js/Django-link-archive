@@ -8,6 +8,7 @@ from ..models import (
     ConfigurationEntry,
     BlockEntryList,
     BlockEntry,
+    AppLogging,
 )
 from ..views import ViewPage, GenericListView
 
@@ -102,6 +103,19 @@ class BlockEntryListView(GenericListView):
     def get_title(self):
         return "Block list entries"
 
+    def get_queryset(self):
+        if "delete" in self.request.GET and "url" in self.request.GET:
+            value = self.request.GET["url"]
+            queryset = super().get_queryset().filter(url=value)
+            queryset.delete()
+
+        print("BlockEntryListView:get_queryset")
+        if "url" in self.request.GET:
+            value = self.request.GET["url"]
+            return super().get_queryset().filter(url=value)
+        else:
+            return super().get_queryset()
+
 
 def blocklists_json(request):
     p = ViewPage(request)
@@ -110,8 +124,13 @@ def blocklists_json(request):
     if data is not None:
         return data
 
+    conditions = Q()
+    if "url" in request.GET:
+        value = request.GET["url"]
+        conditions &= Q(url=value)
+
     rule_data = []
-    for data in BlockEntryList.objects.all():
+    for data in BlockEntryList.objects.filter(conditions):
         rule_data.append(model_to_dict(data))
 
     dict_data = {"blocklists": rule_data}

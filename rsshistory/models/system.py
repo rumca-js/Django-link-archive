@@ -527,7 +527,7 @@ class ConfigurationEntry(models.Model):
             return self.download_path
 
         if self.data_export_path:
-            return self.data
+            return self.data_export_path
 
     def save(self, *args, **kwargs):
         """
