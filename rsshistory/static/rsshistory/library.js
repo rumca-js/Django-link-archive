@@ -62,16 +62,7 @@ function getDynamicContent(url_address, htmlElement, errorInHtml = false) {
         },
         error: function(xhr, status, error) {
             if (getDynamicContentRequestTracker[url_address] === requestId) {
-                if (requestId < getDynamicContentRequestTracker[url_address] + 3) {
-                    getDynamicContent(url_address, htmlElement, errorInHtml);
-                    if (errorInHtml) {
-                        $(htmlElement).html("Error loading dynamic content, retry");
-                    }
-                } else {
-                    if (errorInHtml) {
-                        $(htmlElement).html("Error loading dynamic content");
-                    }
-                }
+                getDynamicContent(url_address, htmlElement, errorInHtml);
             }
         }
     });
@@ -96,16 +87,7 @@ function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
        },
        error: function(xhr, status, error) {
             if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
-                if (requestId < getDynamicJsonContentRequestTracker[url_address] + 3) {
-                    getDynamicJsonContent(url_address, htmlElement, errorInHtml);
-                    if (errorInHtml) {
-                        $(htmlElement).html("Error loading dynamic content, retry");
-                    }
-                } else {
-                    if (errorInHtml) {
-                        $(htmlElement).html("Error loading dynamic content");
-                    }
-                }
+                getDynamicJsonContent(url_address, htmlElement, errorInHtml);
             }
        }
     });
@@ -202,9 +184,7 @@ function getTextContent(url_address, callback, errorInHtml = false) {
         },
         error: function(xhr, status, error) {
             if (getTextContentRequestTracker[url_address] === requestId) {
-                if (requestId < getTextContentRequestTracker[url_address] + 3) {
-                    getTextContent(url_address, callback, errorInHtml);
-                }
+                getTextContent(url_address, callback, errorInHtml);
             }
         }
     });
@@ -232,9 +212,7 @@ function getTextJson(url_address, callback, errorInHtml = false) {
         },
         error: function(xhr, status, error) {
             if (getTextJsonRequestTracker[url_address] === requestId) {
-                if (requestId < getTextJsonRequestTracker[url_address] + 3) {
-                    getTextJson(url_address, callback, errorInHtml);
-                }
+                getTextJson(url_address, callback, errorInHtml);
             }
         }
     });

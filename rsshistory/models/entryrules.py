@@ -98,15 +98,13 @@ class EntryRules(models.Model):
             for rule_url in rule_urls:
                 if rule_url != "":
                     if url.find(rule_url) >= 0:
-                        return True
+                        return str(rule_url)
 
         p = UrlLocation(url)
         domain_only = p.get_domain_only()
 
         if BlockEntry.is_blocked(domain_only):
-            return True
-
-        return False
+            return "BlockEntry"
 
     def is_url_blocked_by_rule(self, url):
         rule_urls = self.get_rule_urls()
@@ -261,3 +259,6 @@ class EntryRules(models.Model):
         )
         link_service.block = True
         link_service.save()
+
+    def __str__(self):
+        return "{} {}".format(self.id, self.rule_name)

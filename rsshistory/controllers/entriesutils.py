@@ -1525,9 +1525,10 @@ class EntryDataBuilder(object):
             self.errors.append("Url:{}. Not enabled to store".format(self.link))
             return
 
-        if EntryRules.is_url_blocked(self.link_data["link"]):
+        rule = EntryRules.is_url_blocked(self.link_data["link"])
+        if rule:
             self.errors.append(
-                "Url:{}. Link was rejected because of a rule.".format(self.link)
+                "Url:{}. Link was rejected because of a rule. {}".format(self.link, rule)
             )
             return
 
@@ -1622,9 +1623,10 @@ class EntryDataBuilder(object):
         entry = None
 
         self.link_data = self.get_clean_link_data()
-        if EntryRules.is_url_blocked(self.link_data["link"]):
+        rule = EntryRules.is_url_blocked(self.link_data["link"])
+        if rule:
             self.errors.append(
-                "Url:{}. Link was rejected because of a rule.".format(self.link)
+                "Url:{}. Link was rejected because of a rule. {}".format(self.link, rule)
             )
             return
 
@@ -1640,7 +1642,7 @@ class EntryDataBuilder(object):
         if self.source_is_auto:
             if EntryRules.is_dict_blocked(self.link_data):
                 self.errors.append(
-                    "Url:{}. Link was rejected due contents rule.".format(self.link)
+                    "Url:{}. Link was rejected due contents rule - by checking properties.".format(self.link)
                 )
                 return
 
