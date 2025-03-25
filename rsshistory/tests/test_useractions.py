@@ -10,6 +10,7 @@ from ..models import (
     UserBookmarks,
     CompactedTags,
     UserCompactedTags,
+    EntryCompactedTags,
 )
 from utils.dateutils import DateUtils
 
@@ -275,6 +276,9 @@ class CompactedTagsTest(TestCase):
         self.assertTrue("tag1" in compact_list)
         self.assertTrue("tag2" in compact_list)
 
+        tags = UserTags.objects.all()
+        self.assertEqual(tags.count(), 2)
+
         data["tag"] = "tag1, tag2"
         # call tested function
         UserTags.set_tags(self.entry, data["tag"], self.user_super)
@@ -288,6 +292,78 @@ class CompactedTagsTest(TestCase):
         compact_list = compacts.values_list("tag", flat=True)
         self.assertTrue("tag1" in compact_list)
         self.assertTrue("tag2" in compact_list)
+
+        tags = UserTags.objects.all()
+        self.assertEqual(tags.count(), 4)
+
+        # call tested function
+        UserTags.set_tags(self.entry, "", self.user_super)
+        UserTags.set_tags(self.entry, "", self.user)
+
+        tags = UserTags.objects.all()
+        self.assertEqual(tags.count(), 0)
+
+        compacts = CompactedTags.objects.all()
+        self.assertEqual(compacts.count(), 0)
+
+
+class EntryCompactedTagsTest(TestCase):
+    def setUp(self):
+        c = Configuration.get_object()
+
+        domain = DomainsController.objects.create(
+            domain="https://youtube.com",
+        )
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+        )
+
+        self.entry = LinkDataController.objects.create(
+            source_url="https://youtube.com",
+            link="https://youtube.com?v=bookmarked",
+            title="The first link",
+            source=source_youtube,
+            bookmarked=True,
+            language="en",
+            domain=domain,
+        )
+
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword"
+        )
+
+        self.user_super = User.objects.create_user(
+            username="test_username2",
+            password="testpassword",
+            is_superuser=True,
+        )
+
+    def test_compact__set(self):
+        UserTags.objects.all().delete()
+
+        data = {}
+        data["tag"] = "tag1, tag2"
+
+        # call tested function
+        UserTags.set_tags(self.entry, data["tag"], self.user)
+
+        compacts = EntryCompactedTags.objects.all()
+        self.assertEqual(compacts.count(), 1)
+
+        self.assertEqual(compacts[0].entry, self.entry)
+        self.assertEqual(compacts[0].tag, "tag1,tag2,")
+
+        # call tested function
+        UserTags.set_tags(self.entry, "", self.user)
+
+        tags = UserTags.objects.all()
+        self.assertEqual(tags.count(), 0)
+
+        compacts = EntryCompactedTags.objects.all()
+        self.assertEqual(compacts.count(), 0)
 
 
 class UserVotesTest(TestCase):

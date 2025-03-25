@@ -229,6 +229,12 @@ def create_destionation_table(table_name, source_table, destination_engine):
             destination_table.create(destination_engine)
 
 
+def get_source_table(workspace, table_name, source_engine):
+    source_metadata = MetaData()
+    source_table = Table("{}_{}".format(workspace, table), source_metadata, autoload_with=source_engine)
+    return source_table
+
+
 def copy_table(instance, table_name, source_engine, destination_engine):
     """
     Copies table from postgres to destination
@@ -238,8 +244,7 @@ def copy_table(instance, table_name, source_engine, destination_engine):
 
     print("{} Creating table".format(table_name))
 
-    source_metadata = MetaData()
-    source_table = Table("{}_{}".format(instance, table_name), source_metadata, autoload_with=source_engine)
+    source_table = get_source_table(instance, table_name, source_engine)
 
     create_destionation_table(table_name, source_table, destination_engine)
 
@@ -315,7 +320,7 @@ def obfuscate_all(destination_engine):
 #### SQLite
 
 
-def run_db_copy_backup(run_info):
+def get_source_engine(run_info):
     workspace = run_info["workspace"]
     user = run_info["user"]
     database = run_info["database"]
@@ -323,45 +328,59 @@ def run_db_copy_backup(run_info):
     password = run_info["password"]
     tables = run_info["tables"]
 
-    file_name = workspace+".db"
-
     # Create the database engine
     SOURCE_DATABASE_URL = f"postgresql://{user}:{password}@{host}/{database}"
     source_engine = create_engine(SOURCE_DATABASE_URL)
+
+    return source_engine
+
+
+def get_destination_engine(run_info):
+    workspace = run_info["workspace"]
+
+    file_name = workspace+".db"
+    DESTINATION_DATABASE_URL = "sqlite:///" + file_name
+    destination_engine = create_engine(DESTINATION_DATABASE_URL)
+
+    return destination_engine
+
+
+def run_db_copy_backup(run_info):
+    workspace = run_info["workspace"]
+    tables = run_info["tables"]
+    empty = run_info["empty"]
+
+    # Create the database engine
+    source_engine = get_source_engine()
 
     operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(operating_dir)
 
-    DESTINATION_DATABASE_URL = "sqlite:///" + file_name
-    destination_engine = create_engine(DESTINATION_DATABASE_URL)
+    destination_engine = get_destination_engine(run_info)
 
     for table in tables:
         table = table.replace(workspace + "_", "")
-        copy_table(workspace, table, source_engine, destination_engine)
+        if not empty:
+            copy_table(workspace, table, source_engine, destination_engine)
+        else:
+            source_table = get_source_table(workspace, table, source_engine)
+            create_destionation_table(table_name, source_table, destination_engine)
 
     return True
 
 
 def run_db_copy_backup_auth(run_info):
     workspace = run_info["workspace"]
-    user = run_info["user"]
-    database = run_info["database"]
-    host = run_info["host"]
-    password = run_info["password"]
-
-    file_name = workspace+".db"
 
     # Create the database engine
-    SOURCE_DATABASE_URL = f"postgresql://{user}:{password}@{host}/{database}"
-    source_engine = create_engine(SOURCE_DATABASE_URL)
+    source_engine = get_source_engine(run_info)
 
     operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(operating_dir)
 
-    DESTINATION_DATABASE_URL = "sqlite:///" + file_name
-    destination_engine = create_engine(DESTINATION_DATABASE_URL)
+    destination_engine = get_destination_engine()
 
     copy_table("auth", "user", source_engine, destination_engine)
 
@@ -431,10 +450,7 @@ def backup_workspace(run_info):
     if run_info["format"] == "sqlite":
         run_db_copy_backup_auth(run_info)
 
-        workspace = run_info["workspace"]
-        file_name = workspace+".db"
-        DESTINATION_DATABASE_URL = "sqlite:///" + file_name
-        destination_engine = create_engine(DESTINATION_DATABASE_URL)
+        destination_engine = get_destination_engine(run_info)
 
         create_index(destination_engine, "linkdatamodel", "link")
         create_index(destination_engine, "linkdatamodel", "title")
@@ -573,6 +589,7 @@ def parse_backup():
     parser.add_argument("-w", "--workspace", help="Workspace for which to perform backup/restore. If not specified - all")
     parser.add_argument("-D", "--debug", help="Enable debug output")  # TODO implement debug
     parser.add_argument("-i", "--ignore-errors", action="store_true", help="Ignore errors during the operation")
+    parser.add_argument("--empty", action="store_true", help="Creates empty table version during backup")
     parser.add_argument("-f", "--format", default="custom", choices=["custom", "plain", "sql", "sqlite"],
                         help="Format of the backup (default: 'custom'). Choices: 'custom', 'plain', or 'sql'.")
 
@@ -610,6 +627,7 @@ def main():
         run_info["host"] = args.host
         run_info["format"] = args.format
         run_info["password"] = args.password
+        run_info["empty"] = args.empty
 
         if args.ignore_errors:
             run_info["ignore_errors"] = True

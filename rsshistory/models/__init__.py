@@ -53,6 +53,7 @@ from .useractions import (
     UserTags,
     UserCompactedTags,
     CompactedTags,
+    EntryCompactedTags,
 )
 from .userhistory import (
     UserSearchHistory,

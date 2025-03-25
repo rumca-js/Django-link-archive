@@ -36,6 +36,7 @@ from .models import (
     UserTags,
     CompactedTags,
     UserCompactedTags,
+    EntryCompactedTags,
     UserVotes,
     UserBookmarks,
     UserSearchHistory,
@@ -1143,6 +1144,7 @@ class CleanupJobHandler(BaseJobHandler):
             UserTags.cleanup(cfg)
             CompactedTags.cleanup(cfg)
             UserCompactedTags.cleanup(cfg)
+            EntryCompactedTags.cleanup(cfg)
         if table == "all" or table == "UserComments":
             UserCommentsController.cleanup(cfg)
         if table == "all" or table == "UserVotes":

@@ -9,7 +9,7 @@ from ..controllers import (
     LinkDataController,
     EntryUpdater,
 )
-from ..models import EntryRules, Browser
+from ..models import EntryRules, Browser, UserBookmarks
 from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
@@ -188,9 +188,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual(EntryRules.get_age_for_dictionary(dictionary), 15)
 
-    def test_apply_entry_rule(self):
-
-        self.browser.save()
+    def test_apply_entry_rule__applies_age(self):
 
         therule = EntryRules.objects.create(
             enabled=True,
@@ -207,13 +205,61 @@ class EntryUpdaterTest(FakeInternetTestCase):
             description="NSFW AI girlfriend",
         )
 
+        # call tested function
         EntryRules.apply_entry_rule(entry)
 
         entry.refresh_from_db()
 
         self.assertEqual(entry.age, 15)
 
-    def test_get_entry_pulp(self):
+    def test_apply_entry_rule__removes(self):
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=True,
+            rule_name="Rule1",
+            trigger_text="nsfw",
+            trigger_text_hits=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            link="https://nsfw.com",
+            title="NFSW AI girlfriend",
+            description="NSFW AI girlfriend",
+        )
+
+        # call tested function
+        EntryRules.apply_entry_rule(entry)
+
+        entries = LinkDataController.objects.filter( link="https://nsfw.com")
+        self.assertEqual(len(entries), 0)
+
+    def test_apply_entry_rule__does_not_remove_bookmarked(self):
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=True,
+            rule_name="Rule1",
+            trigger_text="nsfw",
+            trigger_text_hits=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            link="https://nsfw.com",
+            title="NFSW AI girlfriend",
+            description="NSFW AI girlfriend",
+            bookmarked=True,
+        )
+
+        UserBookmarks.add(self.user, entry)
+
+        # call tested function
+        EntryRules.apply_entry_rule(entry)
+
+        entries = LinkDataController.objects.filter( link="https://nsfw.com")
+        self.assertEqual(len(entries), 1)
+
+    def test_get_entry_pulp__empty_fields(self):
 
         self.browser.save()
 
@@ -236,6 +282,32 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual(
             pulp, "nfsw ai girlfriend - titlensfw ai girlfriend - description"
+        )
+
+    def test_get_entry_pulp__title_field(self):
+
+        self.browser.save()
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=False,
+            rule_name="Rule1",
+            trigger_text="nsfw",
+            trigger_text_hits=1,
+            trigger_text_fields="title",
+            apply_age_limit=15,
+        )
+
+        entry = LinkDataController.objects.create(
+            link="https://nsfw.com",
+            title="NFSW AI girlfriend - title",
+            description="NSFW AI girlfriend - description",
+        )
+
+        pulp = therule.get_entry_pulp(entry)
+
+        self.assertEqual(
+            pulp, "nfsw ai girlfriend - title"
         )
 
     def test_get_dict_pulp(self):

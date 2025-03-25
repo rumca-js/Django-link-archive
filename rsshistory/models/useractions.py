@@ -74,7 +74,7 @@ class UserTags(models.Model):
             if tag != "":
                 tags_set.add(tag)
 
-        return tags_set
+        return sorted(tags_set)
 
     def set_tag(entry, tag_name, user=None):
         """
@@ -154,7 +154,8 @@ class UserTags(models.Model):
         tag_objs = UserTags.objects.filter(user=user, entry=entry)
 
         if tag_objs.exists():
-            tag_objs.delete()
+            for tag_obj in tag_objs:
+                tag_obj.delete()
 
         tags_set = data["tags"]
 
@@ -190,6 +191,7 @@ class UserTags(models.Model):
         super().save(*args, **kwargs)
 
         UserCompactedTags.compact(self.user, self.tag)
+        EntryCompactedTags.compact(self.entry)
 
     def delete(self, *args, **kwargs):
         tag_name = self.tag
@@ -199,6 +201,49 @@ class UserTags(models.Model):
         super().delete(*args, **kwargs)
 
         UserCompactedTags.compact(user, tag_name)
+        EntryCompactedTags.compact(entry)
+
+
+class EntryCompactedTags(models.Model):
+    """
+    because SQLite does not have distinct we will provide one row data for tags
+    """
+    tag = models.CharField(max_length=1000, help_text="Full tag text, with colon as delimiter")
+
+    entry = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.CASCADE,
+        related_name="compacted_tags",
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ["-entry"]
+
+    def compact(entry):
+        compacts = EntryCompactedTags.objects.filter(entry=entry)
+        compacts.delete()
+
+        tags = UserTags.objects.filter(entry=entry).order_by("tag")
+
+        if tags.count() > 0:
+            tag_text = ""
+            for tag in tags:
+                tag_text += tag.tag + ","
+
+            if tag_text != "":
+                EntryCompactedTags.objects.create(
+                    tag=tag_text, entry=entry
+                )
+
+    def cleanup(cfg=None):
+        tags = UserTags.objects.all()
+
+        for entry in user_tags.values('entry').distinct():
+            entry_instance = LinkDataModel.objects.get(id=entry['entry'])
+            for tag in tag_names:
+                EntryCompactedTags.compact(entry_instance)
 
 
 class UserCompactedTags(models.Model):

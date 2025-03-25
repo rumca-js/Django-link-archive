@@ -120,10 +120,12 @@ class EntryRules(models.Model):
         if not self.trigger_text_fields or self.trigger_text_fields == "":
             pulp = str(entry.title) + str(entry.description)
 
-        if self.trigger_text_fields.find("title") >= 0:
+        fields = self.trigger_text_fields.split(",")
+
+        if "title" in fields:
             pulp += str(entry.title)
 
-        if self.trigger_text_fields.find("description") >= 0:
+        if "description" in fields:
             pulp += str(entry.description)
 
         # ignore case
@@ -138,11 +140,13 @@ class EntryRules(models.Model):
             if "description" in dictionary:
                 pulp += str(dictionary["description"])
 
-        if self.trigger_text_fields.find("title") >= 0:
+        fields = self.trigger_text_fields.split(",")
+
+        if "title" in fields:
             if "title" in dictionary:
                 pulp += str(dictionary["title"])
 
-        if self.trigger_text_fields.find("description") >= 0:
+        if "description" in fields:
             if "description" in dictionary:
                 pulp += str(dictionary["description"])
 
@@ -197,10 +201,15 @@ class EntryRules(models.Model):
 
     def apply_entry_rule(entry):
         if EntryRules.is_url_blocked(entry.link):
-            entry.delete()
+            EntryRules.attemp_delete(entry)
             return
 
         EntryRules.check_entry_text_rules(entry)
+
+    def attemp_delete(entry):
+        if entry.bookmarked or entry.page_rating_votes > 0:
+            return
+        entry.delete()
 
     def get_age_for_dictionary(dictionary):
         age = None
@@ -228,7 +237,7 @@ class EntryRules(models.Model):
 
     def apply_entry_rule_action(self, entry):
         if self.block:
-            entry.delete()
+            EntryRules.attemp_delete(entry)
         if self.apply_age_limit:
             if not entry.age or entry.age < self.apply_age_limit:
                 entry.age = self.apply_age_limit

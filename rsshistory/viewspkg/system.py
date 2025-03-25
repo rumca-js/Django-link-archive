@@ -723,6 +723,14 @@ def common_initialization():
         block=True,
     )
 
+    EntryRules.objects.create(
+        rule_name="inactive-links",
+        trigger_text="forbidden, access denied, page not found, site not found, 404 not found, 404: not found, error 404, 404 error, 404 page, 404 file not found, squarespace - website expired, domain name for sale, account suspended, the request could not be satisfied",
+        trigger_text_fields="title",
+        block=True,
+    )
+
+
     ## set browser
     # EntryRules.objects.create(
     #  rule_name = "selenium-full",

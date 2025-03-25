@@ -14,7 +14,6 @@ from ..webtools import (
     UrlLocation,
     UrlAgeModerator,
     RemoteServer,
-    UrlPropertyValidator,
 )
 from utils.dateutils import DateUtils
 
@@ -1630,16 +1629,15 @@ class EntryDataBuilder(object):
             )
             return
 
-        validator = UrlPropertyValidator(properties=self.link_data)
-        if not validator.is_valid():
-            self.errors.append(
-                "Url:{}. Link was rejected because of validator.".format(self.link)
-            )
-            return
-
         # TODO - what if there are many places and we do not want people to insert
         # bad stuff?
         if self.source_is_auto:
+            if "title" not in self.link_data or not self.link_data["title"]:
+                self.errors.append(
+                    "Url:{}. Link was rejected not title.".format(self.link)
+                )
+                return
+
             if EntryRules.is_dict_blocked(self.link_data):
                 self.errors.append(
                     "Url:{}. Link was rejected due contents rule - by checking properties.".format(self.link)
