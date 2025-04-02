@@ -19,7 +19,11 @@ def process_jobs_task(Processor, tasks_info):
 
         c.config_entry = ConfigurationEntry.get()
 
+        AppLogging.debug("Running processor: {}".format(Processor))
         handler = Processor(tasks_info=tasks_info)
+
+        AppLogging.debug("{} {}".format(Processor, handler.get_supported_jobs()))
+
         handler.run()
     except Exception as E:
         AppLogging.error(

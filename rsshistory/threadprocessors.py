@@ -105,12 +105,12 @@ class RefreshProcessor(CeleryTaskInterface):
         systemcontroller = SystemOperationController()
         systemcontroller.refresh(self.get_name())
 
-        if not systemcontroller.is_internet_ok():
-            AppLogging.error("Internet is not OK")
-            return
-
         if systemcontroller.is_remote_server_down():
             AppLogging.error("Remote server is down")
+            return
+
+        if not systemcontroller.is_internet_ok():
+            AppLogging.error("Internet is not OK")
             return
 
         self.check_sources()
@@ -234,12 +234,14 @@ class GenericJobsProcessor(CeleryTaskInterface):
         ]
 
     def run(self):
+        AppLogging.debug("{} Running processor".format(self.get_name()))
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         c = Configuration.get_object()
 
         config = c.config_entry
         if config.block_job_queue:
+            AppLogging.debug("Job queue is blocked")
             return
 
         systemcontroller = SystemOperationController()
@@ -252,6 +254,8 @@ class GenericJobsProcessor(CeleryTaskInterface):
         if systemcontroller.is_remote_server_down():
             AppLogging.error("Remote server is down")
             return
+
+        AppLogging.debug("{} running jobs".format(self.get_name()))
 
         index = 0
 
@@ -285,6 +289,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
         """
         items = self.get_handler_and_object()
         if len(items) == 0:
+            AppLogging.debug("{} No jobs".format(self.get_name()))
             return True
 
         try:
@@ -298,6 +303,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
                 return True
 
         except KeyboardInterrupt:
+            AppLogging.debug("{} keyboard interrupt".format(self.get_name()))
             return True
 
         except Exception as E:
@@ -330,6 +336,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
                     E,
                     info_text="Exception",
                 )
+                AppLogging.debug("{} object exception".format(self.get_name()))
 
                 return True
 
@@ -342,6 +349,8 @@ class GenericJobsProcessor(CeleryTaskInterface):
         handler_class = items[1]
         handler = None
         deleted = False
+
+        AppLogging.debug("{} Processing job {}".format(self.get_name(), str(obj)))
 
         if handler_class:
             handler = handler_class(config)
@@ -389,9 +398,8 @@ class GenericJobsProcessor(CeleryTaskInterface):
 
             query_conditions &= jobs_conditions
 
-        objs = BackgroundJobController.objects.filter(query_conditions).order_by(
-            "date_created"
-        )
+        # order is in meta
+        objs = BackgroundJobController.objects.filter(query_conditions)
         if objs.exists():
             obj = objs.first()
 
@@ -453,10 +461,23 @@ class ImportJobsProcessor(GenericJobsProcessor):
         ]
 
 
+class SystemJobsProcessor(GenericJobsProcessor):
+    """
+    Jobs that should be working without hiccup
+    """
+
+    def get_supported_jobs(self):
+        return [
+            BackgroundJob.JOB_CLEANUP,
+            BackgroundJob.JOB_LINK_RESET_LOCAL_DATA,
+        ]
+
+
 class LeftOverJobsProcessor(GenericJobsProcessor):
     """
     There can be many queues handling jobs.
     This processor handles jobs that are not handled by other queues
+    If too many jobs are here, they might starve other things
     """
 
     def __init__(self, tasks_info=None):
@@ -464,8 +485,12 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
 
     def get_supported_jobs(self):
         jobs = []
-        choices = BackgroundJobController.JOB_CHOICES
 
+        if not self.tasks_info:
+            AppLogging.error("Task info not yet ready")
+            return
+
+        choices = BackgroundJobController.JOB_CHOICES
         for choice in choices:
             jobs.append(choice[0])
 
@@ -480,6 +505,10 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
                 if processor_job in jobs:
                     jobs.remove(processor_job)
 
+        if len(jobs) == 0:
+            AppLogging.error("Leftover processor does not have any jobs")
+            return
+
         return jobs
 
     def get_processors(self):
@@ -488,18 +517,27 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
         """
         processors = []
         for task_info in self.tasks_info:
-            if task_info[1] == "RefreshProcessor":
-                processors.append(RefreshProcessor)
-            if task_info[1] == "SourceJobsProcessor":
-                processors.append(SourceJobsProcessor)
-            if task_info[1] == "WriteJobsProcessor":
-                processors.append(WriteJobsProcessor)
-            if task_info[1] == "ImportJobsProcessor":
-                processors.append(ImportJobsProcessor)
-            if task_info[1] == "LeftOverJobsProcessor":
-                processors.append(LeftOverJobsProcessor)
+            processor = processor_from_id(task_info[1])
+
+            if processor:
+                processors.append(processor)
 
         return processors
+
+
+def processor_from_id(processor_id):
+    if processor_id == "RefreshProcessor":
+        return RefreshProcessor
+    if processor_id == "SourceJobsProcessor":
+        return SourceJobsProcessor
+    if processor_id == "WriteJobsProcessor":
+        return WriteJobsProcessor
+    if processor_id == "ImportJobsProcessor":
+        return ImportJobsProcessor
+    if processor_id == "SystemJobsProcessor":
+        return SystemJobsProcessor
+    if processor_id == "LeftOverJobsProcessor":
+        return LeftOverJobsProcessor
 
 
 class OneTaskProcessor(GenericJobsProcessor):
@@ -518,18 +556,3 @@ class OneTaskProcessor(GenericJobsProcessor):
 
         leftover_processor = LeftOverJobsProcessor()
         leftover_processor.run()
-
-
-def get_tasks():
-    """
-    TODO replace with what is passed
-    """
-    tasks = [
-        [300.0, RefreshProcessor],
-        [60.0, SourceJobsProcessor],
-        [60.0, WriteJobsProcessor],
-        [60.0, ImportJobsProcessor],
-        [60.0, LeftOverJobsProcessor],
-    ]
-
-    return tasks

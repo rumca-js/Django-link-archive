@@ -238,12 +238,23 @@ class EntryCompactedTags(models.Model):
                 )
 
     def cleanup(cfg=None):
-        tags = UserTags.objects.all()
+        #user_tags = UserTags.objects.all()
 
-        for entry in user_tags.values('entry').distinct():
-            entry_instance = LinkDataModel.objects.get(id=entry['entry'])
-            for tag in tag_names:
-                EntryCompactedTags.compact(entry_instance)
+        ##invalids = []
+
+        #for entry in user_tags.values('entry').distinct():
+        #    if entry['entry']:
+        #        entry_instances = LinkDataModel.objects.filter(id=entry['entry'])
+        #        if entry_instances.exists():
+        #            entry_instance = entry_instances[0]
+        #            EntryCompactedTags.compact(entry_instance)
+        #        #else:
+        #        #    invalids.append(entry["entry"])
+
+        ##for entry_id in invalids:
+        ##    items = UserTags.objects.filter(entry = entry_id)
+        ##    items.delete()
+        pass
 
 
 class UserCompactedTags(models.Model):

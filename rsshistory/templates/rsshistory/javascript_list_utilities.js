@@ -268,8 +268,6 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
 
             if (attempt < 3) {
                 loadRowListContent(search_term, page, attempt + 1);
-                $('#listStatus').html("Error loading list content, retry");
-                $('#footerStatus').html("Error loading list content, retry");
             }
             else {
                 $('#listStatus').html("Error loading list content");

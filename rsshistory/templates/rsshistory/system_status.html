@@ -70,6 +70,8 @@
 
         return htmlOutput;
     }
+
+
     function getThreadsText(threads) {
         let htmloutput = '';
 
@@ -84,7 +86,7 @@
                 }
 
                 let table_text = `
-                    <li class="list-group-item">${thread_name}: ${thread_date}</li>
+                    <li class="list-group-item">${thread.name}: ${thread_date} Status:${thread.status}</li>
                 `;
 
                 htmloutput += table_text;
@@ -95,6 +97,8 @@
 
         return htmloutput;
     }
+
+
     function getTableStatusText(tables) {
         let htmloutput = '';
 
@@ -115,6 +119,8 @@
 
         return htmloutput;
     }
+
+
     function getExportStatusText(exports) {
         let htmloutput = '';
 
@@ -139,6 +145,7 @@
         return htmloutput;
     }
 
+
     function fillSystemStatus(data) {
         var system_status_text = getSystemStatusText(data);
         $('#statusBlock').html(system_status_text);
@@ -149,14 +156,20 @@
            showElement(".threadErrorElement");
         }
     }
+
+
     function fillTableStatus(tables) {
         var text = getTableStatusText(tables);
         $('#tableStats').html(text);
     }
+
+
     function fillExportStatus(data) {
         var text = getExportStatusText(data.exports);
         $('#exportStats').html(text);
     }
+
+
     function fillSettings(data) {
         let htmlOutput = '';
     
@@ -178,6 +191,7 @@
         $('#settingsBlock').html(htmlOutput);
     }
 
+
     function loadSystemStatus(attempt = 1) {
         $('#statusBlock').html(getSpinnerText());
         $.ajax({
@@ -189,16 +203,16 @@
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    $('#statusBlock').html("Error loading dynamic content, retry")
-                    $('#threadStats').html("Error loading dynamic content, retry")
                     loadSystemStatus(attempt + 1);
                 } else {
-                    $('#statusBlock').html("Error loading dynamic content")
-                    $('#threadStats').html("Error loading dynamic content")
+                    //$('#statusBlock').html("Error loading dynamic content")
+                    //$('#threadStats').html("Error loading dynamic content")
                 }
             }
         });
     }
+
+
     function loadTableStatus(attempt = 1) {
         $('#tableStats').html(getSpinnerText());
         $.ajax({
@@ -211,14 +225,15 @@
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    $('#tableStats').html("Error loading dynamic content, retry")
                     loadTableStatus(attempt + 1);
                 } else {
-                    $('#tableStats').html("Error loading dynamic content")
+                    //$('#tableStats').html("Error loading dynamic content")
                 }
             }
         });
     }
+
+
     function loadExportStatus(attempt = 1) {
         $('#exportStats').html(getSpinnerText());
         $.ajax({
@@ -230,14 +245,15 @@
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    $('#exportStats').html("Error loading dynamic content, retry")
                     loadExportStatus(attempt + 1);
                 } else {
-                    $('#exportStats').html("Error loading dynamic content")
+                    //$('#exportStats').html("Error loading dynamic content")
                 }
             }
         });
     }
+
+
     function loadSettings(attempt = 1) {
         $('#settingsBlock').html(getSpinnerText());
         $.ajax({
@@ -249,10 +265,9 @@
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    $('#settingsBlock').html("Error loading dynamic content, retry")
                     loadSettings(attempt + 1);
                 } else {
-                    $('#settingsBlock').html("Error loading dynamic content")
+                    //$('#settingsBlock').html("Error loading dynamic content")
                 }
             }
         });

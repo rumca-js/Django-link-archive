@@ -30,6 +30,7 @@ from ..models import (
     UserTags,
     UserCompactedTags,
     CompactedTags,
+    EntryCompactedTags,
     UserVotes,
     UserBookmarks,
     UserSearchHistory,
@@ -319,6 +320,7 @@ def json_table_status(request):
     table.append({"name": "UserTags", "count": UserTags.objects.count()})
     table.append({"name": "UserCompactedTags", "count": UserCompactedTags.objects.count()})
     table.append({"name": "CompactedTags", "count": CompactedTags.objects.count()})
+    table.append({"name": "EntryCompactedTags", "count": EntryCompactedTags.objects.count()})
     table.append({"name": "UserVotes", "count": UserVotes.objects.count()})
     table.append({"name": "UserBookmarks", "count": UserBookmarks.objects.count()})
     table.append( {"name": "UserComments", "count": UserCommentsController.objects.count()})
@@ -415,9 +417,9 @@ def json_system_status(request):
     data["threads"] = []
 
     threads = SystemOperationController.get_threads()
-    for thread in threads:
-        thread_info = system_controller.get_thread_info(thread)
-        data["threads"].append({"name": thread, "date": thread_info[1]})
+    for thread_id in threads:
+        thread_info = system_controller.get_thread_info(thread_id)
+        data["threads"].append({"name": thread_id, "date": thread_info[1], "status" : thread_info[2]})
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 

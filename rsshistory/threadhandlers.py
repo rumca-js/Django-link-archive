@@ -891,7 +891,7 @@ class ExportDataJobHandler(BaseJobHandler):
 
         elapsed_sec = self.get_time_diff()
         AppLogging.notify(
-            "Successfully pushed data to git. Export:{} Time:{}".format(
+            "Export succcessfull. Export:{} Time:{}".format(
                 obj.subject, elapsed_sec
             )
         )

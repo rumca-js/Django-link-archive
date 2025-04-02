@@ -50,11 +50,6 @@ class BaseLinkDataModel(models.Model):
         help_text="Date when entry was created in the database",
     )
 
-    # date when entry was accessed last by scanned
-    date_update_last = models.DateTimeField(
-        null=True, help_text="Date when page was last checked"
-    )
-
     # web page publication date
     date_published = models.DateTimeField(
         default=timezone.now, help_text="Date when page was published"
@@ -63,6 +58,11 @@ class BaseLinkDataModel(models.Model):
     # web page date when link was found dead
     date_dead_since = models.DateTimeField(
         null=True, help_text="Date when page became inactive"
+    )
+
+    # date when entry was accessed last by scanned
+    date_update_last = models.DateTimeField(
+        null=True, help_text="Date when page was last checked"
     )
 
     # web page date of last modification
@@ -261,7 +261,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         # TODO should it be done by for tag in self.tags: tag.get_map()?
         result = []
 
-        tags = self.tags.all()
+        tags = self.tags.all().order_by("tag")
         for tag in tags:
             result.append(tag.tag)
         return result

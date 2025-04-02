@@ -27,10 +27,15 @@ class SystemOperationTest(FakeInternetTestCase):
 
         # call tested function
         SystemOperationController().refresh("NotRefreshProcessor")
+        SystemOperationController().refresh("NotRefreshProcessor")
 
         operations = SystemOperation.objects.all()
-        self.assertEqual(operations.count(), 1)
-        self.assertEqual(operations[0].is_internet_connection_checked, False)
+        self.assertEqual(operations.count(), 2)
+
+        self.assertEqual(operations[0].is_internet_connection_checked, True)
+        self.assertEqual(operations[0].is_internet_connection_ok, True)
+
+        self.assertEqual(operations[1].is_internet_connection_checked, False)
 
     def test_refresh__adds_multiple(self):
         SystemOperation.objects.all().delete()
@@ -42,9 +47,12 @@ class SystemOperationTest(FakeInternetTestCase):
         SystemOperationController().refresh("RefreshProcessor")
 
         operations = SystemOperation.objects.all()
-        self.assertEqual(operations.count(), 1)
+        self.assertEqual(operations.count(), 2)
+
         self.assertEqual(operations[0].is_internet_connection_checked, True)
         self.assertEqual(operations[0].is_internet_connection_ok, True)
+
+        self.assertEqual(operations[1].is_internet_connection_checked, False)
 
     def test_is_threading_ok(self):
         SystemOperation.objects.all().delete()
@@ -88,7 +96,7 @@ class SystemOperationTest(FakeInternetTestCase):
         thread_info = controller.get_thread_info("RefreshProcessor")
 
         self.assertTrue(thread_info)
-        self.assertEqual(len(thread_info), 2)
+        self.assertEqual(len(thread_info), 3)
         self.assertEqual(thread_info[0], "RefreshProcessor")
 
     def test_cleanup__removes(self):

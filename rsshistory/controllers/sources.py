@@ -226,11 +226,11 @@ class SourceDataController(SourceDataModel):
 
         return info
 
-    def fix_entries(self):
-        entries = LinkDataModel.objects.filter(source_url=self.url)
-        for entry in entries:
-            entry.source = self
-            entry.save()
+    #def fix_entries(self):
+    #    entries = LinkDataModel.objects.filter(source_url=self.url)
+    #    for entry in entries:
+    #        entry.source = self
+    #        entry.save()
 
     def get_clean_data(props):
         result = {}
@@ -463,7 +463,8 @@ class SourceDataBuilder(object):
         if not source:
             return None
 
-        SourceDataController.fix_entries(source)
+        # SourceDataController.fix_entries(source)
+        # background jobs to reconnect entries
 
         self.add_to_download(source)
 

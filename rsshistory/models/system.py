@@ -776,6 +776,7 @@ class AppLogging(models.Model):
     ):
         config = ConfigurationEntry.get()
         if level < config.logging_level:
+            #AppLogging.debug(info_text = info_text, detail_text = detail_text)
             return
 
         if stack:
