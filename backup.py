@@ -231,7 +231,7 @@ def create_destionation_table(table_name, source_table, destination_engine):
 
 def get_source_table(workspace, table_name, source_engine):
     source_metadata = MetaData()
-    source_table = Table("{}_{}".format(workspace, table), source_metadata, autoload_with=source_engine)
+    source_table = Table("{}_{}".format(workspace, table_name), source_metadata, autoload_with=source_engine)
     return source_table
 
 
@@ -300,14 +300,14 @@ def obfuscate_user_table(table_name, destination_engine):
         destination_connection.commit()
 
 
-def create_index(destination_engine, table_name, column_name):
+def create_indexes(destination_engine, table_name, column_name):
     destination_metadata = MetaData()
     destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
 
     r = ReflectedTable(destination_engine)
-    r.create_index(destination_table, "link")
-    r.create_index(destination_table, "title")
-    r.create_index(destination_table, "date_published")
+    #r.create_index(destination_table, "link")
+    #r.create_index(destination_table, "title")
+    #r.create_index(destination_table, "date_published")
 
 
 def obfuscate_all(destination_engine):
@@ -326,7 +326,6 @@ def get_source_engine(run_info):
     database = run_info["database"]
     host = run_info["host"]
     password = run_info["password"]
-    tables = run_info["tables"]
 
     # Create the database engine
     SOURCE_DATABASE_URL = f"postgresql://{user}:{password}@{host}/{database}"
@@ -351,7 +350,7 @@ def run_db_copy_backup(run_info):
     empty = run_info["empty"]
 
     # Create the database engine
-    source_engine = get_source_engine()
+    source_engine = get_source_engine(run_info)
 
     operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
@@ -380,7 +379,7 @@ def run_db_copy_backup_auth(run_info):
     operating_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(operating_dir)
 
-    destination_engine = get_destination_engine()
+    destination_engine = get_destination_engine(run_info)
 
     copy_table("auth", "user", source_engine, destination_engine)
 
@@ -407,7 +406,7 @@ def backup_workspace(run_info):
        "./instance_usertags"      : ["instance_usertags"],
        "./instance_compactedtags"      : ["instance_compactedtags"],
        "./instance_usercompactedtags"      : ["instance_usercompactedtags"],
-       "./instance_usertags"           : ["instance_usertags"],
+       "./instance_entrycompactedtags"           : ["instance_entrycompactedtags"],
        "./instance_compactedtags"      : ["instance_compactedtags"],
        "./instance_usercompactedtags"  : ["instance_usercompactedtags"],
        "./instance_votes"     : ["instance_uservotes"],
@@ -452,9 +451,9 @@ def backup_workspace(run_info):
 
         destination_engine = get_destination_engine(run_info)
 
-        create_index(destination_engine, "linkdatamodel", "link")
-        create_index(destination_engine, "linkdatamodel", "title")
-        create_index(destination_engine, "linkdatamodel", "date_published")
+        create_indexes(destination_engine, "linkdatamodel", "link")
+        create_indexes(destination_engine, "linkdatamodel", "title")
+        create_indexes(destination_engine, "linkdatamodel", "date_published")
 
         obfuscate_all(destination_engine)
 
@@ -479,6 +478,7 @@ def restore_workspace(run_info):
        ["./instance_usertags"        , ["instance_usertags"]],
        ["./instance_compactedtags"   , ["instance_compactedtags"]],
        ["./instance_usercompactedtags" , ["instance_usercompactedtags"]],
+       ["./instance_entrycompactedtags" , ["instance_entrycompactedtags"]],
        ["./instance_votes"           , ["instance_uservotes"]],
        ["./instance_comments"        , ["instance_usercomments"]],
        ["./instance_userbookmarks"   , ["instance_userbookmarks"]],

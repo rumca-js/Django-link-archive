@@ -246,8 +246,8 @@ class Url(ContentInterface):
         # TODO implement
         pass
 
-    def ping(self, timeout_s=20):
-        return RequestsCrawler.ping(self.url, timeout_s = timeout_s)
+    def ping(self, timeout_s=20, user_agent=None):
+        return RequestsCrawler.ping(self.url, timeout_s = timeout_s, user_agent = user_agent)
 
     def get_handler_implementation(self):
         url = self.url

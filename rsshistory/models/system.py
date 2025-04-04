@@ -346,7 +346,7 @@ class ConfigurationEntry(models.Model):
     )  # Might work faster if disabled, but might capture invalid pages
 
     user_agent = models.CharField(
-        default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
         max_length=500,
         help_text=(
             "Custom user agent for network requests. "

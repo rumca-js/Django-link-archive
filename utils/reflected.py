@@ -20,11 +20,10 @@ class ReflectedTable(object):
             connection.commit()
 
     def create_index(self, table, column_name):
-        index_name = f"idx_{table.__tablename__}_{column_name}"
-        index = Index(index_name, getattr(table, column_name))
-
-        # Use the engine to create the index in the database
-        index.create(bind=destination_engine)
+        index_name = f"idx_{table.name}_{column_name}"
+        index = Index(index_name, getattr(table.c, column_name))
+    
+        index.create(bind=self.engine)
 
     def close(self):
         with self.engine.connect() as connection:
