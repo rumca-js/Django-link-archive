@@ -37,6 +37,9 @@
         if (data.last_internet_check) {
             data.last_internet_check = new Date(data.last_internet_check).toLocaleString();
         }
+        if (data.crawling_server_status_check) {
+            data.crawling_server_status_check = new Date(data.crawling_server_status_check).toLocaleString();
+        }
         if (data.days_to_move_to_archive) {
             data.days_to_move_to_archive = new Date(data.days_to_move_to_archive).toLocaleString();
         }
@@ -56,6 +59,8 @@
         let array = [
             { name: "Last internet check", value: data.last_internet_check },
             { name: "Last internet status", value: data.last_internet_status },
+            { name: "Crawling server check", value: data.crawling_server_status_check },
+            { name: "Crawling server status", value: data.crawling_server_status },
             { name: "days to move to archive", value: data.days_to_move_to_archive },
             { name: "days to remove links", value: data.days_to_remove_links },
             { name: "days to remove stale entries", value: data.days_to_remove_stale_entries },

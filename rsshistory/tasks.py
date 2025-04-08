@@ -25,6 +25,9 @@ def process_jobs_task(Processor, tasks_info):
         AppLogging.debug("{} {}".format(Processor, handler.get_supported_jobs()))
 
         handler.run()
+
+        AppLogging.debug("Running processor: {} DONE".format(Processor))
+
     except Exception as E:
         AppLogging.error(
             "Exception in process_jobs_task for processor: {} {}".format(

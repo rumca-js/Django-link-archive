@@ -16,18 +16,41 @@ class SystemOperationController(object):
         # any thread can ping, check
 
         if self.is_it_time_to_ping():
-            if self.ping_internet():
-                SystemOperation.add_by_thread(
-                    thread_id, internet_status_checked=True, internet_status_ok=True
-                )
-            else:
-                SystemOperation.add_by_thread(
-                    thread_id,
-                    internet_status_checked=True,
-                    internet_status_ok=False,
-                )
+            self.check_internet(thread_id)
+            self.check_crawling_sever(thread_id)
         else:
             SystemOperation.add_by_thread(thread_id)
+
+    def check_internet(self, thread_id):
+        if self.ping_internet():
+            SystemOperation.add_by_thread(
+                thread_id, check_type=SystemOperation.CHECK_TYPE_INTERNET, status=True
+            )
+        else:
+            SystemOperation.add_by_thread(
+                thread_id,
+                check_type=SystemOperation.CHECK_TYPE_INTERNET,
+                status=False,
+            )
+
+    def check_crawling_sever(self, thread_id):
+        config_entry = ConfigurationEntry.get()
+
+        remote_server = config_entry.remote_webtools_server_location
+
+        if not remote_server:
+            return False
+
+        from ..pluginurl import UrlHandlerEx
+
+        if not UrlHandlerEx.ping(remote_server):
+            SystemOperation.add_by_thread(
+                thread_id, check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER, status=False,
+            )
+        else:
+            SystemOperation.add_by_thread(
+                thread_id, check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER, status=True,
+            )
 
     def cleanup(cfg=None, thread_ids=None):
         if thread_ids:
@@ -62,7 +85,7 @@ class SystemOperationController(object):
                     entry.delete()
 
     def is_it_time_to_ping(self):
-        datetime = self.get_last_internet_check()
+        datetime = self.last_operation_status_date()
         if not datetime:
             return True
 
@@ -91,23 +114,10 @@ class SystemOperationController(object):
         """
         TODO - we do not know when we started APP.
         """
-        return self.get_last_internet_status()
+        return self.last_operation_status()
 
     def is_remote_server_down(self):
-        config_entry = ConfigurationEntry.get()
-
-        remote_server = config_entry.remote_webtools_server_location
-
-        if not remote_server:
-            return False
-
-        from ..pluginurl import UrlHandlerEx
-
-        if not UrlHandlerEx.ping(remote_server):
-            AppLogging.error("Cannot ping remote server: {}".format(remote_server))
-            return True
-
-        return False
+        return not self.last_operation_status(check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER)
 
     def is_system_healthy(self):
         c = ConfigurationEntry.get()
@@ -148,17 +158,18 @@ class SystemOperationController(object):
         if entries.exists():
             return entries[0].date_created
 
-    def get_last_internet_check(self):
-        entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
+    def last_operation_status_date(self, check_type=SystemOperation.CHECK_TYPE_INTERNET):
+        entries = SystemOperation.objects.filter(check_type=check_type)
 
         if entries.exists():
             return entries[0].date_created
 
-    def get_last_internet_status(self):
-        entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
+    def last_operation_status(self, check_type=SystemOperation.CHECK_TYPE_INTERNET):
+        entries = SystemOperation.objects.filter(check_type=check_type)
 
         if entries.exists():
-            return entries[0].is_internet_connection_ok
+            return entries[0].status
+        return True
 
     def get_thread_info(self, thread_id):
         """

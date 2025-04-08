@@ -562,6 +562,9 @@ class ConfigurationEntry(models.Model):
 
 
 class SystemOperation(models.Model):
+    CHECK_TYPE_INTERNET = "Internet"
+    CHECK_TYPE_CRAWLING_SERVER = "CrawlingServer"
+
     thread_id = models.CharField(
         blank=True,
         help_text="Thread ID",
@@ -570,12 +573,12 @@ class SystemOperation(models.Model):
 
     date_created = models.DateTimeField(auto_now_add=True, null=True)
 
-    is_internet_connection_checked = models.BooleanField(
-        default=False,
-        help_text="Is connection OK",
+    check_type = models.CharField(
+        max_length=50,
+        blank=True,
     )
 
-    is_internet_connection_ok = models.BooleanField(
+    status = models.BooleanField(
         default=True,
         help_text="Is connection OK",
     )
@@ -584,17 +587,17 @@ class SystemOperation(models.Model):
         ordering = ["-date_created"]
 
     def add_by_thread(
-        thread_id, internet_status_checked=False, internet_status_ok=True
+        thread_id, check_type="", status = True
     ):
         # delete all entries without internet check
         all_entries = SystemOperation.objects.filter(
-            thread_id=thread_id, is_internet_connection_checked=False
+            thread_id=thread_id, check_type = "",
         )
         all_entries.delete()
 
         # leave one entry with time check
         all_entries = SystemOperation.objects.filter(
-            thread_id=thread_id, is_internet_connection_checked=True
+            thread_id=thread_id, check_type=check_type
         )
         if all_entries.exists() and all_entries.count() > 1:
             entries = all_entries[1:]
@@ -603,8 +606,8 @@ class SystemOperation(models.Model):
 
         SystemOperation.objects.create(
             thread_id=thread_id,
-            is_internet_connection_checked=internet_status_checked,
-            is_internet_connection_ok=internet_status_ok,
+            check_type=check_type,
+            status=status,
         )
 
 

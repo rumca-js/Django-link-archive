@@ -106,11 +106,9 @@ class RefreshProcessor(CeleryTaskInterface):
         systemcontroller.refresh(self.get_name())
 
         if systemcontroller.is_remote_server_down():
-            AppLogging.error("Remote server is down")
             return
 
         if not systemcontroller.is_internet_ok():
-            AppLogging.error("Internet is not OK")
             return
 
         self.check_sources()
@@ -160,21 +158,23 @@ class RefreshProcessor(CeleryTaskInterface):
         if not entries:
             return
 
-        number_of_entries = entries.count()
+        current_num_of_jobs = (
+            BackgroundJobController.get_number_of_update_reset_jobs()
+        )
 
-        if number_of_entries > 0:
-            current_num_of_jobs = (
-                BackgroundJobController.get_number_of_update_reset_jobs()
-            )
+        jobs_to_add = max_number_of_update_entries - current_num_of_jobs
 
-            if current_num_of_jobs >= max_number_of_update_entries:
+        if jobs_to_add <= 0:
+            return
+
+        index = 0
+        for entry in entries:
+            if index < jobs_to_add:
+                BackgroundJobController.entry_update_data(entries[index])
+            else:
                 return
 
-            jobs_to_add = max_number_of_update_entries - current_num_of_jobs
-            jobs_to_add = min(jobs_to_add, number_of_entries)
-
-            for index in range(jobs_to_add):
-                BackgroundJobController.entry_update_data(entries[index])
+            index += 1
 
     def get_supported_jobs(self):
         return []
@@ -248,11 +248,9 @@ class GenericJobsProcessor(CeleryTaskInterface):
         systemcontroller.refresh(self.get_name())
 
         if not systemcontroller.is_internet_ok():
-            AppLogging.error("Internet is not OK")
             return
 
         if systemcontroller.is_remote_server_down():
-            AppLogging.error("Remote server is down")
             return
 
         AppLogging.debug("{} running jobs".format(self.get_name()))

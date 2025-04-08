@@ -367,11 +367,18 @@ def json_system_status(request):
 
     system_controller = SystemOperationController()
 
-    last_internet_check = c.get_local_time(system_controller.get_last_internet_check())
+    last_internet_check = c.get_local_time(system_controller.last_operation_status_date())
     data["last_internet_check"] = last_internet_check
 
-    last_internet_status = system_controller.is_internet_ok()
+    last_internet_status = system_controller.last_operation_status()
     data["last_internet_status"] = last_internet_status
+
+    last_crawling_server_check = c.get_local_time(system_controller.last_operation_status_date(SystemOperation.CHECK_TYPE_CRAWLING_SERVER))
+
+    data["last_crawling_server_check"] = last_crawling_server_check
+
+    last_crawling_server_status = c.get_local_time(system_controller.last_operation_status(SystemOperation.CHECK_TYPE_CRAWLING_SERVER))
+    data["last_crawling_server_status"] = last_crawling_server_status
 
     now = c.get_local_time(DateUtils.get_datetime_now_utc())
     data["current_time"] = now
@@ -934,66 +941,6 @@ def opensearchxml(request):
     return HttpResponse(text, status=status_code, content_type=content_type)
 
 
-def get_footer_status_line(request):
-    """
-    This function should only use DB access files.
-    No checking if features are enabled, no checking of third-party libraries
-    """
-
-    def add_to_message(message, issue_text):
-        if message != "":
-            message += ", "
-        else:
-            message += "Indicators: "
-        message += issue_text
-
-        return message
-
-    p = ViewPage(request)
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
-
-    process_source_queue_size = BackgroundJobController.get_number_of_jobs(
-        BackgroundJobController.JOB_PROCESS_SOURCE
-    )
-
-    sources = SourceOperationalData.objects.filter(
-        consecutive_errors__gt=0, source_obj__enabled=True
-    )
-
-    error_jobs = BackgroundJobController.objects.filter(errors__gt=0)
-
-    configuration_entry = Configuration.get_object().config_entry
-
-    system_controller = SystemOperationController()
-
-    sources_are_fetched = process_source_queue_size > 0
-    sources_queue_size = process_source_queue_size
-    is_sources_error = sources.count() > 0
-    is_internet_ok = system_controller.is_internet_ok()
-    is_threading_ok = system_controller.is_threading_ok()
-    is_backgroundjobs_error = error_jobs.count() > 0
-    is_configuration_error = False
-
-    message = ""
-    if sources_are_fetched:
-        message += f"Reading sources. Queue:{sources_queue_size}"
-    if is_sources_error:
-        message = add_to_message(message, "Sources")
-    if configuration_entry.enable_background_jobs and not is_internet_ok:
-        message = add_to_message(message, "Internet")
-    if configuration_entry.enable_background_jobs and not is_threading_ok:
-        message = add_to_message(message, "Threads")
-    if is_backgroundjobs_error:
-        message = add_to_message(message, "Jobs")
-    if is_configuration_error:
-        message = add_to_message(message, "Configuration")
-
-    data = {"message": message}
-    return JsonResponse(data, json_dumps_params={"indent": 4})
-
-
 def get_indicators(request):
     p = ViewPage(request)
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -1054,9 +1001,9 @@ def get_indicators(request):
     indicators["internet_error"]["status"] = is_internet_error
 
     is_remote_server_down = system_controller.is_remote_server_down()
-    indicators["remote_server_error"] = {}
-    indicators["remote_server_error"]["message"] = f"Remote server error"
-    indicators["remote_server_error"]["status"] = is_remote_server_down
+    indicators["crawling_server_error"] = {}
+    indicators["crawling_server_error"]["message"] = f"Crawling server error"
+    indicators["crawling_server_error"]["status"] = is_remote_server_down
 
     threads_error = configuration_entry.enable_background_jobs and not is_threading_ok
     indicators["threads_error"] = {}

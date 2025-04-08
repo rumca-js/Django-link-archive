@@ -186,7 +186,7 @@ class SystemViewsTest(FakeInternetTestCase):
         self.assertIn("read_later_queue", data["indicators"])  # used by menu
         self.assertIn("sources_error", data["indicators"])
         self.assertIn("internet_error", data["indicators"])
-        self.assertIn("remote_server_error", data["indicators"])
+        self.assertIn("crawling_server_error", data["indicators"])
         self.assertIn("threads_error", data["indicators"])
         self.assertIn("jobs_error", data["indicators"])
         self.assertIn("configuration_error", data["indicators"])

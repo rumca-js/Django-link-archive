@@ -855,6 +855,9 @@ class SourcesChoiceForm(forms.Form):
         self.fields["subcategory_name"].widget = forms.Select(
             choices=subcategories, attrs=attr
         )
+        self.fields["search"].widget.attrs["placeholder"] = "Search..."
+        self.fields["search"].widget.attrs["autofocus"] = True
+        self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
 
     def get_categories(self):
         result = []

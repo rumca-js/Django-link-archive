@@ -73,6 +73,12 @@ function SetFooterStatusLine() {
    if (common_indicators.configuration_error.status) {
        error_line += add_text(error_line, "Configuration");
    }
+   if (common_indicators.internet_error.status) {
+       error_line += add_text(error_line, "Internet");
+   }
+   if (common_indicators.crawling_server_error.status) {
+       error_line += add_text(error_line, "Crawling server");
+   }
    if (common_indicators.is_reading.status) {
        error_line += add_text(error_line, common_indicators.is_reading.message);
    }
