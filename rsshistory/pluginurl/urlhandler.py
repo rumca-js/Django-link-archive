@@ -72,6 +72,7 @@ class UrlHandler(Url):
             return True
 
         properties = self.get_properties()
+        properties["contents"] = self.get_contents()
         if EntryRules.is_dict_blocked(properties):
             return True
 
@@ -350,12 +351,12 @@ class UrlHandlerEx(object):
         return True
 
     def is_blocked(self):
-        properties = self.get_section("Properties")
-
         if EntryRules.is_url_blocked(self.url):
             return True
 
         properties = self.get_section("Properties")
+        properties["contents"] = self.get_contents()
+
         if EntryRules.is_dict_blocked(properties):
             return True
 

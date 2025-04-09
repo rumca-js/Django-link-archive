@@ -139,6 +139,8 @@ class EntryRules(models.Model):
                 pulp = str(dictionary["title"])
             if "description" in dictionary:
                 pulp += str(dictionary["description"])
+            if "contents" in dictionary:
+                pulp += str(dictionary["contents"])
 
         fields = self.trigger_text_fields.split(",")
 
@@ -149,6 +151,10 @@ class EntryRules(models.Model):
         if "description" in fields:
             if "description" in dictionary:
                 pulp += str(dictionary["description"])
+
+        if "contents" in fields:
+            if "contents" in dictionary:
+                pulp += str(dictionary["contents"])
 
         # ignore case
         return pulp.lower()

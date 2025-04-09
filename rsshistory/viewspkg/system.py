@@ -377,7 +377,7 @@ def json_system_status(request):
 
     data["last_crawling_server_check"] = last_crawling_server_check
 
-    last_crawling_server_status = c.get_local_time(system_controller.last_operation_status(SystemOperation.CHECK_TYPE_CRAWLING_SERVER))
+    last_crawling_server_status = system_controller.last_operation_status(SystemOperation.CHECK_TYPE_CRAWLING_SERVER)
     data["last_crawling_server_status"] = last_crawling_server_status
 
     now = c.get_local_time(DateUtils.get_datetime_now_utc())

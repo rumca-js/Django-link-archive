@@ -99,6 +99,41 @@ def get_errors(page_url):
     return result
 
 
+def get_request_browser(input_map):
+    browser = None
+
+    if "browser" in input_map and input_map["browser"] != "":
+        browser_pk = int(input_map["browser"])
+
+        if browser_pk != Browser.AUTO:
+            browsers = Browser.objects.filter(pk=browser_pk)
+            if browsers.exists():
+                browser = browsers[0]
+            else:
+                AppLogging.error("Browser does not exist!")
+                return
+
+    return browser
+
+
+def get_request_url_with_browser(input_map):
+    browser = get_request_browser(input_map)
+
+    if browser:
+        browsers = [browser.get_setup()]
+    else:
+        browsers = None
+
+    page_link = input_map["link"]
+
+    settings = {}
+    if "html" in input_map:
+        settings["handler_class"] = "HttpPageHandler"
+
+    url_ex = UrlHandlerEx(page_link, settings=settings, browsers=browsers)
+    return url_ex
+
+
 def get_page_properties(request):
     p = ViewPage(request)
     p.set_title("Page properties")
@@ -113,29 +148,7 @@ def get_page_properties(request):
 
     page_link = request.GET["page"]
 
-    browser = None
-
-    if "browser" in request.GET and request.GET["browser"] != "":
-        browser_pk = int(request.GET["browser"])
-
-        if browser_pk != Browser.AUTO:
-            browsers = Browser.objects.filter(pk=browser_pk)
-            if browsers.exists():
-                browser = browsers[0]
-            else:
-                AppLogging.error("Browser does not exist!")
-                return
-
-    settings = {}
-    if "html" in request.GET:
-        settings["handler_class"] = "HttpPageHandler"
-
-    if browser:
-        browsers = [browser.get_setup()]
-    else:
-        browsers = None
-
-    url_ex = UrlHandlerEx(page_link, settings=settings, browsers=browsers)
+    url_ex = get_request_url_with_browser(request.GET)
     all_properties = url_ex.get_properties()
 
     for item in all_properties:
@@ -196,7 +209,7 @@ def get_scan_contents_links(link, contents):
 
 
 def page_scan_link(request):
-    def render_page_scan_input(p, link, template="form_basic.html"):
+    def render_page_scan_input(url, link, template="form_basic.html"):
         h = UrlHandlerEx(link)
         contents = h.get_contents()
 
@@ -213,17 +226,18 @@ def page_scan_link(request):
         return data
 
     if request.method == "POST":
-        form = LinkInputForm(request.POST, request=request)
+        form = LinkPropertiesForm(request.POST, request=request)
         if not form.is_valid():
             return p.render("form_basic.html")
 
         link = form.cleaned_data["link"]
+        url = get_request_url_with_browser(form.cleaned_data)
 
-        return render_page_scan_input(p, link)
+        return render_page_scan_input(url, link)
 
     if request.method == "GET":
         if "link" not in request.GET:
-            form = LinkInputForm(request=request)
+            form = LinkPropertiesForm(request=request)
             form.method = "POST"
 
             p.context["form"] = form
@@ -232,7 +246,8 @@ def page_scan_link(request):
             return p.render("form_basic.html")
         else:
             link = request.GET["link"]
-            return render_page_scan_input(p, link, "form_oneliner.html")
+            url = get_request_url_with_browser(request.GET)
+            return render_page_scan_input(url, link, "form_oneliner.html")
 
 
 def page_add_many_links(request):

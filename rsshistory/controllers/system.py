@@ -65,24 +65,18 @@ class SystemOperationController(object):
 
         thread_ids = SystemOperationController.get_threads()
 
-        for thread_id in thread_ids:
-            # leave one entry with time check
-            all_entries = SystemOperation.objects.filter(
-                thread_id=thread_id, is_internet_connection_checked=True
-            )
-            if all_entries.exists() and all_entries.count() > 1:
-                entries = all_entries[1:]
-                for entry in entries:
-                    entry.delete()
+        check_types = SystemOperation.objects.values_list('check_type', flat=True).distinct()
 
-            # leave one entry without time check
-            all_entries = SystemOperation.objects.filter(
-                thread_id=thread_id, is_internet_connection_checked=False
-            )
-            if all_entries.exists() and all_entries.count() > 1:
-                entries = all_entries[1:]
-                for entry in entries:
-                    entry.delete()
+        for thread_id in thread_ids:
+            for check_type in check_types:
+                # leave one entry
+                all_entries = SystemOperation.objects.filter(
+                    thread_id=thread_id, check_type=check_type
+                )
+                if all_entries.exists() and all_entries.count() > 1:
+                    entries = all_entries[1:]
+                    for entry in entries:
+                        entry.delete()
 
     def is_it_time_to_ping(self):
         datetime = self.last_operation_status_date()

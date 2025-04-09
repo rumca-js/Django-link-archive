@@ -185,8 +185,10 @@ $(document).ready(function() {
 });
 
 
+/* when user switches tab - this might result in many fetches
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
         getIndicators();
     }
 });
+*/
