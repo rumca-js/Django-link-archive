@@ -163,7 +163,7 @@ function sendPagePropertiesRequest(page_url, browser, attempt = 1) {
 
     let encodedPageUrl = encodeURIComponent(page_url);
 
-    let url = `{% url 'rsshistory:get-page-properties' %}?page=${encodedPageUrl}&browser=${browser}`;
+    let url = `{% url 'rsshistory:get-page-properties' %}?link=${encodedPageUrl}&browser=${browser}`;
 
     const requestCurrentPageProperties = ++currentPageProperties;
 

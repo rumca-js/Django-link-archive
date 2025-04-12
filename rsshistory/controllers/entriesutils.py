@@ -1000,8 +1000,14 @@ class EntryWrapper(object):
             return objs[0]
 
     def create(self, link_data):
-        self.date = link_data["date_published"]
-        is_archive = self.is_archive()
+        if "date_published" in link_data:
+            self.date = link_data["date_published"]
+        else:
+            self.date = None
+
+        is_archive = False
+        if self.date:
+            is_archive = self.is_archive()
 
         if "bookmarked" in link_data and link_data["bookmarked"]:
             is_archive = False
@@ -1020,19 +1026,21 @@ class EntryWrapper(object):
             )
             link_data["language"] = None
 
-        # TODO remove hardcoded values
+        title_length = LinkDataController.get_field_length("title")
+        description_length = LinkDataController.get_field_length("description")
+
         if (
             "title" in link_data
             and link_data["title"]
-            and len(link_data["title"]) > 999
+            and len(link_data["title"]) > title_length -1
         ):
-            link_data["title"] = link_data["title"][:998]
+            link_data["title"] = link_data["title"][:title_length-1]
         if (
             "description" in link_data
             and link_data["description"]
-            and len(link_data["description"]) > 999
+            and len(link_data["description"]) > description_length - 1
         ):
-            link_data["description"] = link_data["description"][:998]
+            link_data["description"] = link_data["description"][:description-1]
 
         if not self.strict_ids and "id" in link_data:
             del link_data["id"]
@@ -1040,7 +1048,7 @@ class EntryWrapper(object):
         if self.user:
             link_data["user"] = self.user
 
-        if not is_archive:
+        if not is_archive or self.date is None:
             if self.strict_ids and "id" in link_data:
                 objs = LinkDataController.objects.filter(id=link_data["id"])
                 if objs.exists():
@@ -1254,6 +1262,7 @@ class EntryWrapper(object):
 
     def is_archive(self):
         is_archive = BaseLinkDataController.is_archive_by_date(self.date)
+
         return is_archive
 
     def is_current_entry_perfect(self):
@@ -1464,8 +1473,27 @@ class EntryDataBuilder(object):
         if self.link_data:
             return self.build_from_props(ignore_errors=self.ignore_errors)
 
-    def build_from_link(self, ignore_errors=False):
+    def build_simple(self, link=None):
+        if link:
+            self.link = link
+
+        wrapper = EntryWrapper(link=self.link)
+        obj = wrapper.get()
+        if obj:
+            self.result = obj
+            return obj
+
+        link_data = {}
+        link_data["link"] = self.link
+
+        entry = wrapper.create(link_data)
+        return entry
+
+    def build_from_link(self, link=None, ignore_errors=False):
         from ..pluginurl import UrlHandlerEx
+
+        if link:
+            self.link = link
 
         """
         TODO extract this to a separate class?

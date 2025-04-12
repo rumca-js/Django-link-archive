@@ -481,19 +481,9 @@ class SourceDataBuilder(object):
 
         source = SourceDataController.objects.create(**self.link_data)
 
-        self.additional_source_operations(source)
+        # TODO add entry in source update job (or change link update job)
 
         return source
-
-    def additional_source_operations(self, source):
-        from .backgroundjob import BackgroundJobController
-
-        if source:
-            SourceDataController.add_entry(source)
-
-            config = Configuration.get_object().config_entry
-            if config.auto_store_thumbnails:
-                BackgroundJobController.download_file(source.favicon)
 
     def get_clean_data(self):
         result = {}

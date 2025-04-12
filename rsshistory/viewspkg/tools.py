@@ -141,12 +141,10 @@ def get_page_properties(request):
     if data is not None:
         return data
 
-    if "page" not in request.GET:
+    if "link" not in request.GET:
         data = {}
         data["status"] = False
         return JsonResponse(data, json_dumps_params={"indent": 4})
-
-    page_link = request.GET["page"]
 
     url_ex = get_request_url_with_browser(request.GET)
     all_properties = url_ex.get_properties()

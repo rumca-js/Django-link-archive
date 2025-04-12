@@ -273,6 +273,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.save()
 
         EntryRules.objects.all().delete()
+        EntryRules.initialize_common_rules()
 
         MockRequestCounter.mock_page_requests = 0
 
@@ -644,4 +645,39 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         objs = LinkDataController.objects.filter(link="https://youtube.com/v=1234")
         self.assertEqual(objs.count(), 0)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_build_simple(self):
+        config = Configuration.get_object().config_entry
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
+        config.auto_create_sources = False
+        config.auto_scan_new_entries = True
+        config.save()
+
+        EntryRules.objects.all().delete()
+
+        MockRequestCounter.mock_page_requests = 0
+
+        link_name = "https://youtube.com/v=1234"
+
+        b = EntryDataBuilder()
+        # call tested function
+        entry = b.build_simple(link_name)
+
+        objs = LinkDataController.objects.filter(link=link_name)
+
+        self.assertEqual(objs.count(), 1)
+        self.assertEqual(objs[0].link, link_name)
+        self.assertNotEqual(objs[0].date_published, None)
+
+        self.assertEqual(objs[0].page_rating_contents, 0)
+        # votes are reset
+        self.assertEqual(objs[0].page_rating_votes, 0)
+        # visits are reset
+        self.assertEqual(objs[0].page_rating_visits, 0)
+        # rating is recalculated
+        self.assertEqual(objs[0].page_rating, 0)
+
+        # this is obtained not through page requests
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)

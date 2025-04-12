@@ -31,6 +31,7 @@ from ..models import (
     AppLogging,
     ConfigurationEntry,
     Browser,
+    EntryRules,
 )
 from ..configuration import Configuration
 from ..pluginurl import UrlHandlerEx
@@ -378,6 +379,25 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.save()
 
         c.apply_robots_txt()
+
+        EntryRules.objects.create(
+            rule_name="casinos-block",
+            trigger_text="casino, lotter, jackpot, bingo, poker, slot, betting, togel, gacor, bandar judi, pagcor, slotlara kadar, canli bahis, terpopuler, deposit, g2gbet, terpercaya, maxtoto, Gampang, bonus giveaway, pg slot, cashback rewards, situs slot, slot situs",
+            block=True,
+        )
+
+        EntryRules.objects.create(
+            rule_name="sexual-block",
+            trigger_text="mastubat, porn, sexseite, zoophilia, chaturbat",
+            block=True,
+        )
+
+        EntryRules.objects.create(
+            rule_name="inactive-links",
+            trigger_text="forbidden, access denied, page not found, site not found, 404 not found, 404: not found, error 404, 404 error, 404 page, 404 file not found, squarespace - website expired, domain name for sale, account suspended, the request could not be satisfied",
+            trigger_text_fields="title",
+            block=True,
+        )
 
     def get_user(
         self, username="test_username", password="testpassword", is_superuser=False
