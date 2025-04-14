@@ -31,7 +31,7 @@ function fillIsEntryDownloaded(attempt = 1) {
             is_downloading = data.is_downloading;
 
             if (is_downloading) {
-                const text = getDownloadingText("Downloading...);
+                const text = getDownloadingText("Downloading...");
                 $('#entryDownloadContainer').html(text);
             }
             else {
@@ -40,7 +40,7 @@ function fillIsEntryDownloaded(attempt = 1) {
 
             is_updating = data.is_updating;
             if (is_updating) {
-                const text = getDownloadingText("Fetching link data...);
+                const text = getDownloadingText("Fetching link data...");
                 $('#entryUpdateContainer').html(text);
             }
             else {
