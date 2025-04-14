@@ -33,9 +33,9 @@ class BaseLinkDataModel(models.Model):
     link = models.CharField(max_length=1000, unique=True)
 
     # URL of source, might be RSS source
-    source_url = models.CharField(max_length=2000)
+    source_url = models.CharField(blank=True, max_length=2000)
 
-    title = models.CharField(max_length=1000, null=True)
+    title = models.CharField(max_length=1000, null=True, blank=True)
     description = models.TextField(max_length=1000, null=True, blank=True)
     thumbnail = models.CharField(max_length=1000, null=True, blank=True)
     language = models.CharField(max_length=10, null=True, blank=True)
@@ -43,7 +43,7 @@ class BaseLinkDataModel(models.Model):
         blank=True, null=True, help_text="Age limit to view entry"
     )
 
-    # date when entry was created in DB
+    # DB - date when entry was created
     date_created = models.DateTimeField(
         auto_now_add=True,
         null=True,
@@ -52,7 +52,8 @@ class BaseLinkDataModel(models.Model):
 
     # web page publication date
     date_published = models.DateTimeField(
-        default=timezone.now, help_text="Date when page was published"
+        help_text="Date when page was published",
+        null=True,
     )
 
     # web page date when link was found dead
@@ -60,7 +61,7 @@ class BaseLinkDataModel(models.Model):
         null=True, help_text="Date when page became inactive"
     )
 
-    # date when entry was accessed last by scanned
+    # DB - date when entry was accessed last by scanned
     date_update_last = models.DateTimeField(
         null=True, help_text="Date when page was last checked"
     )
@@ -350,6 +351,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             "title",
             "description",
             "link",
+            "date_created",
             "date_published",
             "date_dead_since",
             "permanent",

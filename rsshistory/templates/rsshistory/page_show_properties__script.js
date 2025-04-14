@@ -2,6 +2,7 @@
 
 
 let page_properties = null;
+let page_errors = null;
 
 
 function getCollapsedPropertyItem(name, data) {
@@ -42,11 +43,14 @@ function fillDataProperty(property) {
     }
     else {
         for (const [key, value] of Object.entries(property.data)) {
-            htmlOutput += `
+            if (key != "contents")
+            {
+                htmlOutput += `
                 <div>
                     <strong>${key}:</strong> ${value ?? "N/A"}
                 </div>
             `;
+            }
         }
     }
 
@@ -60,6 +64,20 @@ function fillData() {
     if (page_properties && page_properties.length > 0) {
         page_properties.forEach(property => {
             htmlOutput += fillDataProperty(property);
+        });
+    }
+
+    if (page_errors && page_errors.errors)
+    {
+        page_errors.errors.forEach(error => {
+            htmlOutput += `<div>Error: ${error}</div>`
+        });
+    }
+
+    if (page_errors && page_errors.warnings)
+    {
+        page_errors.warnings.forEach(warning => {
+            htmlOutput += `<div>Warning: ${warning}</div>`
         });
     }
 
@@ -87,7 +105,10 @@ function getPageProperties(page_url, browser, attempt = 1) {
                return;
            }
            page_properties = data.properties;
-           let text = fillData(data.properties);
+           page_errors = data.errors;
+
+           let text = fillData();
+
            $("#propertiesResponse").html(text);
            $('.btnFilterTrigger').prop("disabled", false);
            $('.btnFilterTrigger').html("Submit")
@@ -131,7 +152,9 @@ $(document).ready(function() {
         OnUserInput();
     });
 
-    if (getQueryParam("link") != null) {
+    let link = getQueryParam("link");
+    if (link != null) {
+        $('#id_link').val(link);
         OnUserInput();
     }
 });

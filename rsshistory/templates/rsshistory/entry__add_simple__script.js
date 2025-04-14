@@ -33,232 +33,6 @@ function resetSearch(text = '') {
 }
 
 
-function getSection(section_name) {
-    if (page_properties && page_properties.length > 0) {
-        let section = page_properties.find(properties => properties.name == section_name);
-        return section ? section.data : null;
-    }
-    return null;
-}
-
-
-function fillEditForm(token) {
-    let page_properties = getSection("Properties");
-    let response_data = getSection("Response");
-
-    let link = page_properties.link;
-    let title = page_properties.title || '';
-    let description = page_properties.description || '';
-    let date_published = page_properties.date_published;
-    let source_url = "";
-    let bookmarked = true;
-    let permanent = false;
-    let language = page_properties.language || '';
-    let user = page_properties.user;
-    let author = page_properties.author || '';
-    let album = page_properties.album || '';
-    let thumbnail = page_properties.thumbnail || '';
-    let manual_status_code = 0;
-    let status_code = response_data.status_code;
-    let page_rating = page_properties.page_rating;
-    let page_rating_contents = page_properties.page_rating;
-    let page_rating_votes = 0;
-    let age = 0;
-
-    // make necessary updates
-
-    if (description.length > 1000) {
-        description = description.slice(0, 1000);
-    }
-
-    date_published = getFormattedDate(date_published);
-
-    // set
-
-    $("#formResponse").html(form_text);
-
-    $("#id_link").val(link);
-    $("#id_title").val(title);
-    $("#id_description").val(description);
-    $("#id_thumbnail").val(thumbnail);
-    $("#id_language").val(language);
-    $("#id_author").val(author);
-    $("#id_album").val(album);
-    $("#id_age").val(age);
-    $("#id_status_code").val(status_code);
-    $("#id_page_rating_contents").val(page_rating_contents);
-    $("#id_page_rating_votes").val(page_rating_votes);
-    $("#id_page_rating").val(page_rating);
-    $("#id_date_published").val(date_published);
-
-    let action_url = `{% url 'rsshistory:entry-add' %}`;
-
-    $("#theForm").attr({
-        method: "POST",
-        action: action_url
-    });
-    $("#theForm").find('input[name="csrfmiddlewaretoken"]').val(token);
-
-    submission_locked = false;
-}
-
-
-let currentGetEditForm = 0;
-function getEditForm(page_url, attempt = 1) {
-    $("#formResponse").html(`Obtaining form for link :${page_url}`);
-
-    let url = `{% url 'rsshistory:entry-add-form' %}?link=${page_url}`;
-    let requestCurrentGetEditForm = ++currentGetEditForm;
-    
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestCurrentGetEditForm != currentGetEditForm)
-           {
-               return;
-           }
-
-           form_text = data;
-           form_text = form_text.replace('btnFetch', 'btnAddLink');
-           
-           // TODO you do not have to hide it.
-           // we can use different id_link names here.
-           let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-           $("#formDiv").html("");
-
-           fillEditForm(csrfToken);
-       },
-       error: function(xhr, status, error) {
-           if (requestCurrentGetEditForm != currentGetEditForm)
-           {
-               return;
-           }
-           
-           if (attempt < 3) {
-               getEditForm(page_url, attempt + 1);
-           } else {
-               resetSearch("Could not obtain edit form");
-           }
-       }
-    });
-}
-
-
-function fillData(page_url) {
-    let htmlOutput = "";
-
-    if (page_properties && page_properties.length > 0) {
-        getEditForm(page_url);
-    }
-
-    return htmlOutput;
-}
-
-
-let currentPageProperties = 0;
-function sendPagePropertiesRequest(page_url, browser, attempt = 1) {
-    $("#formResponse").html(`Fetching link properties ${page_url} with browser:${browser}`);
-
-    let encodedPageUrl = encodeURIComponent(page_url);
-
-    let url = `{% url 'rsshistory:get-page-properties' %}?link=${encodedPageUrl}&browser=${browser}`;
-
-    const requestCurrentPageProperties = ++currentPageProperties;
-
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 40000,  // this depends on configuration
-       success: function(data) {
-           if (requestCurrentPageProperties != currentPageProperties)
-               return;
-           
-           if (data.status) {
-               page_properties = data.properties;
-
-               let text = fillData(page_url);
-               $("#formResponse").html(text);
-               $('#btnFetch').prop("disabled", false);
-               $('#btnFetch').html("Submit");
-           }
-           else {
-               resetSearch("Incorrect call of get page request");
-           }
-       },
-       error: function(xhr, status, error) {
-           if (requestCurrentPageProperties != currentPageProperties)
-               return;
-               
-           if (attempt < 3) {
-               $("#formResponse").html("Could not obtain page properties. Retry");
-               getPageProperties(page_url, browser, attempt + 1);
-           } else {
-               resetSearch("Could not obtain page properties.");
-           }
-       }
-    });
-}
-
-
-let currentsendEmptyFrame = 0;
-function sendEmptyFrame(page_url, browser, attempt = 1) {
-    $("#formResponse").html(`Obtaining form for link :${page_url}`);
-
-    let requestsendEmptyFrame = ++currentsendEmptyFrame;
-
-    let url = `{% url 'rsshistory:entry-add-form' %}?link=${page_url}`;
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestsendEmptyFrame != currentsendEmptyFrame)
-               return;
-           let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-           $("#formDiv").html("");
-
-           form_text = data;
-           form_text = data.replace('btnFetch', 'btnAddLink');
-
-           $("#formResponse").html(form_text);
-
-           $("#id_link").val(page_url);
-
-           let action_url = `{% url 'rsshistory:entry-add' %}`;
-
-           $("#theForm").attr({
-               method: "POST",
-               action: action_url
-           });
-           $("#theForm").find('input[name="csrfmiddlewaretoken"]').val(csrfToken);
-
-           submission_locked = false;
-       },
-       error: function(xhr, status, error) {
-           if (requestsendEmptyFrame != currentsendEmptyFrame)
-               return;
-           if (attempt < 3) {
-               sendEmptyFrame(page_url, browser, attempt + 1);
-           } else {
-               resetSearch("Could not obtain edit form.");
-           }
-       }
-    });
-}
-
-
-function getPageProperties(page_url, browser) {
-    if (browser == EMPTY_FORM) {
-        sendEmptyFrame(page_url, browser);
-    }
-    else {
-        sendPagePropertiesRequest(page_url, browser);
-    }
-}
-
-
 function getExistingObjectLink(object_id) {
     let detail_url = "{% url 'rsshistory:entry-detail' 1017 %}";
     detail_url = detail_url.replace("1017", object_id);
@@ -266,6 +40,51 @@ function getExistingObjectLink(object_id) {
     link_text = `<a href="${detail_url}" class="btn btn-secondary">Link to existing object</a>`;
 
     return link_text;
+}
+
+
+let currentaddLink = 0;
+function addLink(page_url) {
+    let url = `{% url 'rsshistory:entry-add-json' %}?link=${page_url}`;
+    
+    let requestaddLink = ++currentaddLink;
+
+    $.ajax({
+       url: url,
+       type: 'GET',
+       timeout: 10000,
+       success: function(data) {
+           if (requestaddLink != currentaddLink)
+           {
+               return;
+           }
+           
+           if (data.status) {
+               object_id = data.pk;
+               link_text = getExistingObjectLink(object_id);
+
+               $("#formResponse").html(`Entry exists ${link_text}`);
+               resetSearch();
+           }
+           else {
+               object_id = data.pk;
+               link_text = getExistingObjectLink(object_id);
+               $("#formResponse").html(`Entry added ${link_text}`);
+           }
+       },
+       error: function(xhr, status, error) {
+           if (requestaddLink != currentaddLink)
+           {
+               return;
+           }
+           if (attempt < 3) {
+               $("#formResponse").html("Could not obtain information. Retry");
+               checkEntryExists(page_url, browser, attempt + 1);
+           } else {
+               resetSearch("Could not obtain information if link exists.");
+           }
+       }
+    });
 }
 
 
@@ -295,7 +114,7 @@ function checkEntryExists(page_url, browser, attempt=1) {
                resetSearch();
            }
            else {
-               getPageProperties(page_url, browser);
+               addLink(page_url);
            }
        },
        error: function(xhr, status, error) {

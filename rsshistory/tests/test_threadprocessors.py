@@ -480,13 +480,15 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
             job=BackgroundJobController.JOB_IMPORT_DAILY_DATA
         )
 
+        # using order of 'appearance'
+
         mgr = GenericJobsProcessor()
 
         # call tested function
         handler_obj, handler = mgr.get_handler_and_object()
 
         self.assertTrue(handler_obj)
-        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_IMPORT_DAILY_DATA)
+        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_PROCESS_SOURCE)
 
         if handler_obj:
             handler_obj.delete()
@@ -495,7 +497,7 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         handler_obj, handler = mgr.get_handler_and_object()
 
         self.assertTrue(handler_obj)
-        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_PROCESS_SOURCE)
+        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_IMPORT_DAILY_DATA)
 
         if handler_obj:
             handler_obj.delete()

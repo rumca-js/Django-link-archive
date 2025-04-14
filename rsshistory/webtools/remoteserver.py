@@ -1,6 +1,7 @@
 import json
 import requests
 import urllib.parse
+import base64
 
 
 class ResponseObject(object):

@@ -313,21 +313,18 @@ class SourceDataController(SourceDataModel):
 
         self.save()
 
-    def add_entry(source):
+    def add_entry(self):
         """
         It can be used by search engine. If we add link for every source, we will be swamped
         """
-        if not source:
-            return
-
-        if not source.enabled:
+        if not self.enabled:
             return
 
         from .backgroundjob import BackgroundJobController
 
         properties = {"permament": True}
         BackgroundJobController.link_add(
-            url=source.url, properties=properties, source=source
+            url=self.url, properties=properties, source=self
         )
 
     def custom_remove(self):
@@ -406,6 +403,22 @@ class SourceDataBuilder(object):
 
         if self.link_data:
             return self.build_from_props()
+
+    def build_simple(self, link=None, link_data=None, manual_entry=False, strict_ids=False):
+        self.link = link
+        link_data = link_data
+        self.manual_entry = manual_entry
+        self.strict_ids = strict_ids
+
+        sources = SourceDataController.objects.filter(url=link)
+        if sources.count() > 0:
+            return None
+
+        source = SourceDataController.objects.create(link=link)
+
+        # TODO add update job
+
+        return source
 
     def build_from_link(self):
         from ..pluginurl import UrlHandlerEx
@@ -503,3 +516,5 @@ class SourceDataBuilder(object):
             from .backgroundjob import BackgroundJobController
 
             BackgroundJobController.download_rss(source)
+
+        source.add_entry()

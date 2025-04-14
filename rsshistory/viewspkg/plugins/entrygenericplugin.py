@@ -513,7 +513,7 @@ class EntryGenericPlugin(object):
                 reverse(
                     "{}:page-show-props".format(LinkDatabase.name),
                 )
-                + "?page={}".format(self.entry.link),
+                + "?link={}".format(self.entry.link),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Shows page properties",
                 static(
@@ -606,6 +606,10 @@ class EntryGenericPlugin(object):
             self.entry.page_rating_contents,
         )
         parameters.append(EntryParameter("Points", points_text, points_title))
+
+        created_date = c.get_local_time(self.entry.date_created)
+        if created_date:
+            parameters.append(EntryParameter("Creation date", created_date))
 
         update_date = c.get_local_time(self.entry.date_update_last)
         if update_date:

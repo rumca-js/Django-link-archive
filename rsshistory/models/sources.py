@@ -101,7 +101,7 @@ class SourceDataModel(models.Model):
     SOURCE_TYPE_YOUTUBE = "YouTubeChannelPlugin"
 
     url = models.CharField(max_length=2000, unique=True)
-    title = models.CharField(max_length=1000)
+    title = models.CharField(max_length=1000, blank=True)
     enabled = models.BooleanField(default=True)
     # main category
     category_name = models.CharField(max_length=1000, blank=True)
@@ -137,6 +137,7 @@ class SourceDataModel(models.Model):
         blank=True,
         null=True,
     )
+
     subcategory = models.ForeignKey(
         SourceSubCategories,
         on_delete=models.SET_NULL,

@@ -33,7 +33,6 @@ from ..models import (
     BackgroundJob,
     ConfigurationEntry,
     UserConfig,
-    Domains,
     UserEntryVisitHistory,
     UserEntryTransitionHistory,
     UserSearchHistory,
@@ -42,6 +41,7 @@ from ..models import (
     AppLogging,
 )
 from ..controllers import (
+    DomainsController,
     LinkDataController,
     EntryWrapper,
     EntryDataBuilder,
@@ -73,6 +73,7 @@ from ..queryfilters import EntryFilter, OmniSearchFilter
 from ..configuration import Configuration
 from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
+from ..pluginurl import UrlHandlerEx
 
 
 def get_generic_search_init_context(request, form):
@@ -556,7 +557,7 @@ def func_display_data_form(request, p, data):
 
     form = EntryForm(initial=data, request=request)
     form.method = "POST"
-    form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
+    form.action_url = reverse("{}:entry-add-json".format(LinkDatabase.name))
     p.context["form"] = form
 
     domain = page.get_domain()
@@ -604,114 +605,70 @@ def func_display_data_form(request, p, data):
     return p.render("form_entry_add.html")
 
 
-def add_entry(request):
-    def on_added_entry(request, entry):
-        if entry.bookmarked:
-            entry = EntryWrapper(entry=entry).make_bookmarked(request)
+def on_added_entry(request, entry):
+    if not entry.is_archive_entry():
+        # if you add a link you must have visited it?
+        UserEntryVisitHistory.visited(entry, request.user)
 
-        if not entry.is_archive_entry():
-            # if you add a link you must have visited it?
-            UserEntryVisitHistory.visited(entry, request.user)
+    DomainsController.add(entry.link)
 
-        BackgroundJobController.link_scan(entry=entry)
+    BackgroundJobController.entry_update_data(entry=entry)
+    BackgroundJobController.link_scan(entry=entry)
 
-        config = Configuration.get_object().config_entry
+    config = Configuration.get_object().config_entry
 
-        if config.enable_link_archiving:
-            BackgroundJobController.link_save(entry.link)
+    if config.enable_link_archiving:
+        BackgroundJobController.link_save(entry.link)
+
+
+def add_entry_json(request):
 
     from ..controllers import LinkDataController
 
     p = ViewPage(request)
     p.set_title("Add entry")
 
+    data = {}
+    data["pk"] = 0
+    data["status"] = False
+    data["errors"] = []
+
     uc = UserConfig.get(request.user)
     if not uc.can_add():
-        return redirect("{}:missing-rights".format(LinkDatabase.name))
+        data["errors"] = ["User is cannot add links"]
+    else:
+        link = request.GET.get("link", "")
+        link = UrlHandlerEx.get_cleaned_link(link)
 
-    # if this is a POST request we need to process the form data
-    if request.method == "POST":
-        method = "POST"
-
-        # create a form instance and populate it with data from the request:
-        form = EntryForm(request.POST, request=request)
-
-        # check whether it's valid:
-        valid = form.is_valid()
-        link = request.POST.get("link", "")
+        if not link or link == "":
+            data["errors"] = ["Link is empty"]
+            return JsonResponse(data, json_dumps_params={"indent": 4})
 
         w = EntryWrapper(link=link)
         ob = w.get()
         if ob:
-            return HttpResponseRedirect(ob.get_absolute_url())
-
-        if valid:
-            data = form.get_information()
-            data["bookmarked"] = True
-
+            data["errors"] = ["Entry already is defined"]
+        else:
             b = EntryDataBuilder()
-            b.link_data = data
-            b.source_is_auto = False
-            b.user = request.user
-            entry = b.build_from_props_internal()
+            entry = b.build_simple(link=link, user=request.user, source_is_auto=False)
 
             if not entry:
-                text = "Link was not saved\n"
                 for error in b.errors:
-                    text += f"{error}\n"
+                    data["errors"].append(f"{error}")
+                return JsonResponse(data, json_dumps_params={"indent": 4})
 
-                p.context["summary_text"] = text
-                return p.render("summary_present.html")
+            data["pk"] = entry.id
 
             if UserBookmarks.add(request.user, entry):
                 entry.make_bookmarked()
+            if entry.bookmarked:
+                entry = EntryWrapper(entry=entry).make_bookmarked(request)
 
-            p.context["entry"] = entry
-            p.context["form"] = form
+            data["status"] = True
 
             on_added_entry(request, entry)
 
-            return p.render("entry_added.html")
-
-        error_message = "\n".join(
-            [
-                "{}: {}".format(field, ", ".join(errors))
-                for field, errors in form.errors.items()
-            ]
-        )
-
-        p.context["summary_text"] = "Form is invalid: {}".format(error_message)
-        return p.render("summary_present.html")
-    else:
-        p.context["summary_text"] = "Incorrect call of form"
-        return p.render("summary_present.html")
-
-
-def add_entry_form(request):
-    p = ViewPage(request)
-    p.set_title("Add entry form")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    init = {"user": request.user}
-
-    link = None
-    if "link" in request.GET:
-        link = request.GET["link"]
-
-        page = UrlLocation(link)
-        config = Configuration.get_object().config_entry
-
-        if page.is_domain() and config.keep_domain_links:
-            # if something is permanent, it does not have to be bookmarked
-            init["permanent"] = True
-            init["bookmarked"] = False
-
-    form = EntryForm(initial=init, request=request)
-    p.context["form"] = form
-
-    return p.render("entry_add__form.html")
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def add_simple_entry(request):

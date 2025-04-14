@@ -243,7 +243,7 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
     $.ajax({
         url: url,
         type: 'GET',
-        timeout: 15000,
+        timeout: 55000,
         success: function(data) {
             if (requestVersion !== currentLoadRowListContentCounter) {
                return;

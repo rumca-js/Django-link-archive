@@ -31,11 +31,14 @@
 
    {% include "rsshistory/entry_detail__tags.html" %}
 
-   <span id="entryVoteLine">
-   </span>
+   <div id="entryVoteContainer">
+   </div>
 
-   <span id="entryDownloadLine">
-   </span>
+   <div id="entryDownloadContainer">
+   </div>
+
+   <div id="entryUpdateContainer">
+   </div>
 
    {% include "rsshistory/entry_detail__source.html" %}
 
@@ -43,8 +46,8 @@
    {% include "rsshistory/entry_detail__buttons.html" %}
    </div>
 
-   <span id="entryStatusLine" class="mb-2 bg-warning text-dark">
-   </span>
+   <div id="entryStatusLine" class="mb-2 bg-warning text-dark">
+   </div>
 
    <div id="entryDescription" class="link-detail-description">
    {{object_controller.get_description_html | safe | linebreaks }}

@@ -267,18 +267,6 @@ class BackgroundJobController(BackgroundJob):
             )
             args_text = ""
 
-        p = UrlLocation(url)
-        if not p.is_web_link():
-            stack_lines = traceback.format_stack()
-            error_lines = "".join(stack_lines[-10:])
-
-            AppLogging.error(
-                "Attempt to add invalid link:{} input_url:{} lines:\n{}".format(
-                    url, input_url, error_lines
-                )
-            )
-            return
-
         if cfg != {}:
             return BackgroundJobController.create_single_job(
                 BackgroundJob.JOB_LINK_ADD, url, args_text

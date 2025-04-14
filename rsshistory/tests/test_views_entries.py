@@ -231,20 +231,19 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_entry_add__html(self):
+    def test_entry_add__json__html(self):
         LinkDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
-
-        limited_data = self.get_link_data(test_link)
+        url += "?link="+test_link
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
         # call user action
-        response = self.client.post(url, data=limited_data)
+        response = self.client.get(url)
 
         # page_source = response.content.decode("utf-8")
         # print("Contents: {}".format(page_source))
@@ -257,21 +256,19 @@ class EntriesViewsTests(FakeInternetTestCase):
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
         self.assertEqual(bookmarks.count(), 1)
 
-    def test_entry_add__youtube(self):
+    def test_entry_add__json__youtube(self):
         LinkDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://www.youtube.com/watch?v=1234"
-
-        limited_data = self.get_link_data(test_link)
-        # print(limited_data)
+        url += "?link="+test_link
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
         # call user action
-        response = self.client.post(url, data=limited_data)
+        response = self.client.get(url)
 
         page_source = response.content.decode("utf-8")
         # print("Contents: {}".format(page_source))
@@ -287,37 +284,34 @@ class EntriesViewsTests(FakeInternetTestCase):
         entry = entries[0]
 
         # adding fixes link
-        self.assertTrue(entry.title)
+        self.assertFalse(entry.title)
         self.assertEqual(entry.link, "https://www.youtube.com/watch?v=1234")
 
         current_date = DateUtils.get_datetime_now_utc()
         expected_time = DateUtils.get_date_tuple(current_date)
-        self.assertTrue(DateUtils.get_date_tuple(entry.date_published) == expected_time)
+        self.assertFalse(entry.date_published)
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
         self.assertEqual(bookmarks.count(), 1)
 
-    def test_entry_add__youtube_rss(self):
+    def test_entry_add__json__youtube_rss(self):
         LinkDataController.objects.all().delete()
         start_date_time = DateUtils.get_datetime_now_utc()
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        url += "?link="+test_link
         channel_name = "https://www.youtube.com/channel/SAMTIMESAMTIMESAMTIMESAM"
-
-        limited_data = self.get_link_data(test_link)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
         self.assertEqual(
             LinkDataController.objects.filter(link=channel_name).count(), 0
         )
 
-        limited_data["link"] = test_link
-
         # call user action
-        response = self.client.post(url, data=limited_data)
+        response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
 
@@ -329,42 +323,42 @@ class EntriesViewsTests(FakeInternetTestCase):
             entry.link,
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
-        self.assertTrue(entry.title)
+        self.assertFalse(entry.title)
 
         current_date = DateUtils.get_datetime_now_utc()
         expected_time = DateUtils.get_date_tuple(current_date)
-        self.assertTrue(DateUtils.get_date_tuple(entry.date_published) == expected_time)
+        self.assertFalse(entry.date_published)
 
         bookmarks = UserBookmarks.get_user_bookmarks(self.user)
         self.assertEqual(bookmarks.count(), 1)
 
-    def test_entry_add__exists(self):
+    def test_entry_add__json__exists(self):
         LinkDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
+        url += "?link="+test_link
 
         EntryDataBuilder(link=test_link)
-
-        limited_data = self.get_link_data(test_link)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
 
         # call user action
-        response = self.client.post(url, data=limited_data)
+        response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
 
-    def test_entry_add__exists_in_archive(self):
+    def test_entry_add__json__exists_in_archive(self):
         LinkDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
+        url += "?link="+test_link
 
         ob = ArchiveLinkDataController.objects.create(
             source_url="https://linkin.com",
@@ -374,37 +368,34 @@ class EntriesViewsTests(FakeInternetTestCase):
             date_published=DateUtils.get_datetime_now_utc(),
         )
 
-        limited_data = self.get_link_data(test_link)
-
         self.assertEqual(
             ArchiveLinkDataController.objects.filter(link=test_link).count(), 1
         )
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
         # call user action
-        response = self.client.post(url, data=limited_data)
+        response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(
             ArchiveLinkDataController.objects.filter(link=test_link).count(), 1
         )
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
-    def test_entry_add__domain(self):
+    def test_entry_add__json__domain(self):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
-
-        limited_data = self.get_link_data(test_link)
+        url += "?link="+test_link
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
         # call user action
-        response = self.client.post(url, data=limited_data)
+        response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
 
@@ -415,20 +406,6 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertEqual(domains.count(), 1)
 
         entries[0].domain = domains[0]
-
-    def test_entry_add_form(self):
-        LinkDataController.objects.all().delete()
-
-        self.client.login(username="testuser", password="testpassword")
-
-        url = reverse("{}:entry-add-form".format(LinkDatabase.name))
-        test_link = "https://linkedin.com"
-        url = url + "?link=" + test_link
-
-        # call user action
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
 
     def test_entry_add_ext(self):
         LinkDataController.objects.all().delete()
@@ -1135,3 +1112,20 @@ class EntriesDetailViews(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_entry_status(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-status".format(LinkDatabase.name), args=[self.entry_youtube.id])
+
+        # call user action
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        json_data = response.json()
+
+        self.assertFalse(json_data["is_downloading"])
+        self.assertFalse(json_data["is_updating"])

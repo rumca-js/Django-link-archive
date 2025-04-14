@@ -11,8 +11,8 @@ function getEditButton() {
 }
 
 
-function getDownloadingText() {
-    return '<span class="bg-warning text-dark"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Downloading...</span>';
+function getDownloadingText(text = "Downloading...") {
+    return `<span class="bg-warning text-dark"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">${text}</span></span>`;
 }
 
 
@@ -21,21 +21,30 @@ function fillIsEntryDownloaded(attempt = 1) {
     let requestIsDownloading = ++currentIsDownloading;
 
     $.ajax({
-        url: "{% url 'rsshistory:is-entry-download' object.id %}",
+        url: "{% url 'rsshistory:entry-status' object.id %}",
         type: 'GET',
         timeout: 15000,
         success: function(data) {
             if (requestIsDownloading != currentIsDownloading) {
                 return;
             }
-            is_downloading = data.status;
+            is_downloading = data.is_downloading;
 
             if (is_downloading) {
-                const text = getDownloadingText();
-                $('#entryDownloadLine').html(text);
+                const text = getDownloadingText("Downloading...);
+                $('#entryDownloadContainer').html(text);
             }
             else {
-                $('#entryDownloadLine').html("");
+                $('#entryDownloadContainer').html("");
+            }
+
+            is_updating = data.is_updating;
+            if (is_updating) {
+                const text = getDownloadingText("Fetching link data...);
+                $('#entryUpdateContainer').html(text);
+            }
+            else {
+                $('#entryUpdateContainer').html("");
             }
         },
         error: function(xhr, status, error) {
@@ -159,7 +168,7 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1,
 
 
 function getVoteEditForm() {
-    getDynamicContent('{% url "rsshistory:entry-vote-form" object.id %}', "#entryVoteLine", 1, true);
+  getDynamicContent('{% url "rsshistory:entry-vote-form" object.id %}', "#entryVoteLine", 1, true);
 }
 
 
@@ -252,10 +261,9 @@ function entryVote(attempt = 1) {
             }
 
             if (response.status === true) {
-                $('#entryStatusLine').html("Vote added: " + response.vote);
-                $('#entryVoteLine').html("");
+                $('#entryVoteContainer').html("Vote added: " + response.vote);
             } else {
-                $('#entryStatusLine').html(`<p class="text-danger">Error: ${response.message}</p>`);
+                $('#entryVoteContainer').html(`<p class="text-danger">Error: ${response.message}</p>`);
             }
         },
         error: function(xhr, status, error) {
@@ -268,7 +276,7 @@ function entryVote(attempt = 1) {
                 entryVote(attempt + 1);
             }
             else {
-                $('#entryStatusLine').html(`<p class="text-danger">Error during vote update: ${error}</p>`);
+                $('#entryVoteContainer').html(`<p class="text-danger">Error during vote update: ${error}</p>`);
             }
         },
     });

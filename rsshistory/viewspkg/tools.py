@@ -88,8 +88,9 @@ def get_errors(page_url):
         code = response.get_status_code()
         if code < 200 or code > 300:
             errors.append("Invalid status code")
-    if EntryRules.is_blocked(link):
-        errors.append("Entry is blocked by entry rules")
+
+    if page_url.is_blocked():
+        errors.append("Web page is blocked. Check entry rules, configuration")
 
     result = {}
     result["notes"] = notes
@@ -159,6 +160,9 @@ def get_page_properties(request):
     data = OrderedDict()
     data["properties"] = all_properties
     data["status"] = True
+
+    page_link = request.GET["link"]
+    data["errors"] = get_errors(url_ex)
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 

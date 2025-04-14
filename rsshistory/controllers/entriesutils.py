@@ -510,6 +510,8 @@ class EntryUpdater(object):
         if properties:
             if "page_rating" in properties:
                 entry.page_rating_contents = int(properties["page_rating"])
+            if "date_published" in properties and properties["date_published"]:
+                entry.date_published = properties["date_published"]
 
         entry.date_update_last = DateUtils.get_datetime_now_utc()
 
@@ -1040,7 +1042,7 @@ class EntryWrapper(object):
             and link_data["description"]
             and len(link_data["description"]) > description_length - 1
         ):
-            link_data["description"] = link_data["description"][:description-1]
+            link_data["description"] = link_data["description"][:description_length-1]
 
         if not self.strict_ids and "id" in link_data:
             del link_data["id"]
@@ -1466,6 +1468,7 @@ class EntryDataBuilder(object):
         self.link = link
         self.link_data = link_data
         self.strict_ids = strict_ids
+        self.source_is_auto = source_is_auto
 
         if self.link:
             return self.build_from_link()
@@ -1473,7 +1476,7 @@ class EntryDataBuilder(object):
         if self.link_data:
             return self.build_from_props(ignore_errors=self.ignore_errors)
 
-    def build_simple(self, link=None):
+    def build_simple(self, link=None, user=None, source_is_auto=True):
         if link:
             self.link = link
 
@@ -1483,8 +1486,12 @@ class EntryDataBuilder(object):
             self.result = obj
             return obj
 
+        self.user = user
+        self.source_is_auto = source_is_auto
+
         link_data = {}
         link_data["link"] = self.link
+        link_data["user"] = self.user
 
         entry = wrapper.create(link_data)
         return entry

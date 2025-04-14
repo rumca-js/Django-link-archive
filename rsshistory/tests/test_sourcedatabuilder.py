@@ -55,8 +55,10 @@ class SourceDataBuilderTest(FakeInternetTestCase):
         # job to add entry
         jobs = BackgroundJobController.objects.all()
         self.assertEqual(jobs.count(), 2)
-        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_ADD)
-        self.assertEqual(jobs[1].job, BackgroundJobController.JOB_PROCESS_SOURCE)
+
+        job_types = set(j.job for j in jobs)
+        self.assertIn(BackgroundJobController.JOB_LINK_ADD, job_types)
+        self.assertIn(BackgroundJobController.JOB_PROCESS_SOURCE, job_types)
 
     def test_new_source_manual_enabled_false(self):
         # call tested function
@@ -103,8 +105,10 @@ class SourceDataBuilderTest(FakeInternetTestCase):
         # job to add entry
         jobs = BackgroundJobController.objects.all()
         self.assertEqual(jobs.count(), 2)
-        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_ADD)
-        self.assertEqual(jobs[1].job, BackgroundJobController.JOB_PROCESS_SOURCE)
+
+        job_types = set(j.job for j in jobs)
+        self.assertIn(BackgroundJobController.JOB_LINK_ADD, job_types)
+        self.assertIn(BackgroundJobController.JOB_PROCESS_SOURCE, job_types)
 
     def test_new_source_twice(self):
         # call tested function

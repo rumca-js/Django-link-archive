@@ -338,3 +338,57 @@ def is_entry_download(request, pk):
     json_obj = {"status": is_downloaded}
 
     return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+
+def entry_status(request, pk):
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("JSON entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    json_obj = {}
+
+    json_obj["is_downloading"] = False
+    json_obj["is_updating"] = False
+    json_obj["is_entry"] = False
+
+    entries = LinkDataModel.objects.filter(id=pk)
+
+    if entries.exists():
+        json_obj["is_entry"] = True
+
+        entry = entries[0]
+
+        job_condition = (
+            Q(job=BackgroundJobController.JOB_DOWNLOAD_FILE)
+            | Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC)
+            | Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO)
+        )
+
+        job_condition &= Q(subject=entry.link)
+        job_condition &= Q(enabled=True)
+
+        entry = entries[0]
+
+        jobs = BackgroundJobController.objects.filter(job_condition)
+        if jobs.exists():
+            json_obj["is_downloading"] = True
+
+        job_condition = (
+            Q(job=BackgroundJobController.JOB_LINK_UPDATE_DATA)
+        )
+
+        job_condition &= Q(subject=entry.link)
+        job_condition &= Q(enabled=True)
+
+        entry = entries[0]
+
+        jobs = BackgroundJobController.objects.filter(job_condition)
+        if jobs.exists():
+            json_obj["is_updating"] = True
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})

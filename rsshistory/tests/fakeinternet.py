@@ -104,7 +104,7 @@ class FakeInternetData(object):
             "link": self.url,
             "title": "Title",
             "description": "Description",
-            "date_published": "Description",
+            "date_published": DateUtils.get_datetime_now_iso(),
             "author": "Description",
             "language": "Language",
             "album": "Description",

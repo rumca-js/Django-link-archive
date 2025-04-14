@@ -63,7 +63,8 @@ class EntryUrlInterface(object):
             response = url_ex.get_section("Response")
 
             if properties:
-                properties["date_published"] = DateUtils.get_datetime_now_utc()
+                if isinstance(properties.get("date_published"), str):
+                    properties["date_published"] = DateUtils.parse_datetime(properties["date_published"])
 
             # TODO properties["date_dead_since"] = DateUtils.get_datetime_now_utc()
 
