@@ -29,6 +29,10 @@
 <ul id="exportStats" class="list-group">
 </ul>
 
+<h1>System monitoring</h1>
+<ul id="monitoringBlock" class="list-group">
+</ul>
+
 
 <script>
     function getSystemStatusText(data) {
@@ -126,6 +130,43 @@
     }
 
 
+    function getSystemMonitoringText(data) {
+        let htmloutput = '<ul class="list-group">';
+
+        if (!data || typeof data !== 'object') {
+            return '<li class="list-group-item">No system data available</li>';
+        }
+
+        Object.entries(data).forEach(([key, value]) => {
+            htmloutput += `
+                <li class="list-group-item active">${key.replace(/_/g, ' ')}</li>
+            `;
+
+            if (typeof value === 'object' && value !== null) {
+                htmloutput += '<li class="list-group-item"><ul class="list-group">';
+
+                Object.entries(value).forEach(([subKey, subVal]) => {
+                    htmloutput += `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>${subKey.replace(/_/g, ' ')}</span>
+                            <span>${subVal}</span>
+                        </li>
+                    `;
+                });
+
+                htmloutput += '</ul></li>';
+            } else {
+                htmloutput += `
+                    <li class="list-group-item">${value}</li>
+                `;
+            }
+        });
+
+        htmloutput += '</ul>';
+        return htmloutput;
+    }
+
+
     function getExportStatusText(exports) {
         let htmloutput = '';
 
@@ -160,6 +201,12 @@
         if (common_indicators.threads_error.status) {
            showElement(".threadErrorElement");
         }
+    }
+
+
+    function fillSystemMonitoring(data) {
+        var system_status_text = getSystemMonitoringText(data);
+        $('#monitoringBlock').html(system_status_text);
     }
 
 
@@ -212,6 +259,24 @@
                 } else {
                     //$('#statusBlock').html("Error loading dynamic content")
                     //$('#threadStats').html("Error loading dynamic content")
+                }
+            }
+        });
+    }
+
+
+    function loadSystemMonitoring(attempt = 1) {
+        $('#monitoringBlock').html(getSpinnerText());
+        $.ajax({
+            url: '{% url 'rsshistory:json-system-monitoring' %}',
+            type: 'GET',
+            timeout: 10000,
+            success: function(data) {
+                fillSystemMonitoring(data);
+            },
+            error: function(xhr, status, error) {
+                if (attempt < 3) {
+                    loadSystemMonitoring(attempt + 1);
                 }
             }
         });
@@ -280,6 +345,7 @@
 
     function loadAll() {
         loadSystemStatus();
+        loadSystemMonitoring();
         loadTableStatus();
         loadExportStatus();
         loadSettings();

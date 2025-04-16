@@ -296,9 +296,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         }
 
         b = EntryDataBuilder()
-        b.link_data = link_data
+        
         # call tested function
-        entry = b.build_from_props()
+        entry = b.build(link_data=link_data, source_is_auto=True)
 
         objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 0)

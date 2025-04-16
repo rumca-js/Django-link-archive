@@ -282,6 +282,7 @@ urlpatterns = [
     path("get-menu", system.get_menu, name="get-menu",),
     path("json-table-status/", system.json_table_status, name="json-table-status"),
     path("json-system-status/", system.json_system_status, name="json-system-status"),
+    path("json-system-monitoring/", system.json_system_monitoring, name="json-system-monitoring"),
     path("json-export-status/", system.json_export_status, name="json-export-status"),
     path("get-backgroundjobs/", backgroundjobs.get_backgroundjobs, name="get-backgroundjobs",),
     path("get-entry-details/<int:pk>/", entries.EntryDetailDetailView.as_view(), name="get-entry-details"),

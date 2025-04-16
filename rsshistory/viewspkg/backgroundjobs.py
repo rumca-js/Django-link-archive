@@ -382,7 +382,7 @@ def entry_status(request, pk):
             Q(job=BackgroundJobController.JOB_LINK_UPDATE_DATA)
         )
 
-        job_condition &= Q(subject=entry.link)
+        job_condition &= Q(subject=entry.id)
         job_condition &= Q(enabled=True)
 
         entry = entries[0]

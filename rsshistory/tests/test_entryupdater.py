@@ -486,6 +486,8 @@ class EntryUpdaterTest(FakeInternetTestCase):
     def test_update_data__removes_by_text__casinos(self):
         MockRequestCounter.mock_page_requests = 0
 
+        EntryRules.objects.all().delete()
+
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         source_youtube = SourceDataController.objects.create(
@@ -569,6 +571,8 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
+        EntryRules.objects.all().delete()
+
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
@@ -603,6 +607,8 @@ class EntryUpdaterTest(FakeInternetTestCase):
         u = EntryUpdater(entry)
         # call tested function
         u.update_data()
+
+        entry.refresh_from_db()
 
         self.assertEqual(entry.title, "Sex porn")
         self.assertEqual(entry.description, "Sex porn")

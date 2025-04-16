@@ -90,12 +90,56 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         self.assertFalse(EntryRules.is_url_blocked("https://www.test5.com"))
 
-    def test_is_text_triggered(self):
+    def test_is_text_triggered__nocomma(self):
+        EntryRules.objects.all().delete()
+
         rule = EntryRules.objects.create(
             enabled=True,
             block=True,
             rule_name="Rule1",
             trigger_text="casino",
+            trigger_text_hits=4,
+        )
+
+        text = "casino casino casino"
+
+        # call tested function
+        self.assertFalse(rule.is_text_triggered(text))
+
+        text = "casino casino casino casino"
+
+        # call tested function
+        self.assertTrue(rule.is_text_triggered(text))
+
+    def test_is_text_triggered__comma(self):
+        EntryRules.objects.all().delete()
+
+        rule = EntryRules.objects.create(
+            enabled=True,
+            block=True,
+            rule_name="Rule1",
+            trigger_text="casino, royale",
+            trigger_text_hits=4,
+        )
+
+        text = "casino casino casino"
+
+        # call tested function
+        self.assertFalse(rule.is_text_triggered(text))
+
+        text = "casino casino casino casino"
+
+        # call tested function
+        self.assertTrue(rule.is_text_triggered(text))
+
+    def test_is_text_triggered__2commas(self):
+        EntryRules.objects.all().delete()
+
+        rule = EntryRules.objects.create(
+            enabled=True,
+            block=True,
+            rule_name="Rule1",
+            trigger_text="casino, royale,",
             trigger_text_hits=4,
         )
 
@@ -308,6 +352,32 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual(
             pulp, "nfsw ai girlfriend - title"
+        )
+
+    def test_get_entry_pulp__title_description_fields(self):
+
+        self.browser.save()
+
+        therule = EntryRules.objects.create(
+            enabled=True,
+            block=False,
+            rule_name="Rule1",
+            trigger_text="nsfw",
+            trigger_text_hits=1,
+            trigger_text_fields="description, title",
+            apply_age_limit=15,
+        )
+
+        entry = LinkDataController.objects.create(
+            link="https://nsfw.com",
+            title="NFSW AI girlfriend - title",
+            description="NSFW AI girlfriend - description",
+        )
+
+        pulp = therule.get_entry_pulp(entry)
+
+        self.assertEqual(
+            pulp, "nfsw ai girlfriend - titlensfw ai girlfriend - description"
         )
 
     def test_get_dict_pulp(self):

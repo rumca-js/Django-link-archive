@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+import psutil
 import os
 
 from django.contrib.auth.models import User
@@ -21,7 +22,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.7.1"
+__version__ = "2.7.2"
 
 
 class Configuration(object):
@@ -58,6 +59,29 @@ class Configuration(object):
             "app_version": __version__,
             "base_generic": str(Path(LinkDatabase.name) / "base_generic.html"),
         }
+
+    def get_memory_usage(self):
+        process = psutil.Process(os.getpid())
+        mem_info = process.memory_info()
+
+        # in bytes
+        #print("RSS (Resident Set Size):", mem_info.rss)  # Actual physical memory used
+        #print("VMS (Virtual Memory Size):", mem_info.vms)  # Total virtual memory used
+        #print(f"Memory used (RSS): {mem_info.rss / (1024 * 1024):.2f} MB")
+
+        return mem_info
+
+    def is_memory_limit_reached(self):
+        memory = self.get_memory_usage()
+
+        resident = memory.rss / (1024 * 1024)
+        virtual = memory.vms / (1024 * 1024)
+
+        # TODO make this limit configurable
+
+        if resident > 500 or virtual > 500:
+            return True
+        return False
 
     def get_context(self):
         if len(self.context) == 0:

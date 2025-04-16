@@ -38,7 +38,7 @@ class SourceGenericPlugin(object):
         if not source.enabled:
             return
 
-        print("Starting processing source:{}".format(source.url))
+        AppLogging.debug("Starting processing source:{}".format(source.url))
 
         # We do not check if data is correct. We can manually add processing to queue
         # We want the source to be processed then
@@ -58,7 +58,7 @@ class SourceGenericPlugin(object):
         total_time = stop_time - start_time
         total_time.total_seconds()
 
-        print("Stopping processing source:{}".format(source.url))
+        AppLogging.debug("Stopping processing source:{}".format(source.url))
 
         if self.hash:
             self.set_operational_info(
@@ -134,14 +134,10 @@ class SourceGenericPlugin(object):
 
             entry = b.build_from_props()
 
-            # AppLogging.debug("Url:{} Title:{}. Generic plugin add:{} DONE".format(source.url, source.title, link_data["link"]))
-
-            # TODO should below be in data builder?
-
-            if entry and entry.date_published > start_time:
+            if entry and (not entry.date_published or entry.date_published > start_time):
                 if source.auto_tag:
                     user = Configuration.get_object().get_superuser()
-                    UserTags.set_tags(entry, source.auto_tag, user)
+                    UserTags.set_tag(entry, source.auto_tag, user)
 
                 self.on_added_entry(entry)
                 num_entries += 1

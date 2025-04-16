@@ -511,7 +511,10 @@ class EntryUpdater(object):
             if "page_rating" in properties:
                 entry.page_rating_contents = int(properties["page_rating"])
             if "date_published" in properties and properties["date_published"]:
-                entry.date_published = properties["date_published"]
+                if not entry.date_published:
+                    entry.date_published = properties["date_published"]
+                elif properties["date_published"] < entry.date_published:
+                    entry.date_published = properties["date_published"]
 
         entry.date_update_last = DateUtils.get_datetime_now_utc()
 
@@ -821,9 +824,7 @@ class EntryUpdater(object):
         entry.page_rating = 0
 
         if not entry.date_dead_since:
-            error_text = traceback.format_exc()
-
-            AppLogging.error("Cannot access link:{}\n{}".format(entry.link, error_text))
+            AppLogging.error("Cannot access link:{} entry id:{}".format(entry.link, entry.id))
             entry.date_dead_since = DateUtils.get_datetime_now_utc()
             entry.save()
 
@@ -859,7 +860,7 @@ class EntryUpdater(object):
 
 
 class EntriesUpdater(object):
-    def get_entries_to_update(self):
+    def get_entries_to_update(self, max_number_of_entries):
         """
         @note
         Normal entries are checked with interval days_to_check_std_entries
@@ -889,7 +890,7 @@ class EntriesUpdater(object):
             condition_update_null
             | (condition_not_dead & condition_days_to_check_std)
             | (condition_dead & condition_days_to_check_stale)
-        ).order_by("date_update_last", "link")
+            ).order_by("date_update_last", "link")[:max_number_of_entries]
 
         return entries
 

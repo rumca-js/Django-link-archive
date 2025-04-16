@@ -143,6 +143,9 @@ class KeyWords(models.Model):
             if "date_published" not in link_data:
                 return False
 
+            if not link_data["date_published"]:
+                return False
+
             if not KeyWords.is_keyword_date_range(link_data["date_published"]):
                 return False
 

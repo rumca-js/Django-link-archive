@@ -80,7 +80,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     # Manual edit start
-    'django_celery_results',
     "rsshistory.apps.LinkDatabase",
 ]
 

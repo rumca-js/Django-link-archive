@@ -42,7 +42,7 @@ class EntryUrlInterface(object):
         self.all_properties = None
 
         self.url = UrlHandlerEx.get_cleaned_link(url)
-        self.handle = None
+        self.handler = None
 
     def get_response(self):
         return self.response
@@ -90,7 +90,7 @@ class EntryUrlInterface(object):
             props["language"] = None
             props["age"] = None
             props["thumbnail"] = None
-            props["date_published"] = DateUtils.get_datetime_now_utc()
+            props["date_published"] = None
             props["date_dead_since"] = DateUtils.get_datetime_now_utc()
             props["page_rating"] = 0
             props["dead"] = True
@@ -110,6 +110,9 @@ class EntryUrlInterface(object):
 
     def is_valid(self):
         if not self.all_properties:
+            return False
+
+        if not self.handler:
             return False
 
         if not self.handler.is_valid():
@@ -136,8 +139,6 @@ class EntryUrlInterface(object):
         if self.is_property_set(input_props, "date_published"):
             if input_props["date_published"] > DateUtils.get_datetime_now_utc():
                 input_props["date_published"] = DateUtils.get_datetime_now_utc()
-        else:
-            input_props["date_published"] = DateUtils.get_datetime_now_utc()
 
         if self.is_property_set(
             input_props, "date_last_modified"

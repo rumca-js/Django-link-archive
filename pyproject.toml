@@ -10,7 +10,6 @@ readme = "README.md"
 python = "^3.10"
 Django = "^5.2.0"
 django-user-agents = "^0.4.0"
-django-celery-results = "^2.5.1"
 pymemcache = "^4.0.0"
 celery = "^5.5.0"
 python-dateutil = "^2.8.2"
@@ -37,6 +36,7 @@ lxml="^5.3.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
+py-spy = "^0.4.0"
 
 [build-system]
 requires = ["poetry-core"]

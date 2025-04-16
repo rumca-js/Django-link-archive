@@ -34,7 +34,7 @@ class EntryRules(models.Model):
     trigger_text_fields = models.CharField(
         max_length=1000,
         blank=True,
-        help_text="fields that will be used for rule triggering. For example title, description.",
+        help_text="fields that will be used for rule triggering. If not set, then title and description are used.",
     )  # url syntax
 
     block = models.BooleanField(
@@ -98,13 +98,14 @@ class EntryRules(models.Model):
             for rule_url in rule_urls:
                 if rule_url != "":
                     if url.find(rule_url) >= 0:
-                        return str(rule_url)
+                        return True, rule_url
 
         p = UrlLocation(url)
         domain_only = p.get_domain_only()
 
-        if BlockEntry.is_blocked(domain_only):
-            return "BlockEntry"
+        status = BlockEntry.is_blocked(domain_only)
+        if status:
+            return True, "BlockEntry {}".format(status)
 
     def is_url_blocked_by_rule(self, url):
         rule_urls = self.get_rule_urls()
@@ -114,13 +115,20 @@ class EntryRules(models.Model):
 
         return False
 
+    def get_trigger_fields(self):
+        if not self.trigger_text_fields or self.trigger_text_fields == "":
+            return ["title", "description"]
+
+        if "," not in self.trigger_text_fields:
+            return [self.trigger_text_fields.strip()]
+
+        fields = [field.strip() for field in self.trigger_text_fields.split(",")]
+        return fields
+
     def get_entry_pulp(self, entry):
         pulp = ""
 
-        if not self.trigger_text_fields or self.trigger_text_fields == "":
-            pulp = str(entry.title) + str(entry.description)
-
-        fields = self.trigger_text_fields.split(",")
+        fields = self.get_trigger_fields()
 
         if "title" in fields:
             pulp += str(entry.title)
@@ -134,15 +142,7 @@ class EntryRules(models.Model):
     def get_dict_pulp(self, dictionary):
         pulp = ""
 
-        if not self.trigger_text_fields or self.trigger_text_fields == "":
-            if "title" in dictionary:
-                pulp = str(dictionary["title"])
-            if "description" in dictionary:
-                pulp += str(dictionary["description"])
-            if "contents" in dictionary:
-                pulp += str(dictionary["contents"])
-
-        fields = self.trigger_text_fields.split(",")
+        fields = self.get_trigger_fields()
 
         if "title" in fields:
             if "title" in dictionary:
@@ -168,8 +168,10 @@ class EntryRules(models.Model):
         for trigger_text in trigger_split:
             # ignore case
             trigger_text = trigger_text.lower()
+            trigger_text = trigger_text.strip()
 
-            sum += text.count(trigger_text)
+            if trigger_text != "":
+                sum += text.count(trigger_text)
 
         if sum >= self.trigger_text_hits:
             return True
@@ -178,8 +180,9 @@ class EntryRules(models.Model):
 
     def is_dict_blocked(dictionary):
         if "link" in dictionary:
-            if EntryRules.is_url_blocked(dictionary["link"]):
-                return True
+            status = EntryRules.is_url_blocked(dictionary["link"])
+            if status:
+                return status
 
         rules = EntryRules.objects.filter(enabled=True, block=True).exclude(
             trigger_text=""
@@ -187,9 +190,7 @@ class EntryRules(models.Model):
         for rule in rules:
             text = rule.get_dict_pulp(dictionary)
             if rule.is_text_triggered(text):
-                return True
-
-        return False
+                return True, rule.id
 
     def is_entry_blocked(entry):
         if EntryRules.is_url_blocked(entry.link):
@@ -201,9 +202,7 @@ class EntryRules(models.Model):
         for rule in rules:
             text = rule.get_entry_pulp(entry)
             if rule.is_text_triggered(text):
-                return True
-
-        return False
+                return True, rule.id
 
     def apply_entry_rule(entry):
         if EntryRules.is_url_blocked(entry.link):

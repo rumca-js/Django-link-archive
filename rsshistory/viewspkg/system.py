@@ -18,6 +18,7 @@ from django.db.models import Q
 
 
 from utils.dateutils import DateUtils
+from utils.systemmonitoring import get_hardware_info
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -427,6 +428,18 @@ def json_system_status(request):
     for thread_id in threads:
         thread_info = system_controller.get_thread_info(thread_id)
         data["threads"].append({"name": thread_id, "date": thread_info[1], "status" : thread_info[2]})
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
+
+
+def json_system_monitoring(request):
+    p = ViewPage(request)
+    p.set_title("Status")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    data = get_hardware_info()
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 

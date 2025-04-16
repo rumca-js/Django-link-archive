@@ -11,6 +11,7 @@ import logging
 import time
 import traceback
 import json
+import os
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -154,7 +155,7 @@ class RefreshProcessor(CeleryTaskInterface):
             return
 
         u = EntriesUpdater()
-        entries = u.get_entries_to_update()
+        entries = u.get_entries_to_update(max_number_of_update_entries)
         if not entries:
             return
 
@@ -234,26 +235,34 @@ class GenericJobsProcessor(CeleryTaskInterface):
         ]
 
     def run(self):
-        AppLogging.debug("{} Running processor".format(self.get_name()))
-        self.start_processing_time = DateUtils.get_datetime_now_utc()
-
         c = Configuration.get_object()
+
+        pid = os.getpid()
+
+        memory = c.get_memory_usage()
+        resident = memory.rss / (1024 * 1024)
+        virtual = memory.vms / (1024 * 1024)
+
+        AppLogging.debug("{}: Starting. Pid:{} Memory:{}/{} MB".format(self.get_name(), pid, resident, virtual))
+        self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         config = c.config_entry
         if config.block_job_queue:
-            AppLogging.debug("Job queue is blocked")
+            AppLogging.debug("{}: Job queue is locked".format(self.get_name()))
             return
 
         systemcontroller = SystemOperationController()
         systemcontroller.refresh(self.get_name())
 
         if not systemcontroller.is_internet_ok():
+            AppLogging.debug("{}: Internet is not OK".format(self.get_name()))
             return
 
         if systemcontroller.is_remote_server_down():
+            AppLogging.debug("{}: Remove server is down".format(self.get_name()))
             return
 
-        AppLogging.debug("{} running jobs".format(self.get_name()))
+        AppLogging.debug("{}: Running jobs".format(self.get_name()))
 
         index = 0
 
@@ -262,10 +271,14 @@ class GenericJobsProcessor(CeleryTaskInterface):
             if should_stop:
                 break
 
+            if c.is_memory_limit_reached():
+                AppLogging.error("{}: Memory limit reached".format(self.get_name()))
+                return
+
             index += 1
 
             if index > 2000:
-                AppLogging.error("GenericJobsProcessor:run index overflow")
+                AppLogging.error("{}:run index overflow".format(self.get_name()))
                 return
 
     def run_one_job(self, job):
@@ -287,7 +300,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
         """
         items = self.get_handler_and_object()
         if len(items) == 0:
-            AppLogging.debug("{} No jobs".format(self.get_name()))
+            AppLogging.debug("{}: No jobs".format(self.get_name()))
             return True
 
         try:
@@ -301,7 +314,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
                 return True
 
         except KeyboardInterrupt:
-            AppLogging.debug("{} keyboard interrupt".format(self.get_name()))
+            AppLogging.debug("{}: Keyboard interrupt".format(self.get_name()))
             return True
 
         except Exception as E:
@@ -348,7 +361,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
         handler = None
         deleted = False
 
-        AppLogging.debug("{} Processing job {}".format(self.get_name(), str(obj)))
+        AppLogging.debug("{}: Processing job {}".format(self.get_name(), str(obj)))
 
         if handler_class:
             handler = handler_class(config)
@@ -471,6 +484,17 @@ class SystemJobsProcessor(GenericJobsProcessor):
         ]
 
 
+class UpdateJobsProcessor(GenericJobsProcessor):
+    """
+    Jobs that should be working without hiccup
+    """
+
+    def get_supported_jobs(self):
+        return [
+            BackgroundJob.JOB_LINK_UPDATE_DATA,
+        ]
+
+
 class LeftOverJobsProcessor(GenericJobsProcessor):
     """
     There can be many queues handling jobs.
@@ -526,16 +550,18 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
 def processor_from_id(processor_id):
     if processor_id == "RefreshProcessor":
         return RefreshProcessor
-    if processor_id == "SourceJobsProcessor":
+    elif processor_id == "SourceJobsProcessor":
         return SourceJobsProcessor
-    if processor_id == "WriteJobsProcessor":
+    elif processor_id == "WriteJobsProcessor":
         return WriteJobsProcessor
-    if processor_id == "ImportJobsProcessor":
+    elif processor_id == "ImportJobsProcessor":
         return ImportJobsProcessor
-    if processor_id == "SystemJobsProcessor":
+    elif processor_id == "SystemJobsProcessor":
         return SystemJobsProcessor
-    if processor_id == "LeftOverJobsProcessor":
+    elif processor_id == "LeftOverJobsProcessor":
         return LeftOverJobsProcessor
+    elif processor_id == "UpdateJobsProcessor":
+        return UpdateJobsProcessor
 
 
 class OneTaskProcessor(GenericJobsProcessor):

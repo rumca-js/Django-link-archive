@@ -72,6 +72,9 @@ class UrlHandler(Url):
             return True
 
         properties = self.get_properties()
+        if not properties:
+            return True
+
         properties["contents"] = self.get_contents()
         if EntryRules.is_dict_blocked(properties):
             return True
@@ -150,7 +153,7 @@ class UrlHandlerEx(object):
                     name = crawler_data["name"]
 
                 AppLogging.debug(
-                    "Url:{} Calling with name {} and settings {}".format(
+                    "Url:{} Remote server request.\nCrawler:{}\nSettings:{}".format(
                         self.url, name, crawler_data["settings"]
                     )
                 )
@@ -355,6 +358,9 @@ class UrlHandlerEx(object):
             return True
 
         properties = self.get_section("Properties")
+        if not properties:
+            return True
+
         properties["contents"] = self.get_contents()
 
         if EntryRules.is_dict_blocked(properties):
@@ -367,6 +373,26 @@ class UrlHandlerEx(object):
             return True
 
         return False
+
+    def get_block_reason(self):
+        if EntryRules.is_url_blocked(self.url):
+            return "EntryUrl Url block"
+
+        properties = self.get_section("Properties")
+        if not properties:
+            return "Missing properties"
+
+        properties["contents"] = self.get_contents()
+
+        status = EntryRules.is_dict_blocked(properties)
+        if status:
+            return "Dict block: {}".format(status)
+
+        if not self.is_url_valid():
+            return "Url not valid"
+
+        if not self.is_allowed():
+            return "Not Allowed"
 
     def __str__(self):
         return "{}".format(self.options)

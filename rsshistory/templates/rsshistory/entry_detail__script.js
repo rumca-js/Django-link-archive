@@ -12,7 +12,7 @@ function getEditButton() {
 
 
 function getDownloadingText(text = "Downloading...") {
-    return `<span class="bg-warning text-dark"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">${text}</span></span>`;
+    return `<span class="bg-warning text-dark"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></span> ${text}`;
 }
 
 
@@ -168,7 +168,7 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1,
 
 
 function getVoteEditForm() {
-  getDynamicContent('{% url "rsshistory:entry-vote-form" object.id %}', "#entryVoteLine", 1, true);
+  getDynamicContent('{% url "rsshistory:entry-vote-form" object.id %}', "#entryVoteContainer", 1, true);
 }
 
 
@@ -361,7 +361,7 @@ $(document).on('submit', '#voteEditForm', function(event) {
 });
 
 $(document).on('click', '#cancelVoteEdit', function() {
-    $('#entryVoteLine').html("");
+    $('#entryVoteContainer').html("");
 });
 
 $(document).on('submit', '#tagEditForm', function(event) {

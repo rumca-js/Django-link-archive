@@ -90,7 +90,8 @@ def get_errors(page_url):
             errors.append("Invalid status code")
 
     if page_url.is_blocked():
-        errors.append("Web page is blocked. Check entry rules, configuration")
+        reason = page_url.get_block_reason()
+        errors.append("Web page is blocked. Check entry rules, configuration. Reason:{}".format(reason))
 
     result = {}
     result["notes"] = notes

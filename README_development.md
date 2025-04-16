@@ -34,6 +34,7 @@ Keep limits on user actions:
 # Development
 
  - installation should be simple and easy. Provide most common installation methods (Python poetry, docker)
+ - user interactions should be short and simple. All data that can be postponed to threads, should be
  - limit barriers of entry. There should be no obstacles
  - easy import and exported data. The user need to be able to create a new instance in a matter of minutes
  - default configuration should cover 90% of needs

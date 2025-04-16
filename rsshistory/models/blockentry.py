@@ -17,6 +17,7 @@ class BlockListReader(object):
 
     def read(self):
         self.contents = self.contents.replace("\r", "")
+
         while True:
             wh = self.contents.find("\n")
             if wh == -1:
@@ -35,8 +36,6 @@ class BlockListReader(object):
             line = self.process_line(line)
             if line:
                 yield line
-
-            wh = self.contents.find("\n")
 
     def process_line(self, line):
         domain = None
