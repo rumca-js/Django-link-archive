@@ -8,10 +8,13 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
+
+Posgres setup:
+https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,36 +25,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ["SECRET_KEY"]
 
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == "1"
 
-# Add necessary hosts here
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", os.environ.get('ALLOWED_IP')]
-
-# Celery
-
-# for now, to simpliify, we will not use any broker
-# https://www.reddit.com/r/django/comments/er0v7r/did_you_know_that_you_can_use_filesystem_as/
-#CELERY_BROKER_URL = 'memory://localhost/'
-
-RABBIT_SERVER=os.environ["RABBIT_SERVER"]
-MEMCACHED_SERVER=os.environ["MEMCACHED_SERVER"]
-MEMCACHED_PORT=os.environ["MEMCACHED_PORT"]
-DB_SERVER=os.environ["DB_SERVER"]
-
-CELERY_BROKER_URL = f'amqp://guest:guest@{RABBIT_SERVER}'
 
 DB_DB = os.environ["DB_DB"]
 DB_USER = os.environ["DB_USER"]
 DB_PASSWORD = os.environ["DB_PASSWORD"]
 
-#: Only add pickle to this list if your broker is secured
-#: from unwanted access (see userguide/security.html)
-CELERY_ACCEPT_CONTENT = ['json']
-#CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
-CELERY_RESULT_BACKEND = f'db+postgresql://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}/{DB_DB}'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_CACHE_BACKEND = 'django-cache'
-CELERY_RESULT_BACKEND = 'django-db'
+RABBIT_SERVER=os.environ["RABBIT_SERVER"]
+MEMCACHED_SERVER=os.environ["MEMCACHED_SERVER"]
+MEMCACHED_PORT=os.environ["MEMCACHED_PORT"]
+DB_SERVER=os.environ["DB_SERVER"]
+CELERY_BROKER_URL = f'amqp://guest:guest@{RABBIT_SERVER}'
+
 
 if "CRAWLER_BUDDY_SERVER" in os.environ:
     CRAWLER_BUDDY_SERVER = os.environ["CRAWLER_BUDDY_SERVER"]
@@ -67,6 +55,7 @@ if CRAWLER_BUDDY_SERVER and CRAWLER_BUDDY_PORT:
     CRAWLER_BUDDY_URL = CRAWLER_BUDDY_SERVER + ":" + str(CRAWLER_BUDDY_PORT)
 else:
     CRAWLER_BUDDY_URL = None
+
 
 # Application definition
 
@@ -155,13 +144,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
 USE_TZ = True
-
+TIME_ZONE = 'UTC'
+USE_I18N = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -170,7 +155,6 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CACHES = {

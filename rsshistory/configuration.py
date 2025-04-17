@@ -22,7 +22,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.7.2"
+__version__ = "2.8.0"
 
 
 class Configuration(object):
@@ -77,9 +77,9 @@ class Configuration(object):
         resident = memory.rss / (1024 * 1024)
         virtual = memory.vms / (1024 * 1024)
 
-        # TODO make this limit configurable
+        memory_threshold = self.config_entry.thread_memory_threshold
 
-        if resident > 500 or virtual > 500:
+        if resident > memory_threshold or virtual > memory_threshold:
             return True
         return False
 

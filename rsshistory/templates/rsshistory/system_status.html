@@ -2,41 +2,36 @@
 {% load static %}
 {% block content %}
 
-<h1>Status</h1>
+<div id="statusContainer">
+</div>
 
-<ul id="statusBlock" class="list-group">
-</ul>
+<div id="settingsContainer">
+</div>
 
-<h1>Settings</h1>
+<div id="tablesContainer">
+</div>
 
-<ul id="settingsBlock" class="list-group">
-</ul>
-
-<h1>Number of rows</h1>
-<ul id="tableStats" class="list-group">
-</ul>
-
-<h1>Threads
-  <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger invisible threadErrorElement">
+  <!--span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger invisible threadErrorElement">
       !
       <span class="visually-hidden">Configuration error</span>
-  </span>
-</h1>
-<ul id="threadStats" class="list-group">
-</ul>
+  </span-->
+<div id="threadsContainer">
+</div>
 
-<h1>Exports</h1>
-<ul id="exportStats" class="list-group">
-</ul>
+<div id="exportStatsContainer">
+</div>
 
-<h1>System monitoring</h1>
-<ul id="monitoringBlock" class="list-group">
-</ul>
+<div id="monitoringContainer">
+</div>
 
 
 <script>
     function getSystemStatusText(data) {
-        let htmlOutput = '';
+        let htmloutput = '<ul class="list-group">';
+
+        htmloutput += `
+            <li class="list-group-item active">System status</li>
+        `;
 
         if (data.last_internet_check) {
             data.last_internet_check = new Date(data.last_internet_check).toLocaleString();
@@ -59,6 +54,9 @@
         if (data.days_to_check_stale_entries) {
             data.days_to_check_stale_entries = new Date(data.days_to_check_stale_entries).toLocaleString();
         }
+        if (data.current_time) {
+            data.current_time = new Date(data.current_time).toLocaleString();
+        }
 
         let array = [
             { name: "Last internet check", value: data.last_internet_check },
@@ -70,19 +68,26 @@
             { name: "days to remove stale entries", value: data.days_to_remove_stale_entries },
             { name: "days to check std entries", value: data.days_to_check_std_entries },
             { name: "days to check stale entries", value: data.days_to_check_stale_entries },
+            { name: "current time", value: data.current_time },
             { name: "directory", value: data.directory }
         ];
 
         for (let element of array) {
-            htmlOutput += `<li class="list-group-item">${element.name}: ${element.value}</li>`;
+            htmloutput += `<li class="list-group-item">${element.name}: ${element.value}</li>`;
         }
 
-        return htmlOutput;
+        htmloutput += '</ul>';
+
+        return htmloutput;
     }
 
 
     function getThreadsText(threads) {
-        let htmloutput = '';
+        let htmloutput = '<ul class="list-group">';
+
+        htmloutput += `
+            <li class="list-group-item active">Threads</li>
+        `;
 
         if (threads && threads.length > 0) {
             threads.forEach(thread => {
@@ -104,12 +109,18 @@
             htmloutput = '<li class="list-group-item">no entries found</li>';
         }
 
+        htmloutput += '</ul>';
+
         return htmloutput;
     }
 
 
     function getTableStatusText(tables) {
-        let htmloutput = '';
+        let htmloutput = '<ul class="list-group">';
+
+        htmloutput += `
+            <li class="list-group-item active">Tables</li>
+        `;
 
         if (tables && tables.length > 0) {
             tables.forEach(table => {
@@ -125,6 +136,8 @@
         } else {
             htmloutput = '<li class="list-group-item">no entries found</li>';
         }
+
+        htmloutput += '</ul>';
 
         return htmloutput;
     }
@@ -168,7 +181,11 @@
 
 
     function getExportStatusText(exports) {
-        let htmloutput = '';
+        let htmloutput = '<ul class="list-group">';
+
+        htmloutput += `
+            <li class="list-group-item active">Export status</li>
+        `;
 
         if (exports && exports.length > 0) {
             exports.forEach(theexport => {
@@ -188,42 +205,18 @@
             htmloutput = '<li class="list-group-item">no entries found</li>';
         }
 
+        htmloutput += '</ul>';
+
         return htmloutput;
     }
 
 
-    function fillSystemStatus(data) {
-        var system_status_text = getSystemStatusText(data);
-        $('#statusBlock').html(system_status_text);
-        var threads_text = getThreadsText(data.threads);
-        $('#threadStats').html(threads_text);
+    function getDjangoSettings(data) {
+        let htmloutput = '<ul class="list-group">';
 
-        if (common_indicators.threads_error.status) {
-           showElement(".threadErrorElement");
-        }
-    }
-
-
-    function fillSystemMonitoring(data) {
-        var system_status_text = getSystemMonitoringText(data);
-        $('#monitoringBlock').html(system_status_text);
-    }
-
-
-    function fillTableStatus(tables) {
-        var text = getTableStatusText(tables);
-        $('#tableStats').html(text);
-    }
-
-
-    function fillExportStatus(data) {
-        var text = getExportStatusText(data.exports);
-        $('#exportStats').html(text);
-    }
-
-
-    function fillSettings(data) {
-        let htmlOutput = '';
+        htmloutput += `
+            <li class="list-group-item active">Django settings</li>
+        `;
     
         for (const [key, value] of Object.entries(data)) {
             let displayValue;
@@ -236,16 +229,54 @@
                 displayValue = value;
             }
     
-            htmlOutput += `<li class="list-group-item">${key}: ${displayValue}</li>`;
+            htmloutput += `<li class="list-group-item">${key}: ${displayValue}</li>`;
         }
+        htmloutput += '</ul>';
+
+        return htmloutput;
+    }
+
+
+    function fillSystemStatus(data) {
+        var system_status_text = getSystemStatusText(data);
+        $('#statusContainer').html(system_status_text);
+        var threads_text = getThreadsText(data.threads);
+        $('#threadsContainer').html(threads_text);
+
+        if (common_indicators.threads_error.status) {
+           showElement(".threadErrorElement");
+        }
+    }
+
+
+    function fillSystemMonitoring(data) {
+        var system_status_text = getSystemMonitoringText(data);
+        $('#monitoringContainer').html(system_status_text);
+    }
+
+
+    function fillTableStatus(tables) {
+        var text = getTableStatusText(tables);
+        $('#tablesContainer').html(text);
+    }
+
+
+    function fillExportStatus(data) {
+        var text = getExportStatusText(data.exports);
+        $('#exportStatsContainer').html(text);
+    }
+
+
+    function fillDjangoSettings(data) {
+	let htmlOutput = getDjangoSettings(data);
     
         // Inject the HTML into the settings block
-        $('#settingsBlock').html(htmlOutput);
+        $('#settingsContainer').html(htmlOutput);
     }
 
 
     function loadSystemStatus(attempt = 1) {
-        $('#statusBlock').html(getSpinnerText());
+        $('#statusContainer').html(getSpinnerText());
         $.ajax({
             url: '{% url 'rsshistory:json-system-status' %}',
             type: 'GET',
@@ -257,8 +288,6 @@
                 if (attempt < 3) {
                     loadSystemStatus(attempt + 1);
                 } else {
-                    //$('#statusBlock').html("Error loading dynamic content")
-                    //$('#threadStats').html("Error loading dynamic content")
                 }
             }
         });
@@ -266,7 +295,7 @@
 
 
     function loadSystemMonitoring(attempt = 1) {
-        $('#monitoringBlock').html(getSpinnerText());
+        $('#monitoringContainer').html(getSpinnerText());
         $.ajax({
             url: '{% url 'rsshistory:json-system-monitoring' %}',
             type: 'GET',
@@ -284,13 +313,13 @@
 
 
     function loadTableStatus(attempt = 1) {
-        $('#tableStats').html(getSpinnerText());
+        $('#tablesContainer').html(getSpinnerText());
         $.ajax({
             url: '{% url 'rsshistory:json-table-status' %}',
             type: 'GET',
             timeout: 10000,
             success: function(data) {
-                $('#tableStats').html("Table success")
+                $('#tablesContainer').html("Table success")
                 fillTableStatus(data.tables);
             },
             error: function(xhr, status, error) {
@@ -305,7 +334,7 @@
 
 
     function loadExportStatus(attempt = 1) {
-        $('#exportStats').html(getSpinnerText());
+        $('#exportStatsContainer').html(getSpinnerText());
         $.ajax({
             url: '{% url 'rsshistory:json-export-status' %}',
             type: 'GET',
@@ -317,27 +346,27 @@
                 if (attempt < 3) {
                     loadExportStatus(attempt + 1);
                 } else {
-                    //$('#exportStats').html("Error loading dynamic content")
+                    //$('#exportStatsContainer').html("Error loading dynamic content")
                 }
             }
         });
     }
 
 
-    function loadSettings(attempt = 1) {
-        $('#settingsBlock').html(getSpinnerText());
+    function loadDjangoSettings(attempt = 1) {
+        $('#settingsContainer').html(getSpinnerText());
         $.ajax({
             url: '{% url 'rsshistory:get-settings' %}',
             type: 'GET',
             timeout: 10000,
             success: function(data) {
-                fillSettings(data);
+                fillDjangoSettings(data);
             },
             error: function(xhr, status, error) {
                 if (attempt < 3) {
-                    loadSettings(attempt + 1);
+                    loadDjangoSettings(attempt + 1);
                 } else {
-                    //$('#settingsBlock').html("Error loading dynamic content")
+                    //$('#settingsContainer').html("Error loading dynamic content")
                 }
             }
         });
@@ -348,10 +377,10 @@
         loadSystemMonitoring();
         loadTableStatus();
         loadExportStatus();
-        loadSettings();
+        loadDjangoSettings();
     }
 
-    $('#statusBlock').html("Document ready")
+    $('#statusContainer').html("Document ready")
     loadAll();
 
     setInterval(function() {

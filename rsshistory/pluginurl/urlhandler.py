@@ -146,6 +146,7 @@ class UrlHandlerEx(object):
     def get_properties_internal_mode_mapping(self, request_server, mode_mapping):
         config_entry = Configuration.get_object().config_entry
         name = ""
+
         if mode_mapping and len(mode_mapping) > 0:
             for crawler_data in mode_mapping:
                 crawler_data = self.get_ready_crawler_data(crawler_data)
@@ -304,7 +305,9 @@ class UrlHandlerEx(object):
             return False
 
         if "status_code" in response:
-            if response["status_code"] == 403:
+            if response["status_code"] >= 200 and response["status_code"] <= 400:
+                return False
+            else:
                 return True
 
     def get_contents(self):

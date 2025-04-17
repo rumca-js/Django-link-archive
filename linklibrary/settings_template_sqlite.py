@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,6 +28,31 @@ DEBUG = True
 # Add necessary hosts here
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
+DB_DB = os.environ["DB_DB"]
+DB_USER = os.environ["DB_USER"]
+DB_PASSWORD = os.environ["DB_PASSWORD"]
+
+RABBIT_SERVER=os.environ["RABBIT_SERVER"]
+MEMCACHED_SERVER=os.environ["MEMCACHED_SERVER"]
+MEMCACHED_PORT=os.environ["MEMCACHED_PORT"]
+DB_SERVER=os.environ["DB_SERVER"]
+#CELERY_BROKER_URL = f'amqp://guest:guest@{RABBIT_SERVER}'
+
+
+if "CRAWLER_BUDDY_SERVER" in os.environ:
+    CRAWLER_BUDDY_SERVER = os.environ["CRAWLER_BUDDY_SERVER"]
+else:
+    CRAWLER_BUDDY_SERVER = None
+
+if "CRAWLER_BUDDY_PORT" in os.environ:
+    CRAWLER_BUDDY_PORT = os.environ["CRAWLER_BUDDY_PORT"]
+else:
+    CRAWLER_BUDDY_PORT = None
+
+if CRAWLER_BUDDY_SERVER and CRAWLER_BUDDY_PORT:
+    CRAWLER_BUDDY_URL = CRAWLER_BUDDY_SERVER + ":" + str(CRAWLER_BUDDY_PORT)
+else:
+    CRAWLER_BUDDY_URL = None
 
 # Application definition
 
@@ -40,6 +66,9 @@ INSTALLED_APPS = [
     # Manual edit start
     "rsshistory.apps.LinkDatabase",
 ]
+
+# to make auth system to work
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -107,12 +136,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
 USE_TZ = True
-
+TIME_ZONE = 'UTC'
+USE_I18N = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -121,5 +147,4 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

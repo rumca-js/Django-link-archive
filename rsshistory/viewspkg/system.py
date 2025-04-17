@@ -417,6 +417,8 @@ def json_system_status(request):
     else:
         data["days_to_check_stale_entries"] = 0
 
+    data["current_time"] = current_time
+
     # is_remote_server_down = system_controller.is_remote_server_down()
     # data["remote_server_status"] = is_remote_server_down
 

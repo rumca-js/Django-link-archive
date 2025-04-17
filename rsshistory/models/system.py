@@ -199,6 +199,11 @@ class ConfigurationEntry(models.Model):
         help_text="Defines the default behavior of the main search button.",
     )
 
+    thread_memory_threshold = models.IntegerField(
+        default=500,
+        help_text="Unit [MB]. Virtual memory threshold for threads. If memory threshold is breached thread leaves.",
+    )
+
     # features
 
     enable_keyword_support = models.BooleanField(

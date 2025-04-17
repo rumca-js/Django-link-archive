@@ -10,10 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -26,12 +28,31 @@ DEBUG = True
 # Add necessary hosts here
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
-# Celery
+DB_DB = os.environ["DB_DB"]
+DB_USER = os.environ["DB_USER"]
+DB_PASSWORD = os.environ["DB_PASSWORD"]
 
-# for now, to simpliify, we will not use any broker
-# https://www.reddit.com/r/django/comments/er0v7r/did_you_know_that_you_can_use_filesystem_as/
+RABBIT_SERVER=os.environ["RABBIT_SERVER"]
+MEMCACHED_SERVER=os.environ["MEMCACHED_SERVER"]
+MEMCACHED_PORT=os.environ["MEMCACHED_PORT"]
+DB_SERVER=os.environ["DB_SERVER"]
+CELERY_BROKER_URL = f'amqp://guest:guest@{RABBIT_SERVER}'
 
-CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq'
+
+if "CRAWLER_BUDDY_SERVER" in os.environ:
+    CRAWLER_BUDDY_SERVER = os.environ["CRAWLER_BUDDY_SERVER"]
+else:
+    CRAWLER_BUDDY_SERVER = None
+
+if "CRAWLER_BUDDY_PORT" in os.environ:
+    CRAWLER_BUDDY_PORT = os.environ["CRAWLER_BUDDY_PORT"]
+else:
+    CRAWLER_BUDDY_PORT = None
+
+if CRAWLER_BUDDY_SERVER and CRAWLER_BUDDY_PORT:
+    CRAWLER_BUDDY_URL = CRAWLER_BUDDY_SERVER + ":" + str(CRAWLER_BUDDY_PORT)
+else:
+    CRAWLER_BUDDY_URL = None
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
@@ -51,10 +72,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
     # Manual edit start
-    'django_celery_results',
     "rsshistory.apps.LinkDatabase",
 ]
+
+# to make auth system to work
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -122,12 +147,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
 USE_TZ = True
-
+TIME_ZONE = 'UTC'
+USE_I18N = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -136,12 +158,11 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
-        "LOCATION": "127.0.0.1:11211",
+        "LOCATION": f"{MEMCACHED_SERVER}:{MEMCACHED_PORT}",
     }
 }

@@ -116,6 +116,7 @@ class ConfigForm(forms.ModelForm):
             "download_path",
             "auto_store_thumbnails",
             "favicon_internet_url",
+            "thread_memory_threshold",
             # features
             "enable_background_jobs",
             "enable_domain_support",
