@@ -71,6 +71,8 @@ tasks_info = [
         [60.0, "SourceJobsProcessor"],
         [60.0, "WriteJobsProcessor"],
         [60.0, "ImportJobsProcessor"],
+        [60.0, "SystemJobsProcessor"],
+        [60.0, "UpdateJobsProcessor"],
         [60.0, "LeftOverJobsProcessor"],
 ]
 
