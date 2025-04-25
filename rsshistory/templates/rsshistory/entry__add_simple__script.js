@@ -63,13 +63,13 @@ function addLink(page_url) {
                object_id = data.pk;
                link_text = getExistingObjectLink(object_id);
 
-               $("#formResponse").html(`Entry exists ${link_text}`);
+               $("#formResponse").html(`Entry added ${link_text}`);
                resetSearch();
            }
            else {
                object_id = data.pk;
                link_text = getExistingObjectLink(object_id);
-               $("#formResponse").html(`Entry added ${link_text}`);
+               $("#formResponse").html(`Entry not added ${link_text}`);
            }
        },
        error: function(xhr, status, error) {

@@ -1,4 +1,5 @@
 import traceback
+import subprocess
 from pathlib import Path
 from datetime import timedelta, datetime
 
@@ -24,9 +25,13 @@ class UpdateExportManager(object):
         self.writer_config = None
 
     def process(self):
+        status = False
+
         self.write()
-        self.push()
+        status = self.push()
         self.clear()
+
+        return status
 
     def write(self):
         AppLogging.notify("Writing to directory: {}".format(self.get_write_directory()))
@@ -89,9 +94,10 @@ class UpdateExportManager(object):
             data_source_dir=self.get_write_directory(),
         )
 
-        AppLogging.info("Pushing repo")
-        repo.push_to_repo(message)
-        AppLogging.info("Pushing repo done")
+        if repo.push_to_repo(message):
+            return True
+        else:
+            return False
 
     def clear(self):
         dir = self.get_write_directory()
@@ -128,11 +134,18 @@ class UpdateManager(object):
             write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
 
         mgr = UpdateExportManager(self._cfg, self.repo_builder, export_data, write_date)
-        mgr.process()
+        status = mgr.process()
 
-        AppLogging.info(
-            "Export:{}. Writing and Pushing data - DONE".format(export_data.id)
-        )
+        if status:
+            AppLogging.info(
+                "Export:{}. Writing and Pushing data - DONE".format(export_data.id)
+            )
+        else:
+            AppLogging.error(
+                "Export:{}. Writing and Pushing data - ERROR".format(export_data.id)
+            )
+
+        return status
 
     def write(self, export_data, input_date=""):
         if input_date == "":

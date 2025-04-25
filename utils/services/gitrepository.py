@@ -20,6 +20,9 @@ class GitRepository(RepositoryInterface):
         self.is_different_flag = None
 
     def push_to_repo(self, commit_message):
+        if not is_git_username_configured():
+            return False
+
         repo_is_up = False
         try:
             self.up()
@@ -174,3 +177,15 @@ class GitRepository(RepositoryInterface):
                 )
             )
         return p.returncode
+
+    def is_git_username_configured(global_check=True):
+        try:
+            scope = ['--global'] if global_check else ['--local']
+            result = subprocess.run(['git', 'config'] + scope + ['user.name'],
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
+                                    text=True)
+            return bool(result.stdout.strip())
+        except Exception as e:
+            print(f"Error checking git config: {e}")
+            return False

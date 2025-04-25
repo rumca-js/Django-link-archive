@@ -246,6 +246,10 @@ class GenericJobsProcessor(CeleryTaskInterface):
         AppLogging.debug("{}: Starting. Pid:{} Memory:{}/{} MB".format(self.get_name(), pid, resident, virtual))
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
+        if c.is_memory_limit_reached():
+            AppLogging.error("{}: Memory limit reached at start, leaving".format(self.get_name()))
+            return
+
         config = c.config_entry
         if config.block_job_queue:
             AppLogging.debug("{}: Job queue is locked".format(self.get_name()))

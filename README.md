@@ -65,6 +65,7 @@ Personal link database, link aggregator, with RSS functionality.
 
  - [Screenshots](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md)
  - [Installation, configuration](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md)
+ - [Backup and Restore operations](https://github.com/rumca-js/Django-link-archive/blob/main/README_datamanagement.md)
  - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md)
  - [Data analysis](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
  - [Development](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md)

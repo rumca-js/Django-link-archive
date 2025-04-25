@@ -17,7 +17,7 @@ from pathlib import Path
 import time
 from datetime import datetime
 
-from sqlalchemy import create_engine, Column, String, Integer, MetaData, Table, text, LargeBinary, DateTime
+from sqlalchemy import create_engine, Column, String, Integer, MetaData, Table, text, LargeBinary, DateTime, select
 from sqlalchemy.dialects.postgresql.types import BYTEA
 from sqlalchemy.orm import sessionmaker
 
@@ -112,6 +112,55 @@ def truncate_table(run_info, table):
     except subprocess.CalledProcessError as e:
         print("An error occurred:", e)
         return False
+
+    return True
+
+
+def reset_table_index_sequence(run_info, table):
+    user = run_info["user"]
+    database = run_info["database"]
+    host = run_info["host"]
+    tables = run_info["tables"]
+
+    print("Resetting sequence for table {}".format(table))
+
+    sql = f"SELECT setval('{table}_id_seq', COALESCE((SELECT MAX(id) FROM {table}), 1));"
+
+    command = [
+       'psql',
+       "-h", host,
+       "-U", user,
+       "-d", database,
+       '-c', sql,
+    ]
+
+    try:
+        subprocess.run(command, check=True)
+        print("Reset index sequence successfully.")
+    except subprocess.CalledProcessError as e:
+        print("An error occurred:", e)
+        return False
+
+    return True
+
+
+def reset_tables_index_sequence(tablemapping, run_info):
+    workspace = run_info["workspace"]
+
+    # after restore we need to reset sequences
+    for item in tablemapping:
+        key = item[0]
+        tables = item[1]
+
+        run_info["output_file"] = key
+        run_info["tables"] = tables
+
+        for table in tables:
+            table = table.replace("instance_", workspace+"_")
+
+            if not reset_table_index_sequence(run_info, table):
+                print("Could not reset index in table")
+                return False
 
     return True
 
@@ -229,30 +278,53 @@ def create_destionation_table(table_name, source_table, destination_engine):
             destination_table.create(destination_engine)
 
 
-def get_source_table(workspace, table_name, source_engine):
-    source_metadata = MetaData()
-    source_table = Table("{}_{}".format(workspace, table_name), source_metadata, autoload_with=source_engine)
-    return source_table
+def get_engine_table(workspace, table_name, engine, with_workspace=True):
+    if with_workspace:
+        this_tables_name = "{}_{}".format(workspace, table_name)
+    else:
+        this_tables_name = table_name
+
+    engine_metadata = MetaData()
+    engine_table = Table(this_tables_name, engine_metadata, autoload_with=engine)
+    return engine_table
 
 
-def copy_table(instance, table_name, source_engine, destination_engine):
+def get_table_row_values(row, source_table):
+    data = {}
+    
+    for column in source_table.columns:
+        value = getattr(row, column.name)
+        data[column.name] = value
+
+    return data
+
+
+def is_row_with_id(connection, table, id_value):
+    try:
+        existing = connection.execute(
+            select(table.c.id).where(table.c.id == id_value)
+        ).first()
+
+        return existing
+    except Exception as E:
+        connection.rollback()
+        return False
+
+
+def copy_table(instance, table_name, source_engine, destination_engine, override=False, to_sqlite=True, commit_every_row=False):
     """
     Copies table from postgres to destination
+    @param override If true, will work faster, since it does not check if row with id exists
+    @param to_sqlite If to SQLlite then destination table names will not include workspace. If from SQLite then
+                  source tables will not include
     """
     Session = sessionmaker(bind=source_engine)
     session = Session()
 
-    print("{} Creating table".format(table_name))
+    source_table = get_engine_table(instance, table_name, source_engine, with_workspace=to_sqlite)
+    destination_table = get_engine_table(instance, table_name, destination_engine, with_workspace=not to_sqlite)
 
-    source_table = get_source_table(instance, table_name, source_engine)
-
-    create_destionation_table(table_name, source_table, destination_engine)
-
-    # Reflect the destination table after ensuring it exists
-    destination_metadata = MetaData()
-    destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
-
-    print("{} Copying table".format(table_name))
+    print(f"Copying from {source_table} to {destination_table}")
 
     with destination_engine.connect() as destination_connection:
         with source_engine.connect() as connection:
@@ -261,18 +333,36 @@ def copy_table(instance, table_name, source_engine, destination_engine):
             index = 0
             for row in result:
                 index += 1
-
-                data = {}
-                
-                for column in source_table.columns:
-                    value = getattr(row, column.name)
-                    data[column.name] = value
-                
-                destination_connection.execute(destination_table.insert(), data)
-
                 sys.stdout.write("{}\r".format(index))
 
-            destination_connection.commit()
+                data = get_table_row_values(row, source_table)
+
+                # Check if the ID already exists
+                if not override:
+                    id_value = data.get("id")
+                    if id_value is not None:
+                        existing = is_row_with_id(destination_connection, destination_table, id_value)
+
+                        if existing:
+                            continue
+                
+                try:
+                   destination_connection.execute(destination_table.insert(), data)
+                except Exception as e:
+                    print(f"Skipping row {index} due to insert error {e}")
+                    destination_connection.rollback()
+                    continue
+
+                if commit_every_row:
+                    try:
+                        destination_connection.commit()
+                    except Exception as e:
+                        print(f"Skipping row {index} due to insert error {e}")
+                        destination_connection.rollback()
+                        continue
+
+            if not commit_every_row:
+                destination_connection.commit()
 
     session.close()
 
@@ -320,7 +410,7 @@ def obfuscate_all(destination_engine):
 #### SQLite
 
 
-def get_source_engine(run_info):
+def get_local_engine(run_info):
     workspace = run_info["workspace"]
     user = run_info["user"]
     database = run_info["database"]
@@ -334,7 +424,7 @@ def get_source_engine(run_info):
     return source_engine
 
 
-def get_destination_engine(run_info):
+def get_sqlite_engine(run_info):
     workspace = run_info["workspace"]
 
     file_name = workspace+".db"
@@ -350,21 +440,42 @@ def run_db_copy_backup(run_info):
     empty = run_info["empty"]
 
     # Create the database engine
-    source_engine = get_source_engine(run_info)
+    source_engine = get_local_engine(run_info)
 
     operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(operating_dir)
 
-    destination_engine = get_destination_engine(run_info)
+    destination_engine = get_sqlite_engine(run_info)
 
     for table in tables:
         table = table.replace(workspace + "_", "")
+
+        source_table = get_engine_table(workspace, table, source_engine)
+        create_destionation_table(table, source_table, destination_engine)
+
         if not empty:
-            copy_table(workspace, table, source_engine, destination_engine)
-        else:
-            source_table = get_source_table(workspace, table, source_engine)
-            create_destionation_table(table_name, source_table, destination_engine)
+            copy_table(workspace, table, source_engine, destination_engine, override=True, to_sqlite=True)
+
+    return True
+
+
+def run_db_copy_restore(run_info):
+    workspace = run_info["workspace"]
+    tables = run_info["tables"]
+    empty = run_info["empty"]
+    append = run_info["append"]
+
+    destination_engine = get_local_engine(run_info)
+
+    operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
+    os.chdir(operating_dir)
+
+    source_engine = get_sqlite_engine(run_info)
+
+    for table in tables:
+        table = table.replace(workspace + "_", "")
+        copy_table(workspace, table, source_engine, destination_engine, override=False, to_sqlite=False, commit_every_row=True)
 
     return True
 
@@ -373,15 +484,18 @@ def run_db_copy_backup_auth(run_info):
     workspace = run_info["workspace"]
 
     # Create the database engine
-    source_engine = get_source_engine(run_info)
+    source_engine = get_local_engine(run_info)
 
     operating_dir = get_workspace_backup_directory(run_info["format"], workspace)
     operating_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(operating_dir)
 
-    destination_engine = get_destination_engine(run_info)
+    destination_engine = get_sqlite_engine(run_info)
 
-    copy_table("auth", "user", source_engine, destination_engine)
+    source_table = get_engine_table("auth", "user", source_engine)
+    create_destionation_table("user", source_table, destination_engine)
+
+    copy_table("auth", "user", source_engine, destination_engine, override=True, to_sqlite=True)
 
     return True
 
@@ -410,6 +524,7 @@ def backup_workspace(run_info):
        "./instance_compactedtags"      : ["instance_compactedtags"],
        "./instance_usercompactedtags"  : ["instance_usercompactedtags"],
        "./instance_votes"     : ["instance_uservotes"],
+       "./instance_browser"     : ["instance_browser"],
        "./instance_entryrules"     : ["instance_entryrules"],
        "./instance_dataexport"     : ["instance_dataexport"],
        "./instance_gateway"     : ["instance_gateway"],
@@ -449,7 +564,7 @@ def backup_workspace(run_info):
     if run_info["format"] == "sqlite":
         run_db_copy_backup_auth(run_info)
 
-        destination_engine = get_destination_engine(run_info)
+        destination_engine = get_sqlite_engine(run_info)
 
         create_indexes(destination_engine, "linkdatamodel", "link")
         create_indexes(destination_engine, "linkdatamodel", "title")
@@ -464,6 +579,8 @@ def restore_workspace(run_info):
     """
     @note table order is important
     """
+    workspace = run_info["workspace"]
+
     print("--------------------")
     print(run_info["workspace"])
     print("--------------------")
@@ -482,10 +599,11 @@ def restore_workspace(run_info):
        ["./instance_votes"           , ["instance_uservotes"]],
        ["./instance_comments"        , ["instance_usercomments"]],
        ["./instance_userbookmarks"   , ["instance_userbookmarks"]],
+       ["./instance_browser"     , ["instance_browser"]],
        ["./instance_entryrules"     , ["instance_entryrules"]],
        ["./instance_dataexport"     , ["instance_dataexport"]],
        ["./instance_gateway"        , ["instance_gateway"]],
-       #["./instance_blockentrylist"   , ["instance_blockentrylist"]],
+       ["./instance_blockentrylist"   , ["instance_blockentrylist"]],
        ["./instance_modelfiles"   , ["instance_modelfiles"]],
        ["./instance_readlater"    , ["instance_readlater"]],
        ["./instance_userconfig"   , ["instance_userconfig"]],
@@ -495,16 +613,17 @@ def restore_workspace(run_info):
        ["./instance_userentryvisithistory"      , ["instance_userentryvisithistory"]],
     ]
 
-    for item in tablemapping:
-        key = item[0]
-        tables = item[1]
+    if not run_info["append"]:
+        for item in tablemapping:
+            key = item[0]
+            tables = item[1]
 
-        run_info["output_file"] = key
-        run_info["tables"] = tables
+            run_info["output_file"] = key
+            run_info["tables"] = tables
 
-        if not truncate_all(run_info):
-            print("Could not truncate table")
-            return
+            if not truncate_all(run_info):
+                print("Could not truncate table")
+                return
 
     for item in tablemapping:
         key = item[0]
@@ -520,8 +639,14 @@ def restore_workspace(run_info):
             table_name = item.replace("instance", workspace)
             new_run_info["tables"].append(table_name)
 
-        if not run_pg_restore(run_info):
-            return False
+        if new_run_info["format"] == "sqlite":
+            if not run_db_copy_restore(new_run_info):
+                return False
+        else:
+            if not run_pg_restore(new_run_info):
+                return False
+
+    reset_tables_index_sequence(tablemapping, run_info)
 
     return True
 
@@ -583,6 +708,7 @@ def parse_backup():
     parser.add_argument("-a", "--analyze", action="store_true", help="Analyze the database")
     parser.add_argument("--vacuum", action="store_true", help="Vacuum the database")
     parser.add_argument("--reindex", action="store_true", help="Reindex the database. Useful to detect errors in consistency")
+    parser.add_argument("-s", "--sequence-update", action="store_true", help="Updates sequence numbers")
     parser.add_argument("-U", "--user", default="user", help="Username for the database (default: 'user')")
     parser.add_argument("-d", "--database", default="db", help="Database name (default: 'db')")
     parser.add_argument("-p", "--password", default="", help="Password. Necessary for sqlite format")
@@ -590,6 +716,7 @@ def parse_backup():
     parser.add_argument("-D", "--debug", help="Enable debug output")  # TODO implement debug
     parser.add_argument("-i", "--ignore-errors", action="store_true", help="Ignore errors during the operation")
     parser.add_argument("--empty", action="store_true", help="Creates empty table version during backup")
+    parser.add_argument("--append", action="store_true", help="Appends data during restore, does not clear tables")
     parser.add_argument("-f", "--format", default="custom", choices=["custom", "plain", "sql", "sqlite"],
                         help="Format of the backup (default: 'custom'). Choices: 'custom', 'plain', or 'sql'.")
 
@@ -601,7 +728,7 @@ def parse_backup():
 def main():
     parser, args = parse_backup()
 
-    if not args.backup and not args.restore and not args.analyze and not args.vacuum and not args.reindex:
+    if not args.backup and not args.restore and not args.analyze and not args.vacuum and not args.reindex and not args.sequence_update:
         parser.print_help()
 
     workspaces = []
@@ -628,6 +755,7 @@ def main():
         run_info["format"] = args.format
         run_info["password"] = args.password
         run_info["empty"] = args.empty
+        run_info["append"] = args.append
 
         if args.ignore_errors:
             run_info["ignore_errors"] = True
@@ -653,6 +781,12 @@ def main():
             break
 
         if args.reindex and not run_sql_for_workspaces(run_info, "REINDEX TABLE {table};"):
+            print("Leaving because of errors")
+            errors = True
+            break
+
+        sql_text = "SELECT setval('{table}_id_seq', COALESCE((SELECT MAX(id) FROM {table}), 1));"
+        if args.sequence_update and not run_sql_for_workspaces(run_info, sql_text):
             print("Leaving because of errors")
             errors = True
             break

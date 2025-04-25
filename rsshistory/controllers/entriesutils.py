@@ -1103,6 +1103,9 @@ class EntryWrapper(object):
             except Exception as E:
                 AppLogging.exc(E)
 
+            if "id" in themap:
+                del themap["id"]
+
             archive_obj = ArchiveLinkDataController.objects.create(**themap)
             entry_obj.delete()
             return archive_obj

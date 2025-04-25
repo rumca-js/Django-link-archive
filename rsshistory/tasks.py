@@ -28,6 +28,9 @@ def process_jobs_task(Processor, tasks_info):
 
         AppLogging.debug("Running processor: {} DONE".format(Processor))
 
+        # TODO import gc
+        # gc.collect()
+
     except Exception as E:
         AppLogging.error(
             "Exception in process_jobs_task for processor: {} {}".format(

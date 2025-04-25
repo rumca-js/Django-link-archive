@@ -67,6 +67,7 @@ from .controllers import (
 from .configuration import Configuration
 from .pluginurl import UrlHandlerEx
 from .serializers import JsonImporter
+from .updatemgr import UpdateManager
 
 
 class BaseJobHandler(object):
@@ -782,9 +783,6 @@ class WriteDailyDataJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_WRITE_DAILY_DATA
 
     def process(self, obj=None):
-        from .updatemgr import UpdateManager
-        from .datawriter import DataWriter
-
         date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
 
         mgr = UpdateManager(self._config)
@@ -808,8 +806,6 @@ class WriteYearDataJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_WRITE_YEAR_DATA
 
     def process(self, obj=None):
-        from .updatemgr import UpdateManager
-
         c = Configuration.get_object()
         mgr = UpdateManager(c)
 
@@ -832,7 +828,6 @@ class WriteNoTimeDataJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_WRITE_NOTIME_DATA
 
     def process(self, obj=None):
-        from .updatemgr import UpdateManager
 
         c = Configuration.get_object()
         mgr = UpdateManager(c)
@@ -876,8 +871,6 @@ class ExportDataJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_EXPORT_DATA
 
     def process(self, obj=None):
-        from .updatemgr import UpdateManager
-
         export = self.get_export(obj)
         if not export:
             AppLogging.error("Export {} does not exist".format(obj.subject))
@@ -887,14 +880,20 @@ class ExportDataJobHandler(BaseJobHandler):
 
         update_mgr = UpdateManager(self._config)
 
-        update_mgr.write_and_push(export)
-
-        elapsed_sec = self.get_time_diff()
-        AppLogging.notify(
-            "Export succcessfull. Export:{} Time:{}".format(
-                obj.subject, elapsed_sec
+        if update_mgr.write_and_push(export):
+            elapsed_sec = self.get_time_diff()
+            AppLogging.notify(
+                "Export succcessfull. Export:{} Time:{}".format(
+                    obj.subject, elapsed_sec
+                )
             )
-        )
+        else:
+            elapsed_sec = self.get_time_diff()
+            AppLogging.error(
+                "Export failed. Export:{} Time:{}".format(
+                    obj.subject, elapsed_sec
+                )
+            )
 
         return True
 
@@ -914,7 +913,6 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         # TODO read year from string
-        from .updatemgr import UpdateManager
 
         update_mgr = UpdateManager(self._config)
 
@@ -942,8 +940,6 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO
 
     def process(self, obj=None):
-        from .updatemgr import UpdateManager
-
         update_mgr = UpdateManager(self._config)
 
         all_export_data = DataExport.objects.filter(
@@ -971,8 +967,6 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         # TODO read date from string
-        from .updatemgr import UpdateManager
-
         date_input = obj.subject
 
         if date_input == "":

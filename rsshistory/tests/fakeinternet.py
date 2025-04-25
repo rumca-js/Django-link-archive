@@ -282,6 +282,25 @@ class FakeInternetTestCase(TestCase):
         super().__init__(*args, **kwargs)
         MockRequestCounter.reset()
 
+        self._process = psutil.Process(os.getpid())
+        self._mem_before = self._get_memory_mb()
+
+    def _get_memory_mb(self):
+        return self._process.memory_info().rss / 1024 / 1024
+
+    def check_memory(self):
+        mem_after = self._get_memory_mb()
+        print(f"[TEARDOWN] Memory after test: {mem_after:.2f} MB")
+        mem_delta = mem_after - self._mem_before
+        print(f"[TEARDOWN] Memory change: {mem_delta:.2f} MB")
+
+        # Fail the test if memory usage increased too much
+        threshold_mb = 10
+        self.assertLess(
+            mem_delta, threshold_mb,
+            f"Memory increased by {mem_delta:.2f} MB — possible leak?"
+        )
+
     def disable_web_pages(self):
         WebLogger.web_logger = AppLogging
         WebConfig.get_default_crawler = FakeInternetTestCase.get_default_crawler

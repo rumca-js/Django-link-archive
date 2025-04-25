@@ -106,6 +106,35 @@ def get_system_uptime():
     uptime_str = f"{int(uptime_days)} days, {int(uptime_hours % 24)} hours, {int(uptime_minutes % 60)} minutes, {int(uptime_seconds % 60)} seconds"
     return {"uptime": uptime_str}
 
+def get_file_descriptor_stats():
+    """
+    Reads /proc/sys/fs/file-nr and returns:
+    (allocated, unused, max)
+
+    # Example usage
+    stats = get_file_descriptor_stats()
+    print(f"Allocated: {stats['allocated']}")
+    print(f"Unused: {stats['unused']}")
+    print(f"Max FDs: {stats['max']}")
+
+    """
+    with open("/proc/sys/fs/file-nr", "r") as f:
+        content = f.read().strip()
+
+    allocated, unused, max_fds = map(int, content.split())
+
+    pid = os.getpid()
+    fds = psutil.Process(pid).num_fds()
+    threads = psutil.Process(pid).num_threads()
+
+    return {
+        "allocated": allocated,
+        "unused": unused,
+        "max": max_fds,
+        "fds": fds,
+        "threads": threads,
+    }
+
 def get_hardware_info():
     return {
         "kernel_info": get_kernel_info(),
@@ -116,6 +145,7 @@ def get_hardware_info():
         "load_average": get_load_average(),
         "disk_io_counters": get_disk_io_counters(),
         "net_io_counters": get_net_io_counters(),
+        "file_descriptor_stats" : get_file_descriptor_stats(),
     }
 
 

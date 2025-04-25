@@ -26,7 +26,8 @@ pytz = "^2024.2"
 beautifulsoup4 = "^4.13.3"
 
 requests = "^2.32.3"
-psycopg2 = "*"
+#psycopg2 = "*" # for raspberry install python3-psycopyg2
+psycopg2-binary = "*" # for raspberry install python3-psycopyg2
 psutil="*"
 
 # TODO do we need this?
