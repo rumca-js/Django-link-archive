@@ -109,6 +109,8 @@ class BlockEntryList(models.Model):
     url = models.CharField(max_length=1000, unique=True)
     processed = models.BooleanField(default=False)
 
+    STARTUP_ENTRY_LIST = "https://v.firebog.net/hosts/lists.php?type=tick"
+
     class Meta:
         ordering = ["-processed", "url"]
 
@@ -122,9 +124,7 @@ class BlockEntryList(models.Model):
         from ..pluginurl import UrlHandlerEx
 
         # this creates new lists
-        BlockEntryList.read_lists_group(
-            "https://v.firebog.net/hosts/lists.php?type=tick"
-        )
+        BlockEntryList.read_lists_group(BlockEntryList.STARTUP_ENTRY_LIST)
 
         for alist in BlockEntryList.objects.all():
             if not UrlHandlerEx.ping(alist.url):

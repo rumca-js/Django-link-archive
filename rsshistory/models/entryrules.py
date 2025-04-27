@@ -57,7 +57,7 @@ class EntryRules(models.Model):
     )
 
     class Meta:
-        ordering = ["-enabled", "rule_name"]
+        ordering = ["-enabled", "block", "browser", "apply_age_limit", "auto_tag", "rule_name"]
 
     def is_valid(self):
         if self.browser:

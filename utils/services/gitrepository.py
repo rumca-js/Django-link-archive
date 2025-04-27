@@ -20,7 +20,7 @@ class GitRepository(RepositoryInterface):
         self.is_different_flag = None
 
     def push_to_repo(self, commit_message):
-        if not is_git_username_configured():
+        if not GitRepository.is_git_username_configured():
             return False
 
         repo_is_up = False

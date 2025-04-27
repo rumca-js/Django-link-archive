@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
+from django.db.models import Q
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -34,7 +35,7 @@ def block_lists_update(request):
     if data is not None:
         return data
 
-    BlockEntryList.update_lists()
+    BlockEntryList.update_all()
 
     p.context["summary_text"] = "Updated lists"
 

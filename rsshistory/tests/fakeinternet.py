@@ -7,6 +7,8 @@ This module provides replacement for the Internet.
 
 import logging
 import json
+import psutil
+import os
 from django.test import TestCase
 from django.contrib.auth.models import User
 

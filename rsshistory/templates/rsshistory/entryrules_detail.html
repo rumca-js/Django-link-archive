@@ -43,14 +43,12 @@
 {% endif %}
 
 {% if object.trigger_text %}
-    <div>Trigger text:
-    <span class="white-space: nowrap;">{{object.trigger_text}},</span>
-    <span class="white-space: nowrap;">Hits required:{{object.trigger_text_hits}}</span>
-    </div>
+   <div>Trigger text: {{object.trigger_text}}</div>
+   <div class="white-space: nowrap;">Hits required:{{object.trigger_text_hits}}</div>
 {% endif %}
 
 {% if object.trigger_text_fields %}
-   <span>{{object.trigger_text_fields}}</span>
+   <div>Trigger fields:{{object.trigger_text_fields}}</div>
 {% endif %}
 
 <h2>Actions</h2>
