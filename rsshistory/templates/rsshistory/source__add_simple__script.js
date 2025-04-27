@@ -36,7 +36,7 @@ let currentGetEditForm = 0;
 function getRealEditForm(page_url, browser, attempt = 1) {
     $("#formResponse").html(`Obtaining form for link :${page_url}`);
 
-    let url = `{% url 'rsshistory:source-add-form' %}?link=${page_url}`;
+    let url = `{% url 'rsshistory:source-add-form' %}?link=${page_url}&browser=${browser}`;
     let requestCurrentGetEditForm = ++currentGetEditForm;
     
     $.ajax({
@@ -75,103 +75,8 @@ function getRealEditForm(page_url, browser, attempt = 1) {
 }
 
 
-let currentsendJqueryPageProperties = 0;
-function sendJqueryPageProperties(page_url, browser, attempt = 1) {
-    $("#formResponse").html(`Obtaining form for link :${page_url}`);
-
-    let requestsendJqueryPageProperties = ++currentsendJqueryPageProperties;
-
-    let url = `{% url 'rsshistory:source-add-form' %}?link=${page_url}`;
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestsendJqueryPageProperties != currentsendJqueryPageProperties)
-               return;
-
-           let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-           // $("#formDiv").html("");
-
-           form_text = data;
-           form_text = data.replace('btnFetch', 'btnAddLink');
-
-           // TODO - fetch using jQuery for title and other info
-           resetSearch("Feature not yet implemented.");
-
-           submission_locked = false;
-       },
-       error: function(xhr, status, error) {
-           if (requestsendJqueryPageProperties != currentsendJqueryPageProperties)
-               return;
-
-           if (attempt < 3) {
-               sendJqueryPageProperties(page_url, browser, attempt + 1);
-           } else {
-               resetSearch("Could not obtain edit form.");
-           }
-       }
-    });
-}
-
-
-let currentsendEmptyFrame = 0;
-function sendEmptyFrame(page_url, browser, attempt = 1) {
-    $("#formResponse").html(`Obtaining form for link :${page_url}`);
-
-    let requestsendEmptyFrame = ++currentsendEmptyFrame;
-
-    let url = `{% url 'rsshistory:source-add-form' %}?link=${page_url}`;
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestsendEmptyFrame != currentsendEmptyFrame)
-               return;
-           let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-           $("#formDiv").html("");
-
-           form_text = data;
-           form_text = data.replace('btnFetch', 'btnAddLink');
-
-           $("#formResponse").html(form_text);
-
-           $("#id_link").val(page_url);
-
-           let action_url = `{% url 'rsshistory:source-add' %}`;
-
-           $("#theForm").attr({
-               method: "POST",
-               action: action_url
-           });
-           $("#theForm").find('input[name="csrfmiddlewaretoken"]').val(csrfToken);
-
-           submission_locked = false;
-       },
-       error: function(xhr, status, error) {
-           if (requestsendEmptyFrame != currentsendEmptyFrame)
-               return;
-           if (attempt < 3) {
-               sendEmptyFrame(page_url, browser, attempt + 1);
-           } else {
-               resetSearch("Could not obtain edit form.");
-           }
-       }
-    });
-}
-
-
 function getForm(page_url, browser) {
-    if (browser == -1) {
-        sendJqueryPageProperties(page_url, browser);
-    }
-    else if (browser == -2) {
-        sendEmptyFrame(page_url, browser);
-    }
-    else {
-        getRealEditForm(page_url, browser);
-    }
+    getRealEditForm(page_url, browser);
 }
 
 

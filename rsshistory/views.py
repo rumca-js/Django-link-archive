@@ -14,6 +14,7 @@ from .models import (
     ConfigurationEntry,
     AppLogging,
     ApiKeys,
+    Browser,
 )
 from .apps import LinkDatabase
 from .configuration import Configuration
@@ -60,6 +61,27 @@ def get_page_num(themap):
         return page
     else:
         return 1
+
+
+def get_request_browser_id(input_map):
+    if "browser" in input_map and input_map["browser"] != "":
+        return int(input_map["browser"])
+
+
+def get_request_browser(input_map):
+    browser = None
+
+    browser_id = get_request_browser_id(input_map)
+    if browser_id is not None:
+        if browser_id != Browser.AUTO:
+            browsers = Browser.objects.filter(pk=browser_id)
+            if browsers.exists():
+                browser = browsers[0]
+            else:
+                AppLogging.error("Browser does not exist!")
+                return
+
+    return browser
 
 
 class ViewPage(object):

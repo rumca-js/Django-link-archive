@@ -64,19 +64,20 @@
 {% else %}
     <li class="list-group-item text-nowrap mx-2 fw-bold">Enabled: {{ object.enabled }}</li>
 {% endif %}
+    <li class="list-group-item text-nowrap mx-2">Source type: {{ object.source_type }}</li>
     <li class="list-group-item text-nowrap mx-2">Fetch period: {{ object.fetch_period }}</li>
+    <li class="list-group-item text-nowrap mx-2">Language: {{ object.language }}</li>
+    <li class="list-group-item text-nowrap mx-2">Age: {{ object.age }}</li>
+    <li class="list-group-item text-nowrap mx-2">Auto tag: {{ object.auto_tag }}</li>
     <li class="list-group-item text-nowrap mx-2">Category: {{ object.category_name }}</li>
     <li class="list-group-item text-nowrap mx-2">Subcategory: {{ object.subcategory_name }}</li>
     <li class="list-group-item text-nowrap mx-2">Category object: {{ object.category }}</li>
     <li class="list-group-item text-nowrap mx-2">Subcategory object: {{ object.subcategory }}</li>
-    <li class="list-group-item text-nowrap mx-2">Language: {{ object.language }}</li>
-    <li class="list-group-item text-nowrap mx-2">Age: {{ object.age }}</li>
     <li class="list-group-item text-nowrap mx-2">Export to CMS: {{ object.export_to_cms }}</li>
     <li class="list-group-item text-nowrap mx-2">Remove after days: {{ object.remove_after_days }}</li>
     <li class="list-group-item text-nowrap mx-2">Favicon: <a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">
 	   <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
 	   Link</a></li>
-    <li class="list-group-item text-nowrap mx-2">Source type: {{ object.source_type }}</li>
     {% if object.proxy_location %}
     <li class="list-group-item text-nowrap mx-2">Proxy location: <a href="{{ object.proxy_location }}">
 	     <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
@@ -86,7 +87,5 @@
     <li class="list-group-item text-nowrap mx-2">Import seconds: {{object.dynamic_data.import_seconds}}</li>
     <li class="list-group-item text-nowrap mx-2">Consecutive Errors: {{object.dynamic_data.consecutive_errors}}</li>
 </ul>
-
-{% include "rsshistory/search_places_element.html" %}
 
 {% endblock %}

@@ -7,8 +7,7 @@ from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
 from ..configuration import Configuration
-from ..models import AppLogging, UserTags
-from ..models import BaseLinkDataController
+from ..models import AppLogging, UserTags, BaseLinkDataController
 from ..controllers import EntryDataBuilder, SourceDataController
 from ..controllers import LinkDataController, BackgroundJobController
 from ..pluginurl.urlhandler import UrlHandlerEx

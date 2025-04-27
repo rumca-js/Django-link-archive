@@ -7,6 +7,7 @@ from .tvn24plugin import TVN24Plugin
 from .spotifyplugin import SpotifyPlugin
 from .rssparserplugin import RssParserPlugin
 from .hackernewsparserplugin import HackerNewsParserPlugin
+from .emailsourceplugin import EmailSourcePlugin
 from ..models import AppLogging
 
 
@@ -15,6 +16,7 @@ class SourceControllerBuilder(object):
         BaseRssPlugin,
         BaseParsePlugin,
         BaseSourceJsonPlugin,
+        EmailSourcePlugin,
         # domain specific
         CodeProjectPlugin,
         TVN24Plugin,

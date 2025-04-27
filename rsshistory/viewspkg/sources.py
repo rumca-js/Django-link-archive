@@ -18,6 +18,7 @@ from ..models import (
     AppLogging,
     SourceCategories,
     EntryRules,
+    Browser,
 )
 from ..controllers import (
     SourceDataController,
@@ -36,7 +37,7 @@ from ..forms import (
     AddEntryForm,
 )
 from ..queryfilters import SourceFilter
-from ..views import ViewPage, GenericListView, get_page_num, get_search_term
+from ..views import ViewPage, GenericListView, get_page_num, get_search_term, get_request_browser_id
 from ..configuration import Configuration
 from ..pluginurl import UrlHandlerEx, UrlHandler
 from ..pluginsources import SourceControllerBuilder
@@ -272,12 +273,15 @@ def source_add_form(request):
 
         return HttpResponseRedirect(ob[0].get_absolute_url())
 
-    # TODO use browser somehow
+    data = {"url" : url, "status_code" : 0}
+    browser_id = get_request_browser_id(request.GET)
+    if browser_id != Browser.EMPTY_FORM:
+        # TODO use browser somehow
 
-    data = SourceDataController.get_full_information({"url": url})
-    if not data:
-        p.context["summary_text"] = "Could not obtain properties of link:{}".format(url)
-        return p.render("summary_present.html")
+        data = SourceDataController.get_full_information({"url": url})
+        if not data:
+            p.context["summary_text"] = "Could not obtain properties of link:{}".format(url)
+            return p.render("summary_present.html")
 
     notes = []
     warnings = []

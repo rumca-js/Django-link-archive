@@ -27,6 +27,7 @@ from ..controllers import (
     EntryDataBuilder,
     BackgroundJobController,
     SearchEngines,
+    SystemOperationController,
 )
 from ..configuration import Configuration
 from ..forms import (
@@ -35,7 +36,7 @@ from ..forms import (
     UrlContentsForm,
     LinkPropertiesForm,
 )
-from ..views import ViewPage
+from ..views import ViewPage, get_request_browser
 from ..pluginurl.urlhandler import UrlHandlerEx
 
 
@@ -101,23 +102,6 @@ def get_errors(page_url):
     return result
 
 
-def get_request_browser(input_map):
-    browser = None
-
-    if "browser" in input_map and input_map["browser"] != "":
-        browser_pk = int(input_map["browser"])
-
-        if browser_pk != Browser.AUTO:
-            browsers = Browser.objects.filter(pk=browser_pk)
-            if browsers.exists():
-                browser = browsers[0]
-            else:
-                AppLogging.error("Browser does not exist!")
-                return
-
-    return browser
-
-
 def get_request_url_with_browser(input_map):
     browser = get_request_browser(input_map)
 
@@ -146,6 +130,14 @@ def get_page_properties(request):
     if "link" not in request.GET:
         data = {}
         data["status"] = False
+        data["errors"] = ["Link in not in arguments"]
+        return JsonResponse(data, json_dumps_params={"indent": 4})
+
+    system = SystemOperationController()
+    if system.is_remote_server_down():
+        data = {}
+        data["status"] = False
+        data["errors"] = ["Crawling server is down"]
         return JsonResponse(data, json_dumps_params={"indent": 4})
 
     url_ex = get_request_url_with_browser(request.GET)

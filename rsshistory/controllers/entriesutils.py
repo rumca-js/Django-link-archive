@@ -560,11 +560,13 @@ class EntryUpdater(object):
         w = EntryWrapper(entry=self.entry)
         w.evaluate()
 
-        if self.entry is None:
-            AppLogging.error("Cannot update data")
+        if w.entry is None:
             return
 
-        if not w.entry:
+        try:
+            self.entry.refresh_from_db()
+        except Exception as E:
+            AppLogging.error("After evaluation - removed")
             return
 
         if not w.is_current_entry_perfect():
@@ -645,17 +647,16 @@ class EntryUpdater(object):
         except Exception as E:
             return
 
-        """
-        Fetches new information about page, and uses valid fields to set this object.
-
-         - status code and page rating is update always
-         - new data are changed only if new data are present at all
-        """
         w = EntryWrapper(entry=self.entry)
         w.evaluate()
 
-        if self.entry is None:
-            AppLogging.error("Cannot reset data")
+        if w.entry is None:
+            return
+
+        try:
+            self.entry.refresh_from_db()
+        except Exception as E:
+            AppLogging.error("After evaluation - removed")
             return
 
         if not w.is_current_entry_perfect():
@@ -1183,22 +1184,7 @@ class EntryWrapper(object):
         p = UrlLocation(entry.link)
         is_domain = p.is_domain()
 
-        if not config.accept_non_domain_links:
-            if is_domain and config.accept_domain_links:
-                pass
-            elif not is_domain and config.accept_domain_links:
-                """
-                tags and votes, are deleted automatically
-                """
-                entry.delete()
-                self.entry = None
-                return
-            elif entry.bookmarked:
-                pass
-            else:
-                entry.delete()
-                self.entry = None
-                return
+        AppLogging.notify("evaluate:{}".format(entry.link))
 
         if not entry.should_entry_be_permanent():
             entry.permanent = False
@@ -1206,12 +1192,26 @@ class EntryWrapper(object):
             entry.permanent = True
         entry.save()
 
-        if not entry.is_permanent():
-            if entry.is_remove_time():
-                entry.delete()
-                self.entry = None
-            elif entry.is_archive_time():
-                return self.move_to_archive()
+        if entry.is_permanent():
+            return
+
+        if is_domain and not config.accept_domain_links:
+            entry.delete()
+            self.entry = None
+            return
+
+        if not is_domain and config.accept_non_domain_links:
+            entry.delete()
+            self.entry = None
+            return
+
+        if entry.is_remove_time():
+            entry.delete()
+            self.entry = None
+            return
+
+        if entry.is_archive_time():
+            return self.move_to_archive()
 
     def move_entry(self, destination_entry):
         """

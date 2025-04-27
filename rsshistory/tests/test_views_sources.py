@@ -16,6 +16,7 @@ from ..models import (
     SourceCategories,
     SourceSubCategories,
     SourceOperationalData,
+    Browser,
 )
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
@@ -269,6 +270,20 @@ class SourcesViewsTests(FakeInternetTestCase):
         url = reverse("{}:source-add-form".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
         url = url + "?link=" + test_link
+
+        # call user action
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_source_add_form__browser_empty(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:source-add-form".format(LinkDatabase.name))
+        test_link = "https://linkedin.com"
+        url = url + "?link={}&browser={}".format(test_link, Browser.EMPTY_FORM)
 
         # call user action
         response = self.client.get(url)

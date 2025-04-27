@@ -99,9 +99,18 @@ class SourceDataModel(models.Model):
     SOURCE_TYPE_JSON = "BaseSourceJsonPlugin"
     SOURCE_TYPE_PARSE = "BaseParsePlugin"
     SOURCE_TYPE_YOUTUBE = "YouTubeChannelPlugin"
+    SOURCE_TYPE_EMAIL = "EmailSourcePlugin"
 
-    url = models.CharField(max_length=2000, unique=True)
-    title = models.CharField(max_length=1000, blank=True)
+    SOURCES_TYPES = (
+        (SOURCE_TYPE_RSS, SOURCE_TYPE_RSS),
+        (SOURCE_TYPE_JSON, SOURCE_TYPE_JSON),
+        (SOURCE_TYPE_PARSE, SOURCE_TYPE_PARSE),
+        (SOURCE_TYPE_YOUTUBE, SOURCE_TYPE_YOUTUBE),
+        (SOURCE_TYPE_EMAIL, SOURCE_TYPE_EMAIL),
+    )
+
+    url = models.CharField(max_length=2000, unique=True, help_text="Url of RSS feed, location to parse or Email IMAP server")
+    title = models.CharField(max_length=1000, blank=True, help_text="Source title")
     enabled = models.BooleanField(default=True)
     # main category
     category_name = models.CharField(max_length=1000, blank=True)
@@ -119,15 +128,14 @@ class SourceDataModel(models.Model):
     fetch_period = models.IntegerField(
         default=900, help_text="Source is checked for new data after [x] seconds"
     )
-    source_type = models.CharField(max_length=1000, null=False, default=SOURCE_TYPE_RSS)
+    username = models.CharField(max_length=1000, blank=True, help_text="User name required to access source")
+    password = models.CharField(max_length=1000, blank=True, help_text="Password required to access source")
+    source_type = models.CharField(max_length=1000,
+            null=False, default=SOURCE_TYPE_RSS,
+            choices=SOURCES_TYPES,
+    )
     auto_tag = models.CharField(
         max_length=1000, blank=True, help_text="Automatic tag for new entries"
-    )
-
-    proxy_location = models.CharField(
-        max_length=200,
-        blank=True,
-        help_text="Proxy location for the source. Proxy location will be used instead of normal processing.",
     )
 
     category = models.ForeignKey(
@@ -145,6 +153,13 @@ class SourceDataModel(models.Model):
         blank=True,
         null=True,
     )
+
+    proxy_location = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Proxy location for the source. Proxy location will be used instead of normal processing.",
+    )
+
     auto_update_favicon = models.BooleanField(default=True)
 
     class Meta:

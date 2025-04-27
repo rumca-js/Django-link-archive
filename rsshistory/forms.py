@@ -667,6 +667,8 @@ class SourceForm(forms.ModelForm):
             "auto_tag",
             "favicon",
             "auto_update_favicon",
+            "username",
+            "password",
             "proxy_location",
         ]
         widgets = {}
@@ -683,7 +685,7 @@ class SourceForm(forms.ModelForm):
         self.fields["proxy_location"].required = False
 
         names = SourceControllerBuilder.get_plugin_names()
-        self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
+        #self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
 
     def to_choices(self, names):
         names = sorted(names)
