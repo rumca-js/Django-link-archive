@@ -197,14 +197,7 @@ function updateEntry() {
 
     $("#entryTagContainer").html(tag_string);
 
-    if (entry_json_data.link.bookmarked || entry_json_data.link.permanent)
-    {
-        $('#editTagsButton').show();
-    }
-    else
-    {
-        $('#editTagsButton').hide();
-    }
+    $('#editTagsButton').show();
 }
 
 

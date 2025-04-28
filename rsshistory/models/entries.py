@@ -498,13 +498,15 @@ class BaseLinkDataController(BaseLinkDataModel):
         if self.is_archive_entry():
             return False
 
-        return self.permanent or self.bookmarked
+        # return self.permanent or self.bookmarked
+        return True
 
     def is_commentable(self):
         if self.is_archive_entry():
             return False
 
-        return self.permanent or self.bookmarked
+        # return self.permanent or self.bookmarked
+        return True
 
     def is_permanent(self):
         from ..configuration import Configuration
