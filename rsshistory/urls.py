@@ -267,6 +267,7 @@ urlpatterns = [
     path("gateways-initialize", tools.gateways_initialize, name="gateways-initialize",),
     path("search-engines", tools.search_engines, name="search-engines",),
     path("cleanup-link", tools.cleanup_link, name="cleanup-link",),
+    path("cleanup-link-json", tools.cleanup_link_json, name="cleanup-link-json",),
     path("block-lists-initialize", blockentry.initialize_block_lists, name="block-lists-initialize",),
     path("block-lists", blockentry.BlockEntryListListView.as_view(), name="block-lists",),
     path("block-lists-json", blockentry.blocklists_json, name="block-lists-json",),

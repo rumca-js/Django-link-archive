@@ -376,6 +376,7 @@ class Url(ContentInterface):
         return url
 
     def get_clean_url(self):
+        self.get_handler()
         if self.handler:
             return self.handler.get_url()
         else:

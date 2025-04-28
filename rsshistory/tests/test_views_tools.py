@@ -121,3 +121,33 @@ class ToolsViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_cleanup_link(self):
+        MockRequestCounter.mock_page_requests = 0
+        url = (
+            reverse("{}:cleanup-link".format(LinkDatabase.name))
+            + "?link=https://www.linkedin.com"
+        )
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+
+        # two requests: one for page, one for robots.txt
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_cleanup_link_json(self):
+        MockRequestCounter.mock_page_requests = 0
+        url = (
+            reverse("{}:cleanup-link-json".format(LinkDatabase.name))
+            + "?link=https://www.linkedin.com"
+        )
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+
+        # two requests: one for page, one for robots.txt
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)

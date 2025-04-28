@@ -170,13 +170,43 @@ $("#btnAddLink").click(function(event) {
 });
 
 
+$(document).on('click', '.suggestion-item', function(event) {
+    event.preventDefault();
+    let element = $('#theForm input[name="link"]');
+    let text = $(this).text();
+    console.log(`Clicked on element ${text}`);
+    element.val(text);
+});
+
+
 $('#theForm input[name="link"]').on('input', function() {
     let element = $('#theForm input[name="link"]');
+    let search_link = element.val();
 
-    var search_link = element.val();
-    new_search_link = fixStupidGoogleRedirects(search_link);
-    if (new_search_link && search_link != new_search_link)
-    {
-        element.val(new_search_link);
+    if (search_link) {
+        let url = `{% url 'rsshistory:cleanup-link-json' %}?link=${encodeURIComponent(search_link)}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                console.log('Fetched data:', data);
+
+                // Clear old suggestions
+                $('#Suggestions').empty();
+                $('#Suggestions').append(`<div>Other link suggestions</div>`);
+
+                if (data.status && Array.isArray(data.links)) {
+                    // Populate suggestions
+                    data.links.forEach(link => {
+                        $('#Suggestions').append(`<div class="suggestion-item btn btn-secondary">${link}</div>`);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
     }
 });

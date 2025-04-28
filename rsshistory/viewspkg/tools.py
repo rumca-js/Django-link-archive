@@ -11,6 +11,7 @@ from ..webtools import (
     UrlLocation,
     HttpPageHandler,
     RemoteServer,
+    Url,
 )
 
 from ..apps import LinkDatabase
@@ -682,3 +683,33 @@ def cleanup_link(request):
         )
 
         return p.render("form_oneliner.html")
+
+
+def cleanup_link_json(request):
+    p = ViewPage(request)
+    p.set_title("Cleanup Link")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
+
+    data = {}
+    links = set()
+
+    if "link" in request.GET:
+        original_link = request.GET["link"]
+        cleaned_link = UrlHandlerEx.get_cleaned_link(original_link)
+
+        links.add(cleaned_link)
+
+        u = Url(cleaned_link)
+        links.add(u.get_clean_url())
+
+        links -= {original_link}
+
+        data["links"] = sorted(links)
+        data["status"] = True
+    else:
+        data["status"] = False
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
+
