@@ -67,14 +67,21 @@
     <li class="list-group-item text-nowrap mx-2">Source type: {{ object.source_type }}</li>
     <li class="list-group-item text-nowrap mx-2">Fetch period: {{ object.fetch_period }}</li>
     <li class="list-group-item text-nowrap mx-2">Language: {{ object.language }}</li>
+{% if object.age %}
     <li class="list-group-item text-nowrap mx-2">Age: {{ object.age }}</li>
+{% endif %}
+{% if object.auto_tag %}
     <li class="list-group-item text-nowrap mx-2">Auto tag: {{ object.auto_tag }}</li>
+{% endif %}
+    <li class="list-group-item text-nowrap mx-2">Remove after days: {{ object.remove_after_days }}</li>
+{% if object.username %}
+    <li class="list-group-item text-nowrap mx-2">Username: {{ object.username }}</li>
+{% endif %}
     <li class="list-group-item text-nowrap mx-2">Category: {{ object.category_name }}</li>
     <li class="list-group-item text-nowrap mx-2">Subcategory: {{ object.subcategory_name }}</li>
     <li class="list-group-item text-nowrap mx-2">Category object: {{ object.category }}</li>
     <li class="list-group-item text-nowrap mx-2">Subcategory object: {{ object.subcategory }}</li>
     <li class="list-group-item text-nowrap mx-2">Export to CMS: {{ object.export_to_cms }}</li>
-    <li class="list-group-item text-nowrap mx-2">Remove after days: {{ object.remove_after_days }}</li>
     <li class="list-group-item text-nowrap mx-2">Favicon: <a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">
 	   <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
 	   Link</a></li>

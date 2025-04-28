@@ -1,53 +1,83 @@
 """
+    em = EmailReader("server")
+    em.connect("username", "password")
 
-em = EmailChecker()
-em.connect()
+    for email_data in em.get_emails():
+        print("Subject:", email_data.title)
+        print("From:", email_data.author)
+        #print("Body:", email_data.body)
 
-for email_data in em.check_emails():
-    print("Subject:", email_data[0])
-    print("From:", email_data[1])
-    #print("Body:", email_data[2])
-
-em.close()
+    em.close()
 """
 import imaplib
 import email
 from email.header import decode_header
+from email.utils import parsedate_to_datetime
+from email.utils import parseaddr
+
+
+class Email(object):
+    def __init__(self):
+        self.title = None
+        self.body = None
+        self.date_published = None
+        self.author = None
+        self.id = None
+
+    def __str__(self):
+        return "{}/{}/{}\n{}".format(self.title, self.date_published, self.author, self.body)
 
 
 class EmailReader(object):
-    def __init__(self, server):
+    def __init__(self, server, time_limit=None, creds=None):
+        """
+        Specify time limit, to search only mails newer than time limit
+        """
         self.server = server
+        self.time_limit = time_limit
+        self.method = "Simple"
+        self.creds = creds
 
     def connect(self, username, password):
         self.imap = imaplib.IMAP4_SSL(self.server)
-        self.imap.login(username, password)
+        if self.method == "Simple":
+            return self.imap.login(username, password)
+        elif self.method == "XOAUTH2":
+            auth_string = self.generate_xoauth2_token(creds)
+            return self.imap.authenticate("XOAUTH2", lambda x: auth_string)
 
-    def check_emails(self):
+    def generate_xoauth2_token(self, creds):
+        return f"user={creds.id_token['email']}\1auth=Bearer {creds.token}\1\1"
+
+    def get_emails(self):
         # Select the mailbox you want to read (in this case, the inbox)
         self.imap.select("inbox")
 
         # Search for all emails
         status, messages = self.imap.search(None, "ALL")
         email_ids = messages[0].split()
+        email_ids.reverse()
 
-        for email_data in self.read_emails(email_ids):
+        for email_data in self.read_emails_impl(email_ids):
             yield email_data
 
-    def read_emails(self, email_ids):
-        result = []
-
+    def read_emails_impl(self, email_ids):
         for email_id in email_ids:
-            yield self.read_email(email_id)
+            mail = self.read_email_impl(email_id)
+            if self.time_limit:
+                if mail.date_published < self.time_limit:
+                    break
+                else:
+                    yield mail
 
-        return result
-
-    def read_email(self, email_id):
+    def read_email_impl(self, email_id):
         # Fetch the email by ID
         res, msg_data = self.imap.fetch(email_id, "(RFC822)")
         raw_email = msg_data[0][1]
 
         msg = email.message_from_bytes(raw_email)
+        mail = Email()
+        mail.id = msg["Message-ID"]
 
         subject, encoding = decode_header(msg["Subject"])[0]
         if isinstance(subject, bytes):
@@ -58,12 +88,51 @@ class EmailReader(object):
         if msg.is_multipart():
             for part in msg.walk():
                 if part.get_content_type() == "text/plain":
-                    body = part.get_payload(decode=True).decode()
+                    try:
+                        body = part.get_payload(decode=True).decode()
+                    except UnicodeDecodeError as E:
+                        print("Cannot decode message body")
                     break
         else:
-            body = msg.get_payload(decode=True).decode()
+            try:
+                body = msg.get_payload(decode=True).decode()
+            except UnicodeDecodeError as E:
+                print("Cannot decode message body")
 
-        return [subject, msg["From"], body]
+
+        # Extract and parse the sent date
+        date_header = msg["Date"]
+        if date_header:
+            #print("date_header")
+            #print(date_header)
+            try:
+                mail.date_published = parsedate_to_datetime(date_header)
+            except Exception as e:
+                print(f"Failed to parse email date: {e}")
+                mail.date_published = None
+        else:
+            mail.date_published = None
+
+        mail.title = subject
+        mail.body = body
+        #mail.date_published = None
+        # mail.author = msg["From"] # contains more data, display name, etc.
+        mail.author = parseaddr(msg["From"])[1]
+
+        return mail
 
     def close(self):
         self.imap.logout()
+
+
+if __name__ == "__main__":
+    em = EmailReader("imap.poczta.onet.pl")
+    em.connect("winstonarmanip@op.pl", "M@sakra8")
+
+    for email_data in em.get_emails():
+        print("Subject:", email_data.title)
+        print("From:", email_data.author)
+        print("Date published:", email_data.date_published)
+        #print("Body:", email_data[2])
+
+    em.close()

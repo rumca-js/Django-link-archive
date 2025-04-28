@@ -73,7 +73,7 @@ class BaseLinkDataModel(models.Model):
 
     # this entry cannot be removed. Serves a purpose. Domain page, source page
     permanent = models.BooleanField(
-        default=False, help_text="This entry will not be automatically removed"
+        default=False, help_text="Flag automatically used by the system preventing removing of entries"
     )
     bookmarked = models.BooleanField(
         default=False, help_text="This entry will not be automatically removed"
@@ -513,6 +513,18 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         return self.permanent or self.bookmarked
 
+    def is_removable(self):
+        if self.permanent or self.bookmarked:
+            return False
+
+        from ..configuration import Configuration
+
+        conf = Configuration.get_object().config_entry
+        if self.page_rating_votes > conf.remove_entry_vote_threshold:
+            return False
+
+        return True
+
     def get_days_dead(self):
         if not self.date_dead_since:
             return 0
@@ -529,20 +541,24 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         p = UrlLocation(self.link)
 
-        if self.is_dead():
-            days = self.get_days_dead()
-            if (
-                days > conf.days_to_remove_stale_entries
-                and self.page_rating_votes > conf.remove_entry_vote_threshold
-            ):
-                return False
-
-        if p.is_domain() and conf.accept_domain_links and conf.keep_domain_links:
-            return True
-
+        # this entry represents source
         if self.source:
             if self.link == self.source.url:
                 return self.source.enabled
+
+        # if it has votes, then it should not be removed
+        if self.page_rating_votes > conf.remove_entry_vote_threshold:
+            return True
+
+        """
+        Normally links are removed after 7 days or so (even if it is valid)
+        Permanent flag stops "what's new from removing our links"
+        """
+
+        if self.is_dead():
+            days_dead = self.get_days_dead()
+            if (days_dead < conf.days_to_remove_stale_entries):
+                return False
 
         return False
 

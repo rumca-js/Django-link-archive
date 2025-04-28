@@ -441,7 +441,6 @@ class LinkDataControllerTest(FakeInternetTestCase):
     def test_should_entry_be_permanent__source(self):
         config = Configuration.get_object().config_entry
         config.accept_domain_links = True
-        config.keep_domain_links = True
         config.save()
         Configuration.get_object().config_entry = config
 
@@ -463,7 +462,6 @@ class LinkDataControllerTest(FakeInternetTestCase):
     def test_should_entry_be_permanent__domain(self):
         config = Configuration.get_object().config_entry
         config.accept_domain_links = True
-        config.keep_domain_links = True
         config.save()
         Configuration.get_object().config_entry = config
 
@@ -477,7 +475,6 @@ class LinkDataControllerTest(FakeInternetTestCase):
     def test_should_entry_be_permanent__not_domain(self):
         config = Configuration.get_object().config_entry
         config.accept_domain_links = True
-        config.keep_domain_links = True
         config.save()
         Configuration.get_object().config_entry = config
 

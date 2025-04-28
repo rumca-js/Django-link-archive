@@ -248,13 +248,6 @@ class ConfigurationEntry(models.Model):
         default=True, help_text="Allow adding links that are not domains to the system."
     )
 
-    # this option is necessary, if we want to have rss client, with option to drop old entries,
-    # but which keeps domains, or other permanent entries
-    keep_domain_links = models.BooleanField(
-        default=False,
-        help_text="If enabled, domains will be treated as permanent entries in the system.",
-    )
-
     auto_scan_new_entries = models.BooleanField(
         default=False,
         help_text="Automatically scan for new links in descriptions and content when a link is added.",

@@ -206,7 +206,6 @@ class CleanJobHandlerTest(FakeInternetTestCase):
 
         conf = Configuration.get_object().config_entry
         conf.accept_domain_links = False
-        conf.keep_domain_links = False
         conf.enable_domain_support = False
         conf.save()
 

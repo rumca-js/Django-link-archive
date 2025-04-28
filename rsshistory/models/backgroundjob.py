@@ -35,6 +35,7 @@ class BackgroundJob(models.Model):
     JOB_INITIALIZE_BLOCK_LIST = (
         "initialize-block-list"  # initializes one specific block list
     )
+    JOB_REFRESH = "refresh"
 
     # fmt: off
     JOB_CHOICES = (

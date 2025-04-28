@@ -2,8 +2,8 @@ import traceback
 import hashlib
 import base64
 
-from ..webtools import ContentLinkParser, calculate_hash, RemoteServer
 from utils.dateutils import DateUtils
+from ..webtools import ContentLinkParser, calculate_hash, RemoteServer
 
 from ..apps import LinkDatabase
 from ..configuration import Configuration
@@ -12,24 +12,25 @@ from ..controllers import EntryDataBuilder, SourceDataController
 from ..controllers import LinkDataController, BackgroundJobController
 from ..pluginurl.urlhandler import UrlHandlerEx
 
+from .sourceplugininterface import SourcePluginInterface
 
-class SourceGenericPlugin(object):
+
+class SourceGenericPlugin(SourcePluginInterface):
     """
     Class names schemes:
      - those that are ancestors, and generic use "Base" class prefix
      - file names start with source, because I did not know if they will not be in one place
        with entries, so I wanted to be able to distinguish them later
+
+    TODO inherit plugin interface.
+    This is "contents" related plugin interface (rss, parse plugins).
     """
 
     def __init__(self, source_id, options=None):
-        self.source_id = source_id
+        super().__init__(source_id, options)
         self.contents = None
         self.content_handler = None
         self.response = None
-        self.dead = False
-
-        self.get_source()
-
         self.hash = None
 
     def check_for_data(self):
@@ -42,26 +43,25 @@ class SourceGenericPlugin(object):
         # We do not check if data is correct. We can manually add processing to queue
         # We want the source to be processed then
 
-        start_time = DateUtils.get_datetime_now_utc()
-        num_entries = 0
+        self.start_time = DateUtils.get_datetime_now_utc()
 
-        self.hash = self.calculate_plugin_hash()
+        self.hash = self.get_hash()
 
         if source:
             source.update_data()
 
         if self.is_page_ok_to_read():
-            num_entries = self.read_data_from_container_elements()
+            self.read_data_from_container_elements()
 
         stop_time = DateUtils.get_datetime_now_utc()
-        total_time = stop_time - start_time
+        total_time = stop_time - self.start_time
         total_time.total_seconds()
 
         AppLogging.debug("Stopping processing source:{}".format(source.url))
 
         if self.hash:
             self.set_operational_info(
-                stop_time, num_entries, total_time.total_seconds(), self.hash
+                stop_time, self.num_read_entries, total_time.total_seconds(), self.hash
             )
             return True
 
@@ -72,7 +72,7 @@ class SourceGenericPlugin(object):
 
             self.set_operational_info(
                 stop_time,
-                num_entries,
+                self.num_read_entries,
                 total_time.total_seconds(),
                 self.hash,
                 valid=False,
@@ -121,53 +121,15 @@ class SourceGenericPlugin(object):
             yield link_data
 
     def read_data_from_container_elements(self):
-        num_entries = 0
-
-        start_time = DateUtils.get_datetime_now_utc()
         source = self.get_source()
 
         for link_data in self.get_enhanced_entries():
             b = EntryDataBuilder()
-            b.link_data = link_data
-            b.source_is_auto = True
+            entry = b.build(link_data=link_data, source_is_auto=True)
 
-            entry = b.build_from_props()
-
-            if entry and (not entry.date_published or entry.date_published > start_time):
-                if source.auto_tag:
-                    user = Configuration.get_object().get_superuser()
-                    UserTags.set_tag(entry, source.auto_tag, user)
-
-                self.on_added_entry(entry)
-                num_entries += 1
+            self.on_added_entry(entry)
 
             # LinkDatabase.info("Generic plugin item stop:{}".format(link_data["link"]))
-
-        return num_entries
-
-    def is_property_set(self, input_props, property):
-        return property in input_props and input_props[property]
-
-    def enhance_properties(self, properties):
-        source = self.get_source()
-
-        if source:
-            if (
-                self.is_property_set(properties, "language")
-                and source.language != None
-                and source.language != ""
-            ):
-                properties["language"] = source.language
-
-            properties["source_url"] = source.url
-            properties["source"] = source
-            if source.age > 0:
-                properties["age"] = source.age
-
-        if "page_rating" in properties:
-            properties["page_rating_contents"] = properties["page_rating"]
-
-        return properties
 
     def is_page_ok_to_read(self):
         source = self.get_source()
@@ -187,7 +149,7 @@ class SourceGenericPlugin(object):
 
         return True
 
-    def calculate_plugin_hash(self):
+    def get_hash(self):
         self.get_contents()
 
         if not self.contents:
@@ -206,20 +168,6 @@ class SourceGenericPlugin(object):
             if not encoded_hash:
                 encoded_hash = response["hash"]
             return base64.b64decode(encoded_hash)
-
-    def set_operational_info(
-        self, stop_time, num_entries, total_seconds, hash_value, valid=True
-    ):
-        source = self.get_source()
-
-        source.set_operational_info(
-            stop_time, num_entries, total_seconds, hash_value, valid
-        )
-
-    def get_source(self):
-        sources = SourceDataController.objects.filter(id=self.source_id)
-        if sources.exists():
-            return sources[0]
 
     def get_contents(self):
         if self.contents:
@@ -270,12 +218,6 @@ class SourceGenericPlugin(object):
             tag = source.auto_tag
 
         BackgroundJobController.link_add(link_str, source=source, tag=tag)
-
-    def on_added_entry(self, entry):
-        """
-        TO be implemented
-        """
-        pass
 
     def is_link_ok_to_add(self, props):
         if "link" not in props:

@@ -157,6 +157,9 @@ class LinkDataController(LinkDataModel):
         day_to_remove = DateUtils.get_datetime_now_utc() - timedelta(
             days=conf.days_to_remove_links
         )
+        
+        if not self.date_published:
+            return self.date_created < day_to_remove
 
         return self.date_published < day_to_remove
 

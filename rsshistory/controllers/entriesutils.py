@@ -168,7 +168,7 @@ class EntriesCleanup(object):
         config = Configuration.get_object().config_entry
         config_days = config.days_to_remove_links
 
-        if not source.is_removeable():
+        if not source.is_removable():
             return
 
         days = source.get_days_to_remove()
@@ -272,16 +272,13 @@ class EntriesCleanup(object):
         return True
 
     def get_links_to_move_to_archive(self):
-        conf = Configuration.get_object().config_entry
+        day_to_move = Configuration.get_object().get_entry_move_to_archive_date()
 
-        if conf.days_to_move_to_archive == 0:
+        if not day_to_move:
             return
 
-        current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
-
         entries = LinkDataController.objects.filter(
-            bookmarked=False, permanent=False, date_published__lt=days_before
+            bookmarked=False, permanent=False, date_published__lt=day_to_move
         ).order_by("date_published")
 
         if not entries.exists():
@@ -328,24 +325,6 @@ class EntriesCleanup(object):
 
         return True
 
-    def cleanup_permanent_flags(self):
-        """
-        Permaments are:
-         - if enable_domain_support & keep_domain_links
-        """
-        link_is_url = Q(source__url=F("link"))
-        domain_is_notnull = Q(domain__isnull=False)
-        is_permanent = Q(permanent=True)
-
-        # domain is not null and link is url are valid scenarios
-
-        entries = LinkDataController.objects.filter(
-            ~(link_is_url | domain_is_notnull) & is_permanent
-        )
-        for entry in entries:
-            entry.permanent = False
-            entry.save()
-
 
 class EntryCleanup(object):
     def __init__(self, entry):
@@ -367,13 +346,9 @@ class EntryCleanup(object):
         return False
 
     def is_delete_by_config(self):
-        conf = Configuration.get_object().config_entry
-        if conf.days_to_remove_links == 0:
+        day_to_remove = Configuration.get_object().get_entry_remove_date()
+        if not day_to_remove:
             return False
-
-        day_to_remove = DateUtils.get_datetime_now_utc() - timedelta(
-            days=conf.days_to_remove_links
-        )
 
         return self.entry.date_published < day_to_remove
 
@@ -583,9 +558,10 @@ class EntryUpdater(object):
         props = url.get_props()
 
         handler = UrlHandlerEx(url=entry.link)
-        if not entry.bookmarked and not entry.permanent and handler.is_blocked():
-            entry.delete()
-            return
+        if handler.is_blocked():
+            if entry.is_removable():
+                entry.delete()
+                return
 
         entry_changed = self.is_entry_changed(url.all_properties)
 
@@ -673,9 +649,10 @@ class EntryUpdater(object):
         props = url.get_props()
 
         handler = UrlHandlerEx(url=entry.link)
-        if not entry.bookmarked and not entry.permanent and handler.is_blocked():
-            entry.delete()
-            return
+        if handler.is_blocked():
+            if entry.is_removable():
+                entry.delete()
+                return
 
         entry_changed = self.is_entry_changed(url.all_properties)
 
@@ -835,14 +812,15 @@ class EntryUpdater(object):
         date = self.entry.date_dead_since
 
         if cleanup.is_delete_time():
-            self.entry.delete()
+            if self.entry.is_removable():
+                self.entry.delete()
 
-            AppLogging.notify(
-                "Removed entry <a href='{}'>{}</a>. It was dead since {}.".format(
-                    link, link, date
+                AppLogging.notify(
+                    "Removed entry <a href='{}'>{}</a>. It was dead since {}.".format(
+                        link, link, date
+                    )
                 )
-            )
-            return
+                return
 
         entry.page_rating_contents = 0
 
@@ -1184,33 +1162,31 @@ class EntryWrapper(object):
         p = UrlLocation(entry.link)
         is_domain = p.is_domain()
 
-        AppLogging.notify("evaluate:{}".format(entry.link))
-
         if not entry.should_entry_be_permanent():
             entry.permanent = False
         else:
             entry.permanent = True
         entry.save()
 
-        if entry.is_permanent():
-            return
-
         if is_domain and not config.accept_domain_links:
-            entry.delete()
-            self.entry = None
-            return
+            if entry.is_removable():
+                entry.delete()
+                self.entry = None
+                return
 
         if not is_domain and config.accept_non_domain_links:
-            entry.delete()
-            self.entry = None
-            return
+            if entry.is_removable():
+                entry.delete()
+                self.entry = None
+                return
 
         if entry.is_remove_time():
-            entry.delete()
-            self.entry = None
-            return
+            if entry.is_removable():
+                entry.delete()
+                self.entry = None
+                return
 
-        if entry.is_archive_time():
+        if not entry.is_permanent() and entry.is_archive_time():
             return self.move_to_archive()
 
     def move_entry(self, destination_entry):
@@ -1647,6 +1623,9 @@ class EntryDataBuilder(object):
         self.link_data["link"] = UrlHandlerEx.get_cleaned_link(self.link_data["link"])
         self.link = self.link_data["link"]
 
+        if self.is_too_old():
+            return
+
         wrapper = EntryWrapper(link=self.link)
         entry = wrapper.get()
         if entry:
@@ -1656,6 +1635,17 @@ class EntryDataBuilder(object):
         entry = self.build_from_props_internal()
         self.result = entry
         return entry
+
+    def is_too_old(self):
+        day_to_remove = Configuration.get_object().get_entry_remove_date()
+        if not day_to_remove:
+            return False
+
+        if self.source_is_auto and "date_published" in self.link_data and self.link_data["date_published"]:
+            if self.link_data["date_published"] < day_to_remove:
+                return True
+
+        return False
 
     def build_from_props_internal(self):
         entry = None
@@ -1693,9 +1683,6 @@ class EntryDataBuilder(object):
         #    self.link_data["link"] = self.link_data["link"].lower()
 
         c = Configuration.get_object().config_entry
-        if self.is_domain_link_data() and c.accept_domain_links and c.keep_domain_links:
-            if c.accept_domain_links:
-                self.link_data["permanent"] = True
 
         if self.is_enabled_to_store():
             date = None

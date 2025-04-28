@@ -704,7 +704,6 @@ def wizard_setup_news(request):
     c.accept_non_domain_links = True
     c.auto_store_sources = False
     c.accept_domain_links = False
-    c.keep_domain_links = False
     c.enable_keyword_support = True
     c.track_user_actions = True
     c.track_user_searches = True
@@ -759,7 +758,6 @@ def wizard_setup_gallery(request):
     c.accept_non_domain_links = True
     c.auto_store_sources = False
     c.accept_domain_links = False
-    c.keep_domain_links = False
     c.enable_keyword_support = False
     c.track_user_actions = True
     c.track_user_searches = True
@@ -811,7 +809,6 @@ def wizard_setup_search_engine(request):
     c.accept_non_domain_links = True
     c.auto_store_sources = True
     c.accept_domain_links = True
-    c.keep_domain_links = True
     c.enable_keyword_support = False
     c.track_user_actions = True
     c.track_user_searches = True

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import psutil
 import os
@@ -22,7 +22,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.9.0"
+__version__ = "2.9.1"
 
 
 class Configuration(object):
@@ -326,3 +326,27 @@ class Configuration(object):
         result["DB"],
         """
         return settings.DATABASES[db_switch]
+
+    def get_entry_remove_date(self):
+        conf = self.config_entry
+
+        if not conf.days_to_remove_links:
+            return
+
+        day_to_remove = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_remove_links
+        )
+
+        return day_to_remove
+
+    def get_entry_move_to_archive_date(self):
+        conf = self.config_entry
+
+        if not conf.days_to_move_to_archive:
+            return
+
+        day_to_move = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_move_to_archive
+        )
+
+        return day_to_move

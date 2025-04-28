@@ -83,7 +83,7 @@ class SourceDataController(SourceDataModel):
 
         return True
 
-    def is_removeable(self):
+    def is_removable(self):
         """
         TODO rename this function
         """

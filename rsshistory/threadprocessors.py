@@ -31,10 +31,6 @@ from .apps import LinkDatabase
 from .models import (
     AppLogging,
     BackgroundJob,
-    BackgroundJobHistory,
-    SourceExportHistory,
-    DataExport,
-    ConfigurationEntry,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .controllers import (
@@ -72,6 +68,7 @@ from .threadhandlers import (
     LinkSaveJobHandler,
     CheckDomainsJobHandler,
     RunRuleJobHandler,
+    RefreshJobHandler,
 )
 from .configuration import Configuration
 
@@ -82,117 +79,6 @@ class CeleryTaskInterface(object):
 
     def get_name(self):
         return self.__class__.__name__
-
-
-class RefreshProcessor(CeleryTaskInterface):
-    """!
-    One of the most important tasks.
-    It checks what needs to be done, and produces 'new' tasks'.
-
-    @note This handler should only do limited amount of work.
-    Mostly it should only add background jobs, and nothing more!
-    """
-
-    def __init__(self, tasks_info=None):
-        self.tasks_info = tasks_info
-
-    def run(self):
-        c = Configuration.get_object()
-
-        config = c.config_entry
-        if config.block_job_queue:
-            return
-
-        systemcontroller = SystemOperationController()
-        systemcontroller.refresh(self.get_name())
-
-        if systemcontroller.is_remote_server_down():
-            return
-
-        if not systemcontroller.is_internet_ok():
-            return
-
-        self.check_sources()
-
-        for export in DataExport.objects.filter(enabled=True):
-            if SourceExportHistory.is_update_required(export):
-                self.do_update(export)
-                SourceExportHistory.confirm(export)
-
-        if systemcontroller.is_time_to_cleanup():
-            BackgroundJobHistory.mark_done(job=BackgroundJob.JOB_CLEANUP, subject="")
-
-            CleanupJobHandler.cleanup_all()
-
-        self.update_entries()
-
-    def check_sources(self):
-        sources = SourceDataController.objects.filter(enabled=True).order_by(
-            "dynamic_data__date_fetched"
-        )
-        for source in sources:
-            if source.is_fetch_possible():
-                BackgroundJobController.download_rss(source)
-
-    def do_update(self, export):
-        BackgroundJobController.export_data(export)
-
-        c = Configuration.get_object()
-        conf = c.config_entry
-
-        if conf.enable_source_archiving:
-            sources = SourceDataController.objects.filter(enabled=True)
-            for source in sources:
-                BackgroundJobController.link_save(source.url)
-
-    def update_entries(self):
-        c = Configuration.get_object()
-        conf = c.config_entry
-
-        max_number_of_update_entries = conf.number_of_update_entries
-
-        if max_number_of_update_entries == 0:
-            return
-
-        u = EntriesUpdater()
-        entries = u.get_entries_to_update(max_number_of_update_entries)
-        if not entries:
-            return
-
-        current_num_of_jobs = (
-            BackgroundJobController.get_number_of_update_reset_jobs()
-        )
-
-        jobs_to_add = max_number_of_update_entries - current_num_of_jobs
-
-        if jobs_to_add <= 0:
-            return
-
-        index = 0
-        for entry in entries:
-            if index < jobs_to_add:
-                BackgroundJobController.entry_update_data(entries[index])
-            else:
-                return
-
-            index += 1
-
-    def get_supported_jobs(self):
-        return []
-
-
-class GenericJobsProcessor(CeleryTaskInterface):
-    """!
-    @note Uses handler priority when processing jobs.
-    """
-
-    def __init__(self, timeout_s=60 * 10, tasks_info=None):
-        """
-        Default timeout is 10 minutes
-        """
-        self.timeout_s = timeout_s
-        self.start_processing_time = None
-        self.tasks_info = tasks_info
 
     def get_handlers(self):
         """
@@ -233,6 +119,105 @@ class GenericJobsProcessor(CeleryTaskInterface):
             RunRuleJobHandler,
             # fmt: on
         ]
+
+    def get_handler_and_object(self):
+        """
+        TODO select should be based on priority
+        """
+
+        jobs = self.get_supported_jobs()
+        if len(jobs) == 0:
+            return []
+
+        query_conditions = Q(enabled=True)
+        if len(jobs) > 0:
+            jobs_conditions = Q()
+
+            for ajob in jobs:
+                jobs_conditions |= Q(job=ajob)
+
+            query_conditions &= jobs_conditions
+
+        # order is in meta
+        objs = BackgroundJobController.objects.filter(query_conditions)
+        if objs.exists():
+            obj = objs.first()
+
+            handler = self.get_job_handler(obj)
+            return [obj, handler]
+        return []
+
+    def get_job_handler(self, obj):
+        for handler_class in self.get_handlers():
+            if handler_class.get_job() == obj.job:
+                return handler_class
+
+    def get_supported_jobs(self):
+        return []
+
+
+class RefreshProcessor(CeleryTaskInterface):
+    """!
+    One of the most important tasks.
+    It checks what needs to be done, and produces 'new' tasks'.
+
+    @note This handler should only do limited amount of work.
+    Mostly it should only add background jobs, and nothing more!
+    """
+
+    def __init__(self, tasks_info=None):
+        self.tasks_info = tasks_info
+
+    def run(self):
+        c = Configuration.get_object()
+
+        pid = os.getpid()
+
+        memory = c.get_memory_usage()
+        resident = memory.rss / (1024 * 1024)
+        virtual = memory.vms / (1024 * 1024)
+
+        AppLogging.debug("{}: Starting. Pid:{} Memory:{}/{} MB".format(self.get_name(), pid, resident, virtual))
+        self.start_processing_time = DateUtils.get_datetime_now_utc()
+
+        if c.is_memory_limit_reached():
+            AppLogging.error("{}: Memory limit reached at start, leaving".format(self.get_name()))
+            return
+
+        config = c.config_entry
+        if config.block_job_queue:
+            AppLogging.debug("{}: Job queue is locked".format(self.get_name()))
+            return
+
+        systemcontroller = SystemOperationController()
+        systemcontroller.refresh(self.get_name())
+
+        if systemcontroller.is_remote_server_down():
+            return
+
+        if not systemcontroller.is_internet_ok():
+            return
+
+        config = Configuration.get_object()
+        handler = RefreshJobHandler(config)
+        handler.process()
+
+    def get_supported_jobs(self):
+        return [BackgroundJob.JOB_REFRESH]
+
+
+class GenericJobsProcessor(CeleryTaskInterface):
+    """!
+    @note Uses handler priority when processing jobs.
+    """
+
+    def __init__(self, timeout_s=60 * 10, tasks_info=None):
+        """
+        Default timeout is 10 minutes
+        """
+        self.timeout_s = timeout_s
+        self.start_processing_time = None
+        self.tasks_info = tasks_info
 
     def run(self):
         c = Configuration.get_object()

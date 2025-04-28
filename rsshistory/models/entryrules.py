@@ -212,7 +212,7 @@ class EntryRules(models.Model):
         EntryRules.check_entry_text_rules(entry)
 
     def attemp_delete(entry):
-        if entry.bookmarked or entry.page_rating_votes > 0:
+        if not entry.is_removable():
             return
         entry.delete()
 

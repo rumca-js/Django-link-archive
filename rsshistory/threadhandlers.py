@@ -46,6 +46,7 @@ from .models import (
     SystemOperation,
     BlockEntryList,
     Gateway,
+    BackgroundJobHistory,
 )
 
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -1251,3 +1252,79 @@ class RunRuleJobHandler(BaseJobHandler):
                     entry.delete()
 
         return True
+
+
+class RefreshJobHandler(BaseJobHandler):
+    def get_job():
+        return BackgroundJob.JOB_REFRESH
+
+    def process(self, obj=None):
+        self.check_sources()
+
+        for export in DataExport.objects.filter(enabled=True):
+            if SourceExportHistory.is_update_required(export):
+                self.do_update(export)
+                SourceExportHistory.confirm(export)
+
+        systemcontroller = SystemOperationController()
+        if systemcontroller.is_time_to_cleanup():
+            BackgroundJobHistory.mark_done(job=BackgroundJob.JOB_CLEANUP, subject="")
+
+            CleanupJobHandler.cleanup_all()
+
+        self.update_entries()
+        self.todo()
+
+    def check_sources(self):
+        sources = SourceDataController.objects.filter(enabled=True).order_by(
+            "dynamic_data__date_fetched"
+        )
+        for source in sources:
+            if source.is_fetch_possible():
+                BackgroundJobController.download_rss(source)
+
+    def do_update(self, export):
+        BackgroundJobController.export_data(export)
+
+        c = Configuration.get_object()
+        conf = c.config_entry
+
+        if conf.enable_source_archiving:
+            sources = SourceDataController.objects.filter(enabled=True)
+            for source in sources:
+                BackgroundJobController.link_save(source.url)
+
+    def update_entries(self):
+        c = Configuration.get_object()
+        conf = c.config_entry
+
+        max_number_of_update_entries = conf.number_of_update_entries
+
+        if max_number_of_update_entries == 0:
+            return
+
+        u = EntriesUpdater()
+        entries = u.get_entries_to_update(max_number_of_update_entries)
+        if not entries:
+            return
+
+        current_num_of_jobs = (
+            BackgroundJobController.get_number_of_update_reset_jobs()
+        )
+
+        jobs_to_add = max_number_of_update_entries - current_num_of_jobs
+
+        if jobs_to_add <= 0:
+            return
+
+        index = 0
+        for entry in entries:
+            if index < jobs_to_add:
+                BackgroundJobController.entry_update_data(entries[index])
+            else:
+                return
+
+            index += 1
+
+    def todo(self):
+        pass

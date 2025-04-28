@@ -103,8 +103,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         conf = Configuration.get_object().config_entry
         conf.days_to_remove_links = 2
         # conf.days_to_move_to_archive = 1
-        conf.accept_domain_links = True  # to keep up permanent flag
-        conf.keep_domain_links = True
+        conf.accept_domain_links = True
         conf.save()
 
         current_time = DateUtils.get_datetime_now_utc()
@@ -229,8 +228,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         conf = Configuration.get_object().config_entry
         conf.days_to_remove_links = 2
         # conf.days_to_move_to_archive = 1
-        conf.accept_domain_links = True  # to keep up permanent flag
-        conf.keep_domain_links = True
+        conf.accept_domain_links = True
         conf.save()
 
         EntryRules.objects.create(block=True, trigger_rule_url="youtube.com")

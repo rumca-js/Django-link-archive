@@ -59,9 +59,9 @@ class BaseParsePluginTest(FakeInternetTestCase):
         parse = BaseParsePlugin(self.source_youtube.id)
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
 
-    def test_calculate_plugin_hash(self):
+    def test_get_hash(self):
         parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.calculate_plugin_hash())
+        self.assertTrue(parse.get_hash())
 
 
 class RssParserPluginTest(FakeInternetTestCase):
@@ -88,9 +88,9 @@ class RssParserPluginTest(FakeInternetTestCase):
 
         self.assertTrue(jobs.count() > 0)
 
-    def test_calculate_plugin_hash(self):
+    def test_get_hash(self):
         parse = RssParserPlugin(self.source_youtube.id)
-        self.assertTrue(parse.calculate_plugin_hash())
+        self.assertTrue(parse.get_hash())
 
 
 class HackerNewsParserPluginTest(FakeInternetTestCase):
@@ -136,6 +136,6 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
 
         self.assertEqual(jobs.count(), len(props))
 
-    def test_calculate_plugin_hash(self):
+    def test_get_hash(self):
         parse = HackerNewsParserPlugin(self.source.id)
-        self.assertTrue(parse.calculate_plugin_hash())
+        self.assertTrue(parse.get_hash())

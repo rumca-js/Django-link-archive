@@ -526,9 +526,6 @@ def get_cleaned_up_entry_data(request, data):
     page = UrlLocation(link)
     config = Configuration.get_object().config_entry
 
-    if page.is_domain() and config.keep_domain_links:
-        data["permanent"] = True
-
     if "description" in data:
         data["description"] = LinkDataController.get_description_for_add(
             data["description"]

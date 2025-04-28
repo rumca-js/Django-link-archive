@@ -131,7 +131,6 @@ class ConfigForm(forms.ModelForm):
             "accept_dead_links",
             "prefer_https_links",
             "prefer_non_www_links",
-            "keep_domain_links",
             "auto_scan_new_entries",
             "new_entries_merge_data",
             "new_entries_use_clean_data",

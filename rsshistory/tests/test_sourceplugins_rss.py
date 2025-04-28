@@ -184,6 +184,6 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_calculate_plugin_hash(self):
+    def test_get_hash(self):
         plugin = BaseRssPlugin(self.source_rss.id)
-        self.assertTrue(plugin.calculate_plugin_hash())
+        self.assertTrue(plugin.get_hash())
