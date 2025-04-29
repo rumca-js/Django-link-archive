@@ -157,15 +157,25 @@ class BaseLinkDataModel(models.Model):
             )
             self.language = None
 
-        if hasattr(self, "domain"):
-            if self.domain != None:
-                p = UrlLocation(self.link)
-                if p.is_domain():
-                    self.domain.update(self)
+        p = UrlLocation(self.link)
+        if p.is_domain():
+            domain = self.get_domain_safe()
+
+            if domain:
+                domain.update(self)
 
         self.permanent = self.should_entry_be_permanent()
 
         super().save(*args, **kwargs)
+
+    def get_domain_safe(self):
+        try:
+            if hasattr(self, "domain"):
+                if self.domain != None:
+                    return self.domain
+        except Exception as E:
+            self.domain = None
+            AppLogging.debug(str(E))
 
     def get_field_length(field):
         length = BaseLinkDataModel._meta.get_field(field).max_length

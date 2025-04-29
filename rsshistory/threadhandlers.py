@@ -1110,7 +1110,7 @@ class CleanupJobHandler(BaseJobHandler):
             except TypeError as E:
                 pass
 
-        AppLogging.notify("Cleaning up table {}".format(table))
+        AppLogging.notify("Cleanup. Table:{}".format(table))
 
         cfg["limit_s"] = limit_s
 
@@ -1156,7 +1156,7 @@ class CleanupJobHandler(BaseJobHandler):
         status = True
 
         elapsed_sec = self.get_time_diff()
-        AppLogging.notify("Successfully cleaned database. Time:{}".format(elapsed_sec))
+        AppLogging.notify("Cleanup. Table:{} DONE. Time:{}".format(table, elapsed_sec))
         return status
 
 

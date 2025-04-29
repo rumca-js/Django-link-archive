@@ -35,9 +35,12 @@ class YTDLP(YouTubeDownloader):
             self._url,
         ]
 
-        proc = subprocess.run(
-            cmds, cwd=self._cwd, capture_output=True, timeout=self.timeout_s
-        )
+        try:
+           proc = subprocess.run(
+               cmds, cwd=self._cwd, capture_output=True, timeout=self.timeout_s
+           )
+        except FileNotFoundError as E:
+            return
 
         if proc.returncode != 0:
             return None
@@ -49,12 +52,15 @@ class YTDLP(YouTubeDownloader):
     def download_video(self, file_name):
         cmds = ["yt-dlp", "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4", self._url]
 
-        proc = subprocess.run(
-            cmds, cwd=self._cwd, capture_output=True, timeout=self.timeout_s
-        )
+        try:
+            proc = subprocess.run(
+                cmds, cwd=self._cwd, capture_output=True, timeout=self.timeout_s
+            )
+        except FileNotFoundError as E:
+            return
 
         if proc.returncode != 0:
-            return None
+            return
 
         out = self.get_output_ignore(proc)
 
@@ -63,7 +69,10 @@ class YTDLP(YouTubeDownloader):
     def download_data(self, path=None):
         cmds = ["yt-dlp", "--dump-json", "--max-downloads", "1", str(self._url)]
 
-        proc = subprocess.run(cmds, capture_output=True, timeout=self.timeout_s)
+        try:
+            proc = subprocess.run(cmds, capture_output=True, timeout=self.timeout_s)
+        except FileNotFoundError as E:
+            return
 
         out = self.get_output_ignore(proc)
 
@@ -73,7 +82,7 @@ class YTDLP(YouTubeDownloader):
         # everything is fine
 
         if proc.returncode != 0 and proc.returncode != 101:
-            return None
+            return
 
         out = self.get_output_ignore(proc)
         self._json_data = out.strip()

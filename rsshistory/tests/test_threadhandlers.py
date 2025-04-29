@@ -18,6 +18,7 @@ from ..models import (
     SourceExportHistory,
     KeyWords,
     SystemOperation,
+    UserTags,
 )
 from ..configuration import Configuration
 from ..threadhandlers import (
@@ -368,6 +369,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
+        BackgroundJobController.objects.all().delete()
 
         ob = BackgroundJobController.objects.create(
             job=BackgroundJob.JOB_PROCESS_SOURCE,
@@ -425,6 +427,50 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         self.assertTrue("process-source" in subjects)
         # add link job odysee
         self.assertTrue("link-add" in subjects)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_process__source_known(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+        SourceDataController.objects.all().delete()
+        BackgroundJobController.objects.all().delete()
+        UserTags.objects.all().delete()
+
+        source = SourceDataController.objects.create(
+            url="https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
+            auto_tag = "personal",
+        )
+
+        ob = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_PROCESS_SOURCE,
+            subject=str(source.id),
+        )
+
+        handler = ProcessSourceJobHandler()
+        # call tested function
+        result = handler.process(ob)
+
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
+        for persistent_object in persistent_objects:
+            print("AppLogging object info:{}".format(persistent_object.info_text))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
+        self.assertEqual(result, True)
+
+        subjects = BackgroundJobController.objects.values_list("job", flat=True)
+
+        self.assertEqual(len(subjects), 2)
+        # still process source is present
+        self.assertTrue("process-source" in subjects)
+        # add link job odysee
+        self.assertTrue("link-add" in subjects)
+
+        self.assertTrue(UserTags.objects.all().count() > 0)
+        self.assertTrue(LinkDataController.objects.all().count() > 0)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 

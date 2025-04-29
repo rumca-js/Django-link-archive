@@ -38,9 +38,13 @@ class YouTubeDownloader(object):
             self._url,
         ]
         logging.info("Downloading: " + " ".join(cmds))
-        proc = subprocess.run(
-            cmds, cwd=self._cwd, stdout=subprocess.PIPE, timeout=self.timeout_s
-        )
+
+        try:
+           proc = subprocess.run(
+               cmds, cwd=self._cwd, stdout=subprocess.PIPE, timeout=self.timeout_s
+           )
+        except FileNotFoundError as E:
+            return
 
         out = self.get_output_ignore(proc)
 
@@ -52,9 +56,13 @@ class YouTubeDownloader(object):
         # cmds = ['youtube-dl','-o', file_name, '-f','bestvideo[ext={0}]+bestaudio'.format(ext), self._url ]
         cmds = ["youtube-dl", "-o", file_name, self._url]
         logging.info("Downloading: " + " ".join(cmds))
-        proc = subprocess.run(
-            cmds, cwd=self._cwd, stdout=subprocess.PIPE, timeout=self.timeout_s
-        )
+
+        try:
+           proc = subprocess.run(
+               cmds, cwd=self._cwd, stdout=subprocess.PIPE, timeout=self.timeout_s
+           )
+        except FileNotFoundError as E:
+            return
 
         out = self.get_output_ignore(proc)
 
@@ -74,11 +82,15 @@ class YouTubeDownloader(object):
         return handler.get_contents()
 
     def _get_json_data(self):
-        proc = subprocess.run(
-            ["youtube-dl", "--dump-json", self._url],
-            stdout=subprocess.PIPE,
-            timeout=self.timeout_s,
-        )
+        try:
+           proc = subprocess.run(
+               ["youtube-dl", "--dump-json", self._url],
+               stdout=subprocess.PIPE,
+               timeout=self.timeout_s,
+           )
+        except FileNotFoundError as E:
+            return
+
         out = self.get_output_ignore(proc)
         self._json_data = out.strip()
         return self._json_data

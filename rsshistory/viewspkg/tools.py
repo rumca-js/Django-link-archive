@@ -144,6 +144,13 @@ def get_page_properties(request):
     url_ex = get_request_url_with_browser(request.GET)
     all_properties = url_ex.get_properties()
 
+    if not all_properties:
+        data = OrderedDict()
+        data["properties"] = all_properties
+        data["status"] = False
+        data["errors"] = ["Could not obtain properties"]
+        return JsonResponse(data, json_dumps_params={"indent": 4})
+
     for item in all_properties:
         if item["name"] == "Response":
             if "data" in item:

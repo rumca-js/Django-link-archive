@@ -1,6 +1,6 @@
 from utils.dateutils import DateUtils
 
-from ..models import AppLogging
+from ..models import AppLogging, UserTags
 from ..controllers import EntryDataBuilder, SourceDataController
 from ..configuration import Configuration
 
