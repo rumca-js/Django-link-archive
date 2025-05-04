@@ -842,7 +842,7 @@ def entry_remove(request, pk):
     if data is not None:
         return data
 
-    entry = LinkDataController.objects.filter(id=pk)
+    entries = LinkDataController.objects.filter(id=pk)
     status_code = 200
 
     data = {
@@ -850,8 +850,9 @@ def entry_remove(request, pk):
         "message": "",
     }
 
-    if entry.exists():
-        entry.delete()
+    if entries.exists():
+        for entry in entries:
+            entry.delete()
 
         data["message"] = "Remove ok"
         data["status"] = True

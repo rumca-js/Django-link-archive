@@ -29,8 +29,9 @@ Personal link database, link aggregator, with RSS functionality.
 
  - RSS feed support: Supports YouTube RSS, Reddit RSS, Odysee, OpenRss, OPML
  - support for archived pages through InternetArchive, or any configured archive medium
- - GitHub support. Exports. For example [Internet domains, users, projects](https://github.com/rumca-js/Internet-Places-Database)
+ - GitHub support. Exports. For example [Internet domains, users, projects](https://github.com/rumca-js/Internet-Places-Database), using tokens
  - YouTube download support through yt-dlp project
+ - E-mail IMAP support (Gmail via app passwords)
 
 ## Crawling
 

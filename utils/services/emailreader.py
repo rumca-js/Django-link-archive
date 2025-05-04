@@ -79,9 +79,7 @@ class EmailReader(object):
         mail = Email()
         mail.id = msg["Message-ID"]
 
-        subject, encoding = decode_header(msg["Subject"])[0]
-        if isinstance(subject, bytes):
-            subject = subject.decode(encoding if encoding else "utf-8")
+        subject = self.decode_mime_words(msg["Subject"])
 
         body = None
         # Get the email body
@@ -115,11 +113,27 @@ class EmailReader(object):
 
         mail.title = subject
         mail.body = body
-        #mail.date_published = None
-        # mail.author = msg["From"] # contains more data, display name, etc.
-        mail.author = parseaddr(msg["From"])[1]
+
+        name, addr = parseaddr(msg["From"])
+        decoded_name = self.decode_mime_words(name)
+        mail.author = f"{decoded_name} <{addr}>" if decoded_name else addr
 
         return mail
+
+    def decode_mime_words(self, header_value):
+        if header_value is None:
+            return ''
+        decoded_fragments = decode_header(header_value)
+        decoded_string = ''
+        for fragment, encoding in decoded_fragments:
+            if isinstance(fragment, bytes):
+                try:
+                    decoded_string += fragment.decode(encoding or 'utf-8', errors='replace')
+                except Exception as e:
+                    decoded_string += fragment.decode('utf-8', errors='replace')
+            else:
+                decoded_string += fragment
+        return decoded_string
 
     def close(self):
         self.imap.logout()

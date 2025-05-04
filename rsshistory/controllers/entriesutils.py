@@ -138,18 +138,20 @@ class EntriesCleanup(object):
 
         entries = self.get_general_entries()
         if entries:
-            # for entry in entries:
-            #    AppLogging.debug("Removing general entry:{}".format(entry.link))
-            entries.delete()
+             for entry in entries:
+                 if entry.is_removable():
+                     AppLogging.debug("Removing general entry:{}".format(entry.link))
+                     entry.delete()
 
         AppLogging.debug("Removing stale entries")
 
         if not self.archive_cleanup:
             entries = self.get_stale_entries()
             if entries:
-                # for entry in entries:
-                #    AppLogging.debug("Removing stale entry:{}".format(entry.link))
-                entries.delete()
+                for entry in entries:
+                   if entry.is_removable():
+                       AppLogging.debug("Removing stale entry:{} status:{} dead since:{}".format(entry.link, entry.status_code, entry.date_dead_since))
+                       entry.delete()
 
         return True
 
@@ -183,7 +185,7 @@ class EntriesCleanup(object):
 
         days_before = DateUtils.get_days_before_dt(days)
 
-        condition_source = Q(source=source) & Q(date_published__lt=days_before)
+        condition_source = Q(source=source) & Q(date_created__lt=days_before)
         condition_source &= Q(bookmarked=False, permanent=False)
 
         if not self.archive_cleanup:
@@ -209,7 +211,7 @@ class EntriesCleanup(object):
 
         days_before = DateUtils.get_days_before_dt(days)
 
-        condition = Q(date_published__lt=days_before)
+        condition = Q(date_created__lt=days_before)
         condition &= Q(bookmarked=False, permanent=False)
 
         if not self.archive_cleanup:
@@ -220,6 +222,26 @@ class EntriesCleanup(object):
         if entries.exists():
             return entries
 
+    def get_stale_status_condition(self):
+        status_conditions = Q(status_code =403)
+        status_conditions |= (Q(status_code__gte=200) | Q(status_code__lte=300))
+
+        return ~status_conditions
+
+    def get_stale_conditions(self):
+        config = Configuration.get_object().config_entry
+        days = config.days_to_remove_stale_entries
+        if days == 0:
+            return
+
+        days_before = DateUtils.get_days_before_dt(days)
+
+        date_condition = Q(date_dead_since__lt=days_before)
+        permanent_condition = Q(bookmarked=False, permanent=False)
+        manual_status_nok = ~Q(manual_status_code = 200)
+
+        return date_condition & permanent_condition & manual_status_nok
+
     def get_stale_entries(self):
         """
         We only update current database, not archive
@@ -229,10 +251,7 @@ class EntriesCleanup(object):
         if days == 0:
             return
 
-        days_before = DateUtils.get_days_before_dt(days)
-
-        condition = Q(date_published__lt=days_before)
-        condition &= Q(bookmarked=False, permanent=False)
+        condition = self.get_stale_conditions()
 
         entries = LinkDataController.objects.filter(condition)
 
