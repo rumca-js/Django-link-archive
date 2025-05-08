@@ -183,7 +183,12 @@ class EntryUpdateData(BaseJobHandler):
         if len(entries) > 0:
             entry = entries[0]
 
-            u = EntryUpdater(entry)
+            cfg = self.get_args(obj)
+            browser = None
+            if "browser_obj" in cfg:
+                browser = cfg["browser_obj"]
+
+            u = EntryUpdater(entry, browser=browser)
             u.update_data()
         else:
             LinkDatabase.info(
@@ -193,6 +198,17 @@ class EntryUpdateData(BaseJobHandler):
             )
 
         return True
+
+    def get_args(self, obj):
+        cfg = self.get_args_cfg(obj)
+
+        if "browser" in cfg:
+            browser_id = cfg["browser"]
+            browsers = Browser.objects.filter(id=int(browser_id))
+            if browsers.count() > 0:
+                data["browser_obj"] = browsers[0]
+
+        return cfg
 
 
 class LinkResetDataJobHandler(BaseJobHandler):
@@ -214,7 +230,12 @@ class LinkResetDataJobHandler(BaseJobHandler):
         if len(entries) > 0:
             entry = entries[0]
 
-            u = EntryUpdater(entry)
+            cfg = self.get_args(obj)
+            browser = None
+            if "browser_obj" in cfg:
+                browser = cfg["browser_obj"]
+
+            u = EntryUpdater(entry, browser=browser)
             u.reset_data()
 
         return True
@@ -243,6 +264,17 @@ class LinkResetLocalDataJobHandler(BaseJobHandler):
             u.reset_local_data()
 
         return True
+
+    def get_args(self, obj):
+        cfg = self.get_args_cfg(obj)
+
+        if "browser" in cfg:
+            browser_id = cfg["browser"]
+            browsers = Browser.objects.filter(id=int(browser_id))
+            if browsers.count() > 0:
+                data["browser_obj"] = browsers[0]
+
+        return cfg
 
 
 class LinkDownloadJobHandler(BaseJobHandler):
@@ -472,9 +504,13 @@ class LinkAddJobHandler(BaseJobHandler):
             AppLogging.error("Someone posted wrong link:{}".format(link))
             return
 
+        browser = None
+        if "browser_obj" in data:
+            browser = data["browser_obj"]
+
         # Add the link
         b = EntryDataBuilder()
-        entry = b.build(link=link, source_is_auto=True)
+        entry = b.build(link=link, source_is_auto=True, browser=browser)
 
         if not entry:
             errors = "\n".join(b.errors)
@@ -515,6 +551,12 @@ class LinkAddJobHandler(BaseJobHandler):
             source_objs = SourceDataController.objects.filter(id=int(source_id))
             if source_objs.count() > 0:
                 data["source_obj"] = source_objs[0]
+
+        if "browser" in cfg:
+            browser_id = cfg["browser"]
+            browsers = Browser.objects.filter(id=int(browser_id))
+            if browsers.count() > 0:
+                data["browser_obj"] = browsers[0]
 
         user = None
         if "user_id" in cfg:
@@ -1177,36 +1219,14 @@ class LinkScanJobHandler(BaseJobHandler):
     def process(self, obj=None):
         link = obj.subject
 
-        cfg = self.get_args_cfg(obj)
-        source = None
-        entry = None
-
-        if "source_id" in cfg:
-            source_id = cfg["source_id"]
-            source_objs = SourceDataController.objects.filter(id=int(source_id))
-            if source_objs.count() > 0:
-                source = source_objs[0]
-
-        if "entry_id" in cfg:
-            entry_id = cfg["entry_id"]
-            entries = LinkDataController.objects.filter(id=int(entry_id))
-            if entries.count() > 0:
-                entry = entries[0]
-
-        if "source" in cfg:
-            source_id = cfg["source"]
-            source_objs = SourceDataController.objects.filter(id=int(source_id))
-            if source_objs.count() > 0:
-                source = source_objs[0]
-
-        if "entry" in cfg:
-            entry_id = cfg["entry"]
-            entries = LinkDataController.objects.filter(id=int(entry_id))
-            if entries.count() > 0:
-                entry = entries[0]
+        cfg = self.get_args(obj)
 
         p = UrlHandlerEx(link)
         contents = p.get_contents()
+
+        entry = None
+        if "entry_obj" in cfg:
+            entry = cfg["entry_obj"]
 
         if entry:
             scanner = EntryScanner(entry=entry, contents=contents)
@@ -1216,6 +1236,41 @@ class LinkScanJobHandler(BaseJobHandler):
             scanner.run()
 
         return True
+
+    def get_args(self, obj):
+        cfg = self.get_args_cfg(obj)
+
+        if "source_id" in cfg:
+            source_id = cfg["source_id"]
+            source_objs = SourceDataController.objects.filter(id=int(source_id))
+            if source_objs.count() > 0:
+                cfg["source_obj"] = source_objs[0]
+
+        if "entry_id" in cfg:
+            entry_id = cfg["entry_id"]
+            entries = LinkDataController.objects.filter(id=int(entry_id))
+            if entries.count() > 0:
+                cfg["entry_obj"] = entries[0]
+
+        if "source" in cfg:
+            source_id = cfg["source"]
+            source_objs = SourceDataController.objects.filter(id=int(source_id))
+            if source_objs.count() > 0:
+                cfg["source_obj"] = source_objs[0]
+
+        if "entry" in cfg:
+            entry_id = cfg["entry"]
+            entries = LinkDataController.objects.filter(id=int(entry_id))
+            if entries.count() > 0:
+                cfg["entry_obj"] = entries[0]
+
+        if "browser" in cfg:
+            browser_id = cfg["browser"]
+            browsers = Browser.objects.filter(id=int(browser_id))
+            if browsers.count() > 0:
+                data["browser_obj"] = browsers[0]
+
+        return cfg
 
 
 class MoveToArchiveJobHandler(BaseJobHandler):

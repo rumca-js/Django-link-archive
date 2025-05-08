@@ -57,6 +57,9 @@ from ..controllers import (
     EntriesUpdater,
     BackgroundJobController,
     SystemOperationController,
+    system_setup_for_news,
+    system_setup_for_gallery,
+    system_setup_for_search_engine,
 )
 from ..configuration import Configuration
 from ..serializers import JsonImporter
@@ -64,7 +67,7 @@ from ..forms import (
     ConfigForm,
     UserConfigForm,
 )
-from ..views import ViewPage
+from ..views import ViewPage, get_search_view
 
 
 def index(request):
@@ -76,30 +79,12 @@ def index(request):
         if not config.initialized:
             return redirect("{}:wizard-init".format(LinkDatabase.name))
         else:
-            if config.default_search_behavior == ConfigurationEntry.SEARCH_BUTTON_ALL:
-                url = reverse(f"{LinkDatabase.name}:entries") + "?show=0"
-                return HttpResponseRedirect(url)
-            elif (
-                config.default_search_behavior
-                == ConfigurationEntry.SEARCH_BUTTON_RECENT
-            ):
-                url = reverse(f"{LinkDatabase.name}:entries-recent") + "?show=0"
-                return HttpResponseRedirect(url)
-            elif (
-                config.default_search_behavior
-                == ConfigurationEntry.SEARCH_BUTTON_GLOBAL_BOOKMARKS
-            ):
-                url = reverse(f"{LinkDatabase.name}:entries-bookmarks") + "?show=0"
-                return HttpResponseRedirect(url)
-            elif (
-                config.default_search_behavior
-                == ConfigurationEntry.SEARCH_BUTTON_USER_BOOKMARKS
-            ):
-                url = reverse(f"{LinkDatabase.name}:entries-bookmarks") + "?show=0"
-                return HttpResponseRedirect(url)
+            search_view = get_search_view(request)
+            if search_view.auto_fetch:
+                url = reverse(f"{LinkDatabase.name}:entries")
             else:
-                url = reverse(f"{LinkDatabase.name}:entries") + "?show=0"
-                return HttpResponseRedirect(url)
+                url = reverse(f"{LinkDatabase.name}:entries")
+            return HttpResponseRedirect(url)
     else:
         exports = DataExport.get_public_export_names()
         p.context["public_exports"] = exports
@@ -693,48 +678,13 @@ def wizard_setup_news(request):
     if data is not None:
         return data
 
-    UserConfig.get_or_create(request.user)
-
-    c = ConfigurationEntry.get()
-    c.enable_link_archiving = True
-    c.enable_source_archiving = False
-    c.accept_dead_links = False
-    c.accpte_ip_addresses = False
-    c.auto_scan_new_entries = False
-    c.accept_non_domain_links = True
-    c.auto_store_sources = False
-    c.accept_domain_links = False
-    c.enable_keyword_support = True
-    c.track_user_actions = True
-    c.track_user_searches = True
-    c.track_user_navigation = False
-    c.days_to_move_to_archive = 100
-    c.days_to_check_stale_entries = 10
-    c.days_to_remove_links = 20
-    c.days_to_remove_stale_entries = 0  # do not remove bookmarks?
-    c.whats_new_days = 7
-    c.prefer_https_links = False
-    c.entries_order_by = "-date_published, link"
-    c.display_type = ConfigurationEntry.DISPLAY_TYPE_STANDARD
-    c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_RECENT
-    if settings.CRAWLER_BUDDY_URL:
-        c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
-
-    c.initialized = True
-
-    c.save()
-
-    Configuration.get_object().config_entry.refresh_from_db()
-    common_initialization()
-
+    system_setup_for_news(request)
+    
     p.context["summary_text"] = "Set configuration for news."
     p.context["summary_text"] += get_sources_text()
 
     return p.render("summary_present.html")
 
-
-def common_initialization():
-    EntryRules.initialize_common_rules()
 
 def wizard_setup_gallery(request):
     """
@@ -747,39 +697,7 @@ def wizard_setup_gallery(request):
     if data is not None:
         return data
 
-    UserConfig.get_or_create(request.user)
-
-    c = ConfigurationEntry.get()
-    c.enable_link_archiving = False
-    c.enable_source_archiving = False
-    c.accept_dead_links = False
-    c.accpte_ip_addresses = False
-    c.auto_scan_new_entries = False
-    c.accept_non_domain_links = True
-    c.auto_store_sources = False
-    c.accept_domain_links = False
-    c.enable_keyword_support = False
-    c.track_user_actions = True
-    c.track_user_searches = True
-    c.track_user_navigation = True
-    c.days_to_move_to_archive = 0
-    c.days_to_check_stale_entries = 10
-    c.days_to_remove_links = 30
-    c.days_to_remove_stale_entries = 0  # do not remove bookmarks?
-    c.whats_new_days = 7
-    c.prefer_https_links = False
-    c.entries_order_by = "-date_published, link"
-    c.display_type = ConfigurationEntry.DISPLAY_TYPE_GALLERY
-    c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
-    if settings.CRAWLER_BUDDY_URL:
-        c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
-
-    c.initialized = True
-
-    c.save()
-
-    Configuration.get_object().config_entry.refresh_from_db()
-    common_initialization()
+    system_setup_for_gallery(request)
 
     p.context["summary_text"] = "Set configuration for gallery"
     p.context["summary_text"] += get_sources_text()
@@ -798,47 +716,7 @@ def wizard_setup_search_engine(request):
     if data is not None:
         return data
 
-    UserConfig.get_or_create(request.user)
-
-    c = ConfigurationEntry.get()
-    c.enable_link_archiving = False
-    c.enable_source_archiving = False
-    c.accept_dead_links = False
-    c.accpte_ip_addresses = False
-    c.auto_scan_new_entries = True
-    c.accept_non_domain_links = True
-    c.auto_store_sources = True
-    c.accept_domain_links = True
-    c.enable_keyword_support = False
-    c.track_user_actions = True
-    c.track_user_searches = True
-    c.track_user_navigation = (
-        False  # it would be interesting for the search engine though
-    )
-    c.days_to_move_to_archive = 0
-    c.days_to_check_stale_entries = 10
-    c.days_to_remove_links = 30
-    c.days_to_remove_stale_entries = 30
-    c.whats_new_days = 7
-    c.prefer_https_links = True
-    c.entries_order_by = "-page_rating, link"
-    c.display_type = ConfigurationEntry.DISPLAY_TYPE_SEARCH_ENGINE
-    c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
-    c.remove_entry_vote_threshold = (
-        1  # do not remove everything above, or equal to 1 vote
-    )
-    if settings.CRAWLER_BUDDY_URL:
-        c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
-
-    c.initialized = True
-
-    c.save()
-
-    Configuration.get_object().config_entry.refresh_from_db()
-    common_initialization()
-
-    # we want blocklist to be enabled for search engine
-    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
+    system_setup_for_search_engine(request)
 
     p.context["summary_text"] = "Set configuration for search engine"
     p.context["summary_text"] += get_sources_text()

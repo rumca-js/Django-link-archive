@@ -190,15 +190,6 @@ class ConfigurationEntry(models.Model):
         ),
     )
 
-    # TODO rename choices to search_behavior
-    default_search_behavior = models.CharField(
-        max_length=500,
-        null=True,
-        default=SEARCH_BUTTON_ALL,
-        choices=SEARCH_BUTTONS,
-        help_text="Defines the default behavior of the main search button.",
-    )
-
     thread_memory_threshold = models.IntegerField(
         default=500,
         help_text="Unit [MB]. Virtual memory threshold for threads. If memory threshold is breached thread leaves.",
@@ -416,17 +407,6 @@ class ConfigurationEntry(models.Model):
         max_length=50,
         default="UTC",
         help_text="Specify the time zone. Example: Europe/Warsaw. A list of time zones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.",
-    )
-
-    # TODO rename to whats_new_time_range_days
-    whats_new_days = models.IntegerField(
-        default=7, help_text="The number of days to show in the 'What's New' section."
-    )
-
-    entries_order_by = models.CharField(
-        default="-date_published",  # TODO support for multiple columns
-        max_length=1000,
-        help_text="Specify the sorting order for entries. For a Google-like experience, set to '-page_rating'. Default is '-date_published'.",
     )
 
     display_style = models.CharField(

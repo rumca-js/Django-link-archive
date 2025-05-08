@@ -211,9 +211,8 @@ class GenericJobsProcessor(CeleryTaskInterface):
     @note Uses handler priority when processing jobs.
     """
 
-    def __init__(self, timeout_s=60 * 10, tasks_info=None):
+    def __init__(self, timeout_s=60 * 1, tasks_info=None):
         """
-        Default timeout is 10 minutes
         """
         self.timeout_s = timeout_s
         self.start_processing_time = None

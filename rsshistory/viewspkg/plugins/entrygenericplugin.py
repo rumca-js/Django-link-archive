@@ -647,6 +647,9 @@ class EntryGenericPlugin(object):
 
         parameters.append(EntryParameter("Visists", self.entry.page_rating_visits))
 
+        if self.entry.permanent:
+            parameters.append(EntryParameter("Permanent", True))
+
         if self.entry.user is not None:
             parameters.append(EntryParameter("User", self.entry.user.username))
 

@@ -9,23 +9,7 @@ class="navbar sticky-top navbar-expand-sm bg-light"
 >
 
    <a class="navbar-brand nav-link" 
-{% if config.default_search_behavior == "search-button-all" %}
-      href="{% url 'rsshistory:entries' %}?show=0"
-{% else %}
-    {% if config.default_search_behavior == "search-button-recent" %}
-          href="{% url 'rsshistory:entries-recent' %}?show=0"
-    {% else %}
-         {% if config.default_search_behavior == "search-button-global-bookmarks" %}
-               href="{% url 'rsshistory:entries-bookmarked' %}?show=0"
-         {% else %}
-              {% if config.default_search_behavior == "search-button-user-bookmarks" %}
-                    href="{% url 'rsshistory:entries-user-bookmarked' %}?show=0"
-              {% else %}
-                    href="{% url 'rsshistory:entries' %}?show=0"
-              {% endif %}
-         {% endif %}
-    {% endif %}
-{% endif %}
+      href="{% url 'rsshistory:entries' %}"
       title="Home">
     <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
    </a>
@@ -52,16 +36,19 @@ class="navbar sticky-top navbar-expand-sm bg-light"
                            <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
                            Gateways</a>
                    </li>
+		   {% for search_view in searchviews %}
                    <li>
-                       <a href="{% url 'rsshistory:entries-recent' %}?show=0" class="dropdown-item" title="Shows recent entries">
-                           <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
-                           What's new</a>
+			   <a 
+                              {% if search_view.auto_fetch %}
+ 			        href="{% url 'rsshistory:entries' %}?view={{search_view.id}}"
+                              {% else %}
+ 			        href="{% url 'rsshistory:entries' %}?view={{search_view.id}}"
+                              {% endif %}
+ 			      class="dropdown-item" title="{{search_view.hover_text}}">
+                           <img src="{{search_view.icon}}" class="mainbutton-icon" />
+			   {{search_view.name}}</a>
                    </li>
-                   <li>
-                       <a href="{% url 'rsshistory:entries' %}?show=0" class="dropdown-item" title="Shows new entries">
-                           <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
-                           Search all</a>
-                   </li>
+		   {% endfor %}
                </ul>
            </li>
 
@@ -74,11 +61,6 @@ class="navbar sticky-top navbar-expand-sm bg-light"
                    </span>
                </a>
                <ul class="dropdown-menu">
-                   <li>
-                       <a href="{% url 'rsshistory:entries-bookmarked' %}?show=1" class="dropdown-item" title="Shows bookmarked links. By default shows all users bookmarks.">
-                           <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
-                           Bookmarks</a>
-                   </li>
                    <li>
                        <a href="{% url 'rsshistory:tags-show-all' %}" class="dropdown-item" title="Tags. By default shows all users tags">
                            <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
@@ -126,11 +108,20 @@ class="navbar sticky-top navbar-expand-sm bg-light"
                            <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
                            Read later</a>
                    </li>
+		   {% for search_view in usersearchviews %}
                    <li>
-                       <a href="{% url 'rsshistory:entries-user-bookmarked' %}?show=1" class="dropdown-item" title="Shows bookmarked links. By default shows all users bookmarks.">
-                           <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
-                           Bookmarks</a>
+			   <a
+                              {% if search_view.auto_fetch %}
+ 			        href="{% url 'rsshistory:entries' %}?view={{search_view.id}}"
+                              {% else %}
+ 			        href="{% url 'rsshistory:entries' %}?view={{search_view.id}}"
+                              {% endif %}
+                              class="dropdown-item" title="{{search_view.hover_text}}">
+
+                           <img src="{{search_view.icon}}" class="mainbutton-icon" />
+			   {{search_view.name}}</a>
                    </li>
+		   {% endfor %}
                    <li>
                        <a href="{% url 'rsshistory:user-tags-show' %}" class="dropdown-item" title="Tags. By default shows all users tags">
                            <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />

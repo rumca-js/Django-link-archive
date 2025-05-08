@@ -25,6 +25,7 @@ from .models import (
     EntryRules,
     ApiKeys,
     Browser,
+    SearchView,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
@@ -109,7 +110,6 @@ class ConfigForm(forms.ModelForm):
             "view_access_type",
             "download_access_type",
             "add_access_type",
-            "default_search_behavior",
             "use_internal_scripts",
             "data_export_path",
             "data_import_path",
@@ -164,8 +164,6 @@ class ConfigForm(forms.ModelForm):
             "number_of_comments_per_day",
             # display settings
             "time_zone",
-            "whats_new_days",
-            "entries_order_by",
             "display_style",
             "display_type",
             "show_icons",
@@ -193,7 +191,6 @@ class ConfigForm(forms.ModelForm):
         self.long_widget("favicon_internet_url")
         self.long_widget("internet_status_test_url")
         self.long_widget("time_zone")
-        self.long_widget("entries_order_by")
         self.long_widget("data_export_path")
         self.long_widget("data_import_path")
         self.long_widget("download_path")
@@ -273,6 +270,21 @@ class EntryRulesForm(forms.ModelForm):
         self.fields["trigger_text_fields"].widget.attrs.update(
             size=self.init.get_cols_size()
         )
+
+
+class SearchViewForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+
+    class Meta:
+        model = SearchView
+        fields = [
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class ApiKeysForm(forms.ModelForm):
@@ -509,10 +521,10 @@ class InitSearchForm(forms.Form):
         self.init = UserRequest(args, kwargs)
 
         scope = kwargs.pop("scope", "")
+        auto_fetch = kwargs.pop("auto_fetch", "")
 
         super().__init__(*args, **kwargs)
 
-        attr = {"onchange": "this.form.submit()"}
         self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["search"].widget.attrs["autofocus"] = True
         self.fields["search"].help_text = scope
@@ -539,8 +551,6 @@ class OmniSearchForm(forms.Form):
         self.search_history = self.init.pop_data(args, kwargs, "user_choices")
 
         super().__init__(*args, **kwargs)
-
-        attr = {"onchange": "this.form.submit()"}
 
         self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["search"].widget.attrs["autofocus"] = True

@@ -2,7 +2,11 @@
 
 <!-- this element should be uesd by lists, to filter elements -->
 
-<form id="filterForm" action="{{form.action_url}}" method="{{form.method}}">
+<form id="filterForm" action="{{form.action_url}}" method="{{form.method}}"
+   {% if form.auto_fetch %}
+      data-auto-fetch=True
+   {% endif %}
+    >
     {% for field in form %}
        {% if field.is_hidden %}
        <div style="display:none">

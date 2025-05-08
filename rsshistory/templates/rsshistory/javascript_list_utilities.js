@@ -281,6 +281,26 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
 }
 
 
+function isShowRequired() {
+   var show = false;
+   
+   if (getQueryParam('show') === 'true' || getQueryParam('show') === 'True') {
+       show = true;
+   }
+   
+   var $filterForm = $('#filterForm');
+   
+   if ($filterForm.length === 0) {
+       // No filterForm exists
+       show = true;
+   } else if ($filterForm.data('auto-fetch') !== "True") {
+       show = false;
+   }
+
+   return show;
+}
+
+
 //-----------------------------------------------
 $(document).on('click', '.btnFilterTrigger', function(e) {
     e.preventDefault();
@@ -345,9 +365,10 @@ $(document).on("click", '#hideHistory', function(e) {
 
 //-----------------------------------------------
 // Do it now
-var show = getQueryParam('show') || 'true';
+
 var auto_refresh = getQueryParam('auto-refresh') || '';
 var search_term = getQueryParam('search') || '';
+var show = isShowRequired();
 
 $('#searchSuggestions').hide();
 $('#searchHistory').hide();
@@ -356,7 +377,7 @@ $('#searchSyntax').hide();
 loadSearchHistory();
 
 // if (user specified search, or show is true), and entrylist is empty
-if (search_term || (show !== '0' && show !== 'false')) {
+if (search_term || show) {
     if (isEmpty($('#listData'))) {
         loadRowListContent();
     }

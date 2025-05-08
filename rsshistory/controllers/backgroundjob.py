@@ -194,7 +194,7 @@ class BackgroundJobController(BackgroundJob):
             user=user,
         )
 
-    def link_add(url, source=None, tag="", user=None, properties=None):
+    def link_add(url, source=None, tag="", user=None, properties=None, browser=None):
         from ..configuration import Configuration
         from .entriesutils import EntryWrapper
 
@@ -249,6 +249,9 @@ class BackgroundJobController(BackgroundJob):
         if source:
             cfg["source_id"] = source.id
 
+        if browser:
+            cfg["browser"] = browser.id
+
         if tag:
             cfg["tag"] = tag
 
@@ -296,7 +299,7 @@ class BackgroundJobController(BackgroundJob):
                 url,
             )
 
-    def link_scan(url=None, entry=None, source=None):
+    def link_scan(url=None, entry=None, source=None, browser=None):
         from ..configuration import Configuration
 
         cfg = {}
@@ -311,6 +314,9 @@ class BackgroundJobController(BackgroundJob):
 
         if entry:
             cfg["entry_id"] = entry.id
+
+        if browser:
+            cfg["browser"] = browser.id
 
         if entry:
             url = entry.link
@@ -439,7 +445,7 @@ class BackgroundJobController(BackgroundJob):
             user=user,
         )
 
-    def entry_update_data(entry, force=False):
+    def entry_update_data(entry, browser=None, force=False):
         """
         Do not update, if it was updated recently, or if we are missing key components
         """
@@ -456,10 +462,19 @@ class BackgroundJobController(BackgroundJob):
         if BackgroundJobController.is_update_or_reset_entry_job(entry):
             return
 
+        args = {}
+        args["id"] = entry.id
+        args["link"] = entry.link
+
+        if browser:
+            args["browser"] = browser.id
+
+        args_text = json.dumps(args)
+
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_UPDATE_DATA,
             entry.id,
-            entry.link,
+            args_text,
         )
 
     def entry_reset_local_data(entry):
@@ -487,8 +502,16 @@ class BackgroundJobController(BackgroundJob):
         if BackgroundJobController.is_update_or_reset_entry_job(entry):
             return
 
+        args = {}
+        args["id"] = entry.id
+        args["link"] = entry.link
+
+        if browser:
+            args["browser"] = browser.id
+        args_text = json.dumps(args)
+
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_RESET_DATA, entry.id, entry.link
+            BackgroundJob.JOB_LINK_RESET_DATA, entry.id, args.text
         )
 
     def export_data(export, input_date=None, user=None):

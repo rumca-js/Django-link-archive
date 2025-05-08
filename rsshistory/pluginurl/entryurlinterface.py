@@ -31,6 +31,7 @@ class EntryUrlInterface(object):
         url,
         log=False,
         ignore_errors=False,
+        browser=None
     ):
         """
         Some scenarios, like manual entry should log why it is impossible to check
@@ -40,6 +41,7 @@ class EntryUrlInterface(object):
         self.ignore_errors = ignore_errors
         self.props = None
         self.all_properties = None
+        self.browser = None
 
         self.url = UrlHandlerEx.get_cleaned_link(url)
         self.handler = None
@@ -53,7 +55,11 @@ class EntryUrlInterface(object):
 
         props = None
 
-        url_ex = UrlHandlerEx(self.url)
+        browsers = None
+        if self.browser:
+            browsers = [browser.get_setup()]
+
+        url_ex = UrlHandlerEx(self.url, browsers=browsers)
         self.handler = url_ex
 
         self.all_properties = url_ex.get_properties()

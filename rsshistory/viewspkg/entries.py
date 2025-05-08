@@ -39,6 +39,7 @@ from ..models import (
     EntryRules,
     UserBookmarks,
     AppLogging,
+    SearchView,
 )
 from ..controllers import (
     DomainsController,
@@ -68,8 +69,10 @@ from ..views import (
     get_search_term,
     get_order_by,
     get_page_num,
+    get_request_browser,
+    get_search_view,
 )
-from ..queryfilters import EntryFilter, OmniSearchFilter
+from ..queryfilters import EntryFilter, OmniSearchFilter, DjangoEquationProcessor
 from ..configuration import Configuration
 from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
@@ -81,6 +84,7 @@ def get_generic_search_init_context(request, form):
     context["form"] = form
 
     search_term = get_search_term(request.GET)
+
     context["search_term"] = search_term
     context["search_engines"] = SearchEngines(search_term)
     context["view_link"] = form.action_url
@@ -103,11 +107,15 @@ def entries_generic(request, link, data_scope):
     if "search" in request.GET:
         data = {"search": request.GET["search"]}
 
-    data_scope = "Scope: " + data_scope
+    search_view = get_search_view(request)
 
-    filter_form = InitSearchForm(request=request, initial=data, scope=data_scope)
+    #data_scope = "Scope: " + data_scope
+    data_scope = "Scope: " + search_view.name
+
+    filter_form = InitSearchForm(request=request, initial=data, scope=data_scope, auto_fetch=search_view.auto_fetch)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
+    filter_form.auto_fetch = search_view.auto_fetch
 
     context = get_generic_search_init_context(request, filter_form)
 
@@ -130,20 +138,6 @@ def entries(request):
     )
 
 
-def entries_recent(request):
-    return entries_generic(
-        request, reverse("{}:entries-json-recent".format(LinkDatabase.name)), "recent"
-    )
-
-
-def entries_bookmarked(request):
-    return entries_generic(
-        request,
-        reverse("{}:entries-json-bookmarked".format(LinkDatabase.name)),
-        "bookmarked",
-    )
-
-
 def entries_user_bookmarked(request):
     return entries_generic(
         request,
@@ -160,21 +154,14 @@ def entries_archived(request):
     )
 
 
-def entries_untagged(request):
-    return entries_generic(
-        request,
-        reverse("{}:entries-json-untagged".format(LinkDatabase.name)),
-        "untagged",
-    )
-
-    return p.render("entries.html")
-
-
 class EntriesSearchListView(object):
 
     def __init__(self, request=None, user=None):
         self.request = request
         self.user = user
+        self.conditions = None
+        self.search_view = None
+
         if not self.user and self.request and self.request.user:
             self.user = self.request.user
 
@@ -182,9 +169,14 @@ class EntriesSearchListView(object):
         """
         API: Returns queryset
         """
+        search_view = self.get_search_view()
+
         print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
-        objects = self.get_filtered_objects().order_by(*self.get_order_by())
+        if search_view.entry_limit != 0:
+            objects = self.get_filtered_objects().order_by(*self.get_order_by())[:search_view.entry_limit]
+        else:
+            objects = self.get_filtered_objects().order_by(*self.get_order_by())
         print("EntriesSearchListView:get_queryset done {}".format(objects.query))
 
         config = Configuration.get_object().config_entry
@@ -205,40 +197,31 @@ class EntriesSearchListView(object):
             return uc.links_per_page
 
     def get_order_by(self):
-        return get_order_by(self.request.GET)
+        search_view = self.get_search_view()
+
+        if not search_view:
+            return ["-date_published", "link"]
+
+        delimiter = ","
+        input_string = search_view.order_by
+        result_list = [item.strip() for item in input_string.split(delimiter)]
+        return result_list
+
+    def get_search_view(self):
+        if self.search_view:
+            return self.search_view
+
+        self.search_view = get_search_view(self.request)
+        return self.search_view
 
     def get_filter(self):
         self.on_search()
-        print("EntriesSearchListView:get_filter")
 
-        query_filter = EntryFilter(self.request.GET, user=self.user)
-        thefilter = query_filter
-        print("EntriesSearchListView:get_filter done")
-        return thefilter
+        search = None
+        if "search" in self.request.GET:
+            search = self.request.GET["search"]
 
-    def get_filtered_objects(self):
-        print("EntriesSearchListView:get_filtered_objects")
-        return self.query_filter.get_filtered_objects()
-
-    def on_search(self):
-        if self.user and self.user.is_authenticated:
-            search_term = get_search_term(self.request.GET)
-            if search_term:
-                UserSearchHistory.add(self.user, search_term)
-
-
-class EntriesOmniListView(EntriesSearchListView):
-    def get_filter(self):
-        self.on_search()
-
-        if "archive" in self.request.GET and self.request.GET["archive"] == "on":
-            query_set = self.get_initial_query_set(archive=True)
-        else:
-            query_set = self.get_initial_query_set(archive=False)
-
-        query_filter = OmniSearchFilter(
-            self.request.GET, init_objects=query_set, user=self.user
-        )
+        query_filter = DjangoEquationProcessor(search)
 
         translate = BaseLinkDataController.get_query_names()
         query_filter.set_translation_mapping(translate)
@@ -266,16 +249,44 @@ class EntriesOmniListView(EntriesSearchListView):
                 ]
             )
 
-        query_filter.get_conditions()
-
         return query_filter
 
+    def on_search(self):
+        if self.user and self.user.is_authenticated:
+            search_term = get_search_term(self.request.GET)
+            if search_term:
+                UserSearchHistory.add(self.user, search_term)
+
+    def get_conditions(self):
+        if self.conditions:
+            return self.conditions
+
+        self.conditions = self.query_filter.get_conditions() & self.get_search_view_conditions()
+
+        return self.conditions
+
+    def get_search_view_conditions(self):
+        search_view = self.get_search_view()
+        if not search_view:
+            return Q()
+
+        return search_view.get_conditions()
+
     def get_filtered_objects(self):
-        return self.query_filter.get_filtered_objects()
+        print("EntriesSearchListView:get_filtered_objects")
+
+        if "archive" in self.request.GET and self.request.GET["archive"] == "on":
+            query_set = self.get_initial_query_set(archive=True)
+        else:
+            query_set = self.get_initial_query_set(archive=False)
+
+        conditions = self.get_conditions()
+
+        print("EntriesSearchListView:get_filtered_objects DONE")
+        return query_set.filter(conditions)
 
     def get_initial_query_set(self, archive=False):
         """
-        TODO rewrite. Filter should return only query sets. pure. without pagination
         """
         if archive:
             return ArchiveLinkDataController.objects.all()
@@ -283,40 +294,7 @@ class EntriesOmniListView(EntriesSearchListView):
             return LinkDataController.objects.all()
 
 
-class EntriesRecentListView(EntriesOmniListView):
-    def get_initial_query_set(self, archive=False):
-        query_set = super().get_initial_query_set(archive)
-        return query_set.filter(date_published__range=self.get_default_range())
-
-    def get_order_by(self):
-        return ["-date_created"]
-
-    def get_default_range(self):
-        config = Configuration.get_object().config_entry
-        return DateUtils.get_days_range(config.whats_new_days)
-
-
-class EntriesNotTaggedView(EntriesOmniListView):
-
-    def get_order_by(self):
-        return ["-date_published"]
-
-    def get_initial_query_set(self, archive=False):
-        query_set = super().get_initial_query_set(archive)
-        tags_is_null = Q(tags__isnull=True)
-        bookmarked = Q(bookmarked=True)
-        permanent = Q(permanent=True)
-        return query_set.filter(tags_is_null & (bookmarked | permanent))
-
-
-class EntriesBookmarkedListView(EntriesOmniListView):
-
-    def get_initial_query_set(self, archive=False):
-        query_set = super().get_initial_query_set(archive)
-        return query_set.filter(bookmarked=1)
-
-
-class UserEntriesBookmarkedListView(EntriesOmniListView):
+class UserEntriesBookmarkedListView(EntriesSearchListView):
 
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
@@ -326,7 +304,7 @@ class UserEntriesBookmarkedListView(EntriesOmniListView):
             return query_set.filter(bookmarks__user__id=user.id)
 
 
-class EntriesArchiveListView(EntriesOmniListView):
+class EntriesArchiveListView(EntriesSearchListView):
 
     def get_filter(self):
         query_filter = EntryFilter(self.request.GET, user=self.user, use_archive=True)
@@ -609,8 +587,10 @@ def on_added_entry(request, entry):
 
     DomainsController.add(entry.link)
 
-    BackgroundJobController.entry_update_data(entry=entry)
-    BackgroundJobController.link_scan(entry=entry)
+    browser = get_request_browser(request.GET)
+
+    BackgroundJobController.entry_update_data(entry=entry, browser=browser)
+    BackgroundJobController.link_scan(entry=entry, browser=browser)
 
     config = Configuration.get_object().config_entry
 
@@ -1064,11 +1044,16 @@ def handle_json_view(request, view_to_use):
     json_obj["count"] = 0
     json_obj["page"] = page_num
     json_obj["num_pages"] = 0
+    json_obj["view"] = None
 
     user_config = UserConfig.get(request.user)
 
     if view_to_use:
         entries = view_to_use.get_queryset()
+
+        json_obj["view"] = view_to_use.get_search_view().name
+        json_obj["conditions"] = str(view_to_use.get_conditions())
+
         p = Paginator(entries, view_to_use.get_paginate_by())
         page_obj = p.get_page(page_num)
 

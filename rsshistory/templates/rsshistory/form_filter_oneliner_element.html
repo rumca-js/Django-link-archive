@@ -2,7 +2,14 @@
 
 <!-- this element should be uesd by lists, to filter elements, where one line of input is enough -->
 
-<form id="filterForm" action="{{form.action_url}}" method="{{form.method}}">
+<form id="filterForm" action="{{form.action_url}}" method="{{form.method}}"
+   {% if form.auto_fetch %}
+      data-auto-fetch=True
+   {% else %}
+      data-auto-fetch=False
+   {% endif %}
+   >
+
    {% csrf_token %}
 
    {% for field in form %}

@@ -69,3 +69,5 @@ from .browser import Browser
 from .blockentry import BlockEntryList, BlockEntry, BlockListReader
 
 from .gateway import Gateway
+
+from .searchview import SearchView

@@ -20,9 +20,9 @@ class SourceUrlInterface(object):
     Provides interface between Source and URL Properties
     """
 
-    def __init__(self, url, use_headless_browser=False):
+    def __init__(self, url, browser=None):
         self.url = UrlHandlerEx.get_cleaned_link(url)
-        self.use_headless_browser = use_headless_browser
+        self.browser = browser
 
     def get_props(self, input_props=None):
         if not input_props:
@@ -76,10 +76,14 @@ class SourceUrlInterface(object):
                     props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
                     if "Content-Type":
                         content_type = response["Content-Type"]
-                        if content_type.find("html") >= 1:
-                            props["source_type"] = SourceDataModel.SOURCE_TYPE_PARSE
-                        if content_type.find("json") >= 1:
-                            props["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
+                        if content_type:
+                            if content_type.find("html") >= 1:
+                                props["source_type"] = SourceDataModel.SOURCE_TYPE_PARSE
+                            if content_type.find("json") >= 1:
+                                props["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
+                        else:
+                            # This is default mode. It will use default crawling method
+                            props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
         else:
             props = {}
 

@@ -1,3 +1,8 @@
+"""
+Some say "programming is a convesation". Maybe it is true.
+In that case it looks as if one was totally drunk.
+"""
+
 from django.urls import reverse
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -661,6 +666,26 @@ def gateways_initialize(request):
     return p.render("go_back.html")
 
 
+def searchviews_initialize(request):
+    p = ViewPage(request)
+    p.set_title("Searchviews initialization")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    views = SearchView.objects.all()
+    views.delete()
+
+    SearchView.objects.create(name="Default", order_by="-page_rating, link")
+    SearchView.objects.create(name="Votes", order_by="-page_rating_votes, -page_rating, link")
+    SearchView.objects.create(name="What's published", order_by="-date_published")
+    SearchView.objects.create(name="What's created", order_by="-date_created")
+    SearchView.objects.create(name="Bookmarked", filter_statement = "bookmarked=True", order_by="-date_created", user=True)
+
+    p.context["summary_text"] = "Initialized searchviews"
+    return p.render("go_back.html")
+
+
 def cleanup_link(request):
     p = ViewPage(request)
     p.set_title("Cleanup Link")
@@ -720,3 +745,56 @@ def cleanup_link_json(request):
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
+
+# TODO Gmail things below.
+"""
+Steps to enable:
+ - create a project
+ - enabled gmail API (API & Services -> library), enable
+ - configure OAuth consent screen
+    - choose external
+    - add scope https://www.googleapis.com/auth/gmail.readonly
+ - create OAuth 2.0 credentials
+    - APIs & Services -> Credentials
+    - create credentials -> OAuth client ID
+    - choose web application
+    - set authorized redirect URL
+ - you will receive YOUR_CLIENT_ID and YOUR_CLIENT_SECRET
+"""
+
+def gmail_auth(request):
+    params = {
+        'client_id': 'YOUR_CLIENT_ID',
+        'redirect_uri': 'http://localhost:8000/oauth2callback/',
+        'response_type': 'code',
+        'scope': 'https://www.googleapis.com/auth/gmail.readonly',
+        'access_type': 'offline',
+        'prompt': 'consent'
+    }
+    url = 'https://accounts.google.com/o/oauth2/v2/auth?' + urlencode(params)
+    return redirect(url)
+
+
+def oauth2callback(request):
+    code = request.GET.get('code')
+
+    data = {
+        'code': code,
+        'client_id': 'YOUR_CLIENT_ID',
+        'client_secret': 'YOUR_CLIENT_SECRET',
+        'redirect_uri': 'http://localhost:8000/oauth2callback/',
+        'grant_type': 'authorization_code',
+    }
+
+    response = requests.post('https://oauth2.googleapis.com/token', data=data)
+    token_data = response.json()
+    access_token = token_data['access_token']
+    refresh_token = token_data.get('refresh_token')
+
+    # TODO save tokens
+
+
+def read_gmail(access_token):
+    headers = {'Authorization': f'Bearer {access_token}'}
+    res = requests.get('https://gmail.googleapis.com/gmail/v1/users/me/messages', headers=headers)
+    return res.json()

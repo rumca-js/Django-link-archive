@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from utils.dateutils import DateUtils
 
@@ -9,6 +10,7 @@ from ..queryfilters import (
     OmniSearchFilter,
     DjangoSingleSymbolEvaluator,
     OmniSearchWithDefault,
+    DjangoEquationProcessor,
 )
 
 from .fakeinternet import FakeInternetTestCase
@@ -381,6 +383,43 @@ class OmniSearchWithDefaultTest(FakeInternetTestCase):
             str_conditions,
             "(OR: ('title__icontains', 'find title'), ('description__icontains', 'find title'))",
         )
+
+
+class DjangoEquationProcessorTest(FakeInternetTestCase):
+
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_get_conditions__normal(self):
+        search_query = "link === https://test.com"
+
+        processor = DjangoEquationProcessor(search_query)
+
+        # call tested function
+        conditions = processor.get_conditions()
+
+        str_conditions = str(conditions)
+        self.assertEqual(str_conditions, "(AND: ('link__iexact', 'https://test.com'))")
+
+    def test_get_conditions__empty(self):
+        search_query = ""
+
+        processor = DjangoEquationProcessor(search_query)
+
+        # call tested function
+        conditions = processor.get_conditions()
+
+        self.assertEqual(conditions, Q())
+
+    def test_get_conditions__none(self):
+        search_query = None
+
+        processor = DjangoEquationProcessor(search_query)
+
+        # call tested function
+        conditions = processor.get_conditions()
+
+        self.assertEqual(conditions, Q())
 
 
 class OmniSearchFilterTest(FakeInternetTestCase):

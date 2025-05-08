@@ -453,6 +453,26 @@ class OmniSearchWithDefault(OmniSearch):
         return self.symbol_evaluator.errors
 
 
+class DjangoEquationProcessor():
+    def __init__(self, search_statement):
+
+        self.parser = OmniSearchWithDefault(
+            search_statement, DjangoSingleSymbolEvaluator()
+        )
+
+    def set_default_search_symbols(self, symbols):
+        self.parser.set_default_search_symbols(symbols)
+
+    def set_translation_mapping(self, name_mapping):
+        self.parser.set_translation_mapping(name_mapping)
+
+    def get_conditions(self):
+        if not self.parser.search_query:
+            return Q()
+
+        return self.parser.get_query_result()
+
+
 class OmniSearchFilter(BaseQueryFilter):
     def __init__(self, args, user=None, init_objects=None):
         super().__init__(args, init_objects=init_objects)

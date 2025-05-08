@@ -15,6 +15,7 @@ from .models import (
     AppLogging,
     ApiKeys,
     Browser,
+    SearchView,
 )
 from .apps import LinkDatabase
 from .configuration import Configuration
@@ -84,6 +85,22 @@ def get_request_browser(input_map):
     return browser
 
 
+def get_search_view(request):
+    search_view = None
+
+    if "view" in request.GET:
+        search_views = SearchView.objects.filter(id=int(request.GET["view"]))
+        if search_views.exists():
+            search_view = search_views[0]
+
+    if not search_view:
+        search_views = SearchView.objects.filter(name = "Default")
+        if search_views.exists():
+            search_view = search_views[0]
+
+    return search_view
+
+
 class ViewPage(object):
     def __init__(self, request):
         self.request = request
@@ -105,7 +122,7 @@ class ViewPage(object):
         context["debug"] = config.debug_mode
 
         if (
-            self.is_user_allowed(self.view_access_type)
+            self.is_user_allowed_complete()
             and config.enable_background_jobs
         ):
             context.update(c.get_context())
@@ -127,10 +144,18 @@ class ViewPage(object):
         else:
             context["user_config"] = UserConfig.get()
 
+        if context["is_user_allowed"]:
+            context["searchviews"] = SearchView.objects.filter(user=False, default=False)
+            context["usersearchviews"] = SearchView.objects.filter(user=True, default=False)
+            context["searchview"] = get_search_view(self.request)
+
         context["config"] = ConfigurationEntry.get()
         context["view"] = self
 
         return context
+
+    def is_user_allowed_complete(self):
+        return self.is_user_allowed(self.view_access_type)
 
     def read_mobile_status(self):
         from django_user_agents.utils import get_user_agent

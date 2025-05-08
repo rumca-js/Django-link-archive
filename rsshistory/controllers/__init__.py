@@ -40,3 +40,9 @@ from .system import (
 )
 
 from .searchengines import SearchEngines, SearchEngineGoogle, SearchEngineGoogleCache
+
+from .wizards import (
+    system_setup_for_news,
+    system_setup_for_gallery,
+    system_setup_for_search_engine,
+)

@@ -44,8 +44,8 @@ function getExistingObjectLink(object_id) {
 
 
 let currentaddLink = 0;
-function addLink(page_url) {
-    let url = `{% url 'rsshistory:entry-add-json' %}?link=${page_url}`;
+function addLink(page_url, browser, attempt=1) {
+    let url = `{% url 'rsshistory:entry-add-json' %}?link=${page_url}&browser=${browser}`;
     
     let requestaddLink = ++currentaddLink;
 
@@ -79,7 +79,7 @@ function addLink(page_url) {
            }
            if (attempt < 3) {
                $("#formResponse").html("Could not obtain information. Retry");
-               checkEntryExists(page_url, browser, attempt + 1);
+               addLink(page_url, browser, attempt + 1);
            } else {
                resetSearch("Could not obtain information if link exists.");
            }
@@ -89,7 +89,7 @@ function addLink(page_url) {
 
 
 let currentcheckEntryExists = 0;
-function checkEntryExists(page_url, browser, attempt=1) {
+function checkEntryExistsAndAdd(page_url, browser, attempt=1) {
     $("#formResponse").html(`Checking if link exists ${page_url}`);
 
     let url = `{% url 'rsshistory:entry-is' %}?link=${page_url}`;
@@ -124,7 +124,7 @@ function checkEntryExists(page_url, browser, attempt=1) {
            }
            if (attempt < 3) {
                $("#formResponse").html("Could not obtain information. Retry");
-               checkEntryExists(page_url, browser, attempt + 1);
+               checkEntryExistsAndAdd(page_url, browser, attempt + 1);
            } else {
                resetSearch("Could not obtain information if link exists.");
            }
@@ -144,7 +144,7 @@ function onUserInput() {
 
    $('#btnFetch').prop("disabled", true);
    
-   checkEntryExists(page_url, browser);
+   addLink(page_url, browser);
 }
 
 
@@ -184,29 +184,62 @@ $('#theForm input[name="link"]').on('input', function() {
     let search_link = element.val();
 
     if (search_link) {
-        let url = `{% url 'rsshistory:cleanup-link-json' %}?link=${encodeURIComponent(search_link)}`;
-
-        fetch(url)
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(data => {
-                console.log('Fetched data:', data);
-
-                // Clear old suggestions
-                $('#Suggestions').empty();
-                $('#Suggestions').append(`<div>Other link suggestions</div>`);
-
-                if (data.status && Array.isArray(data.links)) {
-                    // Populate suggestions
-                    data.links.forEach(link => {
-                        $('#Suggestions').append(`<div class="suggestion-item btn btn-secondary">${link}</div>`);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-            });
+       checkEntryExistsInDb(search_link);
+       fetchLinkSuggestions(search_link);
     }
 });
+
+
+function checkEntryExistsInDb(search_link) {
+    let entryCheckUrl = `{% url 'rsshistory:entry-is' %}?link=${encodeURIComponent(search_link)}`;
+
+    fetch(entryCheckUrl)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(entryData => {
+            console.log('Entry check data:', entryData);
+            $('#EntryExists').empty();
+
+            if (entryData.status) {
+                $('#btnFetch').prop("disabled", true);
+
+                let link_text = getExistingObjectLink(entryData.pk);
+                $('#EntryExists').append(`<div>The entry already exists ${link_text}.</div>`);
+            }
+            else {
+                $('#btnFetch').prop("disabled", false);
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+        });
+}
+
+
+function fetchLinkSuggestions(search_link) {
+    let url = `{% url 'rsshistory:cleanup-link-json' %}?link=${encodeURIComponent(search_link)}`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Fetched data:', data);
+
+            $('#Suggestions').empty();
+
+            if (data.status && Array.isArray(data.links) && data.links.length > 0) {
+                $('#Suggestions').append(`<div>Other link suggestions</div>`);
+
+                data.links.forEach(link => {
+                    $('#Suggestions').append(`<div class="suggestion-item btn btn-secondary">${link}</div>`);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+        });
+}

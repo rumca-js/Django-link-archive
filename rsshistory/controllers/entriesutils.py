@@ -424,8 +424,9 @@ class EntryScanner(object):
 
 
 class EntryUpdater(object):
-    def __init__(self, entry):
+    def __init__(self, entry, browser=None):
         self.entry = entry
+        self.browser = browser
 
     def is_entry_changed(self, all_properties):
         entry = self.entry
@@ -573,7 +574,7 @@ class EntryUpdater(object):
 
         entry = w.entry
 
-        url = EntryUrlInterface(entry.link)
+        url = EntryUrlInterface(entry.link, browser=self.browser)
         props = url.get_props()
 
         handler = UrlHandlerEx(url=entry.link)
@@ -664,7 +665,7 @@ class EntryUpdater(object):
 
         entry = w.entry
 
-        url = EntryUrlInterface(entry.link)
+        url = EntryUrlInterface(entry.link, browser=browser)
         props = url.get_props()
 
         handler = UrlHandlerEx(url=entry.link)
@@ -1463,11 +1464,13 @@ class EntryDataBuilder(object):
         allow_recursion=True,
         ignore_errors=False,
         strict_ids=False,
+        browser=None
     ):
         self.link = link
         self.link_data = link_data
         self.strict_ids = strict_ids
         self.source_is_auto = source_is_auto
+        self.browser = None
 
         if self.link:
             return self.build_from_link()
@@ -1565,7 +1568,7 @@ class EntryDataBuilder(object):
             )
             return
 
-        url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
+        url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors, browser=self.browser)
         link_data = url.get_props()
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:

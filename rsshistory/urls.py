@@ -27,6 +27,7 @@ from .viewspkg import (
     useractions,
     userhistory,
     blockentry,
+    searchviews,
 )
 
 # register app namespace
@@ -37,18 +38,12 @@ app_name = str(LinkDatabase.name)
 urlpatterns = [
     path("", system.index, name="index"),
     path("entries/", entries.entries, name="entries"),
-    path("entries-recent/", entries.entries_recent, name="entries-recent"),
-    path("entries-bookmarked/", entries.entries_bookmarked, name="entries-bookmarked"),
     path("entries-user-bookmarked/", entries.entries_user_bookmarked, name="entries-user-bookmarked"),
     path("entries-archived/", entries.entries_archived, name="entries-archived"),
-    path("entries-untagged/", entries.entries_untagged, name="entries-untagged"),
 
     path("entries-json/", entries.entries_json, name="entries-json"),
-    path("entries-json-recent/", entries.entries_json_recent, name="entries-json-recent"),
-    path("entries-json-bookmarked/", entries.entries_json_bookmarked, name="entries-json-bookmarked"),
     path("entries-json-user-bookmarked/", entries.entries_json_user_bookmarked, name="entries-json-user-bookmarked"),
     path("entries-json-archived/", entries.entries_json_archived, name="entries-json-archived"),
-    path("entries-json-untagged/", entries.entries_json_untagged, name="entries-json-untagged"),
 
     path("entries-remove-all", entries.entries_remove_all, name="entries-remove-all"),
     path("entries-remove-nonbookmarked", entries.entries_remove_nonbookmarked, name="entries-remove-nonbookmarked"),
@@ -265,6 +260,10 @@ urlpatterns = [
     path("is-url-allowed", tools.is_url_allowed, name="is-url-allowed",),
     path("gateways", tools.gateways, name="gateways",),
     path("gateways-initialize", tools.gateways_initialize, name="gateways-initialize",),
+    path("searchviews-initialize", searchviews.searchviews_initialize, name="searchviews-initialize",),
+    path("searchviews/", searchviews.SearchViewListView.as_view(), name="searchviews",),
+    path("searchview/<int:pk>/", searchviews.SearchViewDetailView.as_view(), name="searchview",),
+    path("searchview-edit/<int:pk>/", searchviews.edit, name="searchview-edit",),
     path("search-engines", tools.search_engines, name="search-engines",),
     path("cleanup-link", tools.cleanup_link, name="cleanup-link",),
     path("cleanup-link-json", tools.cleanup_link_json, name="cleanup-link-json",),

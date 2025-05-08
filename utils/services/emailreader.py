@@ -76,49 +76,73 @@ class EmailReader(object):
         raw_email = msg_data[0][1]
 
         msg = email.message_from_bytes(raw_email)
+
         mail = Email()
         mail.id = msg["Message-ID"]
+        mail.title = self.decode_mime_words(msg["Subject"])
+        mail.body = self.extract_email_body(msg)
+        mail.date_published = self.extract_email_date(msg)
+        mail.author = self.extract_email_author(msg)
 
-        subject = self.decode_mime_words(msg["Subject"])
+        return mail
 
-        body = None
-        # Get the email body
-        if msg.is_multipart():
-            for part in msg.walk():
-                if part.get_content_type() == "text/plain":
-                    try:
-                        body = part.get_payload(decode=True).decode()
-                    except UnicodeDecodeError as E:
-                        print("Cannot decode message body")
-                    break
-        else:
-            try:
-                body = msg.get_payload(decode=True).decode()
-            except UnicodeDecodeError as E:
-                print("Cannot decode message body")
+    def extract_email_author(self, msg):
+        name, addr = parseaddr(msg["From"])
+        decoded_name = self.decode_mime_words(name)
+        return f"{decoded_name} <{addr}>" if decoded_name else addr
 
-
+    def extract_email_date(self, msg):
         # Extract and parse the sent date
         date_header = msg["Date"]
         if date_header:
-            #print("date_header")
-            #print(date_header)
             try:
-                mail.date_published = parsedate_to_datetime(date_header)
+                return parsedate_to_datetime(date_header)
             except Exception as e:
                 print(f"Failed to parse email date: {e}")
-                mail.date_published = None
+
+    def extract_email_body(self, msg):
+        """
+        Extracts the email body from an email.message.Message object.
+        Prefers 'text/plain', falls back to 'text/html' if needed.
+        Handles different character encodings gracefully.
+
+        @return body, or None
+        """
+        body = None
+
+        if msg.is_multipart():
+            # Try to get the plain text part first
+            for part in msg.walk():
+                content_type = part.get_content_type()
+                content_disposition = str(part.get("Content-Disposition"))
+                if content_type == "text/plain" and "attachment" not in content_disposition:
+                    charset = part.get_content_charset() or 'utf-8'
+                    try:
+                        body = part.get_payload(decode=True).decode(charset, errors='replace')
+                        return body  # Prefer plain text; return early
+                    except Exception as e:
+                        print(f"Failed to decode plain text part: {e}")
+            
+            # Fallback to HTML part if no plain text found
+            for part in msg.walk():
+                content_type = part.get_content_type()
+                content_disposition = str(part.get("Content-Disposition"))
+                if content_type == "text/html" and "attachment" not in content_disposition:
+                    charset = part.get_content_charset() or 'utf-8'
+                    try:
+                        body = part.get_payload(decode=True).decode(charset, errors='replace')
+                        return body
+                    except Exception as e:
+                        print(f"Failed to decode HTML part: {e}")
         else:
-            mail.date_published = None
+            # Not multipart — just decode the single payload
+            charset = msg.get_content_charset() or 'utf-8'
+            try:
+                body = msg.get_payload(decode=True).decode(charset, errors='replace')
+            except Exception as e:
+                print(f"Failed to decode body: {e}")
 
-        mail.title = subject
-        mail.body = body
-
-        name, addr = parseaddr(msg["From"])
-        decoded_name = self.decode_mime_words(name)
-        mail.author = f"{decoded_name} <{addr}>" if decoded_name else addr
-
-        return mail
+        return body
 
     def decode_mime_words(self, header_value):
         if header_value is None:
