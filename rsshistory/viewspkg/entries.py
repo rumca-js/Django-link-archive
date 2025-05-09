@@ -173,17 +173,19 @@ class EntriesSearchListView(object):
 
         print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
-        if search_view.entry_limit != 0:
-            objects = self.get_filtered_objects().order_by(*self.get_order_by())[:search_view.entry_limit]
-        else:
-            objects = self.get_filtered_objects().order_by(*self.get_order_by())
-        print("EntriesSearchListView:get_queryset done {}".format(objects.query))
+
+        queryset = self.get_filtered_objects().order_by(*self.get_order_by()).distinct()
+
+        if search_view.entry_limit:
+            queryset = queryset[:search_view.entry_limit]
+
+        print("EntriesSearchListView:get_queryset done {}".format(queryset.query))
 
         config = Configuration.get_object().config_entry
         if config.debug_mode:
-            self.query = objects.query
+            self.query = queryset.query
 
-        return objects
+        return queryset
 
     def get_paginate_by(self):
         """
