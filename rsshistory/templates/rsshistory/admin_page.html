@@ -73,6 +73,11 @@
                    <img src="{% static 'rsshistory/icons/icons8-database-export-100.png' %}" class="content-icon" />
                    Data Exports</a>
            </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:searchviews' %}" title="Searchviews" class="nav-link">
+		   <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="content-icon" />
+                   Search views</a>
+           </li>
            {% if 0 %}
            <li class="list-group-item">
                <a href="{% url 'rsshistory:import-from-files' %}" title="Import from a directory" class="nav-link">Import from a directory</a>

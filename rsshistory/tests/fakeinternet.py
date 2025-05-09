@@ -34,6 +34,7 @@ from ..models import (
     ConfigurationEntry,
     Browser,
     EntryRules,
+    SearchView,
 )
 from ..configuration import Configuration
 from ..pluginurl import UrlHandlerEx
@@ -399,6 +400,8 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.save()
 
         c.apply_robots_txt()
+
+        SearchView.objects.create(name="Default", order_by="-date_created, link", default=True)
 
         EntryRules.objects.create(
             rule_name="casinos-block",

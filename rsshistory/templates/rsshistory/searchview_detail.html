@@ -1,0 +1,31 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+{% if user.is_staff %}
+
+<a href="{% url 'rsshistory:searchview-edit' object.id %}" class="btn btn-primary" title="Edit">
+   {% include "rsshistory/icon_edit.html" %}
+</a>
+
+<a href="{% url 'rsshistory:searchview-remove' object.id %}" class="btn btn-primary" title="Remove">
+   <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+</a>
+
+{% endif %}
+
+<h1>{{object.name}}</h1>
+
+<div>ID: {{object.id}}</div>
+<div>Name: {{object.name}}</div>
+<div>Hover text:{{object.hover_text}}</div>
+<div>Icon:{{object.icon}}</div>
+<div>Order By:{{object.order_by}}</div>
+<div>Entry limit:{{object.entry_limit}}</div>
+<div>Auto fetch:{{object.auto_fetch}}</div>
+<div>date published day limit:{{object.date_published_day_limit}}</div>
+<div>date created day limit:{{object.date_created_day_limit}}</div>
+<div>user:{{object.user}}</div>
+<div>conditions: {{object.get_conditions}}</div>
+
+{% endblock %}

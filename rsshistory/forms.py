@@ -280,11 +280,27 @@ class SearchViewForm(forms.ModelForm):
     class Meta:
         model = SearchView
         fields = [
+            "name",
+            "default",
+            "hover_text",
+            "filter_statement",
+            "icon",
+            "order_by",
+            "entry_limit",
+            "auto_fetch",
+            "date_published_day_limit",
+            "date_created_day_limit",
+            "user",
         ]
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["hover_text"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["filter_statement"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["icon"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["order_by"].widget.attrs.update(size=self.init.get_cols_size())
 
 
 class ApiKeysForm(forms.ModelForm):

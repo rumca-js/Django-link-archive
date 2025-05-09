@@ -235,9 +235,9 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
    const requestVersion = ++currentLoadRowListContentCounter;
 
    const status_text = '<span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span> Loading... ';
-   $('#listStatus').show();
+   //$('#listStatus').show();
    $('#footerStatus').show();
-   $('#listStatus').html(status_text);
+   //$('#listStatus').html(status_text);
    $('#footerStatus').html(status_text);
 
     $.ajax({
@@ -252,8 +252,8 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
             object_list_data = data;
             fillListData();
             $('#listStatus').html("");
-            $('#footerStatus').html("");
             $('#listStatus').hide();
+            $('#footerStatus').html("");
             $('#footerStatus').hide();
 
             loadSearchHistory();

@@ -1,0 +1,30 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+   <a href="{% url 'rsshistory:searchview-add' %}" title="Add new search view" class="btn btn-primary" role="button">
+       {% include "rsshistory/icon_add.html" %}
+   </a>
+</div>
+
+<h1>Search views</h1>
+  {% if content_list %}
+     <div class="list-group">
+         {% for search_view in content_list %}
+             <a href="{% url 'rsshistory:searchview' search_view.id %}"
+               class="my-1 p-1 list-group-item list-group-item-action"
+               title=""
+              {% if search_view.default %}
+	       style="font-weight:bold;"
+              {% endif %}
+             >
+              ID: {{search_view.id}}
+              Name: {{search_view.name}}
+            </a>
+         {% endfor %}
+  {% else %}
+    No rules yet
+  {% endif %}
+
+{% endblock %} 
