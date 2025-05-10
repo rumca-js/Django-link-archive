@@ -33,6 +33,16 @@ Personal link database, link aggregator, with RSS functionality.
  - YouTube download support through yt-dlp project
  - E-mail IMAP support (Gmail via app passwords)
 
+### Gmail [under construction]
+
+1. Create a Google Cloud project [here](https://console.cloud.google.com/projectcreate).
+1. Open [Gmail in API & Services](https://console.cloud.google.com/apis/library/gmail.googleapis.com) and activate the Gmail API.
+1. Open the [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent) and create a new consent screen. You only need to provide a name and contact data.
+1. Next open [Create OAuth client ID](https://console.cloud.google.com/apis/credentials/oauthclient) and create credentials for a `Desktop app`. Download the credentials file and save it under `credentials.json` in the root of this repository.
+1. Use credentials when devices source
+
+Here is a detailed guide on how to create the credentials: [https://developers.google.com/gmail/api/quickstart/python#set_up_your_environment](https://developers.google.com/gmail/api/quickstart/python#set_up_your_environment).
+
 ## Crawling
 
  - some Internet crawling capabilities
