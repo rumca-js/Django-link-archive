@@ -7,6 +7,7 @@ Personal link database, link aggregator, with RSS functionality.
  - YouTube link manager, frontend
  - Very simple search engine
  - data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains, etc.
+ - Email client
 
 <div align="center">
   <img alt="Django Logo" src="images/django_400.png" width="400px">
@@ -43,19 +44,6 @@ Personal link database, link aggregator, with RSS functionality.
 
 Here is a detailed guide on how to create the credentials: [https://developers.google.com/gmail/api/quickstart/python#set_up_your_environment](https://developers.google.com/gmail/api/quickstart/python#set_up_your_environment).
 
-## Crawling
-
- - some Internet crawling capabilities
- - link search. Simple implementation, does not use elastic search
- - does not support proxy rotation. This is ethical web crawling, it should not spam with requests
- - configurable user agents, crawlers, selenium, requests, chrome undetected, crawlee, easily extendible
- - if you need a real web crawler, you may use scrapy, or apache nutch, etc.
-
-## Privacy
-
- - local data, no algorithms, no advertisements, self-hosted
- - local user action tracking. You can observe and analyze history of your 'views', 'searches', 'comments', 'browsing history'
- 
 <div align="center">
   <img alt="Django Logo" src="images/old-wild-west.jpg" width="500px">
 </div>
@@ -81,6 +69,18 @@ Here is a detailed guide on how to create the credentials: [https://developers.g
  - [Data analysis](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
  - [Development](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md)
 
+# How does it work?
+
+ - System checks "sources" regularly
+ - For RSS sources new entries are read, for email server new emails are read, etc. etc.
+ - new links are inserted into database
+ - at certain point in time exports are being performed (to github)
+ 
+## Privacy
+
+ - local data, no algorithms, no advertisements, self-hosted
+ - local user action tracking. You can observe and analyze history of your 'views', 'searches', 'comments', 'browsing history'
+ 
 ## Alternatives
 
 Alternative programs for link bookmarking do exist.
@@ -105,13 +105,13 @@ Alternative programs for link bookmarking do exist.
 
 Awasome list at [Github](https://github.com/awesome-selfhosted/awesome-selfhosted?tab=readme-ov-file#bookmarks-and-link-sharing).
 
-# How does it work?
+## Crawling
 
- - System reads "sources" regularly
- - Each "source" is checked regularly for new data. RSS feeds are one type of source
- - new links are inserted into database
- - every day your bookmarks can be exported to a repository, if configured
- - new links are used to populate popular "keywords"
+ - some Internet crawling capabilities
+ - link search. Simple implementation, does not use elastic search
+ - does not support proxy rotation. This is ethical web crawling, it should not spam with requests
+ - configurable user agents, crawlers, selenium, requests, chrome undetected, crawlee, easily extendible
+ - if you need a real web crawler, you may use scrapy, or apache nutch, etc.
 
 # Ranking algorithm
 
