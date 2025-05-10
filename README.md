@@ -75,7 +75,15 @@ Here is a detailed guide on how to create the credentials: [https://developers.g
  - For RSS sources new entries are read, for email server new emails are read, etc. etc.
  - new links are inserted into database
  - at certain point in time exports are being performed (to github)
- 
+
+# Track your actions
+
+You can easily see all your behvior in app.
+
+ - You can see your entire browse history. Across youtube, internet, emails, etc. etc
+ - only for accounts defined in this project
+  - it is configurable if tracking is enabled
+
 ## Privacy
 
  - local data, no algorithms, no advertisements, self-hosted
