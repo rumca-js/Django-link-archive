@@ -183,14 +183,6 @@ Format:
 https://yourpage.com/your-app/index?key=yourgeneratedkey
 ```
 
-# History
-
-You can keep locally your own web browsing history. Forget about browser history or bookmarks.
-
-With this self-hostied solution you do not need to sync anything, as everything resides on this server.
-
-Forget about YouTube video browsing history, or subscriptions. You can control what you see and when!
-
 # Scripts
 
 Web-crawling functionality can be also used without django.
