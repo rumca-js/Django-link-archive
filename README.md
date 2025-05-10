@@ -34,17 +34,6 @@ Personal link database, link aggregator, with RSS functionality.
  - YouTube download support through yt-dlp project
  - E-mail IMAP support (Gmail via app passwords)
 
-### Gmail [under construction]
-
-1. Create a Google Cloud project [here](https://console.cloud.google.com/projectcreate).
-1. Open [Gmail in API & Services](https://console.cloud.google.com/apis/library/gmail.googleapis.com) and activate the Gmail API.
-1. Open the [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent) and create a new consent screen. You only need to provide a name and contact data.
-1. Next open [Create OAuth client ID](https://console.cloud.google.com/apis/credentials/oauthclient) and create credentials for a `Desktop app`.
-1. On [Audience](https://console.cloud.google.com/auth/audience) click 'Publish app'
-1. Create source in django-link-archive. Provide client_id as user and secret as a password
-
-Here is a detailed guide on how to create the credentials: [https://developers.google.com/gmail/api/quickstart/python#set_up_your_environment](https://developers.google.com/gmail/api/quickstart/python#set_up_your_environment).
-
 <div align="center">
   <img alt="Django Logo" src="images/old-wild-west.jpg" width="500px">
 </div>
@@ -300,3 +289,15 @@ Archive.org:
 # Ending notes
 
 All links belong to us!
+
+
+### Gmail access [under construction]
+
+1. Create a Google Cloud project [here](https://console.cloud.google.com/projectcreate).
+1. Open [Gmail in API & Services](https://console.cloud.google.com/apis/library/gmail.googleapis.com) and activate the Gmail API.
+1. Open the [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent) and create a new consent screen. You only need to provide a name and contact data.
+1. Next open [Create OAuth client ID](https://console.cloud.google.com/apis/credentials/oauthclient) and create credentials for a `Desktop app`.
+1. On [Audience](https://console.cloud.google.com/auth/audience) click 'Publish app'
+1. Create source in django-link-archive. Provide client_id as user and secret as a password
+
+Here is a detailed guide on how to create the credentials: [https://developers.google.com/gmail/api/quickstart/python#set_up_your_environment](https://developers.google.com/gmail/api/quickstart/python#set_up_your_environment).
