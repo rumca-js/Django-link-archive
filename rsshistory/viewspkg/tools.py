@@ -762,10 +762,18 @@ Steps to enable:
  - you will receive YOUR_CLIENT_ID and YOUR_CLIENT_SECRET
 """
 
+
 def gmail_auth(request):
+    client_id = "YOUR_CLIENT_ID"
+
+    config = Configuration.get_object().config_entry
+    location = config.instance_internet_location
+
+    redirect_uri = f'{location}/oauth2callback/'
+
     params = {
-        'client_id': 'YOUR_CLIENT_ID',
-        'redirect_uri': 'http://localhost:8000/oauth2callback/',
+        'client_id': client_id,
+        'redirect_uri': redirect_uri,
         'response_type': 'code',
         'scope': 'https://www.googleapis.com/auth/gmail.readonly',
         'access_type': 'offline',
@@ -778,20 +786,44 @@ def gmail_auth(request):
 def oauth2callback(request):
     code = request.GET.get('code')
 
+    client_id = "YOUR_CLIENT_ID"
+    client_secret = "YOUR_CLIENT_SECRET"
+
+    config = Configuration.get_object().config_entry
+    location = config.instance_internet_location
+
+    redirect_uri = f'{location}/oauth2callback/'
+
     data = {
         'code': code,
-        'client_id': 'YOUR_CLIENT_ID',
-        'client_secret': 'YOUR_CLIENT_SECRET',
-        'redirect_uri': 'http://localhost:8000/oauth2callback/',
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'redirect_uri': redirect_uri,
         'grant_type': 'authorization_code',
     }
 
     response = requests.post('https://oauth2.googleapis.com/token', data=data)
     token_data = response.json()
-    access_token = token_data['access_token']
+
+    access_token = token_data.get('access_token')
     refresh_token = token_data.get('refresh_token')
 
-    # TODO save tokens
+    # Save both tokens (assuming your Credentials model has a field `token_type`)
+    if access_token:
+        Credentials.objects.create(
+            client_id=client_id,
+            client_secret=client_secret,
+            token_type="access_token",
+            token=access_token
+        )
+
+    if refresh_token:
+        Credentials.objects.create(
+            client_id=client_id,
+            client_secret=client_secret,
+            token_type="refresh_token",
+            token=refresh_token
+        )
 
 
 def read_gmail(access_token):

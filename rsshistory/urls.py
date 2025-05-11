@@ -297,6 +297,8 @@ urlpatterns = [
     path("get-settings/", system.get_settings, name="get-settings"),
     path("get-read-later-queue/", readlater.get_read_later_queue, name="get-read-later-queue"),
     path("get-page-properties", tools.get_page_properties, name="get-page-properties",),
+    path("gmail-auth", tools.gmail_auth, name="gmail-auth",),
+    path("oauth2callback", tools.oauth2callback, name="oauth2callback",),
     # login
     path("accounts/", include("django.contrib.auth.urls")),
     path("rsshistory/accounts/logout/", RedirectView.as_view(url="rsshistory/")),

@@ -4,6 +4,7 @@
 let entry_json_data = null;
 let entry_dislike_data = null;
 let is_downloading = false;
+let is_updating = false;
 
 
 function getEditButton() {
@@ -28,6 +29,16 @@ function fillIsEntryDownloaded(attempt = 1) {
             if (requestIsDownloading != currentIsDownloading) {
                 return;
             }
+
+            if ((!is_downloading || !is_updating) && (data.is_downloading || data.is_downloading))
+            {
+                setTimeout(() => fillIsEntryDownloaded(), 60000);
+            }
+            else if ((is_downloading || is_updating) && (!data.is_downloading && !data.is_downloading))
+            {
+                getEntryJson();
+            }
+
             is_downloading = data.is_downloading;
 
             if (is_downloading) {
@@ -42,6 +53,7 @@ function fillIsEntryDownloaded(attempt = 1) {
             if (is_updating) {
                 const text = getDownloadingText("Fetching link data...");
                 $('#entryUpdateContainer').html(text);
+
             }
             else {
                 $('#entryUpdateContainer').html("");
@@ -64,19 +76,6 @@ function loadEntryDynamicDetails(attempt = 1) {
 }
 
 
-// TODO move to library
-function formatNumber(num) {
-    if (num >= 1e9) {
-        return (num / 1e9).toFixed(1) + "B"; // Billions
-    } else if (num >= 1e6) {
-        return (num / 1e6).toFixed(1) + "M"; // Millions
-    } else if (num >= 1e3) {
-        return (num / 1e3).toFixed(1) + "K"; // Thousands
-    }
-    return num.toString(); // Small numbers
-}
-
-
 function fillDislike() {
     let parameters = $('#entryParameters').html();
 
@@ -84,9 +83,9 @@ function fillDislike() {
 
     let text = [];
 
-    if (thumbs_up) text.push(`<div class="text-nowrap mx-1">👍${formatNumber(thumbs_up)}</div>`);
-    if (thumbs_down) text.push(`<div class="text-nowrap mx-1">👎${formatNumber(thumbs_down)}</div>`);
-    if (view_count) text.push(`<div class="text-nowrap mx-1">👁${formatNumber(view_count)}</div>`);
+    if (thumbs_up) text.push(`<div class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</div>`);
+    if (thumbs_down) text.push(`<div class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</div>`);
+    if (view_count) text.push(`<div class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</div>`);
 
     if (upvote_ratio) text.push(`<div class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</div>`);
     if (upvote_view_ratio) text.push(`<div class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</div>`);
@@ -194,8 +193,25 @@ function updateEntry() {
     });
 
     tag_string += getEditButton();
-
     $("#entryTagContainer").html(tag_string);
+
+    $("#entryTitle").html(entry_json_data.title);
+    $("#entryDescription").html(entry_json_data.description);
+    $("#entryLanguage").html(entry_json_data.language);
+    $("#entryAuthor").html(entry_json_data.author);
+    $("#entryAlbum").html(entry_json_data.album);
+    $("#entryAge").html(entry_json_data.age);
+    $("#entryDatePublished").html(entry_json_data.date_published);
+    $("#entryDateCreated").html(entry_json_data.date_created);
+    $("#entryDateUpdateLast").html(entry_json_data.date_update_last);
+    $("#entryDateModified").html(entry_json_data.date_last_modified);
+    $("#entryDateDeadSince").html(entry_json_data.date_dead_since);
+    $("#entryStatusCode").html(entry_json_data.status_code);
+    $("#entryManualStatusCode").html(entry_json_data.manual_status_code);
+    $("#entryPageRatingVisits").html(entry_json_data.page_rating_visits);
+    $("#entryPageRatingVotes").html(entry_json_data.page_rating_votes);
+    $("#entryPermanent").html(entry_json_data.permanent);
+    $("#entryBookmarked").html(entry_json_data.bookmarked);
 
     $('#editTagsButton').show();
 }
@@ -376,10 +392,3 @@ $(document).on('click', '#cancelTagEdit', function() {
 loadEntryDynamicDetails();
 loadDislikeData();
 fillIsEntryDownloaded();
-getEntryJson();
-
-
-setInterval(function() {
-    fillIsEntryDownloaded();
-    getEntryJson();
-}, 300000);

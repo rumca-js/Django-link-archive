@@ -273,9 +273,12 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
 
 
 function fillOneEntry(entry) {
-    let datePublished = new Date(entry.date_published);
-    if (isNaN(datePublished)) {
-        datePublished = new Date();
+    let datePublishedStr = "";
+    if (entry.date_published) {
+        let datePublished = new Date(entry.date_published);
+        if (!isNaN(datePublished)) {
+            datePublishedStr = datePublished.toLocaleString();
+        }
     }
 
     const templateMap = {
@@ -328,7 +331,7 @@ function fillOneEntry(entry) {
         .replace(/{page_rating}/g, entry.page_rating)
         .replace(/{source__title}/g, source__title)
         .replace(/{age}/g, entry.age)
-        .replace(/{date_published}/g, datePublished.toLocaleString());
+        .replace(/{date_published}/g, datePublishedStr);
 
     return listItem;
 }

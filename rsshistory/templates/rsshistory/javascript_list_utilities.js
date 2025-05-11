@@ -208,7 +208,7 @@ function loadSearchHistory(attempt = 1) {
 
 let currentLoadRowListContentCounter = 0;
 function loadRowListContent(search_term = '', page = '', attempt = 1) {
-   $('.btnFilterTrigger').prop("disabled", true);
+   disableFilterButton();
 
    const currentUrl = new URL(window.location);
    const currentSearch = currentUrl.searchParams.get('search') || '';
@@ -275,9 +275,24 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
             }
         },
         complete: function() {
-            $('.btnFilterTrigger').prop("disabled", false);
+	    enableFilterButton();
         }
     });
+}
+
+
+function enableFilterButton() {
+   const status_text = '🔍';
+    $('#btnFilterForm').html(status_text);
+
+    $('.btnFilterTrigger').prop("disabled", false);
+}
+
+function disableFilterButton() {
+   const status_text = '<span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span>';
+    $('#btnFilterForm').html(status_text);
+
+    $('.btnFilterTrigger').prop("disabled", true);
 }
 
 
@@ -330,7 +345,7 @@ $(document).on('click', '#btnSearchHistory', function(e) {
 $('#filterForm input[name="search"]').on('input', function() {
     var search_term = $('#filterForm input[name="search"]').val();
 
-    $('.btnFilterTrigger').prop("disabled", false);
+    //disableFilterButton();
 
     $('#searchSyntax').hide();
     $('#searchSuggestions').empty();

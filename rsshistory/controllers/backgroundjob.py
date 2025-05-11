@@ -485,7 +485,7 @@ class BackgroundJobController(BackgroundJob):
             entry.link,
         )
 
-    def entry_reset_data(entry, force=False):
+    def entry_reset_data(entry, force=False, browser=None):
         """
         Do not update, if it was updated recently
         """

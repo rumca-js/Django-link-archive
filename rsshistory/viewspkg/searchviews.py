@@ -16,6 +16,7 @@ from ..models import (
 from ..configuration import Configuration
 from ..views import ViewPage, GenericListView
 from ..forms import SearchViewForm
+from ..queryfilters import DjangoEquationProcessor
 
 
 class SearchViewListView(GenericListView):
@@ -67,6 +68,15 @@ def searchviews_initialize(request):
     return p.render("go_back.html")
 
 
+def get_form_condition_errors(form):
+    if form.cleaned_data["filter_statement"] != "":
+        processor = DjangoEquationProcessor(form.cleaned_data["filter_statement"])
+        errors = processor.get_errors()
+
+        if len(errors) > 0:
+            return errors
+
+
 def searchview_edit(request, pk):
     p = ViewPage(request)
     p.set_title("Edit searchview")
@@ -81,11 +91,18 @@ def searchview_edit(request, pk):
 
     if request.method == "POST":
         form = SearchViewForm(request.POST, instance=objs[0])
-        if form.is_valid():
-            if objs[0].default and not form.cleaned_data["default"]:
-                p.context["summary_text"] = "Cannot disable default view!"
-                return p.render("go_back.html")
+        errors = get_form_condition_errors(form)
 
+        if objs[0].default and not form.cleaned_data["default"]:
+            p.context["summary_text"] = "Cannot disable default view!"
+            return p.render("go_back.html")
+
+        elif errors and len(errors) > 0:
+            error_message = "\n".join(errors)
+            p.context["summary_text"] = "Form is invalid: {}".format(error_message)
+            return p.render("summary_present.html")
+
+        elif form.is_valid():
             form.save()
 
             return HttpResponseRedirect(
@@ -112,11 +129,19 @@ def searchview_add(request):
 
     if request.method == "POST":
         form = SearchViewForm(request.POST)
-        if form.is_valid():
+        errors = get_form_condition_errors(form)
+
+        if errors and len(errors) > 0:
+            error_message = "\n".join(errors)
+            p.context["summary_text"] = "Form is invalid: {}".format(error_message)
+            return p.render("summary_present.html")
+
+        elif form.is_valid():
             form.save()
             return HttpResponseRedirect(
                 reverse("{}:searchviews".format(LinkDatabase.name))
             )
+
         else:
             error_message = "\n".join(
                 [

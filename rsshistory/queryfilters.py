@@ -472,6 +472,9 @@ class DjangoEquationProcessor():
 
         return self.parser.get_query_result()
 
+    def get_errors(self):
+        return self.parser.get_errors()
+
 
 class OmniSearchFilter(BaseQueryFilter):
     def __init__(self, args, user=None, init_objects=None):

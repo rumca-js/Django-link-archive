@@ -148,6 +148,29 @@ function onUserInput() {
 }
 
 
+function onInputChanged() {
+    let element = $('#theForm input[name="link"]');
+    let search_link = element.val();
+
+    if (search_link) {
+       let new_search_link = fixStupidGoogleRedirects(search_link)
+
+       if (new_search_link != search_link) {
+          let element = $('#theForm input[name="link"]');
+          element.val(new_search_link);
+          search_link = new_search_link;
+       }
+
+       checkEntryExistsInDb(search_link);
+       fetchLinkSuggestions(search_link);
+    }
+    else {
+       $('#EntryExists').html("")
+       $('#Suggestions').html("")
+    }
+}
+
+
 $(document).ready(function() {
    $("#btnFetch").click(function(event) {
        event.preventDefault();
@@ -176,17 +199,13 @@ $(document).on('click', '.suggestion-item', function(event) {
     let text = $(this).text();
     console.log(`Clicked on element ${text}`);
     element.val(text);
+
+    onInputChanged();
 });
 
 
 $('#theForm input[name="link"]').on('input', function() {
-    let element = $('#theForm input[name="link"]');
-    let search_link = element.val();
-
-    if (search_link) {
-       checkEntryExistsInDb(search_link);
-       fetchLinkSuggestions(search_link);
-    }
+    onInputChanged();
 });
 
 
