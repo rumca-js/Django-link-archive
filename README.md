@@ -32,7 +32,7 @@ Personal link database, link aggregator, with RSS functionality.
  - support for archived pages through InternetArchive, or any configured archive medium
  - GitHub support. Exports. For example [Internet domains, users, projects](https://github.com/rumca-js/Internet-Places-Database), using tokens
  - YouTube download support through yt-dlp project
- - E-mail IMAP support (Gmail via app passwords)
+ - E-mail IMAP support (Gmail support is not going to happen, because it is hostile for email clients. If you have gmail, then forward mails to a normal server with normal IMAP access, and attach your client there)
 
 <div align="center">
   <img alt="Django Logo" src="images/old-wild-west.jpg" width="500px">
