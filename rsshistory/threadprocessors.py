@@ -177,11 +177,17 @@ class RefreshProcessor(CeleryTaskInterface):
         resident = memory.rss / (1024 * 1024)
         virtual = memory.vms / (1024 * 1024)
 
-        AppLogging.debug("{}: Starting. Pid:{} Memory:{}/{} MB".format(self.get_name(), pid, resident, virtual))
+        AppLogging.debug(
+            "{}: Starting. Pid:{} Memory:{}/{} MB".format(
+                self.get_name(), pid, resident, virtual
+            )
+        )
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         if c.is_memory_limit_reached():
-            AppLogging.error("{}: Memory limit reached at start, leaving".format(self.get_name()))
+            AppLogging.error(
+                "{}: Memory limit reached at start, leaving".format(self.get_name())
+            )
             return
 
         config = c.config_entry
@@ -212,8 +218,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
     """
 
     def __init__(self, timeout_s=60 * 1, tasks_info=None):
-        """
-        """
+        """ """
         self.timeout_s = timeout_s
         self.start_processing_time = None
         self.tasks_info = tasks_info
@@ -227,11 +232,17 @@ class GenericJobsProcessor(CeleryTaskInterface):
         resident = memory.rss / (1024 * 1024)
         virtual = memory.vms / (1024 * 1024)
 
-        AppLogging.debug("{}: Starting. Pid:{} Memory:{}/{} MB".format(self.get_name(), pid, resident, virtual))
+        AppLogging.debug(
+            "{}: Starting. Pid:{} Memory:{}/{} MB".format(
+                self.get_name(), pid, resident, virtual
+            )
+        )
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         if c.is_memory_limit_reached():
-            AppLogging.error("{}: Memory limit reached at start, leaving".format(self.get_name()))
+            AppLogging.error(
+                "{}: Memory limit reached at start, leaving".format(self.get_name())
+            )
             return
 
         config = c.config_entry

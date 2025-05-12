@@ -8,9 +8,6 @@
    </button>
 
    <ul class="dropdown-menu">
-      <li>
-        <a href="{% url 'rsshistory:entries-untagged' %}" class="dropdown-item" title="Shows untagged bookmarks">Untagged bookmarks</a>
-      </li>
       {% if user.is_staff %}
       <li>
         <a href="{% url 'rsshistory:tags-show-actual' %}" class="dropdown-item" title="Shows actual tags">Actual tags</a>

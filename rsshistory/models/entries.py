@@ -73,7 +73,8 @@ class BaseLinkDataModel(models.Model):
 
     # this entry cannot be removed. Serves a purpose. Domain page, source page
     permanent = models.BooleanField(
-        default=False, help_text="Flag automatically used by the system preventing removing of entries"
+        default=False,
+        help_text="Flag automatically used by the system preventing removing of entries",
     )
     bookmarked = models.BooleanField(
         default=False, help_text="This entry will not be automatically removed"
@@ -110,9 +111,9 @@ class BaseLinkDataModel(models.Model):
         ordering = ["-date_published", "source_url", "title"]
 
         indexes = [
-            models.Index(fields=['title']),
-            models.Index(fields=['link']),
-            models.Index(fields=['date_published']),
+            models.Index(fields=["title"]),
+            models.Index(fields=["link"]),
+            models.Index(fields=["date_published"]),
         ]
 
     def save(self, *args, **kwargs):
@@ -569,7 +570,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         if self.is_dead():
             days_dead = self.get_days_dead()
-            if (days_dead < conf.days_to_remove_stale_entries):
+            if days_dead < conf.days_to_remove_stale_entries:
                 return False
 
         return False

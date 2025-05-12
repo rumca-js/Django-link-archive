@@ -138,10 +138,10 @@ class EntriesCleanup(object):
 
         entries = self.get_general_entries()
         if entries:
-             for entry in entries:
-                 if entry.is_removable():
-                     AppLogging.debug("Removing general entry:{}".format(entry.link))
-                     entry.delete()
+            for entry in entries:
+                if entry.is_removable():
+                    AppLogging.debug("Removing general entry:{}".format(entry.link))
+                    entry.delete()
 
         AppLogging.debug("Removing stale entries")
 
@@ -149,9 +149,13 @@ class EntriesCleanup(object):
             entries = self.get_stale_entries()
             if entries:
                 for entry in entries:
-                   if entry.is_removable():
-                       AppLogging.debug("Removing stale entry:{} status:{} dead since:{}".format(entry.link, entry.status_code, entry.date_dead_since))
-                       entry.delete()
+                    if entry.is_removable():
+                        AppLogging.debug(
+                            "Removing stale entry:{} status:{} dead since:{}".format(
+                                entry.link, entry.status_code, entry.date_dead_since
+                            )
+                        )
+                        entry.delete()
 
         return True
 
@@ -223,8 +227,8 @@ class EntriesCleanup(object):
             return entries
 
     def get_stale_status_condition(self):
-        status_conditions = Q(status_code =403)
-        status_conditions |= (Q(status_code__gte=200) | Q(status_code__lte=300))
+        status_conditions = Q(status_code=403)
+        status_conditions |= Q(status_code__gte=200) | Q(status_code__lte=300)
 
         return ~status_conditions
 
@@ -238,7 +242,7 @@ class EntriesCleanup(object):
 
         date_condition = Q(date_dead_since__lt=days_before)
         permanent_condition = Q(bookmarked=False, permanent=False)
-        manual_status_nok = ~Q(manual_status_code = 200)
+        manual_status_nok = ~Q(manual_status_code=200)
 
         return date_condition & permanent_condition & manual_status_nok
 
@@ -545,7 +549,7 @@ class EntryUpdater(object):
         if not self.entry:
             return
 
-        EntryRules.apply_entry_rule(self.entry)
+        EntryRules.check_all(self.entry)
 
         try:
             self.entry.refresh_from_db()
@@ -636,7 +640,7 @@ class EntryUpdater(object):
         if not self.entry:
             return
 
-        EntryRules.apply_entry_rule(self.entry)
+        EntryRules.check_all(self.entry)
 
         try:
             self.entry.refresh_from_db()
@@ -665,7 +669,7 @@ class EntryUpdater(object):
 
         entry = w.entry
 
-        url = EntryUrlInterface(entry.link, browser=browser)
+        url = EntryUrlInterface(entry.link, browser=self.browser)
         props = url.get_props()
 
         handler = UrlHandlerEx(url=entry.link)
@@ -822,7 +826,9 @@ class EntryUpdater(object):
         entry.page_rating = 0
 
         if not entry.date_dead_since:
-            AppLogging.error("Cannot access link:{} entry id:{}".format(entry.link, entry.id))
+            AppLogging.error(
+                "Cannot access link:{} entry id:{}".format(entry.link, entry.id)
+            )
             entry.date_dead_since = DateUtils.get_datetime_now_utc()
             entry.save()
 
@@ -889,7 +895,7 @@ class EntriesUpdater(object):
             condition_update_null
             | (condition_not_dead & condition_days_to_check_std)
             | (condition_dead & condition_days_to_check_stale)
-            ).order_by("date_update_last", "link")[:max_number_of_entries]
+        ).order_by("date_update_last", "link")[:max_number_of_entries]
 
         return entries
 
@@ -1034,15 +1040,17 @@ class EntryWrapper(object):
         if (
             "title" in link_data
             and link_data["title"]
-            and len(link_data["title"]) > title_length -1
+            and len(link_data["title"]) > title_length - 1
         ):
-            link_data["title"] = link_data["title"][:title_length-1]
+            link_data["title"] = link_data["title"][: title_length - 1]
         if (
             "description" in link_data
             and link_data["description"]
             and len(link_data["description"]) > description_length - 1
         ):
-            link_data["description"] = link_data["description"][:description_length-1]
+            link_data["description"] = link_data["description"][
+                : description_length - 1
+            ]
 
         if not self.strict_ids and "id" in link_data:
             del link_data["id"]
@@ -1434,6 +1442,7 @@ class EntryDataBuilder(object):
         allow_recursion=True,
         ignore_errors=False,
         strict_ids=False,
+        browser=None,
     ):
         self.link = link
         self.link_data = link_data
@@ -1441,6 +1450,7 @@ class EntryDataBuilder(object):
         self.allow_recursion = allow_recursion
         self.user = user
         self.strict_ids = strict_ids
+        self.browser = browser
         self.errors = []
 
         self.ignore_errors = ignore_errors
@@ -1464,7 +1474,7 @@ class EntryDataBuilder(object):
         allow_recursion=True,
         ignore_errors=False,
         strict_ids=False,
-        browser=None
+        browser=None,
     ):
         self.link = link
         self.link_data = link_data
@@ -1564,11 +1574,15 @@ class EntryDataBuilder(object):
         rule = EntryRules.is_url_blocked(self.link_data["link"])
         if rule:
             self.errors.append(
-                "Url:{}. Link was rejected because of a rule. {}".format(self.link, rule)
+                "Url:{}. Link was rejected because of a rule. {}".format(
+                    self.link, rule
+                )
             )
             return
 
-        url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors, browser=self.browser)
+        url = EntryUrlInterface(
+            self.link, ignore_errors=self.ignore_errors, browser=self.browser
+        )
         link_data = url.get_props()
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:
@@ -1663,7 +1677,11 @@ class EntryDataBuilder(object):
         if not day_to_remove:
             return False
 
-        if self.source_is_auto and "date_published" in self.link_data and self.link_data["date_published"]:
+        if (
+            self.source_is_auto
+            and "date_published" in self.link_data
+            and self.link_data["date_published"]
+        ):
             if self.link_data["date_published"] < day_to_remove:
                 return True
 
@@ -1676,7 +1694,9 @@ class EntryDataBuilder(object):
         rule = EntryRules.is_url_blocked(self.link_data["link"])
         if rule:
             self.errors.append(
-                "Url:{}. Link was rejected because of a rule. {}".format(self.link, rule)
+                "Url:{}. Link was rejected because of a rule. {}".format(
+                    self.link, rule
+                )
             )
             return
 
@@ -1691,7 +1711,9 @@ class EntryDataBuilder(object):
 
             if EntryRules.is_dict_blocked(self.link_data):
                 self.errors.append(
-                    "Url:{}. Link was rejected due contents rule - by checking properties.".format(self.link)
+                    "Url:{}. Link was rejected due contents rule - by checking properties.".format(
+                        self.link
+                    )
                 )
                 return
 

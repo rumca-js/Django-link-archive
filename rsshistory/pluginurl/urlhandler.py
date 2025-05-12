@@ -400,14 +400,14 @@ class UrlHandlerEx(object):
     def __str__(self):
         return "{}".format(self.options)
 
-    def ping(url, timeout_s = 20, user_agent=None):
+    def ping(url, timeout_s=20, user_agent=None):
         if not user_agent:
             config_entry = Configuration.get_object().config_entry
             if config_entry.user_agent:
                 user_agent = config_entry.user_agent
 
         u = Url(url)
-        return u.ping(timeout_s = timeout_s, user_agent=user_agent)
+        return u.ping(timeout_s=timeout_s, user_agent=user_agent)
 
     def get_cleaned_link(url):
         return Url.get_cleaned_link(url)

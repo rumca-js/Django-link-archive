@@ -246,7 +246,9 @@ class Url(ContentInterface):
         pass
 
     def ping(self, timeout_s=20, user_agent=None):
-        return RequestsCrawler.ping(self.url, timeout_s = timeout_s, user_agent = user_agent)
+        return RequestsCrawler.ping(
+            self.url, timeout_s=timeout_s, user_agent=user_agent
+        )
 
     def get_handler_implementation(self):
         url = self.url
@@ -609,7 +611,12 @@ class Url(ContentInterface):
                 )
             elif response.get_binary():
                 all_properties.append(
-                    {"name": "Binary", "data": {"Contents": self.property_encode(response.get_binary())}}
+                    {
+                        "name": "Binary",
+                        "data": {
+                            "Contents": self.property_encode(response.get_binary())
+                        },
+                    }
                 )
 
         request_data = dict(self.settings)

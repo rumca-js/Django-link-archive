@@ -98,7 +98,11 @@ def get_errors(page_url):
 
     if page_url.is_blocked():
         reason = page_url.get_block_reason()
-        errors.append("Web page is blocked. Check entry rules, configuration. Reason:{}".format(reason))
+        errors.append(
+            "Web page is blocked. Check entry rules, configuration. Reason:{}".format(
+                reason
+            )
+        )
 
     result = {}
     result["notes"] = notes
@@ -677,10 +681,17 @@ def searchviews_initialize(request):
     views.delete()
 
     SearchView.objects.create(name="Default", order_by="-page_rating, link")
-    SearchView.objects.create(name="Votes", order_by="-page_rating_votes, -page_rating, link")
+    SearchView.objects.create(
+        name="Votes", order_by="-page_rating_votes, -page_rating, link"
+    )
     SearchView.objects.create(name="What's published", order_by="-date_published")
     SearchView.objects.create(name="What's created", order_by="-date_created")
-    SearchView.objects.create(name="Bookmarked", filter_statement = "bookmarked=True", order_by="-date_created", user=True)
+    SearchView.objects.create(
+        name="Bookmarked",
+        filter_statement="bookmarked=True",
+        order_by="-date_created",
+        user=True,
+    )
 
     p.context["summary_text"] = "Initialized searchviews"
     return p.render("go_back.html")
@@ -769,22 +780,22 @@ def gmail_auth(request):
     config = Configuration.get_object().config_entry
     location = config.instance_internet_location
 
-    redirect_uri = f'{location}/oauth2callback/'
+    redirect_uri = f"{location}/oauth2callback/"
 
     params = {
-        'client_id': client_id,
-        'redirect_uri': redirect_uri,
-        'response_type': 'code',
-        'scope': 'https://www.googleapis.com/auth/gmail.readonly',
-        'access_type': 'offline',
-        'prompt': 'consent'
+        "client_id": client_id,
+        "redirect_uri": redirect_uri,
+        "response_type": "code",
+        "scope": "https://www.googleapis.com/auth/gmail.readonly",
+        "access_type": "offline",
+        "prompt": "consent",
     }
-    url = 'https://accounts.google.com/o/oauth2/v2/auth?' + urlencode(params)
+    url = "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params)
     return redirect(url)
 
 
 def oauth2callback(request):
-    code = request.GET.get('code')
+    code = request.GET.get("code")
 
     client_id = "YOUR_CLIENT_ID"
     client_secret = "YOUR_CLIENT_SECRET"
@@ -792,21 +803,21 @@ def oauth2callback(request):
     config = Configuration.get_object().config_entry
     location = config.instance_internet_location
 
-    redirect_uri = f'{location}/oauth2callback/'
+    redirect_uri = f"{location}/oauth2callback/"
 
     data = {
-        'code': code,
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'redirect_uri': redirect_uri,
-        'grant_type': 'authorization_code',
+        "code": code,
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "redirect_uri": redirect_uri,
+        "grant_type": "authorization_code",
     }
 
-    response = requests.post('https://oauth2.googleapis.com/token', data=data)
+    response = requests.post("https://oauth2.googleapis.com/token", data=data)
     token_data = response.json()
 
-    access_token = token_data.get('access_token')
-    refresh_token = token_data.get('refresh_token')
+    access_token = token_data.get("access_token")
+    refresh_token = token_data.get("refresh_token")
 
     # Save both tokens (assuming your Credentials model has a field `token_type`)
     if access_token:
@@ -814,7 +825,7 @@ def oauth2callback(request):
             client_id=client_id,
             client_secret=client_secret,
             token_type="access_token",
-            token=access_token
+            token=access_token,
         )
 
     if refresh_token:
@@ -822,11 +833,13 @@ def oauth2callback(request):
             client_id=client_id,
             client_secret=client_secret,
             token_type="refresh_token",
-            token=refresh_token
+            token=refresh_token,
         )
 
 
 def read_gmail(access_token):
-    headers = {'Authorization': f'Bearer {access_token}'}
-    res = requests.get('https://gmail.googleapis.com/gmail/v1/users/me/messages', headers=headers)
+    headers = {"Authorization": f"Bearer {access_token}"}
+    res = requests.get(
+        "https://gmail.googleapis.com/gmail/v1/users/me/messages", headers=headers
+    )
     return res.json()

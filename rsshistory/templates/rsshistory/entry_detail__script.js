@@ -5,6 +5,7 @@ let entry_json_data = null;
 let entry_dislike_data = null;
 let is_downloading = false;
 let is_updating = false;
+let is_resetting = false;
 
 
 function getEditButton() {
@@ -14,6 +15,16 @@ function getEditButton() {
 
 function getDownloadingText(text = "Downloading...") {
     return `<span class="bg-warning text-dark"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></span> ${text}`;
+}
+
+
+function isEntryDownloadingData(data) {
+  return (!is_downloading || !is_updating || is_resetting) && (data.is_downloading || data.is_downloading || data.is_resetting);
+}
+
+
+function isEntryDownloadStop(data) {
+  return (is_downloading || is_updating || is_resetting) && (!data.is_downloading && !data.is_downloading && !data.is_resetting);
 }
 
 
@@ -30,11 +41,11 @@ function fillIsEntryDownloaded(attempt = 1) {
                 return;
             }
 
-            if ((!is_downloading || !is_updating) && (data.is_downloading || data.is_downloading))
+            if (isEntryDownloadingData(data))
             {
                 setTimeout(() => fillIsEntryDownloaded(), 60000);
             }
-            else if ((is_downloading || is_updating) && (!data.is_downloading && !data.is_downloading))
+            else if (isEntryDownloadStop(data))
             {
                 getEntryJson();
             }
@@ -50,7 +61,9 @@ function fillIsEntryDownloaded(attempt = 1) {
             }
 
             is_updating = data.is_updating;
-            if (is_updating) {
+            is_resetting = data.is_resetting;
+
+            if (is_updating || is_resetting) {
                 const text = getDownloadingText("Fetching link data...");
                 $('#entryUpdateContainer').html(text);
 

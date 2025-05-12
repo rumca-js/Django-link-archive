@@ -296,7 +296,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         }
 
         b = EntryDataBuilder()
-        
+
         # call tested function
         entry = b.build(link_data=link_data, source_is_auto=True)
 

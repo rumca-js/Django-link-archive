@@ -22,8 +22,7 @@ class SearchView(models.Model):
     )
 
     default = models.BooleanField(
-        default=False,
-        help_text="If true, then this is default view."
+        default=False, help_text="If true, then this is default view."
     )
 
     hover_text = models.CharField(
@@ -68,7 +67,8 @@ class SearchView(models.Model):
     )
 
     user = models.BooleanField(
-        default=False, help_text="If true, then it is 'user' view. Otherwise it is generic view."
+        default=False,
+        help_text="If true, then it is 'user' view. Otherwise it is generic view.",
     )
 
     class Meta:
@@ -84,13 +84,17 @@ class SearchView(models.Model):
             conditions = Q()
 
         if self.date_published_day_limit != 0:
-            date_published_date = datetime.now() - timedelta(days = self.date_published_day_limit)
+            date_published_date = datetime.now() - timedelta(
+                days=self.date_published_day_limit
+            )
 
-            conditions &= Q(date_published__gt = date_published_date)
+            conditions &= Q(date_published__gt=date_published_date)
 
         if self.date_created_day_limit != 0:
-            date_created_date = datetime.now() - timedelta(days = self.date_created_day_limit)
-            conditions &= Q(date_created__gt = date_created_date)
+            date_created_date = datetime.now() - timedelta(
+                days=self.date_created_day_limit
+            )
+            conditions &= Q(date_created__gt=date_created_date)
 
         return conditions
 
@@ -104,13 +108,17 @@ class SearchView(models.Model):
             conditions = Q()
 
         if self.date_published_day_limit != 0:
-            date_published_date = datetime.now() - timedelta(days = self.date_published_day_limit)
+            date_published_date = datetime.now() - timedelta(
+                days=self.date_published_day_limit
+            )
 
-            conditions &= Q(date_published__gt = date_published_date)
+            conditions &= Q(date_published__gt=date_published_date)
 
         if self.date_created_day_limit != 0:
-            date_created_date = datetime.now() - timedelta(days = self.date_created_day_limit)
-            conditions &= Q(date_created__gt = date_created_date)
+            date_created_date = datetime.now() - timedelta(
+                days=self.date_created_day_limit
+            )
+            conditions &= Q(date_created__gt=date_created_date)
 
         return conditions
 
@@ -118,9 +126,39 @@ class SearchView(models.Model):
         views = SearchView.objects.all()
         views.delete()
 
-        SearchView.objects.create(name="Default", order_by="-page_rating_votes, -page_rating, link", default=True, hover_text="Search")
-        SearchView.objects.create(name="Bookmarked", filter_statement = "bookmarked=True", order_by="-date_created, link", user=True, hover_text="Search bookmars")
-        SearchView.objects.create(name="Search by votes", order_by="-page_rating_votes, -page_rating, link", entry_limit=1000, hover_text="Searches by rating votes")
-        SearchView.objects.create(name="What's created", order_by="-date_created, link", date_published_day_limit=7, hover_text="Search by date created")
-        SearchView.objects.create(name="What's published", order_by="-date_published, link", date_published_day_limit=7, hover_text="Search by date published")
-        SearchView.objects.create(name="Search all", order_by="-date_created, link", hover_text="Searches all entries")
+        SearchView.objects.create(
+            name="Default",
+            order_by="-page_rating_votes, -page_rating, link",
+            default=True,
+            hover_text="Search",
+        )
+        SearchView.objects.create(
+            name="Bookmarked",
+            filter_statement="bookmarked=True",
+            order_by="-date_created, link",
+            user=True,
+            hover_text="Search bookmars",
+        )
+        SearchView.objects.create(
+            name="Search by votes",
+            order_by="-page_rating_votes, -page_rating, link",
+            entry_limit=1000,
+            hover_text="Searches by rating votes",
+        )
+        SearchView.objects.create(
+            name="What's created",
+            order_by="-date_created, link",
+            date_published_day_limit=7,
+            hover_text="Search by date created",
+        )
+        SearchView.objects.create(
+            name="What's published",
+            order_by="-date_published, link",
+            date_published_day_limit=7,
+            hover_text="Search by date published",
+        )
+        SearchView.objects.create(
+            name="Search all",
+            order_by="-date_created, link",
+            hover_text="Searches all entries",
+        )

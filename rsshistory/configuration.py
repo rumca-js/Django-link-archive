@@ -22,7 +22,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.10.4"
+__version__ = "2.11.0"
 
 
 class Configuration(object):
@@ -65,9 +65,9 @@ class Configuration(object):
         mem_info = process.memory_info()
 
         # in bytes
-        #print("RSS (Resident Set Size):", mem_info.rss)  # Actual physical memory used
-        #print("VMS (Virtual Memory Size):", mem_info.vms)  # Total virtual memory used
-        #print(f"Memory used (RSS): {mem_info.rss / (1024 * 1024):.2f} MB")
+        # print("RSS (Resident Set Size):", mem_info.rss)  # Actual physical memory used
+        # print("VMS (Virtual Memory Size):", mem_info.vms)  # Total virtual memory used
+        # print(f"Memory used (RSS): {mem_info.rss / (1024 * 1024):.2f} MB")
 
         return mem_info
 

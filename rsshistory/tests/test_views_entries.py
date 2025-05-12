@@ -30,6 +30,7 @@ from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 class EntriesGenericViewsTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        self.setup_configuration()
 
         self.user = User.objects.create_user(
             username="testuser",
@@ -72,24 +73,6 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_entries_recent(self):
-        url = reverse("{}:entries-recent".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_untagged(self):
-        url = reverse("{}:entries-untagged".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_bookmarked(self):
-        url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
     def test_entries_user_bookmarked(self):
         url = reverse("{}:entries-user-bookmarked".format(LinkDatabase.name))
         response = self.client.get(url)
@@ -98,12 +81,6 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
 
     def test_entries_archived(self):
         url = reverse("{}:entries-archived".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_untagged(self):
-        url = reverse("{}:entries-untagged".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -123,38 +100,8 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
         self.assertTrue("https://linkedin.com" in links)
         self.assertFalse("https://linkedin.com/page2" in links)
 
-    def test_entries_json_recent(self):
-        url = reverse("{}:entries-json-recent".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_json_untagged(self):
-        url = reverse("{}:entries-json_untagged".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_json_bookmarked(self):
-        url = reverse("{}:entries-json-bookmarked".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_json_user_bookmarked(self):
-        url = reverse("{}:entries-json-user-bookmarked".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
     def test_entries_json_archived(self):
         url = reverse("{}:entries-json-archived".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_json_untagged(self):
-        url = reverse("{}:entries-json-untagged".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -171,16 +118,11 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_entries_untagged(self):
-        url = reverse("{}:entries-untagged".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
 
 class EntriesViewsTests(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        self.setup_configuration()
 
         self.user = User.objects.create_user(
             username="testuser",
@@ -238,7 +180,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
-        url += "?link="+test_link
+        url += "?link=" + test_link
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
@@ -263,7 +205,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://www.youtube.com/watch?v=1234"
-        url += "?link="+test_link
+        url += "?link=" + test_link
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
@@ -302,7 +244,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
-        url += "?link="+test_link
+        url += "?link=" + test_link
         channel_name = "https://www.youtube.com/channel/SAMTIMESAMTIMESAMTIMESAM"
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
@@ -339,7 +281,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
-        url += "?link="+test_link
+        url += "?link=" + test_link
 
         EntryDataBuilder(link=test_link)
 
@@ -358,7 +300,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
-        url += "?link="+test_link
+        url += "?link=" + test_link
 
         ob = ArchiveLinkDataController.objects.create(
             source_url="https://linkin.com",
@@ -390,7 +332,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:entry-add-json".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
-        url += "?link="+test_link
+        url += "?link=" + test_link
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
@@ -740,6 +682,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 class EntriesDetailViews(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        self.setup_configuration()
 
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -1118,7 +1061,9 @@ class EntriesDetailViews(FakeInternetTestCase):
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-status".format(LinkDatabase.name), args=[self.entry_youtube.id])
+        url = reverse(
+            "{}:entry-status".format(LinkDatabase.name), args=[self.entry_youtube.id]
+        )
 
         # call user action
         response = self.client.get(url)

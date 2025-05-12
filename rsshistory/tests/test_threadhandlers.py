@@ -441,7 +441,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
 
         source = SourceDataController.objects.create(
             url="https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
-            auto_tag = "personal",
+            auto_tag="personal",
         )
 
         ob = BackgroundJobController.objects.create(

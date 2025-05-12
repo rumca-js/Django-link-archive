@@ -208,7 +208,10 @@ class EntryCompactedTags(models.Model):
     """
     because SQLite does not have distinct we will provide one row data for tags
     """
-    tag = models.CharField(max_length=1000, help_text="Full tag text, with colon as delimiter")
+
+    tag = models.CharField(
+        max_length=1000, help_text="Full tag text, with colon as delimiter"
+    )
 
     entry = models.ForeignKey(
         LinkDataModel,
@@ -233,27 +236,9 @@ class EntryCompactedTags(models.Model):
                 tag_text += tag.tag + ","
 
             if tag_text != "":
-                EntryCompactedTags.objects.create(
-                    tag=tag_text, entry=entry
-                )
+                EntryCompactedTags.objects.create(tag=tag_text, entry=entry)
 
     def cleanup(cfg=None):
-        #user_tags = UserTags.objects.all()
-
-        ##invalids = []
-
-        #for entry in user_tags.values('entry').distinct():
-        #    if entry['entry']:
-        #        entry_instances = LinkDataModel.objects.filter(id=entry['entry'])
-        #        if entry_instances.exists():
-        #            entry_instance = entry_instances[0]
-        #            EntryCompactedTags.compact(entry_instance)
-        #        #else:
-        #        #    invalids.append(entry["entry"])
-
-        ##for entry_id in invalids:
-        ##    items = UserTags.objects.filter(entry = entry_id)
-        ##    items.delete()
         pass
 
 

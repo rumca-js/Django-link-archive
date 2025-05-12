@@ -22,7 +22,7 @@ class ReflectedTable(object):
     def create_index(self, table, column_name):
         index_name = f"idx_{table.name}_{column_name}"
         index = Index(index_name, getattr(table.c, column_name))
-    
+
         index.create(bind=self.engine)
 
     def close(self):

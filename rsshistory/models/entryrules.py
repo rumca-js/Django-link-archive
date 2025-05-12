@@ -57,7 +57,14 @@ class EntryRules(models.Model):
     )
 
     class Meta:
-        ordering = ["-enabled", "block", "browser", "apply_age_limit", "auto_tag", "rule_name"]
+        ordering = [
+            "-enabled",
+            "block",
+            "browser",
+            "apply_age_limit",
+            "auto_tag",
+            "rule_name",
+        ]
 
     def is_valid(self):
         if self.browser:
@@ -67,6 +74,9 @@ class EntryRules(models.Model):
         return True
 
     def get_rule_urls(self):
+        """
+        Returns list of urls handled by this rule
+        """
         result = set()
 
         urls = self.trigger_rule_url.split(",")
@@ -77,43 +87,18 @@ class EntryRules(models.Model):
 
         return result
 
-    def get_url_rules(url):
-        result = []
+    def get_trigger_texts(self):
+        result = set()
 
-        rules = EntryRules.objects.filter(enabled=True)
-        for rule in rules:
-            rule_urls = rule.get_rule_urls()
-            for rule_url in rule_urls:
-                if url.find(rule_url) >= 0:
-                    result.append(rule)
+        trigger_texts = self.trigger_text
+        trigger_split = trigger_texts.split(",")
+
+        for trigger_text in trigger_split:
+            stripped = trigger_text.strip()
+            if stripped != "":
+                result.add(stripped)
 
         return result
-
-    def is_url_blocked(url):
-        from .blockentry import BlockEntry
-
-        rules = EntryRules.objects.filter(block=True, enabled=True)
-        for rule in rules:
-            rule_urls = rule.get_rule_urls()
-            for rule_url in rule_urls:
-                if rule_url != "":
-                    if url.find(rule_url) >= 0:
-                        return True, rule_url
-
-        p = UrlLocation(url)
-        domain_only = p.get_domain_only()
-
-        status = BlockEntry.is_blocked(domain_only)
-        if status:
-            return True, "BlockEntry {}".format(status)
-
-    def is_url_blocked_by_rule(self, url):
-        rule_urls = self.get_rule_urls()
-        for rule_url in rule_urls:
-            if url.find(rule_url) >= 0:
-                return True
-
-        return False
 
     def get_trigger_fields(self):
         if not self.trigger_text_fields or self.trigger_text_fields == "":
@@ -124,6 +109,14 @@ class EntryRules(models.Model):
 
         fields = [field.strip() for field in self.trigger_text_fields.split(",")]
         return fields
+
+    def is_url_triggering(self, url):
+        rule_urls = self.get_rule_urls()
+        for rule_url in rule_urls:
+            if url.find(rule_url) >= 0:
+                return True
+
+        return False
 
     def get_entry_pulp(self, entry):
         pulp = ""
@@ -162,8 +155,7 @@ class EntryRules(models.Model):
     def is_text_triggered(self, text):
         sum = 0
 
-        trigger_texts = self.trigger_text
-        trigger_split = trigger_texts.split(",")
+        trigger_split = self.get_trigger_texts()
 
         for trigger_text in trigger_split:
             # ignore case
@@ -178,11 +170,56 @@ class EntryRules(models.Model):
 
         return False
 
+    def check_rule(self, entry):
+        p = UrlLocation(entry.link)
+        domain_only = p.get_domain_only()
+
+        if self.is_url_triggering(domain_only):
+            if self.block:
+                self.apply_entry_rule_action(entry)
+
+        text = self.get_entry_pulp(entry)
+        if self.is_text_triggered(text):
+            self.apply_entry_rule_action(entry)
+
+    def apply_entry_rule_action(self, entry):
+        if self.block:
+            EntryRules.attemp_delete(entry, self)
+        if self.apply_age_limit:
+            if not entry.age or entry.age < self.apply_age_limit:
+                entry.age = self.apply_age_limit
+                entry.save()
+
+    def get_url_rules(url):
+        result = []
+
+        rules = EntryRules.objects.filter(enabled=True)
+        for rule in rules:
+            if rule.is_url_triggering(url):
+                result.append(rule)
+
+        return result
+
+    def is_url_blocked(url):
+        from .blockentry import BlockEntry
+
+        rules = EntryRules.objects.filter(block=True, enabled=True)
+        for rule in rules:
+            if rule.is_url_triggering(url):
+                return rule
+
+        p = UrlLocation(url)
+        domain_only = p.get_domain_only()
+
+        block = BlockEntry.get_entry(domain_only)
+        if block:
+            return block
+
     def is_dict_blocked(dictionary):
         if "link" in dictionary:
-            status = EntryRules.is_url_blocked(dictionary["link"])
-            if status:
-                return status
+            reason = EntryRules.is_url_blocked(dictionary["link"])
+            if reason:
+                return reason
 
         rules = EntryRules.objects.filter(enabled=True, block=True).exclude(
             trigger_text=""
@@ -190,11 +227,12 @@ class EntryRules(models.Model):
         for rule in rules:
             text = rule.get_dict_pulp(dictionary)
             if rule.is_text_triggered(text):
-                return True, rule.id
+                return rule
 
     def is_entry_blocked(entry):
-        if EntryRules.is_url_blocked(entry.link):
-            return True
+        reason = EntryRules.is_url_blocked(entry.link)
+        if reason:
+            return reason
 
         rules = EntryRules.objects.filter(enabled=True, block=True).exclude(
             trigger_text=""
@@ -202,18 +240,24 @@ class EntryRules(models.Model):
         for rule in rules:
             text = rule.get_entry_pulp(entry)
             if rule.is_text_triggered(text):
-                return True, rule.id
+                return rule
 
-    def apply_entry_rule(entry):
-        if EntryRules.is_url_blocked(entry.link):
-            EntryRules.attemp_delete(entry)
-            return
+    def check_all(entry):
+        for rule in EntryRules.objects.filter(enabled=True):
+            rule.check_rule(entry)
 
-        EntryRules.check_entry_text_rules(entry)
-
-    def attemp_delete(entry):
+    def attemp_delete(entry, entry_rule=None):
         if not entry.is_removable():
             return
+
+        from ..configuration import Configuration
+
+        if Configuration.get_object().config_entry.log_remove_entries:
+            if entry_rule:
+                AppLogging.info("Removing entry:{} rule ID:{}".format(entry.id, entyry_rule.id))
+            else:
+                AppLogging.info("Removing entry:{}".format(entry.id))
+
         entry.delete()
 
     def get_age_for_dictionary(dictionary):
@@ -239,14 +283,6 @@ class EntryRules(models.Model):
             text = rule.get_entry_pulp(entry)
             if rule.is_text_triggered(text):
                 rule.apply_entry_rule_action(entry)
-
-    def apply_entry_rule_action(self, entry):
-        if self.block:
-            EntryRules.attemp_delete(entry)
-        if self.apply_age_limit:
-            if not entry.age or entry.age < self.apply_age_limit:
-                entry.age = self.apply_age_limit
-                entry.save()
 
     def update_link_service_rule():
         name = "link service"
@@ -274,9 +310,6 @@ class EntryRules(models.Model):
         link_service.block = True
         link_service.save()
 
-    def __str__(self):
-        return "{} {}".format(self.id, self.rule_name)
-
     def initialize_common_rules():
         EntryRules.objects.create(
             rule_name="casinos-block",
@@ -296,3 +329,6 @@ class EntryRules(models.Model):
             trigger_text_fields="title",
             block=True,
         )
+
+    def __str__(self):
+        return "EntryRule ID:{}, Name:{}".format(self.id, self.rule_name)

@@ -225,7 +225,10 @@ class FakeInternetData(object):
             self.response["is_valid"] = False
         elif self.url == "https://invalid.rsspage.com/rss.xml":
             self.response["status_code"] = 500
-        elif self.url == "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM":
+        elif (
+            self.url
+            == "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        ):
             self.set_entries(13)
             self.response["Content-Type"] = "application/rss+xml"
             self.properties["feeds"] = [self.url]
@@ -237,7 +240,10 @@ class FakeInternetData(object):
             self.text_data = geekwire_feed
             self.response["Content-Type"] = "application/rss+xml"
             self.properties["feeds"] = [self.url]
-        elif self.url == "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id":
+        elif (
+            self.url
+            == "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
+        ):
             self.set_entries(13)
             self.response["Content-Type"] = "application/rss+xml"
             self.properties["feeds"] = [self.url]
@@ -300,8 +306,9 @@ class FakeInternetTestCase(TestCase):
         # Fail the test if memory usage increased too much
         threshold_mb = 10
         self.assertLess(
-            mem_delta, threshold_mb,
-            f"Memory increased by {mem_delta:.2f} MB — possible leak?"
+            mem_delta,
+            threshold_mb,
+            f"Memory increased by {mem_delta:.2f} MB — possible leak?",
         )
 
     def disable_web_pages(self):
@@ -401,7 +408,9 @@ class FakeInternetTestCase(TestCase):
 
         c.apply_robots_txt()
 
-        SearchView.objects.create(name="Default", order_by="-date_created, link", default=True)
+        SearchView.objects.create(
+            name="Default", order_by="-date_created, link", default=True
+        )
 
         EntryRules.objects.create(
             rule_name="casinos-block",

@@ -160,12 +160,6 @@ class SystemViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_get_backgroundjobs(self):
-        url = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
     def test_get_settings(self):
         url = reverse("{}:get-settings".format(LinkDatabase.name))
         response = self.client.get(url)

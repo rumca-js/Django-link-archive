@@ -36,9 +36,9 @@ class YTDLP(YouTubeDownloader):
         ]
 
         try:
-           proc = subprocess.run(
-               cmds, cwd=self._cwd, capture_output=True, timeout=self.timeout_s
-           )
+            proc = subprocess.run(
+                cmds, cwd=self._cwd, capture_output=True, timeout=self.timeout_s
+            )
         except FileNotFoundError as E:
             return
 

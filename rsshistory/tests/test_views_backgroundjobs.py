@@ -217,3 +217,10 @@ class BackgroundJobsViewsTest(FakeInternetTestCase):
 
         # redirect to see all jobs
         self.assertEqual(response.status_code, 200)
+
+    def test_backgroundjobs_json(self):
+        url = reverse("{}:backgroundjobs-json".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+

@@ -110,11 +110,17 @@ class SourceDataModel(models.Model):
     )
 
     enabled = models.BooleanField(default=True)
-    source_type = models.CharField(max_length=1000,
-            null=False, default=SOURCE_TYPE_RSS,
-            choices=SOURCES_TYPES,
+    source_type = models.CharField(
+        max_length=1000,
+        null=False,
+        default=SOURCE_TYPE_RSS,
+        choices=SOURCES_TYPES,
     )
-    url = models.CharField(max_length=2000, unique=True, help_text="Url of RSS feed, location to parse or Email IMAP server")
+    url = models.CharField(
+        max_length=2000,
+        unique=True,
+        help_text="Url of RSS feed, location to parse or Email IMAP server",
+    )
     title = models.CharField(max_length=1000, blank=True, help_text="Source title")
     # main category
     category_name = models.CharField(max_length=1000, blank=True)
@@ -132,8 +138,12 @@ class SourceDataModel(models.Model):
     fetch_period = models.IntegerField(
         default=900, help_text="Source is checked for new data after [x] seconds"
     )
-    username = models.CharField(max_length=1000, blank=True, help_text="User name required to access source")
-    password = models.CharField(max_length=1000, blank=True, help_text="Password required to access source")
+    username = models.CharField(
+        max_length=1000, blank=True, help_text="User name required to access source"
+    )
+    password = models.CharField(
+        max_length=1000, blank=True, help_text="Password required to access source"
+    )
     auto_tag = models.CharField(
         max_length=1000, blank=True, help_text="Automatic tag for new entries"
     )

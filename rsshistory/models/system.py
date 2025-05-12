@@ -261,6 +261,11 @@ class ConfigurationEntry(models.Model):
         help_text="Use the Internet to check the status of entries during updates. Otherwise entriy data will not be fetched by Internet",
     )
 
+    log_remove_entries = models.BooleanField(
+        default=False,
+        help_text="If true, automatic entry remove operations will be logged.",
+    )
+
     auto_create_sources = models.BooleanField(
         default=False,
         help_text="Automatically add newly found sources to the system.",
@@ -564,12 +569,11 @@ class SystemOperation(models.Model):
     class Meta:
         ordering = ["-date_created"]
 
-    def add_by_thread(
-        thread_id, check_type="", status = True
-    ):
+    def add_by_thread(thread_id, check_type="", status=True):
         # delete all entries without internet check
         all_entries = SystemOperation.objects.filter(
-            thread_id=thread_id, check_type = "",
+            thread_id=thread_id,
+            check_type="",
         )
         all_entries.delete()
 
@@ -757,7 +761,7 @@ class AppLogging(models.Model):
     ):
         config = ConfigurationEntry.get()
         if level < config.logging_level:
-            #AppLogging.debug(info_text = info_text, detail_text = detail_text)
+            # AppLogging.debug(info_text = info_text, detail_text = detail_text)
             return
 
         if stack:

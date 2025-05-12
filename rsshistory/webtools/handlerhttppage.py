@@ -517,8 +517,10 @@ class HttpPageHandler(HandlerInterface):
         result = []
         url = self.url
 
-        additional_handlers = [RedditChannelHandler,
-                               GitHubUrlHandler, ]
+        additional_handlers = [
+            RedditChannelHandler,
+            GitHubUrlHandler,
+        ]
 
         for additional_handler in additional_handlers:
             h = additional_handler(url)

@@ -31,7 +31,9 @@ class DjangoSingleSymbolEvaluator(SingleSymbolEvaluator):
         self.django_operators.append("range")
 
     def evaluate_complex_translated_symbol(self, symbol, condition_data):
-        condition_data = super().evaluate_complex_translated_symbol(symbol, condition_data)
+        condition_data = super().evaluate_complex_translated_symbol(
+            symbol, condition_data
+        )
 
         if condition_data:
             LinkDatabase.info(
@@ -453,7 +455,7 @@ class OmniSearchWithDefault(OmniSearch):
         return self.symbol_evaluator.errors
 
 
-class DjangoEquationProcessor():
+class DjangoEquationProcessor:
     def __init__(self, search_statement):
 
         self.parser = OmniSearchWithDefault(

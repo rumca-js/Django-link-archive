@@ -511,7 +511,7 @@ class BackgroundJobController(BackgroundJob):
         args_text = json.dumps(args)
 
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_RESET_DATA, entry.id, args.text
+            BackgroundJob.JOB_LINK_RESET_DATA, entry.id, args_text
         )
 
     def export_data(export, input_date=None, user=None):

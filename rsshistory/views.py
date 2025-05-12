@@ -94,7 +94,7 @@ def get_search_view(request):
             search_view = search_views[0]
 
     if not search_view:
-        search_views = SearchView.objects.filter(name = "Default")
+        search_views = SearchView.objects.filter(default=True)
         if search_views.exists():
             search_view = search_views[0]
 
@@ -121,10 +121,7 @@ class ViewPage(object):
 
         context["debug"] = config.debug_mode
 
-        if (
-            self.is_user_allowed_complete()
-            and config.enable_background_jobs
-        ):
+        if self.is_user_allowed_complete() and config.enable_background_jobs:
             context.update(c.get_context())
 
             context["is_user_allowed"] = True
@@ -145,8 +142,12 @@ class ViewPage(object):
             context["user_config"] = UserConfig.get()
 
         if context["is_user_allowed"]:
-            context["searchviews"] = SearchView.objects.filter(user=False, default=False)
-            context["usersearchviews"] = SearchView.objects.filter(user=True, default=False)
+            context["searchviews"] = SearchView.objects.filter(
+                user=False, default=False
+            )
+            context["usersearchviews"] = SearchView.objects.filter(
+                user=True, default=False
+            )
             context["searchview"] = get_search_view(self.request)
 
         context["config"] = ConfigurationEntry.get()

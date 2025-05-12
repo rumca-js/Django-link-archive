@@ -150,14 +150,6 @@ def configuration_advanced_page(request):
         )
 
     if (
-        configuration_entry.whats_new_days > 0
-        and configuration_entry.days_to_remove_links > 0
-        and configuration_entry.whats_new_days
-        > configuration_entry.days_to_remove_links
-    ):
-        errors.append("Links are removed before limit of whats new filter")
-
-    if (
         configuration_entry.data_export_path != ""
         and not Path(configuration_entry.get_export_path_abs()).exists()
     ):
@@ -293,7 +285,9 @@ def json_table_status(request):
     )
 
     table.append({"name": "BackgroundJob", "count": BackgroundJob.objects.count()})
-    table.append({"name": "BackgroundJobHistory", "count": BackgroundJobHistory.objects.count()})
+    table.append(
+        {"name": "BackgroundJobHistory", "count": BackgroundJobHistory.objects.count()}
+    )
     table.append({"name": "AppLogging", "count": AppLogging.objects.count()})
 
     table.append({"name": "UserConfig", "count": UserConfig.objects.count()})
@@ -304,13 +298,21 @@ def json_table_status(request):
     table.append({"name": "BlockEntryList", "count": BlockEntryList.objects.count()})
 
     table.append({"name": "UserTags", "count": UserTags.objects.count()})
-    table.append({"name": "UserCompactedTags", "count": UserCompactedTags.objects.count()})
+    table.append(
+        {"name": "UserCompactedTags", "count": UserCompactedTags.objects.count()}
+    )
     table.append({"name": "CompactedTags", "count": CompactedTags.objects.count()})
-    table.append({"name": "EntryCompactedTags", "count": EntryCompactedTags.objects.count()})
+    table.append(
+        {"name": "EntryCompactedTags", "count": EntryCompactedTags.objects.count()}
+    )
     table.append({"name": "UserVotes", "count": UserVotes.objects.count()})
     table.append({"name": "UserBookmarks", "count": UserBookmarks.objects.count()})
-    table.append( {"name": "UserComments", "count": UserCommentsController.objects.count()})
-    table.append( {"name": "UserSearchHistory", "count": UserSearchHistory.objects.count()})
+    table.append(
+        {"name": "UserComments", "count": UserCommentsController.objects.count()}
+    )
+    table.append(
+        {"name": "UserSearchHistory", "count": UserSearchHistory.objects.count()}
+    )
     table.append(
         {
             "name": "UserEntryVisitHistory",
@@ -325,7 +327,9 @@ def json_table_status(request):
     )
 
     table.append({"name": "DataExport", "count": DataExport.objects.count()})
-    table.append( {"name": "SourceExportHistory", "count": SourceExportHistory.objects.count()})
+    table.append(
+        {"name": "SourceExportHistory", "count": SourceExportHistory.objects.count()}
+    )
     table.append({"name": "ModelFiles", "count": ModelFiles.objects.count()})
     table.append({"name": "Domains", "count": Domains.objects.count()})
 
@@ -353,17 +357,25 @@ def json_system_status(request):
 
     system_controller = SystemOperationController()
 
-    last_internet_check = c.get_local_time(system_controller.last_operation_status_date())
+    last_internet_check = c.get_local_time(
+        system_controller.last_operation_status_date()
+    )
     data["last_internet_check"] = last_internet_check
 
     last_internet_status = system_controller.last_operation_status()
     data["last_internet_status"] = last_internet_status
 
-    last_crawling_server_check = c.get_local_time(system_controller.last_operation_status_date(SystemOperation.CHECK_TYPE_CRAWLING_SERVER))
+    last_crawling_server_check = c.get_local_time(
+        system_controller.last_operation_status_date(
+            SystemOperation.CHECK_TYPE_CRAWLING_SERVER
+        )
+    )
 
     data["last_crawling_server_check"] = last_crawling_server_check
 
-    last_crawling_server_status = system_controller.last_operation_status(SystemOperation.CHECK_TYPE_CRAWLING_SERVER)
+    last_crawling_server_status = system_controller.last_operation_status(
+        SystemOperation.CHECK_TYPE_CRAWLING_SERVER
+    )
     data["last_crawling_server_status"] = last_crawling_server_status
 
     now = c.get_local_time(DateUtils.get_datetime_now_utc())
@@ -414,7 +426,9 @@ def json_system_status(request):
     threads = SystemOperationController.get_threads()
     for thread_id in threads:
         thread_info = system_controller.get_thread_info(thread_id)
-        data["threads"].append({"name": thread_id, "date": thread_info[1], "status" : thread_info[2]})
+        data["threads"].append(
+            {"name": thread_id, "date": thread_info[1], "status": thread_info[2]}
+        )
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
@@ -679,7 +693,7 @@ def wizard_setup_news(request):
         return data
 
     system_setup_for_news(request)
-    
+
     p.context["summary_text"] = "Set configuration for news."
     p.context["summary_text"] += get_sources_text()
 

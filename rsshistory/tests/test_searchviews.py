@@ -11,7 +11,13 @@ class SearchViewTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_get_conditions__date_published(self):
-        search_view = SearchView.objects.create(name = "test", filter_statement="", order_by = "-date_published, link", date_published_day_limit = 3, date_created_day_limit = 0)
+        search_view = SearchView.objects.create(
+            name="test",
+            filter_statement="",
+            order_by="-date_published, link",
+            date_published_day_limit=3,
+            date_created_day_limit=0,
+        )
 
         conditions = search_view.get_conditions()
         str_conditions = str(conditions)
@@ -20,7 +26,13 @@ class SearchViewTest(FakeInternetTestCase):
         self.assertTrue(str_conditions.find(start) >= 0)
 
     def test_get_conditions__date_created(self):
-        search_view = SearchView.objects.create(name = "test", filter_statement="", order_by = "-date_published, link", date_published_day_limit = 0, date_created_day_limit = 4)
+        search_view = SearchView.objects.create(
+            name="test",
+            filter_statement="",
+            order_by="-date_published, link",
+            date_published_day_limit=0,
+            date_created_day_limit=4,
+        )
 
         conditions = search_view.get_conditions()
         str_conditions = str(conditions)
@@ -29,7 +41,13 @@ class SearchViewTest(FakeInternetTestCase):
         self.assertTrue(str_conditions.find(start) >= 0)
 
     def test_get_conditions__bookmarked(self):
-        search_view = SearchView.objects.create(name = "test", filter_statement="bookmarked==True", order_by = "-date_published, link", date_published_day_limit = 0, date_created_day_limit = 0)
+        search_view = SearchView.objects.create(
+            name="test",
+            filter_statement="bookmarked==True",
+            order_by="-date_published, link",
+            date_published_day_limit=0,
+            date_created_day_limit=0,
+        )
 
         conditions = search_view.get_conditions()
 

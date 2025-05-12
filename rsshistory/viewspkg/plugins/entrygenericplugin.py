@@ -586,7 +586,9 @@ class EntryGenericPlugin(object):
 
         c = Configuration.get_object()
         date_published = c.get_local_time(self.entry.date_published)
-        parameters.append(EntryParameter("Publish date", date_published, html_id="entryDatePublished"))
+        parameters.append(
+            EntryParameter("Publish date", date_published, html_id="entryDatePublished")
+        )
 
         return parameters
 
@@ -609,31 +611,59 @@ class EntryGenericPlugin(object):
 
         created_date = c.get_local_time(self.entry.date_created)
         if created_date:
-            parameters.append(EntryParameter("Creation date", created_date, html_id="entryDateCreated"))
+            parameters.append(
+                EntryParameter(
+                    "Creation date", created_date, html_id="entryDateCreated"
+                )
+            )
 
         update_date = c.get_local_time(self.entry.date_update_last)
         if update_date:
-            parameters.append(EntryParameter("Update date", update_date, html_id="entryDateUpdateLast"))
+            parameters.append(
+                EntryParameter(
+                    "Update date", update_date, html_id="entryDateUpdateLast"
+                )
+            )
 
         modified_date = c.get_local_time(self.entry.date_last_modified)
         if modified_date:
-            parameters.append(EntryParameter("Modified date", modified_date, html_id="entryDateModified"))
+            parameters.append(
+                EntryParameter(
+                    "Modified date", modified_date, html_id="entryDateModified"
+                )
+            )
 
         date_dead_since = c.get_local_time(self.entry.date_dead_since)
         if date_dead_since:
-            parameters.append(EntryParameter("Dead since", date_dead_since, html_id="entryDateDeadSince"))
+            parameters.append(
+                EntryParameter(
+                    "Dead since", date_dead_since, html_id="entryDateDeadSince"
+                )
+            )
 
         if self.entry.age:
             parameters.append(EntryParameter("Age", self.entry.age, html_id="entryAge"))
 
         if self.entry.author:
-            parameters.append(EntryParameter("Author", self.entry.get_author_safe(), html_id="entryAuthor"))
+            parameters.append(
+                EntryParameter(
+                    "Author", self.entry.author, html_id="entryAuthor"
+                )
+            )
         if self.entry.album:
-            parameters.append(EntryParameter("Album", self.entry.album, html_id="entryAlbum"))
+            parameters.append(
+                EntryParameter("Album", self.entry.album, html_id="entryAlbum")
+            )
 
-        parameters.append(EntryParameter("Status code", self.entry.status_code, html_id="entryStatusCode"))
+        parameters.append(
+            EntryParameter(
+                "Status code", self.entry.status_code, html_id="entryStatusCode"
+            )
+        )
 
-        parameters.append(EntryParameter("Language", self.entry.language, html_id="entryStatusCode"))
+        parameters.append(
+            EntryParameter("Language", self.entry.language, html_id="entryStatusCode")
+        )
 
         if self.entry.manual_status_code:
             parameters.append(
@@ -643,16 +673,36 @@ class EntryGenericPlugin(object):
         # Artist & album are displayed in buttons
         # Page rating is displayed in title
 
-        parameters.append(EntryParameter("Visists", self.entry.page_rating_visits, html_id="entryPageRatingVisits"))
+        parameters.append(
+            EntryParameter(
+                "Visists",
+                self.entry.page_rating_visits,
+                html_id="entryPageRatingVisits",
+            )
+        )
 
         if self.entry.permanent:
-            parameters.append(EntryParameter("Permanent", True, html_id="entryPermanent"))
+            parameters.append(
+                EntryParameter("Permanent", True, html_id="entryPermanent")
+            )
 
         if self.entry.user is not None:
-            parameters.append(EntryParameter("User", self.entry.user.username, html_id="entryUser"))
+            parameters.append(
+                EntryParameter("User", self.entry.user.username, html_id="entryUser")
+            )
 
-        parameters.append(EntryParameter("Bookmarked", self.entry.bookmarked, html_id="entryBookmarked"))
-        parameters.append(EntryParameter("UserBookmarked", self.entry.is_bookmarked(), html_id="entryUserBookmarked"))
+        parameters.append(
+            EntryParameter(
+                "Bookmarked", self.entry.bookmarked, html_id="entryBookmarked"
+            )
+        )
+        parameters.append(
+            EntryParameter(
+                "UserBookmarked",
+                self.entry.is_bookmarked(),
+                html_id="entryUserBookmarked",
+            )
+        )
 
         return parameters
 

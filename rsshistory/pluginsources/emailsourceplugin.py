@@ -17,6 +17,7 @@ class EmailSourcePlugin(SourcePluginInterface):
      - file names start with source, because I did not know if they will not be in one place
        with entries, so I wanted to be able to distinguish them later
     """
+
     PLUGIN_NAME = "EmailSourcePlugin"
 
     def __init__(self, source_id, options=None):
@@ -28,14 +29,15 @@ class EmailSourcePlugin(SourcePluginInterface):
         day_to_remove = Configuration.get_object().get_entry_remove_date()
 
         try:
-            reader = EmailReader(source.url, time_limit = day_to_remove)
+            reader = EmailReader(source.url, time_limit=day_to_remove)
             if not reader.connect(source.username, source.password):
-                AppLogging.error("Source:{} Could not login to service.".format(source.id))
+                AppLogging.error(
+                    "Source:{} Could not login to service.".format(source.id)
+                )
                 return
         except socket.gaierror as E:
             AppLogging.exc(E, "Source:{} Email exception.".format(source.id))
             return
-
 
         for email in reader.get_emails():
             self.on_email(email)
@@ -51,7 +53,7 @@ class EmailSourcePlugin(SourcePluginInterface):
         link_data = self.enhance_properties(link_data)
 
         b = EntryDataBuilder()
-        entry = b.build(link_data = link_data, source_is_auto=True)
+        entry = b.build(link_data=link_data, source_is_auto=True)
 
         self.on_added_entry(entry)
 

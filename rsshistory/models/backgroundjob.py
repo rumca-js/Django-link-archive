@@ -105,7 +105,9 @@ class BackgroundJob(models.Model):
         ]
 
     def __str__(self):
-        return "Job:{}\tSubject:{}\tArgs:{}\tDate Created:{}".format(self.job, self.subject, self.args, self.date_created)
+        return "Job:{}\tSubject:{}\tArgs:{}\tDate Created:{}".format(
+            self.job, self.subject, self.args, self.date_created
+        )
 
 
 class BackgroundJobHistory(models.Model):

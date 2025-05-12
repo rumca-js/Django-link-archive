@@ -109,10 +109,15 @@ def entries_generic(request, link, data_scope):
 
     search_view = get_search_view(request)
 
-    #data_scope = "Scope: " + data_scope
+    # data_scope = "Scope: " + data_scope
     data_scope = "Scope: " + search_view.name
 
-    filter_form = InitSearchForm(request=request, initial=data, scope=data_scope, auto_fetch=search_view.auto_fetch)
+    filter_form = InitSearchForm(
+        request=request,
+        initial=data,
+        scope=data_scope,
+        auto_fetch=search_view.auto_fetch,
+    )
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
     filter_form.auto_fetch = search_view.auto_fetch
@@ -177,7 +182,7 @@ class EntriesSearchListView(object):
         queryset = self.get_filtered_objects().order_by(*self.get_order_by()).distinct()
 
         if search_view.entry_limit:
-            queryset = queryset[:search_view.entry_limit]
+            queryset = queryset[: search_view.entry_limit]
 
         print("EntriesSearchListView:get_queryset done {}".format(queryset.query))
 
@@ -263,7 +268,9 @@ class EntriesSearchListView(object):
         if self.conditions:
             return self.conditions
 
-        self.conditions = self.query_filter.get_conditions() & self.get_search_view_conditions()
+        self.conditions = (
+            self.query_filter.get_conditions() & self.get_search_view_conditions()
+        )
 
         return self.conditions
 
@@ -288,8 +295,7 @@ class EntriesSearchListView(object):
         return query_set.filter(conditions)
 
     def get_initial_query_set(self, archive=False):
-        """
-        """
+        """ """
         if archive:
             return ArchiveLinkDataController.objects.all()
         else:
@@ -911,22 +917,19 @@ def entry_dislikes(request, pk):
 
         controller = SystemOperationController()
         if controller.is_remote_server_down():
-            return JsonResponse({}, json_dumps_params={"indent": 4})
+            return JsonResponse({"errors" : ["Remote server is down"]}, json_dumps_params={"indent": 4})
 
         link = config.remote_webtools_server_location
         remote_server = RemoteServer(link)
 
         json_obj = remote_server.get_socialj(obj.link)
         if not json_obj:
-            return JsonResponse({}, json_dumps_params={"indent": 4})
+            return JsonResponse({"errors" : ["Could not obtain social data"]}, json_dumps_params={"indent": 4})
 
         try:
             return JsonResponse(json_obj, json_dumps_params={"indent": 4})
         except Exception as E:
-            AppLogging.error(
-                "Url:{} Could not dump social properties".format(obj.link, json_obj)
-            )
-            return JsonResponse({}, json_dumps_params={"indent": 4})
+            return JsonResponse({"errors" : ["Could not dump social data"]}, json_dumps_params={"indent": 4})
 
 
 def entry_bookmark(request, pk):
@@ -1320,3 +1323,89 @@ def archive_hide_entry(request, pk):
     p.context["summary_text"] = summary_text
 
     return p.render("summary_present.html")
+
+
+def is_entry_download(request, pk):
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("JSON entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    is_downloaded = False
+
+    entries = LinkDataController.objects.filter(id=pk)
+
+    if entries.exists():
+        entry = entries[0]
+
+        main_condition = Q(subject=entry.link)
+        main_condition &= Q(enabled=True)
+
+        job_condition = (
+            Q(job=BackgroundJobController.JOB_DOWNLOAD_FILE)
+            | Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC)
+            | Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO)
+        )
+
+        jobs = BackgroundJobController.objects.filter(main_condition & job_condition)
+        if jobs.exists():
+            is_downloaded = True
+
+    json_obj = {"status": is_downloaded}
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+
+def entry_status(request, pk):
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("JSON entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    json_obj = {}
+
+    json_obj["is_downloading"] = False
+    json_obj["is_updating"] = False
+    json_obj["is_entry"] = False
+
+    entries = LinkDataController.objects.filter(id=pk)
+
+    if entries.exists():
+        json_obj["is_entry"] = True
+
+        entry = entries[0]
+
+        main_condition = Q(subject=entry.link)
+        main_condition &= Q(enabled=True)
+
+        job_condition = (
+            Q(job=BackgroundJobController.JOB_DOWNLOAD_FILE)
+            | Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC)
+            | Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO)
+        )
+
+        jobs = BackgroundJobController.objects.filter(job_condition & main_condition)
+        if jobs.exists():
+            json_obj["is_downloading"] = True
+
+        job_condition = Q(job=BackgroundJobController.JOB_LINK_UPDATE_DATA)
+
+        jobs = BackgroundJobController.objects.filter(job_condition & main_condition)
+        if jobs.exists():
+            json_obj["is_updating"] = True
+
+        job_condition = Q(job=BackgroundJobController.JOB_LINK_RESET_DATA)
+
+        jobs = BackgroundJobController.objects.filter(job_condition & main_condition)
+        if jobs.exists():
+            json_obj["is_resetting"] = True
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})

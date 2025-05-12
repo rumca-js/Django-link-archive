@@ -26,13 +26,7 @@ class EntryUrlInterface(object):
     Provides interface between Entry and URL properties.
     """
 
-    def __init__(
-        self,
-        url,
-        log=False,
-        ignore_errors=False,
-        browser=None
-    ):
+    def __init__(self, url, log=False, ignore_errors=False, browser=None):
         """
         Some scenarios, like manual entry should log why it is impossible to check
         TODO maybe add ignore_errors, so we could add any kind of link?
@@ -70,7 +64,9 @@ class EntryUrlInterface(object):
 
             if properties:
                 if isinstance(properties.get("date_published"), str):
-                    properties["date_published"] = DateUtils.parse_datetime(properties["date_published"])
+                    properties["date_published"] = DateUtils.parse_datetime(
+                        properties["date_published"]
+                    )
 
             # TODO properties["date_dead_since"] = DateUtils.get_datetime_now_utc()
 

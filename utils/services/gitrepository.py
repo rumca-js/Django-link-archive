@@ -180,11 +180,13 @@ class GitRepository(RepositoryInterface):
 
     def is_git_username_configured(global_check=True):
         try:
-            scope = ['--global'] if global_check else ['--local']
-            result = subprocess.run(['git', 'config'] + scope + ['user.name'],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE,
-                                    text=True)
+            scope = ["--global"] if global_check else ["--local"]
+            result = subprocess.run(
+                ["git", "config"] + scope + ["user.name"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
             return bool(result.stdout.strip())
         except Exception as e:
             print(f"Error checking git config: {e}")

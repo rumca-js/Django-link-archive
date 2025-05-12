@@ -226,12 +226,6 @@ class SourceDataController(SourceDataModel):
 
         return info
 
-    #def fix_entries(self):
-    #    entries = LinkDataModel.objects.filter(source_url=self.url)
-    #    for entry in entries:
-    #        entry.source = self
-    #        entry.save()
-
     def get_clean_data(props):
         result = {}
         test = SourceDataController()
@@ -404,7 +398,9 @@ class SourceDataBuilder(object):
         if self.link_data:
             return self.build_from_props()
 
-    def build_simple(self, link=None, link_data=None, manual_entry=False, strict_ids=False):
+    def build_simple(
+        self, link=None, link_data=None, manual_entry=False, strict_ids=False
+    ):
         self.link = link
         link_data = link_data
         self.manual_entry = manual_entry

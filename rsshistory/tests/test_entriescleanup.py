@@ -249,12 +249,14 @@ class EntriesCleanupTest(FakeInternetTestCase):
     def test_get_stale_entries(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_remove_links = 2
-        conf.days_to_remove_stale_entries=4
+        conf.days_to_remove_stale_entries = 4
         conf.accept_domain_links = True
         conf.save()
 
         days_before_remove = DateUtils.get_days_before_dt(conf.days_to_remove_links)
-        days_before_stale = DateUtils.get_days_before_dt(conf.days_to_remove_stale_entries)
+        days_before_stale = DateUtils.get_days_before_dt(
+            conf.days_to_remove_stale_entries
+        )
 
         not_dead = LinkDataController.objects.create(
             link="https://youtube.com?v=1",
@@ -262,29 +264,29 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         dead_not_stale = LinkDataController.objects.create(
             link="https://youtube.com?v=2",
-            date_dead_since = days_before_remove - timedelta(days=1),
+            date_dead_since=days_before_remove - timedelta(days=1),
         )
 
         dead_stale = LinkDataController.objects.create(
             link="https://youtube.com?v=3",
-            date_dead_since = days_before_stale -timedelta(days=1),
+            date_dead_since=days_before_stale - timedelta(days=1),
         )
 
         dead_stale_but_ok = LinkDataController.objects.create(
             link="https://youtube.com?v=4",
-            date_dead_since = days_before_stale -timedelta(days=1),
-            manual_status_code = 200,
+            date_dead_since=days_before_stale - timedelta(days=1),
+            manual_status_code=200,
         )
 
         dead_stale_but_bookmarked = LinkDataController.objects.create(
             link="https://youtube.com?v=5",
-            date_dead_since = days_before_stale -timedelta(days=1),
+            date_dead_since=days_before_stale - timedelta(days=1),
             bookmarked=True,
         )
 
         dead_stale_but_permanent = LinkDataController.objects.create(
             link="https://youtube.com?v=6",
-            date_dead_since = days_before_stale -timedelta(days=1),
+            date_dead_since=days_before_stale - timedelta(days=1),
             bookmarked=True,
         )
 

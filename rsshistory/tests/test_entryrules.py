@@ -256,7 +256,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual(entry.age, 15)
 
-    def test_apply_entry_rule__removes(self):
+    def test_check_all__removes(self):
 
         therule = EntryRules.objects.create(
             enabled=True,
@@ -273,12 +273,12 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         # call tested function
-        EntryRules.apply_entry_rule(entry)
+        EntryRules.check_all(entry)
 
-        entries = LinkDataController.objects.filter( link="https://nsfw.com")
+        entries = LinkDataController.objects.filter(link="https://nsfw.com")
         self.assertEqual(len(entries), 0)
 
-    def test_apply_entry_rule__does_not_remove_bookmarked(self):
+    def test_check_all__does_not_remove_bookmarked(self):
 
         therule = EntryRules.objects.create(
             enabled=True,
@@ -298,9 +298,9 @@ class EntryUpdaterTest(FakeInternetTestCase):
         UserBookmarks.add(self.user, entry)
 
         # call tested function
-        EntryRules.apply_entry_rule(entry)
+        EntryRules.check_all(entry)
 
-        entries = LinkDataController.objects.filter( link="https://nsfw.com")
+        entries = LinkDataController.objects.filter(link="https://nsfw.com")
         self.assertEqual(len(entries), 1)
 
     def test_get_entry_pulp__empty_fields(self):
@@ -350,9 +350,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         pulp = therule.get_entry_pulp(entry)
 
-        self.assertEqual(
-            pulp, "nfsw ai girlfriend - title"
-        )
+        self.assertEqual(pulp, "nfsw ai girlfriend - title")
 
     def test_get_entry_pulp__title_description_fields(self):
 

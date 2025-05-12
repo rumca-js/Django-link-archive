@@ -168,8 +168,12 @@ class GitHubUrlHandler(DefaultUrlHandler):
         if elements:
             owner = elements[0]
             repository = elements[1]
-            feeds.append("https://github.com/{}/{}/commits.atom".format(owner, repository))
-            feeds.append("https://github.com/{}/{}/releases.atom".format(owner, repository))
+            feeds.append(
+                "https://github.com/{}/{}/commits.atom".format(owner, repository)
+            )
+            feeds.append(
+                "https://github.com/{}/{}/releases.atom".format(owner, repository)
+            )
 
         return feeds
 

@@ -1,4 +1,5 @@
 let object_list_data = null;
+let original_title = null;
 
 
 function getHideButton(input_text = "Hide") {
@@ -210,8 +211,14 @@ let currentLoadRowListContentCounter = 0;
 function loadRowListContent(search_term = '', page = '', attempt = 1) {
    disableFilterButton();
 
+   if (original_title === null) {
+      original_title = document.title;
+   }
+
    const currentUrl = new URL(window.location);
    const currentSearch = currentUrl.searchParams.get('search') || '';
+
+   document.title = original_title + " " + currentSearch;
 
    page = page || currentUrl.searchParams.get('page') || '1';
 

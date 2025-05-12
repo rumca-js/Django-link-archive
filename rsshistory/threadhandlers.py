@@ -240,6 +240,17 @@ class LinkResetDataJobHandler(BaseJobHandler):
 
         return True
 
+    def get_args(self, obj):
+        cfg = self.get_args_cfg(obj)
+
+        if "browser" in cfg:
+            browser_id = cfg["browser"]
+            browsers = Browser.objects.filter(id=int(browser_id))
+            if browsers.count() > 0:
+                data["browser_obj"] = browsers[0]
+
+        return cfg
+
 
 class LinkResetLocalDataJobHandler(BaseJobHandler):
     def get_job():
@@ -933,9 +944,7 @@ class ExportDataJobHandler(BaseJobHandler):
         else:
             elapsed_sec = self.get_time_diff()
             AppLogging.error(
-                "Export failed. Export:{} Time:{}".format(
-                    obj.subject, elapsed_sec
-                )
+                "Export failed. Export:{} Time:{}".format(obj.subject, elapsed_sec)
             )
 
         return True
@@ -1363,9 +1372,7 @@ class RefreshJobHandler(BaseJobHandler):
         if not entries:
             return
 
-        current_num_of_jobs = (
-            BackgroundJobController.get_number_of_update_reset_jobs()
-        )
+        current_num_of_jobs = BackgroundJobController.get_number_of_update_reset_jobs()
 
         jobs_to_add = max_number_of_update_entries - current_num_of_jobs
 

@@ -9,6 +9,7 @@
 
     em.close()
 """
+
 import imaplib
 import email
 from email.header import decode_header
@@ -25,7 +26,9 @@ class Email(object):
         self.id = None
 
     def __str__(self):
-        return "{}/{}/{}\n{}".format(self.title, self.date_published, self.author, self.body)
+        return "{}/{}/{}\n{}".format(
+            self.title, self.date_published, self.author, self.body
+        )
 
 
 class EmailReader(object):
@@ -115,30 +118,40 @@ class EmailReader(object):
             for part in msg.walk():
                 content_type = part.get_content_type()
                 content_disposition = str(part.get("Content-Disposition"))
-                if content_type == "text/plain" and "attachment" not in content_disposition:
-                    charset = part.get_content_charset() or 'utf-8'
+                if (
+                    content_type == "text/plain"
+                    and "attachment" not in content_disposition
+                ):
+                    charset = part.get_content_charset() or "utf-8"
                     try:
-                        body = part.get_payload(decode=True).decode(charset, errors='replace')
+                        body = part.get_payload(decode=True).decode(
+                            charset, errors="replace"
+                        )
                         return body  # Prefer plain text; return early
                     except Exception as e:
                         print(f"Failed to decode plain text part: {e}")
-            
+
             # Fallback to HTML part if no plain text found
             for part in msg.walk():
                 content_type = part.get_content_type()
                 content_disposition = str(part.get("Content-Disposition"))
-                if content_type == "text/html" and "attachment" not in content_disposition:
-                    charset = part.get_content_charset() or 'utf-8'
+                if (
+                    content_type == "text/html"
+                    and "attachment" not in content_disposition
+                ):
+                    charset = part.get_content_charset() or "utf-8"
                     try:
-                        body = part.get_payload(decode=True).decode(charset, errors='replace')
+                        body = part.get_payload(decode=True).decode(
+                            charset, errors="replace"
+                        )
                         return body
                     except Exception as e:
                         print(f"Failed to decode HTML part: {e}")
         else:
             # Not multipart — just decode the single payload
-            charset = msg.get_content_charset() or 'utf-8'
+            charset = msg.get_content_charset() or "utf-8"
             try:
-                body = msg.get_payload(decode=True).decode(charset, errors='replace')
+                body = msg.get_payload(decode=True).decode(charset, errors="replace")
             except Exception as e:
                 print(f"Failed to decode body: {e}")
 
@@ -146,15 +159,17 @@ class EmailReader(object):
 
     def decode_mime_words(self, header_value):
         if header_value is None:
-            return ''
+            return ""
         decoded_fragments = decode_header(header_value)
-        decoded_string = ''
+        decoded_string = ""
         for fragment, encoding in decoded_fragments:
             if isinstance(fragment, bytes):
                 try:
-                    decoded_string += fragment.decode(encoding or 'utf-8', errors='replace')
+                    decoded_string += fragment.decode(
+                        encoding or "utf-8", errors="replace"
+                    )
                 except Exception as e:
-                    decoded_string += fragment.decode('utf-8', errors='replace')
+                    decoded_string += fragment.decode("utf-8", errors="replace")
             else:
                 decoded_string += fragment
         return decoded_string
@@ -171,6 +186,6 @@ if __name__ == "__main__":
         print("Subject:", email_data.title)
         print("From:", email_data.author)
         print("Date published:", email_data.date_published)
-        #print("Body:", email_data[2])
+        # print("Body:", email_data[2])
 
     em.close()

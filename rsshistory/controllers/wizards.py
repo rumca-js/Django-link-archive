@@ -7,14 +7,30 @@ from ..models import (
     EntryRules,
     SearchView,
 )
+from .backgroundjob import BackgroundJobController
 
 
 def common_initialization():
     EntryRules.initialize_common_rules()
 
-    SearchView.objects.create(name="Search by votes", order_by="-page_rating_votes, -page_rating, link", entry_limit=1000, hover_text="Search by votes")
-    SearchView.objects.create(name="What's created", order_by="-date_created, link", date_published_day_limit=7, hover_text="Search by date created")
-    SearchView.objects.create(name="What's published", order_by="-date_published, link", date_published_day_limit=7, hover_text="Search by date published")
+    SearchView.objects.create(
+        name="Search by votes",
+        order_by="-page_rating_votes, -page_rating, link",
+        entry_limit=1000,
+        hover_text="Search by votes",
+    )
+    SearchView.objects.create(
+        name="What's created",
+        order_by="-date_created, link",
+        date_published_day_limit=7,
+        hover_text="Search by date created",
+    )
+    SearchView.objects.create(
+        name="What's published",
+        order_by="-date_published, link",
+        date_published_day_limit=7,
+        hover_text="Search by date published",
+    )
 
 
 def system_setup_for_news(request):
@@ -53,10 +69,23 @@ def system_setup_for_news(request):
 
     Configuration.get_object().config_entry.refresh_from_db()
 
-    SearchView.objects.create(name="Default", order_by="-date_created, link", default=True, hover_text="Search")
+    SearchView.objects.create(
+        name="Default",
+        order_by="-date_created, link",
+        default=True,
+        hover_text="Search",
+    )
     common_initialization()
-    SearchView.objects.create(name="Bookmarked", filter_statement = "bookmarked=True", order_by="-date_created, link", user=True, hover_text="Search bookmarks")
-    SearchView.objects.create(name="Searchs all entries", order_by="-date_created, link", hover_text="Search")
+    SearchView.objects.create(
+        name="Bookmarked",
+        filter_statement="bookmarked=True",
+        order_by="-date_created, link",
+        user=True,
+        hover_text="Search bookmarks",
+    )
+    SearchView.objects.create(
+        name="Searchs all entries", order_by="-date_created, link", hover_text="Search"
+    )
 
     return True
 
@@ -97,10 +126,20 @@ def system_setup_for_gallery(request):
 
     Configuration.get_object().config_entry.refresh_from_db()
 
-    SearchView.objects.create(name="Default", order_by="-date_created, link", default=True)
+    SearchView.objects.create(
+        name="Default", order_by="-date_created, link", default=True
+    )
     common_initialization()
-    SearchView.objects.create(name="Bookmarked", filter_statement = "bookmarked=True", order_by="-date_published,-date_created, link", user=True, hover_text="Search bookmarks")
-    SearchView.objects.create(name="Searchs all entries", order_by="-date_created, link", hover_text="Search")
+    SearchView.objects.create(
+        name="Bookmarked",
+        filter_statement="bookmarked=True",
+        order_by="-date_published,-date_created, link",
+        user=True,
+        hover_text="Search bookmarks",
+    )
+    SearchView.objects.create(
+        name="Searchs all entries", order_by="-date_created, link", hover_text="Search"
+    )
 
     return True
 
@@ -146,10 +185,22 @@ def system_setup_for_search_engine(request):
 
     Configuration.get_object().config_entry.refresh_from_db()
 
-    SearchView.objects.create(name="Default", order_by="-page_rating_votes, -page_rating, link", default=True)
+    SearchView.objects.create(
+        name="Default", order_by="-page_rating_votes, -page_rating, link", default=True
+    )
     common_initialization()
-    SearchView.objects.create(name="Bookmarked", filter_statement = "bookmarked=True", order_by="-page_rating_votes, -page_rating, link", user=True, hover_text="Search bookmarks")
-    SearchView.objects.create(name="Searchs all entries", order_by="-page_rating_votes, -page_rating, link", hover_text="Search")
+    SearchView.objects.create(
+        name="Bookmarked",
+        filter_statement="bookmarked=True",
+        order_by="-page_rating_votes, -page_rating, link",
+        user=True,
+        hover_text="Search bookmarks",
+    )
+    SearchView.objects.create(
+        name="Searchs all entries",
+        order_by="-page_rating_votes, -page_rating, link",
+        hover_text="Search",
+    )
 
     # we want blocklist to be enabled for search engine
     BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)

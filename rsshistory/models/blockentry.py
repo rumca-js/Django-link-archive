@@ -115,7 +115,7 @@ class BlockEntryList(models.Model):
         ordering = ["-processed", "url"]
 
     def __str__(self):
-        return "BlockEntryList URL:{}".format(self.url)
+        return "BlockEntryList Id:{} Url:{}".format(self.id, self.url)
 
     def initialize():
         BlockEntryList.update_all()
@@ -209,7 +209,12 @@ class BlockEntry(models.Model):
         ordering = ["url"]
 
     def __str__(self):
-        return "URL:{}\tblock_list:{}".format(self.url, self.block_list)
+        return "BlockEntry Url:{} {}".format(self.url, self.block_list)
 
     def is_blocked(domain_only_url):
         return BlockEntry.objects.filter(url=domain_only_url).exists()
+
+    def get_entry(domain_only_url):
+        blocks = BlockEntry.objects.filter(url=domain_only_url)
+        if blocks.exists():
+            return blocks[0]

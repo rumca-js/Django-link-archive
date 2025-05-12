@@ -45,11 +45,15 @@ class SystemOperationController(object):
 
         if not UrlHandlerEx.ping(remote_server):
             SystemOperation.add_by_thread(
-                thread_id, check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER, status=False,
+                thread_id,
+                check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
+                status=False,
             )
         else:
             SystemOperation.add_by_thread(
-                thread_id, check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER, status=True,
+                thread_id,
+                check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
+                status=True,
             )
 
     def cleanup(cfg=None, thread_ids=None):
@@ -65,7 +69,9 @@ class SystemOperationController(object):
 
         thread_ids = SystemOperationController.get_threads()
 
-        check_types = SystemOperation.objects.values_list('check_type', flat=True).distinct()
+        check_types = SystemOperation.objects.values_list(
+            "check_type", flat=True
+        ).distinct()
 
         for thread_id in thread_ids:
             for check_type in check_types:
@@ -111,7 +117,9 @@ class SystemOperationController(object):
         return self.last_operation_status()
 
     def is_remote_server_down(self):
-        return not self.last_operation_status(check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER)
+        return not self.last_operation_status(
+            check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER
+        )
 
     def is_system_healthy(self):
         c = ConfigurationEntry.get()
@@ -152,7 +160,9 @@ class SystemOperationController(object):
         if entries.exists():
             return entries[0].date_created
 
-    def last_operation_status_date(self, check_type=SystemOperation.CHECK_TYPE_INTERNET):
+    def last_operation_status_date(
+        self, check_type=SystemOperation.CHECK_TYPE_INTERNET
+    ):
         entries = SystemOperation.objects.filter(check_type=check_type)
 
         if entries.exists():

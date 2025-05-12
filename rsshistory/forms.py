@@ -135,6 +135,7 @@ class ConfigForm(forms.ModelForm):
             "new_entries_merge_data",
             "new_entries_use_clean_data",
             "entry_update_via_internet",
+            "log_remove_entries",
             "auto_create_sources",
             "default_source_state",
             # updates
@@ -265,7 +266,9 @@ class EntryRulesForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
-        self.fields["trigger_rule_url"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["trigger_rule_url"].widget.attrs.update(
+            size=self.init.get_cols_size()
+        )
         self.fields["trigger_text"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["trigger_text_fields"].widget.attrs.update(
             size=self.init.get_cols_size()
@@ -298,7 +301,9 @@ class SearchViewForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["name"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["hover_text"].widget.attrs.update(size=self.init.get_cols_size())
-        self.fields["filter_statement"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["filter_statement"].widget.attrs.update(
+            size=self.init.get_cols_size()
+        )
         self.fields["icon"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["order_by"].widget.attrs.update(size=self.init.get_cols_size())
 
@@ -710,7 +715,7 @@ class SourceForm(forms.ModelForm):
         self.fields["proxy_location"].required = False
 
         names = SourceControllerBuilder.get_plugin_names()
-        #self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
+        # self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
 
     def to_choices(self, names):
         names = sorted(names)

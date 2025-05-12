@@ -12,6 +12,7 @@ class SourcePluginInterface(object):
      - file names start with source, because I did not know if they will not be in one place
        with entries, so I wanted to be able to distinguish them later
     """
+
     PLUGIN_NAME = ""
 
     def __init__(self, source_id, options=None):
