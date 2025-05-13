@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
-from ..models import SearchViews
+from ..models import SearchView
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -18,8 +18,6 @@ class SearchViewTests(FakeInternetTestCase):
         )
 
     def test_searchview_add__show_form(self):
-        EntryRules.objects.all().delete()
-
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:searchview-add".format(LinkDatabase.name), args=[])
@@ -37,7 +35,7 @@ class SearchViewTests(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse(
-            "{}:searchview-edit".format(LinkDatabase.name), args=[entry_rule.id]
+            "{}:searchview-edit".format(LinkDatabase.name), args=[searchview.id]
         )
 
         form_data = {

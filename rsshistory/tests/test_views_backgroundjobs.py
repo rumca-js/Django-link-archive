@@ -184,7 +184,7 @@ class BackgroundJobsViewsTest(FakeInternetTestCase):
 
         self.assertEqual(bj.enabled, True)
 
-    def test_get_backgroundjobs__no_args(self):
+    def test_backgroundjobs_json__no_args(self):
         bj = BackgroundJobController.objects.create(
             job=BackgroundJobController.JOB_LINK_UPDATE_DATA,
             task=None,
@@ -193,14 +193,14 @@ class BackgroundJobsViewsTest(FakeInternetTestCase):
             enabled=False,
         )
 
-        url = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
+        url = reverse("{}:backgroundjobs-json".format(LinkDatabase.name))
         # call tested function
         response = self.client.get(url)
 
         # redirect to see all jobs
         self.assertEqual(response.status_code, 200)
 
-    def test_get_backgroundjobs__job(self):
+    def test_backgroundjobs_json__job(self):
         bj = BackgroundJobController.objects.create(
             job=BackgroundJobController.JOB_LINK_UPDATE_DATA,
             task=None,
@@ -209,7 +209,7 @@ class BackgroundJobsViewsTest(FakeInternetTestCase):
             enabled=False,
         )
 
-        url = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
+        url = reverse("{}:backgroundjobs-json".format(LinkDatabase.name))
         url = url + "?job=" + BackgroundJobController.JOB_LINK_UPDATE_DATA
 
         # call tested function

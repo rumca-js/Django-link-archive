@@ -232,7 +232,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual(EntryRules.get_age_for_dictionary(dictionary), 15)
 
-    def test_apply_entry_rule__applies_age(self):
+    def test_check_all__applies_age(self):
 
         therule = EntryRules.objects.create(
             enabled=True,
@@ -250,7 +250,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         # call tested function
-        EntryRules.apply_entry_rule(entry)
+        EntryRules.check_all(entry)
 
         entry.refresh_from_db()
 
