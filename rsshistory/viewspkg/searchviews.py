@@ -91,6 +91,10 @@ def searchview_edit(request, pk):
 
     if request.method == "POST":
         form = SearchViewForm(request.POST, instance=objs[0])
+        if not form.is_valid():
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
+
         errors = get_form_condition_errors(form)
 
         if objs[0].default and not form.cleaned_data["default"]:
@@ -108,9 +112,6 @@ def searchview_edit(request, pk):
             return HttpResponseRedirect(
                 reverse("{}:searchview".format(LinkDatabase.name), args=[pk])
             )
-        else:
-            p.context["summary_text"] = "Form is invalid"
-            return p.render("summary_present.html")
 
     form = SearchViewForm(instance=objs[0])
     form.method = "POST"
@@ -129,6 +130,18 @@ def searchview_add(request):
 
     if request.method == "POST":
         form = SearchViewForm(request.POST)
+
+        if not form.is_valid():
+            error_message = "\n".join(
+                [
+                    "{}: {}".format(field, ", ".join(errors))
+                    for field, errors in form.errors.items()
+                ]
+            )
+
+            p.context["summary_text"] = "Form is invalid: {}".format(error_message)
+            return p.render("summary_present.html")
+
         errors = get_form_condition_errors(form)
 
         if errors and len(errors) > 0:
@@ -141,17 +154,6 @@ def searchview_add(request):
             return HttpResponseRedirect(
                 reverse("{}:searchviews".format(LinkDatabase.name))
             )
-
-        else:
-            error_message = "\n".join(
-                [
-                    "{}: {}".format(field, ", ".join(errors))
-                    for field, errors in form.errors.items()
-                ]
-            )
-
-            p.context["summary_text"] = "Form is invalid: {}".format(error_message)
-            return p.render("summary_present.html")
 
     form = SearchViewForm()
     form.method = "POST"

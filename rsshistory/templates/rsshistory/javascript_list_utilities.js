@@ -215,6 +215,10 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
       original_title = document.title;
    }
 
+   if (isEmpty($('#listData'))) {
+      $('#listData').html(getSpinnerText());
+   }
+
    const currentUrl = new URL(window.location);
    const currentSearch = currentUrl.searchParams.get('search') || '';
 
@@ -241,7 +245,7 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
 
    const requestVersion = ++currentLoadRowListContentCounter;
 
-   const status_text = '<span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span> Loading... ';
+   const status_text = getSpinnerText();
    //$('#listStatus').show();
    $('#footerStatus').show();
    //$('#listStatus').html(status_text);
@@ -296,7 +300,7 @@ function enableFilterButton() {
 }
 
 function disableFilterButton() {
-   const status_text = '<span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span>';
+   const status_text = getSpinnerText("");
     $('#btnFilterForm').html(status_text);
 
     $('.btnFilterTrigger').prop("disabled", true);
@@ -400,9 +404,7 @@ loadSearchHistory();
 
 // if (user specified search, or show is true), and entrylist is empty
 if (search_term || show) {
-    if (isEmpty($('#listData'))) {
-        loadRowListContent();
-    }
+   loadRowListContent();
 }
 
 //-----------------------------------------------

@@ -32,7 +32,7 @@ def backgroundjobs(request):
     if "search" in request.GET:
         data = {"search": request.GET["search"]}
 
-    p.context["query_page"] = reverse("{}:get-backgroundjobs".format(LinkDatabase.name))
+    p.context["query_page"] = reverse("{}:backgroundjobs-json".format(LinkDatabase.name))
     p.context["search_suggestions_page"] = None
     p.context["search_history_page"] = None
 

@@ -4,6 +4,9 @@ import json
 import subprocess
 import time
 
+
+# fmt: off
+
 def get_kernel_info():
     return {
         "kernel_version": os.uname().release,
@@ -147,6 +150,8 @@ def get_hardware_info():
         "net_io_counters": get_net_io_counters(),
         "file_descriptor_stats" : get_file_descriptor_stats(),
     }
+
+# fmt: on
 
 
 if __name__ == '__main__':
