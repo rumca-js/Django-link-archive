@@ -378,49 +378,6 @@ class EntryDetailView(generic.DetailView):
         return from_entry
 
 
-class EntryDetailDetailView(generic.DetailView):
-    model = LinkDataController
-    template_name = str(ViewPage.get_full_template("entry_detail__dynamic.html"))
-
-    def get(self, *args, **kwargs):
-        """
-        API: Used to redirect if user does not have rights
-        """
-
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-
-        view = super().get(*args, **kwargs)
-        return view
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super().get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
-
-        return self.setup_context(context)
-
-    def setup_context(self, context):
-        object_controller = EntryPreviewBuilder.get(self.object, self.request.user)
-
-        context["object_controller"] = object_controller
-
-        config = Configuration.get_object().config_entry
-        if config.track_user_actions and config.track_user_navigation:
-            context["transitions"] = UserEntryTransitionHistory.get_related_list(
-                self.request.user, self.object
-            )
-
-        m = WaybackMachine()
-        context["search_engines"] = SearchEngines(
-            self.object.get_search_term(), self.object.link
-        )
-
-        return context
-
-
 class EntryArchivedDetailView(generic.DetailView):
     model = ArchiveLinkDataController
     template_name = str(ViewPage.get_full_template("entry_detail__dynamic.html"))
@@ -1342,7 +1299,7 @@ def is_entry_download(request, pk):
     if entries.exists():
         entry = entries[0]
 
-        main_condition = Q(subject=entry.link)
+        main_condition = Q(subject=entry.id)
         main_condition &= Q(enabled=True)
 
         job_condition = (
@@ -1383,7 +1340,7 @@ def entry_status(request, pk):
 
         entry = entries[0]
 
-        main_condition = Q(subject=entry.link)
+        main_condition = Q(subject=entry.id)
         main_condition &= Q(enabled=True)
 
         job_condition = (
@@ -1409,3 +1366,88 @@ def entry_status(request, pk):
             json_obj["is_resetting"] = True
 
     return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+
+def entry_parameters(request, pk):
+    p = ViewPage(request)
+    p.set_title("Entry parameters")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    entries = LinkDataController.objects.filter(id = pk)
+    if not entries.exists():
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("go_back.html")
+
+    entry = entries[0]
+
+    json_obj = {}
+    json_obj["parameters"] = []
+    
+    object_controller = EntryPreviewBuilder.get(entry, request.user)
+    for parameter in object_controller.get_parameters():
+        adict = {}
+
+        adict["name"] = parameter.name
+        adict["title"] = parameter.title
+        adict["description"] = parameter.description
+
+        json_obj["parameters"].append(adict)
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+
+def entry_op_parameters(request, pk):
+    p = ViewPage(request)
+    p.set_title("Entry parameters")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    entries = LinkDataController.objects.filter(id = pk)
+    if not entries.exists():
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("go_back.html")
+
+    entry = entries[0]
+
+    json_obj = {}
+    json_obj["parameters"] = []
+    
+    object_controller = EntryPreviewBuilder.get(entry, request.user)
+    for parameter in object_controller.get_parameters_operation():
+        adict = {}
+
+        adict["name"] = parameter.name
+        adict["title"] = parameter.title
+        adict["description"] = parameter.description
+
+        json_obj["parameters"].append(adict)
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+
+def entry_related(request, pk):
+    p = ViewPage(request)
+    p.set_title("Entry related")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    entries = LinkDataController.objects.filter(id = pk)
+    if not entries.exists():
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("go_back.html")
+
+    entry = entries[0]
+
+    object_controller = EntryPreviewBuilder.get(entry, request.user)
+
+    config = Configuration.get_object().config_entry
+    if config.track_user_actions and config.track_user_navigation:
+        p.context["transitions"] = UserEntryTransitionHistory.get_related_list(
+            request.user, entry
+        )
+
+    return p.render("entry_detail__related.html")

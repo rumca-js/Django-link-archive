@@ -1,12 +1,6 @@
 {% load static %}
 
 <div class="mb-2" id="entryTagContainer">
-    {% if object.has_tags %}
-      {% for tag in object.get_tag_map %}
-        <a href="{% url 'rsshistory:entries'%}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,
-      {% endfor %}
-    {% endif %}
-
     <button id="editTagsButton"
         {% if not object.is_taggable %}
         hidden

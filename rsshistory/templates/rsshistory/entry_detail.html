@@ -4,7 +4,7 @@
 
    {% include "rsshistory/entry_detail__frame.html" %}
 
-   <div>
+   <div id="entryParameters" class="d-flex flex-wrap">
      {% include "rsshistory/entry_detail__parameters.html" %}
    </div>
 
@@ -32,7 +32,11 @@
    {{object_controller.get_description_html | safe | linebreaks }}
    </div>
 
-   <div id="bodyBlock">
+   <div id="entryOperationalParameters">
+       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+   </div>
+
+   <div id="entryRelated">
        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
    </div>
 

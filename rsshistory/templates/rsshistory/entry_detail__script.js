@@ -29,7 +29,7 @@ function isEntryDownloadStop(data) {
 
 
 let currentIsDownloading = 0;
-function fillIsEntryDownloaded(attempt = 1) {
+function getIsEntryDownloaded(attempt = 1) {
     let requestIsDownloading = ++currentIsDownloading;
 
     $.ajax({
@@ -43,11 +43,11 @@ function fillIsEntryDownloaded(attempt = 1) {
 
             if (isEntryDownloadingData(data))
             {
-                setTimeout(() => fillIsEntryDownloaded(), 60000);
+                setTimeout(() => getIsEntryDownloaded(), 60000);
             }
             else if (isEntryDownloadStop(data))
             {
-                getEntryJson();
+                getEntryProperties();
             }
 
             is_downloading = data.is_downloading;
@@ -77,15 +77,49 @@ function fillIsEntryDownloaded(attempt = 1) {
                 return;
             }
             if (attempt < 3) {
-                fillIsEntryDownloaded(attempt + 1);
+                getIsEntryDownloaded(attempt + 1);
             }
         }
     });
 }
 
 
-function loadEntryDynamicDetails(attempt = 1) {
-    getDynamicContent("{% url 'rsshistory:get-entry-details' object.id %}", "#bodyBlock", 1, true);
+function getEntryRelated(attempt = 1) {
+    getDynamicContent("{% url 'rsshistory:entry-related' object.id %}", "#entryRelated", 1, true);
+}
+
+
+let currentEntryOperationalParamters = 0;
+function getEntryOperationalParamters(attempt = 1) {
+    let requestEntryOperationalParamters = ++currentEntryOperationalParamters;
+
+    $.ajax({
+        url: "{% url 'rsshistory:entry-op-parameters' object.id %}",
+        type: 'GET',
+        timeout: 15000,
+        success: function(data) {
+            if (requestEntryOperationalParamters != currentEntryOperationalParamters) {
+                return;
+            }
+
+            let html_out = "";
+
+            data.parameters.forEach(parameter => {
+                html_out += `<div class="text-nowrap mx-1"
+                    title="${parameter.title}"
+                    >
+                       <strong>${parameter.name}:</strong>
+                       ${parameter.description}
+                    </div>`;
+            });
+
+            if (html_out) {
+		 html_out = "<h1>Parameters</h1>" + html_out;
+	    }
+
+ 	    $("#entryOperationalParameters").html(html_out);
+	}
+    });
 }
 
 
@@ -109,9 +143,9 @@ function fillDislike() {
 }
 
 
-let currentloadDislikeData = 0;
-function loadDislikeData(attempt = 1) {
-    let requestloadDislikeData = ++currentloadDislikeData;
+let currentgetDislikeData = 0;
+function getDislikeData(attempt = 1) {
+    let requestgetDislikeData = ++currentgetDislikeData;
     let url_address = "{% url 'rsshistory:entry-dislikes' object.id %}";
 
     $.ajax({
@@ -119,7 +153,7 @@ function loadDislikeData(attempt = 1) {
        type: 'GET',
        timeout: 10000,
        success: function(data) {
-           if (requestloadDislikeData != currentloadDislikeData) {
+           if (requestgetDislikeData != currentgetDislikeData) {
                return;
            }
            if (data) {
@@ -128,11 +162,11 @@ function loadDislikeData(attempt = 1) {
            }
        },
        error: function(xhr, status, error) {
-           if (requestloadDislikeData != currentloadDislikeData) {
+           if (requestgetDislikeData != currentgetDislikeData) {
                return;
            }
            if (attempt < 3) {
-               loadDislikeData(attempt + 1);
+               getDislikeData(attempt + 1);
            } else {
            }
        }
@@ -155,8 +189,8 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1,
            $(htmlElement).html(data.message);
 
            if (data.status) {
-               getEntryJson();
-               loadEntryMenuContent();
+               getEntryProperties();
+               getEntryMenuContent();
                getIndicators();
            }
        },
@@ -184,17 +218,17 @@ function getVoteEditForm() {
 }
 
 
-function showTagEditForm() {
+function getTagEditForm() {
   getDynamicContent('{% url "rsshistory:entry-tag-form" object.id %}', "#entryTagContainer", 1, true);
 }
 
 
-function loadEntryMenuContent() {
+function getEntryMenuContent() {
     getDynamicContent("{% url 'rsshistory:get-entry-menu' object.id %}", "#entryMenu", 1, true);
 }
 
 
-function updateEntry() {
+function updateEntryProperties() {
     if (entry_json_data == null)
     {
         return;
@@ -230,9 +264,9 @@ function updateEntry() {
 }
 
 
-let currentgetEntryJson = 0;
-function getEntryJson(attempt = 1) {
-    let requestgetEntryJson = ++currentgetEntryJson;
+let currentgetEntryProperties = 0;
+function getEntryProperties(attempt = 1) {
+    let requestgetEntryProperties = ++currentgetEntryProperties;
     let url_address = "{% url 'rsshistory:entry-json' object.id %}";
 
     $.ajax({
@@ -240,20 +274,56 @@ function getEntryJson(attempt = 1) {
        type: 'GET',
        timeout: 10000,
        success: function(data) {
-           if (requestgetEntryJson != currentgetEntryJson) {
+           if (requestgetEntryProperties != currentgetEntryProperties) {
                return;
            }
            if (data) {
                entry_json_data = data;
-               updateEntry();
+               updateEntryProperties();
            }
        },
        error: function(xhr, status, error) {
-           if (requestgetEntryJson != currentgetEntryJson) {
+           if (requestgetEntryProperties != currentgetEntryProperties) {
                return;
            }
            if (attempt < 3) {
-               getEntryJson(attempt + 1);
+               getEntryProperties(attempt + 1);
+           } else {
+           }
+       }
+    });
+}
+
+
+let currentgetEntryTags = 0;
+function getEntryTags(attempt = 1) {
+    let requestgetEntryTags = ++currentgetEntryTags;
+    let url_address = "{% url 'rsshistory:entry-tags' object.id %}";
+
+    $.ajax({
+       url: url_address,
+       type: 'GET',
+       timeout: 10000,
+       success: function(data) {
+           if (requestgetEntryTags != currentgetEntryTags) {
+               return;
+           }
+           if (data) {
+               let tag_string = "";
+               data.tags.forEach(tag => {
+           	  tag_string += `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>,`
+               });
+           
+               tag_string += getEditButton();
+               $("#entryTagContainer").html(tag_string);
+           }
+       },
+       error: function(xhr, status, error) {
+           if (requestgetEntryTags != currentgetEntryTags) {
+               return;
+           }
+           if (attempt < 3) {
+               getEntryTags(attempt + 1);
            } else {
            }
        }
@@ -327,7 +397,7 @@ function tagEntry(attempt = 1) {
                 return;
             }
 
-            getEntryJson();
+            getEntryProperties();
         },
         error: function(xhr, status, error) {
             if (requesttagEntry != currenttagEntry)
@@ -393,15 +463,17 @@ $(document).on('submit', '#tagEditForm', function(event) {
 });
 
 $(document).on('click', '#editTagsButton', function() {
-    showTagEditForm();
+    getTagEditForm();
     $(this).hide();
 });
 
 $(document).on('click', '#cancelTagEdit', function() {
-    updateEntry();
+    getEntryTags();
 });
 
 
-loadEntryDynamicDetails();
-loadDislikeData();
-fillIsEntryDownloaded();
+getEntryRelated();
+getEntryOperationalParamters();
+getDislikeData();
+getIsEntryDownloaded();
+getEntryTags();

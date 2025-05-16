@@ -3,7 +3,7 @@ import urllib.parse
 from django.urls import reverse
 from django.templatetags.static import static
 
-from ...webtools import UrlLocation, InputContent
+from ...webtools import UrlLocation, InputContent, status_code_to_text
 from utils.dateutils import DateUtils
 
 from ...apps import LinkDatabase
@@ -655,9 +655,11 @@ class EntryGenericPlugin(object):
                 EntryParameter("Album", self.entry.album, html_id="entryAlbum")
             )
 
+        status_code_str = status_code_to_text(self.entry.status_code)
+
         parameters.append(
             EntryParameter(
-                "Status code", self.entry.status_code, html_id="entryStatusCode"
+                "Status code", status_code_str, html_id="entryStatusCode"
             )
         )
 
