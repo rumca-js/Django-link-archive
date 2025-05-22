@@ -507,27 +507,20 @@ class HttpPageHandler(HandlerInterface):
         if self.p:
             if type(self.p) is RssPage:
                 return self.p.get_entries()
+            if type(self.p) is HtmlPage:
+                # There might be RSS in HTML
+                rss = RssPage(self.url, self.p.get_contents())
+                if rss.is_valid():
+                    return rss.get_entries()
         return []
 
     def get_feeds(self):
-        # TODO ugly import
-        from .handlers import RedditChannelHandler
-        from .handlers import GitHubUrlHandler
-
         result = []
         url = self.url
 
-        additional_handlers = [
-            RedditChannelHandler,
-            GitHubUrlHandler,
-        ]
-
-        for additional_handler in additional_handlers:
-            h = additional_handler(url)
-            if h.is_handled_by():
-                feeds = h.get_feeds()
-                if feeds and len(feeds) > 0:
-                    result.extend(feeds)
+        feeds = super().get_feeds()
+        if feeds and len(feeds) > 0:
+            result.extend(feeds)
 
         if not self.p:
             return result

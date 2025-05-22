@@ -1480,7 +1480,7 @@ class EntryDataBuilder(object):
         self.link_data = link_data
         self.strict_ids = strict_ids
         self.source_is_auto = source_is_auto
-        self.browser = None
+        self.browser = browser
 
         if self.link:
             return self.build_from_link()
@@ -1488,9 +1488,10 @@ class EntryDataBuilder(object):
         if self.link_data:
             return self.build_from_props(ignore_errors=self.ignore_errors)
 
-    def build_simple(self, link=None, user=None, source_is_auto=True):
+    def build_simple(self, link=None, user=None, source_is_auto=True, browser=None):
         if link:
             self.link = link
+        self.browser = browser
 
         wrapper = EntryWrapper(link=self.link)
         obj = wrapper.get()
@@ -1506,6 +1507,16 @@ class EntryDataBuilder(object):
         link_data["user"] = self.user
 
         entry = wrapper.create(link_data)
+
+        if entry:
+            config = Configuration.get_object().config_entry
+            if config.enable_domain_support:
+                DomainsController.add(entry.link)
+
+            BackgroundJobController.entry_update_data(entry=entry, browser=self.browser)
+            BackgroundJobController.link_scan(entry=entry, browser=browser)
+            BackgroundJobController.link_save(entry.link)
+
         return entry
 
     def build_from_link(self, link=None, ignore_errors=False):

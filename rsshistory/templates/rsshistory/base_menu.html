@@ -81,6 +81,14 @@ class="navbar sticky-top navbar-expand-sm bg-light"
                    </li>
                    {% endif %}
                    <li>
+                       <a href="{% url 'rsshistory:categories-view' %}" class="dropdown-item" title="Source categories">
+                           <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+                           Categories
+                           <span class="position-absolute top-5 start-95 translate-middle badge rounded-pill bg-danger invisible sourceErrorElement">
+                           </span>
+                       </a>
+                   </li>
+                   <li>
                        <a href="{% url 'rsshistory:sources' %}" class="dropdown-item" title="Sources">
                            <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
                            Sources

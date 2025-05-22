@@ -394,7 +394,7 @@ function fillListData() {
 
 
 $(document).on("click", '#showPureLinks', function(e) {
-   if (show_pure_links) {
+   if (!show_pure_links) {
       show_pure_links = true;
    }
    else {

@@ -26,6 +26,7 @@ from .webtools import (
     URL_TYPE_HTML,
     URL_TYPE_FONT,
     URL_TYPE_UNKNOWN,
+    status_code_to_text,
 )
 from .webconfig import WebConfig
 from .urllocation import UrlLocation
@@ -53,6 +54,8 @@ from .handlers import (
     GitHubUrlHandler,
     HackerNewsHandler,
     InternetArchive,
+    FourChanChannelHandler,
+    TwitterUrlHandler,
 )
 
 from utils.dateutils import DateUtils
@@ -73,7 +76,14 @@ class Url(ContentInterface):
         YouTubeChannelHandler,
         OdyseeVideoHandler,
         OdyseeChannelHandler,
-        HttpPageHandler,
+        RedditUrlHandler,
+        ReturnDislike,
+        GitHubUrlHandler,
+        HackerNewsHandler,
+        InternetArchive,
+        FourChanChannelHandler,
+        TwitterUrlHandler,
+        HttpPageHandler,  # default
     ]
 
     def __init__(self, url=None, settings=None, url_builder=None):
@@ -707,6 +717,9 @@ class Url(ContentInterface):
 
         if response:
             response_data["status_code"] = response.get_status_code()
+            response_data["status_code_str"] = status_code_to_text(
+                response.get_status_code()
+            )
 
             response_data["Content-Type"] = response.get_content_type()
             if page_handler == HttpPageHandler:
@@ -761,42 +774,48 @@ class Url(ContentInterface):
     def get_social_properties(self):
         url = self.url
 
-        handler = Url.get_type(url)
-
         json_obj = {}
 
-        if type(handler) == Url.youtube_video_handler:
-            code = handler.get_video_code()
-            h = ReturnDislike(code)
-            json_obj["thumbs_up"] = h.get_thumbs_up()
-            json_obj["thumbs_down"] = h.get_thumbs_down()
-            json_obj["view_count"] = h.get_view_count()
-            json_obj["rating"] = h.get_rating()
-            json_obj["upvote_ratio"] = h.get_upvote_ratio()
-            json_obj["upvote_view_ratio"] = h.get_upvote_view_ratio()
+        json_obj["thumbs_up"] = None
+        json_obj["thumbs_down"] = None
+        json_obj["view_count"] = None
+        json_obj["rating"] = None
+        json_obj["upvote_ratio"] = None
+        json_obj["upvote_view_ratio"] = None
 
-        elif type(handler) == HtmlPage:
-            handlers = [
-                RedditUrlHandler(handler.url),
-                GitHubUrlHandler(handler.url),
-                HackerNewsHandler(handler.url),
-            ]
+        handler = self.get_handler()
+        if not handler:
+            return json_obj
 
-            for handler in handlers:
-                if handler.is_handled_by():
-                    handler_data = handler.get_json_data()
-                    if handler_data and "thumbs_up" in handler_data:
-                        json_obj["thumbs_up"] = handler_data["thumbs_up"]
-                    if handler_data and "thumbs_down" in handler_data:
-                        json_obj["thumbs_down"] = handler_data["thumbs_down"]
-                    if handler_data and "upvote_ratio" in handler_data:
-                        json_obj["upvote_ratio"] = handler_data["upvote_ratio"]
-                    if handler_data and "upvote_view_ratio" in handler_data:
-                        json_obj["upvote_view_ratio"] = handler_data[
-                            "upvote_view_ratio"
-                        ]
+        json_obj = handler.get_json_data()
+        if not json_obj:
+            json_obj = {}
+            if "thumbs_up" not in json_obj:
+                json_obj["thumbs_up"] = None
+            if "thumbs_down" not in json_obj:
+                json_obj["thumbs_down"] = None
+            if "view_count" not in json_obj:
+                json_obj["view_count"] = None
+            if "rating" not in json_obj:
+                json_obj["rating"] = None
+            if "upvote_ratio" not in json_obj:
+                json_obj["upvote_ratio"] = None
+            if "upvote_view_ratio" not in json_obj:
+                json_obj["upvote_view_ratio"] = None
+            return json_obj
 
-                    break
+        if "thumbs_up" not in json_obj:
+            json_obj["thumbs_up"] = None
+        if "thumbs_down" not in json_obj:
+            json_obj["thumbs_down"] = None
+        if "view_count" not in json_obj:
+            json_obj["view_count"] = None
+        if "rating" not in json_obj:
+            json_obj["rating"] = None
+        if "upvote_ratio" not in json_obj:
+            json_obj["upvote_ratio"] = None
+        if "upvote_view_ratio" not in json_obj:
+            json_obj["upvote_view_ratio"] = None
 
         return json_obj
 

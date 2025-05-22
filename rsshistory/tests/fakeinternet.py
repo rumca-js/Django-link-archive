@@ -399,14 +399,11 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.track_user_navigation = False
         c.config_entry.days_to_move_to_archive = 100
         c.config_entry.days_to_remove_links = 0
-        c.config_entry.respect_robots_txt = False
         c.config_entry.whats_new_days = 7
         c.config_entry.entry_update_via_internet = True
         c.remote_webtools_server_location = "https://127.0.0.1:3000"
 
         c.config_entry.save()
-
-        c.apply_robots_txt()
 
         SearchView.objects.create(
             name="Default", order_by="-date_created, link", default=True

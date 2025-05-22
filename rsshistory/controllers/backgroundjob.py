@@ -422,21 +422,20 @@ class BackgroundJobController(BackgroundJob):
         )
 
     def link_save(link_url):
-        archive_items = BackgroundJob.objects.filter(job=BackgroundJob.JOB_LINK_SAVE)
-        if archive_items.count() < 100:
-            return BackgroundJob.objects.create(
-                job=BackgroundJob.JOB_LINK_SAVE,
-                task=None,
-                subject=link_url,
-                args="",
-                priority=BackgroundJobController.get_job_priority(
-                    BackgroundJob.JOB_LINK_SAVE
-                ),
-            )
-        else:
-            for key, obj in enumerate(archive_items):
-                if key > 100:
-                    obj.delete()
+        from ..configuration import Configuration
+        config = Configuration.get_object().config_entry
+        if not config.enable_link_archiving:
+            return
+
+        return BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_LINK_SAVE,
+            task=None,
+            subject=link_url,
+            args="",
+            priority=BackgroundJobController.get_job_priority(
+                BackgroundJob.JOB_LINK_SAVE
+            ),
+        )
 
     def link_download(link_url, user=None):
         return BackgroundJobController.create_single_job(

@@ -149,11 +149,7 @@ class ConfigForm(forms.ModelForm):
             "number_of_update_entries",
             # Networking
             "remote_webtools_server_location",
-            "ssl_verification",
-            "user_agent",
-            "user_headers",
             "internet_status_test_url",
-            "respect_robots_txt",
             # user
             "track_user_actions",
             "track_user_searches",

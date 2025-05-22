@@ -3,6 +3,22 @@
 {% block content %}
 
 {% if categories %}
+   <div class="dropdown">
+       <button class="btn btn-primary" type="button" id="#viewsDrop" data-bs-toggle="dropdown" aria-expanded="false">
+         View
+       </button>
+       <ul class="dropdown-menu">
+          <li>
+             <a href="{% url 'rsshistory:sources-json-all' %}" class="dropdown-item" title="JSON contents">
+              Sources JSON</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:sources-opml' %}" class="dropdown-item" title="OPML contents">
+              Sources OPML</a>
+          </li>
+       </ul>
+   </div>
+
    <div class="d-flex flex-wrap gap-3 justify-content-center">
       {% for category in categories %}
          <div class="card" style="width:18rem;">

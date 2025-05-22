@@ -16,6 +16,23 @@ function getCollapsedPropertyItem(name, data) {
 }
 
 
+function displayProperty(propertyEntry) {
+   let htmlOutput = "";
+   for (const [key, value] of Object.entries(propertyEntry)) {
+       if (key != "description")
+       {
+           htmlOutput += `
+           <div>
+               <strong>${key}:</strong> ${value ?? "N/A"}
+           </div>
+       `;
+       }
+   }
+
+   return htmlOutput;
+}
+
+
 function fillDataProperty(property) {
     let htmlOutput = "";
 
@@ -35,21 +52,32 @@ function fillDataProperty(property) {
 
         htmlOutput += getCollapsedPropertyItem("Binary", escapedContents);
     }
-    else if (property.name == "Headers") {
-        let contents = property.data.Headers;
-        let escapedHeaders = escapeHtml(contents);
-
-        htmlOutput += getCollapsedPropertyItem("Headers", escapedHeaders);
+    else if (property.name == "Entries") {
+        for (const [key, entryObject] of Object.entries(property.data)) {
+            htmlOutput += `<h4>${entryObject.title}</h4>`;
+            htmlOutput += displayProperty(entryObject);
+            htmlOutput += `<hr/>`;
+        }
     }
     else {
         for (const [key, value] of Object.entries(property.data)) {
             if (key != "contents")
             {
-                htmlOutput += `
-                <div>
-                    <strong>${key}:</strong> ${value ?? "N/A"}
-                </div>
-            `;
+                if (key == "settings") {
+                   let props = displayProperty(value);
+                   htmlOutput += `
+                   <div>
+                     <strong>${key}:</strong> <div class="cotainer">${props}</div>
+                   </div>
+                   `;
+                }
+                else {
+                   htmlOutput += `
+                   <div>
+                       <strong>${key}:</strong> ${value ?? "N/A"}
+                   </div>
+                    `;
+                }
             }
         }
     }

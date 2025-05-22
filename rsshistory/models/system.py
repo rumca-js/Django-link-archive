@@ -334,36 +334,11 @@ class ConfigurationEntry(models.Model):
         help_text="URL where the webtools server is located. If defined remote server is used for crawling.",
     )
 
-    ssl_verification = models.BooleanField(
-        default=True,
-        help_text="Enable SSL certificate verification for network requests. Disabling may improve speed but could result in invalid or insecure pages.",
-    )  # Might work faster if disabled, but might capture invalid pages
-
-    user_agent = models.CharField(
-        default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
-        max_length=500,
-        help_text=(
-            "Custom user agent for network requests. "
-            "<a href='https://www.supermonitoring.com/blog/check-browser-http-headers/' target='_blank'>Check your user agent here</a>."
-        ),
-    )
-
-    user_headers = models.CharField(
-        max_length=1000,
-        blank=True,
-        help_text='Provide custom JSON headers for requests. Check your user agent at <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">here</a>.',
-    )
-
     internet_status_test_url = models.CharField(
         default="https://google.com",
         max_length=2000,
         null=True,
         help_text="URL used to test internet connectivity. It will be pinged to verify internet access.",
-    )
-
-    respect_robots_txt = models.BooleanField(
-        default=False,
-        help_text="Respect robots.txt rules for web scraping. Some features may not work, such as fetching YouTube channels.",
     )
 
     # User settings

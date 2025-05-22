@@ -4,11 +4,7 @@
 
 <div class="title-link-container">
    {% if user_config.show_icons %}
-        {% if entry_object %}
 	<a href="{% url 'rsshistory:entry-detail' entry_object.id %}">
-		{% else %}
-	<a href="{{ object.url }}">
-		{% endif %}
 		<div class="title-thumbnail-container">
 	           <img src="{{object.get_favicon}}" class="border rounded title-thumbnail"/>
 		</div>
@@ -16,7 +12,6 @@
    {% endif %}
 
    <div class="mx-2 title-text-content">
-		{% if entry_object %}
 		<div>
 			<h1 class="link-title" title="{{ object.url }}">
 				<a href="{% url 'rsshistory:entry-detail' entry_object.id %}">
@@ -24,25 +19,13 @@
 				 </a>
 			</h1>
 		</div>
-		{% else %}
-		<div>
-			<h1 class="link-title" title="{{ object.url }}">
-				<a href="{{ object.url }}">
-					{% include "rsshistory/icon_external.html" %}
-					{{ object.title }}
-				 </a>
-			</h1>
-		</div>
-		{% endif %}
 
-		{% if entry_object %}
 		<div>
 		  <a href="{{ object.url }}">
 			 {% include "rsshistory/icon_external.html" %}
 			 {{ object.url }}
 		  </a>
 		</div>
-		{% endif %}
 
 		{% for additional_link in additional_links %}
 		<div>
@@ -77,22 +60,29 @@
 {% if object.username %}
     <li class="list-group-item text-nowrap mx-2">Username: {{ object.username }}</li>
 {% endif %}
-    <li class="list-group-item text-nowrap mx-2">Category: {{ object.category_name }}</li>
-    <li class="list-group-item text-nowrap mx-2">Subcategory: {{ object.subcategory_name }}</li>
-    <li class="list-group-item text-nowrap mx-2">Category object: {{ object.category }}</li>
-    <li class="list-group-item text-nowrap mx-2">Subcategory object: {{ object.subcategory }}</li>
+    <li class="list-group-item text-nowrap mx-2">
+        <a href="{% url 'rsshistory:entries' %}?search=source__category_name+%3D%3D+{{object.category}}" class="card-link">
+	    Category: {{ object.category }}
+        </a>
+    </li>
+    <li class="list-group-item text-nowrap mx-2">
+        <a href="{% url 'rsshistory:entries' %}?search=source__category_name+%3D%3D+{{object.category}}+%26+source__subcategory_name+%3D%3D+{{object.subcategory}}" class="card-link">
+	    Subcategory: {{ object.subcategory }}
+        </a>
+    </li>
     <li class="list-group-item text-nowrap mx-2">Export to CMS: {{ object.export_to_cms }}</li>
     <li class="list-group-item text-nowrap mx-2">Favicon: <a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">
 	   <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
 	   Link</a></li>
     {% if object.proxy_location %}
+    <li class="list-group-item text-nowrap mx-2">Fetched: {{date_fetched}}</li>
+    <li class="list-group-item text-nowrap mx-2">Import seconds: {{object.dynamic_data.import_seconds}}</li>
+    <li class="list-group-item text-nowrap mx-2">Consecutive Errors: {{object.dynamic_data.consecutive_errors}}</li>
+
     <li class="list-group-item text-nowrap mx-2">Proxy location: <a href="{{ object.proxy_location }}">
 	     <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
 	     {{ object.proxy_location }}</a></li>
     {% endif %}
-    <li class="list-group-item text-nowrap mx-2">Fetched: {{date_fetched}}</li>
-    <li class="list-group-item text-nowrap mx-2">Import seconds: {{object.dynamic_data.import_seconds}}</li>
-    <li class="list-group-item text-nowrap mx-2">Consecutive Errors: {{object.dynamic_data.consecutive_errors}}</li>
 </ul>
 
 {% endblock %}

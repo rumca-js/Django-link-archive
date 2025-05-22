@@ -517,7 +517,7 @@ def func_display_data_form(request, p, data):
         )
     if domain.lower() != domain:
         warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
-    if config.respect_robots_txt and not is_allowed:
+    if not is_allowed:
         warnings.append("Link is not allowed by site robots.txt")
     if link.find("?") >= 0:
         warnings.append("Link contains arguments. Is that intentional?")
@@ -550,18 +550,6 @@ def on_added_entry(request, entry):
         # if you add a link you must have visited it?
         UserEntryVisitHistory.visited(entry, request.user)
 
-    DomainsController.add(entry.link)
-
-    browser = get_request_browser(request.GET)
-
-    BackgroundJobController.entry_update_data(entry=entry, browser=browser)
-    BackgroundJobController.link_scan(entry=entry, browser=browser)
-
-    config = Configuration.get_object().config_entry
-
-    if config.enable_link_archiving:
-        BackgroundJobController.link_save(entry.link)
-
 
 def add_entry_json(request):
 
@@ -592,7 +580,8 @@ def add_entry_json(request):
             data["errors"] = ["Entry already is defined"]
         else:
             b = EntryDataBuilder()
-            entry = b.build_simple(link=link, user=request.user, source_is_auto=False)
+            browser = get_request_browser(request.GET)
+            entry = b.build_simple(link=link, user=request.user, source_is_auto=False, browser=browser)
 
             if not entry:
                 for error in b.errors:

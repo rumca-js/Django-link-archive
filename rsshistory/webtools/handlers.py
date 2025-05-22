@@ -8,70 +8,47 @@ from .webtools import (
 )
 
 
-class RedditChannelHandler(DefaultChannelHandler):
-    def __init__(self, url=None, contents=None):
-        self.html = None  # channel html page contains useful info
-
-        super().__init__(
-            url,
-            contents=contents,
-        )
-
-        if url:
-            self.code = self.input2code(url)
-
-    def is_handled_by(self):
-        if not self.url:
-            return False
-
-        code = self.input2code(self.url)
-        if code:
-            return True
-
-    def input2code(self, input_string):
-        p = UrlLocation(input_string)
-        if p.get_domain_only().find("reddit.com") >= 0:
-            parts = p.split()
-            if len(parts) >= 4 and parts[3] == "r":
-                return parts[4]
-
-    def code2feed(self, code):
-        return "https://www.reddit.com/r/{}/.rss".format(code)
-
-
 class RedditUrlHandler(DefaultUrlHandler):
-    """https://www.reddit.com/r/redditdev/comments/1hw8p3j/i_used_the_reddit_api_to_save_myself_time_with_my/"""
+    """
+    Url:
+    https://www.reddit.com/r/redditdev/comments/1hw8p3j/i_used_the_reddit_api_to_save_myself_time_with_my/
+    Url to JSON:
+    https://www.reddit.com/r/redditdev/comments/1hw8p3j/i_used_the_reddit_api_to_save_myself_time_with_my/.json
 
-    """https://www.reddit.com/r/redditdev/comments/1hw8p3j/i_used_the_reddit_api_to_save_myself_time_with_my/.json"""
+    Maybe we could use python redditapi
+    """
 
-    def __init__(self, url=None, contents=None):
+    def __init__(self, url=None, contents=None, settings=None, url_builder=None):
+        self.post_id = None
+        self.subreddit = None
+
         super().__init__(
-            url,
-            contents=contents,
+            url, contents=contents, settings=settings, url_builder=url_builder
         )
 
     def is_handled_by(self):
         if not self.url:
             return False
 
-        code = self.input2code(self.url)
-        if code:
-            return True
+        return self.input2code(self.url)
 
     def input2code(self, input_string):
         p = UrlLocation(input_string)
         if p.get_domain_only().find("reddit.com") >= 0:
             parts = p.split()
             if len(parts) >= 6 and parts[3] == "r" and parts[5] == "comments":
-                subreddit = parts[4]
-                post_id = parts[6]
+                self.subreddit = parts[4]
+                self.post_id = parts[6]
 
-                return post_id
+                return True
+            if len(parts) >= 4 and parts[3] == "r":
+                self.subreddit = parts[4]
+                return True
 
     def get_json_url(self):
-        post_id = self.input2code(self.url)
-        if post_id:
-            return f"https://www.reddit.com/{post_id}.json"
+        self.input2code(self.url)
+        if self.post_id:
+            return f"https://www.reddit.com/{self.post_id}.json"
         else:
             WebLogger.error("Reddit:did not found post id {}".format(self.url))
 
@@ -98,7 +75,7 @@ class RedditUrlHandler(DefaultUrlHandler):
             WebLogger.error("Reddit:no Url link")
 
     def get_json_value(self, json_text, var):
-        wh_start = json_text.find(var)
+        wh_start = json_text.find('"{}"'.format(var))
         if wh_start == -1:
             return
 
@@ -123,19 +100,36 @@ class RedditUrlHandler(DefaultUrlHandler):
 
         upvote_ratio = self.get_json_value(json_text, "upvote_ratio")
         try:
-            result["upvote_ratio"] = float(upvote_ratio)
+            upvote_ratio = float(upvote_ratio)
         except ValueError:
-            result["upvote_ratio"] = None
+            upvote_ratio = None
+
+        score = self.get_json_value(json_text, "score")
+        try:
+            score = float(score)
+        except ValueError:
+            score = None
+
+        result["upvote_ratio"] = upvote_ratio
+        # result["score"] = score
+
+        # if upvote_ratio and score and upvote_ratio > 0 and score > 0:
+        #    thumbs_up = (upvote_ratio * score) / (2 * upvote_ratio - 1)
+        #    thumbs_down = thumbs_up - score
+        #    result["thumbs_up"] = thumbs_up
+        #    result["thumbs_down"] = thumbs_down
 
         return result
+
+    def code2feed(self, code):
+        return "https://www.reddit.com/r/{}/.rss".format(code)
 
 
 class GitHubUrlHandler(DefaultUrlHandler):
 
-    def __init__(self, url=None, contents=None):
+    def __init__(self, url=None, contents=None, settings=None, url_builder=None):
         super().__init__(
-            url,
-            contents=contents,
+            url, contents=contents, settings=settings, url_builder=url_builder
         )
 
     def is_handled_by(self):
@@ -163,7 +157,8 @@ class GitHubUrlHandler(DefaultUrlHandler):
         """
         even for post, or individual videos we might request feed url
         """
-        feeds = []
+        feeds = super().get_feeds()
+
         elements = self.input2code(self.url)
         if elements:
             owner = elements[0]
@@ -225,22 +220,28 @@ class GitHubUrlHandler(DefaultUrlHandler):
 
 
 class ReturnDislike(DefaultUrlHandler):
-    def __init__(self, video_code=None):
-        self.code = video_code
-        self.process()
+    def __init__(
+        self, video_code=None, url=None, contents=None, settings=None, url_builder=None
+    ):
 
-    def process(self):
-        data = self.read_data()
-        self.loads(data)
+        if video_code:
+            url = self.code2url(video_code)
 
-    def read_data(self):
-        from .url import Url
+        super().__init__(
+            url=url, contents=contents, settings=settings, url_builder=url_builder
+        )
 
-        url = "https://returnyoutubedislikeapi.com/votes?videoId=" + self.code
+    def code2url(self, input_code):
+        return "https://returnyoutubedislikeapi.com/votes?videoId=" + input_code
 
-        u = Url(url)
-        data = u.get_contents()
-        return data
+    def is_handled_by(self):
+        return False
+
+    def load_response(self):
+        self.get_response()
+        contents = self.get_contents()
+        self._json = self.loads(contents)
+        return self._json
 
     def loads(self, data):
         try:
@@ -268,13 +269,26 @@ class ReturnDislike(DefaultUrlHandler):
         if self._json and "rating" in self._json:
             return self._json["rating"]
 
+    def get_json_data(self):
+        json_obj = {}
+
+        self.get_response()
+
+        json_obj["thumbs_up"] = h.get_thumbs_up()
+        json_obj["thumbs_down"] = h.get_thumbs_down()
+        json_obj["view_count"] = h.get_view_count()
+        json_obj["rating"] = h.get_rating()
+        json_obj["upvote_ratio"] = h.get_upvote_ratio()
+        json_obj["upvote_view_ratio"] = h.get_upvote_view_ratio()
+
+        return json_obj
+
 
 class HackerNewsHandler(DefaultUrlHandler):
 
-    def __init__(self, url=None, contents=None):
+    def __init__(self, url=None, contents=None, settings=None, url_builder=None):
         super().__init__(
-            url,
-            contents=contents,
+            url, contents=contents, settings=settings, url_builder=url_builder
         )
 
     def is_handled_by(self):
@@ -340,8 +354,13 @@ class HackerNewsHandler(DefaultUrlHandler):
 
 
 class InternetArchive(DefaultUrlHandler):
-    def __init__(self, url):
-        super().__init__(url)
+    def __init__(self, url, settings=None, url_builder=None):
+        super().__init__(url, settings=settings, url_builder=url_builder)
+
+    def is_handled_by(self):
+        p = UrlLocation(self.url)
+        if p.get_domain_only().find("archive.org") >= 0:
+            return True
 
     def get_archive_url(self, time=None):
         if not time:
@@ -350,3 +369,53 @@ class InternetArchive(DefaultUrlHandler):
         if time:
             time_str = time.strftime("%Y%m%d")
             return "https://web.archive.org/web/{}110000*/".format(time_str) + self.url
+
+
+class FourChanChannelHandler(DefaultChannelHandler):
+    def __init__(self, url=None, contents=None, settings=None, url_builder=None):
+        super().__init__(
+            url, contents=contents, settings=settings, url_builder=url_builder
+        )
+
+        if url:
+            self.code = self.input2code(url)
+
+    def is_handled_by(self):
+        if not self.url:
+            return False
+
+        p = UrlLocation(self.url)
+        if p.get_domain_only().find("4chan.org") >= 0:
+            return True
+
+    def input2code(self, input_string):
+        p = UrlLocation(input_string)
+        domain_only = p.get_domain_only()
+
+        if domain_only.find("boards.4chan.org") >= 0:
+            parts = p.split()
+            if len(parts) >= 3:
+                return parts[3]
+
+    def code2feed(self, code):
+        return "https://boards.4chan.org/{}/index.rss".format(code)
+
+
+class TwitterUrlHandler(DefaultUrlHandler):
+
+    def __init__(self, url=None, contents=None, settings=None, url_builder=None):
+        super().__init__(
+            url, contents=contents, settings=settings, url_builder=url_builder
+        )
+        wh = self.url.find("?ref_src=")
+        if wh >= 0:
+            self.url = self.url[:wh]
+
+    def is_handled_by(self):
+        if not self.url:
+            return False
+
+        if self.url.find("https://x.com") >= 0:
+            return True
+        if self.url.find("https://twitter.com") >= 0:
+            return True

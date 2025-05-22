@@ -71,7 +71,7 @@ def get_errors(page_url):
         )
     if domain.lower() != domain:
         warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
-    if config.respect_robots_txt and not is_allowed:
+    if not is_allowed:
         warnings.append("Link is not allowed by site robots.txt")
     if link.find("?") >= 0:
         warnings.append("Link contains arguments. Is that intentional?")

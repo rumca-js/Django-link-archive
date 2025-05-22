@@ -4,6 +4,7 @@ import re
 import json
 from datetime import datetime
 from dateutil import parser
+from brutefeedparser import BruteFeedParser
 import html
 import lxml.etree as ET
 
@@ -15,7 +16,6 @@ from .webtools import (
     date_str_to_date,
 )
 from .urllocation import UrlLocation
-from .feedreader import FeedReader
 
 
 class ContentInterface(object):
@@ -491,6 +491,7 @@ class JsonPage(ContentInterface):
 
 class RssPageEntry(ContentInterface):
     def __init__(self, feed_index, feed_entry, url, contents, page_object_properties):
+        """ """
         self.feed_index = feed_index
         self.feed_entry = feed_entry
         self.url = url
@@ -640,8 +641,14 @@ class RssPageEntry(ContentInterface):
                 return DateUtils.get_datetime_now_utc()
 
     def get_author(self):
-        if "author" in self.page_object_properties:
-            return self.page_object_properties["author"]
+        author = None
+        if not author and hasattr(self.feed_entry, "author"):
+            author = self.feed_entry.author
+
+        if not author and "author" in self.page_object_properties:
+            author = self.page_object_properties["author"]
+
+        return author
 
     def get_album(self):
         return ""
@@ -666,31 +673,46 @@ class RssPage(ContentInterface):
         """
         Workaround for https://warhammer-community.com/feed
         """
-        # TODO apply that woraround differently
-        # if contents:
-        #    wh = contents.find("<rss version")
-        #    if wh > 0:
-        #        contents = contents[wh:]
-
         super().__init__(url=url, contents=contents)
 
         if self.contents and not self.feed:
             self.process_contents()
 
     def process_contents(self):
+        self.try_to_parse()
+
+        if not self.feed or not self.feed.entries:
+            if self.contents.find("html") >= 0 and self.contents.find("rss") >= 0:
+                self.try_to_workaround()
+        #    WebLogger.error("Feed does not have any entries {}".format(self.url))
+
+        return self.feed
+
+    def try_to_parse(self):
         contents = self.contents
         if contents is None:
             return None
 
         try:
-            self.feed = FeedReader.parse(contents)
-            # if not self.feed.entries or len(self.feed.entries) == 0:
-            #    WebLogger.error("Feed does not have any entries {}".format(self.url))
-
+            self.feed = BruteFeedParser.parse(contents)
             return self.feed
-
         except Exception as E:
+            print(str(E))
             WebLogger.exc(E, "Url:{}. RssPage, when parsing.".format(self.url))
+
+    def try_to_workaround(self):
+        if not self.contents:
+            return
+
+        start_index = self.contents.find("&lt;rss")
+        end_index = self.contents.rfind("&gt;")
+        if start_index == -1 or end_index == -1 or end_index <= start_index:
+            return
+
+        self.contents = self.contents[start_index : end_index + 4]
+        self.contents = html.unescape(self.contents)
+
+        self.try_to_parse()
 
     def get_entries(self):
         if self.feed is None:

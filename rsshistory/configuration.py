@@ -22,7 +22,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.11.3"
+__version__ = "2.11.4"
 
 
 class Configuration(object):
@@ -156,29 +156,10 @@ class Configuration(object):
         from .models import Browser
         from .webtools import WebConfig
 
-        self.apply_ssl_verification()
-        self.apply_user_agent()
-        self.apply_robots_txt()
         self.apply_web_logger()
 
         if Browser.objects.all().count() == 0:
             Browser.read_browser_setup()
-
-    def apply_ssl_verification(self):
-        from .webtools import WebConfig
-
-        if not self.config_entry.ssl_verification:
-            WebConfig.disable_ssl_warnings()
-
-    def apply_user_agent(self):
-        from .webtools import HttpPageHandler
-
-        HttpPageHandler.user_agent = self.config_entry.user_agent
-
-    def apply_robots_txt(self):
-        from .webtools import DomainCache
-
-        DomainCache.respect_robots_txt = self.config_entry.respect_robots_txt
 
     def apply_web_logger(self):
         from .webtools import WebConfig

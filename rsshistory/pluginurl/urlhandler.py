@@ -53,9 +53,6 @@ class UrlHandler(Url):
                 if rule.browser:
                     o.bring_to_front(rule.browser.get_setup())
 
-        config = Configuration.get_object().config_entry
-        o.ssl_verify = config.ssl_verification
-
         return o
 
     def is_valid(self):
@@ -105,12 +102,6 @@ class UrlHandlerEx(object):
         if not self.settings:
             self.settings = {}
 
-            config_entry = Configuration.get_object().config_entry
-            if config_entry.respect_robots_txt:
-                self.settings["respect_robots_txt"] = True
-            if config_entry.ssl_verification:
-                self.settings["ssl_verify"] = True
-
         self.browsers = browsers
         if not browsers:
             self.browsers = Browser.get_browser_setup()
@@ -149,7 +140,6 @@ class UrlHandlerEx(object):
 
         if mode_mapping and len(mode_mapping) > 0:
             for crawler_data in mode_mapping:
-                crawler_data = self.get_ready_crawler_data(crawler_data)
                 if "name" in crawler_data:
                     name = crawler_data["name"]
 
@@ -194,38 +184,6 @@ class UrlHandlerEx(object):
             self.all_properties = []
 
         return self.all_properties
-
-    def get_ready_crawler_data(self, crawler_data):
-        config_entry = Configuration.get_object().config_entry
-
-        crawler_data = self.get_ready_browser(crawler_data)
-        if not crawler_data:
-            return
-
-        if config_entry.respect_robots_txt:
-            crawler_data["settings"]["respect_robots_txt"] = True
-        else:
-            crawler_data["settings"]["respect_robots_txt"] = False
-        if config_entry.ssl_verification:
-            crawler_data["settings"]["ssl_verify"] = True
-        else:
-            crawler_data["settings"]["ssl_verify"] = False
-        # TODO add proxy support
-        # TODO add user agent
-        # TODO add headers?
-
-        return crawler_data
-
-    def get_ready_browser(self, crawler_data):
-        config_entry = Configuration.get_object().config_entry
-
-        for settings_key in self.settings:
-            crawler_data["settings"][settings_key] = self.settings[settings_key]
-
-        if "ssl_verify" not in crawler_data["settings"]:
-            crawler_data["settings"]["ssl_verify"] = config_entry.ssl_verification
-
-        return crawler_data
 
     def get_browsers(self):
         browsers = self.browsers
@@ -400,14 +358,9 @@ class UrlHandlerEx(object):
     def __str__(self):
         return "{}".format(self.options)
 
-    def ping(url, timeout_s=20, user_agent=None):
-        if not user_agent:
-            config_entry = Configuration.get_object().config_entry
-            if config_entry.user_agent:
-                user_agent = config_entry.user_agent
-
+    def ping(url, timeout_s=20):
         u = Url(url)
-        return u.ping(timeout_s=timeout_s, user_agent=user_agent)
+        return u.ping(timeout_s=timeout_s)
 
     def get_cleaned_link(url):
         return Url.get_cleaned_link(url)
@@ -424,16 +377,7 @@ class UrlHandlerEx(object):
         return True
 
     def is_allowed(self):
-        config_entry = Configuration.get_object().config_entry
-        if config_entry.respect_robots_txt:
-            response = self.get_section("Response")
-            if response:
-                if "is_allowed" in response and not response["is_allowed"]:
-                    return False
-
-            return True
-        else:
-            return True
+        return True
 
     def get_response(self):
         self.get_properties()

@@ -3,8 +3,7 @@ from pathlib import Path
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
@@ -121,10 +120,12 @@ class SourceDetailView(generic.DetailView):
 
         entries = LinkDataController.objects.filter(link=self.object.url)
         if entries.count() > 0:
-            context["entry_object"] = entries[0]
+            entry = entries[0]
         else:
             entry = self.create_entry(self.object.url)
-            context["entry_object"] = entry
+
+        context["entry_object"] = entry
+        context["source_url"] = self.object.url
 
         context["handler"] = SourceControllerBuilder.get(self.object.id)
 
@@ -132,7 +133,7 @@ class SourceDetailView(generic.DetailView):
 
     def create_entry(self, url):
         builder = EntryDataBuilder()
-        entry = builder.build(link=url)
+        entry = builder.build_simple(link=url)
 
         if entry:
             if entry.is_archive_entry():
@@ -321,7 +322,7 @@ def source_add_form(request):
         )
     if domain.lower() != domain:
         warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
-    if config.respect_robots_txt and not is_allowed:
+    if not is_allowed:
         warnings.append("Link is not allowed by site robots.txt")
     if link.find("?") >= 0:
         warnings.append("Link contains arguments. Is that intentional?")
@@ -406,23 +407,7 @@ def edit_source(request, pk):
         )
         return p.render("summary_present.html")
     else:
-        if not ob.favicon:
-            icon = UrlHandlerEx(ob.url).get_thumbnail()
-
-            if not icon:
-                page = UrlLocation(ob.url)
-                domain = page.get_domain()
-                u = UrlHandlerEx(domain, settings={"handler_class": "HttpPageHandler"})
-                icon = u.get_thumbnail()
-
-            if icon:
-                form = SourceForm(
-                    instance=ob, initial={"favicon": icon}, request=request
-                )
-            else:
-                form = SourceForm(instance=ob, request=request)
-        else:
-            form = SourceForm(instance=ob, request=request)
+        form = SourceForm(instance=ob, request=request)
 
         form.method = "POST"
         form.action_url = reverse("{}:source-edit".format(LinkDatabase.name), args=[pk])
@@ -893,6 +878,78 @@ def sources_json_view(request, view_class):
 
     return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
+opml_header = """
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2011-2014 Microsoft Mobile. All rights reserved.
+
+ Nokia, Nokia Connecting People, Nokia Developer, and HERE are trademarks
+ and/or registered trademarks of Nokia Corporation. Other product and company
+ names mentioned herein may be trademarks or trade names of their respective
+ owners.
+
+ See the license text file delivered with this project for more information.
+-->
+<opml version="1.0">
+    <head>
+        <title>OPML contents</title>
+    </head>
+    <body>
+        <outline title="News" text="News">
+"""
+
+opml_footer = """
+        </outline>
+    </body>
+</opml>
+"""
+
+def source_to_opml(user_config, source):
+    # <outline title="News" text="News">
+    title = source.title
+    url = source.url
+
+    return f"""<outline text="{title}" title="{title}" type="rss" xmlUrl="{url}"/>"""
+
+
+def sources_opml_view(request, view_class):
+    p = ViewPage(request)
+    p.set_title("Returns all sources JSON")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    # TODO merge this code with JSON
+
+    page_num = p.get_page_num()
+
+    view = view_class(request)
+
+    uc = UserConfig.get(request.user)
+
+    sources = view.get_queryset()
+    p = Paginator(sources, view.get_paginate_by())
+    page_obj = p.get_page(page_num)
+
+    start = page_obj.start_index()
+    if start > 0:
+        start -= 1
+
+    limited_sources = sources[start : page_obj.end_index()]
+
+    opml_text = opml_header
+
+    if page_num <= p.num_pages:
+        for source in limited_sources:
+            source_text = source_to_opml(uc, source)
+            opml_text += source_text + "\r\n"
+
+    opml_text += opml_footer
+
+    response = HttpResponse(opml_text, content_type='text/x-opml')
+    # response['Content-Disposition'] = 'attachment; filename="feeds.opml"'
+    return response
+
 
 def sources_json_all(request):
     return sources_json_view(request, SourceListView)
@@ -900,6 +957,10 @@ def sources_json_all(request):
 
 def sources_json_enabled(request):
     return sources_json_view(request, SourcesEnabledListView)
+
+
+def sources_opml(request):
+    return sources_opml_view(request, SourceListView)
 
 
 def categories_view(request):

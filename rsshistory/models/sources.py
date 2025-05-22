@@ -36,6 +36,11 @@ class SourceCategories(models.Model):
             self.name,
         )
 
+    def cleanup():
+        for category in SourceCategories.objects.all():
+            if not category.sources.all().exists():
+                category.delete()
+
 
 class SourceSubCategories(models.Model):
     category_name = models.CharField(max_length=1000, default="")
@@ -92,6 +97,11 @@ class SourceSubCategories(models.Model):
         return "{}".format(
             self.name,
         )
+
+    def cleanup():
+        for subcategory in SourceSubCategories.objects.all():
+            if not subcategory.sources.all().exists():
+                subcategory.delete()
 
 
 class SourceDataModel(models.Model):
@@ -205,7 +215,11 @@ class SourceDataModel(models.Model):
         self.subcategory = SourceSubCategories.ensure(
             self.category_name, self.subcategory_name
         )
+
         super().save(*args, **kwargs)
+
+        SourceSubCategories.cleanup()
+        SourceCategories.cleanup()
 
     def get_export_names():
         return [

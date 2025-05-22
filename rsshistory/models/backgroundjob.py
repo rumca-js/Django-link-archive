@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from ..apps import LinkDatabase
+from .system import AppLogging
 
 
 class BackgroundJob(models.Model):
@@ -108,6 +109,47 @@ class BackgroundJob(models.Model):
         return "Job:{}\tSubject:{}\tArgs:{}\tDate Created:{}".format(
             self.job, self.subject, self.args, self.date_created
         )
+
+    def save(self, *args, **kwargs):
+        """
+        We can fix some database errors here.
+        We can trim title and description. No harm done.
+        We cannot trim thumbnails, or link, it will not work after adding.
+        """
+        job_len = BackgroundJob._meta.get_field("job").max_length
+        task_len = BackgroundJob._meta.get_field("task").max_length
+        subject_len = BackgroundJob._meta.get_field("subject").max_length
+        args_len = BackgroundJob._meta.get_field("args").max_length
+
+        if self.job and len(self.job) >= job_len:
+            AppLogging.error(
+                "Job length is too long, cannot save",
+                detail_text = str(self.job),
+            )
+            return
+
+        if self.task and len(self.task) >= task_len:
+            AppLogging.error(
+                info_text = "Job:{} Task length is too long, cannot save".format(self.job),
+                detail_text = str(self.task),
+            )
+            return
+
+        if self.subject and len(str(self.subject)) >= subject_len:
+            AppLogging.error(
+                "Job:{} Subject length is too long, cannot save".format(self.job),
+                detail_text = str(self.subject),
+            )
+            return
+
+        if self.args and len(self.args) >= args_len:
+            AppLogging.error(
+                "Job:{} Args length is too long, cannot save".format(self.job),
+                detail_text = str(self.args),
+            )
+            return
+
+        super().save(*args, **kwargs)
 
 
 class BackgroundJobHistory(models.Model):

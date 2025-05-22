@@ -15,6 +15,9 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             url, contents=contents, settings=settings, url_builder=url_builder
         )
 
+        if not self.is_handled_by():
+            return
+
         self.url = self.input2url(url)
         self.code = self.input2code(url)
 
@@ -143,7 +146,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         self.rd_text = None
         self.rd_ob = None
 
-        self.return_dislike = False
+        self.return_dislike = True
 
         self.dead = False
         self.response = None
@@ -231,7 +234,15 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
     def get_view_count(self):
         if self.get_contents():
-            return self.rd_ob.get_view_count()
+            view_count = None
+
+            if not view_count:
+                if self.yt_ob:
+                    view_count = self.yt_ob.get_view_count()
+            if not view_count:
+                if self.rd_ob:
+                    view_count = self.rd_ob.get_view_count()
+            return view_count
 
     def get_thumbs_up(self):
         if self.get_contents():
@@ -279,6 +290,83 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
     def get_json_text(self):
         if self.get_contents():
             return self.yt_ob.get_json_data()
+
+    def get_json_data(self):
+        json_data = {}
+
+        if self.return_dislike:
+            json_data = self.get_json_data_from_rd()
+        else:
+            json_data = self.get_json_data_from_yt()
+
+        thumbs_up = None
+        thumbs_down = None
+        view_count = None
+
+        if "thumbs_down" in json_data:
+            thumbs_down = json_data["thumbs_down"]
+        if "thumbs_up" in json_data:
+            thumbs_up = json_data["thumbs_up"]
+        if "view_count" in json_data:
+            view_count = json_data["view_count"]
+
+        if thumbs_up and thumbs_down:
+            json_data["upvote_ratio"] = thumbs_up / (thumbs_up + thumbs_down)
+        else:
+            json_data["upvote_ratio"] = None
+        if thumbs_up and view_count:
+            json_data["upvote_view_ratio"] = thumbs_up / view_count
+        else:
+            json_data["upvote_view_ratio"] = None
+
+        return json_data
+
+    def get_json_data_from_yt(self):
+        json_data = {}
+
+        self.download_details_youtube()
+
+        view_count = None
+        thumbs_up = None
+        thumbs_down = None
+
+        try:
+            view_count = int(self.yt_ob.get_view_count())
+        except ValueError as E:
+            pass
+
+        json_data["view_count"] = view_count
+        return json_data
+
+    def get_json_data_from_rd(self):
+        json_data = {}
+
+        self.download_details_return_dislike()
+
+        view_count = None
+        thumbs_up = None
+        thumbs_down = None
+
+        try:
+            view_count = int(self.rd_ob.get_view_count())
+        except (ValueError, AttributeError) as E:
+            pass
+
+        try:
+            thumbs_up = int(self.rd_ob.get_thumbs_up())
+        except (ValueError, AttributeError) as E:
+            pass
+
+        try:
+            thumbs_down = int(self.rd_ob.get_thumbs_down())
+        except (ValueError, AttributeError) as E:
+            pass
+
+        json_data["view_count"] = view_count
+        json_data["thumbs_up"] = thumbs_up
+        json_data["thumbs_down"] = thumbs_down
+
+        return json_data
 
     def get_tags(self):
         if self.get_contents():
@@ -328,19 +416,11 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if self.yt_text and not self.yt_ob.loads(self.yt_text):
             return False
 
-        if self.return_dislike:
-            from utils.serializers import ReturnDislike
-
-            self.rd_ob = ReturnDislike(self.get_video_code())
-            if self.rd_text and not self.rd_ob.loads(self.rd_text):
-                return False
-
         return True
 
     def download_details(self):
         if not self.download_details_youtube():
-            return False
-        if not self.download_details_return_dislike():
+            WebLogger.error("Cannot load youtube details. Is yt-dlp update required?")
             return False
 
         return True
@@ -358,16 +438,21 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         return True
 
     def download_details_return_dislike(self):
-        if not self.return_dislike:
-            return True
-
         if self.rd_text is not None:
             return True
 
-        from utils.serializers import ReturnDislike
+        from .handlers import ReturnDislike
 
-        self.rd_ob = ReturnDislike(self.get_video_code())
-        if self.rd_text and not self.rd_ob.loads(self.rd_text):
+        dislike = ReturnDislike(video_code=self.get_video_code())
+        dislike.get_response()
+        self.rd_text = dislike.get_contents()
+        if not self.rd_text:
+            return False
+
+        dislike.load_response()
+        self.rd_ob = dislike
+
+        if not self.rd_ob:
             return False
 
         return True
@@ -388,7 +473,15 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
     def get_view_count(self):
         if self.get_contents():
-            return self.rd_ob.get_view_count()
+            view_count = None
+
+            if not view_count and self.rd_ob:
+                view_count = self.rd_ob.get_view_count()
+
+            if not view_count and self.yt_ob:
+                view_count = self.yt_ob.get_view_count()
+
+            return view_count
 
     def get_thumbs_up(self):
         if self.get_contents():
