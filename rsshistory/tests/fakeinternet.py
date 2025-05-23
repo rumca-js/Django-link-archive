@@ -82,11 +82,16 @@ class MockRequestCounter(object):
     mock_page_requests = 0
     request_history = []
 
-    def requested(url, info=None):
+    def requested(url, info=None, settings=None):
         """
         Info can be a dict
         """
-        MockRequestCounter.request_history.append([url, info])
+        if info:
+            MockRequestCounter.request_history.append({"url":url, "info":info})
+        elif settings:
+            MockRequestCounter.request_history.append({"url":url, "settings":settings})
+        else:
+            MockRequestCounter.request_history.append({"url":url})
         MockRequestCounter.mock_page_requests += 1
 
     def reset():
@@ -347,7 +352,7 @@ class FakeInternetTestCase(TestCase):
     def get_getj(self, url, name="", settings=None):
         # print("FakeInternet:get_getj: Url:{}".format(url))
         # return json.loads(remote_server_json)
-        MockRequestCounter.requested(url=url)
+        MockRequestCounter.requested(url=url, info=settings)
 
         data = FakeInternetData(url)
         return data.get_getj(name, settings)

@@ -32,6 +32,8 @@
    {{object_controller.get_description_html | safe | linebreaks }}
    </div>
 
+   {% include "rsshistory/entry_detail__comments.html" %}
+
    <div id="entryOperationalParameters">
        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
    </div>

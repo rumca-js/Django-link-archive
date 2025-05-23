@@ -208,13 +208,18 @@ class UrlHandlerExTest(FakeInternetTestCase):
         browser1 = Browser.objects.create(
             name="test1",
             crawler="RequestsCrawler",
-            settings='{"test_setting" : "something"}',
+            settings='{"test_setting" : "something", "timeout_s" : 20}',
         )
 
         browser2 = Browser.objects.create(
             name="test2",
             crawler="RequestsCrawler",
-            settings='{"test_setting" : "something"}',
+            settings='{"test_setting" : "something", "timeout_s" : 20}',
+        )
+
+        EntryRules.objects.create(
+            rule_url = "https://rsspage.com",
+            browser=browser1,
         )
 
         handler = UrlHandlerEx("https://rsspage.com/rss.xml")
@@ -223,6 +228,11 @@ class UrlHandlerExTest(FakeInternetTestCase):
         properties = handler.get_properties()
 
         self.assertTrue(properties)
+        self.assertIn("test_setting", MockRequestCounter.request_history[-1]["settings"]["settings"])
+        self.assertNoIn("test_setting", MockRequestCounter.request_history[-1]["settings"])
+
+        self.assertIn("timeout_s", MockRequestCounter.request_history[-1]["settings"]["settings"])
+        self.assertNoIn("timeout_s", MockRequestCounter.request_history[-1]["settings"])
 
     def test_get_cleaned_link__linkedin(self):
         MockRequestCounter.mock_page_requests = 0

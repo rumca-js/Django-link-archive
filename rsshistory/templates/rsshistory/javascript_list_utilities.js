@@ -23,7 +23,11 @@ function getEntryBar(entry) {
     let link = entry.link;
     let thumbnail = entry.thumbnail;
     let source__title = entry.source__title;
-    let date_published = entry.date_published.toLocaleString();
+    let date_published = null;
+    if (entry.date_published)
+    {
+       date_published = entry.date_published.toLocaleString();
+    }
 
     let date_last_visit = entry.date_last_visit.toLocaleString();
     let number_of_visits = entry.number_of_visits;
