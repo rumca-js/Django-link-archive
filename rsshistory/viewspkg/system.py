@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 import logging
 from datetime import timedelta
 import os
@@ -535,6 +536,8 @@ def json_logs(request):
     data["count"] = 0
     data["num_pages"] = 0
 
+    start_time = time.time()
+
     page_num = p.get_page_num()
     if page_num:
         conditions = Q()
@@ -569,6 +572,8 @@ def json_logs(request):
             for app_logging_entry in page_object:
                 json_data = log_to_json(app_logging_entry)
                 data["logs"].append(json_data)
+
+        data["timestamp_s"] = time.time() - start_time
 
         return JsonResponse(data, json_dumps_params={"indent": 4})
 

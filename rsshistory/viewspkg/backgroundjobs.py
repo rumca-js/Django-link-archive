@@ -1,3 +1,4 @@
+import time
 from django.views import generic
 from django.urls import reverse
 from django.http import HttpResponseRedirect
@@ -73,6 +74,8 @@ def backgroundjobs_json(request):
     data["page"] = page_num
     data["num_pages"] = 0
 
+    start_time = time.time()
+
     if page_num:
         conditions = Q()
         if "job" in request.GET:
@@ -107,6 +110,8 @@ def backgroundjobs_json(request):
             for job in page_object:
                 json_data = job_to_json(job)
                 data["jobs"].append(json_data)
+
+        data["timestamp_s"] = time.time() - start_time
 
         return JsonResponse(data, json_dumps_params={"indent": 4})
 

@@ -6,7 +6,7 @@ function fillQueueList(queue) {
 
     if (queue && queue.length > 0) {
         queue.forEach(entry => {
-           htmlOutput += getEntryBar(entry);
+           htmlOutput += getEntryVisitsBar(entry);
         });
     }
 

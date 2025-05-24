@@ -84,6 +84,62 @@ class LinkDataControllerTest(FakeInternetTestCase):
             date_published=date_to_remove,
         )
 
+    def test_is_valid__true(self):
+        ob = LinkDataController.objects.create(
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            status_code=200,
+        )
+
+        self.assertTrue(ob.is_valid())
+
+    def test_is_valid__true_by_manual(self):
+        ob = LinkDataController.objects.create(
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            status_code=500,
+            manual_status_code=200,
+        )
+
+        self.assertTrue(ob.is_valid())
+
+    def test_is_valid__false(self):
+        ob = LinkDataController.objects.create(
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            status_code=500,
+        )
+
+        self.assertFalse(ob.is_valid())
+
+    def test_is_dead__true(self):
+        ob = LinkDataController.objects.create(
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            status_code=500,
+        )
+
+        self.assertTrue(ob.is_dead())
+
+    def test_is_dead__false(self):
+        ob = LinkDataController.objects.create(
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            status_code=200,
+        )
+
+        self.assertFalse(ob.is_dead())
+
+    def test_is_dead__false_by_manual(self):
+        ob = LinkDataController.objects.create(
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            status_code=500,
+            manual_status_code=200,
+        )
+
+        self.assertFalse(ob.is_dead())
+
     def test_get_favicon_empty_in_model(self):
         conf = Configuration.get_object().config_entry
 

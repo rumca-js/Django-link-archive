@@ -16,6 +16,7 @@ from utils.services import (
     SchemaOrg,
     WhoIs,
     W3CValidator,
+    BuildWith,
 )
 
 
@@ -573,6 +574,19 @@ class EntryGenericPlugin(object):
                 SchemaOrg(link).get_validate_url(),
                 ConfigurationEntry.ACCESS_TYPE_ALL,
                 "Shows Who is information",
+                static(
+                    "{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)
+                ),
+            ),
+        )
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "buildwith.com validator",
+                BuildWith(link).get_validate_url(),
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Shows BuildWith information",
                 static(
                     "{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)
                 ),

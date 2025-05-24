@@ -953,10 +953,26 @@ class EntriesDetailViews(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_get_entry_details(self):
+    def test_entry_parameters(self):
         entry = LinkDataController.objects.filter(link__icontains="https://youtube")[0]
 
-        url = reverse("{}:get-entry-details".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:entry-parameters".format(LinkDatabase.name), args=[entry.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entry_op_parameters(self):
+        entry = LinkDataController.objects.filter(link__icontains="https://youtube")[0]
+
+        url = reverse("{}:entry-op-parameters".format(LinkDatabase.name), args=[entry.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entry_related(self):
+        entry = LinkDataController.objects.filter(link__icontains="https://youtube")[0]
+
+        url = reverse("{}:entry-related".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

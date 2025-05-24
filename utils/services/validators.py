@@ -40,3 +40,12 @@ class SchemaOrg(Validator):
 
     def get_validate_url(self):
         return "https://validator.schema.org/#url=" + self.encode_url(self.url)
+
+
+class BuildWith(Validator):
+    def __init__(self, url):
+        self.url = url
+
+    def get_validate_url(self):
+        p = UrlLocation(self.url)
+        return "https://builtwith.com/" + p.get_domain_only()

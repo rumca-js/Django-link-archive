@@ -56,7 +56,8 @@ class BaseLinkDataModel(models.Model):
         null=True,
     )
 
-    # web page date when link was found dead
+    # web page date when link was found dead. Manual can change 'visible' state of entry
+    # but does not affect this flag.
     date_dead_since = models.DateTimeField(
         null=True, help_text="Date when page became inactive"
     )
@@ -595,6 +596,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         We do not have to make elaborate checks for statuses and manual statuses.
         If there is a dead date -> it is dead. Period.
         """
+        if self.manual_status_code == BaseLinkDataController.STATUS_ACTIVE:
+            return False
         return self.date_dead_since is not None
 
     def is_https(self):

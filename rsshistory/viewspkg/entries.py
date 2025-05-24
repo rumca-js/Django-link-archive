@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 
 from django.views import generic
 from django.urls import reverse
@@ -997,6 +998,8 @@ def handle_json_view(request, view_to_use):
     json_obj["num_pages"] = 0
     json_obj["view"] = None
 
+    start_time = time.time()
+
     user_config = UserConfig.get(request.user)
 
     if view_to_use:
@@ -1020,6 +1023,8 @@ def handle_json_view(request, view_to_use):
                 entry_json = entry_to_json(user_config, entry, tags=show_tags)
 
                 json_obj["entries"].append(entry_json)
+
+        json_obj["timestamp_s"] = time.time() - start_time
 
         return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 

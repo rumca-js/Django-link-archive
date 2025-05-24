@@ -218,7 +218,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         )
 
         EntryRules.objects.create(
-            rule_url = "https://rsspage.com",
+            trigger_rule_url = "https://rsspage.com",
             browser=browser1,
         )
 

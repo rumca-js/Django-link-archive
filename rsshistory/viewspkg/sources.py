@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 from django.views import generic
 from django.urls import reverse
@@ -853,6 +854,8 @@ def sources_json_view(request, view_class):
     json_obj["page"] = page_num
     json_obj["num_pages"] = 0
 
+    start_time = time.time()
+
     view = view_class(request)
 
     uc = UserConfig.get(request.user)
@@ -875,6 +878,8 @@ def sources_json_view(request, view_class):
             source_json = source_to_json(uc, source)
 
             json_obj["sources"].append(source_json)
+
+        json_obj["timestamp_s"] = time.time() - start_time
 
     return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 

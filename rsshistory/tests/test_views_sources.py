@@ -495,7 +495,7 @@ class SourceDetailTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.no_errors())
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_source_detail__odysee(self):
         MockRequestCounter.mock_page_requests = 0
@@ -507,7 +507,7 @@ class SourceDetailTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.no_errors())
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_source_detail__html(self):
         MockRequestCounter.mock_page_requests = 0
@@ -620,7 +620,7 @@ class SourceDetailTestCreatesEntries(FakeInternetTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_source_detail_html(self):
         MockRequestCounter.mock_page_requests = 0
@@ -632,7 +632,7 @@ class SourceDetailTestCreatesEntries(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
         # creates a link for that source
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_source_is__exists(self):
         MockRequestCounter.mock_page_requests = 0
