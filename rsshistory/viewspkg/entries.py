@@ -381,26 +381,7 @@ class EntryDetailView(generic.DetailView):
 
 class EntryArchivedDetailView(generic.DetailView):
     model = ArchiveLinkDataController
-    template_name = str(ViewPage.get_full_template("entry_detail__dynamic.html"))
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super().get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
-
-        if self.object.language == None:
-            self.object.update_language()
-
-        context["page_title"] = self.object.title
-        context["page_thumbnail"] = self.object.thumbnail
-        context["object_controller"] = EntryPreviewBuilder.get(
-            self.object, self.request.user
-        )
-
-        m = WaybackMachine()
-        context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
-
-        return context
+    template_name = str(ViewPage.get_full_template("entry_detail.html"))
 
     def get(self, *args, **kwargs):
         """
@@ -414,6 +395,28 @@ class EntryArchivedDetailView(generic.DetailView):
 
         view = super().get(*args, **kwargs)
         return view
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super().get_context_data(**kwargs)
+        context = ViewPage(self.request).init_context(context)
+
+        return self.setup_context(context)
+
+    def setup_context(self, context):
+        object_controller = EntryPreviewBuilder.get(self.object, self.request.user)
+
+        context["page_title"] = self.object.title
+
+        if self.object.description:
+            context["page_description"] = self.object.description[:100]
+
+        context["page_thumbnail"] = self.object.thumbnail
+        if self.object.date_published:
+            context["page_date_published"] = self.object.date_published.isoformat()
+        context["object_controller"] = object_controller
+
+        return context
 
 
 def get_entry_menu(request, pk):
@@ -1436,8 +1439,6 @@ def entry_related(request, pk):
 
     entry = entries[0]
 
-    object_controller = EntryPreviewBuilder.get(entry, request.user)
-
     config = Configuration.get_object().config_entry
     if config.track_user_actions and config.track_user_navigation:
         p.context["transitions"] = UserEntryTransitionHistory.get_related_list(
@@ -1445,3 +1446,38 @@ def entry_related(request, pk):
         )
 
     return p.render("entry_detail__related.html")
+
+
+def entry_related_json(request, pk):
+    p = ViewPage(request)
+    p.set_title("Entry related")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    entries = LinkDataController.objects.filter(id = pk)
+    if not entries.exists():
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("go_back.html")
+
+    entry_main = entries[0]
+    json_obj = {}
+
+    show_tags = False
+    if "tags" in request.GET:
+        show_tags = True
+
+    json_obj["entries"] = []
+
+    user_config = UserConfig.get(request.user)
+
+    config = Configuration.get_object().config_entry
+    if config.track_user_actions and config.track_user_navigation:
+        entries = UserEntryTransitionHistory.get_related_list(request.user, entry_main)
+
+        for entry in entries:
+            entry_json = entry_to_json(user_config, entry, tags=show_tags)
+
+            json_obj["entries"].append(entry_json)
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})

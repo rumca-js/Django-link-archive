@@ -170,7 +170,7 @@ def searchview_remove(request, pk):
     if data is not None:
         return data
 
-    objs = DataExport.objects.filter(id=pk)
+    objs = SearchView.objects.filter(id=pk)
     if objs.count() == 0:
         p.context["summary_text"] = "No such object"
         return p.render("go_back.html")

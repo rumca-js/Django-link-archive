@@ -596,42 +596,40 @@ class EntryUpdater(object):
             return
 
         # we may not support update for some types. PDFs, other resources on the web
-        if not props or len(props) == 0:
-            return
+        if props and len(props) > 0:
+            if "title" in props and props["title"] is not None:
+                if not entry.title:
+                    entry.title = props["title"]
+
+            if "description" in props and props["description"] is not None:
+                if not entry.description:
+                    entry.description = props["description"]
+
+            if "thumbnail" in props and props["thumbnail"] is not None:
+                # always update
+                entry.thumbnail = props["thumbnail"]
+
+            if "language" in props and props["language"] is not None:
+                if not entry.language:
+                    entry.language = props["language"]
+
+            if "date_published" in props and props["date_published"] is not None:
+                if not entry.date_published:
+                    entry.date_published = props["date_published"]
 
         if entry.date_dead_since:
             entry.date_dead_since = None
 
-        if "title" in props and props["title"] is not None:
-            if not entry.title:
-                entry.title = props["title"]
-
-        if "description" in props and props["description"] is not None:
-            if not entry.description:
-                entry.description = props["description"]
-
-        if "thumbnail" in props and props["thumbnail"] is not None:
-            # always update
-            entry.thumbnail = props["thumbnail"]
-
-        if "language" in props and props["language"] is not None:
-            if not entry.language:
-                entry.language = props["language"]
-
-        if "date_published" in props and props["date_published"] is not None:
-            if not entry.date_published:
-                entry.date_published = props["date_published"]
-
         self.update_calculated_vote()
-        # save is performed by the above
 
-        self.check_for_sources(entry, url)
-        BackgroundJobController.link_scan(entry=entry)
+        if props and len(props) > 0:
+            self.check_for_sources(entry, url)
+            BackgroundJobController.link_scan(entry=entry)
 
-        if entry_changed:
-            self.add_links_from_url(entry, url)
+            if entry_changed:
+                self.add_links_from_url(entry, url)
 
-        self.store_thumbnail(entry)
+            self.store_thumbnail(entry)
 
     def reset_data(self):
         from ..pluginurl import EntryUrlInterface
@@ -687,36 +685,35 @@ class EntryUpdater(object):
             return
 
         # we may not support update for some types. PDFs, other resources on the web
-        if not props or len(props) == 0:
-            return
+        if props and len(props) > 0:
+            if "title" in props and props["title"] is not None:
+                entry.title = props["title"]
+
+            if "description" in props and props["description"] is not None:
+                entry.description = props["description"]
+
+            if "thumbnail" in props and props["thumbnail"] is not None:
+                entry.thumbnail = props["thumbnail"]
+
+            if "language" in props and props["language"] is not None:
+                entry.language = props["language"]
+
+            if "date_published" in props and props["date_published"] is not None:
+                if not entry.date_published:
+                    entry.date_published = props["date_published"]
 
         if entry.date_dead_since:
             entry.date_dead_since = None
 
-        if "title" in props and props["title"] is not None:
-            entry.title = props["title"]
-
-        if "description" in props and props["description"] is not None:
-            entry.description = props["description"]
-
-        if "thumbnail" in props and props["thumbnail"] is not None:
-            entry.thumbnail = props["thumbnail"]
-
-        if "language" in props and props["language"] is not None:
-            entry.language = props["language"]
-
-        if "date_published" in props and props["date_published"] is not None:
-            if not entry.date_published:
-                entry.date_published = props["date_published"]
-
         self.update_calculated_vote()
 
-        if entry_changed:
-            self.add_links_from_url(entry, url)
+        if props and len(props) > 0:
+            if entry_changed:
+                self.add_links_from_url(entry, url)
 
-        self.check_for_sources(entry, url)
-        BackgroundJobController.link_scan(entry=entry)
-        self.store_thumbnail(entry)
+            self.check_for_sources(entry, url)
+            BackgroundJobController.link_scan(entry=entry)
+            self.store_thumbnail(entry)
 
     def store_thumbnail(self, entry):
         if entry.page_rating_votes > 0:  # TODO should that be configurable?

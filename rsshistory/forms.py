@@ -191,15 +191,6 @@ class ConfigForm(forms.ModelForm):
         self.long_widget("data_import_path")
         self.long_widget("download_path")
 
-        if self.init.is_mobile:
-            self.fields["user_headers"].widget = forms.Textarea(
-                attrs={"rows": 10, "cols": 20}
-            )
-        else:
-            self.fields["user_headers"].widget = forms.Textarea(
-                attrs={"rows": 20, "cols": 75}
-            )
-
     def long_widget(self, field_name):
         self.fields[field_name].widget.attrs.update(size=self.init.get_cols_size())
 

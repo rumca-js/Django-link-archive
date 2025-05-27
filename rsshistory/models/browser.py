@@ -92,7 +92,7 @@ class Browser(models.Model):
                     settings=settings,
                 )
 
-    def get_browser_setup():
+    def get_browser_setup(string=False):
         """
         sets WebConfig browser config according to model
         """
@@ -101,7 +101,7 @@ class Browser(models.Model):
             if not browser.enabled:
                 continue
 
-            browser_config = browser.get_setup()
+            browser_config = browser.get_setup(string)
             if "enabled" in browser_config:
                 del browser_config["enabled"]
 

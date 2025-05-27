@@ -59,7 +59,7 @@ class BrowserTest(FakeInternetTestCase):
         browsers = Browser.objects.all()
         self.assertEqual(init_value, browsers.count())
 
-    def test_get_browser_setup(self):
+    def test_get_browser_setup__default(self):
         Browser.read_browser_setup()
         browsers = Browser.objects.all()
         self.assertTrue(browsers.count() > 0)
@@ -67,6 +67,21 @@ class BrowserTest(FakeInternetTestCase):
         # call tested function
         setup = Browser.get_browser_setup()
         self.assertTrue(len(setup) > 0)
+
+        self.assertEqual(setup[0]["name"], "RequestsCrawler")
+        self.assertEqual(setup[0]["crawler"], RequestsCrawler)
+
+    def test_get_browser_setup__string(self):
+        Browser.read_browser_setup()
+        browsers = Browser.objects.all()
+        self.assertTrue(browsers.count() > 0)
+
+        # call tested function
+        setup = Browser.get_browser_setup(string=True)
+        self.assertTrue(len(setup) > 0)
+
+        self.assertEqual(setup[0]["name"], "RequestsCrawler")
+        self.assertEqual(setup[0]["crawler"], "RequestsCrawler")
 
     def test_get_setup__standard(self):
         Browser.objects.all().delete()
@@ -79,6 +94,21 @@ class BrowserTest(FakeInternetTestCase):
 
         # call tested function
         setup = browser.get_setup()
+        self.assertTrue(setup["name"], "test")
+        self.assertTrue(setup["crawler"], RequestsCrawler)
+        self.assertTrue(setup["settings"]["test_setting"], "something")
+
+    def test_get_setup__string(self):
+        Browser.objects.all().delete()
+
+        browser = Browser.objects.create(
+            name="test",
+            crawler="RequestsCrawler",
+            settings='{"test_setting" : "something"}',
+        )
+
+        # call tested function
+        setup = browser.get_setup(string=True)
         self.assertTrue(setup["name"], "test")
         self.assertTrue(setup["crawler"], RequestsCrawler)
         self.assertTrue(setup["settings"]["test_setting"], "something")

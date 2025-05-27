@@ -104,7 +104,7 @@ class UrlHandlerEx(object):
 
         self.browsers = browsers
         if not browsers:
-            self.browsers = Browser.get_browser_setup()
+            self.browsers = Browser.get_browser_setup(string=True)
             self.browsers = self.get_browsers()
 
         self.all_properties = None
@@ -152,7 +152,7 @@ class UrlHandlerEx(object):
                 self.all_properties = request_server.get_getj(
                     self.url,
                     name=crawler_data["name"],
-                    settings=crawler_data["settings"],
+                    settings=crawler_data,
                 )
                 if not self.all_properties:
                     AppLogging.warning(
@@ -192,7 +192,7 @@ class UrlHandlerEx(object):
         if len(rules) > 0:
             for rule in rules:
                 if rule.browser:
-                    browsers = self.bring_to_front(browsers, rule.browser.get_setup())
+                    browsers = self.bring_to_front(browsers, rule.browser.get_setup(True))
 
         return browsers
 

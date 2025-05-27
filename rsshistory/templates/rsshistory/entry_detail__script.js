@@ -2,6 +2,7 @@
 
 
 let entry_json_data = null;
+let entry_related_data = null;
 let entry_dislike_data = null;
 let is_downloading = false;
 let is_updating = false;
@@ -81,11 +82,6 @@ function getIsEntryDownloaded(attempt = 1) {
             }
         }
     });
-}
-
-
-function getEntryRelated(attempt = 1) {
-    getDynamicContent("{% url 'rsshistory:entry-related' object.id %}", "#entryRelated", 1, true);
 }
 
 
@@ -288,6 +284,53 @@ function getEntryProperties(attempt = 1) {
            }
            if (attempt < 3) {
                getEntryProperties(attempt + 1);
+           } else {
+           }
+       }
+    });
+}
+
+
+function fillEntryRelated() {
+    let htmlOutput = "";
+
+    let entries = entry_related_data.entries;
+
+    if (entries && entries.length > 0) {
+        htmlOutput = "<h1>Related</h1>";
+
+        entries.forEach(entry => {
+            htmlOutput += getEntryRelatedBar(entry);
+        });
+    }
+    $("#entryRelated").html(htmlOutput);
+}
+
+
+let currentgetEntryRelated = 0;
+function getEntryRelated(attempt = 1) {
+    let requestgetEntryRelated = ++currentgetEntryRelated;
+    let url_address = "{% url 'rsshistory:entry-related-json' object.id %}";
+
+    $.ajax({
+       url: url_address,
+       type: 'GET',
+       timeout: 10000,
+       success: function(data) {
+           if (requestgetEntryRelated != currentgetEntryRelated) {
+               return;
+           }
+           if (data) {
+               entry_related_data = data;
+               fillEntryRelated();
+           }
+       },
+       error: function(xhr, status, error) {
+           if (requestgetEntryRelated != currentgetEntryRelated) {
+               return;
+           }
+           if (attempt < 3) {
+               getEntryRelated(attempt + 1);
            } else {
            }
        }

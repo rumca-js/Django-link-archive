@@ -39,7 +39,12 @@ class RemoteServer(object):
         encoded_url = urllib.parse.quote(url, safe="")
 
         if settings:
-            crawler_data = json.dumps(settings)
+            try:
+                crawler_data = json.dumps(settings)
+            except Exception as E:
+                print("Cannot json serialize:{}".format(settings))
+                raise
+
             encoded_crawler_data = urllib.parse.quote(crawler_data, safe="")
 
             link = self.remote_server
@@ -52,11 +57,15 @@ class RemoteServer(object):
             link = f"{link}/socialj?url={encoded_url}"
             # print("RemoteServer: calling:{}".format(link))
 
+        real_settings = {}
+        if "settings" in settings:
+            real_settings = settings["settings"]
+
         timeout_s = 50
-        if settings and "timeout_s" in settings:
-            timeout_s = settings["timeout_s"]
-        if settings and "delay_s" in settings:
-            timeout_s += settings["delay_s"]
+        if settings and "timeout_s" in real_settings:
+            timeout_s = real_settings["timeout_s"]
+        if settings and "delay_s" in real_settings:
+            timeout_s += real_settings["delay_s"]
 
         # we make request longer - for the server to be able to respond in time
         timeout_s += 5
@@ -108,7 +117,12 @@ class RemoteServer(object):
             if name != "":
                 settings["name"] = name
 
-            crawler_data = json.dumps(settings)
+            try:
+                crawler_data = json.dumps(settings)
+            except Exception as E:
+                print("Cannot json serialize:{}".format(settings))
+                raise
+
             encoded_crawler_data = urllib.parse.quote(crawler_data, safe="")
 
             link = self.remote_server
@@ -125,11 +139,15 @@ class RemoteServer(object):
 
             print("RemoteServer: calling:{}".format(link))
 
+        real_settings = {}
+        if "settings" in settings:
+            real_settings = settings["settings"]
+
         timeout_s = 50
-        if settings and "timeout_s" in settings:
-            timeout_s = settings["timeout_s"]
-        if settings and "delay_s" in settings:
-            timeout_s += settings["delay_s"]
+        if settings and "timeout_s" in real_settings:
+            timeout_s = real_settings["timeout_s"]
+        if settings and "delay_s" in real_settings:
+            timeout_s += real_settings["delay_s"]
 
         # we make request longer - for the server to be able to respond in time
         timeout_s += 5

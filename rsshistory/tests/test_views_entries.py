@@ -969,10 +969,10 @@ class EntriesDetailViews(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_entry_related(self):
+    def test_entry_related__json(self):
         entry = LinkDataController.objects.filter(link__icontains="https://youtube")[0]
 
-        url = reverse("{}:entry-related".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:entry-related-json".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
