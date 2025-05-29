@@ -122,6 +122,12 @@ class LinkDataController(LinkDataModel):
             if hasattr(test, key):
                 result[key] = props[key]
 
+        result = LinkDataController.get_clean_field(result, "link")
+        result = LinkDataController.get_clean_field(result, "title")
+        result = LinkDataController.get_clean_field(result, "description")
+        result = LinkDataController.get_clean_field(result, "author")
+        result = LinkDataController.get_clean_field(result, "album")
+
         if "link" in result:
             result["link"] = UrlHandlerEx.get_cleaned_link(result["link"])
 
@@ -133,6 +139,12 @@ class LinkDataController(LinkDataModel):
             del result["vote"]
 
         return result
+
+    def get_clean_field(props, field):
+        if field in props and props[field]:
+            props[field] = props[field].replace("\0", "")
+
+        return props
 
     def vote(self, vote):
         self.page_rating_votes = vote

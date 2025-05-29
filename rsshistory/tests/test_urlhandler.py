@@ -192,10 +192,10 @@ class UrlHandlerExTest(FakeInternetTestCase):
         # call tested function
         browsers = handler.get_browsers()
 
-        self.assertEqual(len(browsers) > 0)
+        self.assertTrue(len(browsers) > 0)
 
         self.assertEqual(browsers[0]["name"], "test1")
-        self.assertEqual(browser[0]["settings"]["handler_class"], "HttpPageHandler")
+        self.assertEqual(browsers[0]["settings"]["handler_class"], "HttpPageHandler")
 
     def test_get_properties__no_browser(self):
         Browser.objects.all().delete()
@@ -230,13 +230,13 @@ class UrlHandlerExTest(FakeInternetTestCase):
         properties = handler.get_properties()
 
         self.assertTrue(properties)
-        self.assertIn("settings", MockRequestCounter.request_history[-1])
-        self.assertIn("settings", MockRequestCounter.request_history[-1]["settings"])
+        self.assertIn("info", MockRequestCounter.request_history[-1])
+        self.assertIn("settings", MockRequestCounter.request_history[-1]["info"])
 
-        self.assertIn("test_setting", MockRequestCounter.request_history[-1]["settings"])
+        self.assertIn("test_setting", MockRequestCounter.request_history[-1]["info"]["settings"])
 
-        self.assertIn("timeout_s", MockRequestCounter.request_history[-1]["settings"]["settings"])
-        self.assertNoIn("timeout_s", MockRequestCounter.request_history[-1]["settings"])
+        self.assertIn("timeout_s", MockRequestCounter.request_history[-1]["info"]["settings"])
+        self.assertNotIn("timeout_s", MockRequestCounter.request_history[-1]["info"])
 
     def test_get_cleaned_link__linkedin(self):
         MockRequestCounter.mock_page_requests = 0

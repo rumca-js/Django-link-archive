@@ -248,6 +248,10 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         )
 
     def test_link_save(self):
+        from ..configuration import Configuration
+        config = Configuration.get_object().config_entry
+        config.enable_link_archiving = True
+
         self.assertEqual(
             BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_SAVE),
             0,

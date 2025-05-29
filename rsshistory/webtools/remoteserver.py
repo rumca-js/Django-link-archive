@@ -58,7 +58,7 @@ class RemoteServer(object):
             # print("RemoteServer: calling:{}".format(link))
 
         real_settings = {}
-        if "settings" in settings:
+        if settings and "settings" in settings:
             real_settings = settings["settings"]
 
         timeout_s = 50
@@ -140,7 +140,7 @@ class RemoteServer(object):
             print("RemoteServer: calling:{}".format(link))
 
         real_settings = {}
-        if "settings" in settings:
+        if settings and "settings" in settings:
             real_settings = settings["settings"]
 
         timeout_s = 50
