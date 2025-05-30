@@ -120,6 +120,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let badge_text = getEntryVotesBadge(entry);
     let badge_star = getEntryBookmarkBadge(entry);
     let badge_age = getEntryAgeBadge(entry);
+    let badge_dead = getEntryDeadBadge(entry);
 
     let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
     let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
@@ -167,6 +168,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                   ${badge_text}
                   ${badge_star}
                   ${badge_age}
+                  ${badge_dead}
                 </div>
             </div>
         </a>
@@ -180,6 +182,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let badge_text = getEntryVotesBadge(entry);
     let badge_star = getEntryBookmarkBadge(entry);
     let badge_age = getEntryAgeBadge(entry);
+    let badge_dead = getEntryDeadBadge(entry);
    
     let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
@@ -220,6 +223,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                   ${badge_text}
                   ${badge_star}
                   ${badge_age}
+                  ${badge_dead}
                </div>
             </div>
         </a>
@@ -243,6 +247,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
     let badge_text = getEntryVotesBadge(entry, true);
     let badge_star = getEntryBookmarkBadge(entry, true);
     let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry);
 
     let invalid_style = isEntryValid(entry) ? `` : `opacity: 0.5`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
@@ -254,6 +259,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
             ${badge_text}
             ${badge_star}
             ${badge_age}
+            ${badge_dead}
         </div>
     `;
 
@@ -293,6 +299,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
     let badge_text = getEntryVotesBadge(entry, true);
     let badge_star = getEntryBookmarkBadge(entry, true);
     let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry);
 
     let invalid_style = isEntryValid(entry) ? `` : `opacity: 0.5`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
@@ -303,6 +310,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
         ${badge_text}
         ${badge_star}
         ${badge_age}
+        ${badge_dead}
     `;
 
     let tags_text = getEntryTags(entry);
@@ -383,6 +391,11 @@ function getEntryRelatedBar(entry) {
     let source__title = entry.source__title;
     let date_published = getEntryDatePublished(entry);
 
+    let badge_text = getEntryVotesBadge(entry, true);
+    let badge_star = getEntryBookmarkBadge(entry, true);
+    let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry, true);
+
     let img_text = '';
     if (view_show_icons) {
         const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
@@ -395,6 +408,10 @@ function getEntryRelatedBar(entry) {
          href="${link_absolute}" title="${title}">
              <div class="d-flex">
                ${img_text}
+               ${badge_text}
+               ${badge_star}
+               ${badge_age}
+               ${badge_dead}
 
                <div class="mx-2">
                   ${title_safe}
@@ -418,6 +435,11 @@ function getEntryReadLaterBar(entry) {
     let source__title = entry.source__title;
     let date_published = entry.date_published.toLocaleString();
 
+    let badge_text = getEntryVotesBadge(entry, true);
+    let badge_star = getEntryBookmarkBadge(entry, true);
+    let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry, true);
+
     let img_text = '';
     if (view_show_icons) {
         const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
@@ -437,6 +459,10 @@ function getEntryReadLaterBar(entry) {
          <a href="${link_absolute}" title="${title}">
              <div class="d-flex">
 		 ${thumbnail_text}
+                 ${badge_text}
+                 ${badge_star}
+                 ${badge_age}
+                 ${badge_dead}
         
         	 <div>
         	     ${title_safe}

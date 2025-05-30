@@ -151,3 +151,87 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         # two requests: one for page, one for robots.txt
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_link_input_suggestions_json__no_slash(self):
+        MockRequestCounter.mock_page_requests = 0
+        url = (
+            reverse("{}:link-input-suggestions-json".format(LinkDatabase.name))
+            + "?link=https://www.linkedin.com/"
+        )
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        data = response.json
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("https://www.linkedin.com", data)
+
+        # two requests: one for page, one for robots.txt
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_link_input_suggestions_json__https(self):
+        config = Configuration.get_object().config_entry
+        config.prefer_https_links = True
+        config.save()
+
+        MockRequestCounter.mock_page_requests = 0
+        url = (
+            reverse("{}:link-input-suggestions-json".format(LinkDatabase.name))
+            + "?link=http://www.linkedin.com/"
+        )
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        data = response.json
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("https://www.linkedin.com/", data)
+
+        # two requests: one for page, one for robots.txt
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_link_input_suggestions_json__no_www(self):
+        config = Configuration.get_object().config_entry
+        config.prefer_non_www_links = True
+        config.save()
+
+        MockRequestCounter.mock_page_requests = 0
+        url = (
+            reverse("{}:link-input-suggestions-json".format(LinkDatabase.name))
+            + "?link=https://www.linkedin.com/"
+        )
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        data = response.json
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("https://linkedin.com/", data)
+
+        # two requests: one for page, one for robots.txt
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_link_input_suggestions_json__domain(self):
+        config = Configuration.get_object().config_entry
+        config.accept_non_domain_links = False
+        config.save()
+
+        MockRequestCounter.mock_page_requests = 0
+        url = (
+            reverse("{}:link-input-suggestions-json".format(LinkDatabase.name))
+            + "?link=https://www.linkedin.com/something"
+        )
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        data = response.json
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("https://linkedin.com", data)
+
+        # two requests: one for page, one for robots.txt
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)

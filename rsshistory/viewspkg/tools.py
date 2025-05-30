@@ -757,6 +757,63 @@ def cleanup_link_json(request):
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
+def link_input_suggestions_json(request):
+    p = ViewPage(request)
+    p.set_title("Cleanup Link")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
+
+    data = {}
+    links = set()
+
+    errors = []
+
+    if "link" in request.GET:
+        original_link = request.GET["link"]
+        cleaned_link = UrlHandlerEx.get_cleaned_link(original_link)
+
+        location = UrlLocation(original_link)
+
+        links.add(cleaned_link)
+
+        u = Url(cleaned_link)
+        links.add(u.get_clean_url())
+
+        config = Configuration.get_object().config_entry
+        if config.accept_domain_links:
+            links.add(location.get_domain())
+
+        if not config.accept_domain_links and location.is_domain():
+            errors.append("This is domain link, and system is configured not to accept that")
+
+        if not config.accept_non_domain_links and not location.is_domain():
+            errors.append("This is not a domain link, and system is configured not to accept that")
+
+        if config.prefer_non_www_links and original_link.find("www") >= 0:
+            errors.append("This link has www inside")
+
+        if config.prefer_https_links and original_link.find("http://") >= 0:
+            errors.append("This link has http inside, prefer https")
+
+        if original_link.find("http://") >= 0:
+            links.add(location.get_protocol_url("https"))
+
+        if original_link.find("www.") >= 0:
+            link = original_link.replace("www.", "")
+            links.add(link)
+
+        links -= {original_link}
+
+        data["links"] = sorted(links)
+        data["errors"] = errors
+        data["status"] = True
+    else:
+        data["status"] = False
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
+
+
 # TODO Gmail things below.
 """
 Steps to enable:

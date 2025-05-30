@@ -37,7 +37,7 @@ function getExistingObjectLink(object_id) {
     let detail_url = "{% url 'rsshistory:entry-detail' 1017 %}";
     detail_url = detail_url.replace("1017", object_id);
 
-    link_text = `<a href="${detail_url}" class="btn btn-secondary">Link to existing object</a>`;
+    link_text = `<a href="${detail_url}" class="btn btn-secondary">Entry</a>`;
 
     return link_text;
 }
@@ -229,6 +229,7 @@ function checkEntryExistsInDb(search_link) {
             }
             else {
                 $('#btnFetch').prop("disabled", false);
+                $('#EntryExists').html("");
             }
         })
         .catch(error => {
@@ -238,7 +239,7 @@ function checkEntryExistsInDb(search_link) {
 
 
 function fetchLinkSuggestions(search_link) {
-    let url = `{% url 'rsshistory:cleanup-link-json' %}?link=${encodeURIComponent(search_link)}`;
+    let url = `{% url 'rsshistory:link-input-suggestions-json' %}?link=${encodeURIComponent(search_link)}`;
 
     fetch(url)
         .then(response => {
@@ -249,14 +250,21 @@ function fetchLinkSuggestions(search_link) {
             console.log('Fetched data:', data);
 
             $('#Suggestions').empty();
+            $('#Errors').empty();
 
             if (data.status && Array.isArray(data.links) && data.links.length > 0) {
                 $('#Suggestions').append(`<div>Other link suggestions</div>`);
-
                 data.links.forEach(link => {
-                    $('#Suggestions').append(`<div class="suggestion-item btn btn-secondary">${link}</div>`);
+                    $('#Suggestions').append(`<button class="suggestion-item btn btn-secondary d-block">${link}</button>`);
                 });
             }
+
+            if (data.status && Array.isArray(data.errors) && data.errors.length > 0) {
+                $('#Errors').append(`<h2>Errors</h2>`);
+                data.errors.forEach(error => {
+                    $('#Errors').append(`<div>${error}</div>`);
+                });
+	    }
         })
         .catch(error => {
             console.error('Fetch error:', error);

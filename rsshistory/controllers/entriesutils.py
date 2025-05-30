@@ -65,11 +65,11 @@ class EntriesCleanup(object):
         if not self.cleanup_remove_entries():
             return False
 
+        self.cleanup_entries__invalid_rules()
+
         if not self.archive_cleanup:
             if not self.move_old_links_to_archive():
                 return False
-
-        self.cleanup_entries__invalid_rules()
 
         return True
 
@@ -124,10 +124,14 @@ class EntriesCleanup(object):
                 invalid_domain.delete()
 
     def cleanup_remove_entries(self, limit_s=0):
+        self.cleanup_remove_entries_old_entries()
+        self.cleanup_remove_entries_stale_entries()
+
+    def cleanup_remove_entries_old_entries(self, limit_s=0):
         sources = SourceDataController.objects.all()
         for source in sources:
             AppLogging.debug("Removing for source:{}".format(source.title))
-            entries = self.get_source_entries(source)
+            entries = self.get_source_old_entries_to_remove(source)
 
             if entries:
                 # for entry in entries:
@@ -136,115 +140,163 @@ class EntriesCleanup(object):
 
         AppLogging.debug("Removing general entries")
 
-        entries = self.get_general_entries()
+        entries = self.get_general_old_entries_to_remove()
         if entries:
             for entry in entries:
                 if entry.is_removable():
-                    AppLogging.debug("Removing general entry:{}".format(entry.link))
+                    # AppLogging.debug("Removing general entry:{}".format(entry.link))
                     entry.delete()
 
         AppLogging.debug("Removing stale entries")
 
-        if not self.archive_cleanup:
-            entries = self.get_stale_entries()
+        return True
+
+    def cleanup_remove_entries_stale_entries(self, limit_s=0):
+        sources = SourceDataController.objects.all()
+        for source in sources:
+            AppLogging.debug("Removing for source:{}".format(source.title))
+            entries = self.get_source_stale_entries_to_remove(source)
+
             if entries:
-                for entry in entries:
-                    if entry.is_removable():
-                        AppLogging.debug(
-                            "Removing stale entry:{} status:{} dead since:{}".format(
-                                entry.link, entry.status_code, entry.date_dead_since
-                            )
-                        )
-                        entry.delete()
+                # for entry in entries:
+                #    AppLogging.debug("Removing source entry:{}".format(entry.link))
+                entries.delete()
+
+        AppLogging.debug("Removing general entries")
+
+        entries = self.get_general_stale_entries_to_remove()
+        if entries:
+            for entry in entries:
+                if entry.is_removable():
+                    # AppLogging.debug("Removing general entry:{}".format(entry.link))
+                    entry.delete()
+
+        AppLogging.debug("Removing stale entries")
 
         return True
 
-    def is_time_exceeded(self):
-        passed_seconds = time.time() - self.start_processing_time
-        if passed_seconds >= self.limit_s:
-            LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
-            return True
-
-        return False
-
-    def get_source_entries(self, source):
+    def get_source_old_entries_to_remove(self, source):
         """
-        Choose shorter date - configured, or source limit
+        If links are old and should be removed
         """
-        config = Configuration.get_object().config_entry
-        config_days = config.days_to_remove_links
-
         if not source.is_removable():
             return
 
-        days = source.get_days_to_remove()
-
-        if config_days != 0 and days == 0:
-            days = config_days
-        if config_days != 0 and config_days < days:
-            days = config_days
-
-        if days == 0:
+        stale_conditions = self.get_old_conditions(source.get_days_to_remove())
+        if not stale_conditions:
             return
 
-        days_before = DateUtils.get_days_before_dt(days)
+        condition_source = Q(source=source) & stale_conditions
 
-        condition_source = Q(source=source) & Q(date_created__lt=days_before)
-        condition_source &= Q(bookmarked=False, permanent=False)
+        return self.filter_objects(condition_source)
 
-        if not self.archive_cleanup:
-            entries = LinkDataController.objects.filter(condition_source).order_by(
-                "date_published"
-            )
+    def get_general_old_entries_to_remove(self):
+        """
+        If links are old and should be removed
+        """
+        stale_conditions = self.get_old_conditions()
 
-        else:
-            entries = ArchiveLinkDataController.objects.filter(
-                condition_source
-            ).order_by("date_published")
-
-        if entries and entries.exists():
-            return entries
-
-    def get_general_entries(self):
-        config = Configuration.get_object().config_entry
-        config_days = config.days_to_remove_links
-
-        days = config_days
-        if days == 0:
+        if not stale_conditions:
             return
 
-        days_before = DateUtils.get_days_before_dt(days)
+        return self.filter_objects(stale_conditions)
 
-        condition = Q(date_created__lt=days_before)
-        condition &= Q(bookmarked=False, permanent=False)
+    def get_source_stale_entries_to_remove(self, source):
+        """
+        If links are dead and should be removed
+        """
+        if not source.is_removable():
+            return
 
-        if not self.archive_cleanup:
-            entries = LinkDataController.objects.filter(condition)
-        else:
-            entries = ArchiveLinkDataController.objects.filter(condition)
+        stale_conditions = self.get_stale_conditions(source.get_days_to_remove())
+        if not stale_conditions:
+            return
 
-        if entries.exists():
-            return entries
+        condition_source = Q(source=source) & stale_conditions
+
+        return self.filter_objects(condition_source)
+
+    def get_general_stale_entries_to_remove(self):
+        """
+        If links are dead and should be removed
+        """
+        stale_conditions = self.get_stale_conditions()
+
+        if not stale_conditions:
+            return
+
+        return self.filter_objects(stale_conditions)
 
     def get_stale_status_condition(self):
-        status_conditions = Q(status_code=403)
-        status_conditions |= Q(status_code__gte=200) | Q(status_code__lte=300)
+        return self.get_stale_status_condition_raw() & ~Q(manual_status_code = 200)
 
-        return ~status_conditions
+    def get_stale_status_condition_raw(self):
+        status_conditions_ok = Q(status_code=403) | Q(status_code = 0)
+        status_conditions_ok |= (Q(status_code__gte=200) & Q(status_code__lte=300))
 
-    def get_stale_conditions(self):
+        return Q(~status_conditions_ok)
+
+    def get_stale_conditions(self, days=None):
         config = Configuration.get_object().config_entry
-        days = config.days_to_remove_stale_entries
+
+        config_days = config.days_to_remove_stale_entries
+
+        if days:
+            if config_days != 0 and days == 0:
+                days = config_days
+            if config_days != 0 and config_days < days:
+                days = config_days
+        else:
+            days = config_days
+
         if days == 0:
             return
 
-        days_before = DateUtils.get_days_before_dt(days)
+        not_permanent_condition = Q(bookmarked=False, permanent=False)
+        status_conditions_nok = self.get_stale_status_condition()
 
-        date_condition = Q(date_dead_since__lt=days_before)
-        permanent_condition = Q(bookmarked=False, permanent=False)
-        manual_status_nok = ~Q(manual_status_code=200)
+        page_rating_votes_exists = Q(page_rating_votes__gt=0)
 
-        return date_condition & permanent_condition & manual_status_nok
+        result_condition = not_permanent_condition & status_conditions_nok & ~page_rating_votes_exists
+
+        if days != 0:
+            days_before = DateUtils.get_days_before_dt(days)
+            date_condition = Q(date_dead_since__lt=days_before)
+            result_condition &= date_condition
+        else:
+            return None
+
+        return result_condition
+
+    def get_old_conditions(self, days=None):
+        config = Configuration.get_object().config_entry
+
+        config_days = config.days_to_remove_links
+
+        if days:
+            if config_days != 0 and days == 0:
+                days = config_days
+            if config_days != 0 and config_days < days:
+                days = config_days
+        else:
+            days = config_days
+
+        if days == 0:
+            return
+
+        not_permanent_condition = Q(bookmarked=False, permanent=False)
+        page_rating_votes_exists = Q(page_rating_votes__gt=0)
+
+        result_condition = not_permanent_condition & ~page_rating_votes_exists
+
+        if days != 0:
+            days_before = DateUtils.get_days_before_dt(days)
+            date_condition = Q(date_created__lt=days_before) | Q(date_published__lt=days_before)
+            result_condition &= date_condition
+        else:
+            return None
+
+        return result_condition
 
     def get_stale_entries(self):
         """
@@ -257,24 +309,13 @@ class EntriesCleanup(object):
 
         condition = self.get_stale_conditions()
 
-        entries = LinkDataController.objects.filter(condition)
+        return self.filter_objects(condition)
 
-        if entries.exists():
-            return entries
-
-    def cleanup_invalid_page_ratings(self):
-        condition = Q(page_rating__gte=100)
-        condition2 = Q(page_rating__gte=F("page_rating_contents")) & Q(
-            page_rating_votes=0
-        )
+    def filter_objects(self, input_conditions):
         if not self.archive_cleanup:
-            entries = LinkDataController.objects.filter(condition | (condition2))
-
-            for entry in entries:
-                u = EntryUpdater(entry)
-                u.reset_local_data()
-
-        return True
+            return LinkDataController.objects.filter(input_conditions)
+        else:
+            return ArchiveLinkDataController.objects.filter(input_conditions)
 
     def move_old_links_to_archive(self):
         """
@@ -347,6 +388,14 @@ class EntriesCleanup(object):
                     w.move_entry(nonwww_entries[0])
 
         return True
+
+    def is_time_exceeded(self):
+        passed_seconds = time.time() - self.start_processing_time
+        if passed_seconds >= self.limit_s:
+            LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+            return True
+
+        return False
 
 
 class EntryCleanup(object):

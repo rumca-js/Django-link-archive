@@ -1425,29 +1425,6 @@ def entry_op_parameters(request, pk):
     return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
-def entry_related(request, pk):
-    p = ViewPage(request)
-    p.set_title("Entry related")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
-
-    entries = LinkDataController.objects.filter(id = pk)
-    if not entries.exists():
-        p.context["summary_text"] = "Such entry does not exist"
-        return p.render("go_back.html")
-
-    entry = entries[0]
-
-    config = Configuration.get_object().config_entry
-    if config.track_user_actions and config.track_user_navigation:
-        p.context["transitions"] = UserEntryTransitionHistory.get_related_list(
-            request.user, entry
-        )
-
-    return p.render("entry_detail__related.html")
-
-
 def entry_related_json(request, pk):
     p = ViewPage(request)
     p.set_title("Entry related")
