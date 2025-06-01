@@ -159,7 +159,13 @@ class LinkDataController(LinkDataModel):
             days=conf.days_to_move_to_archive
         )
 
-        return self.date_published < day_to_move
+        if self.date_published and self.date_published < day_to_move:
+            return True
+
+        if self.date_created and self.date_created < day_to_move:
+            return True
+
+        return False
 
     def is_remove_time(self):
         conf = Configuration.get_object().config_entry

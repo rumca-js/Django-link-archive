@@ -11,7 +11,7 @@ class GenericEntryController(object):
 
     def get_title(self, full_title=False, with_brackets=False):
         if not self.entry.title:
-            return
+            return "..."
 
         if not full_title:
             title = self.entry.title[:100]

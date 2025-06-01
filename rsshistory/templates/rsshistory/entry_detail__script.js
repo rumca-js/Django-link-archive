@@ -101,8 +101,13 @@ function getEntryOperationalParamters(attempt = 1) {
             let html_out = "";
 
             data.parameters.forEach(parameter => {
+		let title = parameter.title;
+                if (!title) {
+                  title = parameter.name;
+		}
+
                 html_out += `<div class="text-nowrap mx-1"
-                    title="${parameter.title}"
+                    title="${title}"
                     >
                        <strong>${parameter.name}:</strong>
                        ${parameter.description}
@@ -300,7 +305,7 @@ function fillEntryRelated() {
         htmlOutput = "<h1>Related</h1>";
 
         entries.forEach(entry => {
-            htmlOutput += getEntryRelatedBar(entry);
+            htmlOutput += getEntryRelatedBar(entry, {{object.id}});
         });
     }
     $("#entryRelated").html(htmlOutput);

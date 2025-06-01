@@ -78,6 +78,12 @@ function getEntryTags(entry) {
 }
 
 
+function getEntryLinkText(entry) {
+    let link = entry.link;
+    return `<div class="text-reset text-decoration-underline">@ ${link}</div>`;
+}
+
+
 function getEntrySourceTitle(entry) {
     let source__title = "";
     if (entry.source__title) {
@@ -204,6 +210,8 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let hover_title = title_safe + " " + tags_text;
     let link = entry.link;
 
+    let link_text = getEntryLinkText(entry);
+
     return `
         <a 
             href="${entry_link}"
@@ -215,7 +223,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                ${thumbnail_text}
                <div class="mx-2">
                   <span style="font-weight:bold" class="text-reset">${title_safe}</span>
-                  <div class="text-reset text-decoration-underline">@ ${link}</div>
+		  ${link_text}
                   ${tags}
                </div>
 
@@ -356,16 +364,27 @@ function getEntryVisitsBar(entry) {
     let date_last_visit = entry.date_last_visit.toLocaleString();
     let number_of_visits = entry.number_of_visits;
 
+    let badge_text = getEntryVotesBadge(entry, true);
+    let badge_star = getEntryBookmarkBadge(entry, true);
+    let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry, true);
+
     let img_text = '';
     if (view_show_icons) {
         const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
         img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
     }
+    let link_text = getEntryLinkText(entry);
 
     let text = `
          <a
          class="list-group-item list-group-item-action"
          href="${link_absolute}" title="${title}">
+             ${badge_text}
+             ${badge_star}
+             ${badge_age}
+             ${badge_dead}
+
              <div class="d-flex">
                ${img_text}
 
@@ -373,6 +392,7 @@ function getEntryVisitsBar(entry) {
                   ${title_safe}
                   Visits:${number_of_visits}
                   Date of the last visit:${date_last_visit}
+		  ${link_text}
                </div>
              </div>
          </a>
@@ -381,7 +401,7 @@ function getEntryVisitsBar(entry) {
 }
 
 
-function getEntryRelatedBar(entry) {
+function getEntryRelatedBar(entry, from_entry_id) {
     let link_absolute = entry.link_absolute;
     let id = entry.id;
     let title = entry.title;
@@ -401,20 +421,25 @@ function getEntryRelatedBar(entry) {
         const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
         img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
     }
+    let link_text = getEntryLinkText(entry);
 
     let text = `
          <a
          class="list-group-item list-group-item-action"
-         href="${link_absolute}" title="${title}">
+         href="${link_absolute}?from_entry_id=${from_entry_id}" title="${title}">
+             ${badge_text}
+             ${badge_star}
+             ${badge_age}
+             ${badge_dead}
+
              <div class="d-flex">
                ${img_text}
-               ${badge_text}
-               ${badge_star}
-               ${badge_age}
-               ${badge_dead}
 
                <div class="mx-2">
-                  ${title_safe}
+		  <div>
+        	  ${title_safe}
+		  ${link_text}
+		  </div>
                </div>
              </div>
          </a>
@@ -445,35 +470,34 @@ function getEntryReadLaterBar(entry) {
         const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
         img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
     }
-    
-    let thumbnail_text = '';
-    if (img_text) {
-        thumbnail_text = `
-            <div style="position: relative; display: inline-block;">
-                ${img_text}
-            </div>`;
-    }
+    let link_text = getEntryLinkText(entry);
 
     let text = `
-        <div class="my-1">
-         <a href="${link_absolute}" title="${title}">
+         <div 
+         class="list-group-item list-group-item-action"
+	 >
+             ${badge_text}
+             ${badge_star}
+             ${badge_age}
+             ${badge_dead}
+
              <div class="d-flex">
-		 ${thumbnail_text}
-                 ${badge_text}
-                 ${badge_star}
-                 ${badge_age}
-                 ${badge_dead}
+	         <a href="${link_absolute}" title="${title}" class="d-flex">
+		   ${img_text}
         
-        	 <div>
-        	     ${title_safe}
+                   <div class="mx-2">
+		      <div>
+        	         ${title_safe}
+			 ${link_text}
+		      </div>
+        	   </div>
+	         </a>
         
-        	     <a id="${id}" class="remove-button" href="${remove_link}">
-        		<img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
-        	     </a>
-        	 </div>
+                 <a id="${id}" class="remove-button ms-auto" href="${remove_link}" >
+                    <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+                 </a>
              </div>
-         </a>
-        </div>
+         </div>
     `;
     return text;
 }
