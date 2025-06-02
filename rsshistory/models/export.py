@@ -4,6 +4,7 @@ from datetime import time, datetime, date, timedelta
 
 from utils.dateutils import DateUtils
 
+from .credentials import Credentials
 from .system import AppLogging
 
 
@@ -43,17 +44,13 @@ class DataExport(models.Model):
         blank=True,
         help_text="Example: https://github.com/rumca-js/Django-link-archive.git. Can be empty",
     )
-    user = models.CharField(
-        default="",
-        max_length=2000,
+
+    credentials = models.ForeignKey(
+        Credentials,
+        on_delete=models.CASCADE,
+        related_name="export",
         blank=True,
-        help_text="Repo user name. Can be empty",
-    )
-    password = models.CharField(
-        default="",
-        max_length=2000,
-        blank=True,
-        help_text="Repo password, or token. Can be empty",
+        null=True,
     )
 
     db_user = models.CharField(

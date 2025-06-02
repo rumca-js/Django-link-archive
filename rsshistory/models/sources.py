@@ -4,6 +4,7 @@ from django.urls import reverse
 from ..webtools import UrlLocation
 
 from ..apps import LinkDatabase
+from .credentials import Credentials
 
 
 class SourceCategories(models.Model):
@@ -148,14 +149,17 @@ class SourceDataModel(models.Model):
     fetch_period = models.IntegerField(
         default=900, help_text="Source is checked for new data after [x] seconds"
     )
-    username = models.CharField(
-        max_length=1000, blank=True, help_text="User name required to access source"
-    )
-    password = models.CharField(
-        max_length=1000, blank=True, help_text="Password required to access source"
-    )
+
     auto_tag = models.CharField(
         max_length=1000, blank=True, help_text="Automatic tag for new entries"
+    )
+
+    credentials = models.ForeignKey(
+        Credentials,
+        on_delete=models.CASCADE,
+        related_name="sources",
+        blank=True,
+        null=True,
     )
 
     category = models.ForeignKey(

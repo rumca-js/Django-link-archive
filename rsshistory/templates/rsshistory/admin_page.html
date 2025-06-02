@@ -52,31 +52,26 @@
                    {% endif %}
                </a>
            </li>
-           <li class="list-group-item">
-               <a href="{% url 'rsshistory:entry-rules' %}" title="Entry Rules allow to define URL based rules. Block domains, etc." class="nav-link">
-                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-                   Entry rules</a>
-           </li>
-           <li class="list-group-item">
-               <a href="{% url 'rsshistory:api-keys' %}" title="API keys allow to define URL based rules. Block domains, etc." class="nav-link">
-                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-                   API keys</a>
-           </li>
-           <li class="list-group-item">
-               <a href="{% url 'rsshistory:browsers' %}" title="Browser managment" class="nav-link">
-                   <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
-                   Browsers</a>
-           </li>
 
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:searchviews' %}" title="Searchviews" class="nav-link">
+		   <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="content-icon" />
+                   Search views</a>
+           </li>
            <li class="list-group-item">
                <a href="{% url 'rsshistory:data-exports' %}" title="Configured Data Exports" class="nav-link">
                    <img src="{% static 'rsshistory/icons/icons8-database-export-100.png' %}" class="content-icon" />
                    Data Exports</a>
            </li>
            <li class="list-group-item">
-               <a href="{% url 'rsshistory:searchviews' %}" title="Searchviews" class="nav-link">
-		   <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="content-icon" />
-                   Search views</a>
+               <a href="{% url 'rsshistory:entry-rules' %}" title="Entry Rules allow to define URL based rules. Block domains, etc." class="nav-link">
+                   <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
+                   Entry rules</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:browsers' %}" title="Browser managment" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
+                   Browsers</a>
            </li>
            {% if 0 %}
            <li class="list-group-item">
@@ -96,6 +91,16 @@
            </li>
            {% endif %}
 
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:api-keys' %}" title="API keys allow to define URL based rules. Block domains, etc." class="nav-link">
+                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+                   API keys</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:credentials' %}" title="Credentials" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+                   System credentials</a>
+           </li>
            <li class="list-group-item">
                <a href="{% url 'rsshistory:appusers' %}" title="User administration" class="nav-link">
                    <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />

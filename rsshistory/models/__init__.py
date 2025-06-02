@@ -46,6 +46,9 @@ from .entryrules import (
 from .apikeys import (
     ApiKeys,
 )
+from .credentials import (
+    Credentials,
+)
 from .useractions import (
     UserVotes,
     UserComments,

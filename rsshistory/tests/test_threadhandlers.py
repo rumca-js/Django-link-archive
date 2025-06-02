@@ -491,8 +491,6 @@ class WriteDailyDataJobHandlerTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_DAILY_DATA,
             local_path="test",
             remote_path="test.git",
-            user="user",
-            password="password",
         )
 
     def test_process(self):
@@ -537,8 +535,6 @@ class ExportDataJobHandlerTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_DAILY_DATA,
             local_path="test",
             remote_path="test.git",
-            user="user",
-            password="password",
         )
         self.export_id = self.export_obj.id
 

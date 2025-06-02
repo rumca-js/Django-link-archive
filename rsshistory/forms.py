@@ -24,6 +24,7 @@ from .models import (
     DataExport,
     EntryRules,
     ApiKeys,
+    Credentials,
     Browser,
     SearchView,
 )
@@ -208,8 +209,7 @@ class DataExportForm(forms.ModelForm):
             "export_data",
             "local_path",
             "remote_path",
-            "user",
-            "password",
+            "credentials",
             "db_user",
             "export_entries",
             "export_entries_bookmarks",
@@ -304,6 +304,27 @@ class ApiKeysForm(forms.ModelForm):
         fields = [
             "key",
             "user",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class CredentialsForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+
+    class Meta:
+        model = Credentials
+        fields = [
+            "name",
+            "credential_type",
+            "username",
+            "password",
+            "token",
+            "secret",
+            "owner",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -683,8 +704,7 @@ class SourceForm(forms.ModelForm):
             "auto_tag",
             "favicon",
             "auto_update_favicon",
-            "username",
-            "password",
+            "credentials",
             "proxy_location",
         ]
         widgets = {}

@@ -1,5 +1,3 @@
-import socket
-
 from utils.services import EmailReader
 from utils.dateutils import DateUtils
 
@@ -25,12 +23,20 @@ class EmailSourcePlugin(SourcePluginInterface):
 
     def read_entries(self):
         source = self.get_source()
+        if not source.credentials:
+            AppLogging.error(
+                "Source:{} Credentials were not defined for source.".format(source.id)
+            )
+            return
 
         day_to_remove = Configuration.get_object().get_entry_remove_date()
 
         try:
             reader = EmailReader(source.url, time_limit=day_to_remove)
-            if not reader.connect(source.username, source.password):
+            credentials = source.credentials
+            credentials.decrypt()
+
+            if not reader.connect(credentials.username, credentials.password):
                 AppLogging.error(
                     "Source:{} Could not login to service.".format(source.id)
                 )

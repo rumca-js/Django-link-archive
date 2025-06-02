@@ -494,7 +494,7 @@ function getEntryReadLaterBar(entry) {
 	         </a>
         
                  <a id="${id}" class="remove-button ms-auto" href="${remove_link}" >
-                    <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+                    {% include "rsshistory/icon_remove.html" %}
                  </a>
              </div>
          </div>

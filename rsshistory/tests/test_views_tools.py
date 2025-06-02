@@ -11,6 +11,7 @@ from ..controllers import (
     BackgroundJobController,
 )
 from ..models import KeyWords
+from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
