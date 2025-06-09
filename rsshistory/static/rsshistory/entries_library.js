@@ -1,4 +1,3 @@
-{% load static %}
 /*
  * requires
  *  - show_pure_link
