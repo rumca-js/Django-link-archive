@@ -22,11 +22,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-<<<<<<< HEAD
-__version__ = "2.11.7"
-=======
-__version__ = "2.12.0"
->>>>>>> 9b6136301860f769cbd742fe8c6ac2df77efe05f
+__version__ = "2.12.1"
 
 
 class Configuration(object):

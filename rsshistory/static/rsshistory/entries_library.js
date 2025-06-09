@@ -108,7 +108,6 @@ function getEntryTags(entry) {
 }
 
 
-<<<<<<< HEAD:rsshistory/static/rsshistory/entries_library.js
 function getEntryThumbnail(entry) {
     if (!canUserView(entry))
     {
@@ -118,11 +117,12 @@ function getEntryThumbnail(entry) {
     let thumbnail = entry.thumbnail;
 
     return thumbnail;
-=======
+}
+
+
 function getEntryLinkText(entry) {
     let link = entry.link;
     return `<div class="text-reset text-decoration-underline">@ ${link}</div>`;
->>>>>>> 9b6136301860f769cbd742fe8c6ac2df77efe05f:rsshistory/templates/rsshistory/entries_library.js
 }
 
 
