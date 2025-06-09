@@ -785,7 +785,8 @@ function getEntryRelatedBar(entry, from_entry_id) {
 
 
 function getEntryReadLaterBar(entry) {
-    let remove_link = "{% url 'rsshistory:read-later-remove' 1017 %}".replace("1017", entry.id);
+    let remove_link = entry.remove_link; // manually set
+    let remove_icon = entry.remove_icon; // manually set
 
     let link_absolute = entry.link_absolute;
     let id = entry.id;
@@ -830,7 +831,7 @@ function getEntryReadLaterBar(entry) {
 	         </a>
         
                  <a id="${id}" class="remove-button ms-auto" href="${remove_link}" >
-                    {% include "rsshistory/icon_remove.html" %}
+                    ${remove_icon}
                  </a>
              </div>
          </div>

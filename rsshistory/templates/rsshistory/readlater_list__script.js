@@ -70,12 +70,15 @@ function fillQueueList(queue) {
 
     if (queue && queue.length > 0) {
         queue.forEach(entry => {
+           entry.remove_link = "{% url 'rsshistory:read-later-remove' 1017 %}".replace("1017", entry.id);
+           entry.remove_icon = `{% include 'rsshistory/icon_remove.html' %}`;
 	   htmlOutput += getEntryReadLaterBar(entry);
 	});
     }
 
     return htmlOutput;
 }
+
 
 function fillListData() {
     $('#listData').html("");
