@@ -167,6 +167,7 @@ class EntriesSearchListView(object):
         self.user = user
         self.conditions = None
         self.search_view = None
+        self.query_filter = None
 
         if not self.user and self.request and self.request.user:
             self.user = self.request.user
@@ -221,6 +222,12 @@ class EntriesSearchListView(object):
 
         self.search_view = get_search_view(self.request)
         return self.search_view
+
+    def get_errors(self):
+        if self.query_filter:
+            return self.query_filter.get_errors()
+
+        return []
 
     def get_filter(self):
         self.on_search()
@@ -1000,6 +1007,7 @@ def handle_json_view(request, view_to_use):
     json_obj["page"] = page_num
     json_obj["num_pages"] = 0
     json_obj["view"] = None
+    json_obj["errors"] = []
 
     start_time = time.time()
 
@@ -1010,6 +1018,7 @@ def handle_json_view(request, view_to_use):
 
         json_obj["view"] = view_to_use.get_search_view().name
         json_obj["conditions"] = str(view_to_use.get_conditions())
+        json_obj["errors"] = str(view_to_use.get_errors())
 
         p = Paginator(entries, view_to_use.get_paginate_by())
         page_obj = p.get_page(page_num)

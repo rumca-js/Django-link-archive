@@ -1,3 +1,12 @@
+
+// library code
+
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+
 function isMobile() {
     return /Mobi|Android/i.test(navigator.userAgent);
 }
@@ -17,11 +26,20 @@ function escapeHtml(unsafe)
 }
 
 
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
+function createLinks(inputText) {
+    const urlRegex = /(?<!<a[^>]*>)(https:\/\/[a-zA-Z0-9-_\.\/]+)(?!<\/a>)/g;
+    const urlRegex2 = /(?<!<a[^>]*>)(http:\/\/[a-zA-Z0-9-_\.\/]+)(?!<\/a>)/g;
 
+    inputText = inputText.replace(urlRegex, (match, url) => {
+        return `<a href="${url}" target="_blank">${url}</a>`;
+    });
+
+    inputText = inputText.replace(urlRegex2, (match, url) => {
+        return `<a href="${url}" target="_blank">${url}</a>`;
+    });
+
+    return inputText;
+}
 
 function isEmpty( el ){
     return !$.trim(el.html())
@@ -96,7 +114,7 @@ function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
 
 function GetPaginationNav(data) {
     let totalPages = data.num_pages;
-    let count = data.count;
+    let totalRows = data.count;
     let currentPage = data.page;
 
     if (totalPages <= 1) {
@@ -115,14 +133,14 @@ function GetPaginationNav(data) {
     if (currentPage > 2) {
         paginationText += `
             <li class="page-item">
-                <a href="?page=1${paginationArgs}" data-page="1" class="btnFilterTrigger page-link">|&lt;</a>
+                <a href="?page=1&${paginationArgs}" data-page="1" class="btnNavigation page-link">|&lt;</a>
             </li>
         `;
     }
     if (currentPage > 2) {
         paginationText += `
             <li class="page-item">
-                <a href="?page=${currentPage - 1}${paginationArgs}" data-page="${currentPage - 1}" class="btnFilterTrigger page-link">&lt;</a>
+                <a href="?page=${currentPage - 1}&${paginationArgs}" data-page="${currentPage - 1}" class="btnNavigation page-link">&lt;</a>
             </li>
         `;
     }
@@ -133,7 +151,7 @@ function GetPaginationNav(data) {
     for (let i = startPage; i <= endPage; i++) {
         paginationText += `
             <li class="page-item ${i === currentPage ? 'active' : ''}">
-                <a href="?page=${i}${paginationArgs}" data-page="${i}" class="btnFilterTrigger page-link">${i}</a>
+                <a href="?page=${i}&${paginationArgs}" data-page="${i}" class="btnNavigation page-link">${i}</a>
             </li>
         `;
     }
@@ -141,25 +159,42 @@ function GetPaginationNav(data) {
     if (currentPage + 1 < totalPages) {
         paginationText += `
             <li class="page-item">
-                <a href="?page=${currentPage + 1}${paginationArgs}" data-page="${currentPage + 1}" class="btnFilterTrigger page-link">&gt;</a>
+                <a href="?page=${currentPage + 1}&${paginationArgs}" data-page="${currentPage + 1}" class="btnNavigation page-link">&gt;</a>
             </li>
         `;
     }
     if (currentPage + 1 < totalPages) {
         paginationText += `
             <li class="page-item">
-                <a href="?page=${totalPages}${paginationArgs}" data-page="${totalPages}" class="btnFilterTrigger page-link">&gt;|</a>
+                <a href="?page=${totalPages}&${paginationArgs}" data-page="${totalPages}" class="btnNavigation page-link">&gt;|</a>
             </li>
         `;
     }
 
     paginationText += `
             </ul>
-            ${currentPage} / ${totalPages} @ ${count} records.
+            ${currentPage} / ${totalPages} @ ${totalRows} records.
         </nav>
     `;
 
     return paginationText;
+}
+
+
+function getHumanReadableNumber(num) {
+    if (num >= 1e9) {
+        return (num / 1e9).toFixed(1) + "B"; // Billions
+    } else if (num >= 1e6) {
+        return (num / 1e6).toFixed(1) + "M"; // Millions
+    } else if (num >= 1e3) {
+        return (num / 1e3).toFixed(1) + "K"; // Thousands
+    }
+    return num.toString(); // Small numbers
+}
+
+
+function parseDate(inputDate) {
+    return inputDate.toLocaleString();
 }
 
 
@@ -253,13 +288,48 @@ function fixStupidGoogleRedirects(input_url) {
 }
 
 
-function getHumanReadableNumber(num) {
-    if (num >= 1e9) {
-        return (num / 1e9).toFixed(1) + "B"; // Billions
-    } else if (num >= 1e6) {
-        return (num / 1e6).toFixed(1) + "M"; // Millions
-    } else if (num >= 1e3) {
-        return (num / 1e3).toFixed(1) + "K"; // Thousands
+function getYouTubeVideoId(url) {
+    try {
+        const urlObj = new URL(url);
+        const hostname = urlObj.hostname;
+
+        if (hostname.includes("youtu.be")) {
+            return urlObj.pathname.slice(1);
+        }
+
+        if (urlObj.searchParams.has("v")) {
+            return urlObj.searchParams.get("v");
+        }
+
+        const paths = urlObj.pathname.split("/");
+        const validPrefixes = ["embed", "shorts", "v"];
+        if (validPrefixes.includes(paths[1]) && paths[2]) {
+            return paths[2];
+        }
+
+        return null;
+    } catch (e) {
+        return null;
     }
-    return num.toString(); // Small numbers
+}
+
+
+function getYouTubeEmbedDiv(youtubeUrl) {
+    const videoId = getYouTubeVideoId(youtubeUrl);
+    if (videoId) {
+        const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        const frameHtml = `
+            <div class="youtube_player_container mb-4">
+                <iframe 
+                    src="${embedUrl}" 
+                    frameborder="0" 
+                    allowfullscreen 
+                    class="youtube_player_frame w-100" 
+                    style="aspect-ratio: 16 / 9;"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        `;
+        return frameHtml;
+    }
 }

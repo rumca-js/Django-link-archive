@@ -11,6 +11,36 @@ function isEntryValid(entry) {
 }
 
 
+function getEntryLink(entry) {
+    return show_pure_links ? entry.link : entry.link_absolute;
+}
+
+
+function canUserView(entry) {
+    if (entry.age == 0 || entry.age == null)
+        return true;
+
+    if (entry.age < user_age)
+        return true;
+
+    return false;
+}
+
+
+function getEntryAuthorText(entry) {
+    if (entry.author && entry.album)
+    {
+        return entry.author + " / " + entry.album;
+    }
+    else if (entry.author) {
+        return entry.author;
+    }
+    else if (entry.album) {
+        return entry.album;
+    }
+    return "";
+}
+
 
 function getEntryVotesBadge(entry, overflow=false) {
     let style = "font-size: 0.8rem;"
@@ -78,6 +108,18 @@ function getEntryTags(entry) {
 }
 
 
+function getEntryThumbnail(entry) {
+    if (!canUserView(entry))
+    {
+        return;
+    }
+
+    let thumbnail = entry.thumbnail;
+
+    return thumbnail;
+}
+
+
 function getEntrySourceTitle(entry) {
     let source__title = "";
     if (entry.source__title) {
@@ -92,7 +134,7 @@ function getEntryDatePublished(entry) {
     if (entry.date_published) {
         let datePublished = new Date(entry.date_published);
         if (!isNaN(datePublished)) {
-            datePublishedStr = datePublished.toLocaleString();
+            datePublishedStr = parseDate(datePublished);
         }
     }
 
@@ -102,6 +144,12 @@ function getEntryDatePublished(entry) {
 
 function getEntryTitleSafe(entry) {
     let title_safe = "";
+
+    if (!canUserView(entry))
+    {
+        return "----Age limited----";
+    }
+
     if (entry.title_safe) {
        title_safe = escapeHtml(entry.title_safe)
     }
@@ -110,8 +158,293 @@ function getEntryTitleSafe(entry) {
        title_safe = escapeHtml(entry.title)
     }
 
+    if (title_safe.length > 200) {
+        title_safe = title_safe.substring(0, 200);
+        title_safe = title_safe + "...";
+    }
+
     return title_safe;
 }
+
+
+/**
+ * Detail view
+ */
+
+
+function EntryToArchiveOrg(entry) {
+    let link = entry.link;
+
+    let currentDate = new Date();
+    let formattedDate = currentDate.toISOString().split('T')[0].replace(/-/g, ''); // Format: YYYYMMDD
+
+    return `https://web.archive.org/web/${formattedDate}000000*/${link}`;
+}
+
+
+function EntryToW3CValidator(entry) {
+    let link = entry.link;
+
+    return `https://validator.w3.org/nu/?doc=${encodeURIComponent(link)}`;
+}
+
+
+function EntryToSchemaValidator(entry) {
+    let link = entry.link;
+
+    return `https://validator.schema.org/#url=${encodeURIComponent(link)}`;
+}
+
+
+function EntryToWhoIs(entry) {
+    let link = entry.link;
+    let domain = link.replace(/^https?:\/\//, ''); // Remove 'http://' or 'https://'
+
+    return `https://who.is/whois/${domain}`;
+}
+
+
+function EntryToTranslate(entry) {
+    let link = entry.link;
+
+    let reminder = '?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp';
+    if (link.indexOf("http://") != -1) {
+       reminder = '?_x_tr_sch=http&_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp';
+    }
+
+    if (link.indexOf("?") != -1) {
+        let queryParams = link.split("?")[1];
+        reminder += '&' + queryParams;
+    }
+
+    let domain = link.replace(/^https?:\/\//, '').split('/')[0]; // Extract the domain part
+
+    domain = domain.replace(/-/g, '--').replace(/\./g, '-');
+
+    let translateUrl = `https://${domain}.translate.goog/` + reminder;
+
+    return translateUrl;
+}
+
+
+function GetEditMenu(entry) {
+    let link = entry.link;
+
+    let translate_link = EntryToTranslate(entry);
+    let archive_link = EntryToArchiveOrg(entry);
+    let w3c_link = EntryToW3CValidator(entry);
+    let schema_link = EntryToSchemaValidator(entry);
+    let who_is_link = EntryToWhoIs(entry);
+
+    let text = 
+    `<div class="dropdown mx-1">
+        <button class="btn btn-primary" type="button" id="#entryViewDrop" data-bs-toggle="dropdown" aria-expanded="false">
+          View
+        </button>
+        <ul class="dropdown-menu">`;
+
+    text += `
+        <li>
+          <a href="${translate_link}" id="Edit" class="dropdown-item" title="Edit entry">
+             View translate
+          </a>
+        </li>
+    `;
+
+    text += `
+        <li>
+          <a href="${archive_link}" id="Archive-org" class="dropdown-item" title="View archived version on archive.org">
+             View archive.org
+          </a>
+        </li>
+    `;
+
+    text += `
+        <li>
+          <a href="${w3c_link}" id="w3c-validator" class="dropdown-item" title="Edit entry">
+             W3C validator
+          </a>
+        </li>
+    `;
+
+    text += `
+        <li>
+          <a href="${schema_link}" id="Schama-Validator" class="dropdown-item" title="Edit entry">
+             Schema validator
+          </a>
+        </li>
+    `;
+
+    text += `
+        <li>
+          <a href="${who_is_link}" id="Who-Is" class="dropdown-item" title="Edit entry">
+             Who Is validator
+          </a>
+        </li>
+    `;
+
+    text += `</div>`;
+
+    return text;
+}
+
+
+function getEntryBodyText(entry) {
+    date_published = parseDate(entry.date_published);
+
+    let text = `
+    <a href="${entry.link}"><h1>${entry.title}</h1></a>
+    <div><a href="${entry.link}">${entry.link}</a></div>
+    <div><b>Publish date:</b>${date_published}</div>
+    `;
+
+    let tags_text = getEntryTags(entry);
+    
+    text += `
+        <div>Tags: ${tags_text}</div>
+    `;
+
+    text += GetEditMenu(entry);
+
+    let description = entry.description.replace(/\n/g, '<br>');
+    description = createLinks(description);
+
+    text += `
+    <div>${description}</div>
+    `;
+
+    text += `
+    <h3>Parameters</h3>
+    <div>Points: ${entry.page_rating}|${entry.page_rating_votes}|${entry.page_rating_contents}</div>
+    `;
+
+    if (entry.date_created) {
+        date_created = parseDate(entry.date_created);
+        text += `<div>Creation date:${date_created}</div>`;
+    }
+
+    if (entry.date_updated) {
+        date_updated = parseDate(entry.date_updated);
+        text += `<div>Update date:${date_updated}</div>`;
+    }
+
+    if (entry.date_dead_since) {
+        date_dead_since = parseDate(entry.date_dead_since);
+        text += `<div>Dead since:${date_dead_since}</div>`;
+    }
+
+    text += `
+    <div>Author: ${entry.author}</div>
+    <div>Album: ${entry.album}</div>
+    <div>Status code: ${entry.status_code}</div>
+    <div>Permanent: ${entry.permanent}</div>
+    <div>Language: ${entry.language}</div>
+    `;
+
+    if (entry.manual_status_code) {
+       text += `
+       <div>Manual status code: ${entry.manual_status_code}</div>
+       `;
+    }
+
+    if (entry.age) {
+       text += `
+       <div>Age: ${entry.age}</div>
+       `;
+    }
+
+    return text;
+}
+
+
+function getEntryFullTextStandard(entry) {
+    let text = `<div entry="${entry.id}" class="entry-detail">`;
+
+    if (entry.thumbnail) {
+       text += `
+       <div><img src="" style="max-width:30%;"/></div>
+       `;
+
+       if (canUserView(entry))
+       {
+          text = `
+          <div><img src="${entry.thumbnail}" style="max-width:30%;"/></div>
+          `;
+       }
+    }
+
+    text += getEntryBodyText(entry);
+
+    text += "</div>";
+
+    return text;
+}
+
+
+function getEntryFullTextYouTube(entry) {
+    const urlParams = new URL(entry.link).searchParams;
+    const videoId = urlParams.get("v");
+
+    const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+
+    let text = `<div entry="${entry.id}" class="entry-detail">`;
+
+    if (videoId) {
+        text += `
+          <div class="youtube_player_container">
+              <iframe src="${embedUrl}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        `;
+    }
+
+    text += getEntryBodyText(entry);
+
+    text += "</div>";
+
+    return text;
+}
+
+
+function getEntryFullTextOdysee(entry) {
+    const url = new URL(entry.link);
+    const videoId = url.pathname.split('/').pop();
+
+    const embedUrl = videoId ? `https://odysee.com/$/embed/${videoId}` : "";
+
+    let text = `<div entry="${entry.id}" class="entry-detail">`;
+
+    if (videoId) {
+        text += `
+           <div class="youtube_player_container">
+               <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" width="100%" height="100%" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe>
+           </div>
+        `;
+    }
+
+    text += getEntryBodyText(entry);
+    text += "</div>";
+
+    return text;
+}
+
+
+function getEntryDetailText(entry) {
+    let text = "";
+
+    if (entry.link.startsWith("https://www.youtube.com/watch?v="))
+        text = getEntryFullTextYouTube(entry);
+    else if (entry.link.startsWith("https://odysee.com/"))
+        text = getEntryFullTextOdysee(entry);
+    else
+        text = getEntryFullTextStandard(entry);
+
+    return text;
+}
+
+
+/**
+ * Entry list items
+ */
 
 
 function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
@@ -123,7 +456,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
 
     let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
     let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
-    let thumbnail = entry.thumbnail;
+    let thumbnail = getEntryThumbnail(entry);
 
     let img_text = '';
     if (show_icons) {
@@ -144,11 +477,12 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let date_published = getEntryDatePublished(entry);
     let title_safe = getEntryTitleSafe(entry);
     let hover_title = title_safe + " " + tags_text;
-    let entry_link = show_pure_links ? entry.link : entry.link_absolute;
+    let entry_link = getEntryLink(entry);
 
     return `
         <a 
             href="${entry_link}"
+            entry="${entry.id}"
             title="${hover_title}"
             ${invalid_style}
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
@@ -177,14 +511,14 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
 function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
 
-    let badge_text = getEntryVotesBadge(entry);
-    let badge_star = getEntryBookmarkBadge(entry);
+    let badge_text = getEntryVotesBadge(page_rating_votes);
+    let badge_star = highlight_bookmarks ? getEntryBookmarkBadge(entry) : "";
     let badge_age = getEntryAgeBadge(entry);
    
     let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
 
-    let thumbnail = entry.thumbnail;
+    let thumbnail = getEntryThumbnail(entry);
 
     let thumbnail_text = '';
     if (show_icons) {
@@ -197,13 +531,14 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let tags_text = getEntryTags(entry);
     let tags = `<div class="text-reset mx-2">${tags_text}</div>`;
     let title_safe = getEntryTitleSafe(entry);
-    let entry_link = show_pure_links ? entry.link : entry.link_absolute;
+    let entry_link = getEntryLink(entry);
     let hover_title = title_safe + " " + tags_text;
     let link = entry.link;
 
     return `
         <a 
             href="${entry_link}"
+            entry="${entry.id}"
             title="${hover_title}"
             ${invalid_style}
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
@@ -247,7 +582,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
     let invalid_style = isEntryValid(entry) ? `` : `opacity: 0.5`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
 
-    let thumbnail = entry.thumbnail;
+    let thumbnail = getEntryThumbnail(entry);
     let thumbnail_text = `
         <img src="${thumbnail}" style="width:100%;max-height:100%;aspect-ratio:3/4;object-fit:cover;"/>
         <div class="ms-auto">
@@ -262,12 +597,13 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
 
     let title_safe = getEntryTitleSafe(entry);
     let hover_title = title_safe + " " + tags_text;
-    let entry_link = show_pure_links ? entry.link : entry.link_absolute;
+    let entry_link = getEntryLink(entry);
     let source__title = getEntrySourceTitle(entry);
 
     return `
         <a 
             href="${entry_link}"
+            entry="${entry.id}"
             title="${hover_title}"
             class="list-group-item list-group-item-action m-1 border rounded p-2"
             style="text-overflow: ellipsis; max-width: 18%; min-width: 18%; width: auto; aspect-ratio: 1 / 1; text-decoration: none; display:flex; flex-direction:column; ${invalid_style}"
@@ -297,7 +633,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
     let invalid_style = isEntryValid(entry) ? `` : `opacity: 0.5`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
 
-    let thumbnail = entry.thumbnail;
+    let thumbnail = getEntryThumbnail(entry);
     let thumbnail_text = `
         <img src="${thumbnail}" style="width:100%; max-height:100%; object-fit:cover"/>
         ${badge_text}
@@ -312,11 +648,12 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
     let title_safe = getEntryTitleSafe(entry);
     let hover_title = title_safe + " " + tags_text;
 
-    let entry_link = show_pure_links ? entry.link : entry.link_absolute;
+    let entry_link = getEntryLink(entry);
 
     return `
         <a 
             href="${entry_link}"
+            entry="${entry.id}"
             title="${hover_title}"
             class="list-group-item list-group-item-action border rounded p-2"
             style="text-overflow: ellipsis; max-width: 100%; min-width: 100%; width: auto; aspect-ratio: 1 / 1; text-decoration: none; display:flex; flex-direction:column; ${invalid_style} ${bookmark_class}"
