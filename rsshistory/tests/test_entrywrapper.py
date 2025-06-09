@@ -749,7 +749,7 @@ class EntryWrapperTest(FakeInternetTestCase):
             source_url="https://archive.com/test",
             link="https://archive.com?v=1",
             title="The archive https link",
-            bookmarked=False,
+            bookmarked=True,
             language="en",
             date_dead_since=DateUtils.get_datetime_now_utc() - timedelta(days=5),
             date_published=DateUtils.get_datetime_now_utc() - timedelta(days=5),

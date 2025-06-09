@@ -116,9 +116,6 @@ class SingleSymbolEvaluator(object):
     def set_translation_mapping(self, names):
         self.translatable_names = names
 
-    def add_error(self, error):
-        self.errors.append(error)
-
 
 class EquationTranslator(object):
     def __init__(self, data):
@@ -187,6 +184,7 @@ class EquationEvaluator(object):
         self.symbol_evaluator = symbol_evaluator
         self.known_results = {}
         self.expr = None
+        self.errors = []
 
     def translate_to_symbol_notation(self, data):
         """
@@ -243,9 +241,13 @@ class EquationEvaluator(object):
         else:
             args1 = None
 
-        val = self.evaluate_function(operation_symbol, function, args0, args1)
-        self.known_results[operation_symbol] = val
-        return self.known_results[operation_symbol]
+        try:
+            val = self.evaluate_function(operation_symbol, function, args0, args1)
+            self.known_results[operation_symbol] = val
+            return self.known_results[operation_symbol]
+        except Exception as E:
+            self.errors.append("Cannot evaluate operation:{}, function:{}".format(operation_symbol, function))
+            raise
 
     def evaluate_function(self, operation_symbol, function, args0, args1):
         if function == "And":  # & sign
@@ -322,7 +324,14 @@ class OmniSearch(object):
         if self.query_result is not None:
             return self.query_result
 
-        self.query_result = self.get_combined_query()
+        try:
+            self.query_result = self.get_combined_query()
+        except Exception as E:
+            if self.equation_evaluator:
+                self.errors.extend(self.equation_evaluator.errors)
+
+            self.errors.append("Cannot obtain combined query")
+
         return self.query_result
 
     def get_combined_query(self):

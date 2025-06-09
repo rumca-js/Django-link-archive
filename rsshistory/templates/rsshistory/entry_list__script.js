@@ -59,6 +59,28 @@ function fillEntryList(entries) {
 }
 
 
+function GetQueryDetailsHtml(data) {
+    htmlOutput = "";
+
+    let execution_time = data.timestamp_s;
+    let conditions = data.conditions;
+    let errors = data.errors;
+
+    htmlOutput += `<div>Execution Time:${execution_time}</div>`;
+    htmlOutput += `<div>Conditions:${conditions}</div>`;
+
+    if (errors && errors.length > 0) {
+        htmlOutput += `<div>Errors</div>`;
+
+        errors.forEach(error => {
+            htmlOutput += `<div>${error}</div>`;
+        });
+    }
+
+    return htmlOutput;
+}
+
+
 function fillListData() {
     let data = object_list_data;
 
@@ -69,13 +91,16 @@ function fillListData() {
     if (!entries || entries.length == 0) {
         $('#listData').html("No entries found");
         $('#pagination').html("");
-        return;
+    }
+    else {
+        var finished_text = fillEntryList(entries);
+        $('#listData').html(finished_text);
+        let pagination = GetPaginationNav(data);
+        $('#pagination').html(pagination);
     }
 
-    var finished_text = fillEntryList(entries);
-    $('#listData').html(finished_text);
-    let pagination = GetPaginationNav(data);
-    $('#pagination').html(pagination);
+    let query_info = GetQueryDetailsHtml(data);
+    $('#queryInfo').html(query_info);
 }
 
 

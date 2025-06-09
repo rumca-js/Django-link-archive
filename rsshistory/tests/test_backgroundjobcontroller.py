@@ -291,8 +291,6 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_DAILY_DATA,
             local_path="./daily_dir",
             remote_path="https://github.com/rumca-js/RSS-Link-Database-DAILY.git",
-            user="testuser",
-            password="password",
             export_entries=True,
             export_entries_bookmarks=True,
             export_entries_permanents=True,

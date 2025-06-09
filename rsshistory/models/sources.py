@@ -29,7 +29,7 @@ class SourceCategories(models.Model):
 
     def get(category_name):
         objs = SourceCategories.objects.filter(name=category_name)
-        if objs.count() != 0:
+        if objs.exists():
             return objs[0]
 
     def __str__(self):

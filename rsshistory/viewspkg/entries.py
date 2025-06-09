@@ -73,7 +73,7 @@ from ..views import (
     get_request_browser,
     get_search_view,
 )
-from ..queryfilters import EntryFilter, OmniSearchFilter, DjangoEquationProcessor
+from ..queryfilters import EntryFilter, DjangoEquationProcessor
 from ..configuration import Configuration
 from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
@@ -186,13 +186,19 @@ class EntriesSearchListView(object):
         if search_view.entry_limit:
             queryset = queryset[: search_view.entry_limit]
 
-        print("EntriesSearchListView:get_queryset done {}".format(queryset.query))
+        print("EntriesSearchListView:get_queryset done {}".format(queryset))
 
         config = Configuration.get_object().config_entry
         if config.debug_mode:
             self.query = queryset.query
 
         return queryset
+
+    def get_errors(self):
+        if self.query_filter:
+            return self.query_filter.get_errors()
+        else:
+            return []
 
     def get_paginate_by(self):
         """
@@ -222,12 +228,6 @@ class EntriesSearchListView(object):
 
         self.search_view = get_search_view(self.request)
         return self.search_view
-
-    def get_errors(self):
-        if self.query_filter:
-            return self.query_filter.get_errors()
-
-        return []
 
     def get_filter(self):
         self.on_search()
@@ -276,8 +276,15 @@ class EntriesSearchListView(object):
         if self.conditions:
             return self.conditions
 
+        filter_conditions = self.query_filter.get_conditions()
+
+        if filter_conditions is None:
+            print("No filter conditions")
+            # Errror in filter, filter should return empty Q if everything is OK
+            return
+
         self.conditions = (
-            self.query_filter.get_conditions() & self.get_search_view_conditions()
+            filter_conditions & self.get_search_view_conditions()
         )
 
         return self.conditions
@@ -292,12 +299,19 @@ class EntriesSearchListView(object):
     def get_filtered_objects(self):
         print("EntriesSearchListView:get_filtered_objects")
 
+        archive = False
         if "archive" in self.request.GET and self.request.GET["archive"] == "on":
-            query_set = self.get_initial_query_set(archive=True)
-        else:
-            query_set = self.get_initial_query_set(archive=False)
+            archive = True
+
+        query_set = self.get_initial_query_set(archive=False)
 
         conditions = self.get_conditions()
+
+        if conditions is None:
+            if archive:
+                return ArchiveLinkDataController.objects.none()
+            else:
+                return LinkDataController.objects.none()
 
         print("EntriesSearchListView:get_filtered_objects DONE")
         return query_set.filter(conditions)
@@ -1018,7 +1032,7 @@ def handle_json_view(request, view_to_use):
 
         json_obj["view"] = view_to_use.get_search_view().name
         json_obj["conditions"] = str(view_to_use.get_conditions())
-        json_obj["errors"] = str(view_to_use.get_errors())
+        json_obj["errors"] = view_to_use.get_errors()
 
         p = Paginator(entries, view_to_use.get_paginate_by())
         page_obj = p.get_page(page_num)

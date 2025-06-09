@@ -65,4 +65,4 @@ class EmailSourcePlugin(SourcePluginInterface):
 
     def get_entry_link(self, email):
         source = self.get_source()
-        return "email://{}/{}/{}".format(source.url, source.username, email.id)
+        return "email://{}/{}/{}".format(source.url, source.credentials.username, email.id)

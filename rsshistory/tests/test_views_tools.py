@@ -163,7 +163,7 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         # print(response.text.decode('utf-8'))
 
-        data = response.json
+        data = response.json()
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("https://www.linkedin.com", data)
@@ -185,7 +185,7 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         # print(response.text.decode('utf-8'))
 
-        data = response.json
+        data = response.json()
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("https://www.linkedin.com/", data)
@@ -207,7 +207,7 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         # print(response.text.decode('utf-8'))
 
-        data = response.json
+        data = response.json()
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("https://linkedin.com/", data)
@@ -229,7 +229,7 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         # print(response.text.decode('utf-8'))
 
-        data = response.json
+        data = response.json()
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("https://linkedin.com", data)

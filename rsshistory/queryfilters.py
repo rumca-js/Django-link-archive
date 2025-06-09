@@ -42,7 +42,7 @@ class DjangoSingleSymbolEvaluator(SingleSymbolEvaluator):
             return Q(**condition_data)
 
     def evaluate_complex_not_translated_symbol(self, symbol, condition_data):
-        self.add_error("Cannot evaluate symbol:{}".format(symbol))
+        self.errors.append("Cannot evaluate symbol:{}".format(symbol))
 
     def evaluate_simple_symbol(self, symbol):
         result = None
@@ -223,10 +223,6 @@ class BaseQueryFilter(object):
         if len(not_translateds) > 0:
             for not_translated in not_translateds:
                 self.errors.append("Not translated: {}".format(not_translated))
-
-        errors = query_filter.get_errors()
-        if errors:
-            self.errors.extend(errors)
 
         return conditions
 
@@ -421,7 +417,7 @@ class OmniSearchWithDefault(OmniSearch):
         """
         To speed things up, if query does not have any operator, use default scheme for searching
         """
-        query = Q()
+        query = None
 
         if self.is_complex_query():
             query = super().get_combined_query()
@@ -430,7 +426,6 @@ class OmniSearchWithDefault(OmniSearch):
 
         if query is None:
             self.errors.append("Query is none")
-            query = Q()
 
         return query
 
@@ -452,7 +447,8 @@ class OmniSearchWithDefault(OmniSearch):
         return result
 
     def get_errors(self):
-        return self.symbol_evaluator.errors
+        self.errors.extend(self.symbol_evaluator.errors)
+        return self.errors
 
 
 class DjangoEquationProcessor:
@@ -470,6 +466,8 @@ class DjangoEquationProcessor:
 
     def get_conditions(self):
         if not self.parser.search_query:
+            return Q()
+        if self.parser.search_query == "":
             return Q()
 
         return self.parser.get_query_result()
@@ -505,7 +503,6 @@ class OmniSearchFilter(BaseQueryFilter):
             return self.combined_query
 
         self.combined_query = self.parser.get_query_result()
-        self.errors.extend(self.parser.errors)
 
         return self.combined_query
 

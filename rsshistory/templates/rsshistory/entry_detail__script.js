@@ -101,16 +101,15 @@ function getEntryOperationalParamters(attempt = 1) {
             let html_out = "";
 
             data.parameters.forEach(parameter => {
-		let title = parameter.title;
-                if (!title) {
-                  title = parameter.name;
-		}
+		let title = parameter.title || parameter.name;
+		let name = escapeHtml(parameter.name);
+		let description = escapeHtml(parameter.description);
 
                 html_out += `<div class="text-nowrap mx-1"
                     title="${title}"
                     >
-                       <strong>${parameter.name}:</strong>
-                       ${parameter.description}
+                       <strong>${name}:</strong>
+                       ${description}
                     </div>`;
             });
 

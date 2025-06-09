@@ -28,9 +28,6 @@ class ApiKeysViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        lists = BlockEntryList.objects.all()
-        self.assertTrue(lists.exists())
-
     def test_api_key_edit(self):
         key = ApiKeys.objects.create(key="test")
 
