@@ -10,7 +10,7 @@
        {% include "rsshistory/icon_enable.html" %}
     </a>
     <a href="{% url 'rsshistory:entry-rule-remove' object.id %}" class="btn btn-primary" role="button">
-       <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+       {% include "rsshistory/icon_remove.html" %}
     </a>
 </div>
 

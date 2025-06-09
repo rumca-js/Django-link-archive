@@ -122,6 +122,12 @@ class LinkDataController(LinkDataModel):
             if hasattr(test, key):
                 result[key] = props[key]
 
+        result = LinkDataController.get_clean_field(result, "link")
+        result = LinkDataController.get_clean_field(result, "title")
+        result = LinkDataController.get_clean_field(result, "description")
+        result = LinkDataController.get_clean_field(result, "author")
+        result = LinkDataController.get_clean_field(result, "album")
+
         if "link" in result:
             result["link"] = UrlHandlerEx.get_cleaned_link(result["link"])
 
@@ -133,6 +139,12 @@ class LinkDataController(LinkDataModel):
             del result["vote"]
 
         return result
+
+    def get_clean_field(props, field):
+        if field in props and props[field]:
+            props[field] = props[field].replace("\0", "")
+
+        return props
 
     def vote(self, vote):
         self.page_rating_votes = vote
@@ -147,7 +159,13 @@ class LinkDataController(LinkDataModel):
             days=conf.days_to_move_to_archive
         )
 
-        return self.date_published < day_to_move
+        if self.date_published and self.date_published < day_to_move:
+            return True
+
+        if self.date_created and self.date_created < day_to_move:
+            return True
+
+        return False
 
     def is_remove_time(self):
         conf = Configuration.get_object().config_entry

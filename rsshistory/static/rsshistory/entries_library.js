@@ -108,6 +108,7 @@ function getEntryTags(entry) {
 }
 
 
+<<<<<<< HEAD:rsshistory/static/rsshistory/entries_library.js
 function getEntryThumbnail(entry) {
     if (!canUserView(entry))
     {
@@ -117,6 +118,11 @@ function getEntryThumbnail(entry) {
     let thumbnail = entry.thumbnail;
 
     return thumbnail;
+=======
+function getEntryLinkText(entry) {
+    let link = entry.link;
+    return `<div class="text-reset text-decoration-underline">@ ${link}</div>`;
+>>>>>>> 9b6136301860f769cbd742fe8c6ac2df77efe05f:rsshistory/templates/rsshistory/entries_library.js
 }
 
 
@@ -453,6 +459,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let badge_text = getEntryVotesBadge(entry);
     let badge_star = getEntryBookmarkBadge(entry);
     let badge_age = getEntryAgeBadge(entry);
+    let badge_dead = getEntryDeadBadge(entry);
 
     let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
     let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
@@ -501,6 +508,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                   ${badge_text}
                   ${badge_star}
                   ${badge_age}
+                  ${badge_dead}
                 </div>
             </div>
         </a>
@@ -514,6 +522,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let badge_text = getEntryVotesBadge(page_rating_votes);
     let badge_star = highlight_bookmarks ? getEntryBookmarkBadge(entry) : "";
     let badge_age = getEntryAgeBadge(entry);
+    let badge_dead = getEntryDeadBadge(entry);
    
     let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
@@ -535,6 +544,8 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let hover_title = title_safe + " " + tags_text;
     let link = entry.link;
 
+    let link_text = getEntryLinkText(entry);
+
     return `
         <a 
             href="${entry_link}"
@@ -547,7 +558,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                ${thumbnail_text}
                <div class="mx-2">
                   <span style="font-weight:bold" class="text-reset">${title_safe}</span>
-                  <div class="text-reset text-decoration-underline">@ ${link}</div>
+		  ${link_text}
                   ${tags}
                </div>
 
@@ -555,6 +566,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                   ${badge_text}
                   ${badge_star}
                   ${badge_age}
+                  ${badge_dead}
                </div>
             </div>
         </a>
@@ -578,6 +590,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
     let badge_text = getEntryVotesBadge(entry, true);
     let badge_star = getEntryBookmarkBadge(entry, true);
     let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry);
 
     let invalid_style = isEntryValid(entry) ? `` : `opacity: 0.5`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
@@ -589,6 +602,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
             ${badge_text}
             ${badge_star}
             ${badge_age}
+            ${badge_dead}
         </div>
     `;
 
@@ -629,6 +643,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
     let badge_text = getEntryVotesBadge(entry, true);
     let badge_star = getEntryBookmarkBadge(entry, true);
     let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry);
 
     let invalid_style = isEntryValid(entry) ? `` : `opacity: 0.5`;
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
@@ -639,6 +654,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
         ${badge_text}
         ${badge_star}
         ${badge_age}
+        ${badge_dead}
     `;
 
     let tags_text = getEntryTags(entry);
@@ -685,16 +701,27 @@ function getEntryVisitsBar(entry) {
     let date_last_visit = entry.date_last_visit.toLocaleString();
     let number_of_visits = entry.number_of_visits;
 
+    let badge_text = getEntryVotesBadge(entry, true);
+    let badge_star = getEntryBookmarkBadge(entry, true);
+    let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry, true);
+
     let img_text = '';
     if (view_show_icons) {
         const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
         img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
     }
+    let link_text = getEntryLinkText(entry);
 
     let text = `
          <a
          class="list-group-item list-group-item-action"
          href="${link_absolute}" title="${title}">
+             ${badge_text}
+             ${badge_star}
+             ${badge_age}
+             ${badge_dead}
+
              <div class="d-flex">
                ${img_text}
 
@@ -702,6 +729,7 @@ function getEntryVisitsBar(entry) {
                   ${title_safe}
                   Visits:${number_of_visits}
                   Date of the last visit:${date_last_visit}
+		  ${link_text}
                </div>
              </div>
          </a>
@@ -710,7 +738,7 @@ function getEntryVisitsBar(entry) {
 }
 
 
-function getEntryRelatedBar(entry) {
+function getEntryRelatedBar(entry, from_entry_id) {
     let link_absolute = entry.link_absolute;
     let id = entry.id;
     let title = entry.title;
@@ -720,21 +748,35 @@ function getEntryRelatedBar(entry) {
     let source__title = entry.source__title;
     let date_published = getEntryDatePublished(entry);
 
+    let badge_text = getEntryVotesBadge(entry, true);
+    let badge_star = getEntryBookmarkBadge(entry, true);
+    let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry, true);
+
     let img_text = '';
     if (view_show_icons) {
         const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
         img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
     }
+    let link_text = getEntryLinkText(entry);
 
     let text = `
          <a
          class="list-group-item list-group-item-action"
-         href="${link_absolute}" title="${title}">
+         href="${link_absolute}?from_entry_id=${from_entry_id}" title="${title}">
+             ${badge_text}
+             ${badge_star}
+             ${badge_age}
+             ${badge_dead}
+
              <div class="d-flex">
                ${img_text}
 
                <div class="mx-2">
-                  ${title_safe}
+		  <div>
+        	  ${title_safe}
+		  ${link_text}
+		  </div>
                </div>
              </div>
          </a>
@@ -755,36 +797,44 @@ function getEntryReadLaterBar(entry) {
     let source__title = entry.source__title;
     let date_published = entry.date_published.toLocaleString();
 
+    let badge_text = getEntryVotesBadge(entry, true);
+    let badge_star = getEntryBookmarkBadge(entry, true);
+    let badge_age = getEntryAgeBadge(entry, true);
+    let badge_dead = getEntryDeadBadge(entry, true);
+
     let img_text = '';
     if (view_show_icons) {
         const iconClass = view_small_icons ? 'icon-small' : 'icon-normal';
         img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
     }
-    
-    let thumbnail_text = '';
-    if (img_text) {
-        thumbnail_text = `
-            <div style="position: relative; display: inline-block;">
-                ${img_text}
-            </div>`;
-    }
+    let link_text = getEntryLinkText(entry);
 
     let text = `
-        <div class="my-1">
-         <a href="${link_absolute}" title="${title}">
+         <div 
+         class="list-group-item list-group-item-action"
+	 >
+             ${badge_text}
+             ${badge_star}
+             ${badge_age}
+             ${badge_dead}
+
              <div class="d-flex">
-		 ${thumbnail_text}
+	         <a href="${link_absolute}" title="${title}" class="d-flex">
+		   ${img_text}
         
-        	 <div>
-        	     ${title_safe}
+                   <div class="mx-2">
+		      <div>
+        	         ${title_safe}
+			 ${link_text}
+		      </div>
+        	   </div>
+	         </a>
         
-        	     <a id="${id}" class="remove-button" href="${remove_link}">
-        		<img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
-        	     </a>
-        	 </div>
+                 <a id="${id}" class="remove-button ms-auto" href="${remove_link}" >
+                    {% include "rsshistory/icon_remove.html" %}
+                 </a>
              </div>
-         </a>
-        </div>
+         </div>
     `;
     return text;
 }

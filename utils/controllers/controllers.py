@@ -9,23 +9,24 @@ class GenericEntryController(object):
         self.entry = entry
         self.console_printer = console
 
-    def get_title(self, full_title=False):
+    def get_title(self, full_title=False, with_brackets=False):
         if not self.entry.title:
-            return
+            return "..."
 
         if not full_title:
             title = self.entry.title[:100]
         else:
             title = self.entry.title
 
-        bracket_text = self.get_bracket_text()
-        code = self.get_title_info_string()
+        if with_brackets:
+            bracket_text = self.get_bracket_text()
+            code = self.get_title_info_string()
 
-        if code:
-            title = "[{}] {}".format(code, title)
+            if code:
+                title = "[{}] {}".format(code, title)
 
-        if bracket_text:
-            title = "[{}] {}".format(bracket_text, title)
+            if bracket_text:
+                title = "[{}] {}".format(bracket_text, title)
 
         return title
 

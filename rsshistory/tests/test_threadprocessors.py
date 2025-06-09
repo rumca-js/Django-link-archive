@@ -62,8 +62,6 @@ class RefreshProcessorTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_DAILY_DATA,
             local_path="test",
             remote_path="test.git",
-            user="user",
-            password="password",
         )
 
         DataExport.objects.create(
@@ -72,8 +70,6 @@ class RefreshProcessorTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_YEAR_DATA,
             local_path="test",
             remote_path="test.git",
-            user="user",
-            password="password",
         )
 
         DataExport.objects.create(
@@ -82,8 +78,6 @@ class RefreshProcessorTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_NOTIME_DATA,
             local_path="test",
             remote_path="test.git",
-            user="user",
-            password="password",
         )
 
     def test_get_name(self):

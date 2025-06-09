@@ -176,19 +176,25 @@ class EntryRules(models.Model):
 
         if self.is_url_triggering(domain_only):
             if self.block:
-                self.apply_entry_rule_action(entry)
+                if self.apply_entry_rule_action(entry):
+                    return True
 
         text = self.get_entry_pulp(entry)
         if self.is_text_triggered(text):
-            self.apply_entry_rule_action(entry)
+            if self.apply_entry_rule_action(entry):
+                return True
 
     def apply_entry_rule_action(self, entry):
         if self.block:
             EntryRules.attemp_delete(entry, self)
+            return True
+
         if self.apply_age_limit:
             if not entry.age or entry.age < self.apply_age_limit:
                 entry.age = self.apply_age_limit
                 entry.save()
+
+        return False
 
     def get_url_rules(url):
         result = []
@@ -243,8 +249,12 @@ class EntryRules(models.Model):
                 return rule
 
     def check_all(entry):
+        """
+        @returns True if entry is deleted
+        """
         for rule in EntryRules.objects.filter(enabled=True):
-            rule.check_rule(entry)
+            if rule.check_rule(entry):
+                return True
 
     def attemp_delete(entry, entry_rule=None):
         if not entry.is_removable():

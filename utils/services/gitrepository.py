@@ -101,8 +101,12 @@ class GitRepository(RepositoryInterface):
             logger.debug("Repository is not different")
             return False
 
-        token = self.export_data.password
-        user = self.export_data.user
+        credentials = self.export_data.credentials
+        credentials.decrypt()
+
+        user = credentials.username
+        token = credentials.token
+
         repo = self.get_repo_name()
         p = subprocess.run(
             [

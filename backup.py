@@ -405,6 +405,7 @@ def obfuscate_all(destination_engine):
     obfuscate_user_table("user", destination_engine)
     r.truncate_table("dataexport")
     r.truncate_table("usersearchhistory")
+    r.truncate_table("credentials")
 
 
 #### SQLite
@@ -512,6 +513,7 @@ def backup_workspace(run_info):
     print("--------------------")
 
     tablemapping = {
+       "./instance_credentials"   : ["instance_credentials"],
        "./instance_entries"   : ["instance_linkdatamodel"],
        "./instance_domains"   : ["instance_domains"],
        "./instance_sourcecategories"   : ["instance_sourcecategories"],
@@ -587,6 +589,7 @@ def restore_workspace(run_info):
 
     # order is important
     tablemapping = [
+       ["./instance_credentials"         , ["instance_credentials"]],
        ["./instance_sourcecategories"         , ["instance_sourcecategories"]],
        ["./instance_sourcessubcategories"     , ["instance_sourcesubcategories"]],
        ["./instance_sources"         , ["instance_sourcedatamodel"]],
@@ -658,6 +661,7 @@ def run_sql_for_workspaces(run_info, sql_command):
 
     # order is important
     tablemapping = [
+       "instance_credentials",
        "instance_apikeys",
        "instance_applogging",
        "instance_backgroundjob",

@@ -28,6 +28,7 @@ from .viewspkg import (
     userhistory,
     blockentry,
     searchviews,
+    credentials,
 )
 
 # register app namespace
@@ -240,6 +241,11 @@ urlpatterns = [
     path("api-key-add", apikeys.add, name="api-key-add"),
     path("api-key-remove/<int:pk>/", apikeys.remove, name="api-key-remove"),
     path("api-keys/", apikeys.ListView.as_view(), name="api-keys",),
+    path("credential-add", credentials.add, name="credential-add"),
+    path("credential-edit/<int:pk>/", credentials.edit, name="credential-edit"),
+    path("credential-remove/<int:pk>/", credentials.remove, name="credential-remove"),
+    path("credential/<int:pk>/", credentials.DetailView.as_view(), name="credential",),
+    path("credentials/", credentials.ListView.as_view(), name="credentials",),
     # browser
     path("browsers/", browsers.BrowserListView.as_view(), name="browsers",),
     path("browser-read/", browsers.read_browser_setup, name="browser-read",),
@@ -271,6 +277,7 @@ urlpatterns = [
     path("search-engines", tools.search_engines, name="search-engines",),
     path("cleanup-link", tools.cleanup_link, name="cleanup-link",),
     path("cleanup-link-json", tools.cleanup_link_json, name="cleanup-link-json",),
+    path("link-input-suggestions-json", tools.link_input_suggestions_json, name="link-input-suggestions-json",),
     path("block-lists-initialize", blockentry.initialize_block_lists, name="block-lists-initialize",),
     path("block-lists", blockentry.BlockEntryListListView.as_view(), name="block-lists",),
     path("block-lists-json", blockentry.blocklists_json, name="block-lists-json",),
