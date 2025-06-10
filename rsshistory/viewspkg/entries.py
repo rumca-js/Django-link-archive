@@ -287,6 +287,11 @@ class EntriesSearchListView(object):
             filter_conditions & self.get_search_view_conditions()
         )
 
+        user_config = UserConfig.get(self.request.user)
+        user_age = user_config.get_age()
+
+        self.conditions &= (Q(age = 0) | Q(age__isnull = True) | Q(age__lte = user_age) )
+
         return self.conditions
 
     def get_search_view_conditions(self):

@@ -31,7 +31,7 @@ class CredentialsViewsTest(FakeInternetTestCase):
     def test_credential_edit(self):
         key = Credentials.objects.create(name="test")
 
-        url = reverse("{}:credential-edit".format(LinkDatabase.name), pk=key.id)
+        url = reverse("{}:credential-edit".format(LinkDatabase.name), args=[key.id])
 
         # call tested function
         response = self.client.get(url)
@@ -41,12 +41,12 @@ class CredentialsViewsTest(FakeInternetTestCase):
     def test_credential_remove(self):
         key = Credentials.objects.create(name="test")
 
-        url = reverse("{}:credential-remove".format(LinkDatabase.name), pk=key.id)
+        url = reverse("{}:credential-remove".format(LinkDatabase.name), args=[key.id])
 
         # call tested function
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
         objects = Credentials.objects.all()
         self.assertFalse(objects.exists())

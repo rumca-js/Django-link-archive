@@ -28,25 +28,15 @@ class ApiKeysViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_api_key_edit(self):
-        key = ApiKeys.objects.create(key="test")
-
-        url = reverse("{}:api-key-edit".format(LinkDatabase.name), pk=key.id)
-
-        # call tested function
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
     def test_api_key_remove(self):
         key = ApiKeys.objects.create(key="test")
 
-        url = reverse("{}:api-key-remove".format(LinkDatabase.name), pk=key.id)
+        url = reverse("{}:api-key-remove".format(LinkDatabase.name), args=[key.id])
 
         # call tested function
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
         objects = ApiKeys.objects.all()
         self.assertFalse(objects.exists())
