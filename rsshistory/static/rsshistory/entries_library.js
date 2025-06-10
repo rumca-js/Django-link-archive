@@ -518,7 +518,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
 function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
 
-    let badge_text = getEntryVotesBadge(page_rating_votes);
+    let badge_text = getEntryVotesBadge(entry);
     let badge_star = highlight_bookmarks ? getEntryBookmarkBadge(entry) : "";
     let badge_age = getEntryAgeBadge(entry);
     let badge_dead = getEntryDeadBadge(entry);

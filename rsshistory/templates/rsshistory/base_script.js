@@ -3,7 +3,7 @@ let view_display_type = "{{user_config.display_type}}";
 let view_show_icons = "{{user_config.show_icons}}" == "True";
 let view_small_icons = "{{user_config.small_icons}}" == "True";
 let debug = "{{debug}}" == "True"
-
+let user_age = {{user_config.get_age}};
 
 let common_indicators = null;
 
