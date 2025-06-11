@@ -207,12 +207,7 @@ class SourceDataModel(models.Model):
             SourceSubCategories.add(source.category_name, source.subcategory_name)
 
     def get_favicon(self):
-        if self.favicon:
-            return self.favicon
-
-        # returning real favicon from HTML is too long
-
-        return UrlLocation(self.url).get_domain() + "/favicon.ico"
+        return self.favicon
 
     def save(self, *args, **kwargs):
         self.category = SourceCategories.ensure(self.category_name)

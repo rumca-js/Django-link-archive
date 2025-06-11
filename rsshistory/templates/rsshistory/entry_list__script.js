@@ -99,8 +99,10 @@ function fillListData() {
         $('#pagination').html(pagination);
     }
 
-    let query_info = GetQueryDetailsHtml(data);
-    $('#queryInfo').html(query_info);
+    if (debug) {
+       let query_info = GetQueryDetailsHtml(data);
+       $('#queryInfo').html(query_info);
+    }
 }
 
 

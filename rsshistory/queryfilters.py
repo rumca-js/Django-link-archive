@@ -295,6 +295,10 @@ class BaseQueryFilter(object):
         # )
         return ""
 
+    def get_errors(self):
+        self.errors.extend(self.symbol_evaluator.errors)
+        return self.errors
+
 
 class SourceFilter(BaseQueryFilter):
     def __init__(self, args, user=None, init_objects=None):

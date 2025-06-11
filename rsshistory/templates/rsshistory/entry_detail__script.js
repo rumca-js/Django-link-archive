@@ -228,13 +228,97 @@ function getEntryMenuContent() {
 }
 
 
+function getEntryParameters(entry) {
+   html_out = "";
+
+   let date_published = getEntryDatePublished(entry);
+
+   html_out += `<div class="text-nowrap"><strong>Publish date:</strong> ${date_published}</div>`;
+
+   html_out += getEntryBookmarkBadge(entry);
+   html_out += getEntryVotesBadge(entry);
+   html_out += getEntryAgeBadge(entry);
+   html_out += getEntryDeadBadge(entry);
+
+   return html_out;
+}
+
+
+class InputContent {
+  constructor(text) {
+    this.text = text;
+  }
+
+  htmlify() {
+    this.text = this.stripHtmlAttributes();
+    this.text = this.linkify("https://");
+    this.text = this.linkify("http://");
+    return this.text;
+  }
+
+  stripHtmlAttributes() {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(this.text, "text/html");
+
+    const walk = (node) => {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.tagName.toLowerCase() === "a") {
+          const href = node.getAttribute("href");
+          node.getAttributeNames().forEach(attr => node.removeAttribute(attr));
+          if (href) node.setAttribute("href", href);
+        } else if (node.tagName.toLowerCase() === "img") {
+          const src = node.getAttribute("src");
+          node.getAttributeNames().forEach(attr => node.removeAttribute(attr));
+          if (src) node.setAttribute("src", src);
+        } else {
+          node.getAttributeNames().forEach(attr => node.removeAttribute(attr));
+        }
+      }
+      for (let child of node.childNodes) {
+        walk(child);
+      }
+    };
+
+    walk(doc.body);
+    return doc.body.innerHTML;
+  }
+
+  linkify(protocol = "https://") {
+    if (!this.text.includes(protocol)) return this.text;
+
+    const regex = new RegExp(`${protocol}\\S+?(?=[^\\w./-?#&]|$)`, 'g');
+
+    this.text = this.text.replace(regex, (url, offset, fullText) => {
+      const preceding = fullText.slice(Math.max(0, offset - 10), offset);
+      if (!preceding.includes('<a href="') && !preceding.includes("<img")) {
+        return `<a href="${url}">${url}</a>`;
+      } else {
+        return url;
+      }
+    });
+
+    return this.text;
+  }
+}
+
+function getEntryDescription(entry) {
+  const content = new InputContent(entry.description);
+  let content_text = content.htmlify();
+
+  content_text = content_text.replace(/(\r\n|\r|\n)/g, "<br>");
+  return content_text;
+}
+
+
 function updateEntryProperties() {
     if (entry_json_data == null)
     {
         return;
     }
 
-    tag_string = "";
+    let entry = entry_json_data.link;
+
+    let tag_string = "";
     entry_json_data.link.tags.forEach(tag => {
         tag_string += `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>,`
     });
@@ -242,25 +326,32 @@ function updateEntryProperties() {
     tag_string += getEditButton();
     $("#entryTagContainer").html(tag_string);
 
-    $("#entryTitle").html(entry_json_data.title);
-    $("#entryDescription").html(entry_json_data.description);
-    $("#entryLanguage").html(entry_json_data.language);
-    $("#entryAuthor").html(entry_json_data.author);
-    $("#entryAlbum").html(entry_json_data.album);
-    $("#entryAge").html(entry_json_data.age);
-    $("#entryDatePublished").html(entry_json_data.date_published);
-    $("#entryDateCreated").html(entry_json_data.date_created);
-    $("#entryDateUpdateLast").html(entry_json_data.date_update_last);
-    $("#entryDateModified").html(entry_json_data.date_last_modified);
-    $("#entryDateDeadSince").html(entry_json_data.date_dead_since);
-    $("#entryStatusCode").html(entry_json_data.status_code);
-    $("#entryManualStatusCode").html(entry_json_data.manual_status_code);
-    $("#entryPageRatingVisits").html(entry_json_data.page_rating_visits);
-    $("#entryPageRatingVotes").html(entry_json_data.page_rating_votes);
-    $("#entryPermanent").html(entry_json_data.permanent);
-    $("#entryBookmarked").html(entry_json_data.bookmarked);
+    $("#entryTitle").html(entry.title);
+    $("#entryDescription").html(getEntryDescription(entry));
+    $("#entryLanguage").html(entry.language);
+    $("#entryAuthor").html(entry.author);
+    $("#entryAlbum").html(entry.album);
+    $("#entryAge").html(entry.age);
+    $("#entryDatePublished").html(entry.date_published);
+    $("#entryDateCreated").html(entry.date_created);
+    $("#entryDateUpdateLast").html(entry.date_update_last);
+    $("#entryDateModified").html(entry.date_last_modified);
+    $("#entryDateDeadSince").html(entry.date_dead_since);
+    $("#entryStatusCode").html(entry.status_code);
+    $("#entryManualStatusCode").html(entry.manual_status_code);
+    $("#entryPageRatingVisits").html(entry.page_rating_visits);
+    $("#entryPageRatingVotes").html(entry.page_rating_votes);
+    $("#entryPermanent").html(entry.permanent);
+    $("#entryBookmarked").html(entry.bookmarked);
 
     $('#editTagsButton').show();
+
+    let entry_parameters = getEntryParameters(entry);
+    $('#entryParameters').html(entry_parameters);
+
+    if (debug) {
+       $('#entryDebug').html(String(entry_json_data.link));
+    }
 }
 
 
@@ -519,6 +610,7 @@ $(document).on('click', '#cancelTagEdit', function() {
 });
 
 
+getEntryProperties();
 getEntryRelated();
 getEntryOperationalParamters();
 getDislikeData();

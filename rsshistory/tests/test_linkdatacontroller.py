@@ -154,7 +154,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
         self.assertTrue(len(entries) != 0)
         # call tested function
-        self.assertTrue(entries[0].get_favicon() == "https://youtube.com/favicon.ico")
+        self.assertFalse(entries[0].get_favicon())
 
     def test_get_thumbnail_empty_in_model(self):
         conf = Configuration.get_object().config_entry
@@ -170,7 +170,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
         self.assertTrue(len(entries) != 0)
         # call tested function
-        self.assertEqual(entries[0].get_thumbnail(), "https://youtube.com/favicon.ico")
+        self.assertFalse(entries[0].get_thumbnail())
 
     def test_is_taggable_true(self):
         entry = LinkDataController.objects.create(
@@ -196,7 +196,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
             date_published=DateUtils.get_datetime_now_utc(),
         )
 
-        self.assertFalse(entry.is_taggable())
+        self.assertTrue(entry.is_taggable())
 
     def test_is_commentable_true(self):
         entry = LinkDataController.objects.create(
@@ -222,7 +222,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
             date_published=DateUtils.get_datetime_now_utc(),
         )
 
-        self.assertFalse(entry.is_commentable())
+        self.assertTrue(entry.is_commentable())
 
     def test_make_manual_dead(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
@@ -526,7 +526,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
             title="my title",
         )
 
-        self.assertTrue(entry.should_entry_be_permanent())
+        self.assertFalse(entry.should_entry_be_permanent())
 
     def test_should_entry_be_permanent__not_domain(self):
         config = Configuration.get_object().config_entry

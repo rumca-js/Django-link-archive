@@ -5,7 +5,6 @@
    {% include "rsshistory/entry_detail__frame.html" %}
 
    <div id="entryParameters" class="d-flex flex-wrap">
-     {% include "rsshistory/entry_detail__parameters.html" %}
    </div>
 
    {% include "rsshistory/entry_detail__tags.html" %}
@@ -29,7 +28,6 @@
    </div>
 
    <div id="entryDescription" class="link-detail-description">
-   {{object_controller.get_description_html | safe | linebreaks }}
    </div>
 
    {% include "rsshistory/entry_detail__comments.html" %}
@@ -42,10 +40,13 @@
        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
    </div>
 
-   <script src="{% static 'rsshistory/entries_library.js' %}?=1"></script>
+   <script src="{% static 'rsshistory/entries_library.js' %}?=2"></script>
 
    <script>
    {% include "rsshistory/entry_detail__script.js" %}
    </script>
+
+   <div id="entryDebug">
+   </div>
 
 {% endblock %}

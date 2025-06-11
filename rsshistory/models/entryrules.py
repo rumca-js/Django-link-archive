@@ -2,6 +2,7 @@
 Defined by user, by GUI
 """
 
+from datetime import date
 from django.db import models
 
 from ..webtools import (
@@ -119,35 +120,23 @@ class EntryRules(models.Model):
         return False
 
     def get_entry_pulp(self, entry):
-        pulp = ""
+        from ..serializers import entry_to_json
+        from ..models import UserConfig
 
-        fields = self.get_trigger_fields()
+        user_config = UserConfig.get()
+        user_config.birth_date = date(2024,3,28)
 
-        if "title" in fields:
-            pulp += str(entry.title)
-
-        if "description" in fields:
-            pulp += str(entry.description)
-
-        # ignore case
-        return pulp.lower()
+        entry_json = entry_to_json(user_config, entry)
+        return self.get_dict_pulp(entry_json)
 
     def get_dict_pulp(self, dictionary):
         pulp = ""
 
         fields = self.get_trigger_fields()
 
-        if "title" in fields:
-            if "title" in dictionary:
-                pulp += str(dictionary["title"])
-
-        if "description" in fields:
-            if "description" in dictionary:
-                pulp += str(dictionary["description"])
-
-        if "contents" in fields:
-            if "contents" in dictionary:
-                pulp += str(dictionary["contents"])
+        for field in fields:
+            if field in dictionary:
+                pulp += str(dictionary[field])
 
         # ignore case
         return pulp.lower()

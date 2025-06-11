@@ -375,7 +375,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         pulp = therule.get_entry_pulp(entry)
 
         self.assertEqual(
-            pulp, "nfsw ai girlfriend - titlensfw ai girlfriend - description"
+            pulp, "nsfw ai girlfriend - descriptionnfsw ai girlfriend - title"
         )
 
     def test_get_dict_pulp(self):

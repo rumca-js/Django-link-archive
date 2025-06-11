@@ -485,6 +485,16 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let hover_title = title_safe + " " + tags_text;
     let entry_link = getEntryLink(entry);
 
+    let author = entry.author;
+    if (author && author != source__title)
+    {
+       "by " + escapeHtml(entry.author);
+    }
+    else
+    {
+       author = "";
+    }
+
     return `
         <a 
             href="${entry_link}"
@@ -498,7 +508,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                 <div class="mx-2">
                     <span style="font-weight:bold" class="text-reset">${title_safe}</span>
                     <div class="text-reset">
-                        ${source__title} ${date_published}
+                        ${source__title} ${date_published} ${author}
                     </div>
                     ${tags}
                 </div>

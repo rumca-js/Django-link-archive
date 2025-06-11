@@ -17,6 +17,8 @@ function escapeHtml(unsafe)
     if (unsafe == null)
         return "";
 
+    unsafe = String(unsafe);
+
     return unsafe
          .replace(/&/g, "&amp;")
          .replace(/</g, "&lt;")

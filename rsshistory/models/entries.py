@@ -579,20 +579,6 @@ class BaseLinkDataController(BaseLinkDataModel):
             if self.link == self.source.url:
                 return self.source.enabled
 
-        # if it has votes, then it should not be removed
-        if self.page_rating_votes > conf.remove_entry_vote_threshold:
-            return True
-
-        """
-        Normally links are removed after 7 days or so (even if it is valid)
-        Permanent flag stops "what's new from removing our links"
-        """
-
-        if self.is_dead():
-            days_dead = self.get_days_dead()
-            if days_dead < conf.days_to_remove_stale_entries:
-                return False
-
         return False
 
     def is_dead(self):
@@ -602,7 +588,22 @@ class BaseLinkDataController(BaseLinkDataModel):
         """
         if self.manual_status_code == BaseLinkDataController.STATUS_ACTIVE:
             return False
-        return self.date_dead_since is not None
+        if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:
+            return True
+
+        if self.date_dead_since is not None:
+            return True
+
+        """
+        Link is not valid:
+         - if status indicates so
+         - if it is dead (manual indication)
+         - if it was downvoted to oblivion
+        """
+        if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
+            return not self.is_status_code_valid() and self.page_rating == 0
+
+        return False
 
     def is_https(self):
         return self.link.lower().startswith("https://")
@@ -620,19 +621,11 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def is_valid(self):
         """
-        TODO should we use self.is_dead?
         """
-        if self.manual_status_code == BaseLinkDataController.STATUS_ACTIVE:
-            return True
+        if self.is_dead():
+            return False
 
-        """
-        Link is not valid:
-         - if status indicates so
-         - if it is dead (manual indication)
-         - if it was downvoted to oblivion
-        """
-        if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
-            return self.is_status_code_valid() and self.page_rating >= 0
+        return True
 
     def is_status_code_valid(self):
         if self.status_code == 403:
