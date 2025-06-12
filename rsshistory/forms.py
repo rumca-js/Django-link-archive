@@ -106,6 +106,7 @@ class ConfigForm(forms.ModelForm):
             "instance_title",
             "instance_description",
             "instance_internet_location",
+            "initialization_type",
             "admin_user",
             "logging_level",
             "view_access_type",

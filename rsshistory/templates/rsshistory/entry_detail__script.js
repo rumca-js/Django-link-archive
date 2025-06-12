@@ -244,63 +244,6 @@ function getEntryParameters(entry) {
 }
 
 
-class InputContent {
-  constructor(text) {
-    this.text = text;
-  }
-
-  htmlify() {
-    this.text = this.stripHtmlAttributes();
-    this.text = this.linkify("https://");
-    this.text = this.linkify("http://");
-    return this.text;
-  }
-
-  stripHtmlAttributes() {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(this.text, "text/html");
-
-    const walk = (node) => {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        if (node.tagName.toLowerCase() === "a") {
-          const href = node.getAttribute("href");
-          node.getAttributeNames().forEach(attr => node.removeAttribute(attr));
-          if (href) node.setAttribute("href", href);
-        } else if (node.tagName.toLowerCase() === "img") {
-          const src = node.getAttribute("src");
-          node.getAttributeNames().forEach(attr => node.removeAttribute(attr));
-          if (src) node.setAttribute("src", src);
-        } else {
-          node.getAttributeNames().forEach(attr => node.removeAttribute(attr));
-        }
-      }
-      for (let child of node.childNodes) {
-        walk(child);
-      }
-    };
-
-    walk(doc.body);
-    return doc.body.innerHTML;
-  }
-
-  linkify(protocol = "https://") {
-    if (!this.text.includes(protocol)) return this.text;
-
-    const regex = new RegExp(`${protocol}\\S+?(?=[^\\w./-?#&]|$)`, 'g');
-
-    this.text = this.text.replace(regex, (url, offset, fullText) => {
-      const preceding = fullText.slice(Math.max(0, offset - 10), offset);
-      if (!preceding.includes('<a href="') && !preceding.includes("<img")) {
-        return `<a href="${url}">${url}</a>`;
-      } else {
-        return url;
-      }
-    });
-
-    return this.text;
-  }
-}
-
 function getEntryDescription(entry) {
   const content = new InputContent(entry.description);
   let content_text = content.htmlify();

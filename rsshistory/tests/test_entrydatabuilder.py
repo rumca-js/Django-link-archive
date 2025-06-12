@@ -11,6 +11,7 @@ from ..controllers import (
     BackgroundJobController,
     LinkDataController,
     ArchiveLinkDataController,
+    common_initialize_entry_rules,
 )
 from ..models import LinkDataModel, EntryRules
 from ..configuration import Configuration
@@ -273,7 +274,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.save()
 
         EntryRules.objects.all().delete()
-        EntryRules.initialize_common_rules()
+        common_initialize_entry_rules()
 
         MockRequestCounter.mock_page_requests = 0
 

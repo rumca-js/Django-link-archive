@@ -10,14 +10,18 @@ from ..models import (
 from .backgroundjob import BackgroundJobController
 
 
-def common_initialization():
-    EntryRules.initialize_common_rules()
-
+def common_views_initialization():
     SearchView.objects.create(
-        name="Search by votes",
+        name="by votes",
         order_by="-page_rating_votes, -page_rating, link",
         entry_limit=1000,
         hover_text="Search by votes",
+    )
+    SearchView.objects.create(
+        name="by visits",
+        order_by="-page_rating_visits,-page_rating,-date_published",
+        entry_limit=1000,
+        hover_text="Search by visits",
     )
     SearchView.objects.create(
         name="What's created",
@@ -31,6 +35,109 @@ def common_initialization():
         date_published_day_limit=7,
         hover_text="Search by date published",
     )
+    SearchView.objects.create(
+        name="What's dead",
+        order_by="-page_rating_votes, compacted_tags__id, -date_dead_since, link",
+        filter_statement = "date_dead_since__isnull = False",
+        date_published_day_limit=7,
+        hover_text="Search by date published",
+    )
+
+
+def setup_views_for_news(request):
+    SearchView.objects.create(
+        name="Default",
+        order_by="-date_created, link",
+        default=True,
+        hover_text="Search",
+    )
+
+    common_views_initialization()
+
+    SearchView.objects.create(
+        name="Bookmarked by created",
+        filter_statement="bookmarked=True",
+        order_by="-date_created, link",
+        user=True,
+        hover_text="Search bookmarks",
+    )
+    SearchView.objects.create(
+        name="Bookmarked by publish",
+        filter_statement="bookmarked=True",
+        order_by="-date_published, link",
+        user=True,
+        hover_text="Search bookmarks",
+    )
+    SearchView.objects.create(
+        name="Searchs all", order_by="-date_created, link", hover_text="Search"
+    )
+
+
+def setup_views_for_search_engine():
+    SearchView.objects.create(
+        name="Default",
+        order_by="-page_rating_votes, compacted_tags__id, date_dead_since, -page_rating, link",
+        filter_statement = "page_rating_votes > 0"
+        default=True,
+    )
+    common_views_initialization()
+    SearchView.objects.create(
+        name="Bookmarked",
+        filter_statement="bookmarked=True",
+        order_by="-page_rating_votes, -page_rating, link",
+        user=True,
+        hover_text="Search bookmarks",
+    )
+    SearchView.objects.create(
+        name="Searchs all",
+        order_by="-page_rating_votes, compacted_tags__id, -date_dead_since, -date_created, link",
+        hover_text="Search",
+    )
+
+
+def setup_views_for_gallery():
+    SearchView.objects.create(
+        name="Default", order_by="-date_created, link", default=True
+    )
+    common_views_initialization()
+    SearchView.objects.create(
+        name="Bookmarked by created",
+        filter_statement="bookmarked=True",
+        order_by="-date_created, link",
+        user=True,
+        hover_text="Search bookmarks",
+    )
+    SearchView.objects.create(
+        name="Bookmarked by publish",
+        filter_statement="bookmarked=True",
+        order_by="-date_published, link",
+        user=True,
+        hover_text="Search bookmarks",
+    )
+    SearchView.objects.create(
+        name="Searchs all", order_by="-date_created, link", hover_text="Search"
+    )
+
+
+def common_initialize_entry_rules():
+    EntryRules.objects.create(
+        rule_name="casinos-block",
+        trigger_text="casino, lotter, jackpot, bingo, poker, slot, betting, togel, gacor, bandar judi, pagcor, slotlara kadar, canli bahis, terpopuler, deposit, g2gbet, terpercaya, maxtoto, Gampang, bonus giveaway, pg slot, cashback rewards, situs slot, slot situs",
+        block=True,
+    )
+
+    EntryRules.objects.create(
+        rule_name="sexual-block",
+        trigger_text="mastubat, sexseite, zoophilia, chaturbat",
+        block=True,
+    )
+
+    EntryRules.objects.create(
+        rule_name="inactive-links",
+        trigger_text="forbidden, access denied, page not found, site not found, 404 not found, 404: not found, error 404, 404 error, 404 page, 404 file not found, squarespace - website expired, domain name for sale, account suspended, the request could not be satisfied",
+        trigger_text_fields="title",
+        block=True,
+    )
 
 
 def system_setup_for_news(request):
@@ -41,6 +148,7 @@ def system_setup_for_news(request):
     UserConfig.get_or_create(request.user)
 
     c = ConfigurationEntry.get()
+    c.initialization_type = ConfigurationEntry.CONFIGURATION_NEWS
     c.enable_link_archiving = True
     c.enable_source_archiving = False
     c.accept_dead_links = False
@@ -69,23 +177,8 @@ def system_setup_for_news(request):
 
     Configuration.get_object().config_entry.refresh_from_db()
 
-    SearchView.objects.create(
-        name="Default",
-        order_by="-date_created, link",
-        default=True,
-        hover_text="Search",
-    )
-    common_initialization()
-    SearchView.objects.create(
-        name="Bookmarked",
-        filter_statement="bookmarked=True",
-        order_by="-date_created, link",
-        user=True,
-        hover_text="Search bookmarks",
-    )
-    SearchView.objects.create(
-        name="Searchs all entries", order_by="-date_created, link", hover_text="Search"
-    )
+    setup_views_for_news()
+    common_initialize_entry_rules()
 
     return True
 
@@ -98,6 +191,7 @@ def system_setup_for_gallery(request):
     UserConfig.get_or_create(request.user)
 
     c = ConfigurationEntry.get()
+    c.initialization_type = ConfigurationEntry.CONFIGURATION_GALLERY
     c.enable_link_archiving = False
     c.enable_source_archiving = False
     c.accept_dead_links = False
@@ -126,20 +220,8 @@ def system_setup_for_gallery(request):
 
     Configuration.get_object().config_entry.refresh_from_db()
 
-    SearchView.objects.create(
-        name="Default", order_by="-date_created, link", default=True
-    )
-    common_initialization()
-    SearchView.objects.create(
-        name="Bookmarked",
-        filter_statement="bookmarked=True",
-        order_by="-date_published,-date_created, link",
-        user=True,
-        hover_text="Search bookmarks",
-    )
-    SearchView.objects.create(
-        name="Searchs all entries", order_by="-date_created, link", hover_text="Search"
-    )
+    setup_views_for_gallery()
+    common_initialize_entry_rules()
 
     return True
 
@@ -152,6 +234,7 @@ def system_setup_for_search_engine(request):
     UserConfig.get_or_create(request.user)
 
     c = ConfigurationEntry.get()
+    c.initialization_type = ConfigurationEntry.CONFIGURATION_SEARCH_ENGINE
     c.enable_link_archiving = False
     c.enable_source_archiving = False
     c.accept_dead_links = False
@@ -185,22 +268,8 @@ def system_setup_for_search_engine(request):
 
     Configuration.get_object().config_entry.refresh_from_db()
 
-    SearchView.objects.create(
-        name="Default", order_by="-page_rating_votes, -page_rating, link", default=True
-    )
-    common_initialization()
-    SearchView.objects.create(
-        name="Bookmarked",
-        filter_statement="bookmarked=True",
-        order_by="-page_rating_votes, -page_rating, link",
-        user=True,
-        hover_text="Search bookmarks",
-    )
-    SearchView.objects.create(
-        name="Searchs all entries",
-        order_by="-page_rating_votes, -page_rating, link",
-        hover_text="Search",
-    )
+    setup_views_for_search_engine()
+    common_initialize_entry_rules()
 
     # we want blocklist to be enabled for search engine
     BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)

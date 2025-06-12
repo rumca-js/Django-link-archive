@@ -163,6 +163,46 @@ def searchview_add(request):
     return p.render("form_basic.html")
 
 
+def prio_up(request, pk):
+    p = ViewPage(request)
+    p.set_title("Increments priority")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    data = {}
+    data["message"] = "Entry does not exist"
+    data["status"] = False
+
+    searchviews = SearchView.objects.filter(id=pk)
+    if searchviews.exists():
+        searchviews[0].prio_up()
+        data["status"] = True
+        data["message"] = "OK"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
+
+
+def prio_down(request, pk):
+    p = ViewPage(request)
+    p.set_title("Decrements priority")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    data = {}
+    data["message"] = "Entry does not exist"
+    data["status"] = False
+
+    searchviews = SearchView.objects.filter(id=pk)
+    if searchviews.exists():
+        searchviews[0].prio_down()
+        data["status"] = True
+        data["message"] = "OK"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
+
+
 def searchview_remove(request, pk):
     p = ViewPage(request)
     p.set_title("Remove search view")

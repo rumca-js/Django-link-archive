@@ -12,16 +12,28 @@
   {% if content_list %}
      <div class="list-group">
          {% for search_view in content_list %}
-             <a href="{% url 'rsshistory:searchview' search_view.id %}"
+            <div
                class="my-1 p-1 list-group-item list-group-item-action"
-               title=""
-              {% if search_view.default %}
-	       style="font-weight:bold;"
-              {% endif %}
-             >
-              ID: {{search_view.id}}
-              Name: {{search_view.name}}
-            </a>
+                >
+                <a href="{% url 'rsshistory:searchview' search_view.id %}"
+                   title="{{search_view.name}}"
+                  {% if search_view.default %}
+                    style="font-weight:bold;"
+                  {% endif %}
+                 >
+                  ID: {{search_view.id}}
+                  Name: {{search_view.name}}
+                </a>
+
+                <div>
+                    <a href="{% url 'rsshistory:searchview-prio-up' search_view.id %}" title="Search view prio up" class="btn btn-secondary btn-sm" role="button">
+                        <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
+                    </a>
+                    <a href="{% url 'rsshistory:searchview-prio-down' search_view.id %}" title="Search view prio down" class="btn btn-secondary btn-sm" role="button">
+                        <img src="{% static 'rsshistory/icons/icons8-down-100.png' %}" class="content-icon" />
+                    </a>
+                </div>
+            </div>
          {% endfor %}
   {% else %}
     No rules yet

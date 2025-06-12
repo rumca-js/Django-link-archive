@@ -1,18 +1,18 @@
 from utils.dateutils import DateUtils
+from utils.inputcontent import InputContents
 from ..webtools import (
     HtmlPage,
     RssPage,
     UrlLocation,
     DefaultContentPage,
     HttpPageHandler,
-    UrlAgeModerator,
     RemoteServer,
 )
 
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController
 from ..configuration import Configuration
-from ..models import AppLogging
+from ..models import AppLogging, EntryRules
 
 from .urlhandler import UrlHandlerEx
 
@@ -61,12 +61,6 @@ class EntryUrlInterface(object):
         if self.all_properties:
             properties = url_ex.get_section("Properties")
             response = url_ex.get_section("Response")
-
-            if properties:
-                if isinstance(properties.get("date_published"), str):
-                    properties["date_published"] = DateUtils.parse_datetime(
-                        properties["date_published"]
-                    )
 
             # TODO properties["date_dead_since"] = DateUtils.get_datetime_now_utc()
 
@@ -132,11 +126,19 @@ class EntryUrlInterface(object):
             input_props = {}
             # some Internet sources provide invalid publication date
 
-        moderator = UrlAgeModerator(properties=input_props)
-        age = moderator.get_age()
+        if input_props:
+            if isinstance(input_props.get("date_published"), str):
+                input_props["date_published"] = DateUtils.parse_datetime(
+                    input_props["date_published"]
+                )
+
+        if not self.is_property_set(input_props, "description"):
+            cm = InputContents(input_props["description"])
+            input_props["description"] = cm.strip_html_attrs()
+
+        age = EntryRules.get_age_for_dictionary(input_props)
         if age:
-            if not self.is_property_set(input_props, "age"):
-                input_props["age"] = age
+            input_props["age"] = age
 
         if self.is_property_set(input_props, "date_published"):
             if input_props["date_published"] > DateUtils.get_datetime_now_utc():
@@ -169,17 +171,6 @@ class EntryUrlInterface(object):
             and source_obj.language
         ):
             input_props["language"] = source_obj.language
-
-        if not self.is_property_set(input_props, "age"):
-            if self.is_property_set(input_props, "title") and self.is_property_set(
-                input_props, "description"
-            ):
-                properties = {
-                    "title": input_props["title"],
-                    "description": input_props["description"],
-                }
-                moderator = UrlAgeModerator(properties=properties)
-                input_props["age"] = moderator.get_age()
 
         """
         Sometimes we want thumbnail sometimes we want favicon.

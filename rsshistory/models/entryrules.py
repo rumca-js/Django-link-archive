@@ -309,25 +309,5 @@ class EntryRules(models.Model):
         link_service.block = True
         link_service.save()
 
-    def initialize_common_rules():
-        EntryRules.objects.create(
-            rule_name="casinos-block",
-            trigger_text="casino, lotter, jackpot, bingo, poker, slot, betting, togel, gacor, bandar judi, pagcor, slotlara kadar, canli bahis, terpopuler, deposit, g2gbet, terpercaya, maxtoto, Gampang, bonus giveaway, pg slot, cashback rewards, situs slot, slot situs",
-            block=True,
-        )
-
-        EntryRules.objects.create(
-            rule_name="sexual-block",
-            trigger_text="mastubat, porn, sexseite, zoophilia, chaturbat",
-            block=True,
-        )
-
-        EntryRules.objects.create(
-            rule_name="inactive-links",
-            trigger_text="forbidden, access denied, page not found, site not found, 404 not found, 404: not found, error 404, 404 error, 404 page, 404 file not found, squarespace - website expired, domain name for sale, account suspended, the request could not be satisfied",
-            trigger_text_fields="title",
-            block=True,
-        )
-
     def __str__(self):
         return "EntryRule ID:{}, Name:{}".format(self.id, self.rule_name)

@@ -66,6 +66,10 @@ class ConfigurationEntry(models.Model):
         (SEARCH_BUTTON_USER_BOOKMARKS, SEARCH_BUTTON_USER_BOOKMARKS),
     )
 
+    CONFIGURATION_NEWS = "News"
+    CONFIGURATION_GALLERY = "Gallery"
+    CONFIGURATION_SEARCH_ENGINE = "Search Engine"
+
     # fmt: on
     instance_title = models.CharField(
         default="Personal Link Database",
@@ -140,6 +144,13 @@ class ConfigurationEntry(models.Model):
     initialized = models.BooleanField(
         default=False,
         help_text="Indicates whether the application instance has been initialized.",
+    )
+
+    initialization_type = models.CharField(
+        default=CONFIGURATION_NEWS,
+        max_length=200,
+        blank=True,
+        help_text="Type of initialization, be it news, gallery.",
     )
 
     enable_background_jobs = models.BooleanField(

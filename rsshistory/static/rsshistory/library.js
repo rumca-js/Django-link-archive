@@ -1,4 +1,3 @@
-
 // library code
 
 function getQueryParam(param) {
@@ -61,56 +60,6 @@ function putSpinnerOnIt(button) {
     );
 
     button.parents('form').submit();
-}
-
-
-const getDynamicContentRequestTracker = {};
-function getDynamicContent(url_address, htmlElement, errorInHtml = false) {
-    if (!getDynamicContentRequestTracker[url_address]) {
-        getDynamicContentRequestTracker[url_address] = 0;
-    }
-    const requestId = ++getDynamicContentRequestTracker[url_address];
-
-    $.ajax({
-        url: url_address,
-        type: 'GET',
-        timeout: 10000,
-        success: function(data) {
-            if (getDynamicContentRequestTracker[url_address] === requestId) {
-                $(htmlElement).html(data);
-            }
-        },
-        error: function(xhr, status, error) {
-            if (getDynamicContentRequestTracker[url_address] === requestId) {
-                getDynamicContent(url_address, htmlElement, errorInHtml);
-            }
-        }
-    });
-}
-
-
-const getDynamicJsonContentRequestTracker = {};
-function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
-    if (!getDynamicJsonContentRequestTracker[url_address]) {
-        getDynamicJsonContentRequestTracker[url_address] = 0;
-    }
-    const requestId = ++getDynamicJsonContentRequestTracker[url_address];
-
-    $.ajax({
-       url: url_address,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-         if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
-             $(htmlElement).html(data.message);
-         }
-       },
-       error: function(xhr, status, error) {
-            if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
-                getDynamicJsonContent(url_address, htmlElement, errorInHtml);
-            }
-       }
-    });
 }
 
 
@@ -200,60 +149,67 @@ function parseDate(inputDate) {
 }
 
 
-const getTextContentRequestTracker = {};
-function getTextContent(url_address, callback, errorInHtml = false) {
-    /*
-    Allows to return data via callback
-    */
-    if (!getTextContentRequestTracker[url_address]) {
-        getTextContentRequestTracker[url_address] = 0;
-    }
-    const requestId = ++getTextContentRequestTracker[url_address];
+class InputContent {
+  constructor(text) {
+    this.text = text;
+  }
 
-    $.ajax({
-        url: url_address,
-        type: 'GET',
-        timeout: 10000,
-        success: function(data) {
-            if (getTextContentRequestTracker[url_address] === requestId) {
-                callback(data);
-            }
-        },
-        error: function(xhr, status, error) {
-            if (getTextContentRequestTracker[url_address] === requestId) {
-                getTextContent(url_address, callback, errorInHtml);
-            }
+  htmlify() {
+    this.text = this.stripHtmlAttributes();
+    this.text = this.linkify("https://");
+    this.text = this.linkify("http://");
+    return this.text;
+  }
+
+  stripHtmlAttributes() {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(this.text, "text/html");
+
+    const walk = (node) => {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.tagName.toLowerCase() === "a") {
+          const href = node.getAttribute("href");
+          node.getAttributeNames().forEach(attr => node.removeAttribute(attr));
+          if (href) node.setAttribute("href", href);
+        } else if (node.tagName.toLowerCase() === "img") {
+          const src = node.getAttribute("src");
+          node.getAttributeNames().forEach(attr => node.removeAttribute(attr));
+          if (src) node.setAttribute("src", src);
+        } else {
+          node.getAttributeNames().forEach(attr => node.removeAttribute(attr));
         }
+      }
+      for (let child of node.childNodes) {
+        walk(child);
+      }
+    };
+
+    walk(doc.body);
+    return doc.body.innerHTML;
+  }
+
+  linkify(protocol = "https://") {
+    if (!this.text.includes(protocol)) return this.text;
+
+    const regex = new RegExp(`${protocol}\\S+?(?=[^\\w./-?#&%@-]|$)`, 'g');
+
+    this.text = this.text.replace(regex, (url, offset, fullText) => {
+      const preceding = fullText.slice(Math.max(0, offset - 10), offset);
+      if (!preceding.includes('<a href="') && !preceding.includes("<img")) {
+        return `<a href="${url}">${url}</a>`;
+      } else {
+        return url;
+      }
     });
+
+    return this.text;
+  }
 }
 
 
-const getTextJsonRequestTracker = {};
-function getTextJson(url_address, callback, errorInHtml = false) {
-    /*
-    Allows to return data via callback
-    */
-    if (!getTextJsonRequestTracker[url_address]) {
-        getTextJsonRequestTracker[url_address] = 0;
-    }
-    const requestId = ++getTextJsonRequestTracker[url_address];
-
-    $.ajax({
-        url: url_address,
-        type: 'GET',
-        timeout: 10000,
-        success: function(data) {
-            if (getTextJsonRequestTracker[url_address] === requestId) {
-                callback(data.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            if (getTextJsonRequestTracker[url_address] === requestId) {
-                getTextJson(url_address, callback, errorInHtml);
-            }
-        }
-    });
-}
+/**
+ * services
+ */
 
 
 function fixStupidGoogleRedirects(input_url) {
@@ -334,4 +290,115 @@ function getYouTubeEmbedDiv(youtubeUrl) {
         `;
         return frameHtml;
     }
+}
+
+
+/**
+ Specific
+*/
+
+
+const getTextContentRequestTracker = {};
+function getTextContent(url_address, callback, errorInHtml = false) {
+    /*
+    Allows to return data via callback
+    */
+    if (!getTextContentRequestTracker[url_address]) {
+        getTextContentRequestTracker[url_address] = 0;
+    }
+    const requestId = ++getTextContentRequestTracker[url_address];
+
+    $.ajax({
+        url: url_address,
+        type: 'GET',
+        timeout: 10000,
+        success: function(data) {
+            if (getTextContentRequestTracker[url_address] === requestId) {
+                callback(data);
+            }
+        },
+        error: function(xhr, status, error) {
+            if (getTextContentRequestTracker[url_address] === requestId) {
+                getTextContent(url_address, callback, errorInHtml);
+            }
+        }
+    });
+}
+
+
+const getTextJsonRequestTracker = {};
+function getTextJson(url_address, callback, errorInHtml = false) {
+    /*
+    Allows to return data via callback
+    */
+    if (!getTextJsonRequestTracker[url_address]) {
+        getTextJsonRequestTracker[url_address] = 0;
+    }
+    const requestId = ++getTextJsonRequestTracker[url_address];
+
+    $.ajax({
+        url: url_address,
+        type: 'GET',
+        timeout: 10000,
+        success: function(data) {
+            if (getTextJsonRequestTracker[url_address] === requestId) {
+                callback(data.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            if (getTextJsonRequestTracker[url_address] === requestId) {
+                getTextJson(url_address, callback, errorInHtml);
+            }
+        }
+    });
+}
+
+
+const getDynamicContentRequestTracker = {};
+function getDynamicContent(url_address, htmlElement, errorInHtml = false) {
+    if (!getDynamicContentRequestTracker[url_address]) {
+        getDynamicContentRequestTracker[url_address] = 0;
+    }
+    const requestId = ++getDynamicContentRequestTracker[url_address];
+
+    $.ajax({
+        url: url_address,
+        type: 'GET',
+        timeout: 10000,
+        success: function(data) {
+            if (getDynamicContentRequestTracker[url_address] === requestId) {
+                $(htmlElement).html(data);
+            }
+        },
+        error: function(xhr, status, error) {
+            if (getDynamicContentRequestTracker[url_address] === requestId) {
+                getDynamicContent(url_address, htmlElement, errorInHtml);
+            }
+        }
+    });
+}
+
+
+const getDynamicJsonContentRequestTracker = {};
+function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
+    if (!getDynamicJsonContentRequestTracker[url_address]) {
+        getDynamicJsonContentRequestTracker[url_address] = 0;
+    }
+    const requestId = ++getDynamicJsonContentRequestTracker[url_address];
+
+    $.ajax({
+       url: url_address,
+       type: 'GET',
+       timeout: 10000,
+       success: function(data) {
+         if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
+             $(htmlElement).html(data.message);
+         }
+       },
+       error: function(xhr, status, error) {
+            if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
+                getDynamicJsonContent(url_address, htmlElement, errorInHtml);
+            }
+       }
+    });
 }

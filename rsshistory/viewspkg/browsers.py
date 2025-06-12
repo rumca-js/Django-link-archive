@@ -67,7 +67,7 @@ def remove(request, pk):
 
 def prio_up(request, pk):
     p = ViewPage(request)
-    p.set_title("Removes browser")
+    p.set_title("Increments priority")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
@@ -87,7 +87,7 @@ def prio_up(request, pk):
 
 def prio_down(request, pk):
     p = ViewPage(request)
-    p.set_title("Removes browser")
+    p.set_title("Decrements priority")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data

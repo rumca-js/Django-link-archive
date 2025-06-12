@@ -172,14 +172,37 @@ function getEntryTitleSafe(entry) {
 }
 
 
+function getEntryParameters(entry) {
+   html_out = "";
+
+   let date_published = getEntryDatePublished(entry);
+
+   html_out += `<div class="text-nowrap"><strong>Publish date:</strong> ${date_published}</div>`;
+
+   html_out += getEntryBookmarkBadge(entry);
+   html_out += getEntryVotesBadge(entry);
+   html_out += getEntryAgeBadge(entry);
+   html_out += getEntryDeadBadge(entry);
+
+   return html_out;
+}
+
+
+function getEntryDescription(entry) {
+  const content = new InputContent(entry.description);
+  let content_text = content.htmlify();
+
+  content_text = content_text.replace(/(\r\n|\r|\n)/g, "<br>");
+  return content_text;
+}
+
+
 /**
  * Detail view
  */
 
 
-function EntryToArchiveOrg(entry) {
-    let link = entry.link;
-
+function getArchiveOrgLink(link) {
     let currentDate = new Date();
     let formattedDate = currentDate.toISOString().split('T')[0].replace(/-/g, ''); // Format: YYYYMMDD
 
@@ -187,30 +210,31 @@ function EntryToArchiveOrg(entry) {
 }
 
 
-function EntryToW3CValidator(entry) {
-    let link = entry.link;
-
+function getW3CValidatorLink(link) {
     return `https://validator.w3.org/nu/?doc=${encodeURIComponent(link)}`;
 }
 
 
-function EntryToSchemaValidator(entry) {
-    let link = entry.link;
-
+function getSchemaValidatorLink(link) {
     return `https://validator.schema.org/#url=${encodeURIComponent(link)}`;
 }
 
 
-function EntryToWhoIs(entry) {
-    let link = entry.link;
+function getWhoIsLink(link) {
     let domain = link.replace(/^https?:\/\//, ''); // Remove 'http://' or 'https://'
 
     return `https://who.is/whois/${domain}`;
 }
 
 
-function EntryToTranslate(entry) {
-    let link = entry.link;
+function getBuiltWithLink(link) {
+    let domain = link.replace(/^https?:\/\//, ''); // Remove 'http://' or 'https://'
+
+    return `https://builtwith.com/${domain}`;
+}
+
+
+function getGoogleTranslateLink(link) {
 
     let reminder = '?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp';
     if (link.indexOf("http://") != -1) {
@@ -235,11 +259,12 @@ function EntryToTranslate(entry) {
 function GetEditMenu(entry) {
     let link = entry.link;
 
-    let translate_link = EntryToTranslate(entry);
-    let archive_link = EntryToArchiveOrg(entry);
-    let w3c_link = EntryToW3CValidator(entry);
-    let schema_link = EntryToSchemaValidator(entry);
-    let who_is_link = EntryToWhoIs(entry);
+    let translate_link = getGoogleTranslateLink(link);
+    let archive_link = getArchiveOrgLink(link);
+    let w3c_link = getW3CValidatorLink(link);
+    let schema_link = getSchemaValidatorLink(link);
+    let who_is_link = getWhoIsLink(link);
+    let builtwith_link = getBuiltWithLink(link);
 
     let text = 
     `<div class="dropdown mx-1">
@@ -287,6 +312,13 @@ function GetEditMenu(entry) {
           </a>
         </li>
     `;
+    text += `
+        <li>
+          <a href="${builtwith_link}" id="Bulit with" class="dropdown-item" title="Edit entry">
+             Built with
+          </a>
+        </li>
+    `;
 
     text += `</div>`;
 
@@ -294,29 +326,8 @@ function GetEditMenu(entry) {
 }
 
 
-function getEntryBodyText(entry) {
-    date_published = parseDate(entry.date_published);
-
-    let text = `
-    <a href="${entry.link}"><h1>${entry.title}</h1></a>
-    <div><a href="${entry.link}">${entry.link}</a></div>
-    <div><b>Publish date:</b>${date_published}</div>
-    `;
-
-    let tags_text = getEntryTags(entry);
-    
-    text += `
-        <div>Tags: ${tags_text}</div>
-    `;
-
-    text += GetEditMenu(entry);
-
-    let description = entry.description.replace(/\n/g, '<br>');
-    description = createLinks(description);
-
-    text += `
-    <div>${description}</div>
-    `;
+function getEntryOpParameters(entry) {
+    text = "";
 
     text += `
     <h3>Parameters</h3>
@@ -357,6 +368,38 @@ function getEntryBodyText(entry) {
        <div>Age: ${entry.age}</div>
        `;
     }
+
+    return text;
+}
+
+
+function getEntryBodyText(entry) {
+    let date_published = parseDate(entry.date_published);
+    let parameters = getEntryParameters(entry);
+
+    let text = `
+    <a href="${entry.link}"><h1>${entry.title}</h1></a>
+    <div><a href="${entry.link}">${entry.link}</a></div>
+    ${parameters}
+    `;
+
+    let tags_text = getEntryTags(entry);
+    
+    if (tags_text) {
+       text += `
+           <div>Tags: ${tags_text}</div>
+       `;
+    }
+
+    text += GetEditMenu(entry);
+
+    let description = getEntryDescription(entry);
+
+    text += `
+    <div>${description}</div>
+    `;
+
+    text += getEntryOpParameters(entry);
 
     return text;
 }
@@ -567,7 +610,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                ${thumbnail_text}
                <div class="mx-2">
                   <span style="font-weight:bold" class="text-reset">${title_safe}</span>
-		  ${link_text}
+                  ${link_text}
                   ${tags}
                </div>
 
@@ -848,3 +891,9 @@ function getEntryReadLaterBar(entry) {
     `;
     return text;
 }
+/*
+module.exports = {
+    getEntryTags,
+    getEntryListText
+};
+*/

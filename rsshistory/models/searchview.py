@@ -31,6 +31,8 @@ class SearchView(models.Model):
         help_text="Text displayed on button hover",
     )
 
+    priority = models.IntegerField(default=0, help_text="Priority, affects position in menu")
+
     filter_statement = models.CharField(
         blank=True,
         max_length=500,
@@ -72,7 +74,7 @@ class SearchView(models.Model):
     )
 
     class Meta:
-        ordering = ["-default", "id"]
+        ordering = ["-default", "priority", "id"]
 
     def get_conditions(self):
         from ..queryfilters import DjangoEquationProcessor
@@ -162,3 +164,40 @@ class SearchView(models.Model):
             order_by="-date_created, link",
             hover_text="Searches all entries",
         )
+
+    def reset_priorities():
+        views = list(SearchView.objects.all().order_by('priority'))
+
+        for i, view in enumerate(views):
+            if view.priority != i:
+                view.priority = i
+                view.save()
+
+    def prio_up(self):
+        views = list(SearchView.objects.all().order_by('priority'))
+
+        index = views.index(self)
+        if index == 0:
+            return
+
+        views[index], views[index - 1] = views[index - 1], views[index]
+
+        for i, view in enumerate(views):
+            if view.priority != i:
+                view.priority = i
+                view.save()
+
+    def prio_down(self):
+        views = list(SearchView.objects.all().order_by('priority'))
+
+        index = views.index(self)
+
+        if index == len(views) - 1:
+            return
+
+        views[index], views[index + 1] = views[index + 1], views[index]
+
+        for i, view in enumerate(views):
+            if view.priority != i:
+                view.priority = i
+                view.save()

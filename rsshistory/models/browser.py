@@ -131,35 +131,42 @@ class Browser(models.Model):
 
         return browser_config
 
-    def prio_up(self):
-        browsers = Browser.objects.all()
+    def reset_priorities():
+        browsers = list(Browser.objects.all().order_by('priority'))
 
-        if self.priority == 0:
+        for i, browser in enumerate(browsers):
+            if browser.priority != i:
+                browser.priority = i
+                browser.save()
+
+    def prio_up(self):
+        browsers = list(Browser.objects.all().order_by('priority'))
+
+        index = browsers.index(self)
+        if index == 0:
             return
 
-        other_browsers = Browser.objects.filter(priority=self.priority - 1)
-        if other_browsers.exists():
-            for other_browser in other_browsers:
-                other_browser.priority = self.priority
-                other_browser.save()
+        browsers[index], browsers[index - 1] = browsers[index - 1], browsers[index]
 
-        self.priority -= 1
-        self.save()
+        for i, browser in enumerate(browsers):
+            if browser.priority != i:
+                browser.priority = i
+                browser.save()
 
     def prio_down(self):
-        browsers = Browser.objects.all()
+        browsers = list(Browser.objects.all().order_by('priority'))
 
-        if self.priority > browsers.count():
+        index = browsers.index(self)
+
+        if index == len(browsers) - 1:
             return
 
-        other_browsers = Browser.objects.filter(priority=self.priority + 1)
-        if other_browsers.exists():
-            for other_browser in other_browsers:
-                other_browser.priority = self.priority
-                other_browser.save()
+        browsers[index], browsers[index + 1] = browsers[index + 1], browsers[index]
 
-        self.priority += 1
-        self.save()
+        for i, browser in enumerate(browsers):
+            if browser.priority != i:
+                browser.priority = i
+                browser.save()
 
     def get_crawler_from_string(crawler_string):
         return WebConfig.get_crawler_from_string(crawler_string)
