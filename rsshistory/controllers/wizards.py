@@ -44,7 +44,7 @@ def common_views_initialization():
     )
 
 
-def setup_views_for_news(request):
+def setup_views_for_news():
     SearchView.objects.create(
         name="Default",
         order_by="-date_created, link",
@@ -77,7 +77,7 @@ def setup_views_for_search_engine():
     SearchView.objects.create(
         name="Default",
         order_by="-page_rating_votes, compacted_tags__id, date_dead_since, -page_rating, link",
-        filter_statement = "page_rating_votes > 0"
+        filter_statement = "page_rating_votes > 0",
         default=True,
     )
     common_views_initialization()

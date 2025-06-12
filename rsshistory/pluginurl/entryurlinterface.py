@@ -1,5 +1,5 @@
 from utils.dateutils import DateUtils
-from utils.inputcontent import InputContents
+from utils.inputcontent import InputContent
 from ..webtools import (
     HtmlPage,
     RssPage,
@@ -133,7 +133,7 @@ class EntryUrlInterface(object):
                 )
 
         if not self.is_property_set(input_props, "description"):
-            cm = InputContents(input_props["description"])
+            cm = InputContent(input_props["description"])
             input_props["description"] = cm.strip_html_attrs()
 
         age = EntryRules.get_age_for_dictionary(input_props)

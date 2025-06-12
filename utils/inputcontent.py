@@ -21,7 +21,13 @@ class InputContent(object):
         return self.text
 
     def strip_html_attrs(self):
-        soup = BeautifulSoup(self.text, "html.parser")
+        if not self.text:
+            return
+
+        try:
+            soup = BeautifulSoup(self.text, "html.parser")
+        except Exception as E:
+            return self.text
 
         for tag in soup.find_all(True):
             if tag.name == "a":
