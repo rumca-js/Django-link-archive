@@ -254,6 +254,14 @@ class UrlHandlerEx(object):
         if "thumbnail" in properties:
             return properties["thumbnail"]
 
+    def is_status_code_invalid(self, status_code):
+        if status_code >= 200 and status_code <= 400:
+            return False
+        elif status_code == 0 or status_code == 403:
+            return False
+        else:
+            return True
+
     def is_another_request_necessary(self):
         """
         Commonly, if user agent is not welcome, 403 is displayed
@@ -263,10 +271,11 @@ class UrlHandlerEx(object):
             return False
 
         if "status_code" in response:
-            if response["status_code"] >= 200 and response["status_code"] <= 400:
-                return False
-            else:
+            status_code = response["status_code"]
+            if status_code == 403:
                 return True
+
+            return self.is_status_code_invalid(status_code)
 
     def get_contents(self):
         """

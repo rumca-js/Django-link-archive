@@ -336,10 +336,12 @@ def source_add_form(request):
             "Not a web link. Expecting protocol://domain.tld styled location"
         )
 
+    status_code = data["status_code"]
+
     # errors
     if not page.is_protocolled_link():
         errors.append("Not a protocolled link. Forget http:// or https:// etc.?")
-    if data["status_code"] < 200 or data["status_code"] > 300:
+    if u.is_status_code_invalid(status_code):
         errors.append("Information about page availability could not be obtained")
     if EntryRules.is_url_blocked(link):
         errors.append("Entry is blocked by entry rules")

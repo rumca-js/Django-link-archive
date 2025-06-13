@@ -5,6 +5,18 @@
  */
 
 
+function isStatusCodeValid(entry) {
+    if (entry.status_code >= 200 && entry.status_code <= 400)
+        return true;
+
+    // unknown status is valid (undetermined, not invalid)
+    if (entry.status_code == 0)
+        return true;
+
+    return false;
+}
+
+
 function isEntryValid(entry) {
     return entry.is_valid;
 }
@@ -134,6 +146,36 @@ function getEntrySourceTitle(entry) {
 }
 
 
+function getEntrySourceUrl(entry) {
+    let source_url = "";
+    if (entry.source_url) {
+       source_url = entry.source_url;
+    }
+    return source_url;
+}
+
+
+function getEntrySourceInfo(entry) {
+    let source_title = getEntrySourceTitle(entry);
+    let source_url = getEntrySourceUrl(entry);
+
+    let html = "";
+
+    if (source_title) {
+        html += `<div><a href="${source_url}">${source_title}</a></div>`;
+    }
+    else if (source_url) {
+        html += `<div><a href="${source_url}">Source URL</a></div>`;
+    }
+
+    let channel_url = getChannelUrl(entry.source_url);
+    if (channel_url)
+        html += `<div><a href="${channel_url}">Channel</a></div>`;
+
+    return html;
+}
+
+
 function getEntryDatePublished(entry) {
     let datePublishedStr = "";
     if (entry.date_published) {
@@ -189,6 +231,9 @@ function getEntryParameters(entry) {
 
 
 function getEntryDescription(entry) {
+  if (!entry.description)
+    return "";
+
   const content = new InputContent(entry.description);
   let content_text = content.htmlify();
 
@@ -392,6 +437,11 @@ function getEntryBodyText(entry) {
     }
 
     text += GetEditMenu(entry);
+
+    let source_info = getEntrySourceInfo(entry);
+    text += `
+    <div>${source_info}</div>
+    `;
 
     let description = getEntryDescription(entry);
 

@@ -1715,13 +1715,14 @@ class EntryDataBuilder(object):
         )
 
     def is_link_data_valid_for_auto_add(self, link_data):
+        from ..pluginurl import UrlHandlerEx
+
         if not self.is_property_set(link_data, "title"):
             return False
 
         if "status_code" in link_data and link_data["status_code"]:
-            if (link_data["status_code"] >= 200 and link_data["status_code"] <= 400) or link_data["status_code"] == 403:
-                pass
-            else:
+            h = UrlHandlerEx(link_data["link"])
+            if h.is_status_code_invalid(link_data["status_code"]):
                 return False
 
         if "is_valid" in link_data and not link_data["is_valid"]:

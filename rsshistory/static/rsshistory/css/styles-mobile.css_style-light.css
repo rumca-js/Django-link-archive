@@ -85,10 +85,10 @@ option:hover {
 }
 
 .link-detail-description img {
-     clear: both;
+     display:block;
      max-width: 100%;
      height: auto;
-     float: right;
+     margin: 1em 0;
 }
 
 .link-list a:link, .link-list a:visited, .link-list a:active {

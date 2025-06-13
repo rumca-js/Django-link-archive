@@ -628,15 +628,14 @@ class BaseLinkDataController(BaseLinkDataModel):
         return True
 
     def is_status_code_valid(self):
-        if self.status_code == 403:
-            # Many pages return 403, but they are correct
-            return True
+        from ..pluginurl import UrlHandlerEx
 
-        if self.status_code == 0:
-            # The page has not yet been fetched / checked
-            return True
+        handler = UrlHandlerEx(self.link)
 
-        return self.status_code >= 200 and self.status_code < 300
+        if handler.is_status_code_invalid(self.status_code):
+            return False
+
+        return True
 
     def is_archive_entry(self):
         """

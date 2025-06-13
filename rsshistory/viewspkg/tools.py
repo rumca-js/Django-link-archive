@@ -93,7 +93,7 @@ def get_errors(page_url):
         errors.append("Information about page availability could not be obtained")
     if response:
         code = response.get_status_code()
-        if code < 200 or code > 300:
+        if page_url.is_status_code_invalid(code):
             errors.append("Invalid status code")
 
     if page_url.is_blocked():
