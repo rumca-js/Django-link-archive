@@ -135,8 +135,7 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        # two requests: one for page, one for robots.txt
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_cleanup_link_json(self):
         MockRequestCounter.mock_page_requests = 0
@@ -150,8 +149,7 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        # two requests: one for page, one for robots.txt
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_link_input_suggestions_json__no_slash(self):
         MockRequestCounter.mock_page_requests = 0
@@ -166,10 +164,9 @@ class ToolsViewsTest(FakeInternetTestCase):
         data = response.json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("https://www.linkedin.com", data)
+        self.assertIn("https://www.linkedin.com", data["links"])
 
-        # two requests: one for page, one for robots.txt
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_link_input_suggestions_json__https(self):
         config = Configuration.get_object().config_entry
@@ -188,10 +185,9 @@ class ToolsViewsTest(FakeInternetTestCase):
         data = response.json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("https://www.linkedin.com/", data)
+        self.assertIn("https://www.linkedin.com/", data["links"])
 
-        # two requests: one for page, one for robots.txt
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_link_input_suggestions_json__no_www(self):
         config = Configuration.get_object().config_entry
@@ -210,10 +206,9 @@ class ToolsViewsTest(FakeInternetTestCase):
         data = response.json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("https://linkedin.com/", data)
+        self.assertIn("https://linkedin.com/", data["links"])
 
-        # two requests: one for page, one for robots.txt
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_link_input_suggestions_json__domain(self):
         config = Configuration.get_object().config_entry
@@ -232,7 +227,6 @@ class ToolsViewsTest(FakeInternetTestCase):
         data = response.json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("https://linkedin.com", data)
+        self.assertIn("https://www.linkedin.com", data["links"])
 
-        # two requests: one for page, one for robots.txt
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)

@@ -309,8 +309,8 @@ def source_add_form(request):
     domain = page.get_domain()
     config = Configuration.get_object().config_entry
 
-    h = UrlHandlerEx(link)
-    is_allowed = h.is_allowed()
+    u = UrlHandlerEx(link)
+    is_allowed = u.is_allowed()
 
     # warnings
     if config.prefer_https_links and link.find("http://") >= 0:

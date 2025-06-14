@@ -64,6 +64,9 @@ function addLink(page_url, browser, attempt=1) {
                link_text = getExistingObjectLink(object_id);
 
                $("#formResponse").html(`Entry added ${link_text}`);
+               $('#EntryExists').html("")
+               $('#Suggestions').html("")
+               $('#Errors').html("")
                resetSearch();
            }
            else {
