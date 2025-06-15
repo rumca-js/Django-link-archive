@@ -65,8 +65,9 @@ createsuperuser:
 # - I cannot write installation commands for each Linux distro. I assume you are using debian-derivative
 # - assume you are using sudo for this command. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
 # http://pont.ist/rabbit-mq/
+# ffmpeg is necessary for video conversion
 installsysdeps:
-	apt -y install rabbitmq-server memcached wget id3v2
+	apt -y install rabbitmq-server memcached wget id3v2 ffmpeg
 	systemctl enable rabbitmq-server
 	systemctl start rabbitmq-server
 	systemctl enable memcached.service
@@ -89,6 +90,7 @@ run-celery:
 	# 200000 is 200MB
 	poetry run celery -A linklibrary beat -l INFO &
 	poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=300000 &
+	#poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=200000 &
 	#poetry run celery -A linklibrary worker -l INFO --concurrency=4
 
 run-web-server:

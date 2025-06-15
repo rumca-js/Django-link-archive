@@ -6,6 +6,10 @@ from ..webtools import (
     UrlLocation,
     RemoteServer,
     PageOptions,
+    HTTP_STATUS_UNKNOWN,
+    HTTP_STATUS_CODE_CONNECTION_ERROR,
+    HTTP_STATUS_USER_AGENT,
+    HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
 )
 from ..apps import LinkDatabase
 from ..models import AppLogging, EntryRules, BlockEntry, Browser
@@ -257,7 +261,7 @@ class UrlHandlerEx(object):
     def is_status_code_invalid(self, status_code):
         if status_code >= 200 and status_code <= 400:
             return False
-        elif status_code == 0 or status_code == 403:
+        elif status_code == HTTP_STATUS_UNKNOWN or status_code == HTTP_STATUS_USER_AGENT:
             return False
         else:
             return True
@@ -272,8 +276,14 @@ class UrlHandlerEx(object):
 
         if "status_code" in response:
             status_code = response["status_code"]
-            if status_code == 403:
+            if status_code == HTTP_STATUS_USER_AGENT:
                 return True
+
+            if status_code == HTTP_STATUS_CODE_CONNECTION_ERROR:
+                return False
+
+            if status_code == HTTP_STATUS_CODE_PAGE_UNSUPPORTED:
+                return False
 
             return self.is_status_code_invalid(status_code)
 

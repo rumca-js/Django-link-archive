@@ -16,11 +16,19 @@ class Id3v2(object):
             return
 
         song = self.data["title"]
-        artist = self.data["artist"]
-        album = self.data["album"]
+
+        artist = None
+        if "artist" in self.data:
+            artist = self.data["artist"]
+        album = None
+        if "album" in self.data:
+            artist = self.data["album"]
         track = None
         if "track" in self.data:
             track = self.data["track"]
+
+        artist = str(artist)
+        album = str(album)
 
         if track:
             subprocess.run(
