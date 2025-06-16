@@ -305,6 +305,20 @@ $(document).on('click', '.btnFilterTrigger', function(e) {
     loadRowListContent(search_term, page);
 });
 
+//-----------------------------------------------
+$(document).on('click', '.btnNavigation', function(e) {
+    e.preventDefault();
+    
+    let page = $(this).data("page");
+    let currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set("page", page);
+    window.history.pushState({}, '', currentUrl);
+
+    var search_term = $(this).data('search') || $('#id_search').val();
+    loadRowListContent(search_term, page);
+});
+
+//-----------------------------------------------
 $(document).on('click', '#btnSearchHistory', function(e) {
     e.preventDefault();
 
