@@ -734,6 +734,70 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
         self.assertEqual(entries.count(), 0)
 
+    def test_evaluate__not_removes_domain(self):
+        LinkDataController.objects.all().delete()
+
+        conf = Configuration.get_object().config_entry
+        conf.days_to_move_to_archive = 2
+        conf.days_to_remove_links = 2
+        conf.accept_domain_links = True
+        conf.accept_non_domain_links = False
+        conf.prefer_https_links = True
+        conf.save()
+
+        https_entry = LinkDataController.objects.create(
+            source_url="https://archive.com/test",
+            link="https://archive.com",
+            title="The archive https link",
+            bookmarked=False,
+            language="en",
+            date_dead_since=DateUtils.get_datetime_now_utc() - timedelta(days=5),
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=5),
+        )
+
+        # call tested function
+        result = EntryWrapper(entry=https_entry).evaluate()
+
+        entries = LinkDataController.objects.filter(link__icontains="archive.com")
+        self.assertEqual(entries.count(), 1)
+
+        entries = ArchiveLinkDataController.objects.filter(
+            link__icontains="archive.com"
+        )
+        self.assertEqual(entries.count(), 0)
+
+    def test_evaluate__not_removes_non_domain(self):
+        LinkDataController.objects.all().delete()
+
+        conf = Configuration.get_object().config_entry
+        conf.days_to_move_to_archive = 2
+        conf.days_to_remove_links = 2
+        conf.accept_domain_links = False
+        conf.accept_non_domain_links = True
+        conf.prefer_https_links = True
+        conf.save()
+
+        https_entry = LinkDataController.objects.create(
+            source_url="https://archive.com/test",
+            link="https://archive.com/test",
+            title="The archive https link",
+            bookmarked=False,
+            language="en",
+            date_dead_since=DateUtils.get_datetime_now_utc() - timedelta(days=5),
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=5),
+        )
+
+        # call tested function
+        result = EntryWrapper(entry=https_entry).evaluate()
+
+        entries = LinkDataController.objects.filter(link__icontains="archive.com")
+        self.assertEqual(entries.count(), 1)
+
+        entries = ArchiveLinkDataController.objects.filter(
+            link__icontains="archive.com"
+        )
+        self.assertEqual(entries.count(), 0)
+
     def test_evaluate__not_removes_bookmarked(self):
         LinkDataController.objects.all().delete()
 

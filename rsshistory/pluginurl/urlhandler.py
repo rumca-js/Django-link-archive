@@ -337,14 +337,16 @@ class UrlHandlerEx(object):
         if EntryRules.is_url_blocked(self.url):
             return True
 
-        properties = self.get_section("Properties")
-        if not properties:
-            return True
+        config_entry = Configuration.get_object().config_entry
+        if config_entry.remote_webtools_server_location:
+            properties = self.get_section("Properties")
+            if not properties:
+                return True
 
-        properties["contents"] = self.get_contents()
+            properties["contents"] = self.get_contents()
 
-        if EntryRules.is_dict_blocked(properties):
-            return True
+            if EntryRules.is_dict_blocked(properties):
+                return True
 
         if not self.is_url_valid():
             return True

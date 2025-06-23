@@ -510,6 +510,10 @@ class UserBookmarks(models.Model):
         if not user.is_authenticated:
             return
 
+        if not entry.id:
+            AppLogging.error("This entry was not saved to db, cannot add to bookmarks")
+            return
+
         objs = UserBookmarks.objects.filter(user=user, entry=entry)
         if objs.count() == 0:
             UserBookmarks.objects.create(user=user, entry=entry)

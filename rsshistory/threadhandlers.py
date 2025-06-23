@@ -169,6 +169,12 @@ class EntryUpdateData(BaseJobHandler):
     def process(self, obj=None):
         link_id = None
 
+        c = Configuration.get_object()
+        if not c.config_entry.remote_webtools_server_location:
+            AppLogging.error("cannot update links if no remote server is configured")
+            # consume job
+            return True
+
         try:
             link_id = int(obj.subject)
         except ValueError as E:
@@ -216,6 +222,12 @@ class LinkResetDataJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_LINK_RESET_DATA
 
     def process(self, obj=None):
+        c = Configuration.get_object()
+        if not c.config_entry.remote_webtools_server_location:
+            AppLogging.error("cannot update links if no remote server is configured")
+            # consume job
+            return True
+
         try:
             link_id = int(obj.subject)
         except ValueError as E:

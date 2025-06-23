@@ -1248,7 +1248,7 @@ class EntryWrapper(object):
                 self.entry = None
                 return
 
-        if not is_domain and config.accept_non_domain_links:
+        if not is_domain and not config.accept_non_domain_links:
             if entry.is_removable():
                 entry.delete()
                 self.entry = None
@@ -1540,10 +1540,10 @@ class EntryDataBuilder(object):
         self.browser = browser
 
         wrapper = EntryWrapper(link=self.link)
-        obj = wrapper.get()
-        if obj:
-            self.result = obj
-            return obj
+        entry = wrapper.get()
+        if entry:
+            self.result = entry
+            return entry
 
         self.user = user
         self.source_is_auto = source_is_auto
