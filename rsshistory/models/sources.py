@@ -196,9 +196,9 @@ class SourceDataModel(models.Model):
         )
 
     def reset_dynamic_data():
-        objs = SourceCategories.objects.all()
-        objs.delete()
         objs = SourceSubCategories.objects.all()
+        objs.delete()
+        objs = SourceCategories.objects.all()
         objs.delete()
 
         sources = SourceDataModel.objects.all()
@@ -210,15 +210,15 @@ class SourceDataModel(models.Model):
         return self.favicon
 
     def save(self, *args, **kwargs):
+        SourceSubCategories.cleanup()
+        SourceCategories.cleanup()
+
         self.category = SourceCategories.ensure(self.category_name)
         self.subcategory = SourceSubCategories.ensure(
             self.category_name, self.subcategory_name
         )
 
         super().save(*args, **kwargs)
-
-        SourceSubCategories.cleanup()
-        SourceCategories.cleanup()
 
     def get_export_names():
         return [

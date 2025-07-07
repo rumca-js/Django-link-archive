@@ -328,13 +328,16 @@ class UrlHandlerEx(object):
         if not response["is_valid"]:
             return False
 
-        if self.is_blocked():
+        blocked = self.is_blocked()
+        if blocked:
+            AppLogging.error("Url:{} not valid:{}".format(self.url, blocked))
             return False
 
         return True
 
     def is_blocked(self):
-        if EntryRules.is_url_blocked(self.url):
+        reason = EntryRules.is_url_blocked(self.url)
+        if reason:
             return True
 
         config_entry = Configuration.get_object().config_entry
@@ -345,8 +348,9 @@ class UrlHandlerEx(object):
 
             properties["contents"] = self.get_contents()
 
-            if EntryRules.is_dict_blocked(properties):
-                return True
+            reason = EntryRules.is_dict_blocked(properties)
+            if reason:
+                return reason
 
         if not self.is_url_valid():
             return True

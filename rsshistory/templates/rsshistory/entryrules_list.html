@@ -26,6 +26,9 @@
                     [DISABLED]
                  {% endif %}
 
+                 {% if entry_rule.trust %}
+                  [T]
+                 {% endif %}
                  {% if entry_rule.block %}
                   [B]
                  {% endif %}
@@ -36,7 +39,7 @@
                   [W]
                  {% endif %}
                  {% if entry_rule.auto_tag %}
-                  [T]
+                  [#]
                  {% endif %}
 
                  {{entry_rule.rule_name}}

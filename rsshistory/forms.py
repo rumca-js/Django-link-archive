@@ -245,6 +245,7 @@ class EntryRulesForm(forms.ModelForm):
             "trigger_text_hits",
             "trigger_text_fields",
             "block",
+            "trust",
             "auto_tag",
             "apply_age_limit",
             "browser",

@@ -17,6 +17,7 @@
 <h1>{{object.rule_name}}</h1>
 
 <div>ID: {{object.id}}</div>
+<div>Priority: {{object.priority}}</div>
 
 {% if object.enabled %}
   <div>Enabled: {{object.enabled}}</div>
@@ -52,6 +53,10 @@
 {% endif %}
 
 <h2>Actions</h2>
+
+{% if object.trust %}
+<div>Trust: {{object.trust}}</div>
+{% endif %}
 
 {% if object.block %}
 <div>Block: {{object.block}}</div>

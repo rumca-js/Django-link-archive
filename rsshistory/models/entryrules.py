@@ -17,6 +17,7 @@ from ..apps import LinkDatabase
 
 class EntryRules(models.Model):
     enabled = models.BooleanField(default=True)
+    priority = models.IntegerField(default=0, help_text="Priority")
 
     rule_name = models.CharField(max_length=1000, blank=True, help_text="Rule name")
 
@@ -43,6 +44,11 @@ class EntryRules(models.Model):
         help_text="Blocks entry",
     )
 
+    trust = models.BooleanField(
+        default=False,
+        help_text="Trust, if conditions are met",
+    )
+
     auto_tag = models.CharField(
         max_length=1000, blank=True, help_text="Automatically tag"
     )
@@ -60,7 +66,9 @@ class EntryRules(models.Model):
     class Meta:
         ordering = [
             "-enabled",
-            "block",
+            "priority",
+            "-trust",
+            "-block",
             "browser",
             "apply_age_limit",
             "auto_tag",
@@ -174,16 +182,22 @@ class EntryRules(models.Model):
                 return True
 
     def apply_entry_rule_action(self, entry):
-        if self.block:
+        status = False
+        if self.trust:
+            status = True
+
+        if not self.trust and self.block:
             EntryRules.attemp_delete(entry, self)
-            return True
+            status = True
+            return status
 
         if self.apply_age_limit:
             if not entry.age or entry.age < self.apply_age_limit:
                 entry.age = self.apply_age_limit
                 entry.save()
+                status = True
 
-        return False
+        return status
 
     def get_url_rules(url):
         result = []
@@ -198,9 +212,12 @@ class EntryRules(models.Model):
     def is_url_blocked(url):
         from .blockentry import BlockEntry
 
-        rules = EntryRules.objects.filter(block=True, enabled=True)
+        rules = EntryRules.objects.filter(block=True, trust=True, enabled=True)
         for rule in rules:
             if rule.is_url_triggering(url):
+                if rule.trust:
+                    return False
+
                 return rule
 
         p = UrlLocation(url)
@@ -216,12 +233,15 @@ class EntryRules(models.Model):
             if reason:
                 return reason
 
-        rules = EntryRules.objects.filter(enabled=True, block=True).exclude(
+        rules = EntryRules.objects.filter(enabled=True, block=True, trust=True).exclude(
             trigger_text=""
         )
         for rule in rules:
             text = rule.get_dict_pulp(dictionary)
             if rule.is_text_triggered(text):
+                if rule.trust:
+                    return False
+
                 return rule
 
     def is_entry_blocked(entry):
@@ -229,12 +249,15 @@ class EntryRules(models.Model):
         if reason:
             return reason
 
-        rules = EntryRules.objects.filter(enabled=True, block=True).exclude(
+        rules = EntryRules.objects.filter(enabled=True, block=True, trust=True).exclude(
             trigger_text=""
         )
         for rule in rules:
             text = rule.get_entry_pulp(entry)
             if rule.is_text_triggered(text):
+                if rule.trust:
+                    return False
+
                 return rule
 
     def check_all(entry):
@@ -309,5 +332,43 @@ class EntryRules(models.Model):
         link_service.block = True
         link_service.save()
 
+    def reset_priorities():
+        rules = list(EntryRules.objects.all().order_by('priority'))
+
+        for i, rule in enumerate(rules):
+            if rule.priority != i:
+                rule.priority = i
+                rule.save()
+
+    def prio_up(self):
+        rules = list(EntryRules.objects.all().order_by('priority'))
+
+        index = rules.index(self)
+        if index == 0:
+            return
+
+        rules[index], rules[index - 1] = rules[index - 1], rules[index]
+
+        for i, rule in enumerate(rules):
+            if rule.priority != i:
+                rule.priority = i
+                rule.save()
+
+    def prio_down(self):
+        rules = list(EntryRules.objects.all().order_by('priority'))
+
+        index = rules.index(self)
+
+        if index == len(rules) - 1:
+            return
+
+        rules[index], rules[index + 1] = rules[index + 1], rules[index]
+
+        for i, rule in enumerate(rules):
+            if rule.priority != i:
+                rule.priority = i
+                rule.save()
+
     def __str__(self):
         return "EntryRule ID:{}, Name:{}".format(self.id, self.rule_name)
+
