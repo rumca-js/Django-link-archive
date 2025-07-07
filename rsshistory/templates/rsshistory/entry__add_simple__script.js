@@ -156,10 +156,9 @@ function onInputChanged() {
     let search_link = element.val();
 
     if (search_link) {
-       let new_search_link = fixStupidGoogleRedirects(search_link)
+       let new_search_link = sanitizeLink(search_link);
 
        if (new_search_link != search_link) {
-          let element = $('#theForm input[name="link"]');
           element.val(new_search_link);
           search_link = new_search_link;
        }

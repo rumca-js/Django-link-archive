@@ -3,9 +3,10 @@ from urllib.parse import parse_qs
 
 from utils.dateutils import DateUtils
 
-from .webtools import PageResponseObject, WebLogger
-from .urllocation import UrlLocation
-from .pages import HtmlPage, ContentInterface
+from ..webtools import PageResponseObject, WebLogger
+from ..urllocation import UrlLocation
+from ..pages import HtmlPage, ContentInterface
+
 from .defaulturlhandler import DefaultUrlHandler
 
 
@@ -18,7 +19,6 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         if not self.is_handled_by():
             return
 
-        self.url = self.input2url(url)
         self.code = self.input2code(url)
 
     def is_handled_by(self):
@@ -28,14 +28,27 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         protocol_less = UrlLocation(self.url).get_protocolless()
 
         return (
-            protocol_less.startswith("www.youtube.com/watch")
-            or protocol_less.startswith("youtube.com/watch")
-            or protocol_less.startswith("m.youtube.com/watch")
-            or (
-                protocol_less.startswith("youtu.be/")
-                and len(protocol_less) > len("youtu.be/")
-            )
+            self.is_handled_by_watch(protocol_less)
+            or self.is_handled_by_shorts(protocol_less)
+            or self.is_handled_by_be_domain(protocol_less)
         )
+
+    def is_handled_by_watch(self, protocol_less):
+        return (protocol_less.startswith("www.youtube.com/watch")
+            or protocol_less.startswith("youtube.com/watch")
+            or protocol_less.startswith("m.youtube.com/watch"))
+
+    def get_canonical_url(self):
+        return self.code2url(self.code)
+
+    def is_handled_by_shorts(self, protocol_less):
+        return (protocol_less.startswith("www.youtube.com/shorts")
+            or protocol_less.startswith("youtube.com/shorts")
+            or protocol_less.startswith("m.youtube.com/shorts"))
+
+    def is_handled_by_be_domain(self, protocol_less):
+        return (protocol_less.startswith("youtu.be/")
+                and len(protocol_less) > len("youtu.be/"))
 
     def get_video_code(self):
         return self.input2code(self.url)
@@ -55,6 +68,9 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         if url.find("watch") >= 0 and url.find("v=") >= 0:
             return YouTubeVideoHandler.input2code_standard(url)
 
+        if url.find("shorts") >= 0:
+            return YouTubeVideoHandler.input2code_shorts(url)
+
         if url.find("youtu.be") >= 0:
             return YouTubeVideoHandler.input2code_youtu_be(url)
 
@@ -66,6 +82,17 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             video_code = url[wh + 9 : wh_question]
         else:
             video_code = url[wh + 9 :]
+
+        return video_code
+
+    def input2code_shorts(url):
+        wh = url.find("shorts")
+
+        wh_question = url.find("?", wh)
+        if wh_question >= 0:
+            video_code = url[wh + 7 : wh_question]
+        else:
+            video_code = url[wh + 7 :]
 
         return video_code
 
@@ -529,3 +556,49 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
     def get_tags(self):
         if self.get_contents():
             return self.yt_ob.get_tags()
+
+    def get_entries(self):
+        from utils.programwrappers import ytdlp
+        from utils.serializers import YouTubeJson
+
+        entries = []
+
+        location = UrlLocation(self.url)
+        params = location.get_params()
+
+        if params and "list" in params:
+            yt = ytdlp.YTDLP(self.url)
+            json = yt.get_video_list_json()
+
+            if not json:
+                return entries
+
+            for video in json:
+                j = YouTubeJson()
+                j._json = video
+
+                if "url" in video and video["url"] is not None:
+                    url = j.get_link()
+                    title = j.get_title()
+                    description = j.get_description()
+                    channel_url = j.get_channel_url()
+                    date_published = j.get_date_published()
+                    view_count = j.get_view_count()
+                    live_status = j.is_live()
+                    thumbnail = j.get_thumbnail()
+
+                    entry_data = {
+                            "link": url,
+                            "title" : title,
+                            "description" : description,
+                            "date_published" : date_published,
+                            "thumbnail" : thumbnail,
+                            "live" : live_status,
+                            "view_count" : view_count,
+                            "channel_url" : channel_url,
+                            "source_url" : channel_url,
+                            }
+
+                    entries.append(entry_data)
+
+        return entries

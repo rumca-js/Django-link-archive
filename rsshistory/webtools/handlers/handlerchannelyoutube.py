@@ -1,10 +1,13 @@
 import traceback
 
-from .defaulturlhandler import DefaultChannelHandler
-from .webtools import PageResponseObject
-from .urllocation import UrlLocation
-from .pages import RssPage
+from ..webtools import PageResponseObject
+from ..webtools import WebLogger
+
+from ..urllocation import UrlLocation
+from ..pages import RssPage
+
 from .handlerhttppage import HttpPageHandler
+from .defaulturlhandler import DefaultChannelHandler
 
 
 class YouTubeChannelHandler(DefaultChannelHandler):
@@ -74,6 +77,17 @@ class YouTubeChannelHandler(DefaultChannelHandler):
     def code2feed(self, code):
         return "https://www.youtube.com/feeds/videos.xml?channel_id={}".format(code)
 
+    def get_feeds(self):
+        feeds = super().get_feeds()
+        if self.code:
+            feeds.append(
+                "https://www.youtube.com/feeds/videos.xml?channel_id={}".format(
+                    self.code
+                )
+            )
+
+        return feeds
+
     def input2code(self, url):
         wh = url.find("youtube.com")
         if wh == -1:
@@ -89,8 +103,6 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return self.input2code_feeds(url)
 
     def input2code_handle(self, url):
-        from .webtools import WebLogger
-
         from utils.programwrappers import ytdlp
 
         yt = ytdlp.YTDLP(url)
@@ -154,7 +166,6 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return self.response.get_text()
 
     def get_response(self):
-        from .webtools import WebLogger
 
         if self.response:
             return self.response
@@ -177,8 +188,6 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return self.response
 
     def get_rss_url(self):
-        from .webtools import WebLogger
-
         if self.rss_url:
             return self.rss_url
 

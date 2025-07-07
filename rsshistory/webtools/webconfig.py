@@ -19,8 +19,16 @@ from .crawlers import (
     SeleniumUndetected,
     ScriptCrawler,
     SeleniumBase,
+    SeleniumWireFull,
     StealthRequestsCrawler,
+    CurlCffiCrawler,
+    HttpxCrawler,
 )
+
+
+CRAWLEE_BEAUTIFUL_SCRIPT = "CrawleeScript"
+CRAWLEE_PLAYWRIGHT_SCRIPT = "PlaywrightScript"
+SCRAPY_SCRIPT = "ScrapyScript"
 
 
 class WebConfig(object):
@@ -44,10 +52,67 @@ class WebConfig(object):
             SeleniumUndetected,  # requires driver location
             ScriptCrawler,  # requires script
             SeleniumBase,
+            SeleniumWireFull,
             StealthRequestsCrawler,
+            CurlCffiCrawler,
+            HttpxCrawler,
         ]
 
         return browsers
+
+    def get_init_crawler_config(headless_script=None, full_script=None, port=None):
+        """
+        Caller may provide scripts
+        """
+        mapping = []
+
+        # one of the methods should be available
+        from .ipc import DEFAULT_PORT, SocketConnection
+
+        if not port:
+            port = DEFAULT_PORT
+
+            c = SocketConnection()
+            if not c.connect(host=SocketConnection.gethostname(), port=port):
+                port = None
+
+            c.close()
+
+        headless_script = WebConfig.get_script_path("crawleebeautifulsoup.py")
+        full_script = WebConfig.get_script_path("crawleeplaywright.py")
+        scrapy_script = WebConfig.get_script_path("cralwerscrapy.py")
+
+        mapping.append(WebConfig.get_default_browser_setup(RequestsCrawler))
+
+        mapping.append(WebConfig.get_scriptcralwer(headless_script, CRAWLEE_BEAUTIFUL_SCRIPT))
+        mapping.append(WebConfig.get_scriptcralwer(full_script, CRAWLEE_PLAYWRIGHT_SCRIPT))
+        mapping.append(WebConfig.get_scriptcralwer(scrapy_script, SCRAPY_SCRIPT))
+
+        mapping.append(WebConfig.get_seleniumundetected())
+        mapping.append(WebConfig.get_seleniumbase())
+        mapping.append(WebConfig.get_seleniumheadless())
+        mapping.append(WebConfig.get_seleniumfull())
+
+        mapping.append(WebConfig.get_default_browser_setup(SeleniumWireFull))
+        mapping.append(WebConfig.get_default_browser_setup(StealthRequestsCrawler))
+        mapping.append(WebConfig.get_default_browser_setup(CurlCffiCrawler))
+        mapping.append(WebConfig.get_default_browser_setup(HttpxCrawler))
+
+        return mapping
+
+    def get_script_path(script_relative):
+        """
+        script_relative example crawleebeautifulsoup.py
+        """
+        import os
+
+        poetry_path = ""
+        if "POETRY_ENV" in os.environ:
+            poetry_path = os.environ["POETRY_ENV"] + "/bin/"
+
+        script_relative = poetry_path + "poetry run python {}".format(script_relative)
+
+        return script_relative
 
     def get_browsers():
         str_browsers = []
@@ -76,54 +141,6 @@ class WebConfig(object):
         if c.is_valid():
             return c
 
-    def get_init_crawler_config(headless_script=None, full_script=None, port=None):
-        """
-        Caller may provide scripts
-        """
-        mapping = []
-
-        # one of the methods should be available
-        from .ipc import DEFAULT_PORT, SocketConnection
-
-        if not port:
-            port = DEFAULT_PORT
-
-            c = SocketConnection()
-            if not c.connect(host=SocketConnection.gethostname(), port=port):
-                port = None
-
-            c.close()
-
-        try:
-            import os
-            from crawlee.beautifulsoup_crawler import BeautifulSoupCrawler
-
-            poetry_path = ""
-            if "POETRY_ENV" in os.environ:
-                poetry_path = os.environ["POETRY_ENV"] + "/bin/"
-
-            if full_script is None:
-                full_script = poetry_path + "poetry run python crawleebeautifulsoup.py"
-            if headless_script is None:
-                headless_script = (
-                    poetry_path + "poetry run python crawleebeautifulsoup.py"
-                )
-        except:
-            pass
-
-        mapping.append(WebConfig.get_default_browser_setup(RequestsCrawler))
-
-        mapping.append(WebConfig.get_scriptcralwer(headless_script, "CrawleeScript"))
-        mapping.append(WebConfig.get_scriptcralwer(full_script, "PlaywrightScript"))
-        mapping.append(WebConfig.get_seleniumundetected())
-        mapping.append(WebConfig.get_seleniumbase())
-        mapping.append(WebConfig.get_seleniumheadless())
-        mapping.append(WebConfig.get_seleniumfull())
-
-        mapping.append(WebConfig.get_default_browser_setup(StealthRequestsCrawler))
-
-        return mapping
-
     def get_crawlers(only_enabled=False):
         result = []
         mapping = WebConfig.get_init_crawler_config()
@@ -148,7 +165,7 @@ class WebConfig(object):
             "enabled": enabled,
             "name": browser.__name__,
             "crawler": browser,
-            "settings": {"timeout_s": 20},
+            "settings": {"timeout_s": 30},
         }
 
     def get_requests():
@@ -156,24 +173,16 @@ class WebConfig(object):
             "enabled": True,
             "name": "RequestsCrawler",
             "crawler": RequestsCrawler,
-            "settings": {"timeout_s": 20},
+            "settings": {"timeout_s": 40},
         }
 
     def get_scriptcralwer(script, name=""):
-        if script:
-            return {
-                "enabled": True,
-                "name": name,
-                "crawler": ScriptCrawler,
-                "settings": {"script": script, "timeout_s": 40},
-            }
-        else:
-            return {
-                "enabled": False,
-                "name": name,
-                "crawler": ScriptCrawler,
-                "settings": {"script": script, "timeout_s": 40},
-            }
+        return {
+            "enabled": True,
+            "name": name,
+            "crawler": ScriptCrawler,
+            "settings": {"script": script, "timeout_s": 50},
+        }
 
     def get_seleniumheadless():
         chromedriver_path = Path("/usr/bin/chromedriver")
@@ -185,7 +194,7 @@ class WebConfig(object):
                 "crawler": SeleniumChromeHeadless,
                 "settings": {
                     "driver_executable": str(chromedriver_path),
-                    "timeout_s": 30,
+                    "timeout_s": 60,
                 },
             }
         else:
@@ -193,7 +202,7 @@ class WebConfig(object):
                 "enabled": True,
                 "name": "SeleniumChromeHeadless",
                 "crawler": SeleniumChromeHeadless,
-                "settings": {"driver_executable": None, "timeout_s": 40},
+                "settings": {"driver_executable": None, "timeout_s": 60},
             }
 
     def get_seleniumfull():
@@ -214,7 +223,7 @@ class WebConfig(object):
                 "enabled": False,
                 "name": "SeleniumChromeFull",
                 "crawler": SeleniumChromeFull,
-                "settings": {"driver_executable": None, "timeout_s": 40},
+                "settings": {"driver_executable": None, "timeout_s": 60},
             }
 
     def get_seleniumundetected():
@@ -227,7 +236,7 @@ class WebConfig(object):
                 "crawler": SeleniumUndetected,
                 "settings": {
                     "driver_executable": str(chromedriver_path),
-                    "timeout_s": 30,
+                    "timeout_s": 60,
                 },
             }
         else:
@@ -235,7 +244,7 @@ class WebConfig(object):
                 "enabled": False,
                 "name": "SeleniumUndetected",
                 "crawler": SeleniumUndetected,
-                "settings": {"driver_executable": None, "timeout_s": 40},
+                "settings": {"driver_executable": None, "timeout_s": 60},
             }
 
     def get_seleniumbase():
@@ -263,7 +272,7 @@ class WebConfig(object):
             try:
                 if proc.info["name"] and proc.info["name"].lower().startswith("chrom"):
                     proc.kill()  # Kill the process
-                    webtools.WebLogger.error(
+                    WebLogger.error(
                         f"Killed process: {proc.info['name']} (PID: {proc.info['pid']})"
                     )
             except (
@@ -271,7 +280,7 @@ class WebConfig(object):
                 psutil.AccessDenied,
                 psutil.ZombieProcess,
             ) as e:
-                webtools.WebLogger.error(
+                WebLogger.error(
                     f"Could not kill process {proc.info.get('name', 'unknown')}: {e}"
                 )
 

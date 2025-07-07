@@ -105,8 +105,32 @@ def status_code_to_text(status_code):
 
     if status_code == 200:
         return "HTTP_STATUS_OK(200)"
+    elif status_code == 401:
+        return "HTTP_STATUS_UNAUTHORIZED(401)"
     elif status_code == 403:
         return "HTTP_STATUS_USER_AGENT(403)"
+    elif status_code == 404:
+        return "HTTP_STATUS_NOT_FOUND(404)"
+    elif status_code == 406:
+        return "HTTP_STATUS_NOT_ACCEPTABLE(406)"
+    elif status_code == 409:
+        return "HTTP_STATUS_CONFLICT(409)"
+    elif status_code == 410:
+        return "HTTP_STATUS_GONE(410)"
+    elif status_code == 418:
+        return "HTTP_STATUS_IM_A_TEAPOT(418)"
+    elif status_code == 451:
+        return "HTTP_STATUS_UNAVAILABLE_LEGAL_REASONS(451)"
+    elif status_code == 500:
+        return "HTTP_STATUS_INTERNAL_SERVER(500)"
+    elif status_code == 501:
+        return "HTTP_STATUS_NOT_IMPLEMENTED(501)"
+    elif status_code == 502:
+        return "HTTP_STATUS_BAD_GATEWAY(502)"
+    elif status_code == 503:
+        return "HTTP_STATUS_SERVICE_UNAVAILABLE(503)"
+    elif status_code == 521:
+        return "HTTP_STATUS_WEB_SERVER_IS_DOWN(521)"
     elif status_code == 600:
         return "HTTP_STATUS_CODE_EXCEPTION(600)"
     elif status_code == 603:
@@ -257,8 +281,8 @@ class PageOptions(object):
 
         settings = first_mode["settings"]
 
-        if "timeout" in settings:
-            timeout_crawler = settings["timeout"]
+        if "timeout_s" in settings:
+            timeout_crawler = settings["timeout_s"]
             return timeout_crawler
 
         return timeout_s
@@ -298,100 +322,27 @@ class PageRequestObject(object):
         return "Url:{} Timeout:{} Ping:{}".format(self.url, self.timeout_s, self.ping)
 
 
-class PageResponseObject(object):
-    STATUS_CODE_OK = 200
-    STATUS_CODE_ERROR = 500
-    STATUS_CODE_UNDEF = 0
-
-    def __init__(
-        self,
-        url=None,  # received url
-        binary=None,
-        text=None,
-        status_code=STATUS_CODE_OK,
-        encoding=None,
-        headers=None,
-        request_url=None,
-    ):
-        """
-        @param contents Text
-
-        TODO this should be cleaned up. We should pass binary, and encoding
-        """
-        self.errors = []
-        self.url = url
-        self.request_url = request_url
-        self.status_code = status_code
-        self.crawler_data = None
-
-        self.binary = None
-        self.text = None
-
-        if binary:
-            self.binary = binary
-        if text:
-            self.text = text
-
-        # I read selenium always assume utf8 encoding
-
-        # encoding = chardet.detect(contents)['encoding']
-        # self.apparent_encoding = encoding
-        # self.encoding = encoding
-
-        if not headers:
-            self.headers = {}
-        else:
-            self.headers = headers
-
-        if not self.is_headers_empty():
-            charset = self.get_content_type_charset()
-            if charset:
-                self.encoding = charset
-                self.apparent_encoding = charset
-            elif encoding:
-                self.encoding = encoding
-                self.apparent_encoding = encoding
-            else:
-                self.encoding = "utf-8"
-                self.apparent_encoding = "utf-8"
-        else:
-            self.encoding = encoding
-            self.apparent_encoding = encoding
-
-        if not self.encoding:
-            self.encoding = "utf-8"
-            self.apparent_encoding = "utf-8"
-
-        if self.binary and not self.text:
-            try:
-                self.text = self.binary.decode(self.encoding)
-            except Exception as E:
-                WebLogger.exc(
-                    E, "Cannot properly decode ansower from {}".format(self.url)
-                )
-                self.text = self.binary.decode(self.encoding, errors="ignore")
-
-        if self.text and not self.binary:
-            try:
-                self.binary = self.text.encode(self.encoding)
-            except Exception as E:
-                WebLogger.exc(
-                    E, "Cannot properly encode ansower from {}".format(self.url)
-                )
-                self.binary = self.text.encode(self.encoding, errors="ignore")
+class ResponseHeaders(object):
+    def __init__(self, headers):
+        self.headers = dict(headers)
 
     def is_headers_empty(self):
         return len(self.headers) == 0
-
-    def set_crawler(self, crawler_data):
-        self.crawler_data = dict(crawler_data)
-        self.crawler_data["crawler"] = type(self.crawler_data["crawler"]).__name__
 
     def get_content_type(self):
         if "Content-Type" in self.headers:
             return self.headers["Content-Type"]
         if "content-type" in self.headers:
             return self.headers["content-type"]
+
+    def get_content_type_keys(self):
+        content_type = self.get_content_type()
+        if content_type:
+            semicolon = content_type.find(";")
+            if semicolon >= 0:
+                content_type = content_type[:semicolon]
+            content_type = content_type.replace("+", "/")
+            return content_type.split("/")
 
     def get_last_modified(self):
         date = None
@@ -403,6 +354,23 @@ class PageResponseObject(object):
 
         if date:
             return date_str_to_date(date)
+
+    def get_clean_headers(self):
+        self.headers["Content-Type"] = self.get_content_type()
+        self.headers["Content-Length"] = self.get_content_length()
+        self.headers["Last-Modified"] = self.get_last_modified()
+        self.headers["Charset"] = self.get_content_type_charset()
+
+        return self.headers
+
+    def get_encoding(self):
+        if not self.is_headers_empty():
+            charset = self.get_content_type_charset()
+            if charset:
+                return charset
+
+    def get_default_encoding(self):
+        return "utf-8"
 
     def get_content_type_charset(self):
         content = self.get_content_type()
@@ -457,10 +425,152 @@ class PageResponseObject(object):
             return True
 
     def get_content_length(self):
+        content_len = None
         if "content-length" in self.headers:
-            return int(self.headers["content-length"])
+            content_len = self.headers["content-length"]
         if "Content-Length" in self.headers:
-            return int(self.headers["Content-Length"])
+            content_len = self.headers["Content-Length"]
+
+        if content_len:
+            return int(content_len)
+
+    def get_redirect_url(self):
+        if "Location" in self.headers and self.headers["Location"]:
+            return self.headers["Location"]
+
+
+class PageResponseObject(object):
+    STATUS_CODE_OK = 200
+    STATUS_CODE_ERROR = 500
+    STATUS_CODE_UNDEF = 0
+
+    def __init__(
+        self,
+        url=None,  # received url
+        binary=None,
+        text=None,
+        status_code=STATUS_CODE_OK,
+        encoding=None,
+        headers=None,
+        request_url=None,
+    ):
+        """
+        @param contents Text
+
+        TODO this should be cleaned up. We should pass binary, and encoding
+        """
+        self.errors = []
+        self.url = url
+        self.request_url = request_url
+        self.status_code = status_code
+        self.crawler_data = None
+        self.crawl_time_s = None
+
+        if self.status_code is None:
+            self.status_code = 0
+
+        self.binary = None
+        self.text = None
+
+        if binary:
+            self.binary = binary
+        if text:
+            self.text = text
+
+        # I read selenium always assume utf8 encoding
+
+        # encoding = chardet.detect(contents)['encoding']
+        # self.apparent_encoding = encoding
+        # self.encoding = encoding
+
+        if not headers:
+            self.headers = ResponseHeaders(headers={})
+        else:
+            self.headers = ResponseHeaders(headers=headers)
+
+        headers_encoding = self.headers.get_encoding()
+        if headers_encoding:
+            self.encoding = headers_encoding
+            self.apparent_encoding = headers_encoding
+        elif encoding:
+            self.encoding = encoding
+            self.apparent_encoding = encoding
+        else:
+            self.encoding = "utf-8"
+            self.apparent_encoding = "utf-8"
+
+        if self.binary and not self.text:
+            try:
+                self.text = self.binary.decode(self.encoding)
+            except Exception as E:
+                WebLogger.exc(
+                    E, "Cannot properly decode ansower from {}".format(self.url)
+                )
+                self.text = self.binary.decode(self.encoding, errors="ignore")
+
+        if self.text and not self.binary:
+            try:
+                self.binary = self.text.encode(self.encoding)
+            except Exception as E:
+                WebLogger.exc(
+                    E, "Cannot properly encode ansower from {}".format(self.url)
+                )
+                self.binary = self.text.encode(self.encoding, errors="ignore")
+
+    def set_headers(self, headers):
+        self.headers = ResponseHeaders(headers=headers)
+
+    def set_crawler(self, crawler_data):
+        self.crawler_data = dict(crawler_data)
+        self.crawler_data["crawler"] = type(self.crawler_data["crawler"]).__name__
+
+    def get_content_type(self):
+        return self.headers.get_content_type()
+
+    def get_content_type_keys(self):
+        return self.headers.get_content_type_keys()
+
+    def get_last_modified(self):
+        return self.headers.get_last_modified()
+
+    def is_content_html(self):
+        content = self.headers.get_content_type()
+        if not content:
+            return False
+
+        if content.lower().find("html") >= 0:
+            return True
+
+    def is_content_image(self):
+        content = self.headers.get_content_type()
+        if not content:
+            return False
+
+        if content.lower().find("image") >= 0:
+            return True
+
+    def is_content_rss(self):
+        content = self.headers.get_content_type()
+        if not content:
+            return False
+
+        if content.lower().find("rss") >= 0:
+            return True
+        if content.lower().find("xml") >= 0:
+            return True
+
+    def is_content_json(self):
+        content = self.headers.get_content_type()
+        if not content:
+            return False
+
+        if content.lower().find("json") >= 0:
+            return True
+
+    def get_content_length(self):
+        length = self.headers.get_content_length()
+        if length is not None:
+            return length
 
         if self.text:
             return len(self.text)
@@ -470,7 +580,7 @@ class PageResponseObject(object):
 
         return 0
 
-    def is_content_type_supported(self):
+    def is_content_type_text(self):
         """
         You can preview on a browser headers. Ctr-shift-i on ff
         """
@@ -485,15 +595,13 @@ class PageResponseObject(object):
         return False
 
     def get_redirect_url(self):
-        if (
-            self.is_this_status_redirect()
-            and "Location" in self.headers
-            and self.headers["Location"]
-        ):
-            return self.headers["Location"]
+        return self.headers.get_redirect_url()
 
     def is_this_status_ok(self):
         if self.status_code == 0:
+            return False
+
+        if self.status_code == None:
             return False
 
         return self.status_code >= 200 and self.status_code < 300
@@ -511,6 +619,9 @@ class PageResponseObject(object):
         """
         This function informs that status code is so bad, that further communication does not make any sense
         """
+        if self.status_code is None:
+            return True
+
         if self.is_this_status_redirect():
             return False
 
@@ -532,11 +643,7 @@ class PageResponseObject(object):
         return self.binary
 
     def get_headers(self):
-        self.headers["Content-Type"] = self.get_content_type()
-        self.headers["Content-Length"] = self.get_content_length()
-        self.headers["Charset"] = self.get_content_type_charset()
-
-        return self.headers
+        return self.headers.get_clean_headers()
 
     def set_text(self, text, encoding=None):
         if encoding:
@@ -546,10 +653,10 @@ class PageResponseObject(object):
                 self.encoding = "utf-8"
 
         self.text = text
-        self.content = text.encode(self.encoding)
+        self.binary = text.encode(self.encoding)
 
     def set_binary(self, binary, encoding="utf-8"):
-        self.content = binary
+        self.binary = binary
         self.text = binary.decode(encoding)
 
     def add_error(self, error_text):
@@ -594,6 +701,9 @@ class PageResponseObject(object):
             and self.get_content_type().find(inner) >= 0
         ):
             return True
+
+    def get_encoding(self):
+        return self.encoding
 
 
 def get_request_to_bytes(request, script):

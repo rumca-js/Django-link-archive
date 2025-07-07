@@ -263,6 +263,20 @@ function fixStupidGoogleRedirects(input_url) {
 }
 
 
+function sanitizeLink(link) {
+   if (link.endsWith("/")) {
+      link = link.slice(0, -1);
+   }
+   if (link.endsWith(" ")) {
+      link = link.slice(0, -1);
+   }
+
+   link = fixStupidGoogleRedirects(link);
+
+   return link;
+}
+
+
 function getYouTubeVideoId(url) {
     try {
         const urlObj = new URL(url);

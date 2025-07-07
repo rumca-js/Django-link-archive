@@ -1,9 +1,8 @@
 """
-Url class
+Main Url handling class
 
 @example
-options = Url.get_url_options("https://google.com")
-url = Url(link = "https://google.com", page_options=options)
+url = Url(link = "https://google.com")
 response = url.get_response()
 
 options.request.url
@@ -36,19 +35,15 @@ from .pages import (
     RssPage,
     HtmlPage,
 )
-from .handlerhttppage import (
-    HttpPageHandler,
-    HttpRequestBuilder,
-)
 from .crawlers import (
     RequestsCrawler,
 )
 
-from .handlervideoyoutube import YouTubeJsonHandler
-from .handlervideoodysee import OdyseeVideoHandler
-from .handlerchannelyoutube import YouTubeChannelHandler
-from .handlerchannelodysee import OdyseeChannelHandler
 from .handlers import (
+    YouTubeJsonHandler,
+    OdyseeVideoHandler,
+    YouTubeChannelHandler,
+    OdyseeChannelHandler,
     RedditUrlHandler,
     ReturnDislike,
     GitHubUrlHandler,
@@ -56,6 +51,7 @@ from .handlers import (
     InternetArchive,
     FourChanChannelHandler,
     TwitterUrlHandler,
+    HttpPageHandler,
 )
 
 from utils.dateutils import DateUtils
@@ -721,6 +717,8 @@ class Url(ContentInterface):
                 response.get_status_code()
             )
 
+            response_data["crawl_time_s"] = response.crawl_time_s
+
             response_data["Content-Type"] = response.get_content_type()
             if page_handler == HttpPageHandler:
                 if page_handler.p:
@@ -731,8 +729,7 @@ class Url(ContentInterface):
 
             response_data["Content-Length"] = response.get_content_length()
             response_data["Last-Modified"] = response.get_last_modified()
-
-            response_data["Charset"] = response.get_content_type_charset()
+            response_data["Charset"] = response.get_encoding()
             if not response_data["Charset"]:
                 response_data["Charset"] = response.encoding
 

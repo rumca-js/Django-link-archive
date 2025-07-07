@@ -2,23 +2,7 @@ import json
 import requests
 import urllib.parse
 import base64
-
-
-class ResponseObject(object):
-    def __init__(self, url, text, binary, status_code):
-        self.url = url
-        self.text = text
-        self.binary = binary
-        self.status_code = status_code
-
-    def get_text(self):
-        return self.text
-
-    def get_binary(self):
-        return self.binary
-
-    def get_status_code(self):
-        return self.status_code
+from .webtools import PageResponseObject
 
 
 class RemoteServer(object):
@@ -246,13 +230,16 @@ class RemoteServer(object):
                 binary = base64.b64decode(binary_data["Contents"])
 
         if not response_data:
-            o = ResponseObject(url=properties["link"], text=text, binary=binary)
+            o = PageResponseObject(url=properties["link"], text=text, binary=binary)
             return o
 
-        o = ResponseObject(
-            url=properties["link"],
+        url = properties["link"]
+
+        o = PageResponseObject(
+            url= url,
             text=text,
             binary=binary,
             status_code=response_data["status_code"],
+            request_url = url,
         )
         return o

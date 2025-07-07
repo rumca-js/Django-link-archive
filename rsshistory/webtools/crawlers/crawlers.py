@@ -13,14 +13,11 @@ import subprocess
 import threading
 import urllib.parse
 
-from utils.dateutils import DateUtils
 from utils.basictypes import fix_path_for_os
 
-from .webtools import (
-    PageRequestObject,
+from ..webtools import (
     PageResponseObject,
     WebLogger,
-    get_request_to_bytes,
     get_response_from_bytes,
     HTTP_STATUS_CODE_EXCEPTION,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
@@ -29,14 +26,11 @@ from .webtools import (
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
     HTTP_STATUS_CODE_SERVER_ERROR,
 )
-from .pages import (
+from ..pages import (
     RssPage,
     HtmlPage,
 )
-
-from .ipc import (
-    string_to_command,
-)
+from .crawlerinterface import CrawlerInterface
 
 
 class WebToolsTimeoutException(Exception):
@@ -46,173 +40,15 @@ class WebToolsTimeoutException(Exception):
         super().__init__(message)
 
 
-class CrawlerInterface(object):
-    def __init__(self, request=None, url=None, response_file=None, settings=None):
-        """
-        @param response_file If set, response is stored in a file
-        @param settings passed settings
-        """
-        if not request and url:
-            request = PageRequestObject(url)
-        elif not request and not url:
-            raise TypeError("Incorrect crawler use")
-
-        self.request = request
-        self.response = None
-        self.response_file = response_file
-        if settings:
-            self.set_settings(settings)
-        else:
-            self.settings = settings
-
-        if self.request.timeout_s and settings and "timeout_s" in settings:
-            self.timeout_s = max(self.request.timeout_s, settings["timeout_s"])
-        elif self.request.timeout_s:
-            self.timeout_s = self.request.timeout_s
-        elif settings and "timeout_s" in settings:
-            self.timeout_s = settings["timeout_s"]
-        else:
-            self.timeout_s = 10
-
-    def set_settings(self, settings):
-        self.settings = settings
-
-    def run(self):
-        """
-         - does its job
-         - sets self.response
-         - clears everything from memory, it created
-
-        if crawler can access web, then should return response (may be invalid)
-
-        @return response, None if feature is not available
-        """
-        return self.response
-
-    def response_to_bytes(self):
-        all_bytes = bytearray()
-
-        if not self.response:
-            return all_bytes
-
-        # same as PageResponseObject
-        bytes1 = string_to_command("PageResponseObject.__init__", "OK")
-        all_bytes.extend(bytes1)
-        bytes2 = string_to_command("PageResponseObject.url", self.response.url)
-        all_bytes.extend(bytes2)
-
-        if self.response and self.response.request_url:
-            thebytes = string_to_command(
-                "PageResponseObject.request_url", self.response.request_url
-            )
-            all_bytes.extend(thebytes)
-
-        bytes4 = string_to_command(
-            "PageResponseObject.status_code", str(self.response.status_code)
-        )
-        all_bytes.extend(bytes4)
-
-        if self.response and self.response.text:
-            bytes5 = string_to_command("PageResponseObject.text", self.response.text)
-            all_bytes.extend(bytes5)
-
-        bytes6 = string_to_command(
-            "PageResponseObject.headers", json.dumps(self.response.headers)
-        )
-        all_bytes.extend(bytes6)
-
-        bytes7 = string_to_command("PageResponseObject.__del__", "OK")
-        all_bytes.extend(bytes7)
-
-        return all_bytes
-
-    def get_response(self):
-        return self.response
-
-    def save_response(self):
-        if not self.response:
-            if self.request:
-                WebLogger.error(
-                    "Url:{} Have not received response".format(self.request.url)
-                )
-            else:
-                WebLogger.error("Have not received response")
-            return False
-
-        if self.response_file:
-            self.save_response_file(self.response_file)
-
-        if self.settings and "remote_server" in self.settings:
-            self.save_response_remote(self.settings["remote_server"])
-
-        return True
-
-    def save_response_file(self, file_name):
-        if not file_name:
-            return
-
-        all_bytes = self.response_to_bytes()
-
-        path = Path(self.response_file)
-        if not path.parent.exists():
-            path.parent.mkdir(parents=True, exist_ok=True)
-
-        with open(self.response_file, "wb") as fh:
-            fh.write(all_bytes)
-
-    def save_response_remote(self, remote_server):
-        import requests
-
-        if not self.response:
-            return
-
-        payload = {}
-        payload["url"] = self.response.url
-        payload["request_url"] = self.response.request_url
-        payload["Contents"] = self.response.get_text()
-        payload["Headers"] = self.response.get_headers()
-        payload["status_code"] = self.response.status_code
-
-        try:
-            response = requests.post(remote_server + "/set", json=payload)
-
-            if response.status_code == 200:
-                print("Response successfully sent to the remote server.")
-                return response.json()  # Assuming the server responds with JSON
-            else:
-                print(f"Failed to send response. Status code: {response.status_code}")
-                print(f"Response text: {response.text}")
-                return None
-        except requests.RequestException as e:
-            # Handle any exceptions raised by the requests library
-            print(f"An error occurred while sending the response: {e}")
-            return None
-
-    def is_valid(self):
-        return False
-
-    def close(self):
-        pass
-
-    def get_main_path(self):
-        file_path = os.path.realpath(__file__)
-        full_path = Path(file_path)
-        return full_path.parents[2]
-
-
 class RequestsCrawler(CrawlerInterface):
     """
-    Python requests
-    """
+    Python requests are based.
 
-    default_headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
-        "Accept-Encoding": "none",
-        "Accept-Language": "en-US,en;q=0.8",
-        "Connection": "keep-alive",
-    }
+    Quirks:
+     - timeout in requests defines timeout for stalled communication.
+       this means you can be stuck if you read 1byte/second.
+       This means we have to start a thread, and make timeout ourselves
+    """
 
     def run(self):
         if not self.is_valid():
@@ -248,18 +84,10 @@ class RequestsCrawler(CrawlerInterface):
                 headers=dict(request_result.headers),
                 request_url=self.request.url,
             )
-            if not self.response.is_valid():
+            if not self.is_response_valid():
                 request_result.close()
 
                 return self.response
-
-            content_length = self.response.get_content_length()
-
-            if "bytes_limit" in self.settings:
-                if content_length > self.settings["bytes_limit"]:
-                    self.response.add_error("Page is too big")
-                    request_result.close()
-                    return self.response
 
             if self.request.ping:
                 request_result.close()
@@ -269,15 +97,12 @@ class RequestsCrawler(CrawlerInterface):
 
             content_type = self.response.get_content_type()
 
-            if content_type and not self.response.is_content_type_supported():
+            if content_type and not self.response.is_content_type_text():
                 self.response.binary = request_result.content
                 request_result.close()
                 return self.response
             else:
-                """
-                IF we do not know the content type, or content type is supported
-                """
-                encoding = self.get_encoding(request_result, self.response)
+                encoding = self.get_encoding(self.response, request_result)
                 if encoding:
                     request_result.encoding = encoding
 
@@ -294,6 +119,7 @@ class RequestsCrawler(CrawlerInterface):
                 request_result.close()
 
         except requests.Timeout:
+            WebLogger.debug("Url:{} timeout".format(self.request.url))
             self.response = PageResponseObject(
                 self.request.url,
                 text=None,
@@ -303,6 +129,7 @@ class RequestsCrawler(CrawlerInterface):
             self.response.add_error("Url:{} Page timeout".format(self.request.url))
 
         except WebToolsTimeoutException:
+            WebLogger.debug("Url:{} timeout".format(self.request.url))
             self.response = PageResponseObject(
                 self.request.url,
                 text=None,
@@ -312,6 +139,7 @@ class RequestsCrawler(CrawlerInterface):
             self.response.add_error("Url:{} Page timeout".format(self.request.url))
 
         except requests.exceptions.ConnectionError:
+            WebLogger.debug("Url:{} connection error".format(self.request.url))
             self.response = PageResponseObject(
                 self.request.url,
                 text=None,
@@ -333,7 +161,7 @@ class RequestsCrawler(CrawlerInterface):
 
         return self.response
 
-    def get_encoding(self, request_result, response):
+    def get_encoding(self, response, request_result):
         """
         The default assumed content encoding for text/html is ISO-8859-1 aka Latin-1 :( See RFC-2854. UTF-8 was too young to become the default, it was born in 1993, about the same time as HTML and HTTP.
         Use .content to access the byte stream, or .text to access the decoded Unicode stream.
@@ -344,49 +172,59 @@ class RequestsCrawler(CrawlerInterface):
 
         url = self.request.url
 
-        encoding = response.get_content_type_charset()
+        encoding = response.get_encoding()
         if encoding:
             return encoding
 
         else:
+            text = request_result.text
             # There might be several encoding texts, if so we do not know which one to use
             if response.is_content_html():
-                p = HtmlPage(url, request_result.text)
+                p = HtmlPage(url, text)
                 if p.is_valid():
                     if p.get_charset():
                         return p.get_charset()
             if response.is_content_rss():
-                p = RssPage(url, request_result.text)
+                p = RssPage(url, text)
                 if p.is_valid():
                     if p.get_charset():
                         return p.get_charset()
 
             # TODO this might trigger download of a big file
-            text = request_result.text.lower()
+            text = text.lower()
 
             if text.count("encoding") == 1 and text.find('encoding="utf-8"') >= 0:
                 return "utf-8"
             elif text.count("charset") == 1 and text.find('charset="utf-8"') >= 0:
                 return "utf-8"
 
-    def build_requests(self):
+    def make_requests_call(self, url, headers, timeout, verify, stream):
         """
-        stream argument - will fetch page contents, when we access contents of page.
-
-        Note - sometimes timeout can not work
-        https://stackoverflow.com/questions/21965484/timeout-for-python-requests-get-entire-response
-        https://stackoverflow.com/questions/53242211/python-requests-timeout-not-working-properly
+        This method can be overridden in subclasses to change the request behavior.
         """
         import requests
 
+        return requests.get(
+            url,
+            headers=headers,
+            timeout=timeout,
+            verify=verify,
+            stream=stream,
+        )
+
+    def build_requests(self):
+        """
+        Perform an HTTP GET request with total timeout control using threading.
+
+        Notes:
+        - stream=True defers the content download until accessed.
+        - Overcomes the limitation of requests.get's timeout (which doesn't cover total duration).
+        """
+
         def request_with_timeout(url, headers, timeout, verify, stream, result):
             try:
-                result["response"] = requests.get(
-                    url,
-                    headers=headers,
-                    timeout=timeout,
-                    verify=verify,
-                    stream=stream,
+                result["response"] = self.make_requests_call(
+                    url, headers, timeout, verify, stream
                 )
             except Exception as e:
                 result["exception"] = e
@@ -407,9 +245,7 @@ class RequestsCrawler(CrawlerInterface):
                 raise result["exception"]
             return result["response"]
 
-        headers = self.request.request_headers
-        if not headers:
-            headers = RequestsCrawler.default_headers
+        headers = self.get_request_headers()
 
         response = make_request_with_threading(
             url=self.request.url,
@@ -418,8 +254,7 @@ class RequestsCrawler(CrawlerInterface):
             ssl_verify=self.request.ssl_verify,
             stream=True,
         )
-        if response is not None:
-            return response
+        return response
 
     def is_valid(self):
         try:
@@ -434,16 +269,10 @@ class RequestsCrawler(CrawlerInterface):
         import requests
 
         if not user_agent:
-            user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"
+            user_agent = RequestsCrawler.get_user_agent()
 
-        headers = {
-            "User-Agent": user_agent,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
-            "Accept-Encoding": "none",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Connection": "keep-alive",
-        }
+        headers = RequestsCrawler.get_request_headers_default()
+        headers["User-Agent"] = user_agent
 
         # status code 403 means they do not like our user agent.
         # status code 429 means you are rate limited.
@@ -470,6 +299,212 @@ class RequestsCrawler(CrawlerInterface):
             return False
 
 
+class CurlCffiCrawler(CrawlerInterface):
+    """
+    Python steath requests
+    """
+
+    def run(self):
+        if not self.is_valid():
+            return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
+
+        answer = self.build_requests()
+
+        if answer:
+            self.response = PageResponseObject(
+                self.request.url,
+                status_code=answer.status_code,
+                request_url=self.request.url,
+                headers=answer.headers,
+            )
+            if not self.is_response_valid():
+                return self.response
+
+        content = getattr(answer, "content", None)
+        text = getattr(answer, "text", None)
+
+        if answer and content:
+            self.response = PageResponseObject(
+                self.request.url,
+                binary=content,
+                status_code=answer.status_code,
+                request_url=self.request.url,
+                headers=answer.headers,
+            )
+
+            return self.response
+
+        elif text:
+            self.response = PageResponseObject(
+                self.request.url,
+                binary=None,
+                text=text,
+                status_code=answer.status_code,
+                request_url=self.request.url,
+                headers=answer.headers,
+            )
+
+        elif answer:
+            self.response = PageResponseObject(
+                self.request.url,
+                binary=None,
+                text=None,
+                status_code=answer.status_code,
+                request_url=self.request.url,
+                headers=answer.headers,
+            )
+
+        if self.response:
+            return self.response
+
+    def build_requests(self):
+        from curl_cffi import requests
+        from curl_cffi.requests.errors import ConnectionError
+
+        headers = self.get_request_headers()
+
+        try:
+            answer = requests.get(
+                self.request.url,
+                timeout=self.timeout_s,
+                verify=self.request.ssl_verify,
+                headers=headers,
+                # stream=True, # TODO
+            )
+            return answer
+        except ConnectionError as E:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Cannot create request".format(str(E)))
+        except Exception as E:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_EXCEPTION,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Cannot create request".format(str(E)))
+
+    def is_valid(self):
+        try:
+            from curl_cffi import requests
+
+            return True
+        except Exception as E:
+            print(str(E))
+            return False
+
+
+class HttpxCrawler(CrawlerInterface):
+    """
+    Python httpx
+    """
+
+    def run(self):
+        if not self.is_valid():
+            return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
+
+        answer = self.build_requests()
+
+        if answer:
+            self.response = PageResponseObject(
+                self.request.url,
+                status_code=answer.status_code,
+                request_url=self.request.url,
+                headers=answer.headers,
+            )
+            if not self.is_response_valid():
+                return self.response
+
+        content = getattr(answer, "content", None)
+        text = getattr(answer, "text", None)
+
+        if answer and content:
+            self.response = PageResponseObject(
+                self.request.url,
+                binary=content,
+                status_code=answer.status_code,
+                request_url=self.request.url,
+                headers=answer.headers,
+            )
+
+            return self.response
+
+        elif text:
+            self.response = PageResponseObject(
+                self.request.url,
+                binary=None,
+                text=text,
+                status_code=answer.status_code,
+                request_url=self.request.url,
+                headers=answer.headers,
+            )
+
+        elif answer:
+            self.response = PageResponseObject(
+                self.request.url,
+                binary=None,
+                text=None,
+                status_code=answer.status_code,
+                request_url=self.request.url,
+                headers=answer.headers,
+            )
+
+        if self.response:
+            return self.response
+
+    def build_requests(self):
+        import httpx
+
+        headers = self.get_request_headers()
+
+        try:
+            answer = httpx.get(
+                self.request.url,
+                timeout=self.timeout_s,
+                verify=self.request.ssl_verify,
+                headers=headers,
+                follow_redirects=True,
+                # stream=True, # TODO
+            )
+            return answer
+        except Exception as E:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Cannot create request".format(str(E)))
+
+    def is_valid(self):
+        try:
+            import httpx
+
+            return True
+        except Exception as E:
+            print(str(E))
+            return False
+
+
 class StealthRequestsCrawler(CrawlerInterface):
     """
     Python steath requests
@@ -486,24 +521,7 @@ class StealthRequestsCrawler(CrawlerInterface):
             request_url=self.request.url,
         )
 
-        import stealth_requests as requests
-
-        try:
-            answer = requests.get(
-                self.request.url,
-                timeout=self.timeout_s,
-                verify=self.request.ssl_verify,
-                # stream=True,   # does not work with it
-            )
-        except Exception as E:
-            self.response = PageResponseObject(
-                self.request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
-                request_url=self.request.url,
-            )
-            self.response.add_error("Url:{} Connection error".format(self.request.url))
-            return self.response
+        answer = self.build_requests()
 
         content = answer.content
         text = answer.text
@@ -514,17 +532,20 @@ class StealthRequestsCrawler(CrawlerInterface):
                 binary=content,
                 status_code=answer.status_code,
                 request_url=self.request.url,
+                headers=answer.headers,
             )
 
-            return self.response
+            if not self.is_response_valid():
+                return self.response
 
-        elif text:
+        elif answer and text:
             self.response = PageResponseObject(
                 self.request.url,
                 binary=None,
                 text=text,
                 status_code=answer.status_code,
                 request_url=self.request.url,
+                headers=answer.headers,
             )
 
         elif answer:
@@ -534,9 +555,33 @@ class StealthRequestsCrawler(CrawlerInterface):
                 text=None,
                 status_code=answer.status_code,
                 request_url=self.request.url,
+                headers=answer.headers,
             )
 
             return self.response
+
+        if self.response:
+            return self.response
+
+    def build_requests(self):
+        import stealth_requests as requests
+
+        try:
+            answer = requests.get(
+                self.request.url,
+                timeout=self.timeout_s,
+                verify=self.request.ssl_verify,
+                # stream=True,   # TODO does not work with it
+            )
+            return answer
+        except Exception as E:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Connection error".format(self.request.url))
 
     def is_valid(self):
         try:
@@ -551,6 +596,11 @@ class StealthRequestsCrawler(CrawlerInterface):
 class SeleniumDriver(CrawlerInterface):
     """
     Everybody uses selenium
+
+    Quirks:
+     - status_code cannot be easily read, there is some code that "may" work
+     - we may want to wait some time after reading page for javascript to kick in and do it's job
+     - full browser may require some additional OS shananigans, for example xvfb
 
     Note:
      - how can we make for the driver to be persistent? we do not want to start driver again and again
@@ -576,6 +626,8 @@ class SeleniumDriver(CrawlerInterface):
         self.driver_executable = driver_executable
 
     def set_settings(self, settings):
+        super().set_settings(settings)
+
         if (
             settings
             and "settings" in settings
@@ -583,8 +635,6 @@ class SeleniumDriver(CrawlerInterface):
             and settings["settings"]["driver_executable"]
         ):
             self.driver_executable = settings["settings"]["driver_executable"]
-
-        self.settings = settings
 
     def get_driver(self):
         """
@@ -602,83 +652,146 @@ class SeleniumDriver(CrawlerInterface):
         """
         raise NotImplementedError("Provide selenium driver implementation!")
 
-    def get_selenium_status_code(self, driver):
-        status_code = 200
+    def run(self):
+        """
+        To obtain RSS page you have to run real, full blown browser.
+
+        It may require some magic things to make the browser running.
+
+        https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
+        """
+        if not self.is_valid():
+            return
+
         try:
-            logs = driver.get_log("performance")
-            status_code2 = self.get_selenium_status_code_from_logs(logs)
-            if status_code2:
-                status_code = status_code2
+            from selenium.common.exceptions import TimeoutException
         except Exception as E:
-            WebLogger.exc(E, "Chrome webdrider error.")
-        return status_code
+            print(str(E))
+            selenium_feataure_enabled = False
+
+        self.driver = self.get_driver()
+        if not self.driver:
+            return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
+
+        try:
+            # add 10 seconds for start of browser, etc.
+            selenium_timeout = self.timeout_s
+
+            self.driver.set_page_load_timeout(selenium_timeout)
+
+            self.driver.get(self.request.url)
+
+            if "settings" in self.settings and "delay_s" in self.settings["settings"]:
+                delay_s = self.settings["settings"]["delay_s"]
+                time.sleep(delay_s)
+
+            self.process_response()
+
+            if not self.is_response_valid():
+                return self.response
+
+        except TimeoutException:
+            error_text = traceback.format_exc()
+            print("Page timeout:{}\n{}".format(self.request.url, error_text))
+            WebLogger.debug(
+                info_text="Page timeout:{}".format(self.request.url),
+                detail_text=error_text,
+            )
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} Page timeout".format(self.request.url))
+        except Exception as E:
+            print(E, "Url:{}".format(self.request.url))
+            WebLogger.exc(E, "Url:{}".format(self.request.url))
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_EXCEPTION,
+                request_url=self.request.url,
+            )
+            self.response.add_error("Url:{} exception".format(self.request.url))
+
+        return self.response
+
+    def process_response(self):
+        """
+        TODO - if webpage changes link, it should also update it in this object
+        """
+
+        page_source = self.driver.page_source
+
+        logs = self.driver.get_log("performance")
+        info = self.read_logs(logs)
+
+        headers = {}
+        status_code = 200
+
+        if "status_code" in info:
+            status_code = info["status_code"]
+            print(status_code)
+        if "headers" in info:
+            headers = info["headers"]
+            print(headers)
+
+        self.response = PageResponseObject(
+            self.driver.current_url,
+            text=page_source,
+            status_code=status_code,
+            headers=headers,
+            request_url=self.request.url,
+        )
+
+        if len(info) == 0:
+            self.response.add_error("Cannot read driver logs")
+
+    def read_logs(self, logs):
+        info = {}
+        try:
+            info["status_code"] = self.get_selenium_status_code_from_logs(logs)
+            info["headers"] = self.get_selenium_headers_from_logs(logs)
+        except Exception as E:
+            print(str(E))
+        return info
+
+    def get_response_logs(self, logs):
+        # Parse the Chrome Performance logs
+        response = None
+        for log_entry in logs:
+            log_message = json.loads(log_entry["message"])["message"]
+            # Filter out HTTP responses
+            if log_message["method"] == "Network.responseReceived":
+                # self.responses.append(log_message["params"]["response"])
+                if log_message["params"]["type"] == "Document":
+                    return log_message["params"]["response"]
 
     def get_selenium_status_code_from_logs(self, logs):
         """
-        https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
-        TODO should we use selenium wire?
-
-        TODO this probably does not work "Correctly"
+        Extracts the last HTTP status code for a specific URL from Selenium performance logs.
         """
-        last_status_code = 200
-        for log in logs:
-            if log["message"]:
-                d = json.loads(log["message"])
+        response = self.get_response_logs(logs)
+        if response:
+            return response["status"]
+        else:
+            return 0
 
-                content_type = ""
-                try:
-                    content_type = d["message"]["params"]["response"]["headers"][
-                        "content-type"
-                    ]
-                except Exception as E:
-                    pass
-                try:
-                    content_type = d["message"]["params"]["response"]["headers"][
-                        "Content-Type"
-                    ]
-                except Exception as E:
-                    pass
-
-                try:
-                    response_received = (
-                        d["message"]["method"] == "Network.responseReceived"
-                    )
-                    if content_type.find("text/html") >= 0 and response_received:
-                        last_status_code = d["message"]["params"]["response"]["status"]
-                except Exception as E:
-                    # we expect that some contents do not have this
-                    pass
-
-        return last_status_code
-
-    def get_selenium_headers(self, driver):
-        headers = {}
-        try:
-            logs = driver.get_log("performance")
-            headers = self.get_selenium_headers_logs(logs)
-            return headers
-        except Exception as E:
-            WebLogger.exc(E, "Chrome webdrider error")
-
-        return headers
-
-    def get_selenium_headers_logs(self, logs):
+    def get_selenium_headers_from_logs(self, logs):
         """
-        https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
-        TODO should we use selenium wire?
+        Extracts the last HTTP status code for a specific URL from Selenium performance logs.
         """
-        headers = {}
-        for log in logs:
-            if log["message"]:
-                d = json.loads(log["message"])
-
-                content_type = ""
-                try:
-                    headers = d["message"]["params"]["response"]["headers"]
-                except Exception as E:
-                    pass
-
-        return headers
+        response = self.get_response_logs(logs)
+        if response:
+            return response["headers"]
 
     def close(self):
         """
@@ -764,74 +877,6 @@ class SeleniumChromeHeadless(SeleniumDriver):
             WebLogger.error(f"Failed to initialize WebDriver: {e}")
             return None
 
-    def run(self):
-        """
-        To obtain RSS page you have to run real, full blown browser.
-
-        Headless might not be enough to fool cloudflare.
-        """
-        if not self.is_valid():
-            return
-
-        self.driver = self.get_driver()
-        if not self.driver:
-            return
-
-        self.response = PageResponseObject(
-            self.request.url,
-            text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
-            request_url=self.request.url,
-        )
-
-        WebLogger.debug("SeleniumChromeHeadless Driver:{}".format(self.request.url))
-
-        try:
-            # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.timeout_s
-
-            self.driver.set_page_load_timeout(selenium_timeout)
-
-            self.driver.get(self.request.url)
-            """
-            TODO - if webpage changes link, it should also update it in this object
-            """
-
-            status_code = self.get_selenium_status_code(self.driver)
-
-            headers = self.get_selenium_headers(self.driver)
-            WebLogger.debug("Selenium headers:{}\n{}".format(self.request.url, headers))
-
-            html_content = self.driver.page_source
-
-            # TODO use selenium wire to obtain status code & headers?
-
-            self.response = PageResponseObject(
-                self.driver.current_url,
-                text=html_content,
-                status_code=status_code,
-                request_url=self.request.url,
-            )
-        except TimeoutException:
-            error_text = traceback.format_exc()
-            WebLogger.debug("Page timeout:{}\n{}".format(self.request.url, error_text))
-            self.response = PageResponseObject(
-                self.request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_TIMEOUT,
-                request_url=self.request.url,
-            )
-        except Exception as E:
-            WebLogger.exc(E, "Url:{}".format(self.request.url))
-            self.response = PageResponseObject(
-                self.request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url=self.request.url,
-            )
-
-        return self.response
-
     def is_valid(self):
         selenium_feataure_enabled = True
         try:
@@ -867,7 +912,7 @@ class SeleniumChromeFull(SeleniumDriver):
             selenium_feataure_enabled = False
         from selenium.webdriver.common.proxy import Proxy, ProxyType
 
-        capabilities = webdriver.DesiredCapabilities.CHROME.copy()
+        # capabilities = webdriver.DesiredCapabilities.CHROME.copy()
 
         # Proxy Configuration
         if self.settings and any(
@@ -878,7 +923,10 @@ class SeleniumChromeFull(SeleniumDriver):
             prox.http_proxy = self.settings.get("http_proxy")
             prox.socks_proxy = self.settings.get("socks_proxy")
             prox.ssl_proxy = self.settings.get("ssl_proxy")
-            prox.add_to_capabilities(capabilities)
+            # prox.add_to_capabilities(capabilities)
+
+        # capabilities["goog:loggingPrefs"] = {"performance": "ALL"}
+        # capabilities["loggingPrefs"] = {"performance": "ALL"}
 
         # Validate Chromedriver Executable
         if self.driver_executable:
@@ -901,8 +949,8 @@ class SeleniumChromeFull(SeleniumDriver):
         # options.add_extension(path)
 
         # Add Proxy Capabilities
-        for key, value in capabilities.items():
-            options.set_capability(key, value)
+        # for key, value in capabilities.items():
+        #    options.set_capability(key, value)
 
         options.add_argument("start-maximized")
         options.add_argument("disable-infobars")
@@ -919,88 +967,6 @@ class SeleniumChromeFull(SeleniumDriver):
         except Exception as e:
             WebLogger.error(f"Failed to initialize WebDriver: {e}")
             return None
-
-    def run(self):
-        selenium_feataure_enabled = True
-        try:
-            from selenium import webdriver
-            from selenium.webdriver.chrome.service import Service
-            from selenium.common.exceptions import TimeoutException
-
-            from selenium.webdriver.support.ui import WebDriverWait
-            from selenium.webdriver.support import expected_conditions as EC
-        except Exception as E:
-            print(str(E))
-            selenium_feataure_enabled = False
-        """
-        To obtain RSS page you have to run real, full blown browser.
-
-        It may require some magic things to make the browser running.
-
-        https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
-        """
-        if not self.is_valid():
-            return
-
-        self.driver = self.get_driver()
-        if not self.driver:
-            return
-
-        self.response = PageResponseObject(
-            self.request.url,
-            text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
-            request_url=self.request.url,
-        )
-
-        WebLogger.debug("SeleniumChromeFull Driver:{}".format(self.request.url))
-
-        try:
-            # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.timeout_s
-
-            self.driver.set_page_load_timeout(selenium_timeout)
-
-            self.driver.get(self.request.url)
-
-            if "settings" in self.settings and "delay_s" in self.settings["settings"]:
-                delay_s = self.settings["settings"]["delay_s"]
-                time.sleep(delay_s)
-
-            status_code = self.get_selenium_status_code(self.driver)
-
-            """
-            TODO - if webpage changes link, it should also update it in this object
-            """
-
-            page_source = self.driver.page_source
-
-            self.response = PageResponseObject(
-                self.driver.current_url,
-                text=page_source,
-                status_code=status_code,
-                request_url=self.request.url,
-            )
-
-        except TimeoutException:
-            error_text = traceback.format_exc()
-            WebLogger.debug("Page timeout:{}\n{}".format(self.request.url, error_text))
-            self.response = PageResponseObject(
-                self.request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_TIMEOUT,
-                request_url=self.request.url,
-            )
-        except Exception as E:
-            WebLogger.exc(E, "Url:{}".format(self.request.url))
-            self.response = PageResponseObject(
-                self.request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url=self.request.url,
-            )
-
-        return self.response
 
     def is_valid(self):
         selenium_feataure_enabled = True
@@ -1057,76 +1023,6 @@ class SeleniumUndetected(SeleniumDriver):
             )
             return
 
-    def run(self):
-        selenium_feataure_enabled = True
-        try:
-            from selenium import webdriver
-            from selenium.webdriver.chrome.service import Service
-            from selenium.common.exceptions import TimeoutException
-
-            from selenium.webdriver.support.ui import WebDriverWait
-            from selenium.webdriver.support import expected_conditions as EC
-        except Exception as E:
-            print(str(E))
-            selenium_feataure_enabled = False
-        """
-        To obtain RSS page you have to run real, full blown browser.
-
-        It may require some magic things to make the browser running.
-
-        This does not work on raspberry pi
-        """
-        if not self.is_valid():
-            return
-
-        self.driver = self.get_driver()
-        if not self.driver:
-            return
-
-        self.response = PageResponseObject(
-            self.request.url,
-            text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
-            request_url=self.request.url,
-        )
-
-        WebLogger.debug("SeleniumUndetected Driver:{}".format(self.request.url))
-
-        try:
-            # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.timeout_s
-
-            self.driver.set_page_load_timeout(selenium_timeout)
-
-            self.driver.get(self.request.url)
-
-            status_code = self.get_selenium_status_code(self.driver)
-
-            """
-            TODO - if webpage changes link, it should also update it in this object
-            """
-
-            page_source = self.driver.page_source
-
-            self.response = PageResponseObject(
-                self.driver.current_url,
-                text=page_source,
-                status_code=status_code,
-                request_url=self.request.url,
-            )
-
-        except TimeoutException:
-            error_text = traceback.format_exc()
-            WebLogger.debug("Page timeout:{}\n{}".format(self.request.url, error_text))
-            self.response = PageResponseObject(
-                self.request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_TIMEOUT,
-                request_url=self.request.url,
-            )
-
-        return self.response
-
     def is_valid(self):
         try:
             import undetected_chromedriver as uc
@@ -1134,6 +1030,98 @@ class SeleniumUndetected(SeleniumDriver):
             return True
         except Exception as E:
             return False
+
+
+class SeleniumWireFull(SeleniumDriver):
+
+    def get_driver(self):
+        print("00000")
+        selenium_feature_enabled = True
+        try:
+            from selenium.webdriver.chrome.service import Service
+            from selenium.common.exceptions import TimeoutException
+            from selenium.webdriver.support.ui import WebDriverWait
+            from selenium.webdriver.support import expected_conditions as EC
+        except Exception as E:
+            print(str(E))
+            selenium_feature_enabled = False
+
+        from seleniumwire import webdriver as wire_webdriver
+        from selenium.webdriver.common.proxy import Proxy, ProxyType
+
+        seleniumwire_options = {}
+        proxy_enabled = self.settings and any(
+            key in self.settings for key in ["http_proxy", "socks_proxy", "ssl_proxy"]
+        )
+
+        if proxy_enabled:
+            proxy_str = (
+                self.settings.get("http_proxy")
+                or self.settings.get("socks_proxy")
+                or self.settings.get("ssl_proxy")
+            )
+            seleniumwire_options["proxy"] = {
+                "http": proxy_str,
+                "https": proxy_str,
+                "no_proxy": "localhost,127.0.0.1",  # Optional
+            }
+
+        # Validate Chromedriver Executable
+        if self.driver_executable:
+            p = Path(self.driver_executable)
+            if not p.exists():
+                print(f"Chromedriver executable not found at: {self.driver_executable}")
+                WebLogger.error(
+                    f"Chromedriver executable not found at: {self.driver_executable}"
+                )
+                return None
+            service = Service(executable_path=self.driver_executable)
+        else:
+            service = Service()
+
+        options = wire_webdriver.ChromeOptions()
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--lang=en-US")
+        options.add_argument("start-maximized")
+        options.add_argument("disable-infobars")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-gpu")
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
+        try:
+            driver = wire_webdriver.Chrome(
+                service=service,
+                options=options,
+                seleniumwire_options=seleniumwire_options,
+            )
+            return driver
+        except Exception as e:
+            WebLogger.error(f"Failed to initialize WebDriver: {e}")
+            print(f"Failed to initialize WebDriver: {e}")
+            return None
+
+    def process_response(self):
+        last_status_code = 200
+        last_headers = {}
+
+        for request in self.driver.requests:
+            if request.response:
+                last_status_code = request.response.status_code
+                last_headers = dict(request.response.headers)
+
+        page_source = self.driver.page_source
+
+        self.response = PageResponseObject(
+            self.driver.current_url,
+            text=page_source,
+            status_code=last_status_code,
+            headers=last_headers,
+            request_url=self.request.url,
+        )
+
+    def is_valid(self):
+        return True
 
 
 class ScriptCrawler(CrawlerInterface):
@@ -1163,8 +1151,27 @@ class ScriptCrawler(CrawlerInterface):
         self.cwd = cwd
         self.script = script
 
+    def set_response_file(self):
+        if "response_file" in self.settings["settings"]:
+            self.response_file = self.settings["settings"]["response_file"]
+
+        if not self.response_file:
+            from ..webconfig import WebConfig
+
+            if WebConfig.script_responses_directory is not None:
+                response_dir = Path(WebConfig.script_responses_directory)
+            else:
+                response_dir = Path("storage")
+
+            self.response_file = (
+                self.get_main_path() / response_dir / self.get_response_file_name()
+            )
+
     def set_settings(self, settings):
-        self.settings = settings
+        super().set_settings(settings)
+
+        self.set_response_file()
+
         inner = self.settings["settings"]
 
         if inner and "script" in inner and inner["script"]:
@@ -1178,18 +1185,6 @@ class ScriptCrawler(CrawlerInterface):
 
         if inner and "remote_server" in inner:
             return
-
-        if not self.response_file:
-            from .webconfig import WebConfig
-
-            if WebConfig.script_responses_directory is not None:
-                response_dir = Path(WebConfig.script_responses_directory)
-            else:
-                response_dir = Path("storage")
-
-            self.response_file = (
-                self.get_main_path() / response_dir / self.get_response_file_name()
-            )
 
     def run(self):
         if not self.is_valid():
@@ -1218,6 +1213,8 @@ class ScriptCrawler(CrawlerInterface):
         # WebLogger.error("CWD:{}".format(self.cwd))
         # WebLogger.error("maintl:{}".format(self.get_main_path()))
         # WebLogger.error("script:{}".format(script))
+
+        print("Running CWD:{} script:{}".format(self.cwd, script))
 
         try:
             p = subprocess.run(
@@ -1262,25 +1259,22 @@ class ScriptCrawler(CrawlerInterface):
             )
 
         import requests
+        from ..remoteserver import RemoteServer
 
-        url = f"{remote_server}/find?url={self.request.url}"
+        url = f"{remote_server}/findj?url={self.request.url}"
         response = requests.get(url)
 
         if response.status_code == 200:
             try:
                 data = response.json()
-                if len(data) > 0:
-                    contents = data[1]["data"]["Contents"]
-                if len(data) > 3:
-                    headers = data[4]["data"]
 
-                self.response = PageResponseObject(
-                    url=url, request_url=url, text=contents, headers=headers
-                )
+                server = RemoteServer("")
+                self.response = server.get_response(data)
+
                 return self.response
 
-            except ValueError:
-                print("Response content is not valid JSON.")
+            except ValueError as E:
+                print("Response content is not valid JSON. {}".format(E))
         else:
             WebLogger.error(
                 f"Url:{self.request.url}: Failed to fetch data. Status code: {response.status_code}"
@@ -1302,6 +1296,7 @@ class ScriptCrawler(CrawlerInterface):
         )
 
         response_file_location = Path(self.response_file)
+        print("Running via file {}".format(response_file_location))
 
         if len(response_file_location.parents) > 1:
             response_dir = response_file_location.parents[1]
@@ -1320,6 +1315,7 @@ class ScriptCrawler(CrawlerInterface):
         # WebLogger.error("CWD:{}".format(self.cwd))
         # WebLogger.error("maintl:{}".format(self.get_main_path()))
         # WebLogger.error("script:{}".format(script))
+        print("Running script:{}".format(script))
 
         try:
             p = subprocess.run(
@@ -1437,9 +1433,39 @@ class ScriptCrawler(CrawlerInterface):
         return True
 
 
+class ScriptCrawlerInterface(CrawlerInterface):
+    """
+    Interface that can be inherited by any browser, browser engine, crawler
+    """
+
+    def __init__(self, parser, request, file_name, scraper_name):
+        settings = None
+        self.parser = parser
+
+        if parser.args.remote_server:
+            settings = {"remote_server": parser.args.remote_server}
+        elif not settings:
+            settings = {}
+
+        file_name = os.path.relpath(file_name, os.getcwd())
+
+        settings["name"] = scraper_name
+        settings["crawler"] = ScriptCrawler.__name__
+        settings["settings"] = {}
+        settings["settings"]["timeout_s"] = request.timeout_s
+        settings["settings"]["script"] = file_name
+
+        super().__init__(
+            request, response_file=parser.args.output_file, settings=settings
+        )
+
+    def save_response(self):
+        super().save_response()
+
+
 class SeleniumBase(CrawlerInterface):
     """
-    This is based
+    Missing many things
     """
 
     def __init__(
@@ -1487,3 +1513,83 @@ class SeleniumBase(CrawlerInterface):
 
     def is_valid(self):
         return True
+
+
+class BotasaurusCrawler(CrawlerInterface):
+    """
+    Web crawler using Botasaurus
+    """
+
+    def run(self):
+        if not self.is_valid():
+            return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
+
+        try:
+            result = self.build_browser_request()
+
+            if not result:
+                return self.response
+
+            html = result.get("html")
+            status_code = result.get("status_code", 200)
+            headers = result.get("headers", {})
+
+            self.response = PageResponseObject(
+                self.request.url,
+                text=html,
+                status_code=status_code,
+                request_url=self.request.url,
+                headers=headers,
+            )
+
+            if not self.is_response_valid():
+                return self.response
+
+            return self.response
+
+        except Exception as e:
+            self.response = PageResponseObject(
+                self.request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                request_url=self.request.url,
+            )
+            self.response.add_error(
+                f"Url: {str(e)} Cannot render or fetch with Botasaurus"
+            )
+            return self.response
+
+    def build_browser_request(self):
+        from botasaurus import bts
+
+        """
+        Launch Botasaurus and retrieve HTML content
+        """
+
+        @bts.default
+        def get_html(driver):
+            driver.get(self.request.url)
+            html = driver.page_source
+            return {
+                "html": html,
+                "status_code": 200,  # Botsaurus doesn't expose this, assume OK
+                "headers": {},  # You could mock or skip headers if irrelevant
+            }
+
+        return get_html()
+
+    def is_valid(self):
+        try:
+            from botasaurus import bts
+
+            return True
+        except Exception as E:
+            print(str(E))
+            return False

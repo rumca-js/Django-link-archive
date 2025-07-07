@@ -1,3 +1,7 @@
+"""
+Provides interface and page types Html, RSS, JSON etc.
+"""
+
 from time import strptime
 from bs4 import BeautifulSoup
 import re
@@ -52,6 +56,9 @@ class ContentInterface(object):
 
     def get_canonical_url(self):
         return self.url
+
+    def get_feeds(self):
+        return []
 
     def get_page_rating(self):
         """
@@ -594,6 +601,13 @@ class RssPageEntry(ContentInterface):
         if hasattr(self.feed_entry, "media_content"):
             if len(self.feed_entry.media_content) > 0:
                 thumb = self.feed_entry.media_content[0]
+                if "url" in thumb:
+                    return thumb["url"]
+                else:
+                    return str(thumb)
+        if hasattr(self.feed_entry, "images"):
+            if len(self.feed_entry.images) > 0:
+                thumb = self.feed_entry.images[0]
                 if "url" in thumb:
                     return thumb["url"]
                 else:
