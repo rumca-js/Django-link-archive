@@ -296,7 +296,6 @@ class BaseQueryFilter(object):
         return ""
 
     def get_errors(self):
-        self.errors.extend(self.symbol_evaluator.errors)
         return self.errors
 
 

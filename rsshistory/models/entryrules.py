@@ -4,6 +4,7 @@ Defined by user, by GUI
 
 from datetime import date
 from django.db import models
+from django.db.models import Q
 
 from ..webtools import (
     UrlLocation,
@@ -212,7 +213,9 @@ class EntryRules(models.Model):
     def is_url_blocked(url):
         from .blockentry import BlockEntry
 
-        rules = EntryRules.objects.filter(block=True, trust=True, enabled=True)
+        conditions = (Q(block = True) | Q(trust=True)) & Q(enabled = True)
+
+        rules = EntryRules.objects.filter(conditions)
         for rule in rules:
             if rule.is_url_triggering(url):
                 if rule.trust:
@@ -233,7 +236,9 @@ class EntryRules(models.Model):
             if reason:
                 return reason
 
-        rules = EntryRules.objects.filter(enabled=True, block=True, trust=True).exclude(
+        conditions = (Q(block = True) | Q(trust=True)) & Q(enabled = True)
+
+        rules = EntryRules.objects.filter(conditions).exclude(
             trigger_text=""
         )
         for rule in rules:
@@ -249,7 +254,9 @@ class EntryRules(models.Model):
         if reason:
             return reason
 
-        rules = EntryRules.objects.filter(enabled=True, block=True, trust=True).exclude(
+        conditions = (Q(block = True) | Q(trust=True)) & Q(enabled = True)
+
+        rules = EntryRules.objects.filter(conditions).exclude(
             trigger_text=""
         )
         for rule in rules:

@@ -91,6 +91,8 @@ class SourceGenericPlugin(SourcePluginInterface):
             if not self.all_properties:
                 return calculate_hash("")
 
+            source = self.get_source()
+
             request_server = RemoteServer(c.remote_webtools_server_location)
             entries = request_server.read_properties_section(
                 "Entries", self.all_properties
@@ -99,7 +101,11 @@ class SourceGenericPlugin(SourcePluginInterface):
                 entry["date_published"] = DateUtils.parse_datetime(
                     entry["date_published"]
                 )
-                entry["source"] = self
+                if source:
+                    entry["source"] = source
+
+                    if "language" not in entry or entry["language"] is None:
+                        entry["language"] = source.language
                 yield entry
 
     def get_enhanced_entries(self):
