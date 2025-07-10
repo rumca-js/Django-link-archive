@@ -149,6 +149,22 @@ function onUserInput() {
 }
 
 
+function onInputChanged() {
+    let element = $('#theForm input[name="link"]');
+    let search_link = element.val();
+
+    if (search_link) {
+       let new_search_link = sanitizeLink(search_link);
+
+       if (new_search_link != search_link) {
+          element.val(new_search_link);
+          search_link = new_search_link;
+       }
+       checkEntryExists(search_link);
+    }
+}
+
+
 $(document).ready(function() {
    $("#btnFetch").click(function(event) {
        event.preventDefault();
@@ -172,12 +188,5 @@ $("#btnAddLink").click(function(event) {
 
 
 $('#theForm input[name="link"]').on('input', function() {
-    let element = $('#theForm input[name="link"]');
-
-    var search_link = element.val();
-    new_search_link = fixStupidGoogleRedirects(search_link);
-    if (new_search_link && search_link != new_search_link)
-    {
-        element.val(new_search_link);
-    }
+    onInputChanged();
 });
