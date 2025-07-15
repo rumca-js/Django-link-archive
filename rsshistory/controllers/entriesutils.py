@@ -228,11 +228,11 @@ class EntriesCleanup(object):
         return self.filter_objects(stale_conditions)
 
     def get_stale_status_condition(self):
-        return self.get_stale_status_condition_raw() & ~Q(manual_status_code = 200)
+        return self.get_stale_status_condition_raw() & ~Q(manual_status_code=200)
 
     def get_stale_status_condition_raw(self):
-        status_conditions_ok = Q(status_code=403) | Q(status_code = 0)
-        status_conditions_ok |= (Q(status_code__gte=200) & Q(status_code__lte=300))
+        status_conditions_ok = Q(status_code=403) | Q(status_code=0)
+        status_conditions_ok |= Q(status_code__gte=200) & Q(status_code__lte=300)
 
         return Q(~status_conditions_ok)
 
@@ -257,7 +257,9 @@ class EntriesCleanup(object):
 
         page_rating_votes_exists = Q(page_rating_votes__gt=0)
 
-        result_condition = not_permanent_condition & status_conditions_nok & ~page_rating_votes_exists
+        result_condition = (
+            not_permanent_condition & status_conditions_nok & ~page_rating_votes_exists
+        )
 
         if days != 0:
             days_before = DateUtils.get_days_before_dt(days)
@@ -291,7 +293,9 @@ class EntriesCleanup(object):
 
         if days != 0:
             days_before = DateUtils.get_days_before_dt(days)
-            date_condition = Q(date_created__lt=days_before) | Q(date_published__lt=days_before)
+            date_condition = Q(date_created__lt=days_before) | Q(
+                date_published__lt=days_before
+            )
             result_condition &= date_condition
         else:
             return None
@@ -473,7 +477,7 @@ class EntryScanner(object):
             contents_links.extend(parser.get_links())
 
         for link in contents_links:
-            w = EntryWrapper(link = link)
+            w = EntryWrapper(link=link)
             if not w.get():
                 BackgroundJobController.link_add(link)
 
@@ -1594,13 +1598,9 @@ class EntryDataBuilder(object):
         link_data = url.get_props()
 
         if self.source_is_auto and not url.is_valid():
-            self.errors.append(
-                "Url:{}. Url is not valid".format(self.link)
-            )
+            self.errors.append("Url:{}. Url is not valid".format(self.link))
             AppLogging.debug(
-                'Url:{} Could not obtain properties for {}'.format(
-                    self.link, self.link
-                )
+                "Url:{} Could not obtain properties for {}".format(self.link, self.link)
             )
             return
 
@@ -1658,13 +1658,9 @@ class EntryDataBuilder(object):
         link_data = url.get_props()
 
         if self.source_is_auto and not url.is_valid():
-            self.errors.append(
-                "Url:{}. Url is not valid".format(self.link)
-            )
+            self.errors.append("Url:{}. Url is not valid".format(self.link))
             AppLogging.debug(
-                'Url:{} Could not obtain properties for {}'.format(
-                    self.link, self.link
-                )
+                "Url:{} Could not obtain properties for {}".format(self.link, self.link)
             )
             return
 
@@ -1674,7 +1670,7 @@ class EntryDataBuilder(object):
                     "Url:{}. Could not obtain properties".format(self.link)
                 )
                 AppLogging.debug(
-                    'Url:{} Could not obtain properties for {}'.format(
+                    "Url:{} Could not obtain properties for {}".format(
                         self.link, self.link
                     )
                 )

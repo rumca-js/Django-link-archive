@@ -283,14 +283,12 @@ class EntriesSearchListView(object):
             # Errror in filter, filter should return empty Q if everything is OK
             return
 
-        self.conditions = (
-            filter_conditions & self.get_search_view_conditions()
-        )
+        self.conditions = filter_conditions & self.get_search_view_conditions()
 
         user_config = UserConfig.get(self.request.user)
         user_age = user_config.get_age()
 
-        self.conditions &= (Q(age = 0) | Q(age__isnull = True) | Q(age__lte = user_age) )
+        self.conditions &= Q(age=0) | Q(age__isnull=True) | Q(age__lte=user_age)
 
         return self.conditions
 
@@ -613,7 +611,9 @@ def add_entry_json(request):
         else:
             b = EntryDataBuilder()
             browser = get_request_browser(request.GET)
-            entry = b.build_simple(link=link, user=request.user, source_is_auto=False, browser=browser)
+            entry = b.build_simple(
+                link=link, user=request.user, source_is_auto=False, browser=browser
+            )
 
             if not entry:
                 for error in b.errors:
@@ -621,7 +621,7 @@ def add_entry_json(request):
                 return JsonResponse(data, json_dumps_params={"indent": 4})
 
             data["pk"] = entry.id
-            AppLogging.error("Created entry:{}".format(entry.id))  #TODO
+            AppLogging.error("Created entry:{}".format(entry.id))  # TODO
 
             if UserBookmarks.add(user=request.user, entry=entry):
                 entry.make_bookmarked()
@@ -893,7 +893,9 @@ def entry_dislikes(request, pk):
 
     objs = LinkDataController.objects.filter(id=pk)
     if not objs.exists():
-        return JsonResponse({"errors" : ["Entry does not exists"]}, json_dumps_params={"indent": 4})
+        return JsonResponse(
+            {"errors": ["Entry does not exists"]}, json_dumps_params={"indent": 4}
+        )
 
     obj = objs[0]
 
@@ -902,19 +904,27 @@ def entry_dislikes(request, pk):
 
         controller = SystemOperationController()
         if controller.is_remote_server_down():
-            return JsonResponse({"errors" : ["Remote server is down"]}, json_dumps_params={"indent": 4})
+            return JsonResponse(
+                {"errors": ["Remote server is down"]}, json_dumps_params={"indent": 4}
+            )
 
         link = config.remote_webtools_server_location
         remote_server = RemoteServer(link)
 
         json_obj = remote_server.get_socialj(obj.link)
         if not json_obj:
-            return JsonResponse({"errors" : ["Could not obtain social data"]}, json_dumps_params={"indent": 4})
+            return JsonResponse(
+                {"errors": ["Could not obtain social data"]},
+                json_dumps_params={"indent": 4},
+            )
 
         try:
             return JsonResponse(json_obj, json_dumps_params={"indent": 4})
         except Exception as E:
-            return JsonResponse({"errors" : ["Could not dump social data"]}, json_dumps_params={"indent": 4})
+            return JsonResponse(
+                {"errors": ["Could not dump social data"]},
+                json_dumps_params={"indent": 4},
+            )
 
 
 def entry_bookmark(request, pk):
@@ -1409,7 +1419,7 @@ def entry_parameters(request, pk):
     if data is not None:
         return data
 
-    entries = LinkDataController.objects.filter(id = pk)
+    entries = LinkDataController.objects.filter(id=pk)
     if not entries.exists():
         p.context["summary_text"] = "Such entry does not exist"
         return p.render("go_back.html")
@@ -1418,7 +1428,7 @@ def entry_parameters(request, pk):
 
     json_obj = {}
     json_obj["parameters"] = []
-    
+
     object_controller = EntryPreviewBuilder.get(entry, request.user)
     for parameter in object_controller.get_parameters():
         adict = {}
@@ -1443,12 +1453,12 @@ def entry_op_parameters(request, pk):
     json_obj["parameters"] = []
     json_obj["status"] = False
 
-    entries = LinkDataController.objects.filter(id = pk)
+    entries = LinkDataController.objects.filter(id=pk)
     if not entries.exists():
         return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
     entry = entries[0]
-    
+
     object_controller = EntryPreviewBuilder.get(entry, request.user)
     for parameter in object_controller.get_parameters_operation():
         adict = {}
@@ -1470,7 +1480,7 @@ def entry_related_json(request, pk):
     if data is not None:
         return data
 
-    entries = LinkDataController.objects.filter(id = pk)
+    entries = LinkDataController.objects.filter(id=pk)
     if not entries.exists():
         p.context["summary_text"] = "Such entry does not exist"
         return p.render("go_back.html")

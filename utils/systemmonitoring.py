@@ -154,9 +154,9 @@ def get_hardware_info():
 # fmt: on
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     data = get_hardware_info()
-    print("="*40)
+    print("=" * 40)
     print("System Monitoring")
-    print("="*40)
+    print("=" * 40)
     print(json.dumps(data, indent=4))

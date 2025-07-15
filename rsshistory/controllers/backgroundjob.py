@@ -423,6 +423,7 @@ class BackgroundJobController(BackgroundJob):
 
     def link_save(link_url):
         from ..configuration import Configuration
+
         config = Configuration.get_object().config_entry
         if not config.enable_link_archiving:
             return

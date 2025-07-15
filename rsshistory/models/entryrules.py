@@ -133,7 +133,7 @@ class EntryRules(models.Model):
         from ..models import UserConfig
 
         user_config = UserConfig.get()
-        user_config.birth_date = date(2024,3,28)
+        user_config.birth_date = date(2024, 3, 28)
 
         entry_json = entry_to_json(user_config, entry)
         return self.get_dict_pulp(entry_json)
@@ -213,7 +213,7 @@ class EntryRules(models.Model):
     def is_url_blocked(url):
         from .blockentry import BlockEntry
 
-        conditions = (Q(block = True) | Q(trust=True)) & Q(enabled = True)
+        conditions = (Q(block=True) | Q(trust=True)) & Q(enabled=True)
 
         rules = EntryRules.objects.filter(conditions)
         for rule in rules:
@@ -236,11 +236,9 @@ class EntryRules(models.Model):
             if reason:
                 return reason
 
-        conditions = (Q(block = True) | Q(trust=True)) & Q(enabled = True)
+        conditions = (Q(block=True) | Q(trust=True)) & Q(enabled=True)
 
-        rules = EntryRules.objects.filter(conditions).exclude(
-            trigger_text=""
-        )
+        rules = EntryRules.objects.filter(conditions).exclude(trigger_text="")
         for rule in rules:
             text = rule.get_dict_pulp(dictionary)
             if rule.is_text_triggered(text):
@@ -254,11 +252,9 @@ class EntryRules(models.Model):
         if reason:
             return reason
 
-        conditions = (Q(block = True) | Q(trust=True)) & Q(enabled = True)
+        conditions = (Q(block=True) | Q(trust=True)) & Q(enabled=True)
 
-        rules = EntryRules.objects.filter(conditions).exclude(
-            trigger_text=""
-        )
+        rules = EntryRules.objects.filter(conditions).exclude(trigger_text="")
         for rule in rules:
             text = rule.get_entry_pulp(entry)
             if rule.is_text_triggered(text):
@@ -283,7 +279,9 @@ class EntryRules(models.Model):
 
         if Configuration.get_object().config_entry.log_remove_entries:
             if entry_rule:
-                AppLogging.info("Removing entry:{} rule ID:{}".format(entry.id, entyry_rule.id))
+                AppLogging.info(
+                    "Removing entry:{} rule ID:{}".format(entry.id, entyry_rule.id)
+                )
             else:
                 AppLogging.info("Removing entry:{}".format(entry.id))
 
@@ -340,7 +338,7 @@ class EntryRules(models.Model):
         link_service.save()
 
     def reset_priorities():
-        rules = list(EntryRules.objects.all().order_by('priority'))
+        rules = list(EntryRules.objects.all().order_by("priority"))
 
         for i, rule in enumerate(rules):
             if rule.priority != i:
@@ -348,7 +346,7 @@ class EntryRules(models.Model):
                 rule.save()
 
     def prio_up(self):
-        rules = list(EntryRules.objects.all().order_by('priority'))
+        rules = list(EntryRules.objects.all().order_by("priority"))
 
         index = rules.index(self)
         if index == 0:
@@ -362,7 +360,7 @@ class EntryRules(models.Model):
                 rule.save()
 
     def prio_down(self):
-        rules = list(EntryRules.objects.all().order_by('priority'))
+        rules = list(EntryRules.objects.all().order_by("priority"))
 
         index = rules.index(self)
 
@@ -378,4 +376,3 @@ class EntryRules(models.Model):
 
     def __str__(self):
         return "EntryRule ID:{}, Name:{}".format(self.id, self.rule_name)
-

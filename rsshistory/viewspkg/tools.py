@@ -785,10 +785,14 @@ def link_input_suggestions_json(request):
             links.add(location.get_domain())
 
         if not config.accept_domain_links and location.is_domain():
-            errors.append("This is domain link, and system is configured not to accept that")
+            errors.append(
+                "This is domain link, and system is configured not to accept that"
+            )
 
         if not config.accept_non_domain_links and not location.is_domain():
-            errors.append("This is not a domain link, and system is configured not to accept that")
+            errors.append(
+                "This is not a domain link, and system is configured not to accept that"
+            )
 
         if config.prefer_non_www_links and original_link.find("www") >= 0:
             errors.append("This link has www inside")

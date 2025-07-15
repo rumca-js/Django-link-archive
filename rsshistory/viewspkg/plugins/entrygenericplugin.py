@@ -661,9 +661,7 @@ class EntryGenericPlugin(object):
 
         if self.entry.author:
             parameters.append(
-                EntryParameter(
-                    "Author", self.entry.author, html_id="entryAuthor"
-                )
+                EntryParameter("Author", self.entry.author, html_id="entryAuthor")
             )
         if self.entry.album:
             parameters.append(
@@ -673,9 +671,7 @@ class EntryGenericPlugin(object):
         status_code_str = status_code_to_text(self.entry.status_code)
 
         parameters.append(
-            EntryParameter(
-                "Status code", status_code_str, html_id="entryStatusCode"
-            )
+            EntryParameter("Status code", status_code_str, html_id="entryStatusCode")
         )
 
         parameters.append(

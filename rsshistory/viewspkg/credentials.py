@@ -75,7 +75,9 @@ def add(request):
                 ]
             )
 
-            p.context["summary_text"] = "Could not add credentials {}".format(error_message)
+            p.context["summary_text"] = "Could not add credentials {}".format(
+                error_message
+            )
             return p.render("summary_present.html")
 
     def random_string(length):

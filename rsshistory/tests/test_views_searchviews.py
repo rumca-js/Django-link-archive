@@ -29,8 +29,7 @@ class SearchViewTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_entry_rule_edit__post(self):
-        searchview = SearchView.objects.create(
-        )
+        searchview = SearchView.objects.create()
 
         self.client.login(username="testuser", password="testpassword")
 

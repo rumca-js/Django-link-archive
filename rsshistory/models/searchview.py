@@ -31,7 +31,9 @@ class SearchView(models.Model):
         help_text="Text displayed on button hover",
     )
 
-    priority = models.IntegerField(default=0, help_text="Priority, affects position in menu")
+    priority = models.IntegerField(
+        default=0, help_text="Priority, affects position in menu"
+    )
 
     filter_statement = models.CharField(
         blank=True,
@@ -166,7 +168,7 @@ class SearchView(models.Model):
         )
 
     def reset_priorities():
-        views = list(SearchView.objects.all().order_by('priority'))
+        views = list(SearchView.objects.all().order_by("priority"))
 
         for i, view in enumerate(views):
             if view.priority != i:
@@ -174,7 +176,7 @@ class SearchView(models.Model):
                 view.save()
 
     def prio_up(self):
-        views = list(SearchView.objects.all().order_by('priority'))
+        views = list(SearchView.objects.all().order_by("priority"))
 
         index = views.index(self)
         if index == 0:
@@ -188,7 +190,7 @@ class SearchView(models.Model):
                 view.save()
 
     def prio_down(self):
-        views = list(SearchView.objects.all().order_by('priority'))
+        views = list(SearchView.objects.all().order_by("priority"))
 
         index = views.index(self)
 

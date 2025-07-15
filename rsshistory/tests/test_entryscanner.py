@@ -104,7 +104,7 @@ class EntryScannerTest(FakeInternetTestCase):
     def test_run__nodata(self):
         link_name = "https://youtube.com/v=12345"
 
-        b = EntryScanner(url = link_name)
+        b = EntryScanner(url=link_name)
         b.run()
 
         self.assertEqual(BackgroundJobController.objects.all().count(), 0)
@@ -112,7 +112,7 @@ class EntryScannerTest(FakeInternetTestCase):
     def test_run__nodata(self):
         link_name = "https://www.geekwire.com/feed"
 
-        b = EntryScanner(url = link_name)
+        b = EntryScanner(url=link_name)
         b.run()
 
         self.assertEqual(BackgroundJobController.objects.all().count(), 0)

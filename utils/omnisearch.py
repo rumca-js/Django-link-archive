@@ -246,7 +246,11 @@ class EquationEvaluator(object):
             self.known_results[operation_symbol] = val
             return self.known_results[operation_symbol]
         except Exception as E:
-            self.errors.append("Cannot evaluate operation:{}, function:{}".format(operation_symbol, function))
+            self.errors.append(
+                "Cannot evaluate operation:{}, function:{}".format(
+                    operation_symbol, function
+                )
+            )
             raise
 
     def evaluate_function(self, operation_symbol, function, args0, args1):

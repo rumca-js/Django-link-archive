@@ -263,7 +263,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         dead_not_stale = LinkDataController.objects.create(
             link="https://youtube.com?v=2",
             date_dead_since=days_before_remove - timedelta(days=1),
-            date_created = days_before_remove - timedelta(days=1),
+            date_created=days_before_remove - timedelta(days=1),
         )
 
         # call tested function
@@ -286,7 +286,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         dead_and_stale = LinkDataController.objects.create(
             link="https://youtube.com?v=3",
             date_dead_since=days_before_stale - timedelta(days=1),
-            date_created = days_before_stale - timedelta(days=1),
+            date_created=days_before_stale - timedelta(days=1),
             status_code=500,
         )
 
@@ -310,7 +310,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         dead_stale_but_ok = LinkDataController.objects.create(
             link="https://youtube.com?v=4",
             date_dead_since=days_before_stale - timedelta(days=1),
-            date_created = days_before_stale - timedelta(days=1),
+            date_created=days_before_stale - timedelta(days=1),
             status_code=200,
         )
 
@@ -334,7 +334,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         dead_stale_but_ok = LinkDataController.objects.create(
             link="https://youtube.com?v=4",
             date_dead_since=days_before_stale - timedelta(days=1),
-            date_created = days_before_stale - timedelta(days=1),
+            date_created=days_before_stale - timedelta(days=1),
             status_code=0,
         )
 
@@ -358,7 +358,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         dead_stale_but_ok = LinkDataController.objects.create(
             link="https://youtube.com?v=4",
             date_dead_since=days_before_stale - timedelta(days=1),
-            date_created = days_before_stale - timedelta(days=1),
+            date_created=days_before_stale - timedelta(days=1),
             page_rating_votes=1,
         )
 
@@ -382,7 +382,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         dead_stale_but_ok = LinkDataController.objects.create(
             link="https://youtube.com?v=4",
             date_dead_since=days_before_stale - timedelta(days=1),
-            date_created = days_before_stale - timedelta(days=1),
+            date_created=days_before_stale - timedelta(days=1),
             status_code=500,
             manual_status_code=200,
         )
@@ -407,7 +407,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         dead_stale_but_bookmarked = LinkDataController.objects.create(
             link="https://youtube.com?v=5",
             date_dead_since=days_before_stale - timedelta(days=1),
-            date_created = days_before_stale - timedelta(days=1),
+            date_created=days_before_stale - timedelta(days=1),
             bookmarked=True,
         )
 
@@ -431,7 +431,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         dead_stale_but_permanent = LinkDataController.objects.create(
             link="https://youtube.com?v=6",
             date_dead_since=days_before_stale - timedelta(days=1),
-            date_created = days_before_stale - timedelta(days=1),
+            date_created=days_before_stale - timedelta(days=1),
             bookmarked=True,
         )
 
@@ -478,4 +478,3 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         self.assertEqual(archived[1].domain, domains[0])
         self.assertEqual(archived[1].date_published, date_to_remove)
-

@@ -139,21 +139,15 @@ class BaseLinkDataModel(models.Model):
 
         # Trim the input string to fit within max_length
         if self.title and len(self.title) > title_length:
-            AppLogging.error(
-                "URL:{} Title length is too long".format(self.link)
-            )
+            AppLogging.error("URL:{} Title length is too long".format(self.link))
             self.title = self.title[: title_length - 1]
 
         if self.description and len(self.description) > description_length:
-            AppLogging.error(
-                "URL:{} Description length is too long".format(self.link)
-            )
+            AppLogging.error("URL:{} Description length is too long".format(self.link))
             self.description = self.description[: description_length - 1]
 
         if self.thumbnail and len(self.thumbnail) > thumbnail_length:
-            AppLogging.error(
-                "URL:{} Thumbnail length is too long".format(self.link)
-            )
+            AppLogging.error("URL:{} Thumbnail length is too long".format(self.link))
             self.thumbnail = None
 
         if self.language and len(self.language) > language_length:
@@ -163,15 +157,11 @@ class BaseLinkDataModel(models.Model):
             self.language = None
 
         if self.album and len(self.album) > album_length:
-            AppLogging.error(
-                "URL:{} Album length is too long".format(self.link)
-            )
+            AppLogging.error("URL:{} Album length is too long".format(self.link))
             self.album = self.description[: album_length - 1]
 
         if self.author and len(self.author) > author_length:
-            AppLogging.error(
-                "URL:{} Author length is too long".format(self.link)
-            )
+            AppLogging.error("URL:{} Author length is too long".format(self.link))
             self.author = self.description[: author_length - 1]
 
         p = UrlLocation(self.link)
@@ -620,8 +610,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         return p.get_protocol_url("https")
 
     def is_valid(self):
-        """
-        """
+        """ """
         if self.is_dead():
             return False
 

@@ -25,9 +25,13 @@ class LinkDataController(LinkDataModel):
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
         if self.is_archive_entry():
-            return reverse("{}:entry-archive-detail".format(LinkDatabase.name), args=[str(self.id)])
+            return reverse(
+                "{}:entry-archive-detail".format(LinkDatabase.name), args=[str(self.id)]
+            )
         else:
-            return reverse("{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)])
+            return reverse(
+                "{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)]
+            )
 
     def get_edit_url(self):
         """Returns the URL to access a particular author instance."""
@@ -38,7 +42,8 @@ class LinkDataController(LinkDataModel):
         """Returns the URL to access a particular author instance."""
         if self.is_archive_entry():
             return reverse(
-                "{}:entry-archive-bookmark".format(LinkDatabase.name), args=[str(self.id)]
+                "{}:entry-archive-bookmark".format(LinkDatabase.name),
+                args=[str(self.id)],
             )
         else:
             return reverse(
@@ -49,7 +54,8 @@ class LinkDataController(LinkDataModel):
         """Returns the URL to access a particular author instance."""
         if self.is_archive_entry():
             return reverse(
-                "{}:entry-archive-unbookmark".format(LinkDatabase.name), args=[str(self.id)]
+                "{}:entry-archive-unbookmark".format(LinkDatabase.name),
+                args=[str(self.id)],
             )
         else:
             return reverse(

@@ -196,7 +196,9 @@ class UrlHandlerEx(object):
         if len(rules) > 0:
             for rule in rules:
                 if rule.browser:
-                    browsers = self.bring_to_front(browsers, rule.browser.get_setup(True))
+                    browsers = self.bring_to_front(
+                        browsers, rule.browser.get_setup(True)
+                    )
 
         return browsers
 
@@ -261,7 +263,9 @@ class UrlHandlerEx(object):
     def is_status_code_invalid(self, status_code):
         if status_code >= 200 and status_code <= 400:
             return False
-        elif status_code == HTTP_STATUS_UNKNOWN or status_code == HTTP_STATUS_USER_AGENT:
+        elif (
+            status_code == HTTP_STATUS_UNKNOWN or status_code == HTTP_STATUS_USER_AGENT
+        ):
             return False
         else:
             return True

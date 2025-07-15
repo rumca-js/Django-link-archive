@@ -630,7 +630,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
             "page_rating_contents": 23,
             "page_rating_votes": 12,
             "page_rating": 25,
-            "status_code" : 404,
+            "status_code": 404,
         }
 
         b = EntryDataBuilder()

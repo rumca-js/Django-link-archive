@@ -885,6 +885,7 @@ def sources_json_view(request, view_class):
 
     return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
+
 opml_header = """
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
@@ -910,6 +911,7 @@ opml_footer = """
     </body>
 </opml>
 """
+
 
 def source_to_opml(user_config, source):
     # <outline title="News" text="News">
@@ -953,7 +955,7 @@ def sources_opml_view(request, view_class):
 
     opml_text += opml_footer
 
-    response = HttpResponse(opml_text, content_type='text/x-opml')
+    response = HttpResponse(opml_text, content_type="text/x-opml")
     # response['Content-Disposition'] = 'attachment; filename="feeds.opml"'
     return response
 

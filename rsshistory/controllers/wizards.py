@@ -38,7 +38,7 @@ def common_views_initialization():
     SearchView.objects.create(
         name="What's dead",
         order_by="-page_rating_votes, compacted_tags__id, -date_dead_since, link",
-        filter_statement = "date_dead_since__isnull = False",
+        filter_statement="date_dead_since__isnull = False",
         date_published_day_limit=7,
         hover_text="Search by date published",
     )
@@ -77,7 +77,7 @@ def setup_views_for_search_engine():
     SearchView.objects.create(
         name="Default",
         order_by="-page_rating_votes, compacted_tags__id, date_dead_since, -page_rating, link",
-        filter_statement = "page_rating_votes > 0",
+        filter_statement="page_rating_votes > 0",
         default=True,
     )
     common_views_initialization()

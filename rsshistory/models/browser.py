@@ -132,7 +132,7 @@ class Browser(models.Model):
         return browser_config
 
     def reset_priorities():
-        browsers = list(Browser.objects.all().order_by('priority'))
+        browsers = list(Browser.objects.all().order_by("priority"))
 
         for i, browser in enumerate(browsers):
             if browser.priority != i:
@@ -140,7 +140,7 @@ class Browser(models.Model):
                 browser.save()
 
     def prio_up(self):
-        browsers = list(Browser.objects.all().order_by('priority'))
+        browsers = list(Browser.objects.all().order_by("priority"))
 
         index = browsers.index(self)
         if index == 0:
@@ -154,7 +154,7 @@ class Browser(models.Model):
                 browser.save()
 
     def prio_down(self):
-        browsers = list(Browser.objects.all().order_by('priority'))
+        browsers = list(Browser.objects.all().order_by("priority"))
 
         index = browsers.index(self)
 

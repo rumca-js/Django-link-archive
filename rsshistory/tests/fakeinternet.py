@@ -87,11 +87,13 @@ class MockRequestCounter(object):
         Info can be a dict
         """
         if info:
-            MockRequestCounter.request_history.append({"url":url, "info":info})
+            MockRequestCounter.request_history.append({"url": url, "info": info})
         elif settings:
-            MockRequestCounter.request_history.append({"url":url, "settings":settings})
+            MockRequestCounter.request_history.append(
+                {"url": url, "settings": settings}
+            )
         else:
-            MockRequestCounter.request_history.append({"url":url})
+            MockRequestCounter.request_history.append({"url": url})
         MockRequestCounter.mock_page_requests += 1
 
     def reset():
@@ -280,7 +282,6 @@ class FakeInternetData(object):
             self.properties["title"] = ""
             self.properties["description"] = ""
             self.binary_data = "text".encode()
-
 
         if self.url.find("reddit") >= 0:
             self.properties["language"] = "en"

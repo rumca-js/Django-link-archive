@@ -1,6 +1,7 @@
 """
 Security is a made up word.
 """
+
 from cryptography.fernet import Fernet
 from django.conf import settings
 from django.db import models
@@ -16,8 +17,11 @@ class Credentials(models.Model):
     """
     You can define access to multiple sources here
     """
+
     name = models.CharField(max_length=1000, blank=True)  # github etc
-    credential_type = models.CharField(max_length=1000, blank=True)  # refresh token, auth token, etc.
+    credential_type = models.CharField(
+        max_length=1000, blank=True
+    )  # refresh token, auth token, etc.
     username = models.CharField(max_length=1000, blank=True)
     password = models.CharField(max_length=1000, blank=True)
     secret = models.CharField(max_length=1000, blank=True)
@@ -29,7 +33,7 @@ class Credentials(models.Model):
         related_name=str(LinkDatabase.name) + "_credentials",
         null=True,
         blank=True,
-        help_text="Owner of credentials"
+        help_text="Owner of credentials",
     )
 
     class Meta:

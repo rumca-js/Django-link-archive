@@ -964,7 +964,9 @@ class EntriesDetailViews(FakeInternetTestCase):
     def test_entry_op_parameters(self):
         entry = LinkDataController.objects.filter(link__icontains="https://youtube")[0]
 
-        url = reverse("{}:entry-op-parameters".format(LinkDatabase.name), args=[entry.id])
+        url = reverse(
+            "{}:entry-op-parameters".format(LinkDatabase.name), args=[entry.id]
+        )
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -972,7 +974,9 @@ class EntriesDetailViews(FakeInternetTestCase):
     def test_entry_related__json(self):
         entry = LinkDataController.objects.filter(link__icontains="https://youtube")[0]
 
-        url = reverse("{}:entry-related-json".format(LinkDatabase.name), args=[entry.id])
+        url = reverse(
+            "{}:entry-related-json".format(LinkDatabase.name), args=[entry.id]
+        )
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -1024,6 +1028,23 @@ class EntriesDetailViews(FakeInternetTestCase):
 
         data = response.json()
         self.assertFalse(data["status"])
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_entry_is__archived(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        url = reverse("{}:entry-is".format(LinkDatabase.name))
+
+        url = url + "?link=https://linkedin.com?v=archived"
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertTrue(data["status"])
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 

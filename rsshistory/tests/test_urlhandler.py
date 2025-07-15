@@ -220,7 +220,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         )
 
         EntryRules.objects.create(
-            trigger_rule_url = "https://rsspage.com",
+            trigger_rule_url="https://rsspage.com",
             browser=browser1,
         )
 
@@ -233,9 +233,13 @@ class UrlHandlerExTest(FakeInternetTestCase):
         self.assertIn("info", MockRequestCounter.request_history[-1])
         self.assertIn("settings", MockRequestCounter.request_history[-1]["info"])
 
-        self.assertIn("test_setting", MockRequestCounter.request_history[-1]["info"]["settings"])
+        self.assertIn(
+            "test_setting", MockRequestCounter.request_history[-1]["info"]["settings"]
+        )
 
-        self.assertIn("timeout_s", MockRequestCounter.request_history[-1]["info"]["settings"])
+        self.assertIn(
+            "timeout_s", MockRequestCounter.request_history[-1]["info"]["settings"]
+        )
         self.assertNotIn("timeout_s", MockRequestCounter.request_history[-1]["info"])
 
     def test_get_cleaned_link__linkedin(self):
