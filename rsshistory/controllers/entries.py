@@ -24,7 +24,10 @@ class LinkDataController(LinkDataModel):
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
-        return reverse("{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)])
+        if self.is_archive_entry():
+            return reverse("{}:entry-archive-detail".format(LinkDatabase.name), args=[str(self.id)])
+        else:
+            return reverse("{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)])
 
     def get_edit_url(self):
         """Returns the URL to access a particular author instance."""
@@ -33,15 +36,25 @@ class LinkDataController(LinkDataModel):
 
     def get_bookmark_set_url(self):
         """Returns the URL to access a particular author instance."""
-        return reverse(
-            "{}:entry-bookmark".format(LinkDatabase.name), args=[str(self.id)]
-        )
+        if self.is_archive_entry():
+            return reverse(
+                "{}:entry-archive-bookmark".format(LinkDatabase.name), args=[str(self.id)]
+            )
+        else:
+            return reverse(
+                "{}:entry-bookmark".format(LinkDatabase.name), args=[str(self.id)]
+            )
 
     def get_bookmark_unset_url(self):
         """Returns the URL to access a particular author instance."""
-        return reverse(
-            "{}:entry-unbookmark".format(LinkDatabase.name), args=[str(self.id)]
-        )
+        if self.is_archive_entry():
+            return reverse(
+                "{}:entry-archive-unbookmark".format(LinkDatabase.name), args=[str(self.id)]
+            )
+        else:
+            return reverse(
+                "{}:entry-unbookmark".format(LinkDatabase.name), args=[str(self.id)]
+            )
 
     def get_dead_url(self):
         if self.is_dead():

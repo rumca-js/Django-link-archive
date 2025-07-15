@@ -33,9 +33,21 @@ function resetSearch(text = '') {
 }
 
 
-function getExistingObjectLink(object_id) {
-    let detail_url = "{% url 'rsshistory:entry-detail' 1017 %}";
+function getExistingObjectLink(object_id, archive=false) {
+    let detail_url = "";
+    if (archive) {
+       detail_url = "{% url 'rsshistory:entry-archived' 1017 %}";
+    }
+    else
+    {
+       detail_url = "{% url 'rsshistory:entry-detail' 1017 %}";
+    }
     detail_url = detail_url.replace("1017", object_id);
+
+    if (detail_url == "")
+    {
+       return "";
+    }
 
     link_text = `<a href="${detail_url}" class="btn btn-secondary">Entry</a>`;
 
@@ -226,7 +238,9 @@ function checkEntryExistsInDb(search_link) {
             if (entryData.status) {
                 $('#btnFetch').prop("disabled", true);
 
-                let link_text = getExistingObjectLink(entryData.pk);
+		let archived = entryData.archived;
+
+                let link_text = getExistingObjectLink(entryData.pk, archived);
                 $('#EntryExists').append(`<div>The entry already exists ${link_text}.</div>`);
             }
             else {

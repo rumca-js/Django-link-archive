@@ -17,10 +17,16 @@ class BaseRssPluginTest(FakeInternetTestCase):
         )
 
         self.source_rss_lang = SourceDataController.objects.create(
-            url="https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
+            url="https://www.youtube.com/feeds/videos.xml?channel_id=NOLANGUAGETIMESAMTIMESAM",
             title="SAMTIME",
             export_to_cms=True,
             language="de",
+        )
+
+        self.source_rss_lang_def = SourceDataController.objects.create(
+            url="https://www.reddit.com/r/searchengines/.rss",
+            title="SAMTIME",
+            export_to_cms=True,
         )
 
     def test_get_entries(self):
@@ -53,7 +59,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_get_entries__language(self):
+    def test_get_entries__language_from_source(self):
         MockRequestCounter.mock_page_requests = 0
         LinkDataController.objects.all().delete()
 
@@ -69,7 +75,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.assertTrue(self.source_rss)
 
-        plugin = BaseRssPlugin(self.source_rss.id)
+        plugin = BaseRssPlugin(self.source_rss_lang.id)
         # call tested function
         props = plugin.get_entries()
         props = list(props)
@@ -80,6 +86,37 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertTrue(props[0]["link"])
         self.assertTrue(props[0]["title"])
         self.assertEqual(props[0]["language"], "de")
+        self.assertIn("source", props[0])
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_get_entries__language_from_def(self):
+        MockRequestCounter.mock_page_requests = 0
+        LinkDataController.objects.all().delete()
+
+        config = Configuration.get_object().config_entry
+        config.accept_non_domain_links = True
+        config.auto_create_sources = True
+        config.accept_domain_links = False
+        config.new_entries_merge_data = False
+        config.new_entries_use_clean_data = False
+        config.save()
+
+        MockRequestCounter.mock_page_requests = 0
+
+        self.assertTrue(self.source_rss)
+
+        plugin = BaseRssPlugin(self.source_rss_lang_def.id)
+        # call tested function
+        props = plugin.get_entries()
+        props = list(props)
+
+        self.print_errors()
+
+        self.assertEqual(len(props), 10)
+        self.assertTrue(props[0]["link"])
+        self.assertTrue(props[0]["title"])
+        self.assertEqual(props[0]["language"], "en")
         self.assertIn("source", props[0])
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)

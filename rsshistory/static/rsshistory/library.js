@@ -264,6 +264,8 @@ function fixStupidGoogleRedirects(input_url) {
 
 
 function sanitizeLink(link) {
+   link.trimStart();
+
    if (link.endsWith("/")) {
       link = link.slice(0, -1);
    }

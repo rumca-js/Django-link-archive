@@ -237,6 +237,14 @@ class FakeInternetData(object):
             self.set_entries(13)
             self.response["Content-Type"] = "application/rss+xml"
             self.properties["feeds"] = [self.url]
+        elif (
+            self.url
+            == "https://www.youtube.com/feeds/videos.xml?channel_id=NOLANGUAGETIMESAMTIMESAM"
+        ):
+            self.set_entries(13, language=None)
+            self.response["Content-Type"] = "application/rss+xml"
+            self.properties["feeds"] = [self.url]
+            self.properties["language"] = None
         elif self.url.startswith("https://odysee.com/$/rss"):
             self.set_entries(13)
             self.response["Content-Type"] = "application/rss+xml"
@@ -273,9 +281,13 @@ class FakeInternetData(object):
             self.properties["description"] = ""
             self.binary_data = "text".encode()
 
+
+        if self.url.find("reddit") >= 0:
+            self.properties["language"] = "en"
+
         return self.get_all_properties()
 
-    def set_entries(self, number=1):
+    def set_entries(self, number=1, language="en"):
         for item in range(0, number):
             properties = {}
             properties["link"] = self.url + str(item)
@@ -283,7 +295,7 @@ class FakeInternetData(object):
             properties["description"] = "Description" + str(item)
             properties["date_published"] = DateUtils.get_datetime_now_iso()
             properties["author"] = "Description"
-            properties["language"] = "Language"
+            properties["language"] = language
             properties["album"] = "Description"
             properties["page_rating"] = 80
             properties["thumbnail"] = None

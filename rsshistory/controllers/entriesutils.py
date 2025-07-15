@@ -473,7 +473,9 @@ class EntryScanner(object):
             contents_links.extend(parser.get_links())
 
         for link in contents_links:
-            BackgroundJobController.link_add(link)
+            w = EntryWrapper(link = link)
+            if not w.get():
+                BackgroundJobController.link_add(link)
 
 
 class EntryUpdater(object):

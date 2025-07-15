@@ -100,25 +100,29 @@ function getEntryOperationalParamters(attempt = 1) {
 
             let html_out = "";
 
-            data.parameters.forEach(parameter => {
-		let title = parameter.title || parameter.name;
-		let name = escapeHtml(parameter.name);
-		let description = escapeHtml(parameter.description);
+            if (data) {
+              if (data.status) {
+                  data.parameters.forEach(parameter => {
+                      let title = parameter.title || parameter.name;
+                      let name = escapeHtml(parameter.name);
+                      let description = escapeHtml(parameter.description);
 
-                html_out += `<div class="text-nowrap mx-1"
-                    title="${title}"
-                    >
-                       <strong>${name}:</strong>
-                       ${description}
-                    </div>`;
-            });
+                      html_out += `<div class="text-nowrap mx-1"
+                          title="${title}"
+                          >
+                             <strong>${name}:</strong>
+                             ${description}
+                          </div>`;
+                  });
 
-            if (html_out) {
-		 html_out = "<h1>Parameters</h1>" + html_out;
-	    }
+                  if (html_out) {
+                      html_out = "<h1>Parameters</h1>" + html_out;
+                  }
 
- 	    $("#entryOperationalParameters").html(html_out);
-	}
+                  $("#entryOperationalParameters").html(html_out);
+              }
+            }
+        }
     });
 }
 
@@ -199,7 +203,7 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1,
                return;
            }
            if (attempt < 3) {
-               getDynamicJsonContentWithRefresh(url, htmlElement, attempt + 1, errorInHtml);
+               getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt + 1, errorInHtml);
                if (errorInHtml) {
                    $(htmlElement).html("Error loading dynamic content, retry");
                }
@@ -262,9 +266,11 @@ function updateEntryProperties() {
     let entry = entry_json_data.link;
 
     let tag_string = "";
-    entry_json_data.link.tags.forEach(tag => {
-        tag_string += `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>,`
-    });
+    if (entry_json_data.link.tags) {
+       entry_json_data.link.tags.forEach(tag => {
+           tag_string += `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>,`
+       });
+    }
 
     tag_string += getEditButton();
     $("#entryTagContainer").html(tag_string);
@@ -390,13 +396,15 @@ function getEntryTags(attempt = 1) {
                return;
            }
            if (data) {
-               let tag_string = "";
-               data.tags.forEach(tag => {
-           	  tag_string += `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>,`
-               });
-           
-               tag_string += getEditButton();
-               $("#entryTagContainer").html(tag_string);
+              if (data.status) {
+                  let tag_string = "";
+                  data.tags.forEach(tag => {
+              	  tag_string += `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>,`
+                  });
+              
+                  tag_string += getEditButton();
+                  $("#entryTagContainer").html(tag_string);
+              }
            }
        },
        error: function(xhr, status, error) {

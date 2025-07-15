@@ -686,6 +686,7 @@ def entry_is(request):
     if entry:
         data["status"] = True
         data["pk"] = entry.id
+        data["archived"] = entry.is_archive_entry()
     else:
         data["status"] = False
         data["message"] = "Does not exist"
@@ -888,7 +889,12 @@ def entry_dislikes(request, pk):
     if data is not None:
         return data
 
+    # what if it is in archive
+
     objs = LinkDataController.objects.filter(id=pk)
+    if not objs.exists():
+        return JsonResponse({"errors" : ["Entry does not exists"]}, json_dumps_params={"indent": 4})
+
     obj = objs[0]
 
     config = Configuration.get_object().config_entry
@@ -1433,15 +1439,15 @@ def entry_op_parameters(request, pk):
     if data is not None:
         return data
 
-    entries = LinkDataController.objects.filter(id = pk)
-    if not entries.exists():
-        p.context["summary_text"] = "Such entry does not exist"
-        return p.render("go_back.html")
-
-    entry = entries[0]
-
     json_obj = {}
     json_obj["parameters"] = []
+    json_obj["status"] = False
+
+    entries = LinkDataController.objects.filter(id = pk)
+    if not entries.exists():
+        return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+    entry = entries[0]
     
     object_controller = EntryPreviewBuilder.get(entry, request.user)
     for parameter in object_controller.get_parameters_operation():
@@ -1452,6 +1458,7 @@ def entry_op_parameters(request, pk):
         adict["description"] = parameter.description
 
         json_obj["parameters"].append(adict)
+        json_obj["status"] = True
 
     return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
