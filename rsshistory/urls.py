@@ -194,6 +194,7 @@ urlpatterns = [
     path("user-tags-show", useractions.UserCompactedTagsListView.as_view(), name="user-tags-show"),
     path("user-browse-history/", userhistory.user_browse_history, name="user-browse-history"),
     path("user-search-history/", users.UserSearchHistoryListView.as_view(), name="user-search-history",),
+    path("user-search-history-remove/", userhistory.user_search_history_remove, name="user-search-history-remove",),
     path("search-history-remove/<int:pk>/", userhistory.search_history_remove, name="search-history-remove"),
     path("user-config", system.user_config, name="user-config"),
     path("user-configs", users.UserConfigsListView.as_view(), name="user-configs"),

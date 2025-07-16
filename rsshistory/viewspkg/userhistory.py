@@ -128,6 +128,31 @@ def search_history_remove(request, pk):
     return p.render("go_back.html")
 
 
+def user_search_history_remove(request):
+    p = ViewPage(request)
+    p.set_title("Remove search history")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
+
+    search = None
+    if "search" in request.GET:
+        search = request.GET["search"]
+    else:
+        json_obj["errors"] = "Missing link in arguments"
+        return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+    json_obj = {}
+    json_obj["status"] = False
+
+    entries = UserSearchHistory.objects.filter(user=request.user, search_query = search)
+    if entries.exists():
+        json_obj["status"] = True
+        entries.delete()
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+
 def add_suggestion(json_obj, text):
     # if len(json_obj["items"]) > 100:
     #    return

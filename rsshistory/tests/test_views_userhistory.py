@@ -128,3 +128,33 @@ class UserHistoryViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_user_search_history(self):
+        history = UserSearchHistory.objects.create(
+            search_query="lolipop", user=self.user
+        )
+
+        UserEntryVisitHistory.visited(self.entry_youtube, self.user)
+        UserEntryVisitHistory.visited(self.entry_linkedin, self.user)
+
+        url = reverse("{}:user-search-history".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_search_history_remove(self):
+        history = UserSearchHistory.objects.create(
+            search_query="lolipop", user=self.user
+        )
+
+        UserEntryVisitHistory.visited(self.entry_youtube, self.user)
+        UserEntryVisitHistory.visited(self.entry_linkedin, self.user)
+
+        url = reverse("{}:user-search-history-remove".format(LinkDatabase.name), args=["searchstring=lolipop"])
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)

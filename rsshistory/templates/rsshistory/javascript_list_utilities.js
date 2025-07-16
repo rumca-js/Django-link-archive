@@ -1,3 +1,5 @@
+{% load static %}
+
 let object_list_data = null;
 let original_title = null;
 
@@ -31,10 +33,12 @@ function fillSearchSuggestions(items) {
             let item_escaped = escapeHtml(item);
 
             var listItem = `
-                <a class="btnFilterTrigger list-group-item list-group-item-action" data-search="${item_escaped}" href="?search=${encodeURIComponent(item)}">
-                   🔍
-                    ${item_escaped}
-                </a>
+                <div class="list-group-item list-group-item-action">
+                    <a class="btnFilterTrigger " data-search="${item_escaped}" href="?search=${encodeURIComponent(item)}">
+                       🔍
+                        ${item_escaped}
+                    </a>
+		</div>
             `;
 
             text += listItem;
@@ -69,11 +73,18 @@ function fillSearchHistory(items) {
             let query = item.search_query
             let item_escaped = escapeHtml(query);
 
+            url = `{% url "rsshistory:user-search-history-remove" %}?search=${encodeURIComponent(query)}`;
+
             var listItem = `
-                <a class="btnFilterTrigger list-group-item list-group-item-action" data-search="${item_escaped}" href="?search=${encodeURIComponent(query)}">
-                🔍
-                    ${item_escaped}
-                </a>
+                <div class="list-group-item list-group-item-action d-flex align-items-center">
+                   <a class="btnFilterTrigger" data-search="${item_escaped}" href="?search=${encodeURIComponent(query)}">
+                   🔍
+                       ${item_escaped}
+                   </a>
+		   <a href="${url}" class="ms-auto">
+                     <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
+		   </a>
+                </div>
             `;
 
             text += listItem;
