@@ -19,6 +19,7 @@ class SearchViewTest(FakeInternetTestCase):
             date_created_day_limit=0,
         )
 
+        # call tested function
         conditions = search_view.get_conditions()
         str_conditions = str(conditions)
 
@@ -34,6 +35,7 @@ class SearchViewTest(FakeInternetTestCase):
             date_created_day_limit=4,
         )
 
+        # call tested function
         conditions = search_view.get_conditions()
         str_conditions = str(conditions)
 
@@ -49,8 +51,34 @@ class SearchViewTest(FakeInternetTestCase):
             date_created_day_limit=0,
         )
 
+        # call tested function
         conditions = search_view.get_conditions()
 
         expected_conditions = Q(bookmarked="True")
 
         self.assertEqual(conditions, expected_conditions)
+
+    def test_reset_priority(self):
+        SearchView.objects.all().delete()
+
+        search_view = SearchView.objects.create(
+            name="test",
+            filter_statement="bookmarked==True",
+            order_by="-date_published, link",
+            date_published_day_limit=0,
+            date_created_day_limit=0,
+        )
+
+        # call tested function
+        self.assertEqual(search_view.reset_priority(), 0)
+
+        search_view = SearchView.objects.create(
+            name="test2",
+            filter_statement="bookmarked==False",
+            order_by="-date_published, link",
+            date_published_day_limit=0,
+            date_created_day_limit=0,
+        )
+
+        # call tested function
+        self.assertEqual(search_view.reset_priority(), 1)

@@ -28,7 +28,7 @@ function resetSearch(text = '') {
     $('#btnFetch').prop("disabled", false);
     $('#btnFetch').html("Submit")
     if (text) {
-        $("#formResponse").html(text);
+        $("#Errors").html(text);
     }
 }
 
@@ -76,16 +76,17 @@ function addLink(page_url, browser, attempt=1) {
                link_text = getExistingObjectLink(object_id);
 
                $("#formResponse").html(`Entry added ${link_text}`);
-               $('#EntryExists').html("")
-               $('#Suggestions').html("")
                $('#Errors').html("")
+               $('#Suggestions').html("")
+
                resetSearch();
            }
            else {
                object_id = data.pk;
                link_text = getExistingObjectLink(object_id);
-               $("#formResponse").html(`Entry not added ${link_text}`);
+               $("#formResponse").html(`Entry not added`);
            }
+           resetSearch();
        },
        error: function(xhr, status, error) {
            if (requestaddLink != currentaddLink)
@@ -93,10 +94,9 @@ function addLink(page_url, browser, attempt=1) {
                return;
            }
            if (attempt < 3) {
-               $("#formResponse").html("Could not obtain information. Retry");
                addLink(page_url, browser, attempt + 1);
            } else {
-               resetSearch("Could not obtain information if link exists.");
+               resetSearch();
            }
        }
     });
@@ -125,7 +125,7 @@ function checkEntryExistsAndAdd(page_url, browser, attempt=1) {
                object_id = data.pk;
                link_text = getExistingObjectLink(object_id);
 
-               $("#formResponse").html(`Entry exists ${link_text}`);
+               $("#Errors").html(`Entry exists ${link_text}`);
                resetSearch();
            }
            else {
@@ -138,7 +138,7 @@ function checkEntryExistsAndAdd(page_url, browser, attempt=1) {
                return;
            }
            if (attempt < 3) {
-               $("#formResponse").html("Could not obtain information. Retry");
+               $("#Errors").html("Could not obtain information. Retry");
                checkEntryExistsAndAdd(page_url, browser, attempt + 1);
            } else {
                resetSearch("Could not obtain information if link exists.");
@@ -151,6 +151,9 @@ function checkEntryExistsAndAdd(page_url, browser, attempt=1) {
 function onUserInput() {
    const page_url = $('#id_link').val();
    const browser = $('#id_browser').val();
+
+   $('#Errors').html("")
+   $('#formResponse').html("")
 
    if (page_url == null)
    {
@@ -175,12 +178,17 @@ function onInputChanged() {
           search_link = new_search_link;
        }
 
+       $('#Errors').html("")
+       $('#Suggestions').html("")
+       $('#formResponse').html("")
+
        checkEntryExistsInDb(search_link);
        fetchLinkSuggestions(search_link);
     }
     else {
-       $('#EntryExists').html("")
+       $('#Errors').html("")
        $('#Suggestions').html("")
+       $('#formResponse').html("")
     }
 }
 
@@ -233,7 +241,6 @@ function checkEntryExistsInDb(search_link) {
         })
         .then(entryData => {
             console.log('Entry check data:', entryData);
-            $('#EntryExists').empty();
 
             if (entryData.status) {
                 $('#btnFetch').prop("disabled", true);
@@ -241,11 +248,10 @@ function checkEntryExistsInDb(search_link) {
 		let archived = entryData.archived;
 
                 let link_text = getExistingObjectLink(entryData.pk, archived);
-                $('#EntryExists').append(`<div>The entry already exists ${link_text}.</div>`);
+                $('#Errors').append(`<div>The entry already exists ${link_text}.</div>`);
             }
             else {
                 $('#btnFetch').prop("disabled", false);
-                $('#EntryExists').html("");
             }
         })
         .catch(error => {
@@ -264,9 +270,6 @@ function fetchLinkSuggestions(search_link) {
         })
         .then(data => {
             console.log('Fetched data:', data);
-
-            $('#Suggestions').empty();
-            $('#Errors').empty();
 
             if (data.status && Array.isArray(data.links) && data.links.length > 0) {
                 $('#Suggestions').append(`<div>Other link suggestions</div>`);

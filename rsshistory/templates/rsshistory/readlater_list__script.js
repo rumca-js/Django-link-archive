@@ -100,6 +100,9 @@ function fillListData() {
 }
 
 
+{% include "rsshistory/javascript_list_utilities.js" %}
+
+
 $(document).on("click", '#clear-list', function(e) {
     e.preventDefault();
 
@@ -119,4 +122,3 @@ $(document).on("click", '.remove-button', function(e) {
     sendRemoveListItem(buttonId);
 });
 
-{% include "rsshistory/javascript_list_utilities.js" %}

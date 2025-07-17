@@ -8,15 +8,16 @@
     </a>
 </div>
 
-<h1>Browser list</h1>
-Browsers are selected using this list, by priority
-
-<hr/>
-
+<div class="container">
+  <h1>Browser list</h1>
+  <div class="container">
+    Browsers are selected using this list, by priority
+  </div>
+  
   {% if content_list %}
      <div class="list-group">
          {% for browser in content_list %}
-         <div>
+         <div class="list-group-item">
              <div>
                  {% if not browser.enabled %}
                  <b>[DISABLED]</b>
@@ -59,5 +60,6 @@ Browsers are selected using this list, by priority
   {% else %}
     Browser list is empty!
   {% endif %}
+</div>
 
 {% endblock %} 

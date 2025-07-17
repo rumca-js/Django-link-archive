@@ -163,3 +163,18 @@ $(document).on("click", '#displayDark', function(e) {
 
     fillListData();
 });
+
+
+$(document).on("click", '.user-history-remove', function(e) {
+    e.preventDefault();
+
+    search_data = $(this).data('search');
+
+    url = `{% url "rsshistory:user-search-history-remove" %}?search=${search_data}`;
+
+    getDynamicJson(url, function(data) {
+        if (data.status) {
+           loadSearchHistory();
+	}
+    });
+});

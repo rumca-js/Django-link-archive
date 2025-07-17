@@ -150,7 +150,9 @@ def searchview_add(request):
             return p.render("summary_present.html")
 
         elif form.is_valid():
-            form.save()
+            view = form.save()
+            view.reset_priority()
+
             return HttpResponseRedirect(
                 reverse("{}:searchviews".format(LinkDatabase.name))
             )

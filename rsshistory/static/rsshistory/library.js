@@ -264,7 +264,7 @@ function fixStupidGoogleRedirects(input_url) {
 
 
 function sanitizeLink(link) {
-   link.trimStart();
+   link = link.trimStart();
 
    if (link.endsWith("/")) {
       link = link.slice(0, -1);
@@ -465,6 +465,31 @@ function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
        error: function(xhr, status, error) {
             if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
                 getDynamicJsonContent(url_address, htmlElement, errorInHtml);
+            }
+       }
+    });
+}
+
+
+const getDynamicJsonRequestTracker = {};
+function getDynamicJson(url_address, callback=null, errorInHtml = false) {
+    if (!getDynamicJsonRequestTracker[url_address]) {
+        getDynamicJsonRequestTracker[url_address] = 0;
+    }
+    const requestId = ++getDynamicJsonRequestTracker[url_address];
+
+    $.ajax({
+       url: url_address,
+       type: 'GET',
+       timeout: 10000,
+       success: function(data) {
+         if (callback && getDynamicJsonRequestTracker[url_address] === requestId) {
+             callback(data);
+         }
+       },
+       error: function(xhr, status, error) {
+            if (getDynamicJsonRequestTracker[url_address] === requestId) {
+                getDynamicJson(url_address, callback, errorInHtml);
             }
        }
     });

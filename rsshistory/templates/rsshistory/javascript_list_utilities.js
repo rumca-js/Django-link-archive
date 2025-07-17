@@ -81,7 +81,7 @@ function fillSearchHistory(items) {
                    🔍
                        ${item_escaped}
                    </a>
-		   <a href="${url}" class="ms-auto">
+		   <a href="${url}" class="ms-auto user-history-remove" data-search="${item_escaped}">
                      <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
 		   </a>
                 </div>
@@ -316,6 +316,7 @@ $(document).on('click', '.btnFilterTrigger', function(e) {
     loadRowListContent(search_term, page);
 });
 
+
 //-----------------------------------------------
 $(document).on('click', '.btnNavigation', function(e) {
     e.preventDefault();
@@ -329,6 +330,7 @@ $(document).on('click', '.btnNavigation', function(e) {
     loadRowListContent(search_term, page);
 });
 
+
 //-----------------------------------------------
 $(document).on('click', '#btnSearchHistory', function(e) {
     e.preventDefault();
@@ -337,6 +339,7 @@ $(document).on('click', '#btnSearchHistory', function(e) {
     $('#searchHistory').toggle();
     $('#searchSyntax').hide();
 });
+
 
 //-----------------------------------------------
 // Bind to the input event of the search input within the form
@@ -356,6 +359,7 @@ $('#filterForm input[name="search"]').on('input', function() {
     }
 });
 
+
 //-----------------------------------------------
 // Bind to the button syntax
 $(document).on("click", '#btnSearchSyntax', function(e) {
@@ -366,10 +370,12 @@ $(document).on("click", '#btnSearchSyntax', function(e) {
     $('#searchSuggestsions').hide();
 });
 
+
 $(document).on("click", '#hideSuggestions', function(e) {
     $('#searchSuggestions').hide();
     $('#searchHistory').hide();
 });
+
 
 $(document).on("click", '#hideHistory', function(e) {
     $('#searchSuggestions').hide();

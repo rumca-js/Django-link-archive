@@ -203,6 +203,8 @@ class SourceDataModel(models.Model):
 
         sources = SourceDataModel.objects.all()
         for source in sources:
+            source.category = None
+            source.subcategory = None
             SourceCategories.add(source.category_name)
             SourceSubCategories.add(source.category_name, source.subcategory_name)
 

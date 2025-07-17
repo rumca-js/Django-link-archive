@@ -142,4 +142,11 @@ def edit(request, pk):
     form.action_url = reverse("{}:credential-edit".format(LinkDatabase.name), args=[pk])
 
     p.context["form"] = form
+
+    p.context["form_description_post"] = """
+    <ul>
+       <li>Github supports token setup</li>
+       <li>E-mail supports username/password setup</li>
+    </ul>
+    """
     return p.render("form_basic.html")

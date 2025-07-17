@@ -130,41 +130,54 @@ class SearchView(models.Model):
         views = SearchView.objects.all()
         views.delete()
 
+        priority = 0
+
         SearchView.objects.create(
             name="Default",
             order_by="-page_rating_votes, -page_rating, link",
             default=True,
             hover_text="Search",
+            priority=priority,
         )
+        priority += 1
         SearchView.objects.create(
             name="Bookmarked",
             filter_statement="bookmarked=True",
             order_by="-date_created, link",
             user=True,
             hover_text="Search bookmars",
+            priority=priority,
         )
+        priority += 1
         SearchView.objects.create(
             name="Search by votes",
             order_by="-page_rating_votes, -page_rating, link",
             entry_limit=1000,
             hover_text="Searches by rating votes",
+            priority=priority,
         )
+        priority += 1
         SearchView.objects.create(
             name="What's created",
             order_by="-date_created, link",
             date_published_day_limit=7,
             hover_text="Search by date created",
+            priority=priority,
         )
+        priority += 1
         SearchView.objects.create(
             name="What's published",
             order_by="-date_published, link",
             date_published_day_limit=7,
             hover_text="Search by date published",
+            priority=priority,
         )
+        priority += 1
         SearchView.objects.create(
             name="Search all",
             order_by="-date_created, link",
             hover_text="Searches all entries",
+            priority=priority,
         )
 
     def reset_priorities():
@@ -174,6 +187,10 @@ class SearchView(models.Model):
             if view.priority != i:
                 view.priority = i
                 view.save()
+
+    def reset_priority(self):
+        count = SearchView.objects.all().count()
+        view.priority = count
 
     def prio_up(self):
         views = list(SearchView.objects.all().order_by("priority"))
