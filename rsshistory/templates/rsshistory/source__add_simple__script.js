@@ -6,6 +6,7 @@
 
 let submission_locked = true;
 let form_text = null;
+let url_exists = false;
 
 
 function resetSearch(text = '') {
@@ -114,9 +115,12 @@ function checkEntryExists(page_url, browser, attempt=1) {
 
                $("#formResponse").html(`Object exists ${detail_link_text}`);
                resetSearch();
+               url_exists = true;
            }
            else {
-               getForm(page_url, browser);
+               url_exists = false;
+               $("#formResponse").html("");
+               $('#btnFetch').prop("disabled", false);
            }
        },
        error: function(xhr, status, error) {
@@ -145,13 +149,15 @@ function onUserInput() {
 
     $('#btnFetch').prop("disabled", true);
 
-    checkEntryExists(page_url, browser);
+    getForm(page_url, browser);
 }
 
 
 function onInputChanged() {
     let element = $('#theForm input[name="link"]');
     let search_link = element.val();
+
+    $('#btnFetch').prop("disabled", true);
 
     if (search_link) {
        let new_search_link = sanitizeLink(search_link);
