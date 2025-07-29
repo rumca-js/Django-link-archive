@@ -36,6 +36,7 @@ chardet = "^5.2.0"
 lxml="^5.4.0"
 brutefeedparser="*"
 cryptography="^45.0.3"
+flask = "^3.1.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"

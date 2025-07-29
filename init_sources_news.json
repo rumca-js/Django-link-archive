@@ -8491,21 +8491,6 @@
     },
     {
         "age": 0,
-        "category_name": "New",
-        "enabled": false,
-        "export_to_cms": true,
-        "favicon": "https://renegat0x0.ddns.net/favicon.ico?v=2",
-        "fetch_period": 3600,
-        "id": 155,
-        "language": "en",
-        "remove_after_days": 0,
-        "source_type": "BaseRssPlugin",
-        "subcategory_name": "New",
-        "title": "Instance Programming Proxy",
-        "url": "https://renegat0x0.ddns.net/apps/programming/sources-json"
-    },
-    {
-        "age": 0,
         "category_name": "News",
         "enabled": false,
         "export_to_cms": true,

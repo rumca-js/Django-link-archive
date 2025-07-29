@@ -22,6 +22,7 @@ from utils.sqlmodel import (
 from datetime import timedelta, datetime, timezone
 
 from .webtools import PageOptions
+from .remoteserver import RemoteServer
 from .webconfig import WebConfig
 from .pages import RssPage
 from .url import Url
@@ -64,25 +65,19 @@ def read_source(db, source):
     source_title = source.title
     source_id = source.id
 
-    url = Url(url=source_url)
-    handler = url.get_handler()
-    response = url.get_response()
+    remote = RemoteServer("http://127.0.0.1:3000")
+    all_properties = remote.get_getj(source_url, name="RequestsCrawler")
 
-    if not handler:
-        print("Cannot obtain handler for:{}".format(source_url))
-        return
+    entries = remote.read_properties_section("Entries", all_properties)
 
-    if response:
-        entries = handler.get_entries()
+    if not entries:
+        print("Cannot obtain entries for:{}".format(source_url))
+        return result
 
-        if not entries:
-            print("Cannot obtain entries for:{}".format(source_url))
-            return result
-
-        for item in entries:
-            item["source_url"] = source_url
-            item["source"] = source_id
-            result.append(item)
+    for item in entries:
+        item["source_url"] = source_url
+        item["source"] = source_id
+        result.append(item)
 
     print("\rRead:{}".format(source_url), end="")
 
@@ -128,7 +123,7 @@ def fetch(db, parser, day_limit):
         date_now = DateUtils.get_datetime_now_utc()
         date_now = date_now.replace(tzinfo=None)
 
-        if not parser.args.force:
+        if parser and not parser.args.force:
             operational_data = SourceOperationalDataController(db, session)
             if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
                 if parser.args.verbose:
@@ -155,7 +150,11 @@ def fetch(db, parser, day_limit):
                     .count()
                 )
 
-            if entry["date_published"] > limit and entires_num == 0:
+            date_published = entry["date_published"]
+            date_published = DateUtils.parse_datetime(date_published)
+            entry["date_published"] = date_published
+
+            if date_published > limit and entires_num == 0:
                 ec = EntriesTableController(db)
                 ec.add_entry(entry)
 
@@ -344,73 +343,74 @@ class FeedClient(object):
         self.day_limit = day_limit
         self.engine = engine
 
+        self.parser = parser
         if parser:
-            self.parser = parser
+            database_file = self.parser.args.db
+        else:
+            database_file = "feedclient.db"
+        self.db = SqlModel(database_file=database_file, engine=self.engine)
+
+    def get(self, url):
+        request_server = RemoteServer("http://127.0.0.1:3000")
+
+        all_properties = request_server.get_getj(url, name="RequestsCrawler")
+        return all_properties
 
     def run(self):
-        database_file = self.parser.args.db
-
-        db = SqlModel(database_file=database_file, engine=self.engine)
 
         if self.parser.args.init_sources:
-            importer = JsonImporter(db, "init_sources.json")
+            importer = JsonImporter(self.db, "init_sources.json")
             importer.import_all()
 
         if self.parser.args.cleanup:
-            db.entries_table.truncate()
+            self.db.entries_table.truncate()
 
         if self.parser.args.add:
-            self.add_entry(db, self.parser.args.add)
+            self.add_entry(self.parser.args.add)
 
         if self.parser.args.bookmark:
-            self.make_bookmarked(db, self.parser.args.entry)
+            self.make_bookmarked(self.parser.args.entry)
 
         if self.parser.args.unbookmark:
-            self.make_not_bookmarked(db, self.parser.args.entry)
+            self.make_not_bookmarked(self.parser.args.entry)
 
         if self.parser.args.follow:
-            if not self.follow_url(db, self.parser.args.follow):
+            if not self.follow_url(self.parser.args.follow):
                 print("Cannot follow {}".format(self.parser.args.follow))
 
         if self.parser.args.unfollow:
-            self.unfollow_url(db, self.parser.args.unfollow)
+            self.unfollow_url(self.parser.args.unfollow)
 
         if self.parser.args.unfollow_all:
-            self.unfollow_all(db)
+            self.unfollow_all()
 
         if self.parser.args.enable:
-            self.enable_source(db, self.parser.args.enable)
+            self.enable_source(self.parser.args.enable)
 
         if self.parser.args.disable:
-            self.disable_source(db, self.parser.args.disable)
+            self.disable_source(self.parser.args.disable)
 
         if self.parser.args.enable_all:
-            self.enable_all_sources(db)
+            self.enable_all_sources()
 
         if self.parser.args.disable_all:
-            self.disable_all_sources(db)
+            self.disable_all_sources()
 
         if self.parser.args.mark_read:
-            self.mark_read(db)
+            self.mark_read()
 
         # one of the below needs to be true
         if self.parser.args.refresh_on_start:
-            c = EntriesTableController(db)
-            c.remove(self.day_limit)
-
-            # fetch(db, self.parser, self.day_limit)
-            asyncio.run(fetch_async(db, self.parser, self.day_limit))
-            date_now = DateUtils.get_datetime_now_utc()
-            print("Current time:{}".format(date_now))
+            self.refresh()
 
         if self.parser.args.list_sources:
-            self.list_sources(db)
+            self.list_sources()
 
         if self.parser.args.list_bookmarks:
-            self.list_bookmarks(db)
+            self.list_bookmarks()
 
         if self.parser.args.stats:
-            self.show_stats(db)
+            self.show_stats()
 
         if self.parser.args.output_dir:
             directory = Path(self.parser.args.output_dir)
@@ -420,7 +420,7 @@ class FeedClient(object):
                 shutil.rmtree(str(directory))
                 directory.mkdir(parents=True, exist_ok=True)
 
-            entries = get_entries(db, self.parser.args.source, ascending=False)
+            entries = get_entries(self.db, self.parser.args.source, ascending=False)
 
             verbose = False
             if self.parser.args.verbose:
@@ -431,7 +431,7 @@ class FeedClient(object):
 
         if self.parser.args.search:
             s = AlchemySearch(
-                db, self.parser.args.search, row_handler=SearchResultHandler()
+                self.db, self.parser.args.search, row_handler=SearchResultHandler()
             )
             s.search()
 
@@ -441,10 +441,10 @@ class FeedClient(object):
             PageDisplay(self.parser.args.page_details, verbose=self.parser.args.verbose)
 
         if self.parser.args.list_entries:
-            entries = get_entries(db, self.parser.args.source, ascending=True)
+            entries = get_entries(self.db, self.parser.args.source, ascending=True)
 
             date_limit = None
-            Session = db.get_session()
+            Session = self.db.get_session()
             with Session() as session:
                 read_marker = (
                     session.query(ReadMarkers)
@@ -454,11 +454,36 @@ class FeedClient(object):
                 if read_marker:
                     date_limit = read_marker.read_date
 
-            w = OutputWriter(db, entries, date_limit)
+            w = OutputWriter(self.db, entries, date_limit)
             w.write()
 
-    def enable_all_sources(self, db):
-        Session = db.get_session()
+    def refresh(self):
+        c = EntriesTableController(self.db)
+        c.remove(self.day_limit)
+
+        fetch(self.db, self.parser, self.day_limit)
+        #asyncio.run(fetch(self.db, self.parser, self.day_limit))
+        date_now = DateUtils.get_datetime_now_utc()
+        print("Current time:{}".format(date_now))
+
+    def get_entries(self, source_id=None, ascending=True):
+        Session = self.db.get_session()
+
+        with Session() as session:
+            query = session.query(EntriesTable)
+
+            if source_id:
+                query = query.filter(EntriesTable.source_obj__id == source_id)
+
+            if ascending:
+                query = query.order_by(asc(EntriesTable.date_published))
+            else:
+                query = query.order_by(desc(EntriesTable.date_published))
+
+            return query.all()
+
+    def enable_all_sources(self):
+        Session = self.db.get_session()
 
         with Session() as session:
             sources = session.query(SourcesTable).all()
@@ -472,8 +497,8 @@ class FeedClient(object):
 
         return False
 
-    def disable_all_sources(self, db):
-        Session = db.get_session()
+    def disable_all_sources(self):
+        Session = self.db.get_session()
 
         with Session() as session:
             sources = session.query(SourcesTable).all()
@@ -487,8 +512,8 @@ class FeedClient(object):
 
         return False
 
-    def enable_source(self, db, source_id):
-        Session = db.get_session()
+    def enable_source(self, source_id):
+        Session = self.db.get_session()
 
         try:
             source_id_int = int(source_id)
@@ -514,8 +539,8 @@ class FeedClient(object):
 
         return False
 
-    def disable_source(self, db, source_id):
-        Session = db.get_session()
+    def disable_source(self, source_id):
+        Session = self.db.get_session()
 
         try:
             source_id_int = int(source_id)
@@ -542,16 +567,34 @@ class FeedClient(object):
 
         return False
 
-    def mark_read(self, db):
-        Session = db.get_session()
+    def get_source(self, source_id):
+        Session = self.db.get_session()
+
+        try:
+            source_id_int = int(source_id)
+        except ValueError:
+            print("Cannot find such source:{}".format(source_id))
+            return False
+
+        with Session() as session:
+            source = (
+                session.query(SourcesTable)
+                .filter(SourcesTable.id == source_id_int)
+                .first()
+            )
+            if source:
+                return source
+
+    def mark_read(self):
+        Session = self.db.get_session()
         with Session() as session:
             ReadMarkers.set(session)
 
         print("Marked as read")
 
-    def follow_url(self, db, page_url):
-        def is_source(db, page_url):
-            Session = db.get_session()
+    def follow_url(self, page_url):
+        def is_source(page_url):
+            Session = self.db.get_session()
 
             with Session() as session:
                 count = (
@@ -564,41 +607,35 @@ class FeedClient(object):
 
         source = {}
 
-        if is_source(db, page_url):
-            print("Such source is already added")
+        if is_source(page_url):
+            print("Source {} is already added".format(page_url))
             return False
 
-        u = Url(page_url)
-        u.get_response()
-
-        url = Url.find_rss_url(u)
-        if not url:
-            print("That does not seem to be a correct RSS source:{}".format(page_url))
-            return
-
-        response = url.get_response()
-        title = url.get_title()
+        all_properties = self.get(page_url)
+        remote = RemoteServer("")
+        properties = remote.read_properties_section("Properties", all_properties)
+        title = properties["title"]
 
         if not title:
-            title = input("{}. Specify title of URL".format(page_url))
+            title = input("{}. Specify title of URL:".format(page_url))
 
-        source["url"] = url.url
+        source["url"] = page_url
         source["title"] = title
 
-        if is_source(db, url.url):
-            print("Such source is already added")
+        if is_source(page_url):
+            print("Source {} is already added".format(page_url))
 
-        Session = db.get_session()
+        Session = self.db.get_session()
         with Session() as session:
-            session.add(SourcesTable(url=url.url, title=title))
+            session.add(SourcesTable(url=page_url, title=title))
             session.commit()
 
-        print("You started following {}/{}".format(url.url, title))
+        print("You started following {}/{}".format(page_url, title))
 
         return True
 
-    def unfollow_url(self, db, url):
-        Session = db.get_session()
+    def unfollow_url(self, url):
+        Session = self.db.get_session()
 
         sources = []
         with Session() as session:
@@ -616,8 +653,8 @@ class FeedClient(object):
 
         return True
 
-    def unfollow_all(self, db):
-        Session = db.get_session()
+    def unfollow_all(self):
+        Session = self.db.get_session()
 
         sources = []
         with Session() as session:
@@ -630,16 +667,16 @@ class FeedClient(object):
         print("Unfollowed all sources")
         return True
 
-    def list_sources(self, db):
-        Session = db.get_session()
+    def list_sources(self):
+        Session = self.db.get_session()
         with Session() as session:
             sources = session.query(SourcesTable).all()
 
             for source in sources:
                 print_source(source)
 
-    def list_bookmarks(self, db):
-        Session = db.get_session()
+    def list_bookmarks(self):
+        Session = self.db.get_session()
 
         with Session() as session:
             query = session.query(EntriesTable)
@@ -652,8 +689,8 @@ class FeedClient(object):
             for entry in entries:
                 print_entry(entry)
 
-    def show_stats(self, db):
-        Session = db.get_session()
+    def show_stats(self):
+        Session = self.db.get_session()
 
         with Session() as session:
             q = session.query(EntriesTable)
@@ -665,7 +702,7 @@ class FeedClient(object):
             print(f"Entires:{count_entries}")
             print(f"Sources:{count_sources}")
 
-    def add_entry(self, db, url):
+    def add_entry(self, url):
         u = Url(url=url)
         response = u.get_response()
         if not response or not response.is_valid():
@@ -680,19 +717,19 @@ class FeedClient(object):
             print("Cannot obtain link properties")
             return False
 
-        ec = EntriesTableController(db)
+        ec = EntriesTableController(self.db)
         ec.add_entry(properties)
 
         return True
 
-    def make_bookmarked(self, db, entry_id):
+    def make_bookmarked(self, entry_id):
         try:
             entry_id_int = int(entry_id)
         except ValueError:
             print("Cannot bookmark")
             return False
 
-        Session = db.get_session()
+        Session = self.db.get_session()
         with Session() as session:
             entries = session.query(EntriesTable).filter(
                 EntriesTable.id == entry_id_int
@@ -710,14 +747,14 @@ class FeedClient(object):
 
         return True
 
-    def make_not_bookmarked(self, db, entry_id):
+    def make_not_bookmarked(self, entry_id):
         try:
             entry_id_int = int(entry_id)
         except ValueError:
             print("Cannot bookmark")
             return False
 
-        Session = db.get_session()
+        Session = self.db.get_session()
         with Session() as session:
             entries = session.query(EntriesTable).filter(
                 EntriesTable.id == entry_id_int
