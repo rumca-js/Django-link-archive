@@ -140,6 +140,7 @@ def fetch(db, parser, day_limit):
         op_con = SourceOperationalDataController(db)
         op_con.set_fetched(source, date_now)
 
+        #print("\rReading {}".format(source.url), end="")
         print("\rReading {}".format(source.url), end="")
         source_entries = read_source(db, source)
 
@@ -486,6 +487,34 @@ class FeedClient(object):
                 query = query.order_by(desc(EntriesTable.date_published))
 
             return query.all()
+
+    def get_entry(self, id):
+        Session = self.db.get_session()
+
+        with Session() as session:
+            query = session.query(EntriesTable)
+
+            query = query.filter(EntriesTable.id == id)
+
+            return query.first()
+
+    def get_sources(self):
+        Session = self.db.get_session()
+
+        with Session() as session:
+            query = session.query(SourcesTable)
+
+            return query.all()
+
+    def get_source(self, id):
+        Session = self.db.get_session()
+
+        with Session() as session:
+            query = session.query(SourcesTable)
+
+            query = query.filter(SourceTable.id == id)
+
+            return query.first()
 
     def enable_all_sources(self):
         Session = self.db.get_session()

@@ -2,6 +2,7 @@
 This is example script about how to use this project as a simple RSS reader
 """
 import json
+import time
 import threading
 from sqlalchemy import (
     create_engine,
@@ -46,8 +47,32 @@ def get_html(id, body, title="", index=False):
     return html
 
 
+@app.route("/")
+def index():
+    id = 0
+
+    # fmt: off
+
+    command_links = []
+    command_links.append({"link" : "/entries", "name":"entries", "description":"Shows entries"})
+    command_links.append({"link" : "/sources", "name":"sources", "description":"Shows sources"})
+    command_links.append({"link" : "/entry", "name":"entry", "description":"Shows entry"})
+    command_links.append({"link" : "/source", "name":"source", "description":"Shows source"})
+
+    # fmt: on
+
+    text = """<h1>Commands</h1>"""
+
+    for link_data in command_links:
+        text += """<div><a href="{}?id={}">{}</a> - {}</div>""".format(
+            link_data["link"], id, link_data["name"], link_data["description"]
+        )
+
+    return get_html(id=id, body=text, title="Yafr server", index=True)
+
+
 @app.route("/entries")
-def info():
+def entries():
     text = ""
 
     link = request.args.get("link")
@@ -66,7 +91,7 @@ def info():
         source = client.get_source(entry.source)
 
         text += """
-            <a href="{}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; margin-bottom: 10px;">
+            <a href="/entry?id={}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; margin-bottom: 10px;">
                 <img src="{}" width="100px" style="flex-shrink: 0;"/>
                 <div>
                     <div>{}</div>
@@ -75,9 +100,96 @@ def info():
                     <div>{}</div>
                 </div>
             </a>
-            """.format(entry.link, entry.thumbnail, entry.title, entry.link, entry.date_published, source.title)
+            """.format(entry.id, entry.thumbnail, entry.title, entry.link, entry.date_published, source.title)
 
     return get_html(id=0, body=text, title="Entries")
+
+
+@app.route("/entry")
+def entry():
+    text = ""
+
+    link = request.args.get("link")
+    id = request.args.get("id")
+    index = 0
+
+    entry = client.get_entry(id = id)
+
+    if entry:
+        source = client.get_source(entry.source)
+
+        text += """
+            <a href="{}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; margin-bottom: 10px;">
+                <div>
+                    <img src="{}" width="200px" style="flex-shrink: 0;"/>
+                    <div>{}</div>
+                    <div>{}</div>
+                    <div>{}</div>
+                    <div>{}</div>
+                    <pre>{}</pre>
+                </div>
+            </a>
+            """.format(entry.link, entry.thumbnail, entry.title, entry.link, entry.date_published, source.title, entry.description)
+
+    else:
+        text = "not found"
+
+    return get_html(id=0, body=text, title="Entries")
+
+
+@app.route("/sources")
+def sources():
+    text = ""
+
+    link = request.args.get("link")
+    index = 0
+
+    sources = client.get_sources()
+    for source in sources:
+        if link and source.url.find(link) == -1:
+            continue
+
+        index += 1
+
+        if index > 1000:
+            break
+
+        text += """
+            <a href="/source?id={}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; margin-bottom: 10px;">
+                <img src="{}" width="100px" style="flex-shrink: 0;"/>
+                <div>
+                    <div>{}</div>
+                    <div>{}</div>
+                </div>
+            </a>
+            """.format(source.id, source.favicon, source.url, source.title)
+
+    return get_html(id=0, body=text, title="Sources")
+
+
+@app.route("/source")
+def source():
+    text = ""
+
+    link = request.args.get("link")
+    id = request.args.get("id")
+    index = 0
+
+    source = client.get_source(id=id)
+
+    if source:
+        text += """
+            <a href="{}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; margin-bottom: 10px;">
+                <img src="{}" width="100px" style="flex-shrink: 0;"/>
+                <div>
+                    <div>{}</div>
+                </div>
+            </a>
+            """.format(source.url, source.favicon, source.title)
+    else:
+        text = "Not found"
+
+    return get_html(id=0, body=text, title="Source")
 
 
 def fetch(url):
@@ -100,7 +212,9 @@ def background_refresh():
         #print(url)
         client.follow_url(url)
 
-    client.refresh()
+    while True:
+        client.refresh()
+        time.sleep(60*10) # every 10 minutes
 
 
 def start_server():
