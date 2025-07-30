@@ -123,10 +123,15 @@ def fetch(db, parser, day_limit):
         date_now = DateUtils.get_datetime_now_utc()
         date_now = date_now.replace(tzinfo=None)
 
-        if parser and not parser.args.force:
-            operational_data = SourceOperationalDataController(db, session)
+        force = False
+
+        if parser and parser.args.force:
+            force = True
+
+        if not force:
+            operational_data = SourceOperationalDataController(db)
             if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
-                if parser.args.verbose:
+                if parser and parser.args.verbose:
                     print("Source {} does not require fetch yet".format(source.title))
                 continue
 
@@ -614,7 +619,10 @@ class FeedClient(object):
         all_properties = self.get(page_url)
         remote = RemoteServer("")
         properties = remote.read_properties_section("Properties", all_properties)
-        title = properties["title"]
+
+        title = None
+        if properties:
+            title = properties["title"]
 
         if not title:
             title = input("{}. Specify title of URL:".format(page_url))

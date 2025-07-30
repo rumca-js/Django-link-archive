@@ -2,6 +2,7 @@
 This is example script about how to use this project as a simple RSS reader
 """
 import json
+import threading
 from sqlalchemy import (
     create_engine,
 )
@@ -50,11 +51,17 @@ def info():
     text = ""
 
     link = request.args.get("link")
+    index = 0
 
     entries = client.get_entries()
     for entry in reversed(entries):
         if link and entry.link.find(link) == -1:
             continue
+
+        index += 1
+
+        if index > 1000:
+            break
 
         source = client.get_source(entry.source)
 
@@ -86,6 +93,16 @@ def read_sources(file):
         return json.loads(contents)
 
 
+def background_refresh():
+    news_sources = read_sources("init_sources_news.json")
+    for source in news_sources:
+        url = source["url"]
+        #print(url)
+        client.follow_url(url)
+
+    client.refresh()
+
+
 def start_server():
     host = "127.0.0.1"
     port=8000
@@ -97,13 +114,9 @@ def start_server():
 def main():
     WebConfig.init()
 
-    #news_sources = read_sources("init_sources_news.json")
-    #for source in news_sources:
-    #    url = source["url"]
-    #    #print(url)
-    #    client.follow_url(url)
-
-    #client.refresh()
+    # Start refresh in a daemon thread
+    refresh_thread = threading.Thread(target=background_refresh, daemon=True)
+    refresh_thread.start()
 
     start_server()
 
