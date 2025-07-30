@@ -506,16 +506,6 @@ class FeedClient(object):
 
             return query.all()
 
-    def get_source(self, id):
-        Session = self.db.get_session()
-
-        with Session() as session:
-            query = session.query(SourcesTable)
-
-            query = query.filter(SourceTable.id == id)
-
-            return query.first()
-
     def enable_all_sources(self):
         Session = self.db.get_session()
 
@@ -601,11 +591,11 @@ class FeedClient(object):
 
         return False
 
-    def get_source(self, source_id):
+    def get_source(self, id):
         Session = self.db.get_session()
 
         try:
-            source_id_int = int(source_id)
+            source_id_int = int(id)
         except ValueError:
             print("Cannot find such source:{}".format(source_id))
             return False
@@ -616,8 +606,7 @@ class FeedClient(object):
                 .filter(SourcesTable.id == source_id_int)
                 .first()
             )
-            if source:
-                return source
+            return source
 
     def mark_read(self):
         Session = self.db.get_session()

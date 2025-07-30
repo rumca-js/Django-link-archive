@@ -4,17 +4,20 @@ This is example script about how to use this project as a simple RSS reader
 import json
 import time
 import threading
+
 from sqlalchemy import (
     create_engine,
 )
+
 from flask import Flask, request, jsonify, Response
 
+from utils.sqlmodel import SqlModel
 from rsshistory.webtools import (
    WebConfig,
    RemoteServer,
    FeedClient,
+   Url,
 )
-from utils.sqlmodel import SqlModel
 
 
 engine = create_engine("sqlite:///feedclient.db")
@@ -56,8 +59,6 @@ def index():
     command_links = []
     command_links.append({"link" : "/entries", "name":"entries", "description":"Shows entries"})
     command_links.append({"link" : "/sources", "name":"sources", "description":"Shows sources"})
-    command_links.append({"link" : "/entry", "name":"entry", "description":"Shows entry"})
-    command_links.append({"link" : "/source", "name":"source", "description":"Shows source"})
 
     # fmt: on
 
@@ -76,11 +77,16 @@ def entries():
     text = ""
 
     link = request.args.get("link")
+    source_id = request.args.get("source")
+
     index = 0
 
     entries = client.get_entries()
     for entry in reversed(entries):
         if link and entry.link.find(link) == -1:
+            continue
+
+        if source_id and entry.source != int(source_id):
             continue
 
         index += 1
@@ -118,18 +124,41 @@ def entry():
     if entry:
         source = client.get_source(entry.source)
 
-        text += """
-            <a href="{}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; margin-bottom: 10px;">
-                <div>
-                    <img src="{}" width="200px" style="flex-shrink: 0;"/>
-                    <div>{}</div>
-                    <div>{}</div>
-                    <div>{}</div>
-                    <div>{}</div>
-                    <pre>{}</pre>
-                </div>
-            </a>
-            """.format(entry.link, entry.thumbnail, entry.title, entry.link, entry.date_published, source.title, entry.description)
+        handler = Url.get_type(entry.link)
+        if handler.get_link_embed():
+            embed = handler.get_link_embed()
+
+            text += """
+            <div width=50% height=50%>
+            <iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            """.format(embed)
+
+            text += """
+                <a href="{}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; margin-bottom: 10px;">
+                    <div>
+                        <div>{}</div>
+                        <div>{}</div>
+                        <div>{}</div>
+                        <div>{}</div>
+                        <pre>{}</pre>
+                    </div>
+                </a>
+                """.format(entry.link, entry.thumbnail, entry.title, entry.link, entry.date_published, source.title, entry.description)
+
+        else:
+            text += """
+                <a href="{}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; margin-bottom: 10px;">
+                    <div>
+                        <img src="{}" width="200px" style="flex-shrink: 0;"/>
+                        <div>{}</div>
+                        <div>{}</div>
+                        <div>{}</div>
+                        <div>{}</div>
+                        <pre>{}</pre>
+                    </div>
+                </a>
+                """.format(entry.link, entry.thumbnail, entry.title, entry.link, entry.date_published, source.title, entry.description)
 
     else:
         text = "not found"
@@ -179,13 +208,14 @@ def source():
 
     if source:
         text += """
-            <a href="{}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; margin-bottom: 10px;">
                 <img src="{}" width="100px" style="flex-shrink: 0;"/>
                 <div>
                     <div>{}</div>
+                    <div>{}</div>
+                    <div>{}</div>
+                    <a href="/entries?source={}">Entries</a>
                 </div>
-            </a>
-            """.format(source.url, source.favicon, source.title)
+            """.format(source.favicon, source.id, source.title, source.url, source.id)
     else:
         text = "Not found"
 
