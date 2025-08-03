@@ -21,12 +21,8 @@ from utils.sqlmodel import (
 )
 from datetime import timedelta, datetime, timezone
 
-from .webtools import PageOptions
 from .remoteserver import RemoteServer
-from .webconfig import WebConfig
-from .pages import RssPage
 from .url import Url
-from .handlers import HttpPageHandler
 
 from utils.dateutils import DateUtils
 from utils.serializers import HtmlExporter, JsonImporter
@@ -327,7 +323,7 @@ class SearchResultHandler(AlchemyRowHandler):
         print_entry(row)
 
 
-def get_entries(db, source_id=None, ascending=True):
+def get_entries(db, source_id=None, ascending=True, page=1, rows_per_page=200):
     Session = db.get_session()
 
     with Session() as session:
@@ -341,20 +337,27 @@ def get_entries(db, source_id=None, ascending=True):
         else:
             query = query.order_by(desc(EntriesTable.date_published))
 
+        offset = (page - 1) * rows_per_page
+        query = query.offset(offset).limit(rows_per_page)
+
         return query.all()
 
 
 class FeedClient(object):
-    def __init__(self, day_limit=7, engine=None, parser=None):
+    def __init__(self, day_limit=7, engine=None, parser=None, file_name="feedclient.db"):
         self.day_limit = day_limit
         self.engine = engine
 
         self.parser = parser
+
+        self.database_file = None
         if parser:
-            database_file = self.parser.args.db
-        else:
-            database_file = "feedclient.db"
-        self.db = SqlModel(database_file=database_file, engine=self.engine)
+            self.database_file = self.parser.args.db
+
+        if not self.database_file:
+            self.database_file = file_name
+
+        self.db = SqlModel(database_file=self.database_file, engine=self.engine)
 
     def get(self, url):
         request_server = RemoteServer("http://127.0.0.1:3000")
@@ -472,7 +475,7 @@ class FeedClient(object):
         date_now = DateUtils.get_datetime_now_utc()
         print("Current time:{}".format(date_now))
 
-    def get_entries(self, source_id=None, ascending=True):
+    def get_entries(self, source_id=None, conditions=None, ascending=True, page=1, rows_per_page=200):
         Session = self.db.get_session()
 
         with Session() as session:
@@ -481,10 +484,17 @@ class FeedClient(object):
             if source_id:
                 query = query.filter(EntriesTable.source_obj__id == source_id)
 
+            if conditions:
+                for condition in conditions:
+                    query = query.filter(condition)
+
             if ascending:
                 query = query.order_by(asc(EntriesTable.date_published))
             else:
                 query = query.order_by(desc(EntriesTable.date_published))
+
+            offset = (page - 1) * rows_per_page
+            query = query.offset(offset).limit(rows_per_page)
 
             return query.all()
 
@@ -498,11 +508,18 @@ class FeedClient(object):
 
             return query.first()
 
-    def get_sources(self):
+    def get_sources(self, conditions=None, page=1, rows_per_page=200):
         Session = self.db.get_session()
 
         with Session() as session:
             query = session.query(SourcesTable)
+
+            if conditions:
+                for condition in conditions:
+                    query = query.filter(condition)
+
+            offset = (page - 1) * rows_per_page
+            query = query.offset(offset).limit(rows_per_page)
 
             return query.all()
 

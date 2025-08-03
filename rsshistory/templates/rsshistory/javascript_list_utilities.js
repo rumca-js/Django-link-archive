@@ -189,7 +189,7 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
    }
 
    if (isEmpty($('#listData'))) {
-      $('#listData').html(getSpinnerText());
+      //$('#listData').html(getSpinnerText());
    }
 
    const currentUrl = new URL(window.location);

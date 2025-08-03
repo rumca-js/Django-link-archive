@@ -262,11 +262,25 @@ def create_destionation_table(table_name, source_table, destination_engine):
         if not destination_engine.dialect.has_table(connection, table_name):
             columns = []
             for column in source_table.columns:
-                # Mapping bytea to LargeBinary (or appropriate type)
-                if column.type.__class__ == BYTEA:
-                    columns.append(Column(column.name, LargeBinary, nullable=column.nullable))
+                col_type = column.type
+                if isinstance(col_type, BYTEA):
+                    col_type = LargeBinary
+
+                # Handle 'id' as primary key and autoincrement in SQLite
+                if column.name == "id":
+                    columns.append(Column(
+                        "id",
+                        Integer,
+                        primary_key=True,
+                        autoincrement=True,
+                        nullable=False
+                    ))
                 else:
-                    columns.append(Column(column.name, column.type, nullable=column.nullable))
+                    columns.append(Column(
+                        column.name,
+                        col_type,
+                        nullable=column.nullable
+                    ))
 
                 # For debugging purposes, you can print column details
                 # print(column.name)

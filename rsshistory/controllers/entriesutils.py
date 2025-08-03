@@ -646,10 +646,6 @@ class EntryUpdater(object):
 
         self.update_entry(url.all_properties)
 
-        if not url.is_valid():
-            self.handle_invalid_response(url)
-            return
-
         # we may not support update for some types. PDFs, other resources on the web
         if props and len(props) > 0:
             if "title" in props and props["title"] is not None:
@@ -676,6 +672,10 @@ class EntryUpdater(object):
             entry.date_dead_since = None
 
         self.update_calculated_vote()
+
+        if not url.is_valid():
+            self.handle_invalid_response(url)
+            return
 
         if props and len(props) > 0:
             self.check_for_sources(entry, url)
@@ -735,10 +735,6 @@ class EntryUpdater(object):
 
         self.update_entry(url.all_properties)
 
-        if not url.is_valid():
-            self.handle_invalid_response(url)
-            return
-
         # we may not support update for some types. PDFs, other resources on the web
         if props and len(props) > 0:
             if "title" in props and props["title"] is not None:
@@ -761,6 +757,10 @@ class EntryUpdater(object):
             entry.date_dead_since = None
 
         self.update_calculated_vote()
+
+        if not url.is_valid():
+            self.handle_invalid_response(url)
+            return
 
         if props and len(props) > 0:
             if entry_changed:
