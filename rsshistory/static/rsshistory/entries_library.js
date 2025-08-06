@@ -6,11 +6,15 @@
 
 
 function isStatusCodeValid(entry) {
-    if (entry.status_code >= 200 && entry.status_code <= 400)
+    if (entry.status_code >= 200 && entry.status_code < 400)
         return true;
 
     // unknown status is valid (undetermined, not invalid)
     if (entry.status_code == 0)
+        return true;
+
+    // user agent, means that something is valid, but behind paywall
+    if (entry.status_code == 403)
         return true;
 
     return false;
@@ -60,7 +64,7 @@ function getEntryVotesBadge(entry, overflow=false) {
     }
 
     let badge_text = entry.page_rating_votes > 0 ? `
-        <span class="badge text-bg-warning" style="${style}">
+        <span class="badge text-bg-warning" style="${style}" title="User vote">
             ${entry.page_rating_votes}
         </span>` : '';
 
@@ -75,7 +79,7 @@ function getEntryBookmarkBadge(entry, overflow=false) {
     }
 
     let badge_star = entry.bookmarked ? `
-        <span class="badge text-bg-warning" style="${style}">
+        <span class="badge text-bg-warning" style="${style}" title="Bookmarked">
             ★
         </span>` : '';
     return badge_star;
@@ -89,7 +93,7 @@ function getEntryAgeBadge(entry, overflow=false) {
     }
 
     let badge_text = entry.age > 0 ? `
-        <span class="badge text-bg-warning" style="${style}">
+        <span class="badge text-bg-warning" style="${style}" title="Age limit">
             A
         </span>` : '';
     return badge_text;
@@ -103,7 +107,7 @@ function getEntryDeadBadge(entry, overflow=false) {
     }
 
     let badge_text = entry.date_dead_since ? `
-        <span class="badge text-bg-warning" style="${style}">
+        <span class="badge text-bg-warning" style="${style}" title="Dead">
            💀
         </span>` : '';
     return badge_text;
@@ -219,7 +223,7 @@ function getEntryParameters(entry) {
 
    let date_published = getEntryDatePublished(entry);
 
-   html_out += `<div class="text-nowrap"><strong>Publish date:</strong> ${date_published}</div>`;
+   html_out += `<div class="text-nowrap d-flex flex-wrap" id="entryParameters"><strong>Publish date:</strong> ${date_published}</div>`;
 
    html_out += getEntryBookmarkBadge(entry);
    html_out += getEntryVotesBadge(entry);
@@ -376,7 +380,7 @@ function getEntryOpParameters(entry) {
 
     text += `
     <h3>Parameters</h3>
-    <div>Points: ${entry.page_rating}|${entry.page_rating_votes}|${entry.page_rating_contents}</div>
+    <div title="Points:Page rating|User rating|Page contents rating">Points: ${entry.page_rating}|${entry.page_rating_votes}|${entry.page_rating_contents}</div>
     `;
 
     if (entry.date_created) {
@@ -480,8 +484,7 @@ function getEntryFullTextStandard(entry) {
 
 
 function getEntryFullTextYouTube(entry) {
-    const urlParams = new URL(entry.link).searchParams;
-    const videoId = urlParams.get("v");
+    const videoId = getYouTubeVideoId(entry.link);
 
     const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : "";
 
@@ -504,8 +507,7 @@ function getEntryFullTextYouTube(entry) {
 
 
 function getEntryFullTextOdysee(entry) {
-    const url = new URL(entry.link);
-    const videoId = url.pathname.split('/').pop();
+    const videoId = getOdyseeVideoId(entry.link);
 
     const embedUrl = videoId ? `https://odysee.com/$/embed/${videoId}` : "";
 
@@ -529,9 +531,15 @@ function getEntryFullTextOdysee(entry) {
 function getEntryDetailText(entry) {
     let text = "";
 
-    if (entry.link.startsWith("https://www.youtube.com/watch?v="))
+    const protocol_less = new UrlLocation(entry.link).getProtocolless();
+
+    if (protocol_less.startsWith("www.youtube.com/watch"))
         text = getEntryFullTextYouTube(entry);
-    else if (entry.link.startsWith("https://odysee.com/"))
+    else if (protocol_less.startsWith("youtube.com/watch"))
+        text = getEntryFullTextYouTube(entry);
+    else if (protocol_less.startsWith("m.youtube.com/watch"))
+        text = getEntryFullTextYouTube(entry);
+    else if (protocol_less.startsWith("odysee.com/"))
         text = getEntryFullTextOdysee(entry);
     else
         text = getEntryFullTextStandard(entry);

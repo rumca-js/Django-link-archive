@@ -27,6 +27,21 @@ function escapeHtml(unsafe)
 }
 
 
+class UrlLocation {
+  constructor(urlString) {
+    try {
+      this.url = new URL(urlString);
+    } catch (e) {
+      throw new Error("Invalid URL");
+    }
+  }
+
+  getProtocolless() {
+    return sanitizeLink(this.url.href.replace(`${this.url.protocol}//`, ''));
+  }
+}
+
+
 function createLinks(inputText) {
     const urlRegex = /(?<!<a[^>]*>)(https:\/\/[a-zA-Z0-9-_\.\/]+)(?!<\/a>)/g;
     const urlRegex2 = /(?<!<a[^>]*>)(http:\/\/[a-zA-Z0-9-_\.\/]+)(?!<\/a>)/g;
@@ -52,6 +67,11 @@ function getSpinnerText(text = 'Loading...') {
 }
 
 
+function animateToTop() {
+    $('html, body').animate({ scrollTop: 0 }, 'slow');
+}
+
+
 function putSpinnerOnIt(button) {
     button.prop("disabled", true);
 
@@ -63,10 +83,8 @@ function putSpinnerOnIt(button) {
 }
 
 
-function GetPaginationNav(data) {
-    let totalPages = data.num_pages;
-    let totalRows = data.count;
-    let currentPage = data.page;
+function GetPaginationNav(currentPage, totalPages, totalRows) {
+    totalPages = Math.ceil(totalPages);
 
     if (totalPages <= 1) {
         return '';
@@ -125,6 +143,47 @@ function GetPaginationNav(data) {
     paginationText += `
             </ul>
             ${currentPage} / ${totalPages} @ ${totalRows} records.
+        </nav>
+    `;
+
+    return paginationText;
+}
+
+
+function GetPaginationNavSimple(currentPage) {
+    let paginationText = `
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+    `;
+
+    const currentUrl = new URL(window.location);
+    currentUrl.searchParams.delete('page');
+    const paginationArgs = `${currentUrl.searchParams.toString()}`;
+
+    if (currentPage > 1) {
+        paginationText += `
+            <li class="page-item">
+                <a href="?page=1&${paginationArgs}" data-page="1" class="btnNavigation page-link">|&lt;</a>
+            </li>
+        `;
+    }
+    if (currentPage > 1) {
+        paginationText += `
+            <li class="page-item">
+                <a href="?page=${currentPage - 1}&${paginationArgs}" data-page="${currentPage - 1}" class="btnNavigation page-link">&lt;</a>
+            </li>
+        `;
+    }
+
+    paginationText += `
+        <li class="page-item">
+            <a href="?page=${currentPage + 1}&${paginationArgs}" data-page="${currentPage + 1}" class="btnNavigation page-link">&gt;</a>
+        </li>
+    `;
+
+    paginationText += `
+            </ul>
+            Page: ${currentPage}
         </nav>
     `;
 
@@ -263,7 +322,7 @@ function fixStupidGoogleRedirects(input_url) {
 }
 
 
-function sanitizeLink(link) {
+function sanitizeLinkGeneral(link) {
    link = link.trimStart();
 
    if (link.endsWith("/")) {
@@ -273,7 +332,14 @@ function sanitizeLink(link) {
       link = link.slice(0, -1);
    }
 
+   return link;
+}
+
+
+function sanitizeLink(link) {
+   link = sanitizeLinkGeneral(link);
    link = fixStupidGoogleRedirects(link);
+   link = sanitizeLinkGeneral(link);
 
    return link;
 }
@@ -357,6 +423,13 @@ function getChannelUrl(url) {
     channelid = getYouTubeChannelUrl(url);
     if (channelid)
         return channelid;
+}
+
+
+function getOdyseeVideoId(url) {
+    const url_object = new URL(url);
+    const videoId = url_object.pathname.split('/').pop();
+    return videoId;
 }
 
 

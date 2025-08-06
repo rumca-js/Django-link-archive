@@ -53,7 +53,7 @@ function fillListData() {
 
     var finished_text = fillDomainList(domains);
     $('#listData').html(finished_text);
-    let pagination = GetPaginationNav(data);
+    let pagination = GetPaginationNav(data.page, data.num_pages, data.count);
     $('#pagination').html(pagination);
 }
 

@@ -64,7 +64,7 @@ function fillListData() {
 
     var finished_text = fillSourceList(sources);
     $('#listData').html(finished_text);
-    let pagination = GetPaginationNav(data);
+    let pagination = GetPaginationNav(data.page, data.num_pages, data.count);
     $('#pagination').html(pagination);
 }
 

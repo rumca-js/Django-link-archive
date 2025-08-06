@@ -95,7 +95,7 @@ function fillListData() {
     else {
         var finished_text = fillEntryList(entries);
         $('#listData').html(finished_text);
-        let pagination = GetPaginationNav(data);
+        let pagination = GetPaginationNav(data.page, data.num_pages, data.count);
         $('#pagination').html(pagination);
     }
 
