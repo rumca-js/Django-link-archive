@@ -36,7 +36,7 @@ class ToolsViewsTest(FakeInternetTestCase):
     def test_get_page_properties__html_get(self):
         MockRequestCounter.mock_page_requests = 0
         url = (
-            reverse("{}:get-page-properties".format(LinkDatabase.name))
+            reverse("{}:json-page-properties".format(LinkDatabase.name))
             + "?link=https://www.linkedin.com"
         )
         response = self.client.get(url)
@@ -51,7 +51,7 @@ class ToolsViewsTest(FakeInternetTestCase):
     def test_get_page_properties__youtube_get(self):
         MockRequestCounter.mock_page_requests = 0
         url = (
-            reverse("{}:get-page-properties".format(LinkDatabase.name))
+            reverse("{}:json-page-properties".format(LinkDatabase.name))
             + "?link=https://www.youtube.com/watch?v=SwlIAjcYypA"
         )
         response = self.client.get(url)
@@ -64,7 +64,7 @@ class ToolsViewsTest(FakeInternetTestCase):
     def test_get_page_properties__ytchannel_get(self):
         MockRequestCounter.mock_page_requests = 0
         url = (
-            reverse("{}:get-page-properties".format(LinkDatabase.name))
+            reverse("{}:json-page-properties".format(LinkDatabase.name))
             + "?link=https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
         response = self.client.get(url)

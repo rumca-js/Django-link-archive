@@ -2,6 +2,7 @@
 
 let object_list_data = null;
 let original_title = null;
+let showSuggestions = true;
 
 
 function getHideButton(input_text = "Hide") {
@@ -104,8 +105,6 @@ function fillSearchHistory(items) {
 
 
 let currentSearchSuggestions = 0;
-let showSuggestions = true;
-
 function loadSearchSuggestions(search_term, attempt = 1) {
     let requestVersion = ++currentSearchSuggestions;
 

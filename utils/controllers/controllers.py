@@ -1,5 +1,4 @@
 from utils.sqlmodel import (
-    SqlModel,
     EntriesTable,
 )
 

@@ -1,9 +1,11 @@
+from .controllers import (
+    EntriesTableController,
+    SourcesTableController,
+)
 from .sqlmodel import (
     SqlModel,
-    EntriesTableController,
     EntriesTable,
     SourcesTable,
-    SourcesTableController,
 )
 
 from .reflected import (

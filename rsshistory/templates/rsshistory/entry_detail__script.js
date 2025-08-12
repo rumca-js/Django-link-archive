@@ -299,7 +299,7 @@ function updateEntryProperties() {
     $('#entryParameters').html(entry_parameters);
 
     if (debug) {
-       $('#entryDebug').html(String(entry_json_data.link));
+       // TODO does not work, displays object $('#entryDebug').html(String(entry_json_data.link));
     }
 }
 

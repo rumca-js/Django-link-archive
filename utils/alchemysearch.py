@@ -12,13 +12,12 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
     return 1 if true
     """
 
-    def __init__(self, table, ignore_case=False):
+    def __init__(self, table, ignore_case = False):
         self.table = table
         self.ignore_case = ignore_case
 
     def evaluate_complex_symbol(self, symbol, condition_data):
         # TODO make todo check if symbol exists in table?
-
         if condition_data[1] == "==":
             if self.ignore_case:
                 column = self.table.c[condition_data[0]]
@@ -48,6 +47,9 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
         if condition_data[1] == "=":
             symbol = condition_data[2]
             symbol = symbol.replace("*", "%")
+
+            print(condition_data[0])
+            print(symbol)
 
             if self.ignore_case:
                 return self.table.c[condition_data[0]].ilike(symbol)
@@ -94,74 +96,74 @@ class AlchemyRowHandler(object):
 
 
 class AlchemySearch(object):
-    def __init__(self, db, search_term, row_handler=None, args=None):
+    def __init__(self, db, search_term, row_handler=None, table=None, rows_per_page=None, page=None, ignore_case=True, order_by=None, init_conditions=None):
         self.db = db
         self.search_term = search_term
+
         self.alchemy_row_handler = row_handler
 
-        self.args = args
+        self.rows_per_page = rows_per_page
+        self.page = page
+
+        self.table = table
+        self.ignore_case = ignore_case
+        self.order_by = order_by
+        self.init_conditions = init_conditions
+
+        self.get_destination_table()
 
     def search(self):
+        rows = self.get_filtered_objects()
+
+        for row in rows:
+            self.alchemy_row_handler.handle_row(row)
+
+    def get_destination_table(self):
         destination_metadata = MetaData()
 
-        if self.args and "table" in self.args:
-            destination_table = Table(
-                self.args.table, destination_metadata, autoload_with=self.db
-            )
+        if self.table:
+            self.destination_table = Table(self.table, destination_metadata, autoload_with=self.db)
         else:
-            destination_table = Table(
-                "linkdatamodel", destination_metadata, autoload_with=self.db
-            )
+            self.destination_table = Table("linkdatamodel", destination_metadata, autoload_with=self.db)
 
-        ignore_case = False
-        if self.args and self.args.ignore_case:
-            ignore_case = True
-
-        symbol_evaluator = AlchemySymbolEvaluator(destination_table, ignore_case)
-        equation_evaluator = AlchemyEquationEvaluator(
-            self.search_term, symbol_evaluator
-        )
+    def get_query_conditions(self):
+        symbol_evaluator = AlchemySymbolEvaluator(self.destination_table, self.ignore_case)
+        equation_evaluator = AlchemyEquationEvaluator(self.search_term, symbol_evaluator)
 
         search = OmniSearch(self.search_term, equation_evaluator=equation_evaluator)
         combined_query_conditions = search.get_combined_query()
 
+        return combined_query_conditions
+
+    def get_filtered_objects(self):
+        combined_query_conditions = self.get_query_conditions()
+        print(combined_query_conditions)
+
+        if combined_query_conditions is not None and self.init_conditions is not None:
+            combined_query_conditions = and_(combined_query_conditions, self.init_conditions)
+        elif self.init_conditions is not None:
+            combined_query_conditions = self.init_conditions
+
         rows = []
         with self.db.connect() as connection:
-            order_by_column_name = "id"
-            if self.args and self.args.order_by:
-                order_by_column_name = self.args.order_by
-
-            order_by_column = getattr(destination_table.c, order_by_column_name, None)
-
-            if order_by_column is None:
-                raise AttributeError(f"Invalid order_by column: {self.args.order_by}")
-
-            if self.args:
-                # Determine sorting order
-                order_by_clause = (
-                    order_by_column.asc()
-                    if self.args.asc
-                    else (
-                        order_by_column.desc()
-                        if self.args.desc
-                        else order_by_column.asc()
-                    )
-                )
+            if combined_query_conditions is None:
+                stmt = select(self.destination_table)
             else:
-                order_by_clause = order_by_column.asc()
+                stmt = select(self.destination_table).where(combined_query_conditions)
 
-            # Use select() for SQLAlchemy Core
-            stmt = (
-                select(destination_table)
-                .where(combined_query_conditions)
-                .order_by(order_by_clause)
-            )
+            if self.order_by:
+                stmt = stmt.order_by(*self.order_by)
+
+            print(stmt)
+
+            if self.rows_per_page and self.page:
+                offset = (self.page - 1) * self.rows_per_page
+                stmt = stmt.offset(offset).limit(self.rows_per_page)
 
             # Execute the query
             result = connection.execute(stmt)
-
+            
             # Fetch all results
             rows = result.fetchall()
 
-        for row in rows:
-            self.alchemy_row_handler.handle_row(row)
+            return rows

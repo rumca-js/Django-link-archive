@@ -42,7 +42,7 @@ from ..forms import (
     UrlContentsForm,
     LinkPropertiesForm,
 )
-from ..views import ViewPage, get_request_browser
+from ..views import ViewPage, get_request_browser, get_request_url_with_browser
 from ..pluginurl.urlhandler import UrlHandlerEx
 
 
@@ -53,10 +53,10 @@ def get_errors(page_url):
 
     link = page_url.url
 
-    page = UrlLocation(link)
+    location = UrlLocation(link)
     config = Configuration.get_object().config_entry
 
-    domain = page.get_domain()
+    domain = location.get_domain()
     u = UrlHandlerEx(link)
     is_allowed = u.is_allowed()
 
@@ -77,9 +77,9 @@ def get_errors(page_url):
         warnings.append("Link contains arguments. Is that intentional?")
     if link.find("#") >= 0:
         warnings.append("Link contains arguments. Is that intentional?")
-    if page.get_port() and page.get_port() >= 0:
+    if location.get_port() and location.get_port() >= 0:
         warnings.append("Link contains port. Is that intentional?")
-    if not page.is_web_link():
+    if not location.is_web_link():
         warnings.append(
             "Not a web link. Expecting protocol://domain.tld styled location"
         )
@@ -87,7 +87,7 @@ def get_errors(page_url):
     response = page_url.get_response()
 
     # errors
-    if not page.is_protocolled_link():
+    if not location.is_protocolled_link():
         errors.append("Not a protocolled link. Forget http:// or https:// etc.?")
     if not response:
         errors.append("Information about page availability could not be obtained")
@@ -112,25 +112,7 @@ def get_errors(page_url):
     return result
 
 
-def get_request_url_with_browser(input_map):
-    browser = get_request_browser(input_map)
-
-    if browser:
-        browsers = [browser.get_setup()]
-    else:
-        browsers = None
-
-    page_link = input_map["link"]
-
-    settings = {}
-    if "html" in input_map:
-        settings["handler_class"] = "HttpPageHandler"
-
-    url_ex = UrlHandlerEx(page_link, settings=settings, browsers=browsers)
-    return url_ex
-
-
-def get_page_properties(request):
+def json_page_properties(request):
     p = ViewPage(request)
     p.set_title("Page properties")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -177,7 +159,7 @@ def get_page_properties(request):
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
-def page_show_properties(request):
+def page_show_props(request):
     p = ViewPage(request)
     p.set_title("Show page properties")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)

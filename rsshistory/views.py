@@ -20,6 +20,7 @@ from .models import (
 from .apps import LinkDatabase
 from .configuration import Configuration
 from .pluginurl.urlhandler import UrlHandler
+from .pluginurl.urlhandler import UrlHandlerEx
 
 
 def get_search_term(themap):
@@ -83,6 +84,24 @@ def get_request_browser(input_map):
                 return
 
     return browser
+
+
+def get_request_url_with_browser(input_map):
+    browser = get_request_browser(input_map)
+
+    if browser:
+        browsers = [browser.get_setup()]
+    else:
+        browsers = None
+
+    page_link = input_map["link"]
+
+    settings = {}
+    if "html" in input_map:
+        settings["handler_class"] = "HttpPageHandler"  # TODO should not be hardcoded?
+
+    url_ex = UrlHandlerEx(page_link, settings=settings, browsers=browsers)
+    return url_ex
 
 
 def get_search_view(request):

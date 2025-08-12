@@ -20,6 +20,8 @@ from sqlalchemy import (
     DateTime,
     delete,
     update,
+    asc,
+    desc,
 )
 from sqlalchemy.orm import sessionmaker
 from datetime import timedelta, datetime, timezone
@@ -123,9 +125,9 @@ class Base(DeclarativeBase):
 class EntriesTable(Base):
     __tablename__ = "linkdatamodel"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     link: Mapped[str] = mapped_column(String(30), unique=True)
-    title: Mapped[str]
+    title: Mapped[Optional[str]]
     description: Mapped[Optional[str]]
     thumbnail: Mapped[Optional[str]]
     language: Mapped[Optional[str]]
@@ -143,61 +145,26 @@ class EntriesTable(Base):
     permanent: Mapped[bool] = mapped_column(default=False)
     author: Mapped[Optional[str]]
     album: Mapped[Optional[str]]
+    source_url: Mapped[Optional[str]]
+    contents_type: Mapped[int] = mapped_column(default=0)
+    page_rating_contents: Mapped[int] = mapped_column(default=0)
+    page_rating_votes: Mapped[int] = mapped_column(default=0)
+    page_rating_visits: Mapped[int] = mapped_column(default=0)
+    page_rating: Mapped[int] = mapped_column(default=0)
     # advanced / foreign
-    source: Mapped[Optional[int]]
-
-
-class EntriesTableController(object):
-    def __init__(self, db, session=None):
-        self.conn = db
-        self.session = session
-
-    def get_session(self):
-        if not self.session:
-            return self.conn.get_session()
-        else:
-            return self.session
-
-    def remove(self, days):
-        now = datetime.now(timezone.utc)
-        limit = now - timedelta(days=days)
-
-        Session = self.get_session()
-
-        with Session() as session:
-            entries = session.query
-
-            query = delete(EntriesTable).where(
-                EntriesTable.date_published < limit, EntriesTable.bookmarked == False
-            )
-            session.execute(query)
-            session.commit()
-
-    def add_entry(self, entry):
-        # Get the set of column names from EntriesTable
-        valid_columns = {column.name for column in EntriesTable.__table__.columns}
-
-        # Remove keys that are not in EntriesTable
-        entry = {key: value for key, value in entry.items() if key in valid_columns}
-
-        entry_obj = EntriesTable(**entry)
-
-        Session = self.get_session()
-        with Session() as session:
-            session.add(entry_obj)
-            session.commit()
+    source_id: Mapped[Optional[int]]
 
 
 class SourcesTable(Base):
     __tablename__ = "sourcedatamodel"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     enabled: Mapped[bool] = mapped_column(default=True)
     url: Mapped[str] = mapped_column(unique=True)
-    title: Mapped[str]
+    title: Mapped[Optional[str]]
     age: Mapped[int] = mapped_column(default=0)
-    category: Mapped[Optional[str]]
-    subcategory: Mapped[Optional[str]]
+    category_id: Mapped[Optional[int]]
+    subcategory_id: Mapped[Optional[int]]
     export_to_cms: Mapped[bool] = mapped_column(default=True)
     favicon: Mapped[Optional[str]]
     fetch_period: Mapped[Optional[int]]
@@ -207,128 +174,23 @@ class SourcesTable(Base):
     source_type: Mapped[Optional[str]]
     category_name: Mapped[Optional[str]]
     subcategory_name: Mapped[Optional[str]]
+    auto_tag: Mapped[str] = mapped_column(String(1000), default="")
+    auto_update_favicon: Mapped[bool] = mapped_column(default=True)
 
-
-class SourcesTableController(object):
-    def __init__(self, db, session=None):
-        self.conn = db
-        self.session = session
-
-    def get_session(self):
-        if not self.session:
-            return self.conn.get_session()
-        else:
-            return self.session
-
-    def get_all(self):
-        sources = []
-
-        Session = self.get_session()
-        with Session() as session:
-            sources = session.query(SourcesTable).all()
-
-        return sources
-
-    def is_source(self, id=None, url=None):
-        is_source = False
-        Session = self.get_session()
-
-        with Session() as session:
-            if id:
-                sources = (
-                    session.query(SourcesTable)
-                    .filter(SourcesTable.id == int(id))
-                    .count()
-                )
-                if sources != 0:
-                    is_source = True
-            if url:
-                sources = (
-                    session.query(SourcesTable).filter(SourcesTable.url == url).count()
-                )
-                if sources != 0:
-                    is_source = True
-
-        return is_source
-
-    def add(self, source):
-        # Get the set of column names from EntriesTable
-        valid_columns = {column.name for column in SourcesTable.__table__.columns}
-
-        # Remove keys that are not in EntriesTable
-        source = {key: value for key, value in source.items() if key in valid_columns}
-
-        source_obj = SourcesTable(**source)
-
-        Session = self.get_session()
-        with Session() as session:
-            session.add(source_obj)
-            session.commit()
 
 
 class SourceOperationalData(Base):
     __tablename__ = "sourceoperationaldata"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     date_fetched = mapped_column(DateTime, nullable=True)
     source: Mapped[int]
-
-
-class SourceOperationalDataController(object):
-    def __init__(self, db, session=None):
-        self.conn = db
-        self.session = session
-
-    def get_session(self):
-        if not self.session:
-            return self.conn.get_session()
-        else:
-            return self.session
-
-    def is_fetch_possible(self, source, date_now, limit_seconds=60 * 10):
-        Session = self.get_session()
-        with Session() as session:
-            rows = (
-                session.query(SourceOperationalData)
-                .filter(SourceOperationalData.source == source.id)
-                .all()
-            )
-
-            if len(rows) == 0:
-                return True
-
-            row = rows[0]
-
-            source_datetime = row.date_fetched
-
-            diff = date_now - source_datetime
-
-            if diff.total_seconds() > limit_seconds:
-                return True
-            return False
-
-    def set_fetched(self, source, date_now):
-        Session = self.get_session()
-        with Session() as session:
-            op_data = (
-                session.query(SourceOperationalData)
-                .filter(SourceOperationalData.source == source.id)
-                .all()
-            )
-            if len(op_data) == 0:
-                obj = SourceOperationalData(date_fetched=date_now, source=source.id)
-                session.add(obj)
-                session.commit()
-            else:
-                op_data = op_data[0]
-                op_data.date_fetched = date_now
-                session.commit()
 
 
 class UserTags(Base):
     __tablename__ = "usertags"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     date = mapped_column(DateTime)
     tag: Mapped[str] = mapped_column(String(1000))
 
@@ -338,7 +200,7 @@ class UserTags(Base):
 
 class UserBookmarks(Base):
     __tablename__ = "userbookmarks"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
     date_bookmarked = mapped_column(DateTime)
 
@@ -348,7 +210,7 @@ class UserBookmarks(Base):
 
 class UserVotes(Base):
     __tablename__ = "uservotes"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
     user: Mapped[str] = mapped_column(String(1000))
     vote: Mapped[int] = mapped_column(default=0)
@@ -359,7 +221,7 @@ class UserVotes(Base):
 
 class ReadMarkers(Base):
     __tablename__ = "readmarkers"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     read_date = mapped_column(DateTime)
     source_object: Mapped[Optional[int]]
 
@@ -388,6 +250,162 @@ class ReadMarkers(Base):
                 session.commit()
 
 
+class SearchView(Base):
+    __tablename__ = "searchview"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(500))
+    default: Mapped[bool] = mapped_column(default=False)
+    hover_text: Mapped[Optional[str]] = mapped_column(String(500))
+    priority: Mapped[int] = mapped_column(default=0)
+    filter_statement: Mapped[Optional[str]] = mapped_column(String(500))
+    icon: Mapped[Optional[str]] = mapped_column(String(500))
+    order_by: Mapped[Optional[str]] = mapped_column(String(500))
+    entry_limit: Mapped[int] = mapped_column(default=0)
+    auto_fetch: Mapped[bool] = mapped_column(default=False)
+    date_published_day_limit: Mapped[int] = mapped_column(default=0)
+    date_created_day_limit: Mapped[int] = mapped_column(default=0)
+    user: Mapped[bool] = mapped_column(default=False)
+
+
+class Gateway(Base):
+    __tablename__ = "gateway"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    link: Mapped[str] = mapped_column(String(1000))
+    title: Mapped[str] = mapped_column(String(1000))
+    description: Mapped[str] = mapped_column(String(1000))
+    gateway_type: Mapped[str] = mapped_column(String(1000))
+
+
+class UserSearchHistory(Base):
+    __tablename__ = "usersearchhistory"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    search_query: Mapped[str] = mapped_column(String(500))
+    date = mapped_column(DateTime(timezone=True), nullable=True)
+    user_id: Mapped[Optional[int]] = mapped_column()
+
+
+class UserEntryTransitionHistory(Base):
+    __tablename__ = "userentrytransitionhistory"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    counter: Mapped[Optional[int]] = mapped_column()
+    user: Mapped[Optional[int]] = mapped_column()
+    entry_from_id: Mapped[Optional[int]] = mapped_column()
+    entry_to_id: Mapped[Optional[int]] = mapped_column()
+
+
+class UserEntryVisitHistory(Base):
+    __tablename__ = "userentryvisithistory"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    visits: Mapped[Optional[int]] = mapped_column()
+    date_last_visit = mapped_column(DateTime(timezone=True), nullable=True)
+    user_id: Mapped[Optional[int]] = mapped_column()
+    entry_id: Mapped[Optional[int]] = mapped_column()
+
+
+class BackgroundJob(Base):
+    __tablename__ = "backgroundjob"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    job: Mapped[str] = mapped_column(String(1000))
+    task: Mapped[Optional[str]] = mapped_column(String(1000))
+    subject: Mapped[str] = mapped_column(String(1000))
+    args: Mapped[str] = mapped_column(String(1000))
+    date_created = mapped_column(DateTime(timezone=True), nullable=True)
+
+    priority: Mapped[int] = mapped_column(default=0)
+    errors: Mapped[int] = mapped_column(default=0)
+    enabled: Mapped[bool] = mapped_column(default=True)
+    user_id: Mapped[Optional[int]] = mapped_column()
+
+
+class Browser(Base):
+    __tablename__ = "browser"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    enabled: Mapped[bool] = mapped_column(default=True)
+    priority: Mapped[int] = mapped_column(default=0)
+    name: Mapped[str] = mapped_column(String(2000))
+    crawler: Mapped[str] = mapped_column(String(2000))
+    settings: Mapped[str] = mapped_column(String(2000))
+
+
+class ConfigurationEntry(Base):
+    __tablename__ = "configurationentry"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    instance_title: Mapped[str] = mapped_column(String(500))
+    instance_description: Mapped[Optional[str]] = mapped_column(String(500))
+    instance_internet_location: Mapped[Optional[str]] = mapped_column(String(200))
+    favicon_internet_url: Mapped[Optional[str]] = mapped_column(String(200))
+    admin_user: Mapped[Optional[str]] = mapped_column(String(500))
+    view_access_type: Mapped[Optional[str]] = mapped_column(String(100))
+    download_access_type: Mapped[Optional[str]] = mapped_column(String(100))
+    add_access_type: Mapped[Optional[str]] = mapped_column(String(100))
+    logging_level: Mapped[int] = mapped_column(default=0)
+    initialized: Mapped[bool] = mapped_column(default=False)
+    initialization_type: Mapped[Optional[str]] = mapped_column(String(100))
+    enable_background_jobs: Mapped[bool] = mapped_column(default=True)
+    block_job_queue: Mapped[bool] = mapped_column(default=False)
+    use_internal_scripts: Mapped[bool] = mapped_column(default=False)
+    data_import_path: Mapped[Optional[str]] = mapped_column(String(2000))
+    data_export_path: Mapped[Optional[str]] = mapped_column(String(2000))
+    download_path: Mapped[Optional[str]] = mapped_column(String(2000))
+    auto_store_thumbnails: Mapped[bool] = mapped_column(default=False)
+    thread_memory_threshold: Mapped[int] = mapped_column(default=0)
+    enable_keyword_support: Mapped[bool] = mapped_column(default=False)
+    enable_domain_support: Mapped[bool] = mapped_column(default=False)
+    enable_file_support: Mapped[bool] = mapped_column(default=False)
+    enable_link_archiving: Mapped[bool] = mapped_column(default=False)
+    enable_source_archiving: Mapped[bool] = mapped_column(default=False)
+
+    accept_dead_links: Mapped[bool] = mapped_column(default=False)
+    accept_ip_links: Mapped[bool] = mapped_column(default=False)
+    accept_domain_links: Mapped[bool] = mapped_column(default=False)
+    accept_non_domain_links: Mapped[bool] = mapped_column(default=False)
+    auto_scan_new_entries: Mapped[bool] = mapped_column(default=False)
+    new_entries_merge_data: Mapped[bool] = mapped_column(default=False)
+    new_entries_use_clean_data: Mapped[bool] = mapped_column(default=False)
+    entry_update_via_internet: Mapped[bool] = mapped_column(default=False)
+    log_remove_entries: Mapped[bool] = mapped_column(default=False)
+    auto_create_sources: Mapped[bool] = mapped_column(default=False)
+    default_source_state: Mapped[bool] = mapped_column(default=False)
+    prefer_https_links: Mapped[bool] = mapped_column(default=False)
+    prefer_https_links: Mapped[bool] = mapped_column(default=False)
+    prefer_non_www_links: Mapped[bool] = mapped_column(default=False)
+
+    sources_refresh_period: Mapped[int] = mapped_column(default=0)
+    days_to_move_to_archive: Mapped[int] = mapped_column(default=0)
+    days_to_remove_links: Mapped[int] = mapped_column(default=0)
+    days_to_remove_stale_entries: Mapped[int] = mapped_column(default=0)
+    days_to_check_std_entries: Mapped[int] = mapped_column(default=0)
+    days_to_check_stale_entries: Mapped[int] = mapped_column(default=0)
+    remove_entry_vote_threshold: Mapped[int] = mapped_column(default=1)
+    number_of_update_entries: Mapped[int] = mapped_column(default=1)
+
+    remote_webtools_server_location: Mapped[Optional[str]] = mapped_column(default="")
+    internet_status_test_url: Mapped[Optional[str]] = mapped_column(default="https://google.com")
+
+    track_user_actions: Mapped[bool] = mapped_column(default=False)
+    track_user_searches: Mapped[bool] = mapped_column(default=False)
+    track_user_navigation: Mapped[bool] = mapped_column(default=False)
+    max_user_entry_visit_history: Mapped[int] = mapped_column(default=1)
+    max_number_of_user_search: Mapped[int] = mapped_column(default=1)
+    vote_min: Mapped[int] = mapped_column(default=-100)
+    vote_max: Mapped[int] = mapped_column(default=-100)
+    number_of_comments_per_day: Mapped[int] = mapped_column(default=-100)
+
+    time_zone: Mapped[int] = mapped_column(default=-100)
+    display_style: Mapped[int] = mapped_column(default=-100)
+    display_type: Mapped[int] = mapped_column(default=-100)
+    show_icons: Mapped[bool] = mapped_column(default=False)
+    thumbnails_as_icons: Mapped[bool] = mapped_column(default=False)
+    small_icons: Mapped[bool] = mapped_column(default=False)
+    local_icons: Mapped[bool] = mapped_column(default=False)
+    links_per_page: Mapped[int] = mapped_column(default=-100)
+    sources_per_page: Mapped[int] = mapped_column(default=-100)
+    max_links_per_page: Mapped[int] = mapped_column(default=-100)
+    max_sources_per_page: Mapped[int] = mapped_column(default=-100)
+    max_number_of_related_links: Mapped[int] = mapped_column(default=-100)
+    debug_mode: Mapped[bool] = mapped_column(default=False)
+
+
 class SqlModel(object):
     def __init__(self, database_file="test.db", parser=None, engine=None):
         self.db_file = database_file
@@ -406,3 +424,51 @@ class SqlModel(object):
     def close(self):
         if self.engine:
             self.engine.dispose()
+
+    def all(self, table):
+        entries = []
+
+        Session = self.get_session()
+        with Session() as session:
+            entries = session.query(table).all()
+
+        return entries
+
+    def truncate(self, table):
+        entries = []
+
+        Session = self.get_session()
+        with Session() as session:
+            query = delete(table)
+            session.execute(query)
+            session.commit()
+
+        return entries
+
+    def get(self, table, id):
+        Session = self.get_session()
+
+        with Session() as session:
+            query = session.query(table)
+
+            query = query.filter(table.id == id)
+
+            return query.first()
+
+    def filter(self, table, conditions=None, order_by=None, page=1, rows_per_page=200):
+        Session = self.get_session()
+
+        with Session() as session:
+            query = session.query(table)
+
+            if conditions:
+                for condition in conditions:
+                    query = query.filter(condition)
+
+            if order_by:
+                query = query.order_by(*order_by)
+
+            offset = (page - 1) * rows_per_page
+            query = query.offset(offset).limit(rows_per_page)
+
+            return query.all()

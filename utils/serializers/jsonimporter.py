@@ -10,14 +10,14 @@ from utils.logger import get_logger
 from utils.sqlmodel import (
     SqlModel,
     EntriesTable,
-    EntriesTableController,
     SourcesTable,
-    SourcesTableController,
     SourceOperationalData,
-    SourceOperationalDataController,
 )
 
 from utils.controllers import (
+    EntriesTableController,
+    SourcesTableController,
+    SourceOperationalDataController,
     SourceDataBuilder,
     EntryDataBuilder,
     EntryWrapper,

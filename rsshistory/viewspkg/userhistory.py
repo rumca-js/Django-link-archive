@@ -135,6 +135,8 @@ def user_search_history_remove(request):
     if data is not None:
         return data
 
+    json_obj = {}
+
     search = None
     if "search" in request.GET:
         search = request.GET["search"]
@@ -142,7 +144,6 @@ def user_search_history_remove(request):
         json_obj["errors"] = "Missing link in arguments"
         return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
-    json_obj = {}
     json_obj["status"] = False
 
     entries = UserSearchHistory.objects.filter(user=request.user, search_query = search)

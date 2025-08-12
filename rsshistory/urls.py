@@ -258,7 +258,7 @@ urlpatterns = [
     path("browser-prio-up/<int:pk>/", browsers.prio_up, name="browser-prio-up"),
     path("browser-prio-down/<int:pk>/", browsers.prio_down, name="browser-prio-down"),
     # other, debug forms
-    path("page-show-props", tools.page_show_properties, name="page-show-props",),
+    path("page-show-props", tools.page_show_props, name="page-show-props",),
     path("page-scan-link", tools.page_scan_link, name="page-scan-link",),
     path("page-scan-contents", tools.page_scan_contents, name="page-scan-contents",),
     path("page-verify", tools.page_verify, name="page-verify",),
@@ -309,7 +309,7 @@ urlpatterns = [
     path("history-remove-all/", userhistory.history_remove_all, name="history-remove-all"),
     path("get-settings/", system.get_settings, name="get-settings"),
     path("get-read-later-queue/", readlater.get_read_later_queue, name="get-read-later-queue"),
-    path("get-page-properties", tools.get_page_properties, name="get-page-properties",),
+    path("json-page-properties", tools.json_page_properties, name="json-page-properties",),
     path("gmail-auth", tools.gmail_auth, name="gmail-auth",),
     path("oauth2callback", tools.oauth2callback, name="oauth2callback",),
     # login
