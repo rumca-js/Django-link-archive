@@ -1114,14 +1114,14 @@ def json_tools_container(request):
         row["title"] = "Downloads video"
         rows.append(row)
 
-    if not user_obj.user.is_staff:
+    if user_obj.user.is_staff:
         row = {}
         row["link"] = reverse(f"{LinkDatabase.name}:page-scan-link")
         row["icon"] = radar_icon
         row["title"] = "Scan page URL"
         rows.append(row)
 
-    if not user_obj.user.is_staff:
+    if user_obj.user.is_staff:
         row = {}
         row["link"] = reverse(f"{LinkDatabase.name}:page-show-props")
         row["icon"] = radar_icon
@@ -1134,7 +1134,7 @@ def json_tools_container(request):
     row["title"] = "Check link for robots.txt"
     rows.append(row)
 
-    if not user_obj.user.is_staff:
+    if user_obj.user.is_staff:
         row = {}
         row["link"] = reverse(f"{LinkDatabase.name}:page-verify")
         row["icon"] = radar_icon

@@ -118,7 +118,7 @@ function getPageProperties(page_url, browser, attempt = 1) {
     let requestgetPageProperties = ++currentgetPageProperties;
 
     let encodedPageUrl = encodeURIComponent(page_url);
-    let url = `{% url 'rsshistory:get-page-properties' %}?link=${encodedPageUrl}&browser=${browser}`;
+    let url = `{% url 'rsshistory:json-page-properties' %}?link=${encodedPageUrl}&browser=${browser}`;
 
     let spinner_text = getSpinnerText(`Fetching... ${url}`);
     $("#propertiesResponse").html(spinner_text);
