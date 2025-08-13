@@ -84,6 +84,12 @@ function GetQueryDetailsHtml(data) {
 function fillListData() {
     let data = object_list_data;
 
+    if (!data) {
+        $('#listData').html("");
+        $('#pagination').html("");
+        return;
+    }
+
     $('#listData').html("");
 
     let entries = data.entries;

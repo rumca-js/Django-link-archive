@@ -4,6 +4,7 @@ import logging
 from datetime import timedelta
 import os
 
+from django.templatetags.static import static
 from django.views import generic
 from django.urls import reverse
 from django.utils.html import escape
@@ -48,6 +49,7 @@ from ..models import (
     ModelFiles,
     ReadLater,
     EntryRules,
+    SearchView,
 )
 from ..controllers import (
     SourceDataController,
@@ -456,7 +458,7 @@ def history_to_json(history):
     return json
 
 
-def get_settings(request):
+def json_settings(request):
     p = ViewPage(request)
     p.set_title("Settings")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -825,7 +827,7 @@ def opensearchxml(request):
     return HttpResponse(text, status=status_code, content_type=content_type)
 
 
-def get_indicators(request):
+def json_indicators(request):
     p = ViewPage(request)
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
@@ -922,3 +924,275 @@ def get_menu(request):
         )
 
     return p.render_implementation("base_menu.html")
+
+
+def json_search_container(request):
+    c = Configuration.get_object()
+
+    data = {}
+
+    rows = []
+
+    search_icon = static("{}/icons/icons8-search-100.png".format(LinkDatabase.name))
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:search-engines")
+    row["icon"] = search_icon
+    row["title"] = "Search Internet"
+    rows.append(row)
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:gateways")
+    row["icon"] = search_icon
+    row["title"] = "Gateways"
+    rows.append(row)
+
+    for searchview in SearchView.objects.filter(user=False):
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:entries") + "?view=" + str(searchview.id)
+        row["icon"] = search_icon
+        row["title"] = searchview.name
+        rows.append(row)
+
+    data["rows"] = rows
+    data["title"] = "Search"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
+
+
+def json_global_container(request):
+    data = {}
+
+    config_entry = ConfigurationEntry.get()
+
+    rows = []
+
+    tag_icon = static("{}/icons/icons8-tags-100.png".format(LinkDatabase.name))
+    domains_icon = static("{}/icons/icons8-www-64.png".format(LinkDatabase.name))
+    keywords_icon = static("{}/icons/icons8-letters-96.png".format(LinkDatabase.name))
+    categories_icon = static("{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name))
+    sources_icon = static("{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name))
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:tags-show-all")
+    row["icon"] = tag_icon
+    row["title"] = "Tags"
+    rows.append(row)
+
+    if config_entry.enable_domain_support:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:domains")
+        row["icon"] = domains_icon
+        row["title"] = "Domains"
+        rows.append(row)
+
+    if config_entry.enable_keyword_support:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:keywords")
+        row["icon"] = keywords_icon
+        row["title"] = "Keywords"
+        rows.append(row)
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:categories-view")
+    row["icon"] = categories_icon
+    row["title"] = "Categories"
+    rows.append(row)
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:sources")
+    row["icon"] = sources_icon
+    row["title"] = "Sources"
+    rows.append(row)
+
+    data["rows"] = rows
+    data["title"] = "Global"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
+
+
+def json_personal_container(request):
+    data = {}
+
+    read_later_icon = static("{}/icons/icons8-bookmarks-100.png".format(LinkDatabase.name))
+    user_tags_icon = static("{}/icons/icons8-tags-100.png".format(LinkDatabase.name))
+    user_browse_icon = static("{}/icons/icons8-link-90.png".format(LinkDatabase.name))
+    user_search_icon = static("{}/icons/icons8-link-90.png".format(LinkDatabase.name))
+    user_comments_icon = static("{}/icons/icons8-link-90.png".format(LinkDatabase.name))
+
+    user_obj = UserConfig.get_or_create(request.user)
+    if not user_obj.user.is_authenticated:
+        return JsonResponse(data, json_dumps_params={"indent": 4})
+
+    config_entry = ConfigurationEntry.get()
+
+    rows = []
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:read-later-entries")
+    row["icon"] = read_later_icon
+    row["title"] = "Read later"
+    rows.append(row)
+
+    for searchview in SearchView.objects.filter(user=True):
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:entries") + "?view=" + str(searchview.id)
+        row["icon"] = user_search_icon
+        row["title"] = searchview.name
+        rows.append(row)
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:user-tags-show")
+    row["icon"] = user_tags_icon
+    row["title"] = "Tags"
+    rows.append(row)
+
+    if config_entry.track_user_navigation:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:user-browse-history")
+        row["icon"] = user_browse_icon
+        row["title"] = "Browse history"
+        rows.append(row)
+
+    if config_entry.track_user_searches:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:user-search-history")
+        row["icon"] = user_search_icon
+        row["title"] = "Search history"
+        rows.append(row)
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:user-comments")
+    row["icon"] = user_comments_icon
+    row["title"] = "Comments"
+    rows.append(row)
+
+    data["rows"] = rows
+    data["title"] = "Personal"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
+
+
+def json_tools_container(request):
+    data = {}
+
+    add_icon = static("{}/icons/icons8-add-link-96.png".format(LinkDatabase.name))
+    download_url_icon = static("{}/icons/icons8-download-page-96.png".format(LinkDatabase.name))
+    download_music_url_icon = static("{}/icons/icons8-download-music-96.png".format(LinkDatabase.name))
+    download_video_url_icon = static("{}/icons/icons8-download-video-96.png".format(LinkDatabase.name))
+    radar_icon = static("{}/icons/icons8-radar-64.png".format(LinkDatabase.name))
+
+    user_obj = UserConfig.get_or_create(request.user)
+    if not user_obj.user.is_authenticated:
+        return JsonResponse(data, json_dumps_params={"indent": 4})
+
+    rows = []
+
+    if user_obj.can_add():
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:entry-add-simple")
+        row["icon"] = add_icon
+        row["title"] = "Add entry"
+        rows.append(row)
+
+    if user_obj.can_download():
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:download-url")
+        row["icon"] = download_url_icon
+        row["title"] = "Downloads URL"
+        rows.append(row)
+
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:download-music-url")
+        row["icon"] = download_music_url_icon
+        row["title"] = "Downloads music"
+        rows.append(row)
+
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:download-video-url")
+        row["icon"] = download_video_url_icon
+        row["title"] = "Downloads video"
+        rows.append(row)
+
+    if not user_obj.user.is_staff:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:page-scan-link")
+        row["icon"] = radar_icon
+        row["title"] = "Scan page URL"
+        rows.append(row)
+
+    if not user_obj.user.is_staff:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:page-show-props")
+        row["icon"] = radar_icon
+        row["title"] = "Page Properties"
+        rows.append(row)
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:is-url-allowed")
+    row["icon"] = radar_icon
+    row["title"] = "Check link for robots.txt"
+    rows.append(row)
+
+    if not user_obj.user.is_staff:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:page-verify")
+        row["icon"] = radar_icon
+        row["title"] = "Verify page"
+        rows.append(row)
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:cleanup-link")
+    row["icon"] = radar_icon
+    row["title"] = "Cleanup Link"
+    rows.append(row)
+
+    data["rows"] = rows
+    data["title"] = "Tools"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
+
+
+def json_users_container(request):
+    data = {}
+
+    user_obj = UserConfig.get_or_create(request.user)
+    if not user_obj.user.is_authenticated:
+        return JsonResponse(data, json_dumps_params={"indent": 4})
+
+    login_icon = static("{}/icons/icons8-login-100.png".format(LinkDatabase.name))
+    configuration_icon = static("{}/icons/icons8-configuration-67.png".format(LinkDatabase.name))
+    accounts_icon = static("{}/icons/account.png".format(LinkDatabase.name))
+    logout_icon = static("{}/icons/icons8-logout-100.png".format(LinkDatabase.name))
+
+    rows = []
+
+    if not user_obj.user.is_authenticated:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:login") + "?next=" + reverse(f"{LinkDatabase.name}:index")
+        row["icon"] = login_icon
+        row["title"] = "Login"
+        rows.append(row)
+    else:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:admin-page")
+        row["icon"] = configuration_icon
+        row["title"] = "Admin"
+        rows.append(row)
+
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:user-config")
+        row["icon"] = accounts_icon
+        row["title"] = "Admin"
+        rows.append(row)
+
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:logout") + "?next=" + reverse(f"{LinkDatabase.name}:index")
+        row["icon"] = logout_icon
+        row["title"] = "Logout"
+        rows.append(row)
+
+    data["rows"] = rows
+    data["title"] = "User"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})

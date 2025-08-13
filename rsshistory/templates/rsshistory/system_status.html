@@ -359,7 +359,7 @@
     function loadDjangoSettings(attempt = 1) {
         $('#settingsContainer').html(getSpinnerText());
         $.ajax({
-            url: '{% url 'rsshistory:get-settings' %}',
+            url: '{% url 'rsshistory:json-settings' %}',
             type: 'GET',
             timeout: 10000,
             success: function(data) {

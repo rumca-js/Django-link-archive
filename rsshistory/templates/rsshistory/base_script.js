@@ -1,151 +1,8 @@
-let view_display_style = "{{user_config.display_style}}";
-let view_display_type = "{{user_config.display_type}}";
-let view_show_icons = "{{user_config.show_icons}}" == "True";
-let view_small_icons = "{{user_config.small_icons}}" == "True";
-let debug = "{{debug}}" == "True"
-let user_age = {{user_config.get_age}};
-
-let common_indicators = null;
-
-
-$(document).ready(function() {
-   $("#btnFetch").click(function(event) {
-       event.preventDefault();
-       putSpinnerOnIt($(this));
-   });
-});
-
-
-function add_text(error_line, text) {
-    let result = "";
-    if (error_line == "") {
-        result = text;
-    }
-    else {
-        result += ", " + text;
-    }
-
-    return result;
-}
-
-
-function SetMenuStatusLine() {
-       if (common_indicators.read_later_queue.status) {
-           showElement(".readLaterElement");
-       }
-       else {
-           hideElement(".readLaterElement");
-       }
-       if (common_indicators.sources_error.status) {
-           showElement(".sourceErrorElement");
-       }
-       else {
-           hideElement(".sourceErrorElement");
-       }
-       if (common_indicators.threads_error.status) {
-           showElement(".configurationErrorElement");
-       }
-       else {
-           hideElement(".configurationErrorElement");
-       }
-       if (common_indicators.configuration_error.status ||
-           common_indicators.jobs_error.status) {
-           showElement(".adminErrorElement");
-       }
-       else {
-           hideElement(".adminErrorElement");
-       }
-}
-
-
-function SetFooterStatusLine() {
-   let error_line = "";
-
-   if (common_indicators.sources_error.status) {
-       error_line += add_text(error_line, "Sources");
-   }
-   if (common_indicators.threads_error.status) {
-       error_line += add_text(error_line, "Threads");
-   }
-   if (common_indicators.jobs_error.status) {
-       error_line += add_text(error_line, "Jobs");
-   }
-   if (common_indicators.configuration_error.status) {
-       error_line += add_text(error_line, "Configuration");
-   }
-   if (common_indicators.internet_error.status) {
-       error_line += add_text(error_line, "Internet");
-   }
-   if (common_indicators.crawling_server_error.status) {
-       error_line += add_text(error_line, "Crawling server");
-   }
-   if (common_indicators.is_reading.status) {
-       error_line += add_text(error_line, common_indicators.is_reading.message);
-   }
-
-   if (error_line == "") {
-       $("#footerLine").html("");
-       $("#footerLine").hide();
-   }
-   else {
-       $("#footerLine").html(error_line);
-       $("#footerLine").show();
-   }
-}
-
-
-function showElement(element) {
-   $(element).show();
-   $(element).removeClass("invisible");
-}
-
-
-function hideElement(element) {
-   $(element).hide();
-   $(element).addClass("invisible");
-}
-
-
-function setLightMode() {
-    view_display_style = "style-light";
-
-    const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
-    if (linkElement) {
-        // TODO replace rsshistory with something else
-        //linkElement.href = "/django/rsshistory/css/styles.css_style-light.css";
-    }
-
-    const htmlElement = document.documentElement;
-    htmlElement.setAttribute("data-bs-theme", "light");
-
-    const navbar = document.getElementById('navbar');
-    navbar.classList.remove('navbar-light', 'bg-dark');
-    navbar.classList.add('navbar-dark', 'bg-light');
-}
-
-
-function setDarkMode() {
-    view_display_style = "style-dark";
-
-    const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
-    if (linkElement) {
-        //linkElement.href = "/django/rsshistory/css/styles.css_style-dark.css";
-    }
-
-    const htmlElement = document.documentElement;
-    htmlElement.setAttribute("data-bs-theme", "dark");
-
-    const navbar = document.getElementById('navbar');
-    navbar.classList.remove('navbar-light', 'bg-light');
-    navbar.classList.add('navbar-dark', 'bg-dark');
-}
-
-
 let currentgetIndicators = 0;
 function getIndicators(attempt=1) {
     let requestCurrentgetIndicators = ++currentgetIndicators;
 
-    let url = '{% url 'rsshistory:get-indicators' %}';
+    let url = "{% url 'rsshistory:json-indicators' %}";
     
     $.ajax({
        url: url,
@@ -176,11 +33,81 @@ function getIndicators(attempt=1) {
 }
 
 
-$(document).ready(function() {
+function getMenuSearchContainer() {
+    let link = "{% url 'rsshistory:json-search-container' %}";
+    getDynamicJson(link, function(data) {
+        processMenuData(data, '#MenuSearchContainer');
+    });
+}
+
+
+function getMenuGlobalContainer() {
+    let link = "{% url 'rsshistory:json-global-container' %}";
+    getDynamicJson(link, function(data) {
+        processMenuData(data, '#MenuGlobalContainer');
+    });
+}
+
+
+function getMenuPersonalContainer() {
+    let link = "{% url 'rsshistory:json-personal-container' %}";
+    getDynamicJson(link, function(data) {
+        processMenuData(data, '#MenuPersonalContainer');
+    });
+}
+
+function getMenuTools() {
+    let link = "{% url 'rsshistory:json-tools-container' %}";
+    getDynamicJson(link, function(data) {
+        processMenuData(data, '#MenuToolsContainer');
+    });
+}
+
+
+function getMenuUsers() {
+    let link = "{% url 'rsshistory:json-users-container' %}";
+    getDynamicJson(link, function(data) {
+        processMenuData(data, '#MenuUsersContainer');
+    });
+}
+
+
+function getBasicPageElements() {
     getIndicators();
+    getMenuSearchContainer();
+    getMenuGlobalContainer();
+    getMenuPersonalContainer();
+    getMenuTools();
+    getMenuUsers();
+}
+
+
+function applyConfiguration() {
+    view_display_style = "{{user_config.display_style}}";
+    view_display_type = "{{user_config.display_type}}";
+    view_show_icons = "{{user_config.show_icons}}" == "True";
+    view_small_icons = "{{user_config.small_icons}}" == "True";
+    debug = "{{debug}}" == "True";
+    user_age = {{user_config.get_age}};
+
+    setDisplayMode();
+}
+
+
+
+///-----
+$(document).ready(function() {
+
+    $("#btnFetch").click(function(event) {
+        event.preventDefault();
+        putSpinnerOnIt($(this));
+    });
+
+    getBasicPageElements();
+    applyConfiguration();
 
     setInterval(function() {
-        getIndicators();
+        getBasicPageElements();
     }, 300000);
 });
 
@@ -192,3 +119,60 @@ document.addEventListener('visibilitychange', function() {
     }
 });
 */
+
+//-----------------------------------------------
+$(document).on('click', '.btnNavigation', function(e) {
+    e.preventDefault();
+
+    const currentPage = $(this).data('page');
+
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('page', currentPage);
+    window.history.pushState({}, '', currentUrl);
+
+    animateToTop();
+
+    performSearch();
+});
+
+
+//-----------------------------------------------
+$(document).on('keydown', "#searchInput", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+
+        hideSearchSuggestions();
+
+        performSearch();
+    }
+});
+
+
+//-----------------------------------------------
+$(document).on('click', '.suggestion-item', function(e) {
+    e.preventDefault();
+
+    const searchInput = document.getElementById('searchInput');
+    let suggestion_item_value = $(this).data('search')
+
+    searchInput.value = suggestion_item_value;
+
+    hideSearchSuggestions();
+
+    performSearch();
+});
+
+
+//-----------------------------------------------
+$(document).on('click', '#dropdownButton', function(e) {
+    e.preventDefault();
+
+    let search_suggestions = document.getElementById("search-suggestions");
+    if (search_suggestions.style.display == "none") {
+        showSearchSuggestions();
+    }
+    else {
+        hideSearchSuggestions();
+    }
+});
+
