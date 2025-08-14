@@ -82,6 +82,9 @@ class DomainsController(Domains):
         else:
             DomainsController.remove_all()
 
+    def truncate(cfg=None):
+        DomainsController.remove_all()
+
     def get_link_object(self):
         if not hasattr(self, "link_obj"):
             entries = LinkDataController.objects.filter(link=self.get_domain_full_url())

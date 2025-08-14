@@ -43,6 +43,21 @@ class SourceDataController(SourceDataModel):
                 entry.permanent = True
                 entry.save()
 
+    def truncate(cfg=None):
+        sources = Q()
+        if cfg:
+            if "enabled" in cfg:
+                if cfg["enabled"] == True:
+                    sources = SourceDataModel.objects.filter(enabled=True)
+                else:
+                    sources = SourceDataModel.objects.filter(enabled=False)
+            else:
+                sources = SourceDataModel.objects.all()
+
+        if sources.count() > 0:
+            for source in sources:
+                source.custom_remove()
+
     def get_days_to_remove(self):
         days = self.remove_after_days
         return days

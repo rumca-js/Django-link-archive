@@ -1176,11 +1176,17 @@ def entries_remove_all(request):
     if data is not None:
         return data
 
-    LinkDataController.objects.all().delete()
+    json_obj = {}
+    json_obj["status"] = True
 
-    p.context["summary_text"] = "Removed all entries"
+    if LinkDataController.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "LinkDataController")
+        json_obj["message"] = "Added remove job"
+    else:
+        LinkDataController.objects.all().delete()
+        json_obj["message"] = "Removed all entries"
 
-    return p.render("summary_present.html")
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def entries_remove_nonbookmarked(request):

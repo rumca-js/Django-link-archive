@@ -123,6 +123,19 @@ class LinkDataController(LinkDataModel):
         # indicate that all has been finished correctly
         return moved_all
 
+    def truncate(cfg=None):
+        BATCH_SIZE = 1000
+        if cfg and "archive" in cfg:
+            entries = ArchiveLinkDataController.objects.all()
+
+            if entries.exists():
+                entries[:BATCH_SIZE].delete()
+        else:
+            entries = LinkDataController.objects.all()
+
+            if entries.exists():
+                entries[:BATCH_SIZE].delete()
+
     def get_full_information(data):
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 

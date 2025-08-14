@@ -232,10 +232,17 @@ def backgroundjobs_remove_all(request):
     if data is not None:
         return data
 
-    bg = BackgroundJobController.objects.all()
-    bg.delete()
+    json_obj = {}
+    json_obj["status"] = True
 
-    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
+    if BackgroundJobController.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "BackgroundJobController")
+        json_obj["message"] = "Added remove job"
+    else:
+        BackgroundJobController.objects.all().delete()
+        json_obj["message"] = "Removed all entries"
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def backgroundjobs_check_new(request):

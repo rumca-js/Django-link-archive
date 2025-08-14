@@ -543,16 +543,18 @@ def remove_all_sources(request):
     if data is not None:
         return data
 
-    sources = SourceDataController.objects.all()
-    if sources.exists():
+    json_obj = {}
+    json_obj["status"] = True
+
+    if SourceDataController.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "SourceDataController")
+        json_obj["message"] = "Added remove job"
+    else:
         for source in sources:
             source.custom_remove()
+        json_obj["message"] = "Removed all entries"
 
-        return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
-    else:
-        p.context["summary_text"] = "No source to remove"
-
-    return p.render("summary_present.html")
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def remove_disabled(request):
@@ -562,16 +564,21 @@ def remove_disabled(request):
     if data is not None:
         return data
 
+    json_obj = {}
+    json_obj["status"] = True
+
     sources = SourceDataController.objects.filter(enabled=False)
-    if sources.exists():
+    if sources.count() > 1000:
+        cfg = {}
+        cfg["enabled"] = False
+        BackgroundJobController.create_single_job("truncate", "SourceDataController", cfg=cfg)
+        json_obj["message"] = "Added remove job"
+    else:
         for source in sources:
             source.custom_remove()
+        json_obj["message"] = "Removed all entries"
 
-        return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
-    else:
-        p.context["summary_text"] = "No source to remove"
-
-    return p.render("summary_present.html")
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def enable_all_sources(request):

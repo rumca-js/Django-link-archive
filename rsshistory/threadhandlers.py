@@ -98,20 +98,10 @@ class BaseJobHandler(object):
         return result
 
     def get_args_cfg(self, in_object=None):
-        cfg = {}
+        if in_object:
+            return in_object.get_cfg()
 
-        if in_object.args and len(in_object.args) > 0:
-            try:
-                cfg = json.loads(in_object.args)
-            except ValueError as E:
-                AppLogging.exc(
-                    exception_object=E,
-                    info_text="Exception when adding link {0}".format(
-                        in_object.subject
-                    ),
-                )
-
-        return cfg
+        return {}
 
 
 class ProcessSourceJobHandler(BaseJobHandler):
@@ -189,7 +179,7 @@ class EntryUpdateData(BaseJobHandler):
         if len(entries) > 0:
             entry = entries[0]
 
-            cfg = self.get_args(obj)
+            cfg = self.get_args_cfg(obj)
             browser = None
             if "browser_obj" in cfg:
                 browser = cfg["browser_obj"]
@@ -205,8 +195,8 @@ class EntryUpdateData(BaseJobHandler):
 
         return True
 
-    def get_args(self, obj):
-        cfg = self.get_args_cfg(obj)
+    def get_args_cfg(self, obj):
+        cfg = super().get_args_cfg(obj)
 
         if "browser" in cfg:
             browser_id = cfg["browser"]
@@ -242,7 +232,7 @@ class LinkResetDataJobHandler(BaseJobHandler):
         if len(entries) > 0:
             entry = entries[0]
 
-            cfg = self.get_args(obj)
+            cfg = self.get_args_cfg(obj)
             browser = None
             if "browser_obj" in cfg:
                 browser = cfg["browser_obj"]
@@ -252,8 +242,8 @@ class LinkResetDataJobHandler(BaseJobHandler):
 
         return True
 
-    def get_args(self, obj):
-        cfg = self.get_args_cfg(obj)
+    def get_args_cfg(self, obj):
+        cfg = super().get_args_cfg(obj)
 
         if "browser" in cfg:
             browser_id = cfg["browser"]
@@ -288,8 +278,8 @@ class LinkResetLocalDataJobHandler(BaseJobHandler):
 
         return True
 
-    def get_args(self, obj):
-        cfg = self.get_args_cfg(obj)
+    def get_args_cfg(self, obj):
+        cfg = super().get_args_cfg(obj)
 
         if "browser" in cfg:
             browser_id = cfg["browser"]
@@ -1090,7 +1080,7 @@ class InitializeBlockListJobHandler(BaseJobHandler):
 
 class CleanupJobHandler(BaseJobHandler):
     """!
-    Pushes data to repo
+    Cleans ups tables
     """
 
     def get_job():
@@ -1164,18 +1154,10 @@ class CleanupJobHandler(BaseJobHandler):
         status = False
 
         limit_s = 0
-        cfg = {}
-        if obj.args != "":
-            try:
-                cfg = json.loads(obj.args)
-            except ValueError as E:
-                pass
-            except TypeError as E:
-                pass
+        cfg = self.get_args_cfg(obj)
+        cfg["limit_s"] = limit_s
 
         AppLogging.notify("Cleanup. Table:{}".format(table))
-
-        cfg["limit_s"] = limit_s
 
         if table == "all" or table == "LinkDataController":
             status = EntriesCleanupAndUpdate().cleanup(cfg)
@@ -1223,6 +1205,134 @@ class CleanupJobHandler(BaseJobHandler):
         return status
 
 
+class TruncateTableJobHandler(BaseJobHandler):
+    """!
+    Truncate table job handler
+    """
+
+    def get_job():
+        return BackgroundJob.JOB_TRUNCATE_TABLE
+
+    def truncate_table(args=None):
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="LinkDataController", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="SourceDataController", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="AppLogging", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="DomainsController", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="KeyWords", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserConfig", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="SourceExportHistory", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="ModelFiles", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="SystemOperation", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserTags", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserComments", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserVotes", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserBookmarks", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserSearchHistory", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserEntryTransitionHistory", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserEntryVisitHistory", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="Gateway", args=args
+        )
+
+    def process(self, obj=None):
+        """
+        Cleanup:
+         subject - table name, or all
+         args["verify"] = True - check consistency of data, full
+        """
+        table = obj.subject
+
+        if table == "":
+            TruncateTableJobHandler.truncate_table(obj.args)
+            return True
+
+        status = False
+
+        limit_s = 0
+
+        cfg = obj.get_cfg()
+        cfg["limit_s"] = limit_s
+
+        AppLogging.notify("Truncate. Table:{}".format(table))
+
+        if table == "all" or table == "LinkDataController":
+            status = LinkDataController().truncate(cfg)
+        if table == "all" or table == "SourceDataController":
+            SourceDataController.truncate(cfg)
+        if table == "all" or table == "AppLogging":
+            AppLogging.truncate(cfg)
+        if table == "all" or table == "DomainsController":
+            DomainsController.truncate(cfg)
+        if table == "all" or table == "KeyWords":
+            KeyWords.truncate(cfg)
+        if table == "all" or table == "UserConfig":
+            UserConfig.truncate(cfg)
+        if table == "all" or table == "SourceExportHistory":
+            SourceExportHistory.truncate(cfg)
+        if table == "all" or table == "ModelFiles":
+            ModelFiles.truncate(cfg)
+        if table == "all" or table == "SystemOperation":
+            SystemOperationController.truncate(cfg)
+        if table == "all" or table == "Gateway":
+            Gateway.truncate(cfg)
+
+        if table == "all" or table == "UserTags":
+            UserTags.truncate(cfg)
+            CompactedTags.truncate(cfg)
+            UserCompactedTags.truncate(cfg)
+            EntryCompactedTags.truncate(cfg)
+        if table == "all" or table == "UserComments":
+            UserCommentsController.truncate(cfg)
+        if table == "all" or table == "UserVotes":
+            UserVotes.truncate(cfg)
+        if table == "all" or table == "UserBookmarks":
+            UserBookmarks.truncate(cfg)
+        if table == "all" or table == "UserSearchHistory":
+            UserSearchHistory.truncate(cfg)
+        if table == "all" or table == "UserEntryTransitionHistory":
+            UserEntryTransitionHistory.truncate(cfg)
+        if table == "all" or table == "UserEntryVisitHistory":
+            UserEntryVisitHistory.truncate(cfg)
+
+        status = True
+
+        elapsed_sec = self.get_time_diff()
+        AppLogging.notify("Truncate. Table:{} DONE. Time:{}".format(table, elapsed_sec))
+        return status
+
+
 class CheckDomainsJobHandler(BaseJobHandler):
     def get_job():
         return BackgroundJob.JOB_CHECK_DOMAINS
@@ -1240,7 +1350,7 @@ class LinkScanJobHandler(BaseJobHandler):
     def process(self, obj=None):
         link = obj.subject
 
-        cfg = self.get_args(obj)
+        cfg = self.get_args_cfg(obj)
 
         p = UrlHandlerEx(link)
         contents = p.get_contents()
@@ -1258,8 +1368,8 @@ class LinkScanJobHandler(BaseJobHandler):
 
         return True
 
-    def get_args(self, obj):
-        cfg = self.get_args_cfg(obj)
+    def get_args_cfg(self, obj):
+        cfg = super().get_args_cfg(obj)
 
         if "source_id" in cfg:
             source_id = cfg["source_id"]

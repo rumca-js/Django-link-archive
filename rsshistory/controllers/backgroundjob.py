@@ -44,6 +44,7 @@ class BackgroundJobController(BackgroundJob):
         # source in between
         (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,),
         (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP),
+        (BackgroundJob.JOB_TRUNCATE_TABLE, BackgroundJob.JOB_TRUNCATE_TABLE),
         (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE),
         (BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, BackgroundJob.JOB_LINK_RESET_LOCAL_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),
@@ -128,8 +129,12 @@ class BackgroundJobController(BackgroundJob):
         )
         return objs.count() > 0
 
-    def create_single_job(job_name, subject="", args="", user=None):
+    def create_single_job(job_name, subject="", args="", user=None, cfg=None):
         from ..configuration import Configuration
+
+        args_text = args
+        if args_text == "" and cfg:
+            args_text = json.dumps(cfg)
 
         items = BackgroundJob.objects.filter(job=job_name, subject=subject)
         if items.count() == 0:
@@ -137,7 +142,7 @@ class BackgroundJobController(BackgroundJob):
                 job=job_name,
                 task=None,
                 subject=subject,
-                args=args,
+                args=args_text,
                 priority=BackgroundJobController.get_job_priority(job_name),
                 user=user,
             )
@@ -279,6 +284,17 @@ class BackgroundJobController(BackgroundJob):
                 BackgroundJob.JOB_LINK_ADD,
                 url,
             )
+
+    def get_cfg(self):
+        cfg = {}
+        if self.args != "":
+            try:
+                cfg = json.loads(self.args)
+            except ValueError as E:
+                pass
+            except TypeError as E:
+                pass
+        return cfg
 
     def source_add(url, properties=None):
         cfg = {}

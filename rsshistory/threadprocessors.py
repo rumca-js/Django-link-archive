@@ -53,6 +53,7 @@ from .threadhandlers import (
     ImportInstanceJobHandler,
     ImportFromFilesJobHandler,
     CleanupJobHandler,
+    TruncateTableJobHandler,
     MoveToArchiveJobHandler,
     ProcessSourceJobHandler,
     LinkAddJobHandler,
@@ -102,6 +103,7 @@ class CeleryTaskInterface(object):
             ImportFromFilesJobHandler,
 
             CleanupJobHandler,
+            TruncateTableJobHandler,
             MoveToArchiveJobHandler,
             ProcessSourceJobHandler,
             LinkAddJobHandler,
@@ -479,6 +481,7 @@ class SystemJobsProcessor(GenericJobsProcessor):
     def get_supported_jobs(self):
         return [
             BackgroundJob.JOB_CLEANUP,
+            BackgroundJob.JOB_TRUNCATE_TABLE,
             BackgroundJob.JOB_LINK_RESET_LOCAL_DATA,
         ]
 

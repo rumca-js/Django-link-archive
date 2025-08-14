@@ -36,10 +36,17 @@ def keywords_remove_all(request):
     if data is not None:
         return data
 
-    keys = KeyWords.objects.all()
-    keys.delete()
+    json_obj = {}
+    json_obj["status"] = True
 
-    return redirect("{}:keywords".format(LinkDatabase.name))
+    if KeyWords.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "KeyWords")
+        json_obj["message"] = "Added remove job"
+    else:
+        KeyWords.objects.all().delete()
+        json_obj["message"] = "Removed all entries"
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def keyword_remove(request):

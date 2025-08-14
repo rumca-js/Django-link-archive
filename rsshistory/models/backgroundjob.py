@@ -30,6 +30,8 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_FROM_FILES = "import-from-files"
     JOB_EXPORT_DATA = "export-data"
     JOB_CLEANUP = "cleanup"
+    JOB_TRUNCATE_TABLE = "truncate-table"
+    JOB_REMOVE = "remove"
     JOB_CHECK_DOMAINS = "check-domains"
     JOB_RUN_RULE = "run-rule"
     JOB_INITIALIZE = "initialize"
@@ -64,6 +66,7 @@ class BackgroundJob(models.Model):
         (JOB_IMPORT_FROM_FILES, JOB_IMPORT_FROM_FILES),
         (JOB_EXPORT_DATA, JOB_EXPORT_DATA),
         (JOB_CLEANUP, JOB_CLEANUP),
+        (JOB_TRUNCATE_TABLE, JOB_TRUNCATE_TABLE),
         (JOB_CHECK_DOMAINS, JOB_CHECK_DOMAINS),
         (JOB_INITIALIZE, JOB_INITIALIZE),
         (JOB_INITIALIZE_BLOCK_LIST, JOB_INITIALIZE_BLOCK_LIST),

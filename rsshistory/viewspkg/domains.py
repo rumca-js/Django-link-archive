@@ -231,9 +231,17 @@ def domains_remove_all(request):
     if data is not None:
         return data
 
-    DomainsController.remove_all()
+    json_obj = {}
+    json_obj["status"] = True
 
-    return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
+    if DomainsController.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "DomainsController")
+        json_obj["message"] = "Added remove job"
+    else:
+        DomainsController.remove_all()
+        json_obj["message"] = "Removed all entries"
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def domain_update_data(request, pk):

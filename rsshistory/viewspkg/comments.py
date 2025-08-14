@@ -162,8 +162,14 @@ def remove_all(request):
     if data is not None:
         return data
 
-    UserCommentsController.objects.all().delete()
+    json_obj = {}
+    json_obj["status"] = True
 
-    p.context["summary_text"] = "Removed comment"
+    if UserCommentsController.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "UserComments")
+        json_obj["message"] = "Added remove job"
+    else:
+        UserCommentsController.objects.all().delete()
+        json_obj["message"] = "Removed all entries"
 
-    return p.render("summary_present.html")
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})

@@ -74,6 +74,8 @@ class EntriesCleanup(object):
         return True
 
     def cleanup_entries__invalid_rules(self):
+        BATCH_SIZE = 1000
+
         rules = EntryRules.objects.filter(block=True, enabled=True)
         for rule in rules:
             urls = rule.get_rule_urls()
@@ -81,10 +83,12 @@ class EntriesCleanup(object):
             for url in urls:
                 if url != "":
                     entries = LinkDataController.objects.filter(link__icontains=url)
-                    entries.delete()
+                    while entries.exists():
+                        entries[:BATCH_SIZE].delete()
 
                     domains = DomainsController.objects.filter(domain__icontains=url)
-                    domains.delete()
+                    while domains.exists():
+                        domains[:BATCH_SIZE].delete()
 
     def cleanup_entries_with_ports(self):
         """
@@ -128,6 +132,7 @@ class EntriesCleanup(object):
         self.cleanup_remove_entries_stale_entries()
 
     def cleanup_remove_entries_old_entries(self, limit_s=0):
+        BATCH_SIZE = 1000
         sources = SourceDataController.objects.all()
         for source in sources:
             AppLogging.debug("Removing for source:{}".format(source.title))
@@ -136,7 +141,8 @@ class EntriesCleanup(object):
             if entries:
                 # for entry in entries:
                 #    AppLogging.debug("Removing source entry:{}".format(entry.link))
-                entries.delete()
+                while entries.exists():
+                    entries[:BATCH_SIZE].delete()
 
         AppLogging.debug("Removing general entries")
 
@@ -152,6 +158,7 @@ class EntriesCleanup(object):
         return True
 
     def cleanup_remove_entries_stale_entries(self, limit_s=0):
+        BATCH_SIZE = 1000
         sources = SourceDataController.objects.all()
         for source in sources:
             AppLogging.debug("Removing for source:{}".format(source.title))
@@ -160,7 +167,8 @@ class EntriesCleanup(object):
             if entries:
                 # for entry in entries:
                 #    AppLogging.debug("Removing source entry:{}".format(entry.link))
-                entries.delete()
+                while entries.exists():
+                    entries[:BATCH_SIZE].delete()
 
         AppLogging.debug("Removing general entries")
 

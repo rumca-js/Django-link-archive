@@ -244,9 +244,29 @@ def history_remove_all(request):
     if data is not None:
         return data
 
-    UserSearchHistory.objects.all().delete()
-    UserEntryTransitionHistory.objects.all().delete()
-    UserEntryVisitHistory.objects.all().delete()
+    json_obj = {}
+    json_obj["status"] = True
+    json_obj["message"] = ""
 
-    p.context["summary_text"] = "Removed all history objects"
-    return p.render("go_back.html")
+    if UserSearchHistory.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "UserSearchHistory")
+        json_obj["message"] += "Added remove job for UserSearchHistory."
+    else:
+        UserSearchHistory.objects.all().delete()
+        json_obj["message"] += "Removed all entries for UserSearchHistory."
+
+    if UserEntryTransitionHistory.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "UserEntryTransitionHistory")
+        json_obj["message"] += "Added remove job for UserEntryTransitionHistory."
+    else:
+        UserEntryTransitionHistory.objects.all().delete()
+        json_obj["message"] += "Removed all entries for UserEntryTransitionHistory."
+
+    if UserEntryVisitHistory.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "UserEntryVisitHistory")
+        json_obj["message"] += "Added remove job for UserEntryVisitHistory."
+    else:
+        UserEntryVisitHistory.objects.all().delete()
+        json_obj["message"] += "Removed all entries for UserEntryVisitHistory."
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})

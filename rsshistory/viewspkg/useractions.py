@@ -257,11 +257,17 @@ def tags_remove_all(request):
     if data is not None:
         return data
 
-    entry = UserTags.objects.all().delete()
+    json_obj = {}
+    json_obj["status"] = True
 
-    # TODO recalculate entries?
+    if UserTags.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "UserTags")
+        json_obj["message"] = "Added remove job"
+    else:
+        UserTags.objects.all().delete()
+        json_obj["message"] = "Removed all entries"
 
-    return HttpResponseRedirect(reverse("{}:index".format(LinkDatabase.name)))
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def tag_remove_form(request):
@@ -440,11 +446,17 @@ def votes_remove_all(request):
     if data is not None:
         return data
 
-    entry = UserVotes.objects.all().delete()
+    json_obj = {}
+    json_obj["status"] = True
 
-    # TODO recalculate entries?
+    if UserVotes.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "UserVotes")
+        json_obj["message"] = "Added remove job"
+    else:
+        UserVotes.objects.all().delete()
+        json_obj["message"] = "Removed all entries"
 
-    return HttpResponseRedirect(reverse("{}:index".format(LinkDatabase.name)))
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def entry_vote(request, pk):
