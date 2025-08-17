@@ -316,40 +316,41 @@ class EntryGenericPlugin(object):
         config = Configuration.get_object().config_entry
         buttons = []
 
-        if not self.entry.is_archive_entry():
-            read_laters = ReadLater.objects.filter(entry=self.entry)
-            if read_laters.count() == 0:
-                buttons.append(
-                    EntryButton(
-                        self.user,
-                        "Read later",
-                        reverse(
-                            "{}:read-later-add".format(LinkDatabase.name),
-                            args=[self.entry.id],
+        if self.user.is_authenticated:
+            if not self.entry.is_archive_entry():
+                read_laters = ReadLater.objects.filter(entry=self.entry)
+                if read_laters.count() == 0:
+                    buttons.append(
+                        EntryButton(
+                            self.user,
+                            "Read later",
+                            reverse(
+                                "{}:read-later-add".format(LinkDatabase.name),
+                                args=[self.entry.id],
+                            ),
+                            ConfigurationEntry.ACCESS_TYPE_ALL,
+                            "Adds to read later list",
+                            static(
+                                "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
+                            ),
                         ),
-                        ConfigurationEntry.ACCESS_TYPE_ALL,
-                        "Adds to read later list",
-                        static(
-                            "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
+                    )
+                else:
+                    buttons.append(
+                        EntryButton(
+                            self.user,
+                            "Do not read later",
+                            reverse(
+                                "{}:read-later-remove".format(LinkDatabase.name),
+                                args=[read_laters[0].id],
+                            ),
+                            ConfigurationEntry.ACCESS_TYPE_ALL,
+                            "Removes from read later list",
+                            static(
+                                "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
+                            ),
                         ),
-                    ),
-                )
-            else:
-                buttons.append(
-                    EntryButton(
-                        self.user,
-                        "Do not read later",
-                        reverse(
-                            "{}:read-later-remove".format(LinkDatabase.name),
-                            args=[read_laters[0].id],
-                        ),
-                        ConfigurationEntry.ACCESS_TYPE_ALL,
-                        "Removes from read later list",
-                        static(
-                            "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
-                        ),
-                    ),
-                )
+                    )
 
         translate_url = TranslateBuilder.get(self.entry.link).get_translate_url()
 

@@ -12,7 +12,7 @@ function sendClearList(attempt = 1) {
           $("#listStatus").html("Successful");
           $('#clear-list').prop("disabled", false);
           $('.remove-button').prop("disabled", false);
-          loadRowListContent();
+          performSearch();
           getIndicators();
        },
        error: function(xhr, status, error) {
@@ -44,7 +44,7 @@ function sendRemoveListItem(id, attempt = 1) {
        success: function(data) {
           $('#clear-list').prop("disabled", false);
           $('.remove-button').prop("disabled", false);
-          loadRowListContent();
+          performSearch();
           getIndicators();
        },
        error: function(xhr, status, error) {

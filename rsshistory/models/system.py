@@ -681,6 +681,12 @@ class UserConfig(models.Model):
         diff = relativedelta(date.today(), self.birth_date).years
         return diff
 
+    def is_authenticated(self):
+        if not self.user:
+            return False
+
+        return self.user.is_authenticated
+
     def can_download(self):
         config = ConfigurationEntry.get()
         if not self.user or not self.user.is_authenticated:

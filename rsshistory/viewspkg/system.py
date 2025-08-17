@@ -1021,18 +1021,22 @@ def json_personal_container(request):
     user_comments_icon = static("{}/icons/icons8-link-90.png".format(LinkDatabase.name))
 
     user_obj = UserConfig.get_or_create(request.user)
-    if not user_obj.user.is_authenticated:
+    if not user_obj.is_authenticated():
         return JsonResponse(data, json_dumps_params={"indent": 4})
 
     config_entry = ConfigurationEntry.get()
 
     rows = []
 
-    row = {}
-    row["link"] = reverse(f"{LinkDatabase.name}:read-later-entries")
-    row["icon"] = read_later_icon
-    row["title"] = "Read later"
-    rows.append(row)
+    read_later_queue_size = ReadLater.objects.filter(user=request.user).count()
+    read_later = read_later_queue_size > 0
+
+    if read_later:
+        row = {}
+        row["link"] = reverse(f"{LinkDatabase.name}:read-later-entries")
+        row["icon"] = read_later_icon
+        row["title"] = "Read later"
+        rows.append(row)
 
     for searchview in SearchView.objects.filter(user=True):
         row = {}
@@ -1083,7 +1087,7 @@ def json_tools_container(request):
     radar_icon = static("{}/icons/icons8-radar-64.png".format(LinkDatabase.name))
 
     user_obj = UserConfig.get_or_create(request.user)
-    if not user_obj.user.is_authenticated:
+    if not user_obj.is_authenticated():
         return JsonResponse(data, json_dumps_params={"indent": 4})
 
     rows = []
@@ -1157,8 +1161,6 @@ def json_users_container(request):
     data = {}
 
     user_obj = UserConfig.get_or_create(request.user)
-    if not user_obj.user.is_authenticated:
-        return JsonResponse(data, json_dumps_params={"indent": 4})
 
     login_icon = static("{}/icons/icons8-login-100.png".format(LinkDatabase.name))
     configuration_icon = static("{}/icons/icons8-configuration-67.png".format(LinkDatabase.name))
@@ -1167,7 +1169,7 @@ def json_users_container(request):
 
     rows = []
 
-    if not user_obj.user.is_authenticated:
+    if not user_obj.is_authenticated():
         row = {}
         row["link"] = reverse(f"{LinkDatabase.name}:login") + "?next=" + reverse(f"{LinkDatabase.name}:index")
         row["icon"] = login_icon

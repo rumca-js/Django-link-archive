@@ -180,7 +180,7 @@ function loadSearchHistory(attempt = 1) {
 
 
 let currentLoadRowListContentCounter = 0;
-function loadRowListContent(search_term = '', page = '', attempt = 1) {
+function performSearch(search_term = '', page = '', attempt = 1) {
    disableFilterButton();
 
    if (original_title === null) {
@@ -250,7 +250,7 @@ function loadRowListContent(search_term = '', page = '', attempt = 1) {
             $('#footerStatus').show();
 
             if (attempt < 3) {
-                loadRowListContent(search_term, page, attempt + 1);
+                performSearch(search_term, page, attempt + 1);
             }
             else {
                 $('#listStatus').html("Error loading list content");
@@ -312,7 +312,7 @@ $(document).on('click', '.btnFilterTrigger', function(e) {
 
     showSuggestions = false;
 
-    loadRowListContent(search_term, page);
+    performSearch(search_term, page);
 });
 
 
@@ -326,7 +326,7 @@ $(document).on('click', '.btnNavigation', function(e) {
     window.history.pushState({}, '', currentUrl);
 
     var search_term = $(this).data('search') || $('#id_search').val();
-    loadRowListContent(search_term, page);
+    performSearch(search_term, page);
 });
 
 
@@ -381,6 +381,7 @@ $(document).on("click", '#hideHistory', function(e) {
     $('#searchHistory').hide();
 });
 
+
 //-----------------------------------------------
 // Do it now
 
@@ -396,13 +397,13 @@ loadSearchHistory();
 
 // if (user specified search, or show is true), and entrylist is empty
 if (search_term || show) {
-   loadRowListContent();
+   performSearch();
 }
 
 //-----------------------------------------------
 // if auto refresh - keep refreshing list - for kiosk mode
 if (auto_refresh && !isNaN(auto_refresh)) {
     setInterval(function() {
-        loadRowListContent();
+        performSearch();
     }, parseInt(auto_refresh));
 }
