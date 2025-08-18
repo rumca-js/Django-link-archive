@@ -215,7 +215,7 @@ $("#btnAddLink").click(function(event) {
 });
 
 
-$(document).on('click', '.suggestion-item', function(event) {
+$(document).on('click', '.suggestion-link', function(event) {
     event.preventDefault();
     let element = $('#theForm input[name="link"]');
     let text = $(this).text();
@@ -274,7 +274,7 @@ function fetchLinkSuggestions(search_link) {
             if (data.status && Array.isArray(data.links) && data.links.length > 0) {
                 $('#Suggestions').append(`<div>Other link suggestions</div>`);
                 data.links.forEach(link => {
-                    $('#Suggestions').append(`<button class="suggestion-item btn btn-secondary d-block">${link}</button>`);
+                    $('#Suggestions').append(`<button class="suggestion-link btn btn-secondary d-block">${link}</button>`);
                 });
             }
 

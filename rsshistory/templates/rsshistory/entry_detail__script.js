@@ -130,13 +130,15 @@ function getEntryOperationalParamters(attempt = 1) {
 function fillDislike() {
     let parameters = $('#entryParameters').html();
 
-    let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_view_ratio } = entry_dislike_data;
+    let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_view_ratio, stars, followers_count } = entry_dislike_data;
 
     let text = [];
 
     if (thumbs_up) text.push(`<div class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</div>`);
     if (thumbs_down) text.push(`<div class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</div>`);
     if (view_count) text.push(`<div class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</div>`);
+    if (stars) text.push(`<div class="text-nowrap mx-1">S:${getHumanReadableNumber(stars)}</div>`);
+    if (followers_count) text.push(`<div class="text-nowrap mx-1">F:${getHumanReadableNumber(followers_count)}</div>`);
 
     if (upvote_ratio) text.push(`<div class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</div>`);
     if (upvote_view_ratio) text.push(`<div class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</div>`);
