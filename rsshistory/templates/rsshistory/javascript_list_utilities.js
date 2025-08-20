@@ -29,13 +29,18 @@ function fillSearchSuggestions(items) {
     let button_text = getHideButton("Hide");
     text += button_text;
 
+    let currentUrl = new URL(window.location.href);
+
     if (items && items.length > 0) {
         $.each(items, function(index, item) {
             let item_escaped = escapeHtml(item);
 
+            const url = `?search=${encodeURIComponent(item)}&${currentUrl.searchParams.toString()}`;
+            console.log(`url ${url}`);
+
             var listItem = `
                 <div class="list-group-item list-group-item-action">
-                    <a class="btnFilterTrigger " data-search="${item_escaped}" href="?search=${encodeURIComponent(item)}">
+                    <a class="btnFilterTrigger " data-search="${item_escaped}" href="${url}">
                        🔍
                         ${item_escaped}
                     </a>
@@ -69,16 +74,18 @@ function fillSearchHistory(items) {
     let button_text = getHideButton('Hide');
     text += button_text;
 
+    let currentUrl = new URL(window.location.href);
+
     if (items && items.length > 0) {
         $.each(items, function(index, item) {
             let query = item.search_query
             let item_escaped = escapeHtml(query);
 
-            url = `{% url "rsshistory:user-search-history-remove" %}?search=${encodeURIComponent(query)}`;
+            const url = `{% url "rsshistory:user-search-history-remove" %}?search=${encodeURIComponent(query)}&${currentUrl.searchParams.toString()}`;
 
             var listItem = `
                 <div class="list-group-item list-group-item-action d-flex align-items-center">
-                   <a class="btnFilterTrigger" data-search="${item_escaped}" href="?search=${encodeURIComponent(query)}">
+                   <a href="${url}" class="btnFilterTrigger" data-search="${item_escaped}">
                    🔍
                        ${item_escaped}
                    </a>

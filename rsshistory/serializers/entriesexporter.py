@@ -304,11 +304,15 @@ def entry_to_json(user_config, entry, tags=False):
 
     json_entry["source__title"] = ""
     json_entry["source__url"] = ""
+    json_entry["backgroundcolor"] = None
+    json_entry["alpha"] = 1.0
 
     if hasattr(entry, "source"):
         if entry.source:
             json_entry["source__title"] = entry.source.title
             json_entry["source__url"] = entry.source.url
+            json_entry["backgroundcolor"] = entry.source.entries_backgroundcolor
+            json_entry["alpha"] = entry.source.entries_alpha
 
     if user_config.show_icons:
         if user_inappropate:
@@ -318,6 +322,8 @@ def entry_to_json(user_config, entry, tags=False):
                 json_entry["thumbnail"] = entry.get_thumbnail()
             else:
                 json_entry["thumbnail"] = entry.get_favicon()
+            if not json_entry["thumbnail"] and entry.source:
+                json_entry["thumbnail"] = entry.source.get_favicon()
 
     if hasattr(entry, "tags"):
         tags = set()

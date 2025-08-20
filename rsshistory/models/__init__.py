@@ -74,3 +74,4 @@ from .blockentry import BlockEntryList, BlockEntry, BlockListReader
 from .gateway import Gateway
 
 from .searchview import SearchView
+from .social import SocialData

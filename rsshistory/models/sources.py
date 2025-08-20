@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.core.validators import MinValueValidator,MaxValueValidator
 
 from ..webtools import UrlLocation
 
@@ -145,13 +146,23 @@ class SourceDataModel(models.Model):
     )
     language = models.CharField(max_length=10, blank=True)  # inherited into entries
     age = models.IntegerField(default=0)  # inherited into entries
-    favicon = models.CharField(max_length=1000, null=True)
+    favicon = models.CharField(max_length=1000, null=True, blank=True)
     fetch_period = models.IntegerField(
         default=900, help_text="Source is checked for new data after [x] seconds"
     )
 
     auto_tag = models.CharField(
         max_length=1000, blank=True, help_text="Automatic tag for new entries"
+    )
+
+    entries_backgroundcolor = models.CharField(
+        max_length=1000, blank=True, help_text="Background color to be applied for a source"
+    )
+
+    entries_alpha = models.FloatField(
+        default=1.0,
+        validators = [MinValueValidator(0), MaxValueValidator(1)],
+        help_text="Some sources are spammy, you can define alpha for them to be less visible",
     )
 
     credentials = models.ForeignKey(

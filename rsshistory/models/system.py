@@ -230,6 +230,12 @@ class ConfigurationEntry(models.Model):
         default=False, help_text="Enable archiving of sources using archive.org."
     )
 
+    keep_social_data = models.BooleanField(
+        default=False,
+        help_text="Keep link social data in the database.",
+    )
+
+
     # database link contents
 
     accept_dead_links = models.BooleanField(

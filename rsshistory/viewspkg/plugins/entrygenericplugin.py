@@ -37,6 +37,8 @@ class EntryButton(object):
         self.access = access
         self.title = title
 
+        self.id = self.name.replace(" ", "-")
+
     def is_shown(self):
         if self.access == ConfigurationEntry.ACCESS_TYPE_ALL:
             return True
@@ -51,8 +53,15 @@ class EntryButton(object):
 
         return False
 
-    def get_id(self):
-        return self.name.replace(" ", "-")
+    def get_map(self):
+        return {
+           "name" : self.name,
+           "id" : self.id,
+           "action" : self.action,
+           "image" : self.image,
+           "access" : self.access,
+           "title" : self.title,
+        }
 
 
 class EntryParameter(object):

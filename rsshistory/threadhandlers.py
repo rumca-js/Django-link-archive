@@ -47,6 +47,7 @@ from .models import (
     BlockEntryList,
     Gateway,
     BackgroundJobHistory,
+    SocialData,
 )
 
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -1138,6 +1139,9 @@ class CleanupJobHandler(BaseJobHandler):
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CLEANUP, subject="Gateway", args=args
         )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_CLEANUP, subject="SocialData", args=args
+        )
 
     def process(self, obj=None):
         """
@@ -1197,6 +1201,8 @@ class CleanupJobHandler(BaseJobHandler):
             UserEntryTransitionHistory.cleanup(cfg)
         if table == "all" or table == "UserEntryVisitHistory":
             UserEntryVisitHistory.cleanup(cfg)
+        if table == "all" or table == "SocialData":
+            SocialData.cleanup(cfg)
 
         status = True
 
@@ -1265,6 +1271,9 @@ class TruncateTableJobHandler(BaseJobHandler):
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_TRUNCATE_TABLE, subject="Gateway", args=args
         )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="SocialData", args=args
+        )
 
     def process(self, obj=None):
         """
@@ -1325,6 +1334,8 @@ class TruncateTableJobHandler(BaseJobHandler):
             UserEntryTransitionHistory.truncate(cfg)
         if table == "all" or table == "UserEntryVisitHistory":
             UserEntryVisitHistory.truncate(cfg)
+        if table == "all" or table == "SocialData":
+            SocialData.truncate(cfg)
 
         status = True
 

@@ -29,6 +29,15 @@ function isEntryDownloadStop(data) {
 }
 
 
+function getEntryMenu() {
+    getDynamicJson("{% url 'rsshistory:json-entry-menu' object.id %}", function(data) {
+        text = getMenuEntries(data.menu);
+
+        $("#entryMenu").html(text);
+    });
+}
+
+
 let currentIsDownloading = 0;
 function getIsEntryDownloaded(attempt = 1) {
     let requestIsDownloading = ++currentIsDownloading;
@@ -128,23 +137,9 @@ function getEntryOperationalParamters(attempt = 1) {
 
 
 function fillDislike() {
-    let parameters = $('#entryParameters').html();
+    let entry = entry_json_data.link;
 
-    let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_view_ratio, stars, followers_count } = entry_dislike_data;
-
-    let text = [];
-
-    if (thumbs_up) text.push(`<div class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</div>`);
-    if (thumbs_down) text.push(`<div class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</div>`);
-    if (view_count) text.push(`<div class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</div>`);
-    if (stars) text.push(`<div class="text-nowrap mx-1">S:${getHumanReadableNumber(stars)}</div>`);
-    if (followers_count) text.push(`<div class="text-nowrap mx-1">F:${getHumanReadableNumber(followers_count)}</div>`);
-
-    if (upvote_ratio) text.push(`<div class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</div>`);
-    if (upvote_view_ratio) text.push(`<div class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</div>`);
-
-    parameters = `${parameters} ${text.join(" ")}`;
-
+    let parameters = getEntryParameters(entry, entry_dislike_data);
     $('#entryParameters').html(parameters);
 }
 
@@ -196,7 +191,7 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1,
 
            if (data.status) {
                getEntryProperties();
-               getEntryMenuContent();
+               getEntryMenu();
                getIndicators();
            }
        },
@@ -229,33 +224,11 @@ function getTagEditForm() {
 }
 
 
-function getEntryMenuContent() {
-    getDynamicContent("{% url 'rsshistory:get-entry-menu' object.id %}", "#entryMenu", 1, true);
-}
-
-
-function getEntryParameters(entry) {
-   html_out = "";
-
-   let date_published = getEntryDatePublished(entry);
-
-   html_out += `<div class="text-nowrap"><strong>Publish date:</strong> ${date_published}</div>`;
-
-   html_out += getEntryBookmarkBadge(entry);
-   html_out += getEntryVotesBadge(entry);
-   html_out += getEntryAgeBadge(entry);
-   html_out += getEntryDeadBadge(entry);
-
-   return html_out;
-}
-
-
-function getEntryDescription(entry) {
-  const content = new InputContent(entry.description);
-  let content_text = content.htmlify();
-
-  content_text = content_text.replace(/(\r\n|\r|\n)/g, "<br>");
-  return content_text;
+function getEntryTagLink(tag) {
+    if (tag) {
+       return `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>,`
+    }
+    return "";
 }
 
 
@@ -267,12 +240,7 @@ function updateEntryProperties() {
 
     let entry = entry_json_data.link;
 
-    let tag_string = "";
-    if (entry_json_data.link.tags) {
-       entry_json_data.link.tags.forEach(tag => {
-           tag_string += `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>,`
-       });
-    }
+    let tag_string = getEntryDetailTags(entry);
 
     tag_string += getEditButton();
     $("#entryTagContainer").html(tag_string);
@@ -297,7 +265,7 @@ function updateEntryProperties() {
 
     $('#editTagsButton').show();
 
-    let entry_parameters = getEntryParameters(entry);
+    let entry_parameters = getEntryParameters(entry, entry_dislike_data);
     $('#entryParameters').html(entry_parameters);
 
     if (debug) {
@@ -353,70 +321,30 @@ function fillEntryRelated() {
 }
 
 
-let currentgetEntryRelated = 0;
-function getEntryRelated(attempt = 1) {
-    let requestgetEntryRelated = ++currentgetEntryRelated;
+function getEntryRelated() {
     let url_address = "{% url 'rsshistory:entry-related-json' object.id %}";
 
-    $.ajax({
-       url: url_address,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestgetEntryRelated != currentgetEntryRelated) {
-               return;
-           }
-           if (data) {
-               entry_related_data = data;
-               fillEntryRelated();
-           }
-       },
-       error: function(xhr, status, error) {
-           if (requestgetEntryRelated != currentgetEntryRelated) {
-               return;
-           }
-           if (attempt < 3) {
-               getEntryRelated(attempt + 1);
-           } else {
-           }
-       }
+    getDynamicJson(url_address, function(data) {
+        if (data) {
+            entry_related_data = data;
+            fillEntryRelated();
+        }
     });
 }
 
 
 let currentgetEntryTags = 0;
-function getEntryTags(attempt = 1) {
+function getEntryTags() {
     let requestgetEntryTags = ++currentgetEntryTags;
     let url_address = "{% url 'rsshistory:entry-tags' object.id %}";
 
-    $.ajax({
-       url: url_address,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestgetEntryTags != currentgetEntryTags) {
-               return;
-           }
-           if (data) {
-              if (data.status) {
-                  let tag_string = "";
-                  data.tags.forEach(tag => {
-              	  tag_string += `<a href="{% url 'rsshistory:entries' %}?search=tags__tag+%3D%3D+${tag}">#${tag}</a>,`
-                  });
-              
-                  tag_string += getEditButton();
-                  $("#entryTagContainer").html(tag_string);
-              }
-           }
-       },
-       error: function(xhr, status, error) {
-           if (requestgetEntryTags != currentgetEntryTags) {
-               return;
-           }
-           if (attempt < 3) {
-               getEntryTags(attempt + 1);
-           } else {
-           }
+    getDynamicJson(url_address, function(data) {
+       if (data) {
+          if (data.status) {
+              let tag_string = getEntryDetailTags(data);
+              tag_string += getEditButton();
+              $("#entryTagContainer").html(tag_string);
+          }
        }
     });
 }
@@ -569,3 +497,4 @@ getEntryOperationalParamters();
 getDislikeData();
 getIsEntryDownloaded();
 getEntryTags();
+getEntryMenu();

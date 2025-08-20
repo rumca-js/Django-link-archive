@@ -3,6 +3,7 @@ import time
 
 from django.views import generic
 from django.urls import reverse
+from django.forms.models import model_to_dict
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.http import JsonResponse
@@ -41,6 +42,8 @@ from ..models import (
     UserBookmarks,
     AppLogging,
     SearchView,
+    ReadLater,
+    SocialData,
 )
 from ..controllers import (
     DomainsController,
@@ -443,7 +446,7 @@ class EntryArchivedDetailView(generic.DetailView):
         return context
 
 
-def get_entry_menu(request, pk):
+def json_entry_menu(request, pk):
     p = ViewPage(request)
     p.set_title("Get entry menu")
 
@@ -451,17 +454,34 @@ def get_entry_menu(request, pk):
     if not uc.can_add():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
 
+    json_data = {}
+    json_data["menu"] = []
+
     entries = LinkDataController.objects.filter(id=pk)
     if entries.exists():
         entry = entries[0]
-        p.context["object"] = entry
-        p.context["user"] = request.user
-        p.context["object_controller"] = EntryPreviewBuilder.get(
-            entry,
-            request.user,
-        )
 
-    return p.render("entry_detail__buttons.html")
+        object_controller = EntryPreviewBuilder.get(entry, request.user)
+
+        buttons = []
+        for button in object_controller.get_edit_menu_buttons():
+            if button.is_shown():
+                buttons.append(button.get_map())
+        json_data["menu"].append({"name" : "Edit", "buttons" : buttons})
+
+        buttons = []
+        for button in object_controller.get_view_menu_buttons():
+            if button.is_shown():
+                buttons.append(button.get_map())
+        json_data["menu"].append({"name" : "View", "buttons" : buttons})
+
+        buttons = []
+        for button in object_controller.get_advanced_menu_buttons():
+            if button.is_shown():
+                buttons.append(button.get_map())
+        json_data["menu"].append({"name" : "Advanced", "buttons" : buttons})
+
+    return JsonResponse(json_data, json_dumps_params={"indent": 4})
 
 
 def func_display_empty_form(request, p, template_name):
@@ -897,34 +917,12 @@ def entry_dislikes(request, pk):
             {"errors": ["Entry does not exists"]}, json_dumps_params={"indent": 4}
         )
 
-    obj = objs[0]
+    entry = objs[0]
 
-    config = Configuration.get_object().config_entry
-    if config.remote_webtools_server_location:
-
-        controller = SystemOperationController()
-        if controller.is_remote_server_down():
-            return JsonResponse(
-                {"errors": ["Remote server is down"]}, json_dumps_params={"indent": 4}
-            )
-
-        link = config.remote_webtools_server_location
-        remote_server = RemoteServer(link)
-
-        json_obj = remote_server.get_socialj(obj.link)
-        if not json_obj:
-            return JsonResponse(
-                {"errors": ["Could not obtain social data"]},
-                json_dumps_params={"indent": 4},
-            )
-
-        try:
-            return JsonResponse(json_obj, json_dumps_params={"indent": 4})
-        except Exception as E:
-            return JsonResponse(
-                {"errors": ["Could not dump social data"]},
-                json_dumps_params={"indent": 4},
-            )
+    social_data = SocialData.get(entry=entry)
+    if social_data:
+        json_obj = model_to_dict(social_data)
+        return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def entry_bookmark(request, pk):
@@ -1071,6 +1069,12 @@ def handle_json_view(request, view_to_use):
         if page_num <= p.num_pages:
             for entry in page_obj:
                 entry_json = entry_to_json(user_config, entry, tags=show_tags)
+
+                read_laters = ReadLater.objects.filter(entry = entry, user=request.user)
+                entry_json["read_later"] = read_laters.exists()
+
+                visits = UserEntryVisitHistory.objects.filter(entry=entry, user=request.user)
+                entry_json["visited"] = visits.exists()
 
                 json_obj["entries"].append(entry_json)
 

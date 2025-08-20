@@ -56,6 +56,12 @@
 {% if object.auto_tag %}
     <li class="list-group-item text-nowrap mx-2">Auto tag: {{ object.auto_tag }}</li>
 {% endif %}
+{% if object.entries_backgroundcolor %}
+    <li class="list-group-item text-nowrap mx-2">Entries background color: {{ object.entries_backgroundcolor }}</li>
+{% endif %}
+{% if object.entries_alpha %}
+    <li class="list-group-item text-nowrap mx-2">Entries alpha: {{ object.entries_alpha }}</li>
+{% endif %}
     <li class="list-group-item text-nowrap mx-2">Remove after days: {{ object.remove_after_days }}</li>
 {% if object.username %}
     <li class="list-group-item text-nowrap mx-2">Username: {{ object.username }}</li>

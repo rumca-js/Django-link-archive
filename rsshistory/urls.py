@@ -77,7 +77,7 @@ urlpatterns = [
     path("entry-archive-remove/<int:pk>/", entries.archive_remove_entry, name="entry-archive-remove"),
     path("entries-archive-remove-all", entries.archive_entries_remove_all, name="entries-archive-remove-all"),
     path("entry-save/<int:pk>/", entries.wayback_save, name="entry-save"),
-    path("get-entry-menu/<int:pk>/", entries.get_entry_menu, name="get-entry-menu"),
+    path("json-entry-menu/<int:pk>/", entries.json_entry_menu, name="json-entry-menu"),
     # sources
     path("sources/", sources.sources, name="sources"),
     path("source/<int:pk>/", sources.SourceDetailView.as_view(), name="source-detail"),

@@ -5,6 +5,7 @@
    {% include "rsshistory/entry_detail__frame.html" %}
 
    <div id="entryParameters" class="d-flex flex-wrap">
+       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
    </div>
 
    {% include "rsshistory/entry_detail__tags.html" %}
@@ -21,13 +22,14 @@
    {% include "rsshistory/entry_detail__source.html" %}
 
    <div id="entryMenu" class="d-flex">
-   {% include "rsshistory/entry_detail__buttons.html" %}
+       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
    </div>
 
    <div id="entryStatusLine" class="mb-2 bg-warning text-dark">
    </div>
 
    <div id="entryDescription" class="link-detail-description">
+       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
    </div>
 
    {% include "rsshistory/entry_detail__comments.html" %}

@@ -114,12 +114,61 @@ function getEntryDeadBadge(entry, overflow=false) {
 }
 
 
-function getEntryTags(entry) {
-    let tags_text = "";
-    if (entry.tags && entry.tags.length > 0) {
-        tags_text = entry.tags.map(tag => `#${tag}`).join(",");
+function getEntryReadLaterBadge(entry, overflow=false) {
+    let style = "font-size: 0.8rem;"
+    if (overflow) {
+        style = "position: absolute; top: 30px; right: 60px;" + style;
     }
-    return tags_text;
+
+    let badge_text = entry.read_later ? `
+        <span class="badge text-bg-warning" style="${style}" title="Read Later">
+           R
+        </span>` : '';
+    return badge_text;
+}
+
+
+function getEntryVisitedBadge(entry, overflow=false) {
+    let style = "font-size: 0.8rem;"
+    if (overflow) {
+        style = "position: absolute; top: 30px; right: 60px;" + style;
+    }
+
+    let badge_text = entry.visited ? `
+        <span class="badge text-bg-warning" style="${style}" title="Visited">
+           V
+        </span>` : '';
+    return badge_text;
+}
+
+
+function getEntryParameters(entry, entry_dislike_data) {
+   html_out = "";
+
+   let date_published = getEntryDatePublished(entry);
+
+   html_out += `<div class="text-nowrap d-flex flex-wrap" id="entryParameters"><strong>Publish date:</strong> ${date_published}</div>`;
+
+   html_out += getEntryBookmarkBadge(entry);
+   html_out += getEntryVotesBadge(entry);
+   html_out += getEntryAgeBadge(entry);
+   html_out += getEntryDeadBadge(entry);
+   html_out += getEntryReadLaterBadge(entry);
+
+   if (entry_dislike_data) {
+        let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_view_ratio, stars, followers_count } = entry_dislike_data;
+    
+        if (thumbs_up) html_out += `<div class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</div>`;
+        if (thumbs_down) html_out += `<div class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</div>`;
+        if (view_count) html_out += `<div class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</div>`;
+        if (stars) html_out += `<div class="text-nowrap mx-1">S:${getHumanReadableNumber(stars)}</div>`;
+        if (followers_count) html_out += `<div class="text-nowrap mx-1">F:${getHumanReadableNumber(followers_count)}</div>`;
+    
+        if (upvote_ratio) html_out += `<div class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</div>`;
+        if (upvote_view_ratio) html_out += `<div class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</div>`;
+   }
+
+   return html_out;
 }
 
 
@@ -218,22 +267,6 @@ function getEntryTitleSafe(entry) {
 }
 
 
-function getEntryParameters(entry) {
-   html_out = "";
-
-   let date_published = getEntryDatePublished(entry);
-
-   html_out += `<div class="text-nowrap d-flex flex-wrap" id="entryParameters"><strong>Publish date:</strong> ${date_published}</div>`;
-
-   html_out += getEntryBookmarkBadge(entry);
-   html_out += getEntryVotesBadge(entry);
-   html_out += getEntryAgeBadge(entry);
-   html_out += getEntryDeadBadge(entry);
-
-   return html_out;
-}
-
-
 function getEntryDescription(entry) {
   if (!entry.description)
     return "";
@@ -249,6 +282,19 @@ function getEntryDescription(entry) {
 /**
  * Detail view
  */
+
+
+function getEntryDetailTags(entry) {
+   tag_string = "";
+
+   if (entry.tags && entry.tags.length > 0 ) {
+      entry.tags.forEach(tag => {
+         tag_string += getEntryTagLink(tag);
+      });
+   }
+
+   return tag_string;
+}
 
 
 function getArchiveOrgLink(link) {
@@ -305,6 +351,7 @@ function getGoogleTranslateLink(link) {
 }
 
 
+"Fixed manu entry - TODO provide a button class instances and call other formatting functions below"
 function GetEditMenu(entry) {
     let link = entry.link;
 
@@ -375,6 +422,54 @@ function GetEditMenu(entry) {
 }
 
 
+function getMenuButtonText(button) {
+    let button_image_text = "";
+    if (button.image) {
+       button_image_text = `<img src="${button.image}" class="content-icon" />`;
+    }
+
+    return `
+     	 <li>
+             <a href="${button.action}" id="${button.id}" class="dropdown-item" title="${button.title}">
+	       ${button_image_text}
+               ${button.name}
+             </a>
+         </li>
+     `;
+}
+
+
+function getMenuEntry(menu_entry) {
+
+    let buttons_text = "";
+    menu_entry.buttons.forEach(button => {
+	buttons_text += getMenuButtonText(button);
+    });
+
+
+     let menu_entry_text = `<div class="dropdown mx-2">
+        <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+	  ${menu_entry.name}
+        </button>
+     
+        <ul class="dropdown-menu">
+	   ${buttons_text}
+        </ul>
+     </div>`
+
+     return menu_entry_text;
+}
+
+
+function getMenuEntries(menu_entries) {
+    text = "";
+    menu_entries.forEach(menu_entry => {
+       text += getMenuEntry(menu_entry);
+    });
+    return text;
+}
+
+
 function getEntryOpParameters(entry) {
     text = "";
 
@@ -432,7 +527,7 @@ function getEntryBodyText(entry) {
     ${parameters}
     `;
 
-    let tags_text = getEntryTags(entry);
+    let tags_text = getEntryTagStrings(entry);
     
     if (tags_text) {
        text += `
@@ -553,6 +648,50 @@ function getEntryDetailText(entry) {
  */
 
 
+function getEntryTagStrings(entry) {
+   tag_string = "";
+   if (entry.tags && entry.tags.length > 0 ) {
+	tag_string = entry.tags.map(tag => `#${tag}`).join(",");
+   }
+
+   return tag_string;
+}
+
+
+`
+ - If this is not valid, then we have display style to dead
+ - if entry was visited it is opaque
+    - but if entry is bookmarked we do not want to make it more or less opaque
+    - bookmarked was always visited, and should be visible
+`
+function getEntryDisplayStyle(entry, mark_visited=true) {
+    let display_style = "";
+
+    if (entry.alpha)
+    {
+        let opacity = entry.alpha;
+	display_style = `opacity: ${opacity};`;
+    }
+
+    if (mark_visited && !entry.bookmarked && entry.visited)
+    {
+       display_style = `opacity: 0.6;`;
+    }
+
+    if (!isEntryValid(entry))
+    {
+	display_style = `opacity: 0.5;`;
+    }
+
+    if (entry.background_color)
+    {
+       display_style += `background-color: ${entry.background_color};`;
+    }
+
+    return display_style;
+}
+
+
 function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
 
@@ -560,8 +699,10 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let badge_star = getEntryBookmarkBadge(entry);
     let badge_age = getEntryAgeBadge(entry);
     let badge_dead = getEntryDeadBadge(entry);
+    let badge_read_later = getEntryReadLaterBadge(entry);
+    let badge_visited = getEntryVisitedBadge(entry);
 
-    let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
+    let invalid_style = getEntryDisplayStyle(entry);
     let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
     let thumbnail = getEntryThumbnail(entry);
 
@@ -578,7 +719,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                 ${img_text}
             </div>`;
     }
-    let tags_text = getEntryTags(entry);
+    let tags_text = getEntryTagStrings(entry);
     let tags = `<div class="text-reset mx-2">${tags_text}</div>`;
     let source__title = getEntrySourceTitle(entry);
     let date_published = getEntryDatePublished(entry);
@@ -601,7 +742,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
             href="${entry_link}"
             entry="${entry.id}"
             title="${hover_title}"
-            ${invalid_style}
+            style="${invalid_style}"
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
         >
             <div class="d-flex">
@@ -619,6 +760,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                   ${badge_star}
                   ${badge_age}
                   ${badge_dead}
+                  ${badge_read_later}
                 </div>
             </div>
         </a>
@@ -633,8 +775,10 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let badge_star = highlight_bookmarks ? getEntryBookmarkBadge(entry) : "";
     let badge_age = getEntryAgeBadge(entry);
     let badge_dead = getEntryDeadBadge(entry);
+    let badge_read_later = getEntryReadLaterBadge(entry);
+    let badge_visited = getEntryVisitedBadge(entry);
    
-    let invalid_style = isEntryValid(entry) ? `` : `style="opacity: 0.5"`;
+    let invalid_style = getEntryDisplayStyle(entry);
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
 
     let thumbnail = getEntryThumbnail(entry);
@@ -647,7 +791,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                 <img src="${thumbnail}" class="rounded ${iconClass}"/>
             </div>`;
     }
-    let tags_text = getEntryTags(entry);
+    let tags_text = getEntryTagStrings(entry);
     let tags = `<div class="text-reset mx-2">${tags_text}</div>`;
     let title_safe = getEntryTitleSafe(entry);
     let entry_link = getEntryLink(entry);
@@ -661,7 +805,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
             href="${entry_link}"
             entry="${entry.id}"
             title="${hover_title}"
-            ${invalid_style}
+            style="${invalid_style}"
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
         >
             <div class="d-flex">
@@ -677,6 +821,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                   ${badge_star}
                   ${badge_age}
                   ${badge_dead}
+                  ${badge_read_later}
                </div>
             </div>
         </a>
@@ -701,8 +846,10 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
     let badge_star = getEntryBookmarkBadge(entry, true);
     let badge_age = getEntryAgeBadge(entry, true);
     let badge_dead = getEntryDeadBadge(entry);
+    let badge_read_later = getEntryReadLaterBadge(entry);
+    let badge_visited = getEntryVisitedBadge(entry);
 
-    let invalid_style = isEntryValid(entry) ? `` : `opacity: 0.5`;
+    let invalid_style = getEntryDisplayStyle(entry);
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
 
     let thumbnail = getEntryThumbnail(entry);
@@ -713,10 +860,11 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
             ${badge_star}
             ${badge_age}
             ${badge_dead}
+            ${badge_read_later}
         </div>
     `;
 
-    let tags_text = getEntryTags(entry);
+    let tags_text = getEntryTagStrings(entry);
     let tags = `<div class="text-reset mx-2">${tags_text}</div>`;
 
     let title_safe = getEntryTitleSafe(entry);
@@ -754,8 +902,10 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
     let badge_star = getEntryBookmarkBadge(entry, true);
     let badge_age = getEntryAgeBadge(entry, true);
     let badge_dead = getEntryDeadBadge(entry);
+    let badge_read_later = getEntryReadLaterBadge(entry);
+    let badge_visited = getEntryVisitedBadge(entry);
 
-    let invalid_style = isEntryValid(entry) ? `` : `opacity: 0.5`;
+    let invalid_style = getEntryDisplayStyle(entry);
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
 
     let thumbnail = getEntryThumbnail(entry);
@@ -765,9 +915,10 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
         ${badge_star}
         ${badge_age}
         ${badge_dead}
+        ${badge_read_later}
     `;
 
-    let tags_text = getEntryTags(entry);
+    let tags_text = getEntryTagStrings(entry);
     let tags = `<div class="text-reset mx-2">${tags_text}</div>`;
 
     let source__title = getEntrySourceTitle(entry);
@@ -815,6 +966,7 @@ function getEntryVisitsBar(entry) {
     let badge_star = getEntryBookmarkBadge(entry, true);
     let badge_age = getEntryAgeBadge(entry, true);
     let badge_dead = getEntryDeadBadge(entry, true);
+    let badge_read_later = getEntryReadLaterBadge(entry);
 
     let img_text = '';
     if (view_show_icons) {
@@ -831,6 +983,7 @@ function getEntryVisitsBar(entry) {
              ${badge_star}
              ${badge_age}
              ${badge_dead}
+             ${badge_read_later}
 
              <div class="d-flex">
                ${img_text}
@@ -862,6 +1015,8 @@ function getEntryRelatedBar(entry, from_entry_id) {
     let badge_star = getEntryBookmarkBadge(entry, true);
     let badge_age = getEntryAgeBadge(entry, true);
     let badge_dead = getEntryDeadBadge(entry, true);
+    let badge_read_later = getEntryReadLaterBadge(entry);
+    let badge_visited = getEntryVisitedBadge(entry);
 
     let img_text = '';
     if (view_show_icons) {
@@ -878,6 +1033,7 @@ function getEntryRelatedBar(entry, from_entry_id) {
              ${badge_star}
              ${badge_age}
              ${badge_dead}
+             ${badge_read_later}
 
              <div class="d-flex">
                ${img_text}

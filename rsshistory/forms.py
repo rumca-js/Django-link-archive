@@ -126,6 +126,7 @@ class ConfigForm(forms.ModelForm):
             "enable_file_support",
             "enable_link_archiving",
             "enable_source_archiving",
+            "keep_social_data",
             # database link contents
             "accept_domain_links",
             "accept_non_domain_links",
@@ -704,6 +705,8 @@ class SourceForm(forms.ModelForm):
             "fetch_period",
             "remove_after_days",
             "auto_tag",
+            "entries_alpha",
+            "entries_backgroundcolor",
             "favicon",
             "auto_update_favicon",
             "credentials",
@@ -718,9 +721,7 @@ class SourceForm(forms.ModelForm):
         self.fields["url"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["favicon"].widget.attrs.update(size=self.init.get_cols_size())
 
-        # TODO thing below should be handled by model properties
-        self.fields["favicon"].required = False
-        self.fields["proxy_location"].required = False
+        self.fields["entries_backgroundcolor"].widget = forms.TextInput(attrs={"type" : "color"})
 
         names = SourceControllerBuilder.get_plugin_names()
         # self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
