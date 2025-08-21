@@ -105,7 +105,7 @@ function fillListData() {
         $('#pagination').html(pagination);
     }
 
-    if (debug) {
+    if (debug_mode) {
        let query_info = GetQueryDetailsHtml(data);
        $('#queryInfo').html(query_info);
     }

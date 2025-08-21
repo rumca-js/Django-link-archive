@@ -138,8 +138,6 @@ class ViewPage(object):
         c = Configuration.get_object()
         config = ConfigurationEntry.get()
 
-        context["debug"] = config.debug_mode
-
         if self.is_user_allowed_complete() and config.enable_background_jobs:
             context.update(c.get_context())
 

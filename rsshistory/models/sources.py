@@ -207,17 +207,37 @@ class SourceDataModel(models.Model):
         )
 
     def reset_dynamic_data():
-        objs = SourceSubCategories.objects.all()
-        objs.delete()
-        objs = SourceCategories.objects.all()
-        objs.delete()
+        from ..models import AppLogging
+
+        objs = SourceSubCategories.objects.all().delete()
+        objs = SourceCategories.objects.all().delete()
 
         sources = SourceDataModel.objects.all()
         for source in sources:
             source.category = None
             source.subcategory = None
-            SourceCategories.add(source.category_name)
-            SourceSubCategories.add(source.category_name, source.subcategory_name)
+
+            if (not source.category_name or source.category_name == "") and (source.subcategory_name and source.subcategory_name != ""):
+                AppLogging.error("Source:{} Incorrectly defined source categories".format(source.id))
+                source.save()
+                continue
+
+            category = SourceCategories.ensure(source.category_name)
+            if not category:
+                AppLogging.error("Source:{} Cannot create category with name {}".format(source.id, source.category_name))
+                source.save()
+                continue
+
+            subcategory = SourceSubCategories.ensure(source.category_name, source.subcategory_name)
+            if not  subcategory:
+                AppLogging.error("Source:{} Cannot create category with name {} subcategory name {}".format(source.id, source.category_name, source.subcategory_name))
+                source.save()
+                continue
+
+            source.category = category
+            source.subcategory = subcategory
+
+            source.save()
 
     def get_favicon(self):
         return self.favicon

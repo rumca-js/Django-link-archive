@@ -268,7 +268,7 @@ function updateEntryProperties() {
     let entry_parameters = getEntryParameters(entry, entry_dislike_data);
     $('#entryParameters').html(entry_parameters);
 
-    if (debug) {
+    if (debug_mode) {
        // TODO does not work, displays object $('#entryDebug').html(String(entry_json_data.link));
     }
 }
@@ -442,27 +442,42 @@ $(document).on('click', '#Vote', function(event) {
 
 $(document).on('click', '#Bookmark', function(event) {
     event.preventDefault();
-    getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-bookmark' object.id %}", '#entryStatusLine');
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-entry-bookmark' object.id %}", '#entryStatusLine');
 });
 
 $(document).on('click', '#Unbookmark', function(event) {
     event.preventDefault();
-    getDynamicJsonContentWithRefresh("{% url 'rsshistory:entry-unbookmark' object.id %}", '#entryStatusLine');
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-entry-unbookmark' object.id %}", '#entryStatusLine');
+});
+
+$(document).on('click', '#Update-data', function(event) {
+    event.preventDefault();
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-entry-update-data' object.id %}", '#entryStatusLine');
+});
+
+$(document).on('click', '#Reset-data', function(event) {
+    event.preventDefault();
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-entry-reset-data' object.id %}", '#entryStatusLine');
+});
+
+$(document).on('click', '#Reset-local-data', function(event) {
+    event.preventDefault();
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-entry-reset-local-data' object.id %}", '#entryStatusLine');
 });
 
 $(document).on('click', '#Read-later', function(event) {
     event.preventDefault();
-    getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-add' object.id %}", '#entryStatusLine');
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-read-later-add' object.id %}", '#entryStatusLine');
 });
 
 $(document).on('click', '#Do-not-read-later', function(event) {
     event.preventDefault();
-    getDynamicJsonContentWithRefresh("{% url 'rsshistory:read-later-remove' object.id %}", '#entryStatusLine');
+    getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-read-later-remove' object.id %}", '#entryStatusLine');
 });
 
 $(document).on('click', '#Remove', function(event) {
     event.preventDefault();
-    getDynamicJsonContent("{% url 'rsshistory:entry-remove' object.id %}", "#entryStatusLine");
+    getDynamicJsonContent("{% url 'rsshistory:json-entry-remove' object.id %}", "#entryStatusLine");
 });
 
 $(document).on('submit', '#voteEditForm', function(event) {

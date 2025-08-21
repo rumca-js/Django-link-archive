@@ -169,6 +169,8 @@ class ConfigForm(forms.ModelForm):
             "show_icons",
             "thumbnails_as_icons",
             "small_icons",
+            "entries_visit_alpha",
+            "entries_dead_alpha",
             "links_per_page",
             "sources_per_page",
             "max_links_per_page",
@@ -721,7 +723,7 @@ class SourceForm(forms.ModelForm):
         self.fields["url"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["favicon"].widget.attrs.update(size=self.init.get_cols_size())
 
-        self.fields["entries_backgroundcolor"].widget = forms.TextInput(attrs={"type" : "color"})
+        self.fields["entries_backgroundcolor"].widget = forms.TextInput(attrs={"type" : "color", "value" : ""})
 
         names = SourceControllerBuilder.get_plugin_names()
         # self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))

@@ -666,26 +666,35 @@ function getEntryTagStrings(entry) {
 `
 function getEntryDisplayStyle(entry, mark_visited=true) {
     let display_style = "";
+    let opacity = null;
 
     if (entry.alpha)
     {
-        let opacity = entry.alpha;
-	display_style = `opacity: ${opacity};`;
+        opacity = entry.alpha;
     }
 
-    if (mark_visited && !entry.bookmarked && entry.visited)
+    if (entries_visit_alpha && !entry.bookmarked && entry.visited)
     {
-       display_style = `opacity: 0.6;`;
+        opacity = entries_visit_alpha;
     }
 
     if (!isEntryValid(entry))
     {
-	display_style = `opacity: 0.5;`;
+	opacity = entries_dead_alpha;
     }
 
-    if (entry.background_color)
+    console.log(`opacity ${opacity} ${entries_dead_alpha} ${entries_visit_alpha}`);
+
+    // apply
+
+    if (opacity)
     {
-       display_style += `background-color: ${entry.background_color};`;
+       display_style = `opacity: ${opacity};`;
+    }
+
+    if (entry.backgroundcolor)
+    {
+       display_style += `background-color: ${entry.backgroundcolor};`;
     }
 
     return display_style;

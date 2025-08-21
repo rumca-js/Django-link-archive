@@ -34,7 +34,7 @@ function sendClearList(attempt = 1) {
 
 
 function sendRemoveListItem(id, attempt = 1) {
-    let url = "{% url 'rsshistory:read-later-remove' 1017 %}";
+    let url = "{% url 'rsshistory:json-read-later-remove' 1017 %}";
     url = url.replace("1017", id);
 
     $.ajax({
@@ -70,7 +70,7 @@ function fillQueueList(queue) {
 
     if (queue && queue.length > 0) {
         queue.forEach(entry => {
-           entry.remove_link = "{% url 'rsshistory:read-later-remove' 1017 %}".replace("1017", entry.id);
+           entry.remove_link = "{% url 'rsshistory:json-read-later-remove' 1017 %}".replace("1017", entry.id);
            entry.remove_icon = `{% include 'rsshistory/icon_remove.html' %}`;
 	   htmlOutput += getEntryReadLaterBar(entry);
 	});

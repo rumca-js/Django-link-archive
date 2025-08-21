@@ -6,6 +6,7 @@ import os
 from pytz import timezone
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
+from django.core.validators import MinValueValidator,MaxValueValidator
 
 from django.db import models
 from django.urls import reverse
@@ -459,6 +460,18 @@ class ConfigurationEntry(models.Model):
         help_text="The maximum number of related links displayed in the 'entry detail' view.",
     )
 
+    entries_visit_alpha = models.FloatField(
+        default=0.6,
+        validators = [MinValueValidator(0), MaxValueValidator(1)],
+        help_text="Alpha of visited entries.",
+    )
+
+    entries_dead_alpha = models.FloatField(
+        default=0.6,
+        validators = [MinValueValidator(0), MaxValueValidator(1)],
+        help_text="Alpha of dead entries.",
+    )
+
     debug_mode = models.BooleanField(
         default=False, help_text="Enable debug mode to see errors more clearly."
     )
@@ -605,6 +618,9 @@ class UserConfig(models.Model):
     birth_date = models.DateField(null=True, help_text="Format: 2024-03-28")
     links_per_page = models.IntegerField(default=100)
     sources_per_page = models.IntegerField(default=100)
+    debug_mode = models.BooleanField(
+        default=False, help_text="Enable debug mode to see errors more clearly."
+    )
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

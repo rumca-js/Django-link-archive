@@ -108,3 +108,20 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props)
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["language"], "ch")
+
+    def test_get_props__casino_block(self):
+        rule = EntryRules.objects.create(
+            enabled=True,
+            block=True,
+            rule_name="Rule1",
+            trigger_text="casino",
+            trigger_text_hits=1,
+        )
+
+        url = EntryUrlInterface("https://casino.com")
+
+        props = url.get_props(source_obj=source_obj)
+        self.assertTrue(props)
+        self.assertTrue(url.is_valid())
+        self.assertTrue(url.is_blocked())
+        self.assertEqual(props["title"], "Casino Casino Casino")

@@ -87,8 +87,11 @@ function applyConfiguration() {
     view_display_type = "{{user_config.display_type}}";
     view_show_icons = "{{user_config.show_icons}}" == "True";
     view_small_icons = "{{user_config.small_icons}}" == "True";
-    debug = "{{debug}}" == "True";
+    debug_mode = "{{user_config.debug_mode}}" == "True";
     user_age = {{user_config.get_age}};
+
+    entries_visit_alpha = {{config.entries_visit_alpha}};
+    entries_dead_alpha = {{config.entries_dead_alpha}};
 
     setDisplayMode();
 }

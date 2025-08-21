@@ -155,7 +155,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "Update data",
                     reverse(
-                        "{}:entry-update-data".format(LinkDatabase.name),
+                        "{}:json-entry-update-data".format(LinkDatabase.name),
                         args=[self.entry.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
@@ -170,7 +170,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "Reset data",
                     reverse(
-                        "{}:entry-reset-data".format(LinkDatabase.name),
+                        "{}:json-entry-reset-data".format(LinkDatabase.name),
                         args=[self.entry.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
@@ -187,7 +187,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "Reset local data",
                     reverse(
-                        "{}:entry-reset-local-data".format(LinkDatabase.name),
+                        "{}:json-entry-reset-local-data".format(LinkDatabase.name),
                         args=[self.entry.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
@@ -301,7 +301,7 @@ class EntryGenericPlugin(object):
                     self.user,
                     "Remove",
                     reverse(
-                        "{}:entry-remove".format(LinkDatabase.name),
+                        "{}:json-entry-remove".format(LinkDatabase.name),
                         args=[self.entry.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
@@ -334,7 +334,7 @@ class EntryGenericPlugin(object):
                             self.user,
                             "Read later",
                             reverse(
-                                "{}:read-later-add".format(LinkDatabase.name),
+                                "{}:json-read-later-add".format(LinkDatabase.name),
                                 args=[self.entry.id],
                             ),
                             ConfigurationEntry.ACCESS_TYPE_ALL,
@@ -350,7 +350,7 @@ class EntryGenericPlugin(object):
                             self.user,
                             "Do not read later",
                             reverse(
-                                "{}:read-later-remove".format(LinkDatabase.name),
+                                "{}:json-read-later-remove".format(LinkDatabase.name),
                                 args=[read_laters[0].id],
                             ),
                             ConfigurationEntry.ACCESS_TYPE_ALL,

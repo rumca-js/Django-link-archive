@@ -714,64 +714,73 @@ def entry_is(request):
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
-def entry_update_data(request, pk):
+def json_entry_update_data(request, pk):
     p = ViewPage(request)
     p.set_title("Update entry data")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
 
-    p.context["pk"] = pk
+    data = {}
+    data["status"] = False
+    data["message"] = ""
 
     entries = LinkDataController.objects.filter(id=pk)
     if not entries.exists():
-        p.context["summary_text"] = "Such entry does not exist"
-        return p.render("summary_present.html")
-
+        data["message"] = "Such entry does not exist: {}".format(pk)
     else:
         entry = entries[0]
         BackgroundJobController.entry_update_data(entry, force=True)
-        return HttpResponseRedirect(entry.get_absolute_url())
+        data["status"] = True
+        data["message"] = "Update ok"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
-def entry_reset_data(request, pk):
+def json_entry_reset_data(request, pk):
     p = ViewPage(request)
     p.set_title("Reset entry data")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
 
-    p.context["pk"] = pk
+    data = {}
+    data["status"] = False
+    data["message"] = ""
 
     entries = LinkDataController.objects.filter(id=pk)
     if not entries.exists():
-        p.context["summary_text"] = "Such entry does not exist"
-        return p.render("summary_present.html")
-
+        data["message"] = "Such entry does not exist: {}".format(pk)
     else:
         entry = entries[0]
         BackgroundJobController.entry_reset_data(entry, force=True)
-        return HttpResponseRedirect(entry.get_absolute_url())
+        data["status"] = True
+        data["message"] = "Reset ok"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
-def entry_reset_local_data(request, pk):
+def json_entry_reset_local_data(request, pk):
     p = ViewPage(request)
     p.set_title("Reset local entry data")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
 
-    p.context["pk"] = pk
+    data = {}
+    data["status"] = False
+    data["message"] = ""
 
     entries = LinkDataController.objects.filter(id=pk)
     if not entries.exists():
-        p.context["summary_text"] = "Such entry does not exist: {}".format(pk)
-        return p.render("summary_present.html")
-
+        data["message"] = "Such entry does not exist: {}".format(pk)
     else:
         entry = entries[0]
         BackgroundJobController.entry_reset_local_data(entry)
-        return HttpResponseRedirect(entry.get_absolute_url())
+        data["status"] = True
+        data["message"] = "Reset local data ok"
+
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
 def edit_entry(request, pk):
@@ -1187,7 +1196,7 @@ def entries_remove_all(request):
         BackgroundJobController.create_single_job("truncate", "LinkDataController")
         json_obj["message"] = "Added remove job"
     else:
-        LinkDataController.objects.all().delete()
+        LinkDataController.truncate()
         json_obj["message"] = "Removed all entries"
 
     return JsonResponse(json_obj, json_dumps_params={"indent": 4})
@@ -1308,11 +1317,17 @@ def archive_entries_remove_all(request):
     if data is not None:
         return data
 
-    ArchiveLinkDataController.objects.all().delete()
+    json_obj = {}
+    json_obj["status"] = True
 
-    p.context["summary_text"] = "Removed all entries"
+    if ArchiveLinkDataController.objects.all().count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "ArchiveLinkDataController")
+        json_obj["message"] = "Added remove job"
+    else:
+        ArchiveLinkDataController.truncate()
+        json_obj["message"] = "Removed all entries"
 
-    return p.render("summary_present.html")
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def archive_hide_entry(request, pk):

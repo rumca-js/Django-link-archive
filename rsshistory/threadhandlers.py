@@ -54,6 +54,7 @@ from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .controllers import (
     BackgroundJobController,
     LinkDataController,
+    ArchiveLinkDataController,
     SourceDataController,
     EntryDataBuilder,
     DomainsController,
@@ -1224,6 +1225,9 @@ class TruncateTableJobHandler(BaseJobHandler):
             BackgroundJob.JOB_TRUNCATE_TABLE, subject="LinkDataController", args=args
         )
         BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="ArchiveLinkDataController", args=args
+        )
+        BackgroundJobController.create_single_job(
             BackgroundJob.JOB_TRUNCATE_TABLE, subject="SourceDataController", args=args
         )
         BackgroundJobController.create_single_job(
@@ -1298,6 +1302,8 @@ class TruncateTableJobHandler(BaseJobHandler):
 
         if table == "all" or table == "LinkDataController":
             status = LinkDataController().truncate(cfg)
+        if table == "all" or table == "ArchiveLinkDataController":
+            status = ArchiveLinkDataController().truncate(cfg)
         if table == "all" or table == "SourceDataController":
             SourceDataController.truncate(cfg)
         if table == "all" or table == "AppLogging":

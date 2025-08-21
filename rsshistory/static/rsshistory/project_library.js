@@ -1,17 +1,24 @@
+// Things that come from config
+let entries_visit_alpha=1.0;
+let entries_dead_alpha=0.5;
+
+// user configuration things
 let view_display_style = "style-light";
 let view_display_type = "standard";
 let view_show_icons = false;
 let view_small_icons = false;
-let highlight_bookmarks = false;
 let user_age = 18;
-let show_pure_links = false;
+let debug_mode = false;
 
+// other global variables
 let search_suggestions = [];
-let default_page_size = 200;
-let sort_function = "-date_published";
 let common_indicators = null;
 
-let debug = false;
+let highlight_bookmarks = false;
+let show_pure_links = false;
+let default_page_size = 200;
+let sort_function = "-date_published";
+
 
 
 function add_text(error_line, text) {

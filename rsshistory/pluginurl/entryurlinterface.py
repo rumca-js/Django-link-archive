@@ -108,18 +108,21 @@ class EntryUrlInterface(object):
         if not self.all_properties:
             return False
 
-        if not self.handler:
-            return False
-
-        if not self.handler.is_valid():
-            return False
-
         server = RemoteServer("https://")
         response = server.read_properties_section("Response", self.all_properties)
         if "is_valid" in response:
             return response["is_valid"]
 
         return True
+
+    def is_blocked(self):
+        if not self.handler:
+            return False
+
+        if self.handler.is_blocked():
+            return True
+
+        return False
 
     def fix_properties(self, input_props=None, source_obj=None):
         if not input_props:
