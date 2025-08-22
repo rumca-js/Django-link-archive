@@ -31,10 +31,22 @@ function isEntryDownloadStop(data) {
 
 function getEntryMenu() {
     getDynamicJson("{% url 'rsshistory:json-entry-menu' object.id %}", function(data) {
-        text = getMenuEntries(data.menu);
+        let text = getMenuEntries(data.menu);
 
         $("#entryMenu").html(text);
     });
+}
+
+
+function fillEntryStatus() {
+    if (is_updating || is_resetting) {
+        const text = getDownloadingText("Fetching link data...");
+        $('#entryUpdateContainer').html(text);
+
+    }
+    else {
+        $('#entryUpdateContainer').html("");
+    }
 }
 
 
@@ -73,14 +85,7 @@ function getIsEntryDownloaded(attempt = 1) {
             is_updating = data.is_updating;
             is_resetting = data.is_resetting;
 
-            if (is_updating || is_resetting) {
-                const text = getDownloadingText("Fetching link data...");
-                $('#entryUpdateContainer').html(text);
-
-            }
-            else {
-                $('#entryUpdateContainer').html("");
-            }
+            fillEntryStatus();
         },
         error: function(xhr, status, error) {
             if (requestIsDownloading != currentIsDownloading) {
@@ -136,11 +141,20 @@ function getEntryOperationalParamters(attempt = 1) {
 }
 
 
-function fillDislike() {
-    let entry = entry_json_data.link;
+function fillEntryParameters() {
+   console.log(`fillEntryParameters ${entry_json_data} ${entry_dislike_data}`);
 
-    let parameters = getEntryParameters(entry, entry_dislike_data);
-    $('#entryParameters').html(parameters);
+   console.log("entry parameters 0");
+   if (entry_json_data == null)
+   {
+       console.log("entry parameters 1");
+       return;
+   }
+   console.log("entry parameters 2");
+   let entry = entry_json_data.link;
+
+   let parameters = getEntryParameters(entry, entry_dislike_data);
+   $('#entryParameters').html(parameters);
 }
 
 
@@ -159,7 +173,7 @@ function getDislikeData(attempt = 1) {
            }
            if (data) {
                entry_dislike_data = data;
-               fillDislike();
+               fillEntryParameters();
            }
        },
        error: function(xhr, status, error) {
@@ -193,6 +207,7 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1,
                getEntryProperties();
                getEntryMenu();
                getIndicators();
+	       getIsEntryDownloaded();
            }
        },
        error: function(xhr, status, error) {
@@ -233,6 +248,7 @@ function getEntryTagLink(tag) {
 
 
 function updateEntryProperties() {
+    console.log(`updateEntryProperties ${entry_json_data} ${entry_dislike_data}`);
     if (entry_json_data == null)
     {
         return;
@@ -251,11 +267,11 @@ function updateEntryProperties() {
     $("#entryAuthor").html(entry.author);
     $("#entryAlbum").html(entry.album);
     $("#entryAge").html(entry.age);
-    $("#entryDatePublished").html(entry.date_published);
-    $("#entryDateCreated").html(entry.date_created);
-    $("#entryDateUpdateLast").html(entry.date_update_last);
-    $("#entryDateModified").html(entry.date_last_modified);
-    $("#entryDateDeadSince").html(entry.date_dead_since);
+    $("#entryDatePublished").html(getEntryDate(entry.date_published));
+    $("#entryDateCreated").html(getEntryDate(entry.date_created));
+    $("#entryDateUpdateLast").html(getEntryDate(entry.date_update_last));
+    $("#entryDateModified").html(getEntryDate(entry.date_last_modified));
+    $("#entryDateDeadSince").html(getEntryDate(entry.date_dead_since));
     $("#entryStatusCode").html(entry.status_code);
     $("#entryManualStatusCode").html(entry.manual_status_code);
     $("#entryPageRatingVisits").html(entry.page_rating_visits);
@@ -265,12 +281,7 @@ function updateEntryProperties() {
 
     $('#editTagsButton').show();
 
-    let entry_parameters = getEntryParameters(entry, entry_dislike_data);
-    $('#entryParameters').html(entry_parameters);
-
-    if (debug_mode) {
-       // TODO does not work, displays object $('#entryDebug').html(String(entry_json_data.link));
-    }
+    fillEntryParameters();
 }
 
 
@@ -329,6 +340,15 @@ function getEntryRelated() {
             entry_related_data = data;
             fillEntryRelated();
         }
+    });
+}
+
+function updateEntry() {
+    let url = "{% url 'rsshistory:json-entry-update-data' object.id %}";
+
+    getDynamicJson(url_address, function(data) {
+       getIsEntryDownloaded();
+       $("#entryStatusLine").html(data.message);
     });
 }
 

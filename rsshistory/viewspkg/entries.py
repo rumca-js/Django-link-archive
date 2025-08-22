@@ -1018,25 +1018,31 @@ def entry_json(request, pk):
     User might set access through config. Default is all
     """
     p = ViewPage(request)
-    p.set_title("Remove all entries")
+    p.set_title("Entry JSON")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
     if data is not None:
         return data
 
-    links = LinkDataController.objects.filter(id=pk)
+    entries = LinkDataController.objects.filter(id=pk)
 
-    if links.count() == 0:
+    if entries.count() == 0:
         p = ViewPage(request)
         p.set_title("Entry JSON")
         p.context["summary_text"] = "No such link in the database {}".format(pk)
         return p.render("summary_present.html")
 
-    link = links[0]
+    entry = entries[0]
+    user_config = UserConfig.get(request.user)
 
-    exporter = InstanceExporter()
-    json_obj = exporter.export_link(link)
+    entry_json = entry_to_json(user_config, entry, tags=True)
 
-    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+    read_laters = ReadLater.objects.filter(entry = entry, user=request.user)
+    entry_json["read_later"] = read_laters.exists()
+
+    full_json = {}
+    full_json["link"] = entry_json
+
+    return JsonResponse(full_json, json_dumps_params={"indent": 4})
 
 
 def handle_json_view(request, view_to_use):

@@ -694,6 +694,8 @@ class EntryUpdater(object):
 
             self.store_thumbnail(entry)
 
+        entry.save()
+
     def reset_data(self):
         from ..pluginurl import EntryUrlInterface
         from ..pluginurl import UrlHandlerEx
@@ -735,7 +737,9 @@ class EntryUpdater(object):
 
         handler = UrlHandlerEx(url=entry.link)
         if handler.is_blocked():
+            link = entry.link
             if entry.is_removable():
+                AppLogging.warning(f"Url:{link} Removing link. Blocked by a rule.")
                 entry.delete()
                 return
 
@@ -761,7 +765,7 @@ class EntryUpdater(object):
                 if not entry.date_published:
                     entry.date_published = props["date_published"]
 
-        if entry.date_dead_since:
+        if entry.date_dead_since is not None:
             entry.date_dead_since = None
 
         self.update_calculated_vote()
@@ -1664,6 +1668,13 @@ class EntryDataBuilder(object):
         )
 
         link_data = url.get_props()
+
+        if url.is_blocked():
+            self.errors.append("Url:{}. Url is blocked".format(self.link))
+            AppLogging.debug(
+                "Url:{} Could not obtain properties for {}".format(self.link, self.link)
+            )
+            return
 
         if self.source_is_auto and not url.is_valid():
             self.errors.append("Url:{}. Url is not valid".format(self.link))

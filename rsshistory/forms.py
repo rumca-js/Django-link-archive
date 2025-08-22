@@ -709,6 +709,7 @@ class SourceForm(forms.ModelForm):
             "auto_tag",
             "entries_alpha",
             "entries_backgroundcolor",
+            "entries_backgroundcolor_alpha",
             "favicon",
             "auto_update_favicon",
             "credentials",

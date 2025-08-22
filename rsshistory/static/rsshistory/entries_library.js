@@ -142,7 +142,9 @@ function getEntryVisitedBadge(entry, overflow=false) {
 }
 
 
-function getEntryParameters(entry, entry_dislike_data) {
+function getEntryParameters(entry, entry_dislike_data=null) {
+   console.log(`Entry parameters ${entry} ${entry_dislike_data}`);
+
    html_out = "";
 
    let date_published = getEntryDatePublished(entry);
@@ -233,6 +235,19 @@ function getEntryDatePublished(entry) {
     let datePublishedStr = "";
     if (entry.date_published) {
         let datePublished = new Date(entry.date_published);
+        if (!isNaN(datePublished)) {
+            datePublishedStr = parseDate(datePublished);
+        }
+    }
+
+    return datePublishedStr;
+}
+
+
+function getEntryDate(date_string) {
+    let datePublishedStr = "";
+    if (date_string) {
+        let datePublished = new Date(date_string);
         if (!isNaN(datePublished)) {
             datePublishedStr = parseDate(datePublished);
         }
@@ -658,6 +673,23 @@ function getEntryTagStrings(entry) {
 }
 
 
+function hexToRgb(hex) {
+    // Remove "#" if present
+    hex = hex.replace(/^#/, "");
+
+    // Parse shorthand format (#RGB)
+    if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+    }
+
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+
+    return [r, g, b];
+}
+
 `
  - If this is not valid, then we have display style to dead
  - if entry was visited it is opaque
@@ -689,7 +721,13 @@ function getEntryDisplayStyle(entry, mark_visited=true) {
 
     if (opacity)
     {
-       display_style = `opacity: ${opacity};`;
+       display_style += `opacity: ${opacity};`;
+    }
+
+    if (entry.backgroundcolor) {
+        let alpha = entry.backgroundcolor_alpha !== undefined ? entry.backgroundcolor_alpha : 1;
+        const [r, g, b] = hexToRgb(entry.backgroundcolor);
+        display_style += `background-color: rgba(${r}, ${g}, ${b}, ${alpha});`;
     }
 
     if (entry.backgroundcolor)

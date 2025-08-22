@@ -254,6 +254,7 @@ def system_setup_for_search_engine(request):
     c.days_to_remove_links = 30
     c.days_to_remove_stale_entries = 30
     c.prefer_https_links = True
+    c.entries_visit_alpha = 1.0 # visits do not change visibility
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_SEARCH_ENGINE
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
     c.remove_entry_vote_threshold = (

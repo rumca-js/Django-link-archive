@@ -47,7 +47,7 @@ class LinkDataController(LinkDataModel):
             )
         else:
             return reverse(
-                "{}:entry-bookmark".format(LinkDatabase.name), args=[str(self.id)]
+                "{}:json-entry-bookmark".format(LinkDatabase.name), args=[str(self.id)]
             )
 
     def get_bookmark_unset_url(self):
@@ -59,7 +59,7 @@ class LinkDataController(LinkDataModel):
             )
         else:
             return reverse(
-                "{}:entry-unbookmark".format(LinkDatabase.name), args=[str(self.id)]
+                "{}:json-entry-unbookmark".format(LinkDatabase.name), args=[str(self.id)]
             )
 
     def get_dead_url(self):
@@ -125,16 +125,11 @@ class LinkDataController(LinkDataModel):
 
     def truncate(cfg=None):
         BATCH_SIZE = 1000
-        if cfg and "archive" in cfg:
-            entries = ArchiveLinkDataController.objects.all()
 
-            if entries.exists():
-                entries[:BATCH_SIZE].delete()
-        else:
-            entries = LinkDataController.objects.all()
+        entries = LinkDataController.objects.all()
 
-            if entries.exists():
-                entries[:BATCH_SIZE].delete()
+        if entries.exists():
+            entries[:BATCH_SIZE].delete()
 
     def get_full_information(data):
         from ..pluginurl.entryurlinterface import EntryUrlInterface
@@ -269,3 +264,11 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
     def is_bookmarked(self):
         return False
+
+    def truncate(cfg=None):
+        BATCH_SIZE = 1000
+
+        entries = ArchiveLinkDataController.objects.all()
+
+        if entries.exists():
+            entries[:BATCH_SIZE].delete()

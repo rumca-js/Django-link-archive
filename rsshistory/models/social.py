@@ -33,17 +33,17 @@ class SocialData(models.Model):
         null=True,
     )
 
-    rating = models.IntegerField(
+    rating = models.FloatField(
         null=True,
         help_text="For various sites rating has different meaning.",
     )
 
-    upvote_ratio = models.IntegerField(
+    upvote_ratio = models.FloatField(
         null=True,
         help_text="Thumbs up - thumbs diff.",
     )
 
-    upvote_view_ratio = models.IntegerField(
+    upvote_view_ratio = models.FloatField(
         null=True,
         help_text="(Thumbs up - thumbs diff) / view count.",
     )

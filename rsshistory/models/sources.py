@@ -155,6 +155,12 @@ class SourceDataModel(models.Model):
         max_length=1000, blank=True, help_text="Automatic tag for new entries"
     )
 
+    entries_backgroundcolor_alpha = models.FloatField(
+        default=0.0,
+        validators = [MinValueValidator(0), MaxValueValidator(1)],
+        help_text="Background color alpha needs to be 1.0 to be visible",
+    )
+
     entries_backgroundcolor = models.CharField(
         max_length=1000, blank=True, help_text="Background color to be applied for a source"
     )
@@ -162,7 +168,7 @@ class SourceDataModel(models.Model):
     entries_alpha = models.FloatField(
         default=1.0,
         validators = [MinValueValidator(0), MaxValueValidator(1)],
-        help_text="Some sources are spammy, you can define alpha for them to be less visible",
+        help_text="Alpha of entire entry",
     )
 
     credentials = models.ForeignKey(
