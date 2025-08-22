@@ -34,14 +34,44 @@ class BasicViewTest(FakeInternetTestCase):
         # redirect to search init
         self.assertEqual(response.status_code, 302)
 
-    def test_get_indicators(self):
-        url = reverse("{}:get-indicators".format(LinkDatabase.name))
+    def test_json_indicators(self):
+        url = reverse("{}:json-indicators".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
 
     def test_get_menu(self):
         url = reverse("{}:get-menu".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_json_search_container(self):
+        url = reverse("{}:json-search-container".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_json_global_container(self):
+        url = reverse("{}:json-global-container".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_json_personal_container(self):
+        url = reverse("{}:json-personal-container".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_json_tools_container(self):
+        url = reverse("{}:json-tools-container".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_json_users_container(self):
+        url = reverse("{}:json-users-container".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

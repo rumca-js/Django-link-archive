@@ -7,7 +7,6 @@ from ..webtools import (
     RssPage,
     HtmlPage,
     YouTubeVideoHandler,
-    FeedClient,
     UrlAgeModerator,
 )
 from utils.sqlmodel import SqlModel, EntriesTable, SourcesTable

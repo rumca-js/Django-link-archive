@@ -136,9 +136,9 @@ class BackgroundJobController(BackgroundJob):
         if args_text == "" and cfg:
             args_text = json.dumps(cfg)
 
-        items = BackgroundJob.objects.filter(job=job_name, subject=subject)
+        items = BackgroundJobController.objects.filter(job=job_name, subject=subject)
         if items.count() == 0:
-            job = BackgroundJob.objects.create(
+            job = BackgroundJobController.objects.create(
                 job=job_name,
                 task=None,
                 subject=subject,

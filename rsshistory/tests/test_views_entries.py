@@ -112,8 +112,8 @@ class EntriesGenericViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_entry_remove(self):
-        url = reverse("{}:entry-remove".format(LinkDatabase.name), args=[0])
+    def test_json_entry_remove(self):
+        url = reverse("{}:json-entry-remove".format(LinkDatabase.name), args=[0])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -500,7 +500,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         )
 
         self.client.login(username="testuser", password="testpassword")
-        url = reverse("{}:entry-bookmark".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:json-entry-bookmark".format(LinkDatabase.name), args=[entry.id])
 
         # call user action
         response = self.client.get(url)
@@ -540,7 +540,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         UserBookmarks.objects.create(entry=entry, user=self.user)
 
         self.client.login(username="testuser", password="testpassword")
-        url = reverse("{}:entry-unbookmark".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:json-entry-unbookmark".format(LinkDatabase.name), args=[entry.id])
 
         # call user action
         response = self.client.get(url)

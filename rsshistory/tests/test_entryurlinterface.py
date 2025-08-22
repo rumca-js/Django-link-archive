@@ -5,6 +5,7 @@ from ..pluginurl.entryurlinterface import EntryUrlInterface
 from ..controllers import SourceDataController
 from ..configuration import Configuration
 from ..configuration import Configuration
+from ..models import EntryRules
 
 from .fakeinternet import FakeInternetTestCase
 

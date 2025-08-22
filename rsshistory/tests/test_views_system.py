@@ -166,8 +166,8 @@ class SystemViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_get_indicators(self):
-        url = reverse("{}:get-indicators".format(LinkDatabase.name))
+    def test_json_indicators(self):
+        url = reverse("{}:json-indicators".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

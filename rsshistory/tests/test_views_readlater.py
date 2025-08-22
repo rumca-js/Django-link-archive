@@ -42,7 +42,7 @@ class ReadLaterViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_read_later_add(self):
+    def test_json_read_later_add(self):
         entry = LinkDataController.objects.create(
             source_url="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -56,12 +56,12 @@ class ReadLaterViewsTest(FakeInternetTestCase):
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:read-later-add".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:json-read-later-add".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
 
-    def test_read_later_remove(self):
+    def test_json_read_later_remove(self):
         entry = LinkDataController.objects.create(
             source_url="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -77,7 +77,7 @@ class ReadLaterViewsTest(FakeInternetTestCase):
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:read-later-remove".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:json-read-later-remove".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
