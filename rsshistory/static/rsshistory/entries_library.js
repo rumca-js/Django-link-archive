@@ -730,11 +730,6 @@ function getEntryDisplayStyle(entry, mark_visited=true) {
         display_style += `background-color: rgba(${r}, ${g}, ${b}, ${alpha});`;
     }
 
-    if (entry.backgroundcolor)
-    {
-       display_style += `background-color: ${entry.backgroundcolor};`;
-    }
-
     return display_style;
 }
 
