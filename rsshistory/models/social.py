@@ -40,6 +40,11 @@ class SocialData(models.Model):
 
     upvote_ratio = models.FloatField(
         null=True,
+        help_text="(Thumbs up - thumbs diff) / all thumbs.",
+    )
+
+    upvote_diff = models.FloatField(
+        null=True,
         help_text="Thumbs up - thumbs diff.",
     )
 

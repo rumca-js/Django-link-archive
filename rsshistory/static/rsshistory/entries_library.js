@@ -158,14 +158,15 @@ function getEntryParameters(entry, entry_dislike_data=null) {
    html_out += getEntryReadLaterBadge(entry);
 
    if (entry_dislike_data) {
-        let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_view_ratio, stars, followers_count } = entry_dislike_data;
+        let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_diff, upvote_view_ratio, stars, followers_count } = entry_dislike_data;
     
         if (thumbs_up) html_out += `<div class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</div>`;
         if (thumbs_down) html_out += `<div class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</div>`;
         if (view_count) html_out += `<div class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</div>`;
-        if (stars) html_out += `<div class="text-nowrap mx-1">S:${getHumanReadableNumber(stars)}</div>`;
-        if (followers_count) html_out += `<div class="text-nowrap mx-1">F:${getHumanReadableNumber(followers_count)}</div>`;
+        if (stars) html_out += `<div class="text-nowrap mx-1">⭐:${getHumanReadableNumber(stars)}</div>`;
+        if (followers_count) html_out += `<div class="text-nowrap mx-1">👥:${getHumanReadableNumber(followers_count)}</div>`;
     
+        if (upvote_diff) html_out += `<div class="text-nowrap mx-1">👍-👎${getHumanReadableNumber(upvote_diff)}</div>`;
         if (upvote_ratio) html_out += `<div class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</div>`;
         if (upvote_view_ratio) html_out += `<div class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</div>`;
    }
