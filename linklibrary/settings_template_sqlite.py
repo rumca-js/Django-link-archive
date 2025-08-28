@@ -30,14 +30,14 @@ DEBUG = True
 # Add necessary hosts here
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
-DB_DB = os.environ["DB_DB"]
-DB_USER = os.environ["DB_USER"]
-DB_PASSWORD = os.environ["DB_PASSWORD"]
+DB_DB = os.environ.get("DB_DB")
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ("DB_PASSWORD")
 
-RABBIT_SERVER=os.environ["RABBIT_SERVER"]
-MEMCACHED_SERVER=os.environ["MEMCACHED_SERVER"]
-MEMCACHED_PORT=os.environ["MEMCACHED_PORT"]
-DB_SERVER=os.environ["DB_SERVER"]
+RABBIT_SERVER=os.environ.get("RABBIT_SERVER")
+MEMCACHED_SERVER=os.environ.get("MEMCACHED_SERVER")
+MEMCACHED_PORT=os.environ.get("MEMCACHED_PORT")
+DB_SERVER=os.environ.get("DB_SERVER")
 #CELERY_BROKER_URL = f'amqp://guest:guest@{RABBIT_SERVER}'
 
 
