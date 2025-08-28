@@ -3,6 +3,7 @@ from utils.dateutils import DateUtils
 from ..models import AppLogging, UserTags
 from ..controllers import EntryDataBuilder, SourceDataController
 from ..configuration import Configuration
+from ..pluginurl.urlhandler import UrlHandlerEx
 
 
 class SourcePluginInterface(object):
@@ -75,6 +76,19 @@ class SourcePluginInterface(object):
     def enhance_properties(self, properties):
         source = self.get_source()
 
+        c = Configuration.get_object().config_entry
+
+        if c.new_entries_use_clean_data:
+            BackgroundJobController.link_add(properties.get("url"), source=source)
+
+        if c.new_entries_merge_data:
+            url_ex = UrlHandlerEx(page_link)
+            new_properties = url_ex.get_properties()
+            if new_properties and c.new_entries_merge_data:
+                for key in new_properties:
+                    if properties.get(key, None) == None and new_properties.get(key, None) != None:
+                        properties[key] = new_properties[key]
+
         if source:
             if (
                 self.is_property_set(properties, "language")
@@ -98,11 +112,15 @@ class SourcePluginInterface(object):
             return
 
         source = self.get_source()
+        configuration = Configuration.get_object()
 
         if entry and (entry.date_created > self.start_time):
             if source.auto_tag:
-                user = Configuration.get_object().get_superuser()
+                user = configuration.get_superuser()
                 UserTags.set_tag(entry, source.auto_tag, user)
+
+            if configuration.config_entry.new_entries_fetch_social_data:
+                SocialData.get(entry)
 
         self.num_read_entries += 1
 

@@ -65,10 +65,14 @@ class EntriesCleanup(object):
         if not self.cleanup_remove_entries():
             return False
 
-        self.cleanup_entries__invalid_rules()
+        if not self.cleanup_entries__invalid_rules():
+            return False
 
         if not self.archive_cleanup:
             if not self.move_old_links_to_archive():
+                return False
+        else:
+            if not self.clean_archive():
                 return False
 
         return True
@@ -83,12 +87,16 @@ class EntriesCleanup(object):
             for url in urls:
                 if url != "":
                     entries = LinkDataController.objects.filter(link__icontains=url)
-                    while entries.exists():
-                        entries[:BATCH_SIZE].delete()
+                    entries.delete()
+                    #while entries.exists():
+                    #    entries[:BATCH_SIZE].delete()
 
                     domains = DomainsController.objects.filter(domain__icontains=url)
-                    while domains.exists():
-                        domains[:BATCH_SIZE].delete()
+                    domains.delete()
+                    #while domains.exists():
+                    #    domains[:BATCH_SIZE].delete()
+
+        return True
 
     def cleanup_entries_with_ports(self):
         """
@@ -128,21 +136,27 @@ class EntriesCleanup(object):
                 invalid_domain.delete()
 
     def cleanup_remove_entries(self, limit_s=0):
-        self.cleanup_remove_entries_old_entries()
-        self.cleanup_remove_entries_stale_entries()
+        if not self.cleanup_remove_entries_old_entries():
+            return False
+
+        if not self.cleanup_remove_entries_stale_entries():
+            return False
+
+        return True
 
     def cleanup_remove_entries_old_entries(self, limit_s=0):
         BATCH_SIZE = 1000
+
         sources = SourceDataController.objects.all()
         for source in sources:
             AppLogging.debug("Removing for source:{}".format(source.title))
             entries = self.get_source_old_entries_to_remove(source)
 
             if entries:
-                # for entry in entries:
-                #    AppLogging.debug("Removing source entry:{}".format(entry.link))
-                while entries.exists():
-                    entries[:BATCH_SIZE].delete()
+                for entry in entries:
+                   AppLogging.debug("Removing source entry:{}".format(entry.link))
+                #while entries.exists():
+                #    entries[:BATCH_SIZE].delete()
 
         AppLogging.debug("Removing general entries")
 
@@ -165,10 +179,10 @@ class EntriesCleanup(object):
             entries = self.get_source_stale_entries_to_remove(source)
 
             if entries:
-                # for entry in entries:
-                #    AppLogging.debug("Removing source entry:{}".format(entry.link))
-                while entries.exists():
-                    entries[:BATCH_SIZE].delete()
+                for entry in entries:
+                   AppLogging.debug("Removing source entry:{}".format(entry.link))
+                #while entries.exists():
+                #    entries[:BATCH_SIZE].delete()
 
         AppLogging.debug("Removing general entries")
 
@@ -182,6 +196,16 @@ class EntriesCleanup(object):
         AppLogging.debug("Removing stale entries")
 
         return True
+
+    def clean_archive(self):
+        BATCH_SIZE = 1000
+
+        config = Configuration.get_object().config_entry
+        if config.days_to_move_to_archive == 0:
+            entries = ArchiveLinkDataController.objects.all()
+            entries.delete()
+            #while entries.exists():
+            #    entries[:BATCH_SIZE].delete()
 
     def get_source_old_entries_to_remove(self, source):
         """
@@ -1000,6 +1024,10 @@ class EntryWrapper(object):
         return ob
 
     def get_internal(self):
+        config = Configuration.get_object().config_entry
+        if config.days_to_move_to_archive == 0:
+            return self.get_from_db(LinkDataController.objects)
+
         if not self.link:
             return
 

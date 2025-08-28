@@ -7,26 +7,33 @@
 <div>Karma: {{user_object.karma}}</div>
 
 <form action="{{config_form.action_url}}" method="{{config_form.method}}" style="margin:10px">
-    <table>
-        {% csrf_token %}
-        {{config_form}}
-        <tr>
-            <td>
-                <input type="submit" value="Submit" class="btn btn-primary" role="button">
-            </td>
-        </tr>
-    </table>
+      {% csrf_token %}
+      {% for field in config_form %}
+         <div class="form-group row">
+            <label for="{{field.id_for_label}}" class="col-sm-2 col-form-label">{{field.label}}</label>
+            <div class="col-sm-10">
+               <div>
+               {{field }}
+               </div>
+               <small id="{{field.id_for_label}}_help" class="form-text text-muted">
+                 {{field.help_text | safe }}
+               </small>
+            </div>
+         </div>
+      {% endfor %}
+
+      <button type="submit" id="btnFetch" value="Submit" class="btn btn-primary" role="button">Apply</button>
 </form>
 
 {% with object=user_object.user %}
-User ID:{{object.id}}
-User name:{{object.username}}
-Password:<span title="{{object.password}}">password</span>
-e-mail:{{object.email}}
-Staff:{{object.is_staff}}
-Active:{{object.is_active}}
-Last login:{{object.last_login}}
-Date joined:{{object.date_joined}}
+<div>User ID:{{object.id}}</div>
+<div>User name:{{object.username}}</div>
+<div>Password:<span title="{{object.password}}">password</span></div>
+<div>e-mail:{{object.email}}</div>
+<div>Staff:{{object.is_staff}}</div>
+<div>Active:{{object.is_active}}</div>
+<div>Last login:{{object.last_login}}</div>
+<div>Date joined:{{object.date_joined}}</div>
 {% endwith %}
 
 {% endblock %}

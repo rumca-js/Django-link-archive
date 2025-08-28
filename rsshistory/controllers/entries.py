@@ -127,9 +127,12 @@ class LinkDataController(LinkDataModel):
         BATCH_SIZE = 1000
 
         entries = LinkDataController.objects.all()
+        entries.delete()
 
-        if entries.exists():
-            entries[:BATCH_SIZE].delete()
+        #if entries.exists():
+        #    entries[:BATCH_SIZE].delete()
+
+        return True
 
     def get_full_information(data):
         from ..pluginurl.entryurlinterface import EntryUrlInterface
@@ -270,5 +273,8 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
         entries = ArchiveLinkDataController.objects.all()
 
-        if entries.exists():
-            entries[:BATCH_SIZE].delete()
+        entries.delete()
+        #if entries.exists():
+        #    entries[:BATCH_SIZE].delete()
+
+        return True

@@ -3,15 +3,16 @@
 {% block content %}
 
 <div id="formDiv" style="margin-top: 20vh;">
-{% include "rsshistory/form_multiline_element.html" %} 
+  {% include "rsshistory/form_multiline_element.html" %} 
 </div>
 
 <ul>
-    <li>Internet is dangerous, so carefully select which links you add</a>
-</li>
+   <li>Internet is dangerous, so carefully select which links you add</li>
+</ul>
 
-<div id="propertiesResponse">
-</div>
+<div id="Errors"></div>
+<div id="Suggestions"></div>
+<div id="formResponse"></div>
 
 <script>
 {% include "rsshistory/page_show_properties__script.js" %}

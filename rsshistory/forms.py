@@ -106,9 +106,9 @@ class ConfigForm(forms.ModelForm):
             "instance_title",
             "instance_description",
             "instance_internet_location",
-            "initialization_type",
-            "admin_user",
+            #"admin_user",
             "logging_level",
+            "initialization_type",
             "view_access_type",
             "download_access_type",
             "add_access_type",
@@ -126,7 +126,6 @@ class ConfigForm(forms.ModelForm):
             "enable_file_support",
             "enable_link_archiving",
             "enable_source_archiving",
-            "keep_social_data",
             # database link contents
             "accept_domain_links",
             "accept_non_domain_links",
@@ -134,9 +133,11 @@ class ConfigForm(forms.ModelForm):
             "accept_dead_links",
             "prefer_https_links",
             "prefer_non_www_links",
+            "keep_social_data",
             "auto_scan_new_entries",
             "new_entries_merge_data",
             "new_entries_use_clean_data",
+            "new_entries_fetch_social_data",
             "entry_update_via_internet",
             "log_remove_entries",
             "auto_create_sources",
@@ -150,6 +151,7 @@ class ConfigForm(forms.ModelForm):
             "days_to_check_stale_entries",
             "remove_entry_vote_threshold",
             "number_of_update_entries",
+            "block_job_queue",
             # Networking
             "remote_webtools_server_location",
             "internet_status_test_url",
@@ -163,9 +165,9 @@ class ConfigForm(forms.ModelForm):
             "vote_max",
             "number_of_comments_per_day",
             # display settings
-            "time_zone",
             "display_style",
             "display_type",
+            "time_zone",
             "show_icons",
             "thumbnails_as_icons",
             "small_icons",
@@ -177,7 +179,6 @@ class ConfigForm(forms.ModelForm):
             "max_sources_per_page",
             "max_number_of_related_links",
             # other
-            "block_job_queue",
             "debug_mode",
         ]
 
@@ -188,7 +189,7 @@ class ConfigForm(forms.ModelForm):
         self.long_widget("instance_title")
         self.long_widget("instance_description")
         self.long_widget("instance_internet_location")
-        self.long_widget("admin_user")
+        #self.long_widget("admin_user")
         self.long_widget("favicon_internet_url")
         self.long_widget("internet_status_test_url")
         self.long_widget("time_zone")

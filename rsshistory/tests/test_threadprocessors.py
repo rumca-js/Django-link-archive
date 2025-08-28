@@ -112,7 +112,7 @@ class RefreshProcessorTest(FakeInternetTestCase):
             BackgroundJobController.get_number_of_jobs(
                 BackgroundJobController.JOB_CLEANUP
             ),
-            18,
+            19,
         )
 
         self.assertEqual(SourceExportHistory.objects.all().count(), 3)
@@ -146,7 +146,7 @@ class RefreshProcessorTest(FakeInternetTestCase):
             BackgroundJobController.get_number_of_jobs(
                 BackgroundJobController.JOB_CLEANUP
             ),
-            18,
+            19,
         )
 
     def test_refresh__adds_update_entry_job(self):
@@ -591,7 +591,7 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
             BackgroundJobController.get_number_of_jobs(
                 BackgroundJobController.JOB_CLEANUP
             ),
-            18,
+            19,
         )
 
         self.assertEqual(BackgroundJobController.get_number_of_jobs(), 19)

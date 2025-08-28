@@ -546,7 +546,9 @@ def remove_all_sources(request):
     json_obj = {}
     json_obj["status"] = True
 
-    if SourceDataController.objects.all().count() > 1000:
+    sources = SourceDataController.objects.all()
+
+    if sources.count() > 1000:
         BackgroundJobController.create_single_job("truncate", "SourceDataController")
         json_obj["message"] = "Added remove job"
     else:

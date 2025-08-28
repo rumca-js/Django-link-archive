@@ -112,9 +112,15 @@ class SocialData(models.Model):
 
         five_days_ago = DateUtils.get_datetime_now_utc() - timedelta(days=5)
 
-        social_datas = SocialData.objects.filter(date_updated__lt = five_days_ago)
-        while social_datas.exists():
-            social_datas[:BATCH_SIZE].delete()
+        while True:
+            old_ids = list(
+                SocialData.objects
+                .filter(date_updated__lt=five_days_ago)
+                .values_list('id', flat=True)[:BATCH_SIZE]
+            )
+            if not old_ids:
+                break
+            SocialData.objects.filter(id__in=old_ids).delete()
 
         config = Configuration.get_object().config_entry
         if not config.keep_social_data:
@@ -124,5 +130,7 @@ class SocialData(models.Model):
         BATCH_SIZE = 1000
 
         social_datas = SocialData.objects.all()
-        while social_datas.exists():
-            social_datas[:BATCH_SIZE].delete()
+        social_datas.delete()
+
+        #while social_datas.exists():
+        #    social_datas[:BATCH_SIZE].delete()

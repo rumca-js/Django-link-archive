@@ -3,6 +3,13 @@
 
 let page_properties = null;
 let page_errors = null;
+let page_warnings = null;
+let page_notes = null;
+
+
+function addError(error) {
+    $('#Errors').append(`<div class="alert alert-danger">${error}</div>`);
+}
 
 
 function getCollapsedPropertyItem(name, data) {
@@ -86,26 +93,26 @@ function fillDataProperty(property) {
 }
 
 
-function fillData() {
+function fillData(data) {
     let htmlOutput = "";
 
-    if (page_properties && page_properties.length > 0) {
+    if (page_properties != null && page_properties.length > 0) {
         page_properties.forEach(property => {
             htmlOutput += fillDataProperty(property);
         });
     }
 
-    if (page_errors && page_errors.errors)
+    if (page_errors != null)
     {
-        page_errors.errors.forEach(error => {
-            htmlOutput += `<div>Error: ${error}</div>`
+        page_errors.forEach(error => {
+            htmlOutput += `<div class="alert alert-danger">${error}</div>`
         });
     }
 
-    if (page_errors && page_errors.warnings)
+    if (page_warnings != null)
     {
-        page_errors.warnings.forEach(warning => {
-            htmlOutput += `<div>Warning: ${warning}</div>`
+        page_warnings.forEach(warning => {
+            htmlOutput += `<div class="alert alert-warning">${warning}</div>`
         });
     }
 
@@ -121,7 +128,7 @@ function getPageProperties(page_url, browser, attempt = 1) {
     let url = `{% url 'rsshistory:json-page-properties' %}?link=${encodedPageUrl}&browser=${browser}`;
 
     let spinner_text = getSpinnerText(`Fetching... ${url}`);
-    $("#propertiesResponse").html(spinner_text);
+    $("#formResponse").html(spinner_text);
 
     $.ajax({
        url: url,
@@ -132,12 +139,18 @@ function getPageProperties(page_url, browser, attempt = 1) {
            {
                return;
            }
+
            page_properties = data.properties;
-           page_errors = data.errors;
+           if (data.errors)
+              page_errors = data.errors;
+           if (data.warnings)
+              page_warnings = data.warnings;
+           if (data.notes)
+              page_notes = data.notes;
 
-           let text = fillData();
+           let text = fillData(data);
 
-           $("#propertiesResponse").html(text);
+           $("#formResponse").html(text);
            $('.btnFilterTrigger').prop("disabled", false);
            $('.btnFilterTrigger').html("Submit")
        },
@@ -147,10 +160,10 @@ function getPageProperties(page_url, browser, attempt = 1) {
                return;
            }
            if (attempt < 3) {
-               $("#propertiesResponse").html("Could not obtain information. Retry");
+               addError("Could not obtain information. Retry");
                getPageProperties(page_url, browser, attempt + 1);
            } else {
-               $("#propertiesResponse").html("Could not obtain information. Error");
+               addError("Could not obtain information. Error");
                $('.btnFilterTrigger').prop("disabled", false);
                $('.btnFilterTrigger').html("Submit")
            }
@@ -159,17 +172,65 @@ function getPageProperties(page_url, browser, attempt = 1) {
 }
 
 
-function OnUserInput() {
-    $('.btnFilterTrigger').prop("disabled", true);
+function fillLinkSuggestions(data) {
+    console.log('Fetched data:', data);
 
-    const link = $('#id_link').val();
+    if (data.status && Array.isArray(data.links) && data.links.length > 0) {
+         $('#Suggestions').append(`<div>Link suggestions</div>`);
+         data.links.forEach(link => {
+              $('#Suggestions').append(`<button class="suggestion-link btn btn-secondary d-block">${link}</button>`);
+         });
+    }
+
+    if (data.status && Array.isArray(data.errors) && data.errors.length > 0) {
+       data.errors.forEach(error => {
+            addError(`${error}`);
+       });
+    }
+}
+
+
+let currentfetchLinkSuggestions = 0;
+function fetchLinkSuggestions(page_url) {
+    let url = `{% url 'rsshistory:link-input-suggestions-json' %}?link=${encodeURIComponent(page_url)}`;
+    let requestfetchLinkSuggestions = ++currentfetchLinkSuggestions;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+           if (requestfetchLinkSuggestions != currentfetchLinkSuggestions)
+           {
+               return;
+           }
+           fillLinkSuggestions(data);
+        })
+        .catch(error => {
+           if (requestfetchLinkSuggestions != currentfetchLinkSuggestions)
+           {
+               return;
+           }
+           console.error('Fetch error:', error);
+        });
+}
+
+
+function OnUserInput() {
+    const page_url = $('#id_link').val();
     const browser = $('#id_browser').val();
 
-    if (link == null) {
+    $('#Errors').html("")
+    $('#formResponse').html("")
+
+    if (page_url == null) {
         return;
     }
 
-    getPageProperties(link, browser);
+    $('.btnFilterTrigger').prop("disabled", true);
+
+    getPageProperties(page_url, browser);
 }
 
 
@@ -184,6 +245,17 @@ function onInputChanged() {
           element.val(new_search_link);
           search_link = new_search_link;
        }
+
+       $('#Errors').html("")
+       $('#Suggestions').html("")
+       $('#formResponse').html("")
+
+       fetchLinkSuggestions(search_link);
+    }
+    else {
+       $('#Errors').html("")
+       $('#Suggestions').html("")
+       $('#formResponse').html("")
     }
 }
 

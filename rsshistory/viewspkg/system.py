@@ -42,6 +42,7 @@ from ..models import (
     KeyWords,
     BlockEntry,
     BlockEntryList,
+    SocialData,
     SystemOperation,
     DataExport,
     SourceExportHistory,
@@ -300,6 +301,7 @@ def json_table_status(request):
     table.append({"name": "BlockEntry", "count": BlockEntry.objects.count()})
     table.append({"name": "BlockEntryList", "count": BlockEntryList.objects.count()})
 
+    table.append({"name": "SocialData", "count": SocialData.objects.count()})
     table.append({"name": "UserTags", "count": UserTags.objects.count()})
     table.append(
         {"name": "UserCompactedTags", "count": UserCompactedTags.objects.count()}

@@ -39,20 +39,24 @@ class Domains(models.Model):
     def remove_all():
         BATCH_SIZE = 1000
         domains = Domains.objects.all()
-        while domains.exists():
-            domains[:BATCH_SIZE].delete()
+        domains.delete()
+        #while domains.exists():
+        #    domains[:BATCH_SIZE].delete()
 
         suffs = DomainsSuffixes.objects.all()
-        while suffs.exists():
-            suffs[:BATCH_SIZE].delete()
+        suffs.delete()
+        #while suffs.exists():
+        #    suffs[:BATCH_SIZE].delete()
 
         tlds = DomainsTlds.objects.all()
-        while tlds.exists():
-            tlds[:BATCH_SIZE].delete()
+        tlds.delete()
+        #while tlds.exists():
+        #    tlds[:BATCH_SIZE].delete()
 
         mains = DomainsMains.objects.all()
-        while mains.exists():
-            mains[:BATCH_SIZE].delete()
+        mains.delete()
+        #while mains.exists():
+        #    mains[:BATCH_SIZE].delete()
 
     def update_complementary_data(self, force=False):
         DomainsSuffixes.add(self.suffix)

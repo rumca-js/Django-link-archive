@@ -60,6 +60,7 @@ from .controllers import (
     DomainsController,
     UserCommentsController,
     EntriesCleanupAndUpdate,
+    EntriesCleanup,
     EntryUpdater,
     EntriesUpdater,
     EntryScanner,
@@ -1093,6 +1094,9 @@ class CleanupJobHandler(BaseJobHandler):
             BackgroundJob.JOB_CLEANUP, subject="LinkDataController", args=args
         )
         BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_CLEANUP, subject="ArchiveLinkDataController", args=args
+        )
+        BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CLEANUP, subject="SourceDataController", args=args
         )
         BackgroundJobController.create_single_job(
@@ -1165,7 +1169,9 @@ class CleanupJobHandler(BaseJobHandler):
         AppLogging.notify("Cleanup. Table:{}".format(table))
 
         if table == "all" or table == "LinkDataController":
-            status = EntriesCleanupAndUpdate().cleanup(cfg)
+            status = EntriesCleanup(archive_cleanup=False).cleanup(cfg)
+        if table == "all" or table == "ArchiveLinkDataController":
+            status = EntriesCleanup(archive_cleanup=True).cleanup(cfg)
         if table == "all" or table == "SourceDataController":
             SourceDataController.cleanup(cfg)
         if table == "all" or table == "AppLogging":

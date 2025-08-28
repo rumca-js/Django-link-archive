@@ -119,6 +119,12 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
             trigger_text_hits=1,
         )
 
+        source_obj = SourceDataController.objects.create(
+            url=source_link,
+            title="The first link",
+            language="ch",
+        )
+
         url = EntryUrlInterface("https://casino.com")
 
         props = url.get_props(source_obj=source_obj)

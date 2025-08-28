@@ -203,8 +203,28 @@ function getHumanReadableNumber(num) {
 }
 
 
+/**
+ * Returns date in Locale
+ */
 function parseDate(inputDate) {
     return inputDate.toLocaleString();
+}
+
+
+/**
+ * Returns date in known format
+ */
+function getFormattedDate(input_date) {
+    let dateObject = input_date ? new Date(input_date) : new Date();
+
+    let formattedDate = dateObject.getFullYear() + "-" +
+        String(dateObject.getMonth() + 1).padStart(2, "0") + "-" +
+        String(dateObject.getDate()).padStart(2, "0") + " " +
+        String(dateObject.getHours()).padStart(2, "0") + ":" +
+        String(dateObject.getMinutes()).padStart(2, "0") + ":" +
+        String(dateObject.getSeconds()).padStart(2, "0");
+
+    return formattedDate;
 }
 
 
@@ -325,9 +345,10 @@ function fixStupidGoogleRedirects(input_url) {
 function sanitizeLinkGeneral(link) {
    link = link.trimStart();
 
-   if (link.endsWith("/")) {
-      link = link.slice(0, -1);
-   }
+   // link can be inserted by hand, so someone might enter / at the end
+   //if (link.endsWith("/")) {
+   //   link = link.slice(0, -1);
+   //}
    if (link.endsWith(" ")) {
       link = link.slice(0, -1);
    }

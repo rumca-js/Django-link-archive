@@ -14,11 +14,11 @@
       {% csrf_token %}
    
       {% for field in config_form %}
-         {% if field.id_for_label == "id_enable_domain_support" %}
+         {% if field.id_for_label == "id_enable_background_jobs" %}
              <h3>Features</h3>
          {%endif%}
    
-         {% if field.id_for_label == "id_accept_dead" %}
+         {% if field.id_for_label == "id_accept_domain_links" %}
              <h3>Link rules</h3>
          {%endif%}
 
@@ -26,7 +26,7 @@
              <h3>Updates</h3>
          {%endif%}
 
-         {% if field.id_for_label == "id_ssl_verification" %}
+         {% if field.id_for_label == "id_remote_webtools_server_location" %}
              <h3>Networking</h3>
          {%endif%}
 
@@ -34,7 +34,7 @@
              <h3>User settings</h3>
          {%endif%}
 
-         {% if field.id_for_label == "id_whats_new_days" %}
+         {% if field.id_for_label == "id_display_style" %}
              <h3>Display</h3>
          {%endif%}
 

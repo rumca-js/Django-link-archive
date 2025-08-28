@@ -123,7 +123,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         handler.process(job)
 
         jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 19)
+        self.assertEqual(jobs.count(), 20)
 
     def test_cleanup_job__all_process(self):
         self.prepare_data()

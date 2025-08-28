@@ -2,12 +2,12 @@ import logging
 import traceback
 from pathlib import Path
 import os
-
 from pytz import timezone
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
-from django.core.validators import MinValueValidator,MaxValueValidator
 
+from django.conf import settings
+from django.core.validators import MinValueValidator,MaxValueValidator
 from django.db import models
 from django.urls import reverse
 from django.conf import settings
@@ -17,6 +17,15 @@ from django.templatetags.static import static
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
+
+
+def batch_remove(model, query, batch_size):
+    while True:
+        batch_ids = list(query.values_list('id', flat=True)[:batch_size])
+        if not batch_ids:
+            break
+
+        model.objects.filter(id__in=batch_is).delete()
 
 
 DISPLAY_STYLE_LIGHT = "style-light"
@@ -71,6 +80,12 @@ class ConfigurationEntry(models.Model):
     CONFIGURATION_GALLERY = "Gallery"
     CONFIGURATION_SEARCH_ENGINE = "Search Engine"
 
+    CONFIGURATION_TYPES = (
+       (CONFIGURATION_NEWS, CONFIGURATION_NEWS),
+       (CONFIGURATION_GALLERY, CONFIGURATION_GALLERY),
+       (CONFIGURATION_SEARCH_ENGINE, CONFIGURATION_SEARCH_ENGINE),
+    )
+
     # fmt: on
     instance_title = models.CharField(
         default="Personal Link Database",
@@ -96,11 +111,18 @@ class ConfigurationEntry(models.Model):
         help_text="URL of the instance's favicon. For example, https://my-domain.com/static/icons/favicon.ico",
     )
 
-    admin_user = models.CharField(
-        max_length=500,
-        default="admin",
-        blank=True,
-        help_text="Username of the administrator.",
+    #admin_user = models.CharField(
+    #    max_length=500,
+    #    default="admin",
+    #    blank=True,
+    #    help_text="Username of the administrator.",
+    #)
+
+    admin_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name) + "_admin_user",
+        null=True,
     )
 
     view_access_type = models.CharField(
@@ -149,6 +171,7 @@ class ConfigurationEntry(models.Model):
 
     initialization_type = models.CharField(
         default=CONFIGURATION_NEWS,
+        choices=CONFIGURATION_TYPES,
         max_length=200,
         blank=True,
         help_text="Type of initialization, be it news, gallery.",
@@ -161,7 +184,7 @@ class ConfigurationEntry(models.Model):
 
     block_job_queue = models.BooleanField(
         default=False,
-        help_text="If enabled, no new jobs will be created. Calls for new jobs will be discarded",
+        help_text="Allows to temporarily block job queues, jobs will not be created",
     )
 
     use_internal_scripts = models.BooleanField(
@@ -232,7 +255,7 @@ class ConfigurationEntry(models.Model):
     )
 
     keep_social_data = models.BooleanField(
-        default=False,
+        default=True,
         help_text="Keep link social data in the database.",
     )
 
@@ -265,13 +288,18 @@ class ConfigurationEntry(models.Model):
     # TODO rename to merge_data_for_new_entries
     new_entries_merge_data = models.BooleanField(
         default=False,
-        help_text="Attempt to merge missing data for newly added entries.",
+        help_text="New entries (for example from RSS) will be updated with Internet data.",
     )
 
     # TODO rename to use_clean_data_for_new_entries
     new_entries_use_clean_data = models.BooleanField(
         default=False,
-        help_text="Fetch clean and updated information from the Internet for new entries.",
+        help_text="New entries will use data fresh from Internet crawling, not from source",
+    )
+
+    new_entries_fetch_social_data = models.BooleanField(
+        default=False,
+        help_text="New entries will fetch social data",
     )
 
     entry_update_via_internet = models.BooleanField(
@@ -521,10 +549,6 @@ class ConfigurationEntry(models.Model):
         """
         Fix errors here
         """
-
-        users = User.objects.filter(username=self.admin_user)
-        if users.count() == 0:
-            self.admin_user = ""
 
         main_directory = self.get_main_directory()
         export_path = main_directory / self.data_export_path

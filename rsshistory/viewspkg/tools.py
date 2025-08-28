@@ -154,7 +154,11 @@ def json_page_properties(request):
     data["status"] = True
 
     page_link = request.GET["link"]
-    data["errors"] = get_errors(url_ex)
+    things = get_errors(url_ex)
+    if things:
+        data["errors"] = things["errors"]
+        data["warnings"] = things["warnings"]
+        data["notes"] = things["notes"]
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
@@ -765,6 +769,9 @@ def link_input_suggestions_json(request):
         config = Configuration.get_object().config_entry
         if config.accept_domain_links:
             links.add(location.get_domain())
+
+        if original_link.endswith("/"):
+            errors.append("Link should not end with slash")
 
         if not config.accept_domain_links and location.is_domain():
             errors.append(
