@@ -163,8 +163,8 @@ function getEntryParameters(entry, entry_dislike_data=null) {
         if (thumbs_up) html_out += `<div class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</div>`;
         if (thumbs_down) html_out += `<div class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</div>`;
         if (view_count) html_out += `<div class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</div>`;
-        if (stars) html_out += `<div class="text-nowrap mx-1">⭐:${getHumanReadableNumber(stars)}</div>`;
-        if (followers_count) html_out += `<div class="text-nowrap mx-1">👥:${getHumanReadableNumber(followers_count)}</div>`;
+        if (stars) html_out += `<div class="text-nowrap mx-1">⭐${getHumanReadableNumber(stars)}</div>`;
+        if (followers_count) html_out += `<div class="text-nowrap mx-1">👥${getHumanReadableNumber(followers_count)}</div>`;
     
         if (upvote_diff) html_out += `<div class="text-nowrap mx-1">👍-👎${getHumanReadableNumber(upvote_diff)}</div>`;
         if (upvote_ratio) html_out += `<div class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</div>`;
@@ -715,8 +715,6 @@ function getEntryDisplayStyle(entry, mark_visited=true) {
     {
 	opacity = entries_dead_alpha;
     }
-
-    console.log(`opacity ${opacity} ${entries_dead_alpha} ${entries_visit_alpha}`);
 
     // apply
 

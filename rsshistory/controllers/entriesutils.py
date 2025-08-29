@@ -207,6 +207,8 @@ class EntriesCleanup(object):
             #while entries.exists():
             #    entries[:BATCH_SIZE].delete()
 
+        return True
+
     def get_source_old_entries_to_remove(self, source):
         """
         If links are old and should be removed
@@ -620,6 +622,12 @@ class EntryUpdater(object):
         properties = {"title": entry.title, "description": entry.description}
 
         entry.save()
+
+        c = Configuration.get_object()
+        config = c.config_entry
+
+        if config.keep_social_data:
+            BackgroundJobController.link_download_social_data(entry)
 
     def update_data(self):
         from ..pluginurl import EntryUrlInterface

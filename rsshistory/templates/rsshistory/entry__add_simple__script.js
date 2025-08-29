@@ -46,94 +46,41 @@ function getExistingObjectLink(object_id, archive=false) {
 }
 
 
-let currentaddLink = 0;
 function addLink(page_url, browser, attempt=1) {
-    let url = `{% url 'rsshistory:entry-add-json' %}?link=${page_url}&browser=${browser}`;
-    
-    let requestaddLink = ++currentaddLink;
+    addEntryJson(page_url, function(data) {
+      if (data.status) {
+          object_id = data.pk;
+          link_text = getExistingObjectLink(object_id);
 
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestaddLink != currentaddLink)
-           {
-               return;
-           }
-           
-           if (data.status) {
-               object_id = data.pk;
-               link_text = getExistingObjectLink(object_id);
+          $("#formResponse").html(`Entry added ${link_text}`);
+          $('#Errors').html("")
+          $('#Suggestions').html("")
 
-               $("#formResponse").html(`Entry added ${link_text}`);
-               $('#Errors').html("")
-               $('#Suggestions').html("")
-
-               resetSearch();
-           }
-           else {
-               object_id = data.pk;
-               link_text = getExistingObjectLink(object_id);
-               $("#formResponse").html(`Entry not added`);
-           }
-           resetSearch();
-       },
-       error: function(xhr, status, error) {
-           if (requestaddLink != currentaddLink)
-           {
-               return;
-           }
-           if (attempt < 3) {
-               addLink(page_url, browser, attempt + 1);
-           } else {
-               resetSearch();
-           }
-       }
+          resetSearch();
+      }
+      else {
+          object_id = data.pk;
+          link_text = getExistingObjectLink(object_id);
+          $("#formResponse").html(`Entry not added`);
+      }
+      resetSearch();
     });
 }
 
 
-let currentcheckEntryExists = 0;
 function checkEntryExistsAndAdd(page_url, browser, attempt=1) {
     $("#formResponse").html(`Checking if link exists ${page_url}`);
 
-    let url = `{% url 'rsshistory:entry-is' %}?link=${page_url}`;
-    
-    let requestCurrentcheckEntryExists = ++currentcheckEntryExists;
+    isEntry(page_url, function(data) {
+       if (data.status) {
+           object_id = data.pk;
+           link_text = getExistingObjectLink(object_id);
 
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestCurrentcheckEntryExists != currentcheckEntryExists)
-           {
-               return;
-           }
-           
-           if (data.status) {
-               object_id = data.pk;
-               link_text = getExistingObjectLink(object_id);
-
-               addError(`Entry already exists ${link_text}`);
-               resetSearch();
-           }
-           else {
-               addLink(page_url);
-           }
-       },
-       error: function(xhr, status, error) {
-           if (requestCurrentcheckEntryExists != currentcheckEntryExists)
-           {
-               return;
-           }
-           if (attempt < 3) {
-               addError("Could not obtain information. Retry");
-               checkEntryExistsAndAdd(page_url, browser, attempt + 1);
-           } else {
-               addError("Could not obtain information if link exists.");
-           }
+           addError(`Entry already exists ${link_text}`);
+           resetSearch();
+       }
+       else {
+           addLink(page_url);
        }
     });
 }
@@ -142,33 +89,23 @@ function checkEntryExistsAndAdd(page_url, browser, attempt=1) {
 function checkEntryExistsInDb(page_url) {
     $("#formResponse").html(`Checking if entry exists ${page_url}`);
 
-    let entryCheckUrl = `{% url 'rsshistory:entry-is' %}?link=${encodeURIComponent(page_url)}`;
+    isEntry(page_url, function(entryData) {
+        console.log('Entry check data:', entryData);
 
-    fetch(entryCheckUrl)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(entryData => {
-            console.log('Entry check data:', entryData);
+        if (entryData.status) {
+             $('.btnFilterTrigger').prop("disabled", true);
 
-            if (entryData.status) {
-                $('.btnFilterTrigger').prop("disabled", true);
+             let archived = entryData.archived;
 
-		let archived = entryData.archived;
+             let link_text = getExistingObjectLink(entryData.pk, archived);
+             addError(`Entry already exists ${link_text}`);
+        }
+        else {
+             $('.btnFilterTrigger').prop("disabled", false);
+        }
 
-                let link_text = getExistingObjectLink(entryData.pk, archived);
-                addError(`Entry already exists ${link_text}`);
-            }
-            else {
-                $('.btnFilterTrigger').prop("disabled", false);
-            }
-
-            $("#formResponse").html("");
-        })
-        .catch(error => {
-            console.error('Fetch error:', error);
-        });
+        $("#formResponse").html("");
+    });
 }
 
 
@@ -190,30 +127,10 @@ function fillLinkSuggestions(data) {
 }
 
 
-let currentfetchLinkSuggestions = 0;
 function fetchLinkSuggestions(page_url) {
-    let url = `{% url 'rsshistory:link-input-suggestions-json' %}?link=${encodeURIComponent(page_url)}`;
-    let requestfetchLinkSuggestions = ++currentfetchLinkSuggestions;
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-           if (requestfetchLinkSuggestions != currentfetchLinkSuggestions)
-           {
-               return;
-           }
-           fillLinkSuggestions(data);
-        })
-        .catch(error => {
-           if (requestfetchLinkSuggestions != currentfetchLinkSuggestions)
-           {
-               return;
-           }
-           console.error('Fetch error:', error);
-        });
+    getLinkInputSuggestionsJson(page_url, function(data) {
+        fillLinkSuggestions(data);
+    });
 }
 
 
@@ -259,6 +176,9 @@ function onInputChanged() {
        $('#formResponse').html("")
     }
 }
+
+
+{% include "rsshistory/urls.js" %}
 
 
 $(document).ready(function() {

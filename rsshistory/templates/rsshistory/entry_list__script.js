@@ -103,6 +103,8 @@ function fillListData() {
         $('#listData').html(finished_text);
         let pagination = GetPaginationNav(data.page, data.num_pages, data.count);
         $('#pagination').html(pagination);
+
+        fillEntryDislikes(entries);
     }
 
     if (debug_mode) {
@@ -112,7 +114,23 @@ function fillListData() {
 }
 
 
+function fillEntryDislikes(entries) {
+    if (entries && entries.length > 0) {
+        entries.forEach(entry => {
+           getEntryDislikeData(entry.id, function (data) {
+              console.log(`Found dislike data for ${entry.id}`);
+
+              let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_diff, upvote_view_ratio, stars, followers_count } = data;
+
+              // $(`[entry="${entry.id}"]`).html(upvote_ratio);
+           });
+        });
+    }
+}
+
+
 {% include "rsshistory/javascript_list_utilities.js" %}
+{% include "rsshistory/urls.js" %}
 
 
 $(document).on("click", '#showPureLinks', function(e) {

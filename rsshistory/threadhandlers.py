@@ -293,6 +293,41 @@ class LinkResetLocalDataJobHandler(BaseJobHandler):
         return cfg
 
 
+class LinkDownloadSocialData(BaseJobHandler):
+    def get_job():
+        return BackgroundJob.JOB_LINK_DOWNLOAD_SOCIAL
+
+    def process(self, obj=None):
+        try:
+            link_id = int(obj.subject)
+        except ValueError as E:
+            AppLogging.exc(
+                exception_object=E,
+                info_text="Incorrect link ID:{}".format(obj.subject),
+            )
+            # consume job
+            return True
+
+        entries = LinkDataController.objects.filter(id=link_id)
+        if len(entries) > 0:
+            entry = entries[0]
+
+            SocialData.get(entry)
+
+        return True
+
+    def get_args_cfg(self, obj):
+        cfg = super().get_args_cfg(obj)
+
+        if "browser" in cfg:
+            browser_id = cfg["browser"]
+            browsers = Browser.objects.filter(id=int(browser_id))
+            if browsers.count() > 0:
+                data["browser_obj"] = browsers[0]
+
+        return cfg
+
+
 class LinkDownloadJobHandler(BaseJobHandler):
     """!
     downloads entry

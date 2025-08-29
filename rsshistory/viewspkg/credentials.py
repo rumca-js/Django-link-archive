@@ -9,12 +9,21 @@ import string
 
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry
-from ..views import ViewPage, GenericListView
+from ..views import ViewPage, GenericListView, UserGenericListView
 from ..models import Credentials
 from ..forms import CredentialsForm
 
 
 class ListView(GenericListView):
+    model = Credentials
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get_title(self):
+        return "Credentials"
+
+
+class UserListView(UserGenericListView):
     model = Credentials
     context_object_name = "content_list"
     paginate_by = 100

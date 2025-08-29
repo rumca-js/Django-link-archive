@@ -29,6 +29,7 @@ from ..models import (
     BackgroundJob,
     BackgroundJobHistory,
     AppLogging,
+    ApiKeys,
     Domains,
     UserTags,
     UserCompactedTags,

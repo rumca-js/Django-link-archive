@@ -12,6 +12,7 @@ class BackgroundJob(models.Model):
     JOB_LINK_UPDATE_DATA = "link-update-data"
     JOB_LINK_RESET_DATA = "link-reset-data"
     JOB_LINK_RESET_LOCAL_DATA = "link-reset-local-data"
+    JOB_LINK_DOWNLOAD_SOCIAL = "link-social-data"
     JOB_LINK_DOWNLOAD = "link-download"
     JOB_LINK_DOWNLOAD_MUSIC = "download-music"
     JOB_LINK_DOWNLOAD_VIDEO = "download-video"
@@ -48,6 +49,7 @@ class BackgroundJob(models.Model):
         (JOB_LINK_UPDATE_DATA, JOB_LINK_UPDATE_DATA),           # fetches data from the internet, updates what is missing, updates page rating
         (JOB_LINK_RESET_DATA, JOB_LINK_RESET_DATA,),            # fetches data from the internet, replaces data, updates page rating
         (JOB_LINK_RESET_LOCAL_DATA, JOB_LINK_RESET_LOCAL_DATA,),# recalculates page rating
+        (JOB_LINK_DOWNLOAD_SOCIAL, JOB_LINK_DOWNLOAD_SOCIAL,),  # downloads social data
         (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
         (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),     #
         (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),     #

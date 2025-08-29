@@ -149,6 +149,7 @@ class ConfigForm(forms.ModelForm):
             "days_to_remove_stale_entries",
             "days_to_check_std_entries",
             "days_to_check_stale_entries",
+            "days_to_remove_social_data",
             "remove_entry_vote_threshold",
             "number_of_update_entries",
             "block_job_queue",
@@ -330,7 +331,7 @@ class CredentialsForm(forms.ModelForm):
             "password",
             "token",
             "secret",
-            "owner",
+            "user",
         ]
 
     def __init__(self, *args, **kwargs):

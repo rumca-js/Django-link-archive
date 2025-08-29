@@ -47,6 +47,7 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_TRUNCATE_TABLE, BackgroundJob.JOB_TRUNCATE_TABLE),
         (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE),
         (BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, BackgroundJob.JOB_LINK_RESET_LOCAL_DATA),           # update data, recalculate
+        (BackgroundJob.JOB_LINK_DOWNLOAD_SOCIAL, BackgroundJob.JOB_LINK_DOWNLOAD_SOCIAL),
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),
         (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
         (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),
@@ -448,6 +449,19 @@ class BackgroundJobController(BackgroundJob):
             job=BackgroundJob.JOB_LINK_SAVE,
             task=None,
             subject=link_url,
+            args="",
+            priority=BackgroundJobController.get_job_priority(
+                BackgroundJob.JOB_LINK_SAVE
+            ),
+        )
+
+    def link_download_social_data(entry):
+        from ..configuration import Configuration
+
+        return BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_LINK_DOWNLOAD_SOCIAL,
+            task=None,
+            subject=entry.id,
             args="",
             priority=BackgroundJobController.get_job_priority(
                 BackgroundJob.JOB_LINK_SAVE

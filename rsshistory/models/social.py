@@ -78,14 +78,12 @@ class SocialData(models.Model):
         SocialData.objects.create(entry=entry)
 
     def get_from_model(entry):
+        from ..configuration import Configuration
+        config = Configuration.get_object().config_entry
+
         social_datas = SocialData.objects.filter(entry = entry)
         if social_datas.exists():
             social_data = social_datas[0]
-
-            five_days_ago = DateUtils.get_datetime_now_utc() - timedelta(days=5)
-            if social_data.date_updated < five_days_ago:
-                social_data.delete()
-                return
 
             return social_data
 
@@ -112,22 +110,23 @@ class SocialData(models.Model):
 
     def cleanup(cfg=None):
         from ..configuration import Configuration
+        config = Configuration.get_object().config_entry
 
         BATCH_SIZE = 1000
 
-        five_days_ago = DateUtils.get_datetime_now_utc() - timedelta(days=5)
+        if config.keep_social_data:
+            five_days_ago = DateUtils.get_datetime_now_utc() - timedelta(days=config.days_to_remove_social_data)
 
-        while True:
-            old_ids = list(
-                SocialData.objects
-                .filter(date_updated__lt=five_days_ago)
-                .values_list('id', flat=True)[:BATCH_SIZE]
-            )
-            if not old_ids:
-                break
-            SocialData.objects.filter(id__in=old_ids).delete()
+            while True:
+                old_ids = list(
+                    SocialData.objects
+                    .filter(date_updated__lt=five_days_ago)
+                    .values_list('id', flat=True)[:BATCH_SIZE]
+                )
+                if not old_ids:
+                    break
+                SocialData.objects.filter(id__in=old_ids).delete()
 
-        config = Configuration.get_object().config_entry
         if not config.keep_social_data:
             SocialData.truncate(cfg)
 

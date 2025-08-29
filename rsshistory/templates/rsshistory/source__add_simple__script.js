@@ -101,48 +101,22 @@ let currentcheckEntryExists = 0;
 function checkEntryExists(page_url, browser, attempt=1) {
     $("#formResponse").html(`Checking if source exists ${page_url}`);
 
-    let url = `{% url 'rsshistory:source-is' %}?link=${page_url}`;
-    
-    let requestCurrentcheckEntryExists = ++currentcheckEntryExists;
+    isSource(page_url, function(data) {
+       if (data.status) {
+           $('.btnFilterTrigger').prop("disabled", true);
 
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestCurrentcheckEntryExists != currentcheckEntryExists)
-           {
-               return;
-           }
-           
-           if (data.status) {
-               $('.btnFilterTrigger').prop("disabled", true);
+           object_id = data.pk;
+           detail_link_text = getExistingObjectLink(object_id);
 
-               object_id = data.pk;
-               detail_link_text = getExistingObjectLink(object_id);
-
-               addError(`Source alredy exists ${detail_link_text}`);
-               url_exists = true;
-           }
-           else {
-               url_exists = false;
-               $('.btnFilterTrigger').prop("disabled", false);
-           }
-
-           $("#formResponse").html("");
-       },
-       error: function(xhr, status, error) {
-           if (requestCurrentcheckEntryExists != currentcheckEntryExists)
-           {
-               return;
-           }
-           if (attempt < 3) {
-               addError("Could not obtain information. Retry");
-               checkEntryExists(page_url, browser, attempt + 1);
-           } else {
-               resetSearch("Could not obtain information if link exists.");
-           }
+           addError(`Source alredy exists ${detail_link_text}`);
+           url_exists = true;
        }
+       else {
+           url_exists = false;
+           $('.btnFilterTrigger').prop("disabled", false);
+       }
+
+       $("#formResponse").html("");
     });
 }
 
@@ -165,30 +139,10 @@ function fillLinkSuggestions(data) {
 }
 
 
-let currentfetchLinkSuggestions = 0;
 function fetchLinkSuggestions(page_url) {
-    let url = `{% url 'rsshistory:link-input-suggestions-json' %}?link=${encodeURIComponent(page_url)}`;
-    let requestfetchLinkSuggestions = ++currentfetchLinkSuggestions;
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-           if (requestfetchLinkSuggestions != currentfetchLinkSuggestions)
-           {
-               return;
-           }
-           fillLinkSuggestions(data);
-        })
-        .catch(error => {
-           if (requestfetchLinkSuggestions != currentfetchLinkSuggestions)
-           {
-               return;
-           }
-           console.error('Fetch error:', error);
-        });
+    getLinkInputSuggestionsJson(page_url, function(data) {
+        fillLinkSuggestions(data);
+    });
 }
 
 
@@ -234,6 +188,9 @@ function onInputChanged() {
        $('#formResponse').html("")
     }
 }
+
+
+{% include "rsshistory/urls.js" %}
 
 
 $(document).ready(function() {

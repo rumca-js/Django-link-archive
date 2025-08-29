@@ -9,12 +9,21 @@ import string
 
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry
-from ..views import ViewPage, GenericListView
+from ..views import ViewPage, GenericListView, UserGenericListView
 from ..models import ApiKeys
 from ..forms import ApiKeysForm
 
 
 class ListView(GenericListView):
+    model = ApiKeys
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get_title(self):
+        return "API Keys"
+
+
+class UserListView(UserGenericListView):
     model = ApiKeys
     context_object_name = "content_list"
     paginate_by = 100

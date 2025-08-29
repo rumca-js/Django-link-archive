@@ -190,30 +190,10 @@ function fillLinkSuggestions(data) {
 }
 
 
-let currentfetchLinkSuggestions = 0;
 function fetchLinkSuggestions(page_url) {
-    let url = `{% url 'rsshistory:link-input-suggestions-json' %}?link=${encodeURIComponent(page_url)}`;
-    let requestfetchLinkSuggestions = ++currentfetchLinkSuggestions;
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-           if (requestfetchLinkSuggestions != currentfetchLinkSuggestions)
-           {
-               return;
-           }
-           fillLinkSuggestions(data);
-        })
-        .catch(error => {
-           if (requestfetchLinkSuggestions != currentfetchLinkSuggestions)
-           {
-               return;
-           }
-           console.error('Fetch error:', error);
-        });
+    getLinkInputSuggestionsJson(page_url, function(data) {
+        fillLinkSuggestions(data);
+    });
 }
 
 
@@ -258,6 +238,9 @@ function onInputChanged() {
        $('#formResponse').html("")
     }
 }
+
+
+{% include "rsshistory/urls.js" %}
 
 
 $(document).ready(function() {

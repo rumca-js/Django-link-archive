@@ -18,9 +18,9 @@
   {% if content_list %}
      <div class="list-group">
          {% for entry_rule in content_list %}
-
+         <div class="list-group-item d-flex justify-content-between align-items-center">
              <a href="{% url 'rsshistory:entry-rule' entry_rule.id %}"
-                class="my-1 p-1 list-group-item list-group-item-action"
+                class="list-group-item-action"
                 title="{{entry_rule.rule_name}}">
                  {% if not entry_rule.enabled %}
                     [DISABLED]
@@ -44,6 +44,13 @@
 
                  {{entry_rule.rule_name}}
              </a>
+
+             <div>
+                <a href="{% url 'rsshistory:entry-rule-remove' entry_rule.id %}" class="btn btn-sm btn-secondary" role="button">
+                   {% include "rsshistory/icon_remove.html" %}
+                </a>
+	     </div>
+	 </div>
          {% endfor %}
   {% else %}
     No rules yet

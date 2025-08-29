@@ -12,16 +12,18 @@
   {% if content_list %}
      <div class="list-group">
          {% for apikey_object in content_list %}
-         <div class="list-group-item">
+         <div class="list-group-item d-flex justify-content-between align-items-center">
              <div>
-                 Key: <div>{{apikey_object.key}}</div>
+                 Key: <span>{{apikey_object.key}}</span>
 
                  {% with user=apikey_object.user %}
                  <span>{{user.id}}</span>
                  <span>{{user.username}}</span>
                  {% endwith %}
+             </div>
 
-                 <a href="{% url 'rsshistory:api-key-remove' apikey_object.id %}" title="Remove api key" class="btn btn-secondary btn-sm" role="button">
+             <div>
+                 <a href="{% url 'rsshistory:api-key-remove' apikey_object.id %}" title="Remove api key" class="btn btn-sm btn-secondary" role="button">
                      <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
                  </a>
              </div>

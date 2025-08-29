@@ -252,12 +252,14 @@ urlpatterns = [
     # API keys
     path("api-key-add", apikeys.add, name="api-key-add"),
     path("api-key-remove/<int:pk>/", apikeys.remove, name="api-key-remove"),
+    path("user-api-keys/", apikeys.UserListView.as_view(), name="user-api-keys",),
     path("api-keys/", apikeys.ListView.as_view(), name="api-keys",),
     path("credential-add", credentials.add, name="credential-add"),
     path("credential-edit/<int:pk>/", credentials.edit, name="credential-edit"),
     path("credential-remove/<int:pk>/", credentials.remove, name="credential-remove"),
     path("credential/<int:pk>/", credentials.DetailView.as_view(), name="credential",),
     path("credentials/", credentials.ListView.as_view(), name="credentials",),
+    path("user-credentials/", credentials.UserListView.as_view(), name="user-credentials",),
     # browser
     path("browsers/", browsers.BrowserListView.as_view(), name="browsers",),
     path("browser-read/", browsers.read_browser_setup, name="browser-read",),

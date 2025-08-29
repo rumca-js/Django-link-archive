@@ -479,9 +479,9 @@ function getTextContent(url_address, callback, errorInHtml = false) {
             }
         },
         error: function(xhr, status, error) {
-            if (getTextContentRequestTracker[url_address] === requestId) {
-                getTextContent(url_address, callback, errorInHtml);
-            }
+            //if (getTextContentRequestTracker[url_address] === requestId) {
+            //    getTextContent(url_address, callback, errorInHtml);
+            //}
         }
     });
 }
@@ -507,9 +507,9 @@ function getTextJson(url_address, callback, errorInHtml = false) {
             }
         },
         error: function(xhr, status, error) {
-            if (getTextJsonRequestTracker[url_address] === requestId) {
-                getTextJson(url_address, callback, errorInHtml);
-            }
+            //if (getTextJsonRequestTracker[url_address] === requestId) {
+            //    getTextJson(url_address, callback, errorInHtml);
+            //}
         }
     });
 }
@@ -532,9 +532,9 @@ function getDynamicContent(url_address, htmlElement, errorInHtml = false) {
             }
         },
         error: function(xhr, status, error) {
-            if (getDynamicContentRequestTracker[url_address] === requestId) {
-                getDynamicContent(url_address, htmlElement, errorInHtml);
-            }
+            //if (getDynamicContentRequestTracker[url_address] === requestId) {
+            //    getDynamicContent(url_address, htmlElement, errorInHtml);
+            //}
         }
     });
 }
@@ -557,9 +557,9 @@ function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
          }
        },
        error: function(xhr, status, error) {
-            if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
-                getDynamicJsonContent(url_address, htmlElement, errorInHtml);
-            }
+            //if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
+            //    getDynamicJsonContent(url_address, htmlElement, errorInHtml);
+            //}
        }
     });
 }
@@ -582,9 +582,11 @@ function getDynamicJson(url_address, callback=null, errorInHtml = false) {
          }
        },
        error: function(xhr, status, error) {
-            if (getDynamicJsonRequestTracker[url_address] === requestId) {
-                getDynamicJson(url_address, callback, errorInHtml);
-            }
+            // TODO if page returns 500 we should not retry
+
+            // if (getDynamicJsonRequestTracker[url_address] === requestId) {
+            //     getDynamicJson(url_address, callback, errorInHtml);
+            // }
        }
     });
 }

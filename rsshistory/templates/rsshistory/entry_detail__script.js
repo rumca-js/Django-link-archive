@@ -100,42 +100,31 @@ function getIsEntryDownloaded(attempt = 1) {
 
 
 let currentEntryOperationalParamters = 0;
-function getEntryOperationalParamters(attempt = 1) {
-    let requestEntryOperationalParamters = ++currentEntryOperationalParamters;
+function getThisEntryOperationalParameters(attempt = 1) {
+    getEntryOperationalParamters({{object.id}}, function (data) {
+        let html_out = "";
 
-    $.ajax({
-        url: "{% url 'rsshistory:entry-op-parameters' object.id %}",
-        type: 'GET',
-        timeout: 15000,
-        success: function(data) {
-            if (requestEntryOperationalParamters != currentEntryOperationalParamters) {
-                return;
-            }
+        if (data) {
+          if (data.status) {
+              data.parameters.forEach(parameter => {
+                  let title = parameter.title || parameter.name;
+                  let name = escapeHtml(parameter.name);
+                  let description = escapeHtml(parameter.description);
 
-            let html_out = "";
+                  html_out += `<div class="text-nowrap mx-1"
+                      title="${title}"
+                      >
+                         <strong>${name}:</strong>
+                         ${description}
+                      </div>`;
+              });
 
-            if (data) {
-              if (data.status) {
-                  data.parameters.forEach(parameter => {
-                      let title = parameter.title || parameter.name;
-                      let name = escapeHtml(parameter.name);
-                      let description = escapeHtml(parameter.description);
-
-                      html_out += `<div class="text-nowrap mx-1"
-                          title="${title}"
-                          >
-                             <strong>${name}:</strong>
-                             ${description}
-                          </div>`;
-                  });
-
-                  if (html_out) {
-                      html_out = "<h1>Parameters</h1>" + html_out;
-                  }
-
-                  $("#entryOperationalParameters").html(html_out);
+              if (html_out) {
+                  html_out = "<h1>Parameters</h1>" + html_out;
               }
-            }
+
+              $("#entryOperationalParameters").html(html_out);
+          }
         }
     });
 }
@@ -158,47 +147,29 @@ function fillEntryParameters() {
 }
 
 
-let currentgetDislikeData = 0;
-function getDislikeData(attempt = 1) {
-    let requestgetDislikeData = ++currentgetDislikeData;
-    let url_address = "{% url 'rsshistory:entry-dislikes' object.id %}";
-
-    $.ajax({
-       url: url_address,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestgetDislikeData != currentgetDislikeData) {
-               return;
-           }
-           if (data) {
-               entry_dislike_data = data;
-               fillEntryParameters();
-           }
-       },
-       error: function(xhr, status, error) {
-           if (requestgetDislikeData != currentgetDislikeData) {
-               return;
-           }
-           if (attempt < 3) {
-               getDislikeData(attempt + 1);
-           } else {
-           }
+function getThisEntryDislikeData(attempt = 1) {
+   getEntryDislikeData({{object.id}}, function (data) {
+       if (data) {
+           entry_dislike_data = data;
+           fillEntryParameters();
        }
-    });
+   });
 }
 
 
-let currentgetDynamicJsonContentWithRefresh = 0;
-function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1, errorInHtml = false) {
-    let requestgetDynamicJsonContentWithRefresh = ++currentgetDynamicJsonContentWithRefresh;
+const getDynamicJsonContentWithRefreshTracker = {};
+function getDynamicJsonContentWithRefresh(url_address, htmlElement, errorInHtml = false) {
+    if (!getDynamicJsonContentWithRefreshTracker[url_address]) {
+        getDynamicJsonContentWithRefreshTracker[url_address] = 0;
+    }
+    const requestId = ++getDynamicJsonContentWithRefreshTracker[url_address];
 
     $.ajax({
        url: url_address,
        type: 'GET',
        timeout: 10000,
        success: function(data) {
-           if (requestgetDynamicJsonContentWithRefresh != currentgetDynamicJsonContentWithRefresh) {
+           if (getDynamicContentRequestTracker[url_address] !== requestId) {
                return;
            }
            $(htmlElement).html(data.message);
@@ -211,31 +182,22 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt = 1,
            }
        },
        error: function(xhr, status, error) {
-           if (requestgetDynamicJsonContentWithRefresh != currentgetDynamicJsonContentWithRefresh) {
+           if (getDynamicContentRequestTracker[url_address] !== requestId) {
                return;
            }
-           if (attempt < 3) {
-               getDynamicJsonContentWithRefresh(url_address, htmlElement, attempt + 1, errorInHtml);
-               if (errorInHtml) {
-                   $(htmlElement).html("Error loading dynamic content, retry");
-               }
-           } else {
-               if (errorInHtml) {
-                   $(htmlElement).html("Error loading dynamic content");
-               }
-           }
+           getDynamicJsonContentWithRefresh(url_address, htmlElement, errorInHtml);
        }
     });
 }
 
 
 function getVoteEditForm() {
-  getDynamicContent('{% url "rsshistory:entry-vote-form" object.id %}', "#entryVoteContainer", 1, true);
+  getDynamicContent('{% url "rsshistory:entry-vote-form" object.id %}', "#entryVoteContainer");
 }
 
 
 function getTagEditForm() {
-  getDynamicContent('{% url "rsshistory:entry-tag-form" object.id %}', "#entryTagContainer", 1, true);
+  getDynamicContent('{% url "rsshistory:entry-tag-form" object.id %}', "#entryTagContainer");
 }
 
 
@@ -455,6 +417,9 @@ function tagEntry(attempt = 1) {
 }
 
 
+{% include "rsshistory/urls.js" %}
+
+
 $(document).on('click', '#Vote', function(event) {
     event.preventDefault();
     getVoteEditForm();
@@ -528,8 +493,8 @@ $(document).on('click', '#cancelTagEdit', function() {
 
 getEntryProperties();
 getEntryRelated();
-getEntryOperationalParamters();
-getDislikeData();
+getThisEntryOperationalParameters();
+getThisEntryDislikeData();
 getIsEntryDownloaded();
 getEntryTags();
 getEntryMenu();

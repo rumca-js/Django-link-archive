@@ -12,8 +12,9 @@
   {% if content_list %}
      <div class="list-group">
          {% for export_object in content_list %}
+         <div class="list-group-item d-flex justify-content-between align-items-center">
              <a href="{% url 'rsshistory:data-export' export_object.id %}"
-               class="my-1 p-1 list-group-item list-group-item-action"
+               class="list-group-item-action"
                title="
              Enabled:{{ export_object.enabled }},
              Remote path:{{ export_object.remote_path }}
@@ -21,7 +22,6 @@
              Export data:{{ export_object.export_data }},
                "
              >
-             - 
              {% if not export_object.enabled %}
                 [DISABLED]
              {% endif %}
@@ -31,6 +31,14 @@
              Export type:{{ export_object.export_type }},
              Export data:{{ export_object.export_data }}
              </a>
+
+             <div>
+                <a href="{% url 'rsshistory:data-export-remove' export_object.id %}" class="btn btn-sm btn-secondary" title="Remove">
+                   <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+                </a>
+             </div>
+
+	 </div>
          {% endfor %}
   {% else %}
     No domains yet

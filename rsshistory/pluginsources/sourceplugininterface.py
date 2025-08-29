@@ -1,7 +1,11 @@
 from utils.dateutils import DateUtils
 
 from ..models import AppLogging, UserTags
-from ..controllers import EntryDataBuilder, SourceDataController
+from ..controllers import (
+   EntryDataBuilder,
+   SourceDataController,
+   BackgroundJobController
+)
 from ..configuration import Configuration
 from ..pluginurl.urlhandler import UrlHandlerEx
 
@@ -120,7 +124,7 @@ class SourcePluginInterface(object):
                 UserTags.set_tag(entry, source.auto_tag, user)
 
             if configuration.config_entry.new_entries_fetch_social_data:
-                SocialData.get(entry)
+                BackgroundJobController.link_download_social_data(entry)
 
         self.num_read_entries += 1
 

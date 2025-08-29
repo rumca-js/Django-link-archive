@@ -17,22 +17,22 @@
   {% if content_list %}
      <div class="list-group">
          {% for browser in content_list %}
-         <div class="list-group-item">
+         <div class="list-group-item d-flex justify-content-between align-items-center">
              <div>
-                 {% if not browser.enabled %}
-                 <b>[DISABLED]</b>
-                 {% endif %}
-                 Prio:{{browser.priority}}
-                 Name:{{browser.name}}
-                 Crawler:{{browser.crawler}}
-                 Settings:{{browser.settings}}
+                 <a href="{% url 'rsshistory:browser-edit' browser.id %}" 
+		    title="Edits browser"
+                    class="list-group-item-action"
+		    >
+                    {% if not browser.enabled %}
+                    <b>[DISABLED]</b>
+                    {% endif %}
+                    Prio:{{browser.priority}}
+                    Name:{{browser.name}}
+                    Crawler:{{browser.crawler}}
+		 </a>
              </div>
 
              <div>
-                 <a href="{% url 'rsshistory:browser-edit' browser.id %}" title="Edits browser" class="btn btn-secondary btn-sm" role="button">
-                   {% include "rsshistory/icon_edit.html" %}
-                 </a>
-
                  <a href="{% url 'rsshistory:browser-prio-up' browser.id %}" title="Browser prio up" class="btn btn-secondary btn-sm" role="button">
                      <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
                  </a>

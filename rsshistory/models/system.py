@@ -362,6 +362,11 @@ class ConfigurationEntry(models.Model):
         help_text="Number of days after which inactive entries are checked for status.",
     )
 
+    days_to_remove_social_data = models.IntegerField(
+        default=5,
+        help_text="Number of days after which social data are removed Disabled if 0.",
+    )
+
     remove_entry_vote_threshold = models.IntegerField(
         default=1,
         help_text="Threshold for votes required to retain an entry. Disabled if set to 0.",

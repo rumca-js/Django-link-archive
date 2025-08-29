@@ -142,6 +142,11 @@ class UrlHandlerEx(object):
         config_entry = Configuration.get_object().config_entry
         name = ""
 
+        # try default server setup
+        self.all_properties = request_server.get_getj(self.url)
+        if self.all_properties:
+            return self.all_properties
+
         if mode_mapping and len(mode_mapping) > 0:
             for crawler_data in mode_mapping:
                 if "name" in crawler_data:

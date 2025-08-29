@@ -796,6 +796,7 @@ def link_input_suggestions_json(request):
             link = original_link.replace("www.", "")
             links.add(link)
 
+        links.discard(None)
         links -= {original_link}
 
         data["links"] = sorted(links)

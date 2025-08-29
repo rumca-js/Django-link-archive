@@ -27,7 +27,7 @@ class Credentials(models.Model):
     secret = models.CharField(max_length=1000, blank=True)
     token = models.CharField(max_length=1000, blank=True)
 
-    owner = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_credentials",
@@ -37,7 +37,7 @@ class Credentials(models.Model):
     )
 
     class Meta:
-        ordering = ["owner"]
+        ordering = ["user"]
 
     def encrypt(self):
         """Still the better way than Facebook plaintext."""
