@@ -1,79 +1,24 @@
-let currentgetIndicators = 0;
-function getIndicators(attempt=1) {
-    let requestCurrentgetIndicators = ++currentgetIndicators;
 
-    let url = "{% url 'rsshistory:json-indicators' %}";
-    
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestCurrentgetIndicators != currentgetIndicators)
-           {
-               return;
-           }
-           common_indicators = data.indicators;
+{% include "rsshistory/urls.js" %}
 
-           SetMenuStatusLine();
-           SetFooterStatusLine();
-       },
-       error: function(xhr, status, error) {
-           if (requestCurrentgetIndicators != currentgetIndicators)
-           {
-               return;
-           }
-           
-           if (attempt < 3) {
-               getIndicators(attempt + 1);
-           } else {
-           }
-       }
-    });
+
+function getBaseScriptVersion() {
+   return 12;
 }
 
 
-function getMenuSearchContainer() {
-    let link = "{% url 'rsshistory:json-search-container' %}";
-    getDynamicJson(link, function(data) {
-        processMenuData(data, '#MenuSearchContainer');
-    });
-}
+function getSystemIndicators() {
+   getIndicators(function(data) {
+       common_indicators = data.indicators;
 
-
-function getMenuGlobalContainer() {
-    let link = "{% url 'rsshistory:json-global-container' %}";
-    getDynamicJson(link, function(data) {
-        processMenuData(data, '#MenuGlobalContainer');
-    });
-}
-
-
-function getMenuPersonalContainer() {
-    let link = "{% url 'rsshistory:json-personal-container' %}";
-    getDynamicJson(link, function(data) {
-        processMenuData(data, '#MenuPersonalContainer');
-    });
-}
-
-function getMenuTools() {
-    let link = "{% url 'rsshistory:json-tools-container' %}";
-    getDynamicJson(link, function(data) {
-        processMenuData(data, '#MenuToolsContainer');
-    });
-}
-
-
-function getMenuUsers() {
-    let link = "{% url 'rsshistory:json-users-container' %}";
-    getDynamicJson(link, function(data) {
-        processMenuData(data, '#MenuUsersContainer');
-    });
+       SetMenuStatusLine();
+       SetFooterStatusLine();
+   });
 }
 
 
 function getBasicPageElements() {
-    getIndicators();
+    getSystemIndicators();
     getMenuSearchContainer();
     getMenuGlobalContainer();
     getMenuPersonalContainer();
@@ -118,7 +63,7 @@ $(document).ready(function() {
 /* when user switches tab - this might result in many fetches
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
-        getIndicators();
+        getSystemIndicators();
     }
 });
 */

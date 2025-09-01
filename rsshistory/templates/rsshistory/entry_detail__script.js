@@ -169,9 +169,9 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, errorInHtml 
        type: 'GET',
        timeout: 10000,
        success: function(data) {
-           if (getDynamicContentRequestTracker[url_address] !== requestId) {
-               return;
-           }
+           //if (getDynamicContentRequestTracker[url_address] !== requestId) {
+           //    return;
+           //}
            $(htmlElement).html(data.message);
 
            if (data.status) {
@@ -182,10 +182,10 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, errorInHtml 
            }
        },
        error: function(xhr, status, error) {
-           if (getDynamicContentRequestTracker[url_address] !== requestId) {
-               return;
-           }
-           getDynamicJsonContentWithRefresh(url_address, htmlElement, errorInHtml);
+           //if (getDynamicContentRequestTracker[url_address] !== requestId) {
+           //    return;
+           //}
+           //getDynamicJsonContentWithRefresh(url_address, htmlElement, errorInHtml);
        }
     });
 }

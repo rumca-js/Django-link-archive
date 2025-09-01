@@ -7,8 +7,6 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils.http import urlencode
 
-from .webtools import HtmlPage, RssPage, HttpPageHandler
-
 from .models import (
     UserConfig,
     ConfigurationEntry,
@@ -123,13 +121,32 @@ def get_search_view(request):
 class ViewPage(object):
     def __init__(self, request):
         self.request = request
+        self.printx("ViewPage")
+
         self.view_access_type = None
 
         self.context = None
         self.context = self.get_context()
         self.is_mobile = self.read_mobile_status()
+        self.printx("ViewPage DONE")
+
+    def printx(self, text):
+        print("Url:{}: {}".format(self.request.build_absolute_uri(), text))
+
+    def get_context(self, request=None):
+        if self.context is not None:
+            return self.context
+
+        context = {}
+        context = self.init_context(context)
+
+        self.context = context
+
+        return context
 
     def init_context(self, context):
+        self.printx("ViewPage::init_context")
+
         from .models import (
             ReadLater,
         )
@@ -169,6 +186,7 @@ class ViewPage(object):
 
         context["config"] = ConfigurationEntry.get()
         context["view"] = self
+        self.printx("ViewPage::init_context DONE")
 
         return context
 
@@ -183,17 +201,6 @@ class ViewPage(object):
             return user_agent.is_mobile
         except Exception as E:
             return False
-
-    def get_context(self, request=None):
-        if self.context is not None:
-            return self.context
-
-        context = {}
-        context = self.init_context(context)
-
-        self.context = context
-
-        return context
 
     def set_title(self, title):
         self.context["page_title"] += " - {}".format(title)

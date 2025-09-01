@@ -20,7 +20,6 @@ let default_page_size = 200;
 let sort_function = "-date_published";
 
 
-
 function add_text(error_line, text) {
     let result = "";
     if (error_line == "") {

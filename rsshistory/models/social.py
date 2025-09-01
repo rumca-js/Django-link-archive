@@ -104,6 +104,9 @@ class SocialData(models.Model):
             if not json_obj:
                 return
 
+            if len(json_obj) == 0:
+                return
+
             json_obj["entry"] = entry
 
             return SocialData.objects.create(**json_obj)

@@ -5,6 +5,9 @@
  */
 
 
+let entry_list_social = new Map();
+
+
 function isStatusCodeValid(entry) {
     if (entry.status_code >= 200 && entry.status_code < 400)
         return true;
@@ -142,14 +145,31 @@ function getEntryVisitedBadge(entry, overflow=false) {
 }
 
 
-function getEntryParameters(entry, entry_dislike_data=null) {
-   console.log(`Entry parameters ${entry} ${entry_dislike_data}`);
+function getEntryDislikeDataText(data) {
+   let html_out = "";
 
+   let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_diff, upvote_view_ratio, stars, followers_count } = data;
+    
+   if (thumbs_up) html_out += `<span class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</span>`;
+   if (thumbs_down) html_out += `<span class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</span>`;
+   if (view_count) html_out += `<span class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</span>`;
+   if (stars) html_out += `<span class="text-nowrap mx-1">⭐${getHumanReadableNumber(stars)}</span>`;
+   if (followers_count) html_out += `<span class="text-nowrap mx-1">👥${getHumanReadableNumber(followers_count)}</span>`;
+    
+   if (upvote_diff) html_out += `<span class="text-nowrap mx-1">👍-👎${getHumanReadableNumber(upvote_diff)}</span>`;
+   if (upvote_ratio) html_out += `<span class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</span>`;
+   if (upvote_view_ratio) html_out += `<span class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</span>`;
+
+   return html_out;
+}
+
+
+function getEntryParameters(entry, entry_dislike_data=null) {
    html_out = "";
 
    let date_published = getEntryDatePublished(entry);
 
-   html_out += `<div class="text-nowrap d-flex flex-wrap" id="entryParameters"><strong>Publish date:</strong> ${date_published}</div>`;
+   html_out += `<span class="text-nowrap d-flex flex-wrap" id="entryParameters"><strong>Publish date:</strong> ${date_published}</span>`;
 
    html_out += getEntryBookmarkBadge(entry);
    html_out += getEntryVotesBadge(entry);
@@ -158,17 +178,7 @@ function getEntryParameters(entry, entry_dislike_data=null) {
    html_out += getEntryReadLaterBadge(entry);
 
    if (entry_dislike_data) {
-        let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_diff, upvote_view_ratio, stars, followers_count } = entry_dislike_data;
-    
-        if (thumbs_up) html_out += `<div class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</div>`;
-        if (thumbs_down) html_out += `<div class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</div>`;
-        if (view_count) html_out += `<div class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</div>`;
-        if (stars) html_out += `<div class="text-nowrap mx-1">⭐${getHumanReadableNumber(stars)}</div>`;
-        if (followers_count) html_out += `<div class="text-nowrap mx-1">👥${getHumanReadableNumber(followers_count)}</div>`;
-    
-        if (upvote_diff) html_out += `<div class="text-nowrap mx-1">👍-👎${getHumanReadableNumber(upvote_diff)}</div>`;
-        if (upvote_ratio) html_out += `<div class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</div>`;
-        if (upvote_view_ratio) html_out += `<div class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</div>`;
+      html_out += getEntryDislikeDataText(entry_dislike_data);
    }
 
    return html_out;
@@ -789,14 +799,17 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
             <div class="d-flex">
                 ${thumbnail_text}
                 <div class="mx-2">
-                    <span style="font-weight:bold" class="text-reset">${title_safe}</span>
-                    <div class="text-reset">
+                    <span style="font-weight:bold" class="text-reset" entryTitle="true">${title_safe}</span>
+                    <div 
+		       class="text-reset"
+		       entryDetails="true"
+		       >
                         ${source__title} ${date_published} ${author}
                     </div>
                     ${tags}
                 </div>
 
-                <div class="mx-2 ms-auto">
+                <div class="mx-2 ms-auto" entryBadges="true">
                   ${badge_text}
                   ${badge_star}
                   ${badge_age}

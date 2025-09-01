@@ -47,7 +47,7 @@ function getExistingObjectLink(object_id, archive=false) {
 
 
 function addLink(page_url, browser, attempt=1) {
-    addEntryJson(page_url, function(data) {
+    addEntryJson(page_url, browser, function(data) {
       if (data.status) {
           object_id = data.pk;
           link_text = getExistingObjectLink(object_id);

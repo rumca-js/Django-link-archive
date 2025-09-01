@@ -9,6 +9,7 @@ from ..webtools import (
     HTTP_STATUS_UNKNOWN,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
     HTTP_STATUS_USER_AGENT,
+    HTTP_STATUS_TOO_MANY_REQUESTS,
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
 )
 from ..apps import LinkDatabase
@@ -268,16 +269,19 @@ class UrlHandlerEx(object):
     def is_status_code_invalid(self, status_code):
         if status_code >= 200 and status_code <= 400:
             return False
-        elif (
-            status_code == HTTP_STATUS_UNKNOWN or status_code == HTTP_STATUS_USER_AGENT
-        ):
+
+        if status_code == HTTP_STATUS_UNKNOWN:
             return False
-        else:
-            return True
+        if status_code == HTTP_STATUS_USER_AGENT:
+            return False
+        if status_code == HTTP_STATUS_TOO_MANY_REQUESTS:
+            return False
+
+        return True
 
     def is_another_request_necessary(self):
         """
-        Commonly, if user agent is not welcome, 403 is displayed
+        Commonly, if user agent is not welcome
         """
         response = self.get_section("Response")
         if not response:
@@ -286,6 +290,9 @@ class UrlHandlerEx(object):
         if "status_code" in response:
             status_code = response["status_code"]
             if status_code == HTTP_STATUS_USER_AGENT:
+                return True
+
+            if status_code == HTTP_STATUS_TOO_MANY_REQUESTS:
                 return True
 
             if status_code == HTTP_STATUS_CODE_CONNECTION_ERROR:

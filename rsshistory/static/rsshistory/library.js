@@ -472,7 +472,7 @@ function getTextContent(url_address, callback, errorInHtml = false) {
     $.ajax({
         url: url_address,
         type: 'GET',
-        timeout: 10000,
+        timeout: 20000,
         success: function(data) {
             if (getTextContentRequestTracker[url_address] === requestId) {
                 callback(data);
@@ -500,7 +500,7 @@ function getTextJson(url_address, callback, errorInHtml = false) {
     $.ajax({
         url: url_address,
         type: 'GET',
-        timeout: 10000,
+        timeout: 20000,
         success: function(data) {
             if (getTextJsonRequestTracker[url_address] === requestId) {
                 callback(data.message);
@@ -525,7 +525,7 @@ function getDynamicContent(url_address, htmlElement, errorInHtml = false) {
     $.ajax({
         url: url_address,
         type: 'GET',
-        timeout: 10000,
+        timeout: 20000,
         success: function(data) {
             if (getDynamicContentRequestTracker[url_address] === requestId) {
                 $(htmlElement).html(data);
@@ -550,7 +550,7 @@ function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
     $.ajax({
        url: url_address,
        type: 'GET',
-       timeout: 10000,
+       timeout: 20000,
        success: function(data) {
          if (getDynamicJsonContentRequestTracker[url_address] === requestId) {
              $(htmlElement).html(data.message);
@@ -566,27 +566,37 @@ function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
 
 
 const getDynamicJsonRequestTracker = {};
-function getDynamicJson(url_address, callback=null, errorInHtml = false) {
-    if (!getDynamicJsonRequestTracker[url_address]) {
-        getDynamicJsonRequestTracker[url_address] = 0;
+function getDynamicJson(url_address, callback = null, errorInHtml = false, retry=true) {
+    // Abort previous request if needed
+    if (getDynamicJsonRequestTracker[url_address]?.xhr) {
+        getDynamicJsonRequestTracker[url_address].xhr.abort();
     }
-    const requestId = ++getDynamicJsonRequestTracker[url_address];
 
-    $.ajax({
-       url: url_address,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-         if (callback && getDynamicJsonRequestTracker[url_address] === requestId) {
-             callback(data);
-         }
-       },
-       error: function(xhr, status, error) {
-            // TODO if page returns 500 we should not retry
+    const requestId = (getDynamicJsonRequestTracker[url_address]?.id || 0) + 1;
+    getDynamicJsonRequestTracker[url_address] = { id: requestId };
 
-            // if (getDynamicJsonRequestTracker[url_address] === requestId) {
-            //     getDynamicJson(url_address, callback, errorInHtml);
-            // }
-       }
+    const xhr = $.ajax({
+        url: url_address,
+        type: 'GET',
+        timeout: 20000,
+        success: function(data) {
+            if (getDynamicJsonRequestTracker[url_address].id === requestId) {
+                callback?.(data);
+            }
+        },
+        error: function(xhr, status, error) {
+          if (retry) {
+            if (status === 'timeout') {
+                console.warn(`Timeout on ${url_address}. Retrying...`);
+                if (getDynamicJsonRequestTracker[url_address].id === requestId) {
+                    getDynamicJson(url_address, callback, errorInHtml);
+                }
+            } else {
+                console.error(`Error fetching ${url_address}:`, status, error);
+            }
+          }
+        }
     });
+
+    getDynamicJsonRequestTracker[url_address].xhr = xhr;
 }

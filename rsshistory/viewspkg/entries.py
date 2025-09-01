@@ -171,9 +171,16 @@ class EntriesSearchListView(object):
         self.conditions = None
         self.search_view = None
         self.query_filter = None
+        self.start_time = time.time()
 
         if not self.user and self.request and self.request.user:
             self.user = self.request.user
+
+    def get_time_diff(self):
+        return time.time() - self.start_time
+
+    def get_time_diff_text(self, text):
+        print(text + " " + str(self.get_time_diff()))
 
     def get_queryset(self):
         """
@@ -181,15 +188,17 @@ class EntriesSearchListView(object):
         """
         search_view = self.get_search_view()
 
-        print("EntriesSearchListView:get_queryset")
+        self.get_time_diff_text("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
 
         queryset = self.get_filtered_objects().order_by(*self.get_order_by()).distinct()
 
+        self.get_time_diff_text("EntriesSearchListView:get_queryset - after distinct")
+
         if search_view.entry_limit:
             queryset = queryset[: search_view.entry_limit]
 
-        print("EntriesSearchListView:get_queryset done {}".format(queryset))
+        self.get_time_diff_text("EntriesSearchListView:get_queryset DONE")
 
         config = Configuration.get_object().config_entry
         if config.debug_mode:
@@ -303,7 +312,7 @@ class EntriesSearchListView(object):
         return search_view.get_conditions()
 
     def get_filtered_objects(self):
-        print("EntriesSearchListView:get_filtered_objects")
+        self.get_time_diff_text("EntriesSearchListView:get_filtered_objects")
 
         archive = False
         if "archive" in self.request.GET and self.request.GET["archive"] == "on":
@@ -319,7 +328,7 @@ class EntriesSearchListView(object):
             else:
                 return LinkDataController.objects.none()
 
-        print("EntriesSearchListView:get_filtered_objects DONE")
+        self.get_time_diff_text("EntriesSearchListView:get_filtered_objects DONE")
         return query_set.filter(conditions)
 
     def get_initial_query_set(self, archive=False):
@@ -1062,17 +1071,24 @@ def handle_json_view(request, view_to_use):
 
     start_time = time.time()
 
+    view_to_use.get_time_diff_text("handle_json_view start")
+
     user_config = UserConfig.get(request.user)
 
     if view_to_use:
+        view_to_use.get_time_diff_text("handle_json_view get queryset")
         entries = view_to_use.get_queryset()
+        view_to_use.get_time_diff_text("handle_json_view after queryset")
 
         json_obj["view"] = view_to_use.get_search_view().name
         json_obj["conditions"] = str(view_to_use.get_conditions())
         json_obj["errors"] = view_to_use.get_errors()
 
+        view_to_use.get_time_diff_text("handle_json_view before paginator")
+
         p = Paginator(entries, view_to_use.get_paginate_by())
         page_obj = p.get_page(page_num)
+        view_to_use.get_time_diff_text("handle_json_view get_page")
 
         json_obj["count"] = p.count
         json_obj["num_pages"] = p.num_pages
@@ -1094,6 +1110,7 @@ def handle_json_view(request, view_to_use):
                 json_obj["entries"].append(entry_json)
 
         json_obj["timestamp_s"] = time.time() - start_time
+        view_to_use.get_time_diff_text("handle_json_view returning")
 
         return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 

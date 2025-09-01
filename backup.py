@@ -562,9 +562,8 @@ def backup_workspace(run_info):
     for key in tablemapping:
         new_run_info = dict(run_info)
 
-        new_key = key.replace("instance", workspace)
-
         new_run_info["tables"] = []
+        new_key = key.replace("instance", workspace)
         new_run_info["output_file"] = new_key
 
         for item in tablemapping[key]:
@@ -577,6 +576,14 @@ def backup_workspace(run_info):
         else:
             if not run_pg_dump_backup(new_run_info):
                 return False
+
+    if run_info["format"] == "custom":
+        new_run_info = dict(run_info)
+        new_run_info["tables"] = ['auth_user']
+        new_run_info["workspace"] = 'auth'
+        new_run_info["output_file"] = "auth_user"
+        if not run_pg_dump_backup(new_run_info):
+            return False
 
     if run_info["format"] == "sqlite":
         run_db_copy_backup_auth(run_info)

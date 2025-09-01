@@ -115,16 +115,26 @@ function fillListData() {
 
 
 function fillEntryDislikes(entries) {
+    entry_list_social = new Map();
+
     if (entries && entries.length > 0) {
-        entries.forEach(entry => {
-           getEntryDislikeData(entry.id, function (data) {
-              console.log(`Found dislike data for ${entry.id}`);
+        for(let i = 0; i < entries.length; i++) {
+           const entry = entries[i];
 
-              let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_diff, upvote_view_ratio, stars, followers_count } = data;
+           // TODO setTimeout will not be necessary if
+           // https://github.com/rumca-js/crawler-buddy/issues/176 is solved
 
-              // $(`[entry="${entry.id}"]`).html(upvote_ratio);
-           });
-        });
+           setTimeout(() => {
+             getEntryDislikeData(entry.id, function (data) {
+                let entry_parameters = getEntryDislikeDataText(data);
+                entry_list_social.set(entry.id, entry_parameters);
+  
+                let upvote_ratio_div = `<div>${entry_parameters}</div>`;
+
+                $(`[entry="${entry.id}"] [entryDetails="true"]`).append(upvote_ratio_div);
+             })
+	   }, i * 100);
+        };
     }
 }
 

@@ -18,8 +18,6 @@ class RemoteServer(object):
         """
         @returns None in case of error
         """
-        import requests
-
         url = url.strip()
         encoded_url = urllib.parse.quote(url, safe="")
 
@@ -92,7 +90,6 @@ class RemoteServer(object):
                 timeout_s = real_settings.get("timeout_s", 50)
                 timeout_s += real_settings.get("delay_s", 0)
                 timeout_s += 5
-
 
         print(f"Remote server: Calling {link_call}")
 
