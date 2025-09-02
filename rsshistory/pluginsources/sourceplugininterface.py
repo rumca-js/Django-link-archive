@@ -86,7 +86,7 @@ class SourcePluginInterface(object):
             BackgroundJobController.link_add(properties.get("url"), source=source)
 
         if c.new_entries_merge_data:
-            url_ex = UrlHandlerEx(page_link)
+            url_ex = UrlHandlerEx(properties.get("link"))
             new_properties = url_ex.get_properties()
             if new_properties and c.new_entries_merge_data:
                 for key in new_properties:

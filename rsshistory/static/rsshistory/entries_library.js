@@ -150,15 +150,15 @@ function getEntryDislikeDataText(data) {
 
    let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_diff, upvote_view_ratio, stars, followers_count } = data;
     
-   if (thumbs_up) html_out += `<span class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</span>`;
-   if (thumbs_down) html_out += `<span class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</span>`;
-   if (view_count) html_out += `<span class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</span>`;
-   if (stars) html_out += `<span class="text-nowrap mx-1">⭐${getHumanReadableNumber(stars)}</span>`;
-   if (followers_count) html_out += `<span class="text-nowrap mx-1">👥${getHumanReadableNumber(followers_count)}</span>`;
+   if (thumbs_up != null) html_out += `<span class="text-nowrap mx-1">👍${getHumanReadableNumber(thumbs_up)}</span>`;
+   if (thumbs_down != null) html_out += `<span class="text-nowrap mx-1">👎${getHumanReadableNumber(thumbs_down)}</span>`;
+   if (view_count != null) html_out += `<span class="text-nowrap mx-1">👁${getHumanReadableNumber(view_count)}</span>`;
+   if (stars != null) html_out += `<span class="text-nowrap mx-1">⭐${getHumanReadableNumber(stars)}</span>`;
+   if (followers_count != null) html_out += `<span class="text-nowrap mx-1">👥${getHumanReadableNumber(followers_count)}</span>`;
     
-   if (upvote_diff) html_out += `<span class="text-nowrap mx-1">👍-👎${getHumanReadableNumber(upvote_diff)}</span>`;
-   if (upvote_ratio) html_out += `<span class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</span>`;
-   if (upvote_view_ratio) html_out += `<span class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</span>`;
+   if (upvote_diff != null) html_out += `<span class="text-nowrap mx-1">👍-👎${getHumanReadableNumber(upvote_diff)}</span>`;
+   if (upvote_ratio != null) html_out += `<span class="text-nowrap mx-1">👍/👎${parseFloat(upvote_ratio).toFixed(2)}</span>`;
+   if (upvote_view_ratio != null) html_out += `<span class="text-nowrap mx-1">👍/👁${parseFloat(upvote_view_ratio).toFixed(2)}</span>`;
 
    return html_out;
 }
@@ -852,8 +852,6 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let hover_title = title_safe + " " + tags_text;
     let link = entry.link;
 
-    let link_text = getEntryLinkText(entry);
-
     return `
         <a 
             href="${entry_link}"
@@ -865,8 +863,8 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
             <div class="d-flex">
                ${thumbnail_text}
                <div class="mx-2">
-                  <span style="font-weight:bold" class="text-reset">${title_safe}</span>
-                  ${link_text}
+                  <span style="font-weight:bold" class="text-reset" entryTitle="true">${title_safe}</span>
+                  <div class="text-reset text-decoration-underline" entryDetails="true">@ ${entry.link}</div>
                   ${tags}
                </div>
 
@@ -939,8 +937,8 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
                     ${thumbnail_text}
                 </div>
                 <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                    <span style="font-weight: bold" class="text-primary">${title_safe}</span>
-                    <div class="link-list-item-description">${source__title}</div>
+                    <span style="font-weight: bold" class="text-primary" entryTitle="true">${title_safe}</span>
+                    <div class="link-list-item-description" entryDetails="true">${source__title}</div>
                     ${tags}
                 </div>
             </div>
@@ -994,8 +992,8 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
                     ${thumbnail_text}
                 </div>
                 <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
-                    <span style="font-weight: bold" class="text-primary">${title_safe}</span>
-                    <div class="link-list-item-description">${source__title}</div>
+                    <span style="font-weight: bold" class="text-primary" entryTitle="true">${title_safe}</span>
+                    <div class="link-list-item-description" entryDetails="true">${source__title}</div>
                     ${tags}
                 </div>
             </div>

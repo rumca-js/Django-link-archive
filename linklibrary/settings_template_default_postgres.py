@@ -156,3 +156,14 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+WORKSPACES = [ "rsshistory"]
+TASKS_INFO = [
+        [300.0, "RefreshProcessor"],
+        [60.0, "SourceJobsProcessor"],
+        [60.0, "WriteJobsProcessor"],
+        [60.0, "ImportJobsProcessor"],
+        [60.0, "SystemJobsProcessor"],
+        [60.0, "UpdateJobsProcessor"],
+        [60.0, "LeftOverJobsProcessor"],
+]

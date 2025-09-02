@@ -148,3 +148,12 @@ backfiles:
 celery-status:
 	poetry run celery -A linklibrary inspect active
 	poetry run celery -A linklibrary inspect active_queues
+
+workers:
+	poetry run python manage.py threadprocessor --thread RefreshProcessor &
+	poetry run python manage.py threadprocessor --thread SourceJobsProcessor &
+	poetry run python manage.py threadprocessor --thread WriteJobsProcessor &
+	poetry run python manage.py threadprocessor --thread ImportJobsProcessor &
+	poetry run python manage.py threadprocessor --thread SystemJobsProcessor &
+	poetry run python manage.py threadprocessor --thread UpdateJobsProcessor &
+	poetry run python manage.py threadprocessor --thread LeftOverJobsProcessor &

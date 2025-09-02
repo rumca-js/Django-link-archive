@@ -146,7 +146,8 @@ class UrlHandlerEx(object):
         # try default server setup
         self.all_properties = request_server.get_getj(self.url)
         if self.all_properties:
-            return self.all_properties
+            if not self.is_another_request_necessary():
+                return self.all_properties
 
         if mode_mapping and len(mode_mapping) > 0:
             for crawler_data in mode_mapping:

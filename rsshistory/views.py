@@ -131,7 +131,10 @@ class ViewPage(object):
         self.printx("ViewPage DONE")
 
     def printx(self, text):
-        print("Url:{}: {}".format(self.request.build_absolute_uri(), text))
+        if self.request:
+            print("Url:{}: {}".format(self.request.build_absolute_uri(), text))
+        else:
+            print("{}".format(text))
 
     def get_context(self, request=None):
         if self.context is not None:

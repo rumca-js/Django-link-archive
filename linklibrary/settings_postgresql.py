@@ -172,22 +172,15 @@ CACHES = {
     }
 }
 
-# Celery Configuration Options
-# CELERY_TIMEZONE = "Australia/Tasmania"
-# CELERY_TASK_TRACK_STARTED = True
-# CELERY_TASK_TIME_LIMIT = 30 * 60
-#
-# CELERY_RESULT_BACKEND = 'django-db'
-# CELERY_CACHE_BACKEND = 'django-cache'
+WORKSPACES = [ "rsshistory"]
+TASKS_INFO = [
+        [300.0, "RefreshProcessor"],
+        [60.0, "SourceJobsProcessor"],
+        [60.0, "WriteJobsProcessor"],
+        [60.0, "ImportJobsProcessor"],
+        [60.0, "SystemJobsProcessor"],
+        [60.0, "UpdateJobsProcessor"],
+        [60.0, "LeftOverJobsProcessor"],
+]
 
-# CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
-#: Only add pickle to this list if your broker is secured
-#: from unwanted access (see userguide/security.html)
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
-# CELERY_TASK_SERIALIZER = 'json'
 
-# CELERY_BROKER_URL = "redis://127.0.0.1:8080/0"
-# CELERY_RESULT_BACKEND = "redis://127.0.0.1:8080/0"
-
-# Manual edit stop

@@ -46,10 +46,19 @@ fi
 touch /app/linklibrary/initialized.txt
 mkdir -p /app/linklibrary/lesson-11/broker/queue
 
-echo "Starting celery"
-rm -rf celerybeat-schedule.db
-poetry run celery -A linklibrary beat -l INFO &
-poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=200000 &
+#echo "Starting celery"
+#rm -rf celerybeat-schedule.db
+#poetry run celery -A linklibrary beat -l INFO &
+#poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=200000 &
+
+echo "Starting workers"
+poetry run python manage.py threadprocessor --thread RefreshProcessor &
+poetry run python manage.py threadprocessor --thread SourceJobsProcessor &
+poetry run python manage.py threadprocessor --thread WriteJobsProcessor &
+poetry run python manage.py threadprocessor --thread ImportJobsProcessor &
+poetry run python manage.py threadprocessor --thread SystemJobsProcessor &
+poetry run python manage.py threadprocessor --thread UpdateJobsProcessor &
+poetry run python manage.py threadprocessor --thread LeftOverJobsProcessor &
 
 echo "Starting web server"
 poetry run python manage.py runserver 0.0.0.0:8000

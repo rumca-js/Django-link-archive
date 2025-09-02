@@ -111,6 +111,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["language"], "ch")
 
     def test_get_props__casino_block(self):
+        source_link = "https://youtube.com"
         rule = EntryRules.objects.create(
             enabled=True,
             block=True,

@@ -265,7 +265,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
             AppLogging.debug("{}: Remove server is down".format(self.get_name()))
             return
 
-        AppLogging.debug("{}: Running jobs".format(self.get_name()))
+        # AppLogging.debug("{}: Running jobs".format(self.get_name()))
 
         index = 0
 
@@ -303,7 +303,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
         """
         items = self.get_handler_and_object()
         if len(items) == 0:
-            AppLogging.debug("{}: No jobs".format(self.get_name()))
+            #AppLogging.debug("{}: No jobs".format(self.get_name()))
             return True
 
         try:

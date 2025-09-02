@@ -168,3 +168,15 @@ CACHES = {
         "LOCATION": f"{MEMCACHED_SERVER}:{MEMCACHED_PORT}",
     }
 }
+
+
+WORKSPACES = [ "rsshistory"]
+TASKS_INFO = [
+        [300.0, "RefreshProcessor"],
+        [60.0, "SourceJobsProcessor"],
+        [60.0, "WriteJobsProcessor"],
+        [60.0, "ImportJobsProcessor"],
+        [60.0, "SystemJobsProcessor"],
+        [60.0, "UpdateJobsProcessor"],
+        [60.0, "LeftOverJobsProcessor"],
+]
