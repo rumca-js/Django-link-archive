@@ -156,11 +156,9 @@ def entry_comment_remove(request, pk):
 
 
 def remove_all(request):
-    p = ViewPage(request)
-    p.set_title("Remove all comment")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
     json_obj["status"] = True

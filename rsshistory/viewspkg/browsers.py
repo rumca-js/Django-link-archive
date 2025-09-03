@@ -7,7 +7,7 @@ from ..controllers import (
     LinkDataController,
 )
 from ..models import ConfigurationEntry, Browser
-from ..views import ViewPage, GenericListView
+from ..views import ViewPage, SimpleViewPage, GenericListView
 from ..apps import LinkDatabase
 from ..forms import BrowserEditForm
 
@@ -66,11 +66,9 @@ def remove(request, pk):
 
 
 def prio_up(request, pk):
-    p = ViewPage(request)
-    p.set_title("Increments priority")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
     data["message"] = "Entry does not exist"
@@ -86,11 +84,9 @@ def prio_up(request, pk):
 
 
 def prio_down(request, pk):
-    p = ViewPage(request)
-    p.set_title("Decrements priority")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
     data["message"] = "Entry does not exist"

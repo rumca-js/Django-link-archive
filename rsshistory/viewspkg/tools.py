@@ -42,7 +42,7 @@ from ..forms import (
     UrlContentsForm,
     LinkPropertiesForm,
 )
-from ..views import ViewPage, get_request_browser, get_request_url_with_browser
+from ..views import ViewPage, SimpleViewPage, get_request_browser, get_request_url_with_browser
 from ..pluginurl.urlhandler import UrlHandlerEx
 
 
@@ -113,11 +113,9 @@ def get_errors(page_url):
 
 
 def json_page_properties(request):
-    p = ViewPage(request)
-    p.set_title("Page properties")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     if "link" not in request.GET:
         data = {}
@@ -561,11 +559,9 @@ def page_verify(request):
 
         return JsonResponse(data, json_dumps_params={"indent": 4})
 
-    p = ViewPage(request)
-    p.set_title("Verify page")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     p.context["form_submit_button_name"] = "Verify"
 
@@ -715,11 +711,9 @@ def cleanup_link(request):
 
 
 def cleanup_link_json(request):
-    p = ViewPage(request)
-    p.set_title("Cleanup Link")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
     links = set()

@@ -66,16 +66,44 @@ class SocialData(models.Model):
         help_text="Date of update"
     )
 
+    def is_supported(entry):
+        if entry.link.find("youtube.com") >= 0:
+            return True
+        if entry.link.find("github.com") >= 0:
+            return True
+        if entry.link.find("reddit.com") >= 0:
+            return True
+        if entry.link.find("news.ycombinator.com") >= 0:
+            return True
+
+        return False
+
     def get(entry):
+        if not SocialData.is_supported(entry):
+            return
+
         social = SocialData.get_from_model(entry)
         if social:
             return social
 
         social = SocialData.get_from_server(entry)
         if social:
-            return social
+            return SocialData.objects.create(**social)
 
         SocialData.objects.create(entry=entry)
+
+    def update(entry):
+        if not SocialData.is_supported(entry):
+            social_data = SocialData.objects.filter(entry=entry)
+            if social_data.exists():
+                    social_data.delete()
+
+        new_social = SocialData.get_from_server(entry)
+        if new_social:
+            social_data = SocialData.objects.filter(entry=entry)
+            if social_data.exists():
+                    social_data.delete()
+            return SocialData.objects.create(**new_social)
 
     def get_from_model(entry):
         from ..configuration import Configuration
@@ -108,8 +136,7 @@ class SocialData(models.Model):
                 return
 
             json_obj["entry"] = entry
-
-            return SocialData.objects.create(**json_obj)
+            return json_obj
 
     def cleanup(cfg=None):
         from ..configuration import Configuration
@@ -118,6 +145,9 @@ class SocialData(models.Model):
         BATCH_SIZE = 1000
 
         if config.keep_social_data:
+            if config.days_to_remove_social_data == 0:
+                return
+
             five_days_ago = DateUtils.get_datetime_now_utc() - timedelta(days=config.days_to_remove_social_data)
 
             while True:

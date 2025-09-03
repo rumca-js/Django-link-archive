@@ -12,6 +12,7 @@ import time
 import traceback
 import json
 import os
+import gc
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -189,6 +190,7 @@ class RefreshProcessor(CeleryTaskInterface):
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         if c.is_memory_limit_reached():
+            gc.collect()
             AppLogging.error(
                 "{}: Memory limit reached at start, leaving".format(self.get_name())
             )

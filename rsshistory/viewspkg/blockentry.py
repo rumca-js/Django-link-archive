@@ -11,7 +11,7 @@ from ..models import (
     BlockEntry,
     AppLogging,
 )
-from ..views import ViewPage, GenericListView
+from ..views import ViewPage, GenericListView, SimpleViewPage
 
 
 def initialize_block_lists(request):
@@ -119,11 +119,9 @@ class BlockEntryListView(GenericListView):
 
 
 def blocklists_json(request):
-    p = ViewPage(request)
-    p.set_title("Block List JSON")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     conditions = Q()
     if "url" in request.GET:

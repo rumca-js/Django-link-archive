@@ -312,7 +312,7 @@ class LinkDownloadSocialData(BaseJobHandler):
         if len(entries) > 0:
             entry = entries[0]
 
-            SocialData.get(entry)
+            SocialData.update(entry)
 
         return True
 

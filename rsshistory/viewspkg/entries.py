@@ -69,6 +69,7 @@ from ..forms import (
     AddEntryForm,
 )
 from ..views import (
+    SimpleViewPage,
     ViewPage,
     get_search_term,
     get_order_by,
@@ -456,11 +457,8 @@ class EntryArchivedDetailView(generic.DetailView):
 
 
 def json_entry_menu(request, pk):
-    p = ViewPage(request)
-    p.set_title("Get entry menu")
-
-    uc = UserConfig.get(request.user)
-    if not uc.can_add():
+    p = SimpleViewPage(request)
+    if not p.is_allowed():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_data = {}
@@ -611,11 +609,11 @@ def on_added_entry(request, entry):
 
 
 def add_entry_json(request):
-
     from ..controllers import LinkDataController
 
-    p = ViewPage(request)
-    p.set_title("Add entry")
+    p = SimpleViewPage(request)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
     data["pk"] = 0
@@ -680,6 +678,10 @@ def entry_add_ext(request):
     p = ViewPage(request)
     p.set_title("Add entry")
 
+    uc = UserConfig.get(request.user)
+    if not uc.can_add():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
+
     if not p.is_api_key_allowed():
         p.context["summary_text"] = "Cannot add anything"
         return p.render("summary_present.html")
@@ -699,11 +701,9 @@ def entry_add_ext(request):
 
 
 def entry_is(request):
-    p = ViewPage(request)
-    p.set_title("Checks if entry exists")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     link = request.GET["link"]
 
@@ -724,11 +724,9 @@ def entry_is(request):
 
 
 def json_entry_update_data(request, pk):
-    p = ViewPage(request)
-    p.set_title("Update entry data")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
     data["status"] = False
@@ -747,11 +745,9 @@ def json_entry_update_data(request, pk):
 
 
 def json_entry_reset_data(request, pk):
-    p = ViewPage(request)
-    p.set_title("Reset entry data")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
     data["status"] = False
@@ -770,11 +766,9 @@ def json_entry_reset_data(request, pk):
 
 
 def json_entry_reset_local_data(request, pk):
-    p = ViewPage(request)
-    p.set_title("Reset local entry data")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
     data["status"] = False
@@ -842,11 +836,13 @@ def edit_entry(request, pk):
 
 
 def entry_remove(request, pk):
-    p = ViewPage(request)
-    p.set_title("Remove entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+    uc = UserConfig.get(request.user)
+    if not uc.can_add():
+        data["errors"] = ["User is cannot remove links"]
 
     entries = LinkDataController.objects.filter(id=pk)
     status_code = 200
@@ -921,11 +917,9 @@ def entry_clear_status(request, pk):
 
 
 def entry_dislikes(request, pk):
-    p = ViewPage(request)
-    p.set_title("Show entry likes/dislikes")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     # what if it is in archive
 
@@ -944,11 +938,9 @@ def entry_dislikes(request, pk):
 
 
 def entry_bookmark(request, pk):
-    p = ViewPage(request)
-    p.set_title("Bookmark entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     entry = LinkDataController.objects.get(id=pk)
 
@@ -970,11 +962,9 @@ def entry_bookmark(request, pk):
 
 
 def entry_unbookmark(request, pk):
-    p = ViewPage(request)
-    p.set_title("Not bookmark entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     entry = LinkDataController.objects.get(id=pk)
     new_entry = EntryWrapper(entry=entry).make_not_bookmarked(request)
@@ -1026,11 +1016,9 @@ def entry_json(request, pk):
     """
     User might set access through config. Default is all
     """
-    p = ViewPage(request)
-    p.set_title("Entry JSON")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     entries = LinkDataController.objects.filter(id=pk)
 
@@ -1206,11 +1194,9 @@ def entries_json_untagged(request):
 
 
 def entries_remove_all(request):
-    p = ViewPage(request)
-    p.set_title("Remove all entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
     json_obj["status"] = True
@@ -1334,11 +1320,9 @@ def archive_remove_entry(request, pk):
 
 
 def archive_entries_remove_all(request):
-    p = ViewPage(request)
-    p.set_title("Remove all entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
     json_obj["status"] = True
@@ -1378,11 +1362,9 @@ def is_entry_download(request, pk):
     """
     User might set access through config. Default is all
     """
-    p = ViewPage(request)
-    p.set_title("JSON entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     is_downloaded = False
 
@@ -1461,11 +1443,9 @@ def entry_status(request, pk):
 
 
 def entry_parameters(request, pk):
-    p = ViewPage(request)
-    p.set_title("Entry parameters")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     entries = LinkDataController.objects.filter(id=pk)
     if not entries.exists():

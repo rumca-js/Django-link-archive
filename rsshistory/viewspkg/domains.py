@@ -26,6 +26,7 @@ from ..forms import DomainsChoiceForm, DomainEditForm, LinkInputForm
 from ..queryfilters import DomainFilter
 from ..views import (
     ViewPage,
+    SimpleViewPage,
     get_search_term,
     get_order_by,
     get_page_num,
@@ -225,11 +226,9 @@ def domain_remove(request, pk):
 
 
 def domains_remove_all(request):
-    p = ViewPage(request)
-    p.set_title("Remove all domains")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
     json_obj["status"] = True
@@ -288,6 +287,10 @@ def domains_read_bookmarks(request):
 
 
 def domain_json(request, pk):
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
+
     domains = DomainsController.objects.filter(id=pk)
 
     if domains.count() == 0:
@@ -314,11 +317,9 @@ def domain_to_json(user_config, domain):
 
 
 def domains_json(request):
-    p = ViewPage(request)
-    p.set_title("Returns all domains JSON")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     page_num = p.get_page_num()
 

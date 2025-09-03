@@ -1,4 +1,5 @@
 import traceback
+import gc
 
 from .apps import LinkDatabase
 from .models import AppLogging
@@ -18,3 +19,5 @@ def process_jobs_task(Processor, tasks_info):
     handler = Processor(tasks_info=tasks_info)
 
     handler.run()
+
+    gc.collect()

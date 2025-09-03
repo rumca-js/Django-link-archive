@@ -18,7 +18,7 @@ from ..models import (
 from ..configuration import Configuration
 from ..controllers import LinkDataController, EntryWrapper
 from ..forms import TagForm, TagEditForm, TagRenameForm, ScannerForm, LinkVoteForm
-from ..views import ViewPage, GenericListView, UserGenericListView
+from ..views import ViewPage, SimpleViewPage, GenericListView, UserGenericListView
 
 
 class CompactedTagsListView(GenericListView):
@@ -114,11 +114,9 @@ class ActualTags(UserGenericListView):
 
 
 def entry_tags(request, pk):
-    p = ViewPage(request)
-    p.set_title("Tag entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     operation_data = {}
 
@@ -142,11 +140,9 @@ def entry_tags(request, pk):
 
 
 def entry_tag(request, pk):
-    p = ViewPage(request)
-    p.set_title("Tag entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
 
@@ -251,11 +247,9 @@ def tag_remove(request, pk):
 
 
 def tags_remove_all(request):
-    p = ViewPage(request)
-    p.set_title("Tags removed")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
     json_obj["status"] = True
@@ -440,11 +434,9 @@ def tag_many(request):
 
 
 def votes_remove_all(request):
-    p = ViewPage(request)
-    p.set_title("Tags removed")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
     json_obj["status"] = True
@@ -462,13 +454,9 @@ def votes_remove_all(request):
 def entry_vote(request, pk):
     # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
 
-    p = ViewPage(request)
-    p.set_title("Vote for entry")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
-
-    p.context["pk"] = pk
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     operation_data = {}
     entries = LinkDataController.objects.filter(id=pk)

@@ -72,14 +72,14 @@ from ..forms import (
     ConfigForm,
     UserConfigForm,
 )
-from ..views import ViewPage, get_search_view
+from ..views import ViewPage, SimpleViewPage, get_search_view
 
 
 def index(request):
-    p = ViewPage(request)
+    p = ViewPage(request, ConfigurationEntry.ACCESS_TYPE_ALL)
     p.set_title("Index")
 
-    if p.is_user_allowed(ConfigurationEntry.ACCESS_TYPE_ALL):
+    if p.is_allowed():
         config = Configuration.get_object().config_entry
         if not config.initialized:
             return redirect("{}:wizard-init".format(LinkDatabase.name))
@@ -186,11 +186,9 @@ def configuration_advanced_page(request):
 
 
 def configuration_advanced_json(request):
-    p = ViewPage(request)
-    p.set_title("Configuration JSON")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     config = ConfigurationEntry.get()
 
@@ -259,11 +257,9 @@ def system_status(request):
 
 
 def json_table_status(request):
-    p = ViewPage(request)
-    p.set_title("Status")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     table = []
 
@@ -351,11 +347,9 @@ def json_table_status(request):
 
 
 def json_system_status(request):
-    p = ViewPage(request)
-    p.set_title("Status")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
 
@@ -440,11 +434,9 @@ def json_system_status(request):
 
 
 def json_system_monitoring(request):
-    p = ViewPage(request)
-    p.set_title("Status")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = get_hardware_info()
 
@@ -462,11 +454,9 @@ def history_to_json(history):
 
 
 def json_settings(request):
-    p = ViewPage(request)
-    p.set_title("Settings")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     configuration = Configuration.get_object()
     data = configuration.get_settings()
@@ -475,11 +465,9 @@ def json_settings(request):
 
 
 def json_export_status(request):
-    p = ViewPage(request)
-    p.set_title("Status")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
     data["exports"] = []
@@ -530,11 +518,9 @@ def log_to_json(applogging_entry):
 
 
 def json_logs(request):
-    p = ViewPage(request)
-    p.set_title("Clearing all logs")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     data = {}
     data["logs"] = []
@@ -831,10 +817,9 @@ def opensearchxml(request):
 
 
 def json_indicators(request):
-    p = ViewPage(request)
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     process_source_queue_size = BackgroundJobController.get_number_of_jobs(
         BackgroundJobController.JOB_PROCESS_SOURCE

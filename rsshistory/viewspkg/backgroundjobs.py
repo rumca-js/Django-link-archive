@@ -19,7 +19,7 @@ from ..controllers import (
 from ..forms import (
     BackgroundJobForm,
 )
-from ..views import ViewPage, GenericListView
+from ..views import ViewPage, SimpleViewPage, GenericListView
 
 
 def backgroundjobs(request):
@@ -62,11 +62,9 @@ def job_to_json(job):
 
 
 def backgroundjobs_json(request):
-    p = ViewPage(request)
-    p.set_title("Background Jobs JSON")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     page_num = p.get_page_num()
 
@@ -226,11 +224,9 @@ def backgroundjob_remove(request, pk):
 
 
 def backgroundjobs_remove_all(request):
-    p = ViewPage(request)
-    p.set_title("Remove all background jobs")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
     json_obj["status"] = True

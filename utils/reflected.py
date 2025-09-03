@@ -48,10 +48,7 @@ class ReflectedTable(object):
 
 class ReflectedEntryTable(ReflectedTable):
     def get_entries(self):
-        destination_metadata = MetaData()
-        destination_table = Table(
-            "linkdatamodel", destination_metadata, autoload_with=self.engine
-        )
+        destination_table = self.get_table("linkdatamodel")
 
         entries_select = select(destination_table)
 
@@ -62,11 +59,10 @@ class ReflectedEntryTable(ReflectedTable):
             for entry in entries:
                 yield entry
 
+
+class ReflectedUserTags(ReflectedTable):
     def get_tags_string(self, entry_id):
-        destination_metadata = MetaData()
-        destination_table = Table(
-            "usertags", destination_metadata, autoload_with=self.engine
-        )
+        destination_table = self.get_table("usertags")
 
         stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
 
@@ -84,10 +80,7 @@ class ReflectedEntryTable(ReflectedTable):
         return tags
 
     def get_tags(self, entry_id):
-        destination_metadata = MetaData()
-        destination_table = Table(
-            "usertags", destination_metadata, autoload_with=self.engine
-        )
+        destination_table = self.get_table("usertags")
 
         stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
 
@@ -104,15 +97,25 @@ class ReflectedEntryTable(ReflectedTable):
 
 class ReflectedSourceTable(ReflectedTable):
     def get_source(self, source_id):
-        destination_metadata = MetaData()
-        destination_table = Table(
-            "sourcedatamodel", destination_metadata, autoload_with=self.engine
-        )
+        destination_table = self.get_table("sourcedatamodel")
 
         stmt = select(destination_table).where(destination_table.c.id == source_id)
 
         with self.engine.connect() as connection:
             result = connection.execute(stmt)
             rows = result.fetchall()
+            for row in rows:
+                return row
+
+
+class ReflectedSocialData(ReflectedTable):
+    def get(self, entry_id):
+        destination_table = self.get_table("socialdata")
+
+        stmt = select(destination_table).where(destination_table.c.id == entry_id)
+
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            rows = result.first()
             for row in rows:
                 return row

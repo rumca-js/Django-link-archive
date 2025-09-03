@@ -8,7 +8,7 @@ from django.forms.models import model_to_dict
 from ..apps import LinkDatabase
 from ..models import EntryRules, ConfigurationEntry
 from ..controllers import BackgroundJobController, LinkDataController
-from ..views import ViewPage, GenericListView
+from ..views import ViewPage, GenericListView, SimpleViewPage
 from ..forms import EntryRulesForm
 
 
@@ -166,11 +166,9 @@ def entry_rule_check(request, pk):
 
 
 def entry_rules_json(request):
-    p = ViewPage(request)
-    p.set_title("Entry Rules")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     rule_data = []
     for entry_rule in EntryRules.objects.all():

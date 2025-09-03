@@ -22,7 +22,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.16.12"
+__version__ = "2.16.13"
 
 
 class Configuration(object):
@@ -47,15 +47,9 @@ class Configuration(object):
         self.apply_webconfig()
 
     def get_context_minimal():
-        config_entry = ConfigurationEntry.get()
         return {
             "page_title": "[{}]".format(LinkDatabase.name),
             "app_name": str(LinkDatabase.name),
-            "app_title": config_entry.instance_title,
-            "app_description": config_entry.instance_description,
-            "app_favicon": config_entry.favicon_internet_url,
-            "admin_email": "renegat@renegat0x0.ddns.net",
-            "admin_user": config_entry.admin_user,
             "app_version": __version__,
             "base_generic": str(Path(LinkDatabase.name) / "base_generic.html"),
         }

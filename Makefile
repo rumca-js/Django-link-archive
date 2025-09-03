@@ -77,11 +77,7 @@ run: run-server run-web-server
 
 run-minimal: run-server
 
-run-server: run-script-server run-celery
-
-run-script-server:
-	rm -rf storage
-	poetry run python script_server.py &
+run-server: workers
 
 run-celery:
 	rm -rf storage

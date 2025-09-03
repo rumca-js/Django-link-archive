@@ -372,6 +372,14 @@ class FakeInternetTestCase(TestCase):
 
     def get_socialj(self, url):
         MockRequestCounter.requested(url=url)
+        if url.find("youtube.com") >= 0:
+            return {"view_count" : 15, "thumbs_up" : 1, "thumbs_down" : 0}
+        if url.find("github.com") >= 0:
+            return {"stars" : 5}
+        if url.find("news.ycombinator.com") >= 0:
+            return {"upvote_diff" : 5}
+        if url.find("reddit.com") >= 0:
+            return {"upvote_ratio" : 5}
         return None
 
     def get_default_crawler(url):

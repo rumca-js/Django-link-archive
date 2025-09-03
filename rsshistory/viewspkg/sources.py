@@ -39,8 +39,8 @@ from ..forms import (
 from ..queryfilters import SourceFilter
 from ..views import (
     ViewPage,
+    SimpleViewPage,
     GenericListView,
-    get_page_num,
     get_search_term,
     get_request_browser_id,
 )
@@ -424,11 +424,9 @@ def source_is(request):
         if sources.count() != 0:
             return sources[0]
 
-    p = ViewPage(request)
-    p.set_title("Checks if source exists")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     link = request.GET["link"]
 
@@ -537,11 +535,9 @@ def source_remove_entries(request, pk):
 
 
 def remove_all_sources(request):
-    p = ViewPage(request)
-    p.set_title("Remove all sources")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
     json_obj["status"] = True
@@ -560,11 +556,9 @@ def remove_all_sources(request):
 
 
 def remove_disabled(request):
-    p = ViewPage(request)
-    p.set_title("Remove disabled sources")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
     json_obj["status"] = True
@@ -811,11 +805,9 @@ def sources_initialize(request):
 
 
 def source_json(request, pk):
-    p = ViewPage(request)
-    p.set_title("Remove all entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     sources = SourceDataController.objects.filter(id=pk)
 

@@ -51,16 +51,18 @@ def get_order_by(themap):
 
 
 def get_page_num(themap):
-    if "page" in themap:
-        page = themap["page"]
+    page = themap.get("page")
+
+    if page:
         try:
             page = int(page)
         except ValueError:
-            page = 1
+            pass
 
-        return page
-    else:
-        return 1
+    if not page:
+        page = 1
+
+    return page
 
 
 def get_request_browser_id(input_map):
@@ -118,116 +120,33 @@ def get_search_view(request):
     return search_view
 
 
-class ViewPage(object):
-    def __init__(self, request):
+class SimpleViewPage(object):
+    def __init__(self, request, view_access_type=None):
         self.request = request
-        self.printx("ViewPage")
-
-        self.view_access_type = None
-
-        self.context = None
-        self.context = self.get_context()
-        self.is_mobile = self.read_mobile_status()
-        self.printx("ViewPage DONE")
-
-    def printx(self, text):
-        if self.request:
-            print("Url:{}: {}".format(self.request.build_absolute_uri(), text))
-        else:
-            print("{}".format(text))
-
-    def get_context(self, request=None):
-        if self.context is not None:
-            return self.context
-
-        context = {}
-        context = self.init_context(context)
-
-        self.context = context
-
-        return context
-
-    def init_context(self, context):
-        self.printx("ViewPage::init_context")
-
-        from .models import (
-            ReadLater,
-        )
-        from .controllers import BackgroundJobController
-
-        c = Configuration.get_object()
-        config = ConfigurationEntry.get()
-
-        if self.is_user_allowed_complete() and config.enable_background_jobs:
-            context.update(c.get_context())
-
-            context["is_user_allowed"] = True
-
-        else:
-            context.update(Configuration.get_context_minimal())
-            # to not logged users indicate everything is fine and dandy
-
-            context["is_user_allowed"] = False
-
-        if "page_description" not in context:
-            if "app_description" in context:
-                context["page_description"] = context["app_description"]
-
-        if self.request:
-            context["user_config"] = UserConfig.get_or_create(self.request.user)
-        else:
-            context["user_config"] = UserConfig.get()
-
-        if context["is_user_allowed"]:
-            context["searchviews"] = SearchView.objects.filter(
-                user=False, default=False
-            )
-            context["usersearchviews"] = SearchView.objects.filter(
-                user=True, default=False
-            )
-            context["searchview"] = get_search_view(self.request)
-
-        context["config"] = ConfigurationEntry.get()
-        context["view"] = self
-        self.printx("ViewPage::init_context DONE")
-
-        return context
-
-    def is_user_allowed_complete(self):
-        return self.is_user_allowed(self.view_access_type)
-
-    def read_mobile_status(self):
-        from django_user_agents.utils import get_user_agent
-
-        try:
-            user_agent = get_user_agent(self.request)
-            return user_agent.is_mobile
-        except Exception as E:
-            return False
-
-    def set_title(self, title):
-        self.context["page_title"] += " - {}".format(title)
-
-    def set_access(self, view_access_type):
         self.view_access_type = view_access_type
 
-        return self.check_access()
+    def printx(self, text):
+        pass
+        #if self.request:
+        #    print("Url:{}: {}".format(self.request.build_absolute_uri(), text))
+        #else:
+        #    print("{}".format(text))
 
-    def set_variable(self, variable_name, variable_value):
-        self.context[variable_name] = variable_value
+    def is_allowed(self):
+        return self.is_user_allowed_internal(self.view_access_type)
+
+    def is_authenticated(self):
+        return self.request.user.is_authenticated
 
     def check_access(self):
-        if (
-            not self.is_user_allowed(self.view_access_type)
-            and not self.is_api_key_allowed()
-        ):
+        if not self.is_user_allowed_internal(self.view_access_type):
             return self.render_implementation("missing_rights.html", 500)
 
     def is_api_key_allowed(self):
-        key = None
-        if "key" in self.request.GET and self.request.GET["key"]:
-            key = self.request.GET["key"]
+        if not self.request:
+            return False
 
+        key = self.request.GET.get("key")
         if not key:
             return False
 
@@ -235,7 +154,10 @@ class ViewPage(object):
         if keys.exists():
             return True
 
-    def is_user_allowed(self, view_access_type):
+    def is_user_allowed_internal(self, view_access_type):
+        if self.is_api_key_allowed():
+            return True
+
         if not self.is_user_allowed_on_page_level(self.view_access_type):
             return False
 
@@ -284,6 +206,110 @@ class ViewPage(object):
 
         return True
 
+    def get_pagination_args(self):
+        infilters = self.request.GET
+
+        filter_data = {}
+        for key in infilters:
+            value = infilters[key]
+            if key != "page" and value != "":
+                filter_data[key] = value
+        return "&" + urlencode(filter_data)
+
+    def get_page_num(self):
+        page = self.request.GET.get("page")
+
+        if page:
+            try:
+                page = int(page)
+            except ValueError:
+                pass
+
+        if not page:
+            page = 1
+
+        return page
+
+
+class ViewPage(SimpleViewPage):
+    def __init__(self, request, view_access_type=None):
+        super().__init__(request, view_access_type)
+
+        self.printx("ViewPage")
+
+        self.context = None
+        self.context = self.get_context()
+        self.is_mobile = self.read_mobile_status()
+        self.printx("ViewPage DONE")
+
+    def get_context(self, request=None):
+        if self.context is not None:
+            return self.context
+
+        context = {}
+        context = self.init_context(context)
+
+        self.context = context
+
+        return context
+
+    def init_context(self, context):
+        self.printx("ViewPage::init_context")
+
+        c = Configuration.get_object()
+        config_entry = c.config_entry
+
+        context.update(c.get_context())
+        if self.is_allowed():
+            context["is_user_allowed"] = True
+
+        else:
+            context["is_user_allowed"] = False
+
+        context["app_title"] = config_entry.instance_title
+        context["app_description"] = config_entry.instance_description
+        context["app_favicon"] = config_entry.favicon_internet_url
+        if config_entry.admin_user:
+            context["admin_email"] = config_entry.admin_user.email
+        else:
+            context["admin_email"] = ""
+        context["admin_user"] = config_entry.admin_user
+
+        if "page_description" not in context:
+            if "app_description" in context:
+                context["page_description"] = context["app_description"]
+
+        if self.request:
+            context["user_config"] = UserConfig.get_or_create(self.request.user)
+        else:
+            context["user_config"] = UserConfig.get()
+
+        context["config"] = c.config_entry
+        context["view"] = self
+        self.printx("ViewPage::init_context DONE")
+
+        return context
+
+    def read_mobile_status(self):
+        from django_user_agents.utils import get_user_agent
+
+        try:
+            user_agent = get_user_agent(self.request)
+            return user_agent.is_mobile
+        except Exception as E:
+            return False
+
+    def set_title(self, title):
+        self.context["page_title"] += " - {}".format(title)
+
+    def set_access(self, view_access_type):
+        self.view_access_type = view_access_type
+
+        return self.check_access()
+
+    def set_variable(self, variable_name, variable_value):
+        self.context[variable_name] = variable_value
+
     def get_full_template(template):
         return Path(LinkDatabase.name) / template
 
@@ -301,30 +327,6 @@ class ViewPage(object):
             return result
 
         return self.render_implementation(template, status_code)
-
-    def get_pagination_args(self):
-        infilters = self.request.GET
-
-        filter_data = {}
-        for key in infilters:
-            value = infilters[key]
-            if key != "page" and value != "":
-                filter_data[key] = value
-        return "&" + urlencode(filter_data)
-
-    def get_page_num(self):
-        themap = self.request.GET
-
-        if "page" in themap:
-            page = themap["page"]
-            try:
-                page = int(page)
-            except ValueError:
-                page = 1
-
-            return page
-        else:
-            return 1
 
 
 class GenericListView(generic.ListView):
