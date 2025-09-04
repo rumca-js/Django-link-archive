@@ -3,6 +3,8 @@
 let object_list_data = null;
 let original_title = null;
 let showSuggestions = true;
+let titleSpinner = null;
+const spinnerFrames = ['|', '/', '-', '\\'];
 
 
 function getHideButton(input_text = "Hide") {
@@ -202,6 +204,11 @@ function performSearch(search_term = '', page = '', attempt = 1) {
    const currentSearch = currentUrl.searchParams.get('search') || '';
 
    document.title = original_title + " " + currentSearch;
+   
+   let i = 0;
+   titleSpinner = setInterval(() => {
+      document.title = `${spinnerFrames[i++ % spinnerFrames.length]}` + original_title + " " + currentSearch;
+   }, 200);
 
    page = page || currentUrl.searchParams.get('page') || '1';
 
@@ -230,44 +237,30 @@ function performSearch(search_term = '', page = '', attempt = 1) {
    //$('#listStatus').html(status_text);
    $('#footerStatus').html(status_text);
 
-    $.ajax({
-        url: url,
-        type: 'GET',
-        timeout: 55000,
-        success: function(data) {
-            if (requestVersion !== currentLoadRowListContentCounter) {
-               return;
-            }
-            $('html, body').animate({ scrollTop: 0 }, 'slow');
-            object_list_data = data;
-            fillListData();
-            $('#listStatus').html("");
-            $('#listStatus').hide();
-            $('#footerStatus').html("");
-            $('#footerStatus').hide();
+   getDynamicJson(url, (data) => {
+      $('html, body').animate({ scrollTop: 0 }, 'slow');
 
-            loadSearchHistory();
-        },
-        error: function(xhr, status, error) {
-            if (requestVersion !== currentLoadRowListContentCounter) {
-                return;
-            }
+      object_list_data = data;
+      fillListData();
 
-            $('#listStatus').show();
-            $('#footerStatus').show();
+      $('#listStatus').html("");
+      $('#listStatus').hide();
+      $('#footerStatus').html("");
+      $('#footerStatus').hide();
 
-            if (attempt < 3) {
-                performSearch(search_term, page, attempt + 1);
-            }
-            else {
-                $('#listStatus').html("Error loading list content");
-                $('#footerStatus').html("Error loading list content");
-            }
-        },
-        complete: function() {
-	    enableFilterButton();
-        }
-    });
+      loadSearchHistory();
+
+      // else 
+      // $('#listStatus').show();
+      // $('#footerStatus').show();
+      // $('#listStatus').html("Error");
+      // $('#footerStatus').html("Error");
+
+      enableFilterButton();
+
+      clearInterval(titleSpinner);
+      document.title = original_title + " " + currentSearch;
+   }, timeout_s = 50000);
 }
 
 

@@ -128,12 +128,10 @@ def read_later_remove(request, pk):
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
 
-def read_later_clear(request):
-    p = ViewPage(request)
-    p.set_title("Clear entire later list")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
+def json_read_later_clear(request):
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     ReadLater.objects.filter(user=request.user).delete()
 

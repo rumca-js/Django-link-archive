@@ -41,9 +41,10 @@ class SystemOperationController(object):
         if not remote_server:
             return False
 
-        from ..pluginurl import UrlHandlerEx
+        import requests
+        response = requests.get(remote_server)
 
-        if not UrlHandlerEx.ping(remote_server):
+        if response.status_code != 200:
             SystemOperation.add_by_thread(
                 thread_id,
                 check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
@@ -55,6 +56,8 @@ class SystemOperationController(object):
                 check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
                 status=True,
             )
+
+        response.close()
 
     def cleanup(cfg=None, thread_ids=None):
         if thread_ids:

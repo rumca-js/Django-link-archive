@@ -566,7 +566,7 @@ function getDynamicJsonContent(url_address, htmlElement, errorInHtml = false) {
 
 
 const getDynamicJsonRequestTracker = {};
-function getDynamicJson(url_address, callback = null, errorInHtml = false, retry=true) {
+function getDynamicJson(url_address, callback = null, errorInHtml = false, retry=true, timeout_s=20000) {
     // Abort previous request if needed
     if (getDynamicJsonRequestTracker[url_address]?.xhr) {
         getDynamicJsonRequestTracker[url_address].xhr.abort();
@@ -578,7 +578,7 @@ function getDynamicJson(url_address, callback = null, errorInHtml = false, retry
     const xhr = $.ajax({
         url: url_address,
         type: 'GET',
-        timeout: 20000,
+        timeout: timeout_s,
         success: function(data) {
             if (getDynamicJsonRequestTracker[url_address].id === requestId) {
                 callback?.(data);

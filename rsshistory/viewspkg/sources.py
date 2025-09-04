@@ -792,16 +792,20 @@ def init_sources(request):
             i.import_all()
 
 
-def sources_initialize(request):
-    p = ViewPage(request)
-    p.set_title("Initialize sources")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+def json_sources_initialize(request):
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+    json_response = {}
 
     init_sources(request)
 
-    return redirect("{}:sources".format(LinkDatabase.name))
+    json_response["status"] = True
+    json_response["message"] = "Initialized"
+    json_response["errors"] = []
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
 
 def source_json(request, pk):

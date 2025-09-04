@@ -401,8 +401,9 @@ class UrlHandlerEx(object):
         return "{}".format(self.options)
 
     def ping(url, timeout_s=20):
-        u = Url(url)
-        return u.ping(timeout_s=timeout_s)
+        config_entry = Configuration.get_object().config_entry
+        remote_server = RemoteServer(config_entry.remote_webtools_server_location)
+        return remote_server.get_pingj(url)
 
     def get_cleaned_link(url):
         return Url.get_cleaned_link(url)
@@ -410,8 +411,6 @@ class UrlHandlerEx(object):
     def is_remote_server_down(self):
         config_entry = Configuration.get_object().config_entry
         if config_entry.remote_webtools_server_location:
-            request_server = RemoteServer(config_entry.remote_webtools_server_location)
-
             if not UrlHandlerEx.ping(config_entry.remote_webtools_server_location):
                 return True
 

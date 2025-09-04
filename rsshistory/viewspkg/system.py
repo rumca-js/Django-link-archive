@@ -677,61 +677,61 @@ def wizard_setup_init(request):
     return p.render("wizard_setup_init.html")
 
 
-def wizard_setup_news(request):
+def json_wizard_setup_news(request):
     """
     Displays form, or textarea of available links.
     User can select which links will be added.
     """
-    p = ViewPage(request)
-    p.set_title("Sets configuration for news")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     system_setup_for_news(request)
 
-    p.context["summary_text"] = "Set configuration for news."
-    p.context["summary_text"] += get_sources_text()
+    json_response = {}
+    json_response["status"] = True
+    json_response["message"] = "Set configuration for news."
+    json_response["errors"] = []
 
-    return p.render("summary_present.html")
+    return JsonResponse(json_response, json_dumps_params={"indent": 4})
 
 
-def wizard_setup_gallery(request):
+def json_wizard_setup_gallery(request):
     """
     Displays form, or textarea of available links.
     User can select which links will be added.
     """
-    p = ViewPage(request)
-    p.set_title("Sets configuration for news")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     system_setup_for_gallery(request)
 
-    p.context["summary_text"] = "Set configuration for gallery"
-    p.context["summary_text"] += get_sources_text()
+    json_response = {}
+    json_response["status"] = True
+    json_response["message"] = "Set configuration for gallery."
+    json_response["errors"] = []
 
-    return p.render("summary_present.html")
+    return JsonResponse(json_response, json_dumps_params={"indent": 4})
 
 
-def wizard_setup_search_engine(request):
+def json_wizard_setup_search_engine(request):
     """
     Displays form, or textarea of available links.
     User can select which links will be added.
     """
-    p = ViewPage(request)
-    p.set_title("Sets configuration for news")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     system_setup_for_search_engine(request)
 
-    p.context["summary_text"] = "Set configuration for search engine"
-    p.context["summary_text"] += get_sources_text()
+    json_response = {}
+    json_response["status"] = True
+    json_response["message"] = "Set configuration for search engine."
+    json_response["errors"] = []
 
-    return p.render("summary_present.html")
+    return JsonResponse(json_response, json_dumps_params={"indent": 4})
 
 
 def setup_default_rules(request):

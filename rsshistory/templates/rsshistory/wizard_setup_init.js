@@ -21,22 +21,15 @@ function initializeSources(button_element, button_text) {
 
   $("#setupSpace").append(`<p id="source-line">${spinner_container} Creating sources...</p>`);
 
-  $.ajax({
-    url: "{% url 'rsshistory:sources-initialize' %}",
-    type: "GET",
-    success: function(response, status, xhr) {
-      if (xhr.status === 200) {
-        $("#source-line").html(`${success_icon} Creating sources... OK`);
-
-        $("#setupSpace").append(`<p>You can enable some sources <a href=${source_link}>Sources</a></p>`);
+  jsonSourcesInitialize(function(data) {
+      if (data.status) {
+         $("#source-line").html(`${success_icon} Creating sources... OK`);
+         $("#setupSpace").append(`<p>You can enable some sources <a href=${source_link}>Sources</a></p>`);
       }
-    },
-    error: function() {
-      $("#source-line").html(`${error_icon} Creating sources... ERROR`);
-    },
-    complete: function() {
+      else {
+         $("#source-line").html(`${error_icon} Creating sources... ERROR`);
+      }
       $(button_element).prop("disabled", false).html(button_text);
-    }
   });
 }
 
@@ -53,23 +46,17 @@ function setupFor(url, button_element, button_text) {
 
   $("#setupSpace").append(`<p id="config-line">${spinner_container} Configuring...</p>`);
 
-  $.ajax({
-    url: url,
-    type: "GET",
-    success: function(response, status, xhr) {
-      if (xhr.status === 200) {
+  getDynamicJson(url, function (data) {
+      if (data.status === 200) {
         $("#buttonsSpace").hide();
         $("#config-line").html(`${success_icon} Configuring... OK`);
         initializeSources(button_element, button_text);
       }
-    },
-    error: function() {
-      $("#config-line").html(`${error_icon} Configuring... ERROR`);
-    },
-    complete: function() {
+      else {
+        $("#config-line").html(`${error_icon} Configuring... ERROR`);
+      }
       $(button_element).prop("disabled", false).html(button_text);
-    }
-  });
+  };
 }
 
 $("#btnFetchNews").click(function() {

@@ -2,64 +2,35 @@
 
 
 function sendClearList(attempt = 1) {
-    let url = "{% url 'rsshistory:read-later-clear' %}";
-
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
+    jsonReadLaterClear(function(data) {
+       if (data.status) {
           $("#listStatus").html("Successful");
           $('#clear-list').prop("disabled", false);
           $('.remove-button').prop("disabled", false);
           performSearch();
           getIndicators();
-       },
-       error: function(xhr, status, error) {
-           if (attempt < 3) {
-               sendClearList(attempt + 1);
-               if (errorInHtml) {
-                   $("#listStatus").html("Error during clear, retry");
-               }
-           } else {
-               if (errorInHtml) {
-                   $("#listStatus").html("Error during clear");
-                   $('#clear-list').prop("disabled", false);
-                   $('.remove-button').prop("disabled", false);
-               }
-           }
+       }
+       else {
+          $("#listStatus").html("Error during clear");
+          $('#clear-list').prop("disabled", false);
+          $('.remove-button').prop("disabled", false);
        }
     });
 }
 
 
-function sendRemoveListItem(id, attempt = 1) {
-    let url = "{% url 'rsshistory:json-read-later-remove' 1017 %}";
-    url = url.replace("1017", id);
-
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
+function sendRemoveListItem(entry_id, attempt = 1) {
+    jsonReadLaterRemove(entry_id, function() {
+       if (data.status) {
           $('#clear-list').prop("disabled", false);
           $('.remove-button').prop("disabled", false);
           performSearch();
           getIndicators();
-       },
-       error: function(xhr, status, error) {
-           if (attempt < 3) {
-               sendRemoveListItem(attempt + 1);
-               if (errorInHtml) {
-                   $("#listStatus").html("Error when removing, retry");
-               }
-           } else {
-               if (errorInHtml) {
-                   $("#listStatus").html("Error when removing");
-                   $('#clear-list').prop("disabled", false);
-                   $('.remove-button').prop("disabled", false);
-               }
-           }
+       }
+       else {
+          $("#listStatus").html("Error when removing");
+          $('#clear-list').prop("disabled", false);
+          $('.remove-button').prop("disabled", false);
        }
     });
 }

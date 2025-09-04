@@ -68,6 +68,18 @@ class RemoteServer(object):
 
         return self.perform_remote_call(link, url, settings)
 
+    def get_pingj(self, url, settings=None):
+        """
+        @returns None in case of error
+        """
+
+        link = self.remote_server
+        link = f"{link}/pingj"
+
+        json = self.perform_remote_call(link, url, settings)
+        if json:
+            return json.get("status")
+
     def perform_remote_call(self, link_call, url, settings=None, args=None):
         """
         @param link_call Remote server endpoint

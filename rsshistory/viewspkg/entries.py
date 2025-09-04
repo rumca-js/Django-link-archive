@@ -935,6 +935,8 @@ def entry_dislikes(request, pk):
     if social_data:
         json_obj = model_to_dict(social_data)
         return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+    else:
+        return JsonResponse({}, json_dumps_params={"indent": 4})
 
 
 def entry_bookmark(request, pk):

@@ -114,3 +114,59 @@ function getMenuUsers() {
         processMenuData(data, '#MenuUsersContainer');
     });
 }
+
+function jsonSourcesInitialize(callback=null) {
+    let url_address = "{% url 'rsshistory:json-sources-initialize' %}";
+    getDynamicJson(url_address, function(data) {
+       if (callback) {
+         callback(data);
+       }
+    });
+}
+
+function wizardSetupNews(callback=null) {
+    let url_address = "{% url 'rsshistory:json-wizard-setup-news' %}";
+    getDynamicJson(url_address, function(data) {
+       if (callback) {
+         callback(data);
+       }
+    });
+}
+
+function wizardSetupGallery(callback=null) {
+    let url_address = "{% url 'rsshistory:json-wizard-setup-gallery' %}";
+    getDynamicJson(url_address, function(data) {
+       if (callback) {
+         callback(data);
+       }
+    });
+}
+
+function wizardSetupSearchEngine(callback=null) {
+    let url_address = "{% url 'rsshistory:json-wizard-setup-search-engine' %}";
+    getDynamicJson(url_address, function(data) {
+       if (callback) {
+         callback(data);
+       }
+    });
+}
+
+function jsonReadLaterClear(callback=null) {
+    let url_address = "{% url 'rsshistory:json-read-later-clear' %}";
+
+    getDynamicJson(url_address, function(data) {
+       if (callback) {
+         callback(data);
+       }
+    });
+}
+
+function jsonReadLaterRemove(entry_id, callback=null) {
+    let url_address = "{% url 'rsshistory:json-read-later-remove' 1017 %}".replace("1017", entry_id);
+
+    getDynamicJson(url_address, function(data) {
+       if (callback) {
+         callback(data);
+       }
+    });
+}

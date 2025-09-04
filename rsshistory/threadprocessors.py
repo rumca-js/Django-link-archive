@@ -77,6 +77,11 @@ from .configuration import Configuration
 
 
 class CeleryTaskInterface(object):
+    def __init__(self):
+        c = Configuration.get_object()
+        self.start_processing_time = None
+        self.start_memory = c.get_memory_usage()
+
     def run(self):
         raise NotImplementedError("Not implemented")
 
@@ -125,6 +130,41 @@ class CeleryTaskInterface(object):
             # fmt: on
         ]
 
+    def display_memory(self):
+        c = Configuration.get_object()
+
+        pid = os.getpid()
+
+        memory = c.get_memory_usage()
+        resident = memory.rss / (1024 * 1024)
+        virtual = memory.vms / (1024 * 1024)
+
+        AppLogging.debug(
+            "{}: Starting. Pid:{} Memory:{}/{} MB".format(
+                self.get_name(), pid, resident, virtual
+            )
+        )
+
+    def display_memory_diff(self):
+        c = Configuration.get_object()
+
+        pid = os.getpid()
+
+        memory = c.get_memory_usage()
+
+        resident = memory.rss / (1024 * 1024)
+        virtual = memory.vms / (1024 * 1024)
+
+        resident_diff = memory.rss - self.start_memory.rss
+        virtual_diff = memory.vms - self.start_memory.vms
+
+        name = self.get_name()
+
+        if resident_diff > 0:
+            AppLogging.error(f"{name}: More memory resident memory {resident_diff}")
+        if virtual_diff > 0:
+            AppLogging.error(f"{name}: More memory virtual memory {virtual_diff}")
+
     def get_handler_and_object(self):
         """
         TODO select should be based on priority
@@ -171,26 +211,21 @@ class RefreshProcessor(CeleryTaskInterface):
     """
 
     def __init__(self, tasks_info=None):
+        super().__init__()
         self.tasks_info = tasks_info
 
     def run(self):
+        self.run_one_job()
+
+    def is_more_jobs(self):
+        return False
+
+    def run_one_job(self):
         c = Configuration.get_object()
-
-        pid = os.getpid()
-
-        memory = c.get_memory_usage()
-        resident = memory.rss / (1024 * 1024)
-        virtual = memory.vms / (1024 * 1024)
-
-        AppLogging.debug(
-            "{}: Starting. Pid:{} Memory:{}/{} MB".format(
-                self.get_name(), pid, resident, virtual
-            )
-        )
-        self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         if c.is_memory_limit_reached():
             gc.collect()
+
             AppLogging.error(
                 "{}: Memory limit reached at start, leaving".format(self.get_name())
             )
@@ -214,6 +249,10 @@ class RefreshProcessor(CeleryTaskInterface):
         handler = RefreshJobHandler(config)
         handler.process()
 
+        #self.display_memory_diff()
+        gc.collect()
+        self.display_memory_diff()
+
     def get_supported_jobs(self):
         return [BackgroundJob.JOB_REFRESH]
 
@@ -225,54 +264,21 @@ class GenericJobsProcessor(CeleryTaskInterface):
 
     def __init__(self, timeout_s=60 * 1, tasks_info=None):
         """ """
+        super().__init__()
         self.timeout_s = timeout_s
-        self.start_processing_time = None
         self.tasks_info = tasks_info
 
     def run(self):
-        c = Configuration.get_object()
-
-        pid = os.getpid()
-
-        memory = c.get_memory_usage()
-        resident = memory.rss / (1024 * 1024)
-        virtual = memory.vms / (1024 * 1024)
-
-        AppLogging.debug(
-            "{}: Starting. Pid:{} Memory:{}/{} MB".format(
-                self.get_name(), pid, resident, virtual
-            )
-        )
-        self.start_processing_time = DateUtils.get_datetime_now_utc()
-
-        if c.is_memory_limit_reached():
-            AppLogging.error(
-                "{}: Memory limit reached at start, leaving".format(self.get_name())
-            )
-            return
-
-        config = c.config_entry
-        if config.block_job_queue:
-            AppLogging.debug("{}: Job queue is locked".format(self.get_name()))
-            return
-
-        systemcontroller = SystemOperationController()
-        systemcontroller.refresh(self.get_name())
-
-        if not systemcontroller.is_internet_ok():
-            AppLogging.debug("{}: Internet is not OK".format(self.get_name()))
-            return
-
-        if systemcontroller.is_remote_server_down():
-            AppLogging.debug("{}: Remove server is down".format(self.get_name()))
+        if not self.perform_run_checks():
             return
 
         # AppLogging.debug("{}: Running jobs".format(self.get_name()))
+        self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         index = 0
 
         while True:
-            should_stop = self.run_one_loop()
+            should_stop = self.run_one_job()
             if should_stop:
                 break
 
@@ -286,7 +292,34 @@ class GenericJobsProcessor(CeleryTaskInterface):
                 AppLogging.error("{}:run index overflow".format(self.get_name()))
                 return
 
-    def run_one_job(self, job):
+    def perform_run_checks(self):
+        c = Configuration.get_object()
+
+        if c.is_memory_limit_reached():
+            AppLogging.error(
+                "{}: Memory limit reached at start, leaving".format(self.get_name())
+            )
+            return False
+
+        config = c.config_entry
+        if config.block_job_queue:
+            AppLogging.debug("{}: Job queue is locked".format(self.get_name()))
+            return False
+
+        systemcontroller = SystemOperationController()
+        systemcontroller.refresh(self.get_name())
+
+        if not systemcontroller.is_internet_ok():
+            AppLogging.debug("{}: Internet is not OK".format(self.get_name()))
+            return False
+
+        if systemcontroller.is_remote_server_down():
+            AppLogging.debug("{}: Remote server is down".format(self.get_name()))
+            return False
+
+        return True
+
+    def run_one_job_body(self, job):
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         c = Configuration.get_object()
@@ -299,24 +332,32 @@ class GenericJobsProcessor(CeleryTaskInterface):
 
         self.process_job(items)
 
-    def run_one_loop(self):
+    def is_more_jobs(self):
+        if not self.perform_run_checks():
+            return False
+
+        items = self.get_handler_and_object()
+        if len(items) == 0:
+            # AppLogging.debug("{}: No jobs".format(self.get_name()))
+            return False
+
+        return True
+
+    def run_one_job(self):
         """
         return True, if processing should stop
         """
+        if not self.perform_run_checks():
+            return False
+
         items = self.get_handler_and_object()
         if len(items) == 0:
             #AppLogging.debug("{}: No jobs".format(self.get_name()))
-            return True
+            return False
 
         try:
             self.process_job(items)
-
-            elapsed_time = (
-                DateUtils.get_datetime_now_utc() - self.start_processing_time
-            ).total_seconds()
-            if elapsed_time >= self.timeout_s:
-                self.on_not_safe_exit(items)
-                return True
+            self.display_memory_diff()
 
         except KeyboardInterrupt:
             AppLogging.debug("{}: Keyboard interrupt".format(self.get_name()))
