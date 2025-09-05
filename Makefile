@@ -153,3 +153,10 @@ workers:
 	poetry run python manage.py threadprocessor --thread SystemJobsProcessor &
 	poetry run python manage.py threadprocessor --thread UpdateJobsProcessor &
 	poetry run python manage.py threadprocessor --thread LeftOverJobsProcessor &
+	poetry run python manage.py threadprocessor --thread BlockJobsProcessor &
+
+source-worker:
+	poetry run python manage.py threadprocessor --thread SourceJobsProcessor &
+
+update-worker:
+	poetry run python manage.py threadprocessor --thread UpdateJobsProcessor &
