@@ -29,6 +29,46 @@ from workspace import get_workspaces
 parent_directory = Path(__file__).parents[1]
 
 
+tables_to_backup = [
+  "credentials",
+  "sourcecategories",
+  "sourcesubcategories",
+  "sources",
+  "userconfig",
+  "configurationentry",
+  "linkdatamodel",
+  "domains",
+  "usertags",
+  "compactedtags",
+  "usercompactedtags",
+  "entrycompactedtags",
+  "votes",
+  "browser",
+  "entryrules",
+  "dataexport",
+  "gateway",
+  "modelfiles",
+  "readlater",
+  "searchview",
+  "socialdata",
+  # "blockentry", # do not backup it, the list has to be reinitialized each time
+  "blockentrylist",
+  "comments",
+  "userbookmarks",
+  "usersearchhistory",
+  "userentrytransitionhistory",
+  "userentryvisithistory",
+]
+
+
+all_tables = list(tables_to_backup)
+all_tables.append("blockentry")
+all_tables.append("apikeys")
+all_tables.append("applogging")
+all_tables.append("backgroundjob")
+all_tables.append("backgroundjobhistory")
+all_tables.append("keywords")
+
 def get_backup_directory(export_type):
     return parent_directory / "data" / ("backup_" + export_type)
 
@@ -526,49 +566,17 @@ def backup_workspace(run_info):
     print(run_info["workspace"])
     print("--------------------")
 
-    tablemapping = {
-       "./instance_credentials"   : ["instance_credentials"],
-       "./instance_entries"   : ["instance_linkdatamodel"],
-       "./instance_domains"   : ["instance_domains"],
-       "./instance_sourcecategories"   : ["instance_sourcecategories"],
-       "./instance_sourcessubcategories"   : ["instance_sourcesubcategories"],
-       "./instance_sources"   : ["instance_sourcedatamodel"],
-       "./instance_usertags"      : ["instance_usertags"],
-       "./instance_compactedtags"      : ["instance_compactedtags"],
-       "./instance_usercompactedtags"      : ["instance_usercompactedtags"],
-       "./instance_entrycompactedtags"           : ["instance_entrycompactedtags"],
-       "./instance_compactedtags"      : ["instance_compactedtags"],
-       "./instance_usercompactedtags"  : ["instance_usercompactedtags"],
-       "./instance_votes"     : ["instance_uservotes"],
-       "./instance_browser"     : ["instance_browser"],
-       "./instance_entryrules"     : ["instance_entryrules"],
-       "./instance_dataexport"     : ["instance_dataexport"],
-       "./instance_gateway"     : ["instance_gateway"],
-       "./instance_modelfiles"     : ["instance_modelfiles"],
-       "./instance_readlater"     : ["instance_readlater"],
-       "./instance_searchview"     : ["instance_searchview"],
-       "./instance_blockentrylist"     : ["instance_blockentrylist"],
-       "./instance_comments"  : ["instance_usercomments"],
-       "./instance_userbookmarks" : ["instance_userbookmarks"],
-       "./instance_usersearchhistory"   : ["instance_usersearchhistory"],
-       "./instance_userentrytransitionhistory"   : ["instance_userentrytransitionhistory"],
-       "./instance_userentryvisithistory"   : ["instance_userentryvisithistory"],
-       "./instance_userconfig" : ["instance_userconfig"],
-       "./instance_configurationentry" : ["instance_configurationentry"],
-    }
-
     workspace = run_info["workspace"]
 
-    for key in tablemapping:
+    for table in tables_to_backup:
         new_run_info = dict(run_info)
+        new_key = "instance_" + table
 
         new_run_info["tables"] = []
-        new_key = key.replace("instance", workspace)
         new_run_info["output_file"] = new_key
 
-        for item in tablemapping[key]:
-            table_name = item.replace("instance", workspace)
-            new_run_info["tables"].append(table_name)
+        table_name = workspace + "_" + table
+        new_run_info["tables"].append(table_name)
 
         if new_run_info["format"] == "sqlite":
             if not run_db_copy_backup(new_run_info):
@@ -609,40 +617,10 @@ def restore_workspace(run_info):
     print(run_info["workspace"])
     print("--------------------")
 
-    # order is important
-    tablemapping = [
-       ["./instance_credentials"         , ["instance_credentials"]],
-       ["./instance_sourcecategories"         , ["instance_sourcecategories"]],
-       ["./instance_sourcessubcategories"     , ["instance_sourcesubcategories"]],
-       ["./instance_sources"         , ["instance_sourcedatamodel"]],
-       ["./instance_domains"         , ["instance_domains"]],
-       ["./instance_entries"         , ["instance_linkdatamodel"]],
-       ["./instance_usertags"        , ["instance_usertags"]],
-       ["./instance_compactedtags"   , ["instance_compactedtags"]],
-       ["./instance_usercompactedtags" , ["instance_usercompactedtags"]],
-       ["./instance_entrycompactedtags" , ["instance_entrycompactedtags"]],
-       ["./instance_votes"           , ["instance_uservotes"]],
-       ["./instance_comments"        , ["instance_usercomments"]],
-       ["./instance_userbookmarks"   , ["instance_userbookmarks"]],
-       ["./instance_browser"     , ["instance_browser"]],
-       ["./instance_entryrules"     , ["instance_entryrules"]],
-       ["./instance_dataexport"     , ["instance_dataexport"]],
-       ["./instance_gateway"        , ["instance_gateway"]],
-       ["./instance_blockentrylist"   , ["instance_blockentrylist"]],
-       ["./instance_modelfiles"   , ["instance_modelfiles"]],
-       ["./instance_readlater"    , ["instance_readlater"]],
-       ["./instance_searchview"    , ["instance_searchview"]],
-       ["./instance_userconfig"   , ["instance_userconfig"]],
-       ["./instance_configurationentry"   , ["instance_configurationentry"]],
-       ["./instance_usersearchhistory"         , ["instance_usersearchhistory"]],
-       ["./instance_userentrytransitionhistory" , ["instance_userentrytransitionhistory"]],
-       ["./instance_userentryvisithistory"      , ["instance_userentryvisithistory"]],
-    ]
-
     if not run_info["append"]:
-        for item in tablemapping:
-            key = item[0]
-            tables = item[1]
+        for table in tables_to_backup:
+            key = "./instance_" + table
+            tables = [workspace + "_" + table]
 
             run_info["output_file"] = key
             run_info["tables"] = tables
@@ -651,9 +629,9 @@ def restore_workspace(run_info):
                 print("Could not truncate table")
                 return
 
-    for item in tablemapping:
-        key = item[0]
-        tables = item[1]
+    for table in tables_to_backup:
+        key = "./instance_" + table
+        tables = [workspace + "_" + table]
 
         new_run_info = dict(run_info)
 
@@ -682,44 +660,10 @@ def run_sql_for_workspaces(run_info, sql_command):
     print(run_info["workspace"])
     print("--------------------")
 
-    # order is important
-    tablemapping = [
-       "instance_credentials",
-       "instance_apikeys",
-       "instance_applogging",
-       "instance_backgroundjob",
-       "instance_blockentry",
-       "instance_blockentrylist",
-       "instance_browser",
-       "instance_configurationentry",
-       "instance_domains",
-       "instance_dataexport",
-       "instance_entryrules",
-       "instance_gateway",
-       "instance_keywords",
-       "instance_linkdatamodel",
-       "instance_modelfiles",
-       "instance_readlater",
-       "instance_searchview",
-       "instance_sourcecategories",
-       "instance_sourcesubcategories",
-       "instance_sourcedatamodel",
-       "instance_userconfig",
-       "instance_usercomments",
-       "instance_userbookmarks",
-       "instance_usersearchhistory",
-       "instance_userentrytransitionhistory",
-       "instance_userentryvisithistory",
-       "instance_usertags",
-       "instance_compactedtags",
-       "instance_usercompactedtags",
-       "instance_uservotes",
-    ]
-
     workspace = run_info["workspace"]
 
-    for table in tablemapping:
-        call_table = table.replace("instance", workspace)
+    for table in all_tables:
+        call_table = workspace + "_" + table
         call_sql_command = sql_command.replace("{table}", call_table)
 
         if not run_table_sql(run_info, call_table, call_sql_command):
@@ -762,7 +706,7 @@ def main():
     workspaces = []
 
     if args.workspace:
-        all = get_workspaces()
+        all = sorted(list(get_workspaces()))
         if args.workspace in all:
             workspaces = [args.workspace]
         else:

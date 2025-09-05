@@ -159,6 +159,7 @@ class BackgroundJob(models.Model):
         super().save(*args, **kwargs)
 
 
+allowed_history_count = 500
 class BackgroundJobHistory(models.Model):
     job = models.CharField(max_length=1000, null=False)
     task = models.CharField(max_length=1000, null=True)
@@ -166,13 +167,46 @@ class BackgroundJobHistory(models.Model):
     args = models.CharField(max_length=1000, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
 
-    def mark_done(job, subject="", args="", task=None):
+    class Meta:
+        ordering = [
+            "-date_created", # most recent up top
+        ]
+
+    def remove_old():
+        history_count = BackgroundJobHistory.objects.all().count()
+        if history_count > allowed_history_count:
+            diff_history_count = history_count - allowed_history_count
+            ids_to_delete = BackgroundJobHistory.objects.order_by("date_created").values_list('id', flat=True)[:diff_history_count]
+
+            BackgroundJobHistory.objects.filter(id__in=ids_to_delete).delete()
+
+    def mark_done(job_name, subject="", args="", task=None):
+        BackgroundJobHistory.remove_old()
+
         jobs = BackgroundJobHistory.objects.filter(
-            job=job, subject=subject, task=task, args=args
+            job=job_name, subject=subject, task=task, args=args
         )
+
         if jobs.exists():
             jobs.delete()
 
-        BackgroundJobHistory.objects.create(
-            job=job, subject=subject, task=task, args=args
+        return BackgroundJobHistory.objects.create(
+            job=job_name, subject=subject, task=task, args=args
+        )
+
+    def mark_job_done(job, subject="", args="", task=None):
+        BackgroundJobHistory.remove_old()
+
+        if job is None:
+            return
+
+        jobs = BackgroundJobHistory.objects.filter(
+            job=job.job, subject=job.subject, task=job.task, args=job.args
+        )
+
+        if jobs.exists():
+            jobs.delete()
+
+        return BackgroundJobHistory.objects.create(
+            job=job.job, subject=job.subject, task=job.task, args=job.args
         )

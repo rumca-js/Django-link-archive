@@ -46,7 +46,6 @@ from .models import (
     SystemOperation,
     BlockEntryList,
     Gateway,
-    BackgroundJobHistory,
     SocialData,
 )
 
@@ -1124,7 +1123,7 @@ class CleanupJobHandler(BaseJobHandler):
     def get_job():
         return BackgroundJob.JOB_CLEANUP
 
-    def cleanup_all(args=None):
+    def create_jobs(args=None):
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CLEANUP, subject="LinkDataController", args=args
         )
@@ -1192,7 +1191,7 @@ class CleanupJobHandler(BaseJobHandler):
         table = obj.subject
 
         if table == "":
-            CleanupJobHandler.cleanup_all(obj.args)
+            CleanupJobHandler.create_jobs(obj.args)
             return True
 
         status = False
@@ -1507,17 +1506,14 @@ class RefreshJobHandler(BaseJobHandler):
 
         for export in DataExport.objects.filter(enabled=True):
             if SourceExportHistory.is_update_required(export):
-                self.do_update(export)
+                BackgroundJobController.export_data(export)
                 SourceExportHistory.confirm(export)
 
         systemcontroller = SystemOperationController()
         if systemcontroller.is_time_to_cleanup():
-            BackgroundJobHistory.mark_done(job=BackgroundJob.JOB_CLEANUP, subject="")
-
-            CleanupJobHandler.cleanup_all()
+            CleanupJobHandler.create_jobs()
 
         self.update_entries()
-        self.todo()
 
     def check_sources(self):
         sources = SourceDataController.objects.filter(enabled=True).order_by(
@@ -1526,17 +1522,6 @@ class RefreshJobHandler(BaseJobHandler):
         for source in sources:
             if source.is_fetch_possible():
                 BackgroundJobController.download_rss(source)
-
-    def do_update(self, export):
-        BackgroundJobController.export_data(export)
-
-        c = Configuration.get_object()
-        conf = c.config_entry
-
-        if conf.enable_source_archiving:
-            sources = SourceDataController.objects.filter(enabled=True)
-            for source in sources:
-                BackgroundJobController.link_save(source.url)
 
     def update_entries(self):
         c = Configuration.get_object()
@@ -1550,6 +1535,9 @@ class RefreshJobHandler(BaseJobHandler):
         u = EntriesUpdater()
         entries = u.get_entries_to_update(max_number_of_update_entries)
         if not entries:
+            return
+
+        if not entries.exists():
             return
 
         current_num_of_jobs = BackgroundJobController.get_number_of_update_reset_jobs()
@@ -1567,6 +1555,3 @@ class RefreshJobHandler(BaseJobHandler):
                 return
 
             index += 1
-
-    def todo(self):
-        pass

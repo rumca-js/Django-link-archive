@@ -20,9 +20,9 @@ def process_jobs_task(Processor, tasks_info):
 
     handler.run()
 
+    more_jobs = handler.is_more_jobs()
     gc.collect()
-
-    return handler.is_more_jobs()
+    return more_jobs
 
 
 def process_job_task(Processor, tasks_info):
@@ -38,7 +38,6 @@ def process_job_task(Processor, tasks_info):
     handler = Processor(tasks_info=tasks_info)
 
     status = handler.run_one_job()
-
+    more_jobs = handler.is_more_jobs()
     gc.collect()
-
-    return handler.is_more_jobs()
+    return more_jobs

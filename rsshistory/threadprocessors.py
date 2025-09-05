@@ -32,6 +32,7 @@ from .apps import LinkDatabase
 from .models import (
     AppLogging,
     BackgroundJob,
+    BackgroundJobHistory,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .controllers import (
@@ -161,9 +162,9 @@ class CeleryTaskInterface(object):
         name = self.get_name()
 
         if resident_diff > 0:
-            AppLogging.error(f"{name}: More memory resident memory {resident_diff}")
+            AppLogging.warning(f"{name}: More memory resident memory {resident_diff}")
         if virtual_diff > 0:
-            AppLogging.error(f"{name}: More memory virtual memory {virtual_diff}")
+            AppLogging.warning(f"{name}: More memory virtual memory {virtual_diff}")
 
     def get_handler_and_object(self):
         """
@@ -246,7 +247,10 @@ class RefreshProcessor(CeleryTaskInterface):
             return
 
         config = Configuration.get_object()
+
         handler = RefreshJobHandler(config)
+
+        BackgroundJobHistory.mark_done(job_name=RefreshJobHandler.get_job(), subject="")
         handler.process()
 
         #self.display_memory_diff()
@@ -416,10 +420,12 @@ class GenericJobsProcessor(CeleryTaskInterface):
                 obj.task = self.get_name()
                 obj.save()
 
-            if handler and handler.process(obj):
-                deleted = True
-                if obj:
-                    obj.delete()
+            if handler:
+                BackgroundJobHistory.mark_job_done(obj)
+                if handler.process(obj):
+                    deleted = True
+                    if obj:
+                        obj.delete()
             if not handler:
                 if obj:
                     AppLogging.error(
@@ -542,6 +548,17 @@ class UpdateJobsProcessor(GenericJobsProcessor):
         ]
 
 
+class BlockJobsProcessor(GenericJobsProcessor):
+    """
+    Jobs that should be working without hiccup
+    """
+
+    def get_supported_jobs(self):
+        return [
+            BackgroundJob.JOB_INITIALIZE_BLOCK_LIST,
+        ]
+
+
 class LeftOverJobsProcessor(GenericJobsProcessor):
     """
     There can be many queues handling jobs.
@@ -609,6 +626,8 @@ def processor_from_id(processor_id):
         return LeftOverJobsProcessor
     elif processor_id == "UpdateJobsProcessor":
         return UpdateJobsProcessor
+    elif processor_id == "BlockJobsProcessor":
+        return BlockJobsProcessor
 
 
 class OneTaskProcessor(GenericJobsProcessor):

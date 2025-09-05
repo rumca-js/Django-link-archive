@@ -137,13 +137,15 @@ class BlockEntryList(models.Model):
         from ..controllers import BackgroundJobController
 
         if not UrlHandlerEx.ping(self.url):
-            return
+            return False
 
         self.processed = False
+        self.save()
 
         BackgroundJobController.create_single_job(
             BackgroundJobController.JOB_INITIALIZE_BLOCK_LIST, self.url
         )
+        return True
 
     def reset():
         BlockEntry.objects.all().delete()
@@ -185,9 +187,12 @@ class BlockEntryList(models.Model):
         contents = handler.get_contents()
         if contents:
             reader = BlockListReader(contents)
+            AppLogging.debug("Reading block list {}".format(self.url))
+
             for domain in reader.read():
                 blocked = BlockEntry.objects.filter(url=domain)
                 if not blocked.exists():
+                    AppLogging.debug("Added {}".format(domain))
                     BlockEntry.objects.create(url=domain, block_list=self)
 
         self.processed = True

@@ -364,10 +364,6 @@ class UserEntryVisitHistory(models.Model):
 
         UserEntryVisitHistory.delete_old_entries(user)
 
-        # to increment visited counter on entry
-        # BackgroundJobController.entry_update_data(entry)
-        # TODO - there should be recalculated JOB. we do not want to udpate it's data
-
         return visit
 
     def is_link_just_visited(user, entry):

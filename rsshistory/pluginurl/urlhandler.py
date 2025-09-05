@@ -403,7 +403,9 @@ class UrlHandlerEx(object):
     def ping(url, timeout_s=20):
         config_entry = Configuration.get_object().config_entry
         remote_server = RemoteServer(config_entry.remote_webtools_server_location)
-        return remote_server.get_pingj(url)
+        status = remote_server.get_pingj(url)
+
+        return status
 
     def get_cleaned_link(url):
         return Url.get_cleaned_link(url)

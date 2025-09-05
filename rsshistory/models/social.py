@@ -7,11 +7,9 @@ from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
-from ..controllers import (
-    SystemOperationController,
-)
 from ..webtools import (
     RemoteServer,
+    UrlLocation,
 )
 
 
@@ -67,13 +65,18 @@ class SocialData(models.Model):
     )
 
     def is_supported(entry):
-        if entry.link.find("youtube.com") >= 0:
+        page = UrlLocation(entry.link)
+        domain = page.get_domain()
+        if not domain:
+            return False
+
+        if domain.find("youtube.com") >= 0:
             return True
-        if entry.link.find("github.com") >= 0:
+        if domain.find("github.com") >= 0:
             return True
-        if entry.link.find("reddit.com") >= 0:
+        if domain.find("reddit.com") >= 0:
             return True
-        if entry.link.find("news.ycombinator.com") >= 0:
+        if domain.find("news.ycombinator.com") >= 0:
             return True
 
         return False
@@ -121,6 +124,7 @@ class SocialData(models.Model):
 
     def get_from_server(entry):
         from ..configuration import Configuration
+        from ..controllers import SystemOperationController
 
         config = Configuration.get_object().config_entry
 
@@ -137,6 +141,15 @@ class SocialData(models.Model):
                 return
 
             if len(json_obj) == 0:
+                return
+
+            # indicator of unsupported on crawler buddy
+            all_values_are_none = True
+            for key, value in json_obj.items():
+                if value is not None:
+                    all_values_are_none = False
+
+            if all_values_are_none:
                 return
 
             json_obj["entry"] = entry

@@ -402,8 +402,10 @@ class EntryDetailView(generic.DetailView):
         user = self.request.user
         if user.is_authenticated:
             from_entry = self.get_from_entry()
+            entry = self.object
 
-            UserEntryVisitHistory.visited(self.object, self.request.user, from_entry)
+            UserEntryVisitHistory.visited(entry, self.request.user, from_entry)
+            BackgroundJobController.entry_reset_local_data(entry)
 
     def get_from_entry(self):
         from_entry = None

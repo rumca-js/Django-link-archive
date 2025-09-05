@@ -8,6 +8,7 @@ from ..models import (
     BackgroundJob,
     BackgroundJobHistory,
 )
+from .backgroundjob import BackgroundJobController
 
 
 class SystemOperationController(object):
@@ -34,6 +35,11 @@ class SystemOperationController(object):
             )
 
     def check_crawling_sever(self, thread_id):
+        """
+        We do not want to use crawling server to check crawling server status
+        """
+        import requests
+
         config_entry = ConfigurationEntry.get()
 
         remote_server = config_entry.remote_webtools_server_location
@@ -41,23 +47,23 @@ class SystemOperationController(object):
         if not remote_server:
             return False
 
-        import requests
-        response = requests.get(remote_server)
 
-        if response.status_code != 200:
-            SystemOperation.add_by_thread(
-                thread_id,
-                check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
-                status=False,
-            )
-        else:
-            SystemOperation.add_by_thread(
-                thread_id,
-                check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
-                status=True,
-            )
-
-        response.close()
+        try:
+            with requests.get(remote_server) as response:
+                if response and response.status_code != 200:
+                    SystemOperation.add_by_thread(
+                        thread_id,
+                        check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
+                        status=False,
+                    )
+                else:
+                    SystemOperation.add_by_thread(
+                        thread_id,
+                        check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
+                        status=True,
+                    )
+        except Exception as E:
+            AppLogging.exc(E)
 
     def cleanup(cfg=None, thread_ids=None):
         if thread_ids:
@@ -197,6 +203,12 @@ class SystemOperationController(object):
 
     def is_time_to_cleanup(self):
         today_midnight = datetime.now().date()
+
+        jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJob.JOB_CLEANUP, subject=""
+        )
+        if jobs.exists():
+            return False
 
         jobs = BackgroundJobHistory.objects.filter(
             job=BackgroundJob.JOB_CLEANUP, subject="", date_created__gt=today_midnight

@@ -49,10 +49,13 @@ def block_list_update(request, pk):
     if data is not None:
         return data
 
-    thelist = BlockEntryList.objects.filter(id=pk)
-    if thelist.exists():
-        thelist.update()
-        p.context["summary_text"] = "Added block list update job"
+    lists = BlockEntryList.objects.filter(id=pk)
+    if lists.exists():
+        thelist = lists[0]
+        if thelist.update():
+            p.context["summary_text"] = "List update initiated"
+        else:
+            p.context["summary_text"] = "Could not update block list"
     else:
         p.context["summary_text"] = "Could not update block list"
 

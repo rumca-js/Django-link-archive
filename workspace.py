@@ -19,6 +19,7 @@ import shutil
 import importlib
 from pathlib import Path
 import argparse
+import traceback
 
 
 def get_source_files(path):
@@ -170,37 +171,6 @@ def get_workspaces():
             result.append(item)
 
     return result
-
-
-def process_app(processor, tasks_info):
-    # Parsing the processor string
-    try:
-        app_name, processor_file_name, processor_class_name = processor.split(".")
-    except ValueError as e:
-        print("Processor string format error: %s", processor)
-        return
-
-    # Importing tasks and processor modules
-    try:
-        tasks_module = importlib.import_module(f"{app_name}.tasks")
-        threadprocessors_module = importlib.import_module(f"{app_name}.threadprocessors")
-    except ModuleNotFoundError as e:
-        print("Module import failed for app: %s", app_name)
-        return
-    
-    # Retrieving the processor class
-    try:
-        processor_class = getattr(threadprocessors_module, processor_class_name)
-    except AttributeError as e:
-        print("Processor class not found: ", str(e), processor_class_name)
-        return
-
-    # Call the task with the processor class
-    try:
-        tasks_module.process_jobs_task(processor_class, tasks_info)
-        print("Task processed successfully for: %s", processor)
-    except Exception as e:
-        print("Error while processing jobs for: ", str(e), processor)
 
 
 def parse():

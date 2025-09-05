@@ -107,6 +107,8 @@ function fillListData() {
 
     let jobs = data.jobs;
 
+    $("#jobsTitle").html(`Jobs: ${data.count}`);
+
     if (!jobs || jobs.length == 0) {
         $('#listData').html("No jobs found");
         $('#pagination').html("");

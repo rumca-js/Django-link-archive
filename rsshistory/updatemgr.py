@@ -94,9 +94,13 @@ class UpdateExportManager(object):
             data_source_dir=self.get_write_directory(),
         )
 
-        if repo.push_to_repo(message):
-            return True
-        else:
+        try:
+            if repo.push_to_repo(message):
+                return True
+            else:
+                return False
+        except Exception as E:
+            AppLogging.exc(E)
             return False
 
     def clear(self):
