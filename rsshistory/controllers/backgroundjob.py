@@ -77,17 +77,6 @@ class BackgroundJobController(BackgroundJob):
         self.enabled = False
         self.save()
 
-    def truncate_invalid_jobs():
-        job_choices = BackgroundJobController.JOB_CHOICES
-        valid_jobs_choices = []
-        for job_choice in job_choices:
-            valid_jobs_choices.append(job_choice[0])
-
-        jobs = BackgroundJob.objects.all()
-        for job in jobs:
-            if job.job not in valid_jobs_choices:
-                job.delete()
-
     def get_number_of_jobs(job_name=None, only_enabled=True):
         condition = Q()
         if job_name is not None:
@@ -160,6 +149,17 @@ class BackgroundJobController(BackgroundJob):
 
         processor = GenericJobsProcessor()
         processor.run_one_job(job)
+
+    def truncate_invalid_jobs():
+        job_choices = BackgroundJobController.JOB_CHOICES
+        valid_jobs_choices = []
+        for job_choice in job_choices:
+            valid_jobs_choices.append(job_choice[0])
+
+        jobs = BackgroundJob.objects.all()
+        for job in jobs:
+            if job.job not in valid_jobs_choices:
+                job.delete()
 
     # job functions are defined below
 
@@ -464,7 +464,7 @@ class BackgroundJobController(BackgroundJob):
             subject=entry.id,
             args="",
             priority=BackgroundJobController.get_job_priority(
-                BackgroundJob.JOB_LINK_SAVE
+                BackgroundJob.JOB_LINK_DOWNLOAD_SOCIAL
             ),
         )
 

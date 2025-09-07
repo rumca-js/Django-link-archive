@@ -27,6 +27,7 @@ from .apps import LinkDatabase
 from .models import (
     AppLogging,
     BackgroundJob,
+    BackgroundJobHistory,
     SourceDataModel,
     SourceExportHistory,
     KeyWords,
@@ -297,8 +298,9 @@ class LinkDownloadSocialData(BaseJobHandler):
         return BackgroundJob.JOB_LINK_DOWNLOAD_SOCIAL
 
     def process(self, obj=None):
+        entry_id = None
         try:
-            link_id = int(obj.subject)
+            entry_id = int(obj.subject)
         except ValueError as E:
             AppLogging.exc(
                 exception_object=E,
@@ -307,10 +309,9 @@ class LinkDownloadSocialData(BaseJobHandler):
             # consume job
             return True
 
-        entries = LinkDataController.objects.filter(id=link_id)
-        if len(entries) > 0:
+        entries = LinkDataController.objects.filter(id=entry_id)
+        if entries.exists():
             entry = entries[0]
-
             SocialData.update(entry)
 
         return True
@@ -1124,6 +1125,8 @@ class CleanupJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_CLEANUP
 
     def create_jobs(args=None):
+        BackgroundJobHistory.mark_done(BackgroundJob.JOB_CLEANUP)
+
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CLEANUP, subject="LinkDataController", args=args
         )

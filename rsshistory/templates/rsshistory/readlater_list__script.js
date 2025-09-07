@@ -19,8 +19,8 @@ function sendClearList(attempt = 1) {
 }
 
 
-function sendRemoveListItem(entry_id, attempt = 1) {
-    jsonReadLaterRemove(entry_id, function() {
+function sendRemoveListItem(entry_id) {
+    jsonReadLaterRemove(entry_id, function(data) {
        if (data.status) {
           $('#clear-list').prop("disabled", false);
           $('.remove-button').prop("disabled", false);

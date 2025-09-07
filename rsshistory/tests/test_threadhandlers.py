@@ -13,6 +13,7 @@ from ..controllers import (
 )
 from ..models import (
     BackgroundJob,
+    BackgroundJobHistory,
     AppLogging,
     DataExport,
     SourceExportHistory,
@@ -110,13 +111,14 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         keyword.date_published = datetime
         keyword.save()
 
-    def test_cleanup_job__all(self):
+    def test_cleanup_job__creates_all(self):
         self.prepare_data()
 
         job = BackgroundJobController.objects.create(
             job=BackgroundJob.JOB_CLEANUP,
             subject="",
         )
+        self.assertEqual(number_of_histories, 0)
 
         handler = CleanupJobHandler()
         # call tested function
@@ -124,6 +126,9 @@ class CleanJobHandlerTest(FakeInternetTestCase):
 
         jobs = BackgroundJobController.objects.all()
         self.assertEqual(jobs.count(), 20)
+
+        number_of_histories = BackgroundJobHistory.objects.all().count()
+        self.assertEqual(number_of_histories, 1)
 
     def test_cleanup_job__all_process(self):
         self.prepare_data()
