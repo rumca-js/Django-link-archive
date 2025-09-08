@@ -65,6 +65,11 @@ class SocialData(models.Model):
     )
 
     def is_supported(entry):
+        from ..configuration import Configuration
+        config = Configuration.get_object().config_entry
+        if not config.keep_social_data:
+            return False
+
         page = UrlLocation(entry.link)
         domain = page.get_domain()
         if not domain:
@@ -84,11 +89,6 @@ class SocialData(models.Model):
     def get(entry):
         from ..configuration import Configuration
         from ..controllers import BackgroundJobController
-
-        config = Configuration.get_object().config_entry
-        if not config.keep_social_data:
-            return
-
 
         if not SocialData.is_supported(entry):
             return

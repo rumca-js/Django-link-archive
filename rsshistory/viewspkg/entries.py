@@ -173,6 +173,7 @@ class EntriesSearchListView(object):
         self.search_view = None
         self.query_filter = None
         self.start_time = time.time()
+        self.errors = []
 
         if not self.user and self.request and self.request.user:
             self.user = self.request.user
@@ -192,7 +193,12 @@ class EntriesSearchListView(object):
         self.get_time_diff_text("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
 
-        queryset = self.get_filtered_objects().order_by(*self.get_order_by()).distinct()
+        # TODO can we check if filtered objects are none?
+        try:
+            queryset = self.get_filtered_objects().order_by(*self.get_order_by()).distinct()
+        except Exception as E:
+            self.errors.append("Cannot obtain filtered objects {}".format(str(E)))
+            return self.get_nonequery_set()
 
         self.get_time_diff_text("EntriesSearchListView:get_queryset - after distinct")
 
@@ -208,10 +214,12 @@ class EntriesSearchListView(object):
         return queryset
 
     def get_errors(self):
+        errors = list(self.errors)
+
         if self.query_filter:
-            return self.query_filter.get_errors()
-        else:
-            return []
+            errors.extend(self.query_filter.get_errors())
+
+        return errors
 
     def get_paginate_by(self):
         """
@@ -312,32 +320,40 @@ class EntriesSearchListView(object):
 
         return search_view.get_conditions()
 
+    def is_archive(self):
+        archive = self.request.GET.get("archive", None)
+        return archive == "on"
+
     def get_filtered_objects(self):
         self.get_time_diff_text("EntriesSearchListView:get_filtered_objects")
 
-        archive = False
-        if "archive" in self.request.GET and self.request.GET["archive"] == "on":
-            archive = True
-
-        query_set = self.get_initial_query_set(archive=False)
+        query_set = self.get_initial_query_set()
 
         conditions = self.get_conditions()
 
         if conditions is None:
-            if archive:
-                return ArchiveLinkDataController.objects.none()
-            else:
-                return LinkDataController.objects.none()
+            return self.get_nonequery_set()
 
         self.get_time_diff_text("EntriesSearchListView:get_filtered_objects DONE")
         return query_set.filter(conditions)
 
-    def get_initial_query_set(self, archive=False):
+    def get_initial_query_set(self):
         """ """
+        archive = self.is_archive()
+
         if archive:
             return ArchiveLinkDataController.objects.all()
         else:
             return LinkDataController.objects.all()
+
+    def get_nonequery_set(self):
+        """ """
+        archive = self.is_archive()
+
+        if archive:
+            return ArchiveLinkDataController.objects.none()
+        else:
+            return LinkDataController.objects.none()
 
 
 class UserEntriesBookmarkedListView(EntriesSearchListView):
@@ -608,6 +624,7 @@ def on_added_entry(request, entry):
     if not entry.is_archive_entry():
         # if you add a link you must have visited it?
         UserEntryVisitHistory.visited(entry, request.user)
+        SocialData.get(entry)
 
 
 def add_entry_json(request):

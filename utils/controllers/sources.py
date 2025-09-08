@@ -61,18 +61,18 @@ class SourcesTableController(object):
 
         with Session() as session:
             if id:
-                sources = (
+                exists = (
                     session.query(SourcesTable)
                     .filter(SourcesTable.id == int(id))
-                    .count()
+                    .exists()
                 )
-                if sources != 0:
+                if exists:
                     is_source = True
             if url:
-                sources = (
-                    session.query(SourcesTable).filter(SourcesTable.url == url).count()
+                exists = (
+                    session.query(SourcesTable).filter(SourcesTable.url == url).exists()
                 )
-                if sources != 0:
+                if exists:
                     is_source = True
 
         return is_source
@@ -129,12 +129,12 @@ class SourceDataBuilder(object):
         Session = self.get_session()
 
         with Session() as session:
-            count = (
+            exists = (
                 session.query(SourcesTable)
                 .filter(SourcesTable.url == self.link_data["url"])
-                .count()
+                .exists()
             )
-            if count != 0:
+            if exists:
                 return True
 
     def build_from_props(self):

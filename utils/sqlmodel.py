@@ -228,7 +228,7 @@ class ReadMarkers(Base):
     def set(session, source=None):
         if not source:
             markers = session.query(ReadMarkers)
-            if markers.count() == 0:
+            if not markers.exists():
                 m = ReadMarkers(read_date=DateUtils.get_datetime_now_utc())
                 session.add(m)
                 session.commit()
@@ -238,7 +238,7 @@ class ReadMarkers(Base):
                 session.commit()
         else:
             markers = session.query(ReadMarkers, source_object == source.id)
-            if markers.count() == 0:
+            if not markers.exists():
                 m = ReadMarkers(
                     read_date=DateUtils.get_datetime_now_utc(), source_object=source.id
                 )

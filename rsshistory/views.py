@@ -378,7 +378,7 @@ class UserGenericListView(GenericListView):
 
         if self.search_user_id:
             users = User.objects.filter(id=self.search_user_id)
-            if users.count() > 0:
+            if users.exists():
                 self.search_user = users[0]
 
         return super().get(*args, **kwargs)

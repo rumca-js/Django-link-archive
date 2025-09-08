@@ -37,20 +37,15 @@ class ReadMarkers(models.Model):
     def get_general(user):
         read_markers = ReadMarkers.objects.filter(user=user, source__isnull=True)
         if read_markers.exists():
-            if read_markers.count() > 0:
-                for read_marker in read_markers:
-                    read_marker.delete()
-            return read_markers[0]
+            for read_marker in read_markers:
+                read_marker.delete()
 
     def get_source(user, source):
         if hasattr(source, "marker"):
             read_markers = source.marker.filter(user=user)
-            if read_markers.count() > 0:
+            if read_markers.exists():
                 for read_marker in read_markers:
                     read_marker.delete()
-
-            if read_markers.exists():
-                return read_markers[0]
 
     def set(user, source=None):
         if source:

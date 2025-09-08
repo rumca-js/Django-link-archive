@@ -82,7 +82,7 @@ class DomainsSuffixes(models.Model):
 
     def add(suffix):
         suffixes = DomainsSuffixes.objects.filter(suffix=suffix)
-        if suffixes.count() == 0:
+        if not suffixes.exists():
             DomainsSuffixes.objects.create(suffix=suffix)
 
 
@@ -91,7 +91,7 @@ class DomainsTlds(models.Model):
 
     def add(tld):
         tlds = DomainsTlds.objects.filter(tld=tld)
-        if tlds.count() == 0:
+        if not tlds.count():
             DomainsTlds.objects.create(tld=tld)
 
 
@@ -100,5 +100,5 @@ class DomainsMains(models.Model):
 
     def add(main):
         mains = DomainsMains.objects.filter(main=main)
-        if mains.count() == 0:
+        if not mains.exists():
             DomainsMains.objects.create(main=main)

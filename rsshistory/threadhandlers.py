@@ -130,7 +130,7 @@ class ProcessSourceJobHandler(BaseJobHandler):
             return False
 
         sources = SourceDataModel.objects.filter(id=source_id)
-        if sources.count() > 0 and not sources[0].enabled:
+        if sources.exists() and not sources[0].enabled:
             # This source is disabled, and job should be removed
             return True
 
@@ -204,7 +204,7 @@ class EntryUpdateData(BaseJobHandler):
         if "browser" in cfg:
             browser_id = cfg["browser"]
             browsers = Browser.objects.filter(id=int(browser_id))
-            if browsers.count() > 0:
+            if browsers.exists():
                 data["browser_obj"] = browsers[0]
 
         return cfg
@@ -251,7 +251,7 @@ class LinkResetDataJobHandler(BaseJobHandler):
         if "browser" in cfg:
             browser_id = cfg["browser"]
             browsers = Browser.objects.filter(id=int(browser_id))
-            if browsers.count() > 0:
+            if browsers.exists():
                 data["browser_obj"] = browsers[0]
 
         return cfg
@@ -287,7 +287,7 @@ class LinkResetLocalDataJobHandler(BaseJobHandler):
         if "browser" in cfg:
             browser_id = cfg["browser"]
             browsers = Browser.objects.filter(id=int(browser_id))
-            if browsers.count() > 0:
+            if browsers.exists():
                 data["browser_obj"] = browsers[0]
 
         return cfg
@@ -322,7 +322,7 @@ class LinkDownloadSocialData(BaseJobHandler):
         if "browser" in cfg:
             browser_id = cfg["browser"]
             browsers = Browser.objects.filter(id=int(browser_id))
-            if browsers.count() > 0:
+            if browsers.exists():
                 data["browser_obj"] = browsers[0]
 
         return cfg
@@ -594,19 +594,19 @@ class LinkAddJobHandler(BaseJobHandler):
         if "source_id" in cfg:
             source_id = cfg["source_id"]
             source_objs = SourceDataController.objects.filter(id=int(source_id))
-            if source_objs.count() > 0:
+            if source_objs.exists():
                 data["source_obj"] = source_objs[0]
 
         if "source" in cfg:
             source_id = cfg["source"]
             source_objs = SourceDataController.objects.filter(id=int(source_id))
-            if source_objs.count() > 0:
+            if source_objs.exists():
                 data["source_obj"] = source_objs[0]
 
         if "browser" in cfg:
             browser_id = cfg["browser"]
             browsers = Browser.objects.filter(id=int(browser_id))
-            if browsers.count() > 0:
+            if browsers.exists():
                 data["browser_obj"] = browsers[0]
 
         user = None
@@ -614,7 +614,7 @@ class LinkAddJobHandler(BaseJobHandler):
             user = User.objects.get(id=int(cfg["user_id"]))
         else:
             users = User.objects.filter(is_superuser=True)
-            if users.count() > 0:
+            if users.exists():
                 user = users[0]
             else:
                 AppLogging.error("Could not found super user")
@@ -852,7 +852,7 @@ class ImportFromFilesJobHandler(BaseJobHandler):
         user = None
         if username and username != "":
             users = User.objects.filter(username=username)
-            if users.count() > 0:
+            if users.exists():
                 user = users[0]
 
         data["user"] = user
@@ -991,7 +991,7 @@ class ExportDataJobHandler(BaseJobHandler):
 
     def get_export(self, obj):
         exports = DataExport.objects.filter(id=int(obj.subject))
-        if exports.count() > 0:
+        if exports.exists():
             return exports[0]
 
 
@@ -1434,31 +1434,31 @@ class LinkScanJobHandler(BaseJobHandler):
         if "source_id" in cfg:
             source_id = cfg["source_id"]
             source_objs = SourceDataController.objects.filter(id=int(source_id))
-            if source_objs.count() > 0:
+            if source_objs.exists():
                 cfg["source_obj"] = source_objs[0]
 
         if "entry_id" in cfg:
             entry_id = cfg["entry_id"]
             entries = LinkDataController.objects.filter(id=int(entry_id))
-            if entries.count() > 0:
+            if entries.exists():
                 cfg["entry_obj"] = entries[0]
 
         if "source" in cfg:
             source_id = cfg["source"]
             source_objs = SourceDataController.objects.filter(id=int(source_id))
-            if source_objs.count() > 0:
+            if source_objs.exists():
                 cfg["source_obj"] = source_objs[0]
 
         if "entry" in cfg:
             entry_id = cfg["entry"]
             entries = LinkDataController.objects.filter(id=int(entry_id))
-            if entries.count() > 0:
+            if entries.exists():
                 cfg["entry_obj"] = entries[0]
 
         if "browser" in cfg:
             browser_id = cfg["browser"]
             browsers = Browser.objects.filter(id=int(browser_id))
-            if browsers.count() > 0:
+            if browsers.exists():
                 data["browser_obj"] = browsers[0]
 
         return cfg

@@ -25,6 +25,7 @@ from ..models import (
     ModelFiles,
     ConfigurationEntry,
     EntryRules,
+    SocialData,
 )
 from ..configuration import Configuration
 from ..apps import LinkDatabase
@@ -112,7 +113,7 @@ class EntriesCleanup(object):
 
             invalid_entry = None
             invalid_entries = invalid_domain.entry_objects.all()
-            if invalid_entries.count() > 0:
+            if invalid_entries.exists() > 0:
                 invalid_entry = invalid_entries[0]
 
             valid_domain_name = invalid_domain_name[:wh]
@@ -902,7 +903,7 @@ class EntryUpdater(object):
         are_tags = 0
         if not entry.is_archive_entry():
             tags = entry.tags.all()
-            if tags.count() > 0:
+            if tags.exists():
                 are_tags = 1
 
         # votes are twice as important as contents
@@ -1072,35 +1073,35 @@ class EntryWrapper(object):
                 link_url = link_url.replace("www.", "")
                 entry_objs = objects.filter(link=link_url)
 
-                if entry_objs.count() > 0 and not entry_objs[0].is_dead():
+                if entry_objs.exists() and not entry_objs[0].is_dead():
                     return entry_objs[0]
 
                 link_url = p.get_protocol_url("http")
                 link_url = link_url.replace("www.", "")
                 entry_objs = objects.filter(link=link_url)
 
-                if entry_objs.count() > 0 and not entry_objs[0].is_dead():
+                if entry_objs.exists() and not entry_objs[0].is_dead():
                     return entry_objs[0]
 
             link_https = p.get_protocol_url("https")
             https_objs = objects.filter(link=link_https)
 
-            if https_objs.count() > 0 and not https_objs[0].is_dead():
+            if https_objs.exists() and not https_objs[0].is_dead():
                 return https_objs[0]
 
             link_http = p.get_protocol_url("http")
             http_objs = objects.filter(link=link_http)
 
-            if http_objs.count() > 0 and not http_objs[0].is_dead():
+            if http_objs.exists() and not http_objs[0].is_dead():
                 return http_objs[0]
 
             """
             If both are dead - return https
             """
 
-            if https_objs.count() > 0:
+            if https_objs.exists():
                 return https_objs[0]
-            if http_objs.count() > 0:
+            if http_objs.exists():
                 return http_objs[0]
 
         objs = objects.filter(link=self.link)
@@ -1194,7 +1195,7 @@ class EntryWrapper(object):
 
         objs = ArchiveLinkDataController.objects.filter(link=entry_obj.link)
 
-        if objs.count() == 0:
+        if not objs.exists():
             themap = entry_obj.get_map(stringify=False)
             try:
                 if hasattr(entry_obj, "source"):
@@ -1224,7 +1225,7 @@ class EntryWrapper(object):
         link = archive_obj.link
 
         objs = LinkDataController.objects.filter(link=archive_obj.link)
-        if objs.count() == 0:
+        if not objs.exists():
             themap = archive_obj.get_map(stringify=False)
             try:
                 if hasattr(archive_obj, "source"):
@@ -1362,7 +1363,7 @@ class EntryWrapper(object):
         """
         destination_entries = LinkDataController.objects.filter(link=destination_url)
 
-        if destination_entries.count() > 0:
+        if destination_entries.exists():
             return self.move_entry(destination_entries[0])
         else:
             self.entry.link = destination_url
@@ -1480,7 +1481,7 @@ class EntryWrapper(object):
             http_url = entry.get_http_url()
 
             http_entries = LinkDataController.objects.filter(link=http_url)
-            if http_entries.count() != 0:
+            if http_entries.exists():
                 w = EntryWrapper(entry=http_entries[0])
                 w.move_entry(entry)
 
@@ -1489,7 +1490,7 @@ class EntryWrapper(object):
 
             # if we have both, destroy http entry
             https_entries = LinkDataController.objects.filter(link=https_url)
-            if https_entries.count() != 0:
+            if https_entries.exists():
                 self.move_entry(https_entries[0])
 
         return self.entry
@@ -1896,7 +1897,7 @@ class EntryDataBuilder(object):
                 elif c.new_entries_merge_data:
                     BackgroundJobController.entry_update_data(entry)
 
-        self.add_addition_link_data(entry)
+                self.add_addition_link_data(entry)
 
         return entry
 
@@ -2026,23 +2027,26 @@ class EntryDataBuilder(object):
     def add_addition_link_data(self, entry):
         link_data = self.link_data
 
-        self.add_sub_links()
-        self.add_keywords()
-        self.add_domain()
+        self.add_sub_links(entry)
+        self.add_keywords(entry)
+        self.add_domain(entry)
+        self.add_socialdata(entry)
 
         if entry:
             self.download_thumbnail(entry.thumbnail)
 
-    def add_domain(self):
-        url = UrlLocation(self.link_data["link"]).get_domain()
-        entries = LinkDataController.objects.filter(link=url)
-        if entries.count() == 0:
-            if "source" in self.link_data:
-                BackgroundJobController.link_add(
-                    url=url, source=self.link_data["source"]
-                )
-            else:
-                BackgroundJobController.link_add(url=url)
+    def add_domain(self, entry):
+        #url = UrlLocation(entry.link).get_domain()
+        #    if "source" in self.link_data:
+        #        BackgroundJobController.link_add(
+        #            url=url, source=self.link_data["source"]
+        #        )
+        #    else:
+        #        BackgroundJobController.link_add(url=url)
+        pass
+
+    def add_socialdata(self, entry):
+        SocialData.get(entry)
 
     def download_thumbnail(self, thumbnail_path):
         if thumbnail_path:
@@ -2050,7 +2054,7 @@ class EntryDataBuilder(object):
             if config.auto_store_thumbnails:
                 BackgroundJobController.download_file(thumbnail_path)
 
-    def add_sub_links(self):
+    def add_sub_links(self, entry):
         """
         Adds links from description of that link.
         Store link as-is.
@@ -2098,14 +2102,12 @@ class EntryDataBuilder(object):
                 else:
                     BackgroundJobController.link_add(url=link)
 
-    def add_keywords(self):
-        link_data = self.link_data
-
+    def add_keywords(self, entry):
         config = Configuration.get_object().config_entry
 
         if config.enable_keyword_support:
-            if "title" in link_data and link_data["title"] and link_data["title"] != "":
-                KeyWords.add_link_data(link_data)
+            if entry.title and entry.title != "":
+                KeyWords.add_link_data(entry.title)
 
     def read_domains_from_bookmarks():
         objs = LinkDataController.objects.filter(bookmarked=True)

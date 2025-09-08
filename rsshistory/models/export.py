@@ -112,7 +112,7 @@ class DataExport(models.Model):
             export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
         )
 
-        if exps.count() > 0:
+        if exps.exists():
             return True
         else:
             return False
@@ -122,7 +122,7 @@ class DataExport(models.Model):
             export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
         )
 
-        if exps.count() > 0:
+        if exps.exists():
             return True
         else:
             return False
@@ -132,7 +132,7 @@ class DataExport(models.Model):
             export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
         )
 
-        if exps.count() > 0:
+        if exps.exists():
             return True
         else:
             return False
@@ -170,7 +170,7 @@ class SourceExportHistory(models.Model):
 
         history = SourceExportHistory.objects.filter(date=yesterday, export=export)
 
-        if history.count() != 0:
+        if history.exists():
             return False
 
         c = Configuration.get_object()
@@ -191,10 +191,8 @@ class SourceExportHistory(models.Model):
         if input_date is not None:
             process_date = input_date
 
-        if (
-            SourceExportHistory.objects.filter(date=process_date, export=export).count()
-            == 0
-        ):
+        exists = SourceExportHistory.objects.filter(date=process_date, export=export).exists()
+        if not exists:
             SourceExportHistory.objects.create(date=process_date, export=export)
 
     def cleanup(cfg=None):

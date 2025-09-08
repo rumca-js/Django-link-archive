@@ -514,7 +514,7 @@ class ConfigurationEntry(models.Model):
         Most probably should not be used directly. Should be cached in application
         """
         confs = ConfigurationEntry.objects.all()
-        if confs.count() == 0:
+        if not confs.exists():
             return ConfigurationEntry.objects.create()
         else:
             return confs[0]
@@ -675,7 +675,7 @@ class UserConfig(models.Model):
         """
         if input_user and input_user.is_authenticated:
             confs = UserConfig.objects.filter(user__id=input_user.id)
-            if confs.count() != 0:
+            if confs.exists():
                 return confs[0]
 
         # create some user from settings
@@ -724,7 +724,7 @@ class UserConfig(models.Model):
         configs = UserConfig.objects.filter(user__isnull=True)
         for uc in configs:
             us = User.objects.filter(username=uc.user)
-            if us.count() > 0:
+            if us.exists():
                 uc.user = us[0]
                 uc.save()
 

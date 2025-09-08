@@ -22,7 +22,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.16.15"
+__version__ = "2.16.16"
 
 
 class Configuration(object):
@@ -152,7 +152,7 @@ class Configuration(object):
 
         self.apply_web_logger()
 
-        if Browser.objects.all().count() == 0:
+        if not Browser.objects.all().exists():
             Browser.read_browser_setup()
 
     def apply_web_logger(self):
@@ -213,7 +213,7 @@ class Configuration(object):
 
     def get_superuser(self):
         users = User.objects.filter(is_superuser=True)
-        if users.count() > 0:
+        if users.exists():
             return users[0]
 
     def get_local_time(self, utc_time):

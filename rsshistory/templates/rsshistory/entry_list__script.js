@@ -107,10 +107,25 @@ function fillListData() {
         fillEntryDislikes(entries);
     }
 
+    fillErrors(data.errors);
+
     if (debug_mode) {
        let query_info = GetQueryDetailsHtml(data);
        $('#queryInfo').html(query_info);
     }
+}
+
+
+function fillErrors(errors) {
+   if (errors == null) {
+      return null;
+   }
+
+   text = "";
+   errors.forEach(error => {
+	   text += `<div>${error}</div>`;
+   });
+   $('#queryInfo').html(text);
 }
 
 

@@ -345,7 +345,7 @@ class UserEntryVisitHistory(models.Model):
 
         visits = UserEntryVisitHistory.objects.filter(user=user, entry=entry)
 
-        if visits.count() == 0:
+        if not visits.exists():
             visit = UserEntryVisitHistory.objects.create(
                 visits=1,
                 entry=entry,
@@ -374,7 +374,7 @@ class UserEntryVisitHistory(models.Model):
         visits = UserEntryVisitHistory.objects.filter(user=user, entry=entry)
 
         if (
-            visits.count() > 0
+            visits.exists()
             and visits[0].date_last_visit
             and visits[0].date_last_visit
             > DateUtils.get_datetime_now_utc() - timedelta(minutes=1)
@@ -404,7 +404,7 @@ class UserEntryVisitHistory(models.Model):
             entry=entry,
         )
 
-        if histories.count() > 0:
+        if histories.exists():
             history = histories[0]
             if entry.visits > 0:
                 return True

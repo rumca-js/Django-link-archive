@@ -166,7 +166,7 @@ class DomainsController(Domains):
 
     def create_object(domain_only_text, protocol):
         old_entries = Domains.objects.filter(domain=domain_only_text)
-        if old_entries.count() > 0:
+        if old_entries.exists():
             ob = old_entries[0]
         else:
             import tldextract
@@ -278,7 +278,7 @@ class DomainsController(Domains):
             )
 
             domains = DomainsController.objects.filter(domain=domain_only)
-            if domains.count() == 0:
+            if not domains.exists():
                 LinkDatabase.info(
                     "Create missing domains entry:{} - missing domain".format(
                         entry.link

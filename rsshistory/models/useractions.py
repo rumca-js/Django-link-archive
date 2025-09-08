@@ -95,7 +95,7 @@ class UserTags(models.Model):
 
         objs = UserTags.objects.filter(entry=entry, user=user, tag=tag_name)
 
-        if objs.count() == 0:
+        if not objs.exists():
             UserTags.objects.create(entry=entry, user=user, tag=tag_name)
 
     def set_tags(entry, tags_string, user=None):
@@ -230,7 +230,7 @@ class EntryCompactedTags(models.Model):
 
         tags = UserTags.objects.filter(entry=entry).order_by("tag")
 
-        if tags.count() > 0:
+        if tags.exists():
             tag_text = ""
             for tag in tags:
                 tag_text += tag.tag + ","
@@ -264,7 +264,7 @@ class UserCompactedTags(models.Model):
 
         tags = UserTags.objects.filter(user=user, tag=tag_name)
 
-        if tags.count() > 0:
+        if tags.exists():
             UserCompactedTags.objects.create(
                 tag=tag_name, count=tags.count(), user=user
             )
@@ -291,7 +291,7 @@ class CompactedTags(models.Model):
         for tag in tags:
             sum += tag.count
 
-        if tags.count() > 0:
+        if tags.exists():
             CompactedTags.objects.create(tag=tag_name, count=sum)
 
     def cleanup(cfg=None):
@@ -328,7 +328,7 @@ class UserVotes(models.Model):
         ob = None
 
         if vote != 0:
-            if votes.count() == 0:
+            if not votes.exists():
                 votes = UserVotes.objects.filter(user=user, entry=entry)
                 votes.delete()
 
@@ -342,7 +342,7 @@ class UserVotes(models.Model):
                 ob.vote = vote
                 ob.save()
         else:
-            if votes.count() != 0:
+            if votes.exists():
                 votes = UserVotes.objects.filter(user=user, entry=entry)
                 votes.delete()
 
@@ -354,7 +354,7 @@ class UserVotes(models.Model):
 
     def get_user_vote(user, entry):
         votes = UserVotes.objects.filter(user=user, entry=entry)
-        if votes.count() > 0:
+        if votes.exists():
             vote = votes[0].vote
             return vote
 
@@ -400,9 +400,9 @@ class UserVotes(models.Model):
         # recreate missing entries, from votes alone
         for entry in LinkDataModel.objects.filter(page_rating_votes__gt=0):
             votes = UserVotes.objects.filter(entry=entry)
-            if votes.count() == 0:
+            if not votes.exists():
                 users = User.objects.filter(is_superuser=True)
-                if users.count() > 0:
+                if users.exists():
                     UserVotes.add(users[0], entry, entry.page_rating_votes)
 
     def move_entry(source_entry, destination_entry):
@@ -515,7 +515,7 @@ class UserBookmarks(models.Model):
             return
 
         objs = UserBookmarks.objects.filter(user=user, entry=entry)
-        if objs.count() == 0:
+        if not objs.exists():
             UserBookmarks.objects.create(user=user, entry=entry)
             return True
 
@@ -544,7 +544,7 @@ class UserBookmarks(models.Model):
     def is_bookmarked(entry):
         bookmarks = UserBookmarks.objects.filter(entry=entry)
 
-        if bookmarks.count() > 0:
+        if bookmarks.exists():
             return True
 
         return False

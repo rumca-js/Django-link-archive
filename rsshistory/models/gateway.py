@@ -89,7 +89,7 @@ class Gateway(models.Model):
             Gateway.populate()
 
     def check_init():
-        if Gateway.objects.all().count() == 0:
+        if not Gateway.objects.all().exists():
             Gateway.populate()
 
     def populate():

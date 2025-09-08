@@ -117,7 +117,7 @@ class BackgroundJobController(BackgroundJob):
         objs = BackgroundJobController.objects.filter(
             condition_subject & condition_enabled & (condition_update | condition_reset)
         )
-        return objs.count() > 0
+        return objs.exists()
 
     def create_single_job(job_name, subject="", args="", user=None, cfg=None):
         from ..configuration import Configuration
@@ -127,7 +127,7 @@ class BackgroundJobController(BackgroundJob):
             args_text = json.dumps(cfg)
 
         items = BackgroundJobController.objects.filter(job=job_name, subject=subject)
-        if items.count() == 0:
+        if not items.exists():
             job = BackgroundJobController.objects.create(
                 job=job_name,
                 task=None,

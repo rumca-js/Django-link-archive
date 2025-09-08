@@ -409,6 +409,15 @@ class BaseLinkDataController(BaseLinkDataModel):
         names.add("date_created")
         names.add("date_dead_since")
         names.add("date_update_last")
+
+        names.add("socialdata__stars")
+        names.add("socialdata__view_count")
+        names.add("socialdata__thumbs_up")
+        names.add("socialdata__thumbs_down")
+        names.add("socialdata__upvote_diff")
+        names.add("socialdata__upvote_ratio")
+        names.add("socialdata__followers_count")
+
         return sorted(list(names))
 
     def get_all_export_names():
@@ -748,7 +757,7 @@ class LinkDataModel(BaseLinkDataController):
         if url.startswith("http:"):
             new_url = url.replace("http://", "https://")
             entries = LinkDataModel.objects.filter(link=new_url)
-            if entries.count() > 0:
+            if entries.exists():
                 self.delete()
 
 
@@ -786,5 +795,5 @@ class ArchiveLinkDataModel(BaseLinkDataController):
         if url.startswith("http:"):
             new_url = url.replace("http://", "https://")
             entries = ArchiveLinkDataModel.objects.filter(link=new_url)
-            if entries.count() > 0:
+            if entries.exists():
                 self.delete()

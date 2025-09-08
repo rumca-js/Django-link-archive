@@ -25,7 +25,7 @@ class SourceCategories(models.Model):
     def add(category_name):
         if category_name and category_name != "":
             objs = SourceCategories.objects.filter(name=category_name)
-            if objs.count() == 0:
+            if not objs.exists():
                 return SourceCategories.objects.create(name=category_name)
 
     def get(category_name):
@@ -81,7 +81,7 @@ class SourceSubCategories(models.Model):
             objs = SourceSubCategories.objects.filter(
                 category_name=category_name, name=subcategory_name
             )
-            if objs.count() == 0:
+            if not objs.exists():
                 return SourceSubCategories.objects.create(
                     category_name=category_name,
                     name=subcategory_name,
@@ -92,7 +92,7 @@ class SourceSubCategories(models.Model):
         objs = SourceSubCategories.objects.filter(
             category_name=category_name, name=subcategory_name
         )
-        if objs.count() != 0:
+        if objs.exists():
             return objs[0]
 
     def __str__(self):

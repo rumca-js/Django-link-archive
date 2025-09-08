@@ -36,7 +36,7 @@ class SourceDataController(SourceDataModel):
 
         for source in sources:
             entries = LinkDataModel.objects.filter(link=source.url)
-            if entries.count() == 0:
+            if not entries.exists():
                 SourceDataController.add_entry(source)
             else:
                 entry = entries[0]
@@ -54,9 +54,11 @@ class SourceDataController(SourceDataModel):
             else:
                 sources = SourceDataModel.objects.all()
 
-        if sources.count() > 0:
+        if sources.exists():
             for source in sources:
                 source.custom_remove()
+
+        return True
 
     def get_days_to_remove(self):
         days = self.remove_after_days
@@ -168,7 +170,7 @@ class SourceDataController(SourceDataModel):
             if not valid:
                 consecutive_errors += 1
 
-            if op_datas.count() == 0:
+            if not op_datas.exists():
                 SourceOperationalData.objects.create(
                     date_fetched=date_fetched,
                     import_seconds=import_seconds,
@@ -206,7 +208,7 @@ class SourceDataController(SourceDataModel):
 
     def get_entry_url(self):
         entries = LinkDataModel.objects.filter(link=self.url)
-        if entries.count() > 0:
+        if entries.exists():
             return entries[0].get_absolute_url()
 
         else:
@@ -266,7 +268,7 @@ class SourceDataController(SourceDataModel):
             op.save()
 
         entries = LinkDataModel.objects.filter(link=self.url)
-        if entries.count() == 0:
+        if not entries.exists():
             SourceDataController.add_entry(self)
 
         BackgroundJobController.download_rss(self)
@@ -285,7 +287,7 @@ class SourceDataController(SourceDataModel):
         self.save()
 
         entries = LinkDataModel.objects.filter(link=self.url)
-        if entries.count() > 0:
+        if entries.exists():
             for entry in entries:
                 w = EntryWrapper(entry=entry)
                 w.evaluate()
@@ -422,7 +424,7 @@ class SourceDataBuilder(object):
         self.strict_ids = strict_ids
 
         sources = SourceDataController.objects.filter(url=link)
-        if sources.count() > 0:
+        if sources.exists():
             return None
 
         source = SourceDataController.objects.create(link=link)
@@ -461,7 +463,7 @@ class SourceDataBuilder(object):
             self.link_data["favicon"] = self.link_data["thumbnail"]
 
         sources = SourceDataController.objects.filter(url=self.link_data["url"])
-        if sources.count() > 0:
+        if sources.exists():
             return None
 
         conf = Configuration.get_object().config_entry

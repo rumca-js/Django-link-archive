@@ -83,7 +83,7 @@ class Browser(models.Model):
             enabled = browser_config["enabled"]
 
             browsers = Browser.objects.filter(name=browser_config["name"])
-            if browsers.count() == 0:
+            if not browsers.exists():
                 conf = Browser.objects.create(
                     enabled=enabled,
                     name=browser_config["name"],
