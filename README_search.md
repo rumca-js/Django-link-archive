@@ -1,6 +1,9 @@
-# Why this happened
+# Why this project started
 
 Google Search Is Dying [https://dkb.io/post/google-search-is-dying](https://dkb.io/post/google-search-is-dying)
+
+ - If we cannot rely on Google to find stuff we need some alternatives
+ - I started collecting links using RSS sources - see below
 
 ## Inspirations
 
