@@ -6,6 +6,23 @@ You can be one.
 
 The goal is to create personal archive database. We require small footprint. It should be able to run on SBC, like raspberry PI 5.
 
+# Keep it small
+
+We want small footprint. The database cannot grow indefinitely.
+
+Keep limits on user actions:
+ - store data only necessary amount of data
+ - always define archive limit, we do not allow the database to grow indefinitely
+
+# Conventions
+
+ - everything that relates to link should start with "Entry"
+ - everything that relates to source should start with "Source"
+ - new services are handled by 'services' directory (like handling GIT, webarchive, etc.)
+ - serialization is handled by 'serializers' directory
+ - we use one queue to check for jobs, and processing queue. We do not need many queues, as it makes system more difficult. We do not need speed, as we are ethical scrapers
+ - this program was not designed to store Internet pages, but to store Internet meta data (title, description). We should rely on other services for cooperation. We cannot store entire Internet on a hard drive. We can store some meta though
+
 # On web crawling
 
 Please do not make anyone live miserable. It was designed to capture information from publicly available data (for example RSS), not to exploit anybody.
@@ -23,32 +40,24 @@ RSS reading is not easy: [https://flak.tedunangst.com/post/cloudflare-and-rss](h
 
 That gives us the conslusion, you have to be a sneaky bot, even if what you are doing is not wrong.
 
-# Keep it small
+# On RSS buttons 'mark all read'
+The button is stupid because it is not true. When you have RSS reader it fetches links into the database. When you hit the button, you did not in fact read all.
 
-We want small footprint. The database cannot grow indefinitely.
-
-Keep limits on user actions:
- - store data only necessary amount of data
- - always define archive limit, we do not allow the database to grow indefinitely
+ - The software marks user visits, which can be interpreted as 'reading'. When you visit RSS entry it counts as a 'read'
+ - You cannot click one button and mark everything as 'read'
+ - User visits mark database row. If we have 500 RSS sources, we can have many many links. To limit footprint we do not want visit for all links in database to be generated
+ - We can think about a button that marks point in time, that everything "before" is not new. Maybe we can think about "mark all read" to be consistent with other software, but it will be using something underneat that marks a border between what's new
 
 # Development
 
  - installation should be simple and easy. Provide most common installation methods (Python poetry, docker)
- - user interactions should be short and simple. All data that can be postponed to threads, should be
- - limit barriers of entry. There should be no obstacles
+ - user interactions should be short and simple. Move some code to tasks, jobs, queues
+ - limit barriers of entry. There should be no obstacles for user. Software should be ready to be used from start
  - easy import and exported data. The user need to be able to create a new instance in a matter of minutes
  - default configuration should cover 90% of needs
- - KISS. Do not focus on javascript, and other libraries that make the project bloated, hard to develop for. I know that we already use bootstrap, but we still limit the libraries / frameworks
+ - KISS
+ - use REST-like API, so that browser on client side does heavy lifting
  - provide initial data. Add some RSS sources, block lists, or any other things, that help user to start the project
-
-# Conventions
-
- - everything that relates to link should start with "Entry"
- - everything that relates to source should start with "Source"
- - new services are handled by 'services' directory (like handling GIT, webarchive, etc.)
- - serialization is handled by 'serializers' directory
- - we use one queue to check for jobs, and processing queue. We do not need many queues, as it makes system more difficult. We do not need speed, as we are ethical scrapers
- - this program was not designed to store Internet pages, but to store Internet meta data (title, description). We should rely on other services for cooperation. We cannot store entire Internet on a hard drive. We can store some meta though
 
 # Crawling algorithm
 
@@ -69,6 +78,7 @@ Scenario:
  - do not change exported names of link data model. We do not want to be forced to regenerate all links again. We can add new fields though
  - do not fetch all objects from any table. Do not use Model.objects.all(). One exception: to obtain length of table
  - do not use len() for checking length of table. Use queryset 'count' API
+ - do not use count() if exists() is enough
  - do not use datetime.now(). Use django timezone datetime, or other native means
  - do not iterate over object using .all() [Use batch approach](https://djangosnippets.org/snippets/1170/)
  - if SQLlite is used, then try to cache data. Requesting many things from database might lead to database locking. Therefore passing objects as arguments may not necessarily be the best idea
