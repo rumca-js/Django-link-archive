@@ -41,12 +41,6 @@ You can be one.
 
 Cloudflare and RSS [https://flak.tedunangst.com/post/cloudflare-and-rss](https://flak.tedunangst.com/post/cloudflare-and-rss)
 
-# RSS Reader Behavior
- - The "Mark All Read" button in typical RSS readers is misleading. Here’s how we handle it:
- - A read is only counted when a user visits an entry.
- - Bulk-marking all entries as "read" doesn't reflect real usage.
- - Instead, implement a timestamp boundary: "Mark all before this time as read".
-
 # Development
 
  - Easy installation: Support Poetry and Docker.
@@ -73,19 +67,8 @@ Parts:
  - Use timezone.now() instead of datetime.now().
  - Process large datasets in batches, not via .all().
  - For SQLite: Avoid high-concurrency. Cache or pass values instead of querying frequently.
+ - Keep in mind parts of code, or architectural ideas are moved to other repos, so make the code reusable
  
-# Omni search
-
-Uses sympy.
-
-Processing:
- - read input condition from input to symbol equation that can be digested by sympy 
-      * (link_field = search_value) into (A) condition
-      * (link_field = search_value) & (link_field2 = search_value2) into (A) & (B) condition
- - traverse with sympy equation
- - translate each condition (A, B ...) into Django Q objects
- - use Q object to select from link database
-
 # Reserved names
 
 Some usernames and tags have predefined meanings. [TBD]
