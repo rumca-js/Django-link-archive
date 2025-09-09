@@ -4,84 +4,75 @@ You can be one.
 
 # Hardware requirements
 
-The goal is to create personal archive database. We require small footprint. It should be able to run on SBC, like raspberry PI 5.
+ - the application is optimized for low-resource environments
+ - must run reliably on SBC devices like the Raspberry Pi 5
 
-# Keep it small
+# Storage & Footprint
 
-We want small footprint. The database cannot grow indefinitely.
+ - We aim to keep the database small and controlled:
+ - The archive must not grow indefinitely.
+ - Users should only store essential data.
+ - Archiving limits must be defined and enforced.
+ - Avoid storing entire webpages — only metadata like title and description.
 
-Keep limits on user actions:
- - store data only necessary amount of data
- - always define archive limit, we do not allow the database to grow indefinitely
+# Naming & Directory Conventions
 
-# Conventions
+ - Entry*: Refers to links or individual items.
+ - Source*: Refers to content sources (e.g., RSS feeds).
+ - Services like Git or Web Archive go in the services/ directory.
+ - Data serialization logic lives in the serializers/ directory.
+ - We use a limited amount of job queues.
+ - This system is not a full web archive — it complements other tools by storing metadata only.
 
- - everything that relates to link should start with "Entry"
- - everything that relates to source should start with "Source"
- - new services are handled by 'services' directory (like handling GIT, webarchive, etc.)
- - serialization is handled by 'serializers' directory
- - we use one queue to check for jobs, and processing queue. We do not need many queues, as it makes system more difficult. We do not need speed, as we are ethical scrapers
- - this program was not designed to store Internet pages, but to store Internet meta data (title, description). We should rely on other services for cooperation. We cannot store entire Internet on a hard drive. We can store some meta though
+# Ethical Crawling Guidelines
 
-# On web crawling
+ - This project was designed to interact with publicly accessible content responsibly.
+ - Respect robots.txt.
+ - Avoid aggressive crawling — use reasonable intervals.
+ - Don't burden sites or break terms of service.
+ - Prefer RSS or open APIs when possible.
 
-Please do not make anyone live miserable. It was designed to capture information from publicly available data (for example RSS), not to exploit anybody.
+# Common Crawling Challenges
 
-We should not crawling aggressively. Reads intervals should be sane. We should be reading robots.txt
+ - Some websites hide content unless accessed with a browser-like User-Agent.
+ - Services like Spotify block Python HTTP libraries — consider using Selenium.
+ - Cloudflare and other services use bot-detection (use tools like Chromium Stealth).
+ - In short: Even ethical bots sometimes need to be "sneaky."
 
-On the other hand some web pages use sofisticated barriers that prevents us from successfuly crawling the web contents.
+Cloudflare and RSS [https://flak.tedunangst.com/post/cloudflare-and-rss](https://flak.tedunangst.com/post/cloudflare-and-rss)
 
-Most common techniques:
- - Some pages do not display contents, or provide invalid html data. You can use different user agent. Best results can be obtained if we used chrome user agent
- - Spotify does not display any HTML code if we use common python requests API. For such pages we can use "selenium"
- - Web page uses cloudflare and checks if you are human. There are several techniques for that. There is chromium stealth and other solutions
-
-RSS reading is not easy: [https://flak.tedunangst.com/post/cloudflare-and-rss](https://flak.tedunangst.com/post/cloudflare-and-rss)
-
-That gives us the conslusion, you have to be a sneaky bot, even if what you are doing is not wrong.
-
-# On RSS buttons 'mark all read'
-The button is stupid because it is not true. When you have RSS reader it fetches links into the database. When you hit the button, you did not in fact read all.
-
- - The software marks user visits, which can be interpreted as 'reading'. When you visit RSS entry it counts as a 'read'
- - You cannot click one button and mark everything as 'read'
- - User visits mark database row. If we have 500 RSS sources, we can have many many links. To limit footprint we do not want visit for all links in database to be generated
- - We can think about a button that marks point in time, that everything "before" is not new. Maybe we can think about "mark all read" to be consistent with other software, but it will be using something underneat that marks a border between what's new
+# RSS Reader Behavior
+ - The "Mark All Read" button in typical RSS readers is misleading. Here’s how we handle it:
+ - A read is only counted when a user visits an entry.
+ - Bulk-marking all entries as "read" doesn't reflect real usage.
+ - Instead, implement a timestamp boundary: "Mark all before this time as read".
 
 # Development
 
- - installation should be simple and easy. Provide most common installation methods (Python poetry, docker)
- - user interactions should be short and simple. Move some code to tasks, jobs, queues
- - limit barriers of entry. There should be no obstacles for user. Software should be ready to be used from start
- - easy import and exported data. The user need to be able to create a new instance in a matter of minutes
- - default configuration should cover 90% of needs
- - KISS
- - use REST-like API, so that browser on client side does heavy lifting
- - provide initial data. Add some RSS sources, block lists, or any other things, that help user to start the project
+ - Easy installation: Support Poetry and Docker.
+ - Minimal configuration: Defaults should satisfy 90% of users.
+ - Clean UX: User actions should be simple and intuitive.
+ - Modular tasks: Offload heavy lifting to queues/jobs.
+ - Easy data import/export.
+ - REST-like APIs: Frontend does most of the processing.
+ - Include useful defaults: RSS sources, block lists, etc.
+ - Keep It Simple (KISS).
 
-# Crawling algorithm
+# Crawling architecture
 
 Parts:
  - django application
- - crawling server (script_server.py)
- - crawling script (for example crawleebeautifulsoup.py)
+ - crawling server (cralwer buddy)
+ - queue background thread
+ 
+# Code & DB Practices
 
-Scenario:
- - Django app detects it needs meta data
- - Connects to crawling server, sends request
- - crawling server starts script
- - crawling script tries to obtain info about link, returns data to crawling server
- - crawling server sends data back to caller (django app)
-
-## Notes
-
- - do not change exported names of link data model. We do not want to be forced to regenerate all links again. We can add new fields though
- - do not fetch all objects from any table. Do not use Model.objects.all(). One exception: to obtain length of table
- - do not use len() for checking length of table. Use queryset 'count' API
- - do not use count() if exists() is enough
- - do not use datetime.now(). Use django timezone datetime, or other native means
- - do not iterate over object using .all() [Use batch approach](https://djangosnippets.org/snippets/1170/)
- - if SQLlite is used, then try to cache data. Requesting many things from database might lead to database locking. Therefore passing objects as arguments may not necessarily be the best idea
+ - Avoid changing exported names in the Link model.
+ - Never use .all() unless necessary. Use .count() only when measuring length.
+ - Prefer .exists() over .count() for existence checks.
+ - Use timezone.now() instead of datetime.now().
+ - Process large datasets in batches, not via .all().
+ - For SQLite: Avoid high-concurrency. Cache or pass values instead of querying frequently.
  
 # Omni search
 
@@ -95,22 +86,9 @@ Processing:
  - translate each condition (A, B ...) into Django Q objects
  - use Q object to select from link database
 
-# Styles
-
-Most of views use 'lists' to display elements.
-
-Each link element style is reflected by a separate style in a CSS file.
-
-What if we do not want to use main style for highlights, but for youtube we would like a slightly different color?
-
-Each style should be independent from other styles.
-
 # Reserved names
 
-Expect some names to be reserved.
-
-Users:
- - OpenPageRank - this user will be used to add votes from page rank
+Some usernames and tags have predefined meanings. [TBD]
 
 Some tags will have special meaning. These tags might be used to produce dashboards, etc.
 
@@ -118,22 +96,3 @@ Tags:
  - gatekeepers
  - search engine
  - social platform
-
-# Debugging and other calls
-
-Celery can be debugged as follows
-```
-celery --help
-celery inspect --help
-celery call --help
-```
-
-Shows which tasks are running
-```
-poetry run celery inspect registered
-```
-
-Call process jobs with JSON arguments
-```
-celery call app.tasks.process_all_jobs -a '["rsshistory.threadhandlers.OneTaskProcessor"]'
-```
