@@ -286,6 +286,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
             if should_stop:
                 break
 
+            c = Configuration.get_object()
             if c.is_memory_limit_reached():
                 AppLogging.error("{}: Memory limit reached".format(self.get_name()))
                 return

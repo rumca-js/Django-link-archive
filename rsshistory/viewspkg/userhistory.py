@@ -113,38 +113,32 @@ def json_user_search_history(request):
 
 
 def search_history_remove(request, pk):
-    p = ViewPage(request)
-    p.set_title("Remove search history")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
-
-    entry = UserSearchHistory.objects.get(id=pk)
-    entry.delete()
-
-    p.context["summary_text"] = "Removed search from history"
-    return p.render("go_back.html")
-
-
-def user_search_history_remove(request):
-    p = ViewPage(request)
-    p.set_title("Remove search history")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
     json_obj = {}
 
-    search = None
-    if "search" in request.GET:
-        search = request.GET["search"]
-    else:
-        json_obj["errors"] = "Missing link in arguments"
-        return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+    json_obj["status"] = False
+
+    entries = UserSearchHistory.objects.filter(id = pk)
+    if entries.exists():
+        json_obj["status"] = True
+        entries.delete()
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+
+def user_search_history_remove(request, pk):
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+    json_obj = {}
 
     json_obj["status"] = False
 
-    entries = UserSearchHistory.objects.filter(user=request.user, search_query = search)
+    entries = UserSearchHistory.objects.filter(id = pk, user=request.user)
     if entries.exists():
         json_obj["status"] = True
         entries.delete()

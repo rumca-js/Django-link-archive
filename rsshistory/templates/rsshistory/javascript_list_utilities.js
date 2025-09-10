@@ -83,15 +83,13 @@ function fillSearchHistory(items) {
             let query = item.search_query
             let item_escaped = escapeHtml(query);
 
-            const url = `{% url "rsshistory:user-search-history-remove" %}?search=${encodeURIComponent(query)}&${currentUrl.searchParams.toString()}`;
-
             var listItem = `
                 <div class="list-group-item list-group-item-action d-flex align-items-center">
-                   <a href="${url}" class="btnFilterTrigger" data-search="${item_escaped}">
+                   <a href="" class="btnFilterTrigger" data-search="${query}">
                    🔍
                        ${item_escaped}
                    </a>
-		   <a href="${url}" class="ms-auto user-history-remove" data-search="${item_escaped}">
+		   <a href="" class="ms-auto user-history-remove" data-search-id="${item.id}">
                      <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
 		   </a>
                 </div>

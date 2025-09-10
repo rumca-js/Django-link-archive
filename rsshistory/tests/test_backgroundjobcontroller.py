@@ -403,7 +403,7 @@ class BackgroundJobHistoryTest(FakeInternetTestCase):
     def test_mark_done(self):
         BackgroundJobHistory.objects.all().delete()
 
-        BackgroundJobHistory.mark_done(job=BackgroundJobController.JOB_CLEANUP)
+        BackgroundJobHistory.mark_done(job_name=BackgroundJobController.JOB_CLEANUP)
 
         jobs = BackgroundJobHistory.objects.all()
 

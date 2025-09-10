@@ -36,6 +36,7 @@ from ..models import (
     EntryRules,
     SearchView,
 )
+from ..controllers import SystemOperationController
 from ..configuration import Configuration
 from ..pluginurl import UrlHandlerEx
 
@@ -335,9 +336,12 @@ class FakeInternetTestCase(TestCase):
         WebConfig.get_crawler_from_mapping = (
             FakeInternetTestCase.get_crawler_from_mapping
         )
+
         RemoteServer.get_getj = self.get_getj
         RemoteServer.get_socialj = self.get_socialj
-        UrlHandlerEx.ping = FakeInternetTestCase.ping
+        UrlHandlerEx.ping = FakeInternetTestCase.ping # TODO this is not needed any more
+
+        SystemOperationController.check_crawling_server = self.check_crawling_server
 
         c = Configuration.get_object()
         c.config_entry = ConfigurationEntry.get()
@@ -381,6 +385,9 @@ class FakeInternetTestCase(TestCase):
         if url.find("reddit.com") >= 0:
             return {"upvote_ratio" : 5}
         return None
+
+    def check_crawling_server(self, thread_id):
+        return True
 
     def get_default_crawler(url):
         crawler = DefaultCrawler(url=url)

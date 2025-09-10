@@ -11,12 +11,13 @@
             title="Date: {{search_history.date}}"
             >
              <li class="list-group-item d-flex justify-content-between  align-items-center">
-		<div>
-                   🔍{{search_history.search_query}}
-		</div>
-		<a href="{% url 'rsshistory:user-search-history-remove' %}?search={{search_history.search_query}} class="ms-auto user-history-remove" data-search="${item_escaped}">
+               <div>
+                  🔍{{search_history.search_query}}
+               </div>
+
+               <a href="{% url 'rsshistory:user-search-history-remove' search_history.id %}" class="ms-auto user-history-remove" data-search="${item_escaped}">
                    <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
-		</a>
+               </a>
              </li>
          </a>
          {% endfor %}

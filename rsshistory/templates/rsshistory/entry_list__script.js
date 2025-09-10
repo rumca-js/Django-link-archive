@@ -217,9 +217,9 @@ $(document).on("click", '#displayDark', function(e) {
 $(document).on("click", '.user-history-remove', function(e) {
     e.preventDefault();
 
-    search_data = $(this).data('search');
+    search_id = $(this).data('search-id');
 
-    url = `{% url "rsshistory:user-search-history-remove" %}?search=${search_data}`;
+    url = `{% url "rsshistory:user-search-history-remove"  117 %}`.replace("117", search_id);
 
     getDynamicJson(url, function(data) {
         if (data.status) {

@@ -259,7 +259,11 @@ class ViewPage(SimpleViewPage):
         c = Configuration.get_object()
         config_entry = c.config_entry
 
-        context.update(c.get_context())
+        configuration_context = c.get_context()
+
+        configuration_context.update(context)
+        context = configuration_context
+
         if self.is_allowed():
             context["is_user_allowed"] = True
 
@@ -299,8 +303,17 @@ class ViewPage(SimpleViewPage):
         except Exception as E:
             return False
 
+    def get_title(self):
+        return "[{}]".format(LinkDatabase.name)
+
     def set_title(self, title):
-        self.context["page_title"] += " - {}".format(title)
+        if "page_title" not in self.context:
+            self.context["page_title"] = self.get_title()
+        if self.context["page_title"] is None:
+            self.context["page_title"] = self.get_title()
+
+        if title:
+            self.context["page_title"] += " - {}".format(title)
 
     def set_access(self, view_access_type):
         self.view_access_type = view_access_type
@@ -360,20 +373,25 @@ class GenericListView(generic.ListView):
 
 class UserGenericListView(GenericListView):
     def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-
         self.search_user_id = None
         self.search_user = None
 
-        if "user_id" in kwargs:
+        if self.request.user.is_authenticated:
+            self.search_user_id = self.request.user.id
+        elif "user_id" in kwargs:
             self.search_user_id = kwargs["user_id"]
-        if "user" in kwargs:
+        elif "user" in kwargs:
             self.search_user_id = kwargs["user"]
 
-        if not self.search_user_id or not self.request.user.is_staff:
+        user = self.get_user()
+
+        return super().get(*args, **kwargs)
+
+    def get_user(self):
+        if self.search_user:
+            return self.search_user
+
+        if self.search_user_id is None and self.request.user.is_authenticated:
             self.search_user_id = self.request.user.id
 
         if self.search_user_id:
@@ -381,14 +399,7 @@ class UserGenericListView(GenericListView):
             if users.exists():
                 self.search_user = users[0]
 
-        return super().get(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super().get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
-
-        return context
+        return self.search_user
 
     def get_queryset(self):
         p = ViewPage(self.request)
@@ -396,7 +407,9 @@ class UserGenericListView(GenericListView):
         if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
-        if self.search_user:
-            return super().get_queryset().filter(user=self.search_user)
+        user = self.get_user()
+
+        if user is not None:
+            return super().get_queryset().filter(user=user)
         else:
             return super().get_queryset()

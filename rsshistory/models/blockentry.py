@@ -9,6 +9,7 @@ from django.templatetags.static import static
 from django.conf import settings
 
 from ..apps import LinkDatabase
+from .system import AppLogging
 
 
 class BlockListReader(object):
