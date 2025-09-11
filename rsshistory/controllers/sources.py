@@ -37,7 +37,7 @@ class SourceDataController(SourceDataModel):
         for source in sources:
             entries = LinkDataModel.objects.filter(link=source.url)
             if not entries.exists():
-                SourceDataController.add_entry(source)
+                BackgroundJobController.source_link_add(source)
             else:
                 entry = entries[0]
                 entry.permanent = True
@@ -260,8 +260,6 @@ class SourceDataController(SourceDataModel):
         if self.enabled:
             return
 
-        from .backgroundjob import BackgroundJobController
-
         op = self.get_dynamic_data()
         if op:
             op.consecutive_errors = 0
@@ -269,7 +267,7 @@ class SourceDataController(SourceDataModel):
 
         entries = LinkDataModel.objects.filter(link=self.url)
         if not entries.exists():
-            SourceDataController.add_entry(self)
+            BackgroundJobController.source_link_add(self)
 
         BackgroundJobController.download_rss(self)
 
@@ -280,7 +278,6 @@ class SourceDataController(SourceDataModel):
         if not self.enabled:
             return
 
-        from .backgroundjob import BackgroundJobController
         from .entriesutils import EntryWrapper
 
         self.enabled = False
@@ -330,8 +327,6 @@ class SourceDataController(SourceDataModel):
         """
         if not self.enabled:
             return
-
-        from .backgroundjob import BackgroundJobController
 
         properties = {"permament": True}
         BackgroundJobController.link_add(
@@ -526,8 +521,6 @@ class SourceDataBuilder(object):
 
     def add_to_download(self, source):
         if source.enabled:
-            from .backgroundjob import BackgroundJobController
-
             BackgroundJobController.download_rss(source)
 
-        source.add_entry()
+        BackgroundJobController.source_link_add(source)

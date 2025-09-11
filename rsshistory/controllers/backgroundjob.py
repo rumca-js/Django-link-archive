@@ -366,6 +366,13 @@ class BackgroundJobController(BackgroundJob):
                 url,
             )
 
+    def source_link_add(source):
+        if not source.enabled:
+            return
+
+        properties = {"permament": True}
+        return BackgroundJobController.link_add(url=source.url, properties=properties, source=source)
+
     def download_file(url=None, user=None):
         if url is None:
             return

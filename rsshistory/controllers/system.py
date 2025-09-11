@@ -2,12 +2,12 @@ from datetime import datetime
 from utils.dateutils import DateUtils
 
 from ..models import (
-    ConfigurationEntry,
     SystemOperation,
     AppLogging,
     BackgroundJob,
     BackgroundJobHistory,
 )
+from ..configuration import Configuration
 from .backgroundjob import BackgroundJobController
 
 
@@ -40,7 +40,7 @@ class SystemOperationController(object):
         """
         import requests
 
-        config_entry = ConfigurationEntry.get()
+        config_entry = Configuration.get_object().config_entry
 
         remote_server = config_entry.remote_webtools_server_location
 
@@ -106,7 +106,7 @@ class SystemOperationController(object):
     def ping_internet(self):
         # TODO this should be done by Url. ping
 
-        config_entry = ConfigurationEntry.get()
+        config_entry = Configuration.get_object().config_entry
 
         test_page_url = config_entry.internet_status_test_url
         if test_page_url == "" or not test_page_url:
@@ -131,7 +131,8 @@ class SystemOperationController(object):
         )
 
     def is_system_healthy(self):
-        c = ConfigurationEntry.get()
+        config_entry = Configuration.get_object().config_entry
+
         if c.enable_background_jobs:
             if not self.is_internet_ok():
                 return False
@@ -202,16 +203,24 @@ class SystemOperationController(object):
         return sorted(result)
 
     def is_time_to_cleanup(self):
-        today_midnight = datetime.now().date()
+        today = datetime.today()
+
+        config_entry = Configuration.get_object().config_entry
+        cleanup_time = config_entry.cleanup_time
+
+        cleanup_date = datetime.combine(today, cleanup_time)
+        cleanup_date = DateUtils.to_utc_date(cleanup_date)
+
+        # job without subject is main job
 
         jobs = BackgroundJobController.objects.filter(
-            job=BackgroundJob.JOB_CLEANUP, subject=""
+            job=BackgroundJob.JOB_CLEANUP, subject="",
         )
         if jobs.exists():
             return False
 
         jobs = BackgroundJobHistory.objects.filter(
-            job=BackgroundJob.JOB_CLEANUP, subject="", date_created__gt=today_midnight
+            job=BackgroundJob.JOB_CLEANUP, subject="", date_created__gt=cleanup_date
         )
         if jobs.exists():
             return False

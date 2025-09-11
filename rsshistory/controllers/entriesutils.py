@@ -2028,14 +2028,15 @@ class EntryDataBuilder(object):
         link_data = self.link_data
 
         self.add_sub_links(entry)
-        self.add_keywords(entry)
-        self.add_domain(entry)
+        # self.add_keywords(entry) # TODO
+        # self.add_domain(entry) # TODO
         self.add_socialdata(entry)
 
         if entry:
             self.download_thumbnail(entry.thumbnail)
 
     def add_domain(self, entry):
+        # TODO
         #url = UrlLocation(entry.link).get_domain()
         #    if "source" in self.link_data:
         #        BackgroundJobController.link_add(

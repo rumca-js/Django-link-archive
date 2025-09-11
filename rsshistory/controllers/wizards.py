@@ -10,77 +10,138 @@ from ..models import (
 from .backgroundjob import BackgroundJobController
 
 
+view_priority = 0
+
+
 def common_views_initialization():
+    view_priority += 1
     SearchView.objects.create(
         name="by votes",
         order_by="-page_rating_votes, -page_rating, link",
         entry_limit=1000,
         hover_text="Search by votes",
+        priority=view_priority,
     )
+
+    view_priority += 1
     SearchView.objects.create(
         name="by visits",
         order_by="-page_rating_visits,-page_rating,-date_published",
         entry_limit=1000,
         hover_text="Search by visits",
+        priority=view_priority,
     )
+
+    view_priority += 1
     SearchView.objects.create(
         name="What's created",
         order_by="-date_created, link",
         date_published_day_limit=7,
         hover_text="Search by date created",
+        priority=view_priority,
     )
+
+    view_priority += 1
     SearchView.objects.create(
         name="What's published",
         order_by="-date_published, link",
         date_published_day_limit=7,
         hover_text="Search by date published",
+        priority=view_priority,
     )
+
+    view_priority += 1
     SearchView.objects.create(
         name="What's dead",
         order_by="-page_rating_votes, compacted_tags__id, -date_dead_since, link",
         filter_statement="date_dead_since__isnull = False",
         date_published_day_limit=7,
         hover_text="Search by date published",
+        priority=view_priority,
+    )
+
+    view_priority += 1
+    SearchView.objects.create(
+        name="Most stars",
+        order_by="-socialdata__stars",
+        filter_statement="socialdata__stars__gte = 0",
+        date_published_day_limit=7,
+        hover_text="Search by stars",
+        priority=view_priority,
+    )
+
+    view_priority += 1
+    SearchView.objects.create(
+        name="Most followers",
+        order_by="-socialdata__followers_count",
+        filter_statement="socialdata__followers_count__gte = 0",
+        date_published_day_limit=7,
+        hover_text="Search by followers count",
+        priority=view_priority,
+    )
+
+    view_priority += 1
+    SearchView.objects.create(
+        name="Most view ratio",
+        order_by="-socialdata_view_ratio",
+        filter_statement="socialdata_view_ratio__gte = 0",
+        date_published_day_limit=7,
+        hover_text="Search by view ratio",
+        priority=view_priority,
     )
 
 
 def setup_views_for_news():
+    view_priority += 1
     SearchView.objects.create(
         name="Default",
         order_by="-date_created, link",
         default=True,
         hover_text="Search",
+        priority=view_priority,
     )
 
     common_views_initialization()
 
+    view_priority += 1
     SearchView.objects.create(
         name="Bookmarked by created",
         filter_statement="bookmarked=True",
         order_by="-date_created, link",
         user=True,
         hover_text="Search bookmarks",
+        priority=view_priority,
     )
+    view_priority += 1
     SearchView.objects.create(
         name="Bookmarked by publish",
         filter_statement="bookmarked=True",
         order_by="-date_published, link",
         user=True,
         hover_text="Search bookmarks",
+        priority=view_priority,
     )
+    view_priority += 1
     SearchView.objects.create(
-        name="Searchs all", order_by="-date_created, link", hover_text="Search"
+        name="Searchs all",
+        order_by="-date_created, link",
+        hover_text="Search",
+        priority=view_priority,
     )
 
 
 def setup_views_for_search_engine():
+    view_priority += 1
     SearchView.objects.create(
         name="Default",
         order_by="-page_rating_votes, compacted_tags__id, date_dead_since, -page_rating, link",
         filter_statement="page_rating_votes > 0",
         default=True,
     )
+
     common_views_initialization()
+
+    view_priority += 1
     SearchView.objects.create(
         name="Bookmarked",
         filter_statement="bookmarked=True",
@@ -88,6 +149,8 @@ def setup_views_for_search_engine():
         user=True,
         hover_text="Search bookmarks",
     )
+
+    view_priority += 1
     SearchView.objects.create(
         name="Searchs all",
         order_by="-page_rating_votes, compacted_tags__id, -date_dead_since, -date_created, link",
@@ -96,10 +159,14 @@ def setup_views_for_search_engine():
 
 
 def setup_views_for_gallery():
+    view_priority += 1
     SearchView.objects.create(
         name="Default", order_by="-date_created, link", default=True
     )
+
     common_views_initialization()
+
+    view_priority += 1
     SearchView.objects.create(
         name="Bookmarked by created",
         filter_statement="bookmarked=True",
@@ -107,6 +174,8 @@ def setup_views_for_gallery():
         user=True,
         hover_text="Search bookmarks",
     )
+
+    view_priority += 1
     SearchView.objects.create(
         name="Bookmarked by publish",
         filter_statement="bookmarked=True",
@@ -114,6 +183,8 @@ def setup_views_for_gallery():
         user=True,
         hover_text="Search bookmarks",
     )
+
+    view_priority += 1
     SearchView.objects.create(
         name="Searchs all", order_by="-date_created, link", hover_text="Search"
     )

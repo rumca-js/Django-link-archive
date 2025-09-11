@@ -57,10 +57,7 @@ class BaseDataWriter(object):
             return exp.get_text(keywords)
 
     def get_export_user(self):
-        name = self.export_config.db_user
-        user_objects = User.objects.filter(username=name)
-        if user_objects.exists():
-            return user_objects[0]
+        return self.export_config.user
 
 
 class DailyDataWriter(BaseDataWriter):

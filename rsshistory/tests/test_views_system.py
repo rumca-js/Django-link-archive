@@ -97,8 +97,8 @@ class SystemViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_wizard_setup_news(self):
-        url = reverse("{}:wizard-setup-news".format(LinkDatabase.name))
+    def test_json_wizard_setup_news(self):
+        url = reverse("{}:json-wizard-setup-news".format(LinkDatabase.name))
         url = url + "?noinitialize=True"
 
         # call tested function
@@ -108,8 +108,8 @@ class SystemViewsTest(FakeInternetTestCase):
         # we do not initialize block lists
         self.assertEqual(BackgroundJobController.get_number_of_jobs(), 0)
 
-    def test_wizard_setup_gallery(self):
-        url = reverse("{}:wizard-setup-gallery".format(LinkDatabase.name))
+    def test_json_wizard_setup_gallery(self):
+        url = reverse("{}:json-wizard-setup-gallery".format(LinkDatabase.name))
         url = url + "?noinitialize=True"
 
         # call tested function
@@ -120,8 +120,8 @@ class SystemViewsTest(FakeInternetTestCase):
         # we do not initialize block lists
         self.assertEqual(BackgroundJobController.get_number_of_jobs(), 0)
 
-    def test_wizard_setup_search_engine(self):
-        url = reverse("{}:wizard-setup-search-engine".format(LinkDatabase.name))
+    def test_json_wizard_setup_search_engine(self):
+        url = reverse("{}:json-wizard-setup-search-engine".format(LinkDatabase.name))
         url = url + "?noinitialize=True"
 
         # call tested function

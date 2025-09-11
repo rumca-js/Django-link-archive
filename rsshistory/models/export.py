@@ -1,8 +1,11 @@
 import traceback
-from django.db import models
 from datetime import time, datetime, date, timedelta
 
+from django.db import models
+from django.conf import settings
+
 from utils.dateutils import DateUtils
+from ..apps import LinkDatabase
 
 from .credentials import Credentials
 from .system import AppLogging
@@ -53,11 +56,12 @@ class DataExport(models.Model):
         null=True,
     )
 
-    db_user = models.CharField(
-        default="",
-        max_length=2000,
-        blank=True,
-        help_text="This instance user for which data will be exporter. Example: bookmarks might be for each user separately. Can be empty",
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name=str(LinkDatabase.name) + "_exports",
+        help_text="This instance user for which data will be exported. Example: bookmarks might be for each user separately. Can be empty",
     )
 
     # maybe we should make another table, for each EXPORT

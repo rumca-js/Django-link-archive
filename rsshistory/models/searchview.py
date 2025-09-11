@@ -220,3 +220,9 @@ class SearchView(models.Model):
             if view.priority != i:
                 view.priority = i
                 view.save()
+
+    def save(self, *args, **kwargs):
+        if self.priority == 0:
+            self.priority = SearchView.objects.all().count()
+
+        super().save(*args, **kwargs)

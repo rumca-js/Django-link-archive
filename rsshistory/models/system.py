@@ -3,7 +3,7 @@ import traceback
 from pathlib import Path
 import os
 from pytz import timezone
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, time
 from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
@@ -111,13 +111,6 @@ class ConfigurationEntry(models.Model):
         help_text="URL of the instance's favicon. For example, https://my-domain.com/static/icons/favicon.ico",
     )
 
-    #admin_user = models.CharField(
-    #    max_length=500,
-    #    default="admin",
-    #    blank=True,
-    #    help_text="Username of the administrator.",
-    #)
-
     admin_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -193,6 +186,10 @@ class ConfigurationEntry(models.Model):
             "If enabled, internal JavaScript and CSS files will be used. "
             "Otherwise, external libraries like jQuery will be loaded from CDNs."
         ),
+    )
+
+    cleanup_time = models.TimeField(
+        default=time(0, 0), help_text="Time at which cleanup is performed"
     )
 
     # TODO change null to blank

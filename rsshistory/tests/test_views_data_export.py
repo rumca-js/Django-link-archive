@@ -52,7 +52,7 @@ class DataExportTests(FakeInternetTestCase):
             "remote_path": "something.git",
             "user": "",
             "password": "",
-            "db_user": "",
+            "user": None,
             "export_time": time(0, 0),
             "format_json": False,
             "format_md": False,

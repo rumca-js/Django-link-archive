@@ -13,11 +13,13 @@ function addError(error) {
 
 
 function getCollapsedPropertyItem(name, data) {
+    let escaped_name = name.replace(/\s+/g, "-");
+
     htmlOutput = `
-    <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse${name}" role="button" aria-expanded="false" aria-controls="collapse${name}">
-        Show Details
+    <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapse${escaped_name}" role="button" aria-expanded="false" aria-controls="collapse${escaped_name}">
+        ${name} Details
     </a>
-    <div class="collapse" id="collapse${name}"><pre>${data}</pre></div>`;
+    <div class="collapse" id="collapse${escaped_name}"><pre>${data}</pre></div>`;
 
     return htmlOutput;
 }
@@ -48,16 +50,14 @@ function fillDataProperty(property) {
     htmlOutput += `<h1>${property_name}</h1>`;
 
     if (property.name == "Text") {
-        let contents = property.data.Contents;
-        let escapedContents = escapeHtml(contents);
-
-        htmlOutput += getCollapsedPropertyItem("Contents", escapedContents);
     }
     else if (property.name == "Binary") {
-        let contents = property.data.Binary;
-        let escapedContents = escapeHtml(contents);
-
-        htmlOutput += getCollapsedPropertyItem("Binary", escapedContents);
+    }
+    else if (property.name == "Streams") {
+        for (const [key, stream_data] of Object.entries(property.data)) {
+            let escapedContents = escapeHtml(stream_data);
+            htmlOutput += getCollapsedPropertyItem(key, escapedContents);
+	}
     }
     else if (property.name == "Entries") {
         for (const [key, entryObject] of Object.entries(property.data)) {

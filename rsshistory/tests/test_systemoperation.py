@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 from ..models import SystemOperation, BackgroundJob, BackgroundJobHistory
 from ..controllers import SystemOperationController
@@ -141,19 +141,6 @@ class SystemOperationTest(FakeInternetTestCase):
 
         self.assertTrue(is_time)
 
-    def test_is_time_to_cleanup__no(self):
-        SystemOperation.objects.all().delete()
-        BackgroundJobHistory.objects.all().delete()
-
-        BackgroundJobHistory.objects.create(job=BackgroundJob.JOB_CLEANUP, subject="")
-
-        controller = SystemOperationController()
-
-        # call tested function
-        is_time = controller.is_time_to_cleanup()
-
-        self.assertFalse(is_time)
-
     def test_is_time_to_cleanup__yes__realy_old(self):
         SystemOperation.objects.all().delete()
 
@@ -171,3 +158,34 @@ class SystemOperationTest(FakeInternetTestCase):
         is_time = controller.is_time_to_cleanup()
 
         self.assertTrue(is_time)
+
+    def test_is_time_to_cleanup__no__not_the_time(self):
+        config_entry = Configuration.get_object().config_entry
+        config_entry.cleanup_time = datetime.now() + timedelta(hours=1)
+        config_entry.save()
+
+        Configuration.get_object().config_entry = config_entry
+
+        SystemOperation.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
+
+        controller = SystemOperationController()
+
+        # call tested function
+        is_time = controller.is_time_to_cleanup()
+
+        self.assertFalse(is_time)
+
+    def test_is_time_to_cleanup__no__history(self):
+        SystemOperation.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
+
+        BackgroundJobHistory.objects.create(job=BackgroundJob.JOB_CLEANUP, subject="")
+
+        controller = SystemOperationController()
+
+        # call tested function
+        is_time = controller.is_time_to_cleanup()
+
+        self.assertFalse(is_time)
+
