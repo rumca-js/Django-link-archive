@@ -118,6 +118,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
             job=BackgroundJob.JOB_CLEANUP,
             subject="",
         )
+        number_of_histories = BackgroundJobHistory.objects.all().count()
         self.assertEqual(number_of_histories, 0)
 
         handler = CleanupJobHandler()

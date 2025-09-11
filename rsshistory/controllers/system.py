@@ -133,7 +133,7 @@ class SystemOperationController(object):
     def is_system_healthy(self):
         config_entry = Configuration.get_object().config_entry
 
-        if c.enable_background_jobs:
+        if config_entry.enable_background_jobs:
             if not self.is_internet_ok():
                 return False
             if not self.is_threading_ok():
@@ -203,13 +203,13 @@ class SystemOperationController(object):
         return sorted(result)
 
     def is_time_to_cleanup(self):
-        today = datetime.today()
+        today = datetime.today().date()
 
         config_entry = Configuration.get_object().config_entry
         cleanup_time = config_entry.cleanup_time
 
-        cleanup_date = datetime.combine(today, cleanup_time)
-        cleanup_date = DateUtils.to_utc_date(cleanup_date)
+        new_cleanup_date = datetime.combine(today, cleanup_time)
+        new_cleanup_date = DateUtils.to_utc_date(new_cleanup_date)
 
         # job without subject is main job
 
@@ -220,7 +220,7 @@ class SystemOperationController(object):
             return False
 
         jobs = BackgroundJobHistory.objects.filter(
-            job=BackgroundJob.JOB_CLEANUP, subject="", date_created__gt=cleanup_date
+            job=BackgroundJob.JOB_CLEANUP, subject="", date_created__gt=new_cleanup_date
         )
         if jobs.exists():
             return False

@@ -82,7 +82,7 @@ class ReadLaterViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_read_later_clear(self):
+    def test_json_read_later_clear(self):
         entry = LinkDataController.objects.create(
             source_url="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -96,7 +96,7 @@ class ReadLaterViewsTest(FakeInternetTestCase):
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:read-later-clear".format(LinkDatabase.name))
+        url = reverse("{}:json-read-later-clear".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

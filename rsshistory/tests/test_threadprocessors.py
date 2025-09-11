@@ -573,6 +573,7 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         jobs = BackgroundJobController.objects.filter(
             job=BackgroundJobController.JOB_LINK_ADD
         )
+        self.assertTrue(jobs.exists())
         self.assertNotEqual(
             jobs[0].priority,
             BackgroundJobController.get_job_priority(

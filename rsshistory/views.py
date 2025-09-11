@@ -259,7 +259,7 @@ class ViewPage(SimpleViewPage):
         c = Configuration.get_object()
         config_entry = c.config_entry
 
-        configuration_context = c.get_context()
+        configuration_context = dict(c.get_context())
 
         configuration_context.update(context)
         context = configuration_context

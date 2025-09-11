@@ -14,6 +14,8 @@ view_priority = 0
 
 
 def common_views_initialization():
+    global view_priority
+
     view_priority += 1
     SearchView.objects.create(
         name="by votes",
@@ -92,6 +94,8 @@ def common_views_initialization():
 
 
 def setup_views_for_news():
+    global view_priority
+
     view_priority += 1
     SearchView.objects.create(
         name="Default",
@@ -131,6 +135,8 @@ def setup_views_for_news():
 
 
 def setup_views_for_search_engine():
+    global view_priority
+
     view_priority += 1
     SearchView.objects.create(
         name="Default",
@@ -159,6 +165,8 @@ def setup_views_for_search_engine():
 
 
 def setup_views_for_gallery():
+    global view_priority
+
     view_priority += 1
     SearchView.objects.create(
         name="Default", order_by="-date_created, link", default=True

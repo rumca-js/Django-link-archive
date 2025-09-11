@@ -60,11 +60,11 @@ function setupFor(url, button_element, button_text) {
 }
 
 $("#btnFetchNews").click(function() {
- setupFor("{% url 'rsshistory:wizard-setup-news' %}", "#btnFetchNews", "Setup News Reader");
+ setupFor("{% url 'rsshistory:json-wizard-setup-news' %}", "#btnFetchNews", "Setup News Reader");
 });
 $("#btnFetchGallery").click(function() {
- setupFor("{% url 'rsshistory:wizard-setup-gallery' %}", "#btnFetchGallery", "Setup Gallery Viewer");
+ setupFor("{% url 'rsshistory:json-wizard-setup-gallery' %}", "#btnFetchGallery", "Setup Gallery Viewer");
 });
 $("#btnFetchSearchEngine").click(function() {
- setupFor("{% url 'rsshistory:wizard-setup-search-engine' %}", "#btnFetchSearchEngine", "Setup Simple Search Engine");
+ setupFor("{% url 'rsshistory:json-wizard-setup-search-engine' %}", "#btnFetchSearchEngine", "Setup Simple Search Engine");
 });
