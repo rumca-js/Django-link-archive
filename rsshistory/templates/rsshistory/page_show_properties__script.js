@@ -42,10 +42,24 @@ function displayProperty(propertyEntry) {
 }
 
 
+function isPropertySupported(property) {
+    if (property.name == "Text")
+       return false;
+    if (property.name == "Binary")
+       return false;
+
+    return true;
+}
+
+
 function fillDataProperty(property) {
     let htmlOutput = "";
 
     let property_name = property.name;
+
+    if (!isPropertySupported(property)) {
+        return htmlOutput;
+    }
 
     htmlOutput += `<h1>${property_name}</h1>`;
 
