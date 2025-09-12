@@ -52,6 +52,7 @@ from .handlers import (
     FourChanChannelHandler,
     TwitterUrlHandler,
     HttpPageHandler,
+    HandlerInterface,
 )
 
 from utils.dateutils import DateUtils
@@ -247,11 +248,29 @@ class Url(ContentInterface):
 
             return self.response
 
+    def get_streams(self):
+        if self.handler is not None:
+            return self.handler.get_streams()
+
+        self.handler = self.get_handler_implementation()
+
+        if self.handler:
+            if (
+                "respect_robots_txt" in self.settings
+                and self.settings["respect_robots_txt"]
+            ):
+                if not self.is_allowed():
+                    return
+
+            streams = self.handler.get_streams()
+            return streams
+
     def get_headers(self):
         # TODO implement
         pass
 
     def ping(self, timeout_s=20, user_agent=None):
+        # TODO if that fails we would have to find suitable agent, and then ping
         return RequestsCrawler.ping(
             self.url, timeout_s=timeout_s, user_agent=user_agent
         )
@@ -627,6 +646,9 @@ class Url(ContentInterface):
                     }
                 )
 
+        streams = self.get_streams()
+        all_properties.append({"name": "Streams", "data": streams})
+
         request_data = dict(self.settings)
         request_data["crawler"] = type(request_data["crawler"]).__name__
 
@@ -689,6 +711,53 @@ class Url(ContentInterface):
         properties["link_archives"] = self.get_urls_archive()
 
         return properties
+
+    def response_to_data(self, response):
+        response_data = OrderedDict()
+
+        response_data["is_valid"] = response.is_valid()
+
+        respect_robots_txt = False
+        is_allowed = True
+        if (
+            "respect_robots_txt" in self.settings  # TODO this hsould come from response?
+            and self.settings["respect_robots_txt"]
+        ):
+            respect_robots_txt = self.settings["respect_robots_txt"]
+            is_allowed = self.is_allowed()
+
+        response_data["is_allowed"] = is_allowed
+        if respect_robots_txt and not is_allowed:
+            return response_data
+
+        if response:
+            response_data["status_code"] = response.get_status_code()
+            response_data["status_code_str"] = status_code_to_text(
+                response.get_status_code()
+            )
+
+            response_data["crawl_time_s"] = response.crawl_time_s
+
+            response_data["Content-Type"] = response.get_content_type()
+            response_data["Content-Length"] = response.get_content_length()
+            response_data["Last-Modified"] = response.get_last_modified()
+            response_data["Charset"] = response.get_encoding()
+            if not response_data["Charset"]:
+                response_data["Charset"] = response.encoding
+
+            if response.get_hash():
+                response_data["hash"] = self.property_encode(response.get_hash())
+            else:
+                response_data["hash"] = ""
+
+            response_data["body_hash"] = ""  # TODO implement?
+
+            if len(response.errors) > 0:
+                response_data["errors"] = []
+                for error in response.errors:
+                    response_data["errors"].append(error)
+
+        return response_data
 
     def get_response_data(self):
         """
@@ -775,48 +844,27 @@ class Url(ContentInterface):
 
         json_obj = {}
 
-        json_obj["thumbs_up"] = None
-        json_obj["thumbs_down"] = None
-        json_obj["view_count"] = None
-        json_obj["rating"] = None
-        json_obj["upvote_ratio"] = None
-        json_obj["upvote_view_ratio"] = None
-
         handler = self.get_handler()
         if not handler:
-            return json_obj
+            i = HandlerInterface()
+            return i.get_social_data()
 
-        json_obj = handler.get_json_data()
-        if not json_obj:
-            json_obj = {}
-            if "thumbs_up" not in json_obj:
-                json_obj["thumbs_up"] = None
-            if "thumbs_down" not in json_obj:
-                json_obj["thumbs_down"] = None
-            if "view_count" not in json_obj:
-                json_obj["view_count"] = None
-            if "rating" not in json_obj:
-                json_obj["rating"] = None
-            if "upvote_ratio" not in json_obj:
-                json_obj["upvote_ratio"] = None
-            if "upvote_view_ratio" not in json_obj:
-                json_obj["upvote_view_ratio"] = None
-            return json_obj
+        json_data = handler.get_json_data()
+        return handler.get_social_data()
 
-        if "thumbs_up" not in json_obj:
-            json_obj["thumbs_up"] = None
-        if "thumbs_down" not in json_obj:
-            json_obj["thumbs_down"] = None
-        if "view_count" not in json_obj:
-            json_obj["view_count"] = None
-        if "rating" not in json_obj:
-            json_obj["rating"] = None
-        if "upvote_ratio" not in json_obj:
-            json_obj["upvote_ratio"] = None
-        if "upvote_view_ratio" not in json_obj:
-            json_obj["upvote_view_ratio"] = None
+    def get_properties_section(self, section_name, all_properties):
+        if not all_properties:
+            return
 
-        return json_obj
+        if "success" in all_properties and not all_properties["success"]:
+            # print("Url:{} Remote error. Not a success".format(link))
+            print("Remote error. Not a success")
+            # WebLogger.error(all_properties["error"])
+            return False
+
+        for properties in all_properties:
+            if section_name == properties["name"]:
+                return properties["data"]
 
 
 class DomainCacheInfo(object):

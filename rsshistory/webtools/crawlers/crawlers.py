@@ -12,6 +12,7 @@ import os
 import subprocess
 import threading
 import urllib.parse
+import tempfile
 
 from utils.basictypes import fix_path_for_os
 
@@ -19,6 +20,10 @@ from ..webtools import (
     PageResponseObject,
     WebLogger,
     get_response_from_bytes,
+    HTTP_STATUS_UNKNOWN,
+    HTTP_STATUS_OK,
+    HTTP_STATUS_USER_AGENT,
+    HTTP_STATUS_TOO_MANY_REQUESTS,
     HTTP_STATUS_CODE_EXCEPTION,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
     HTTP_STATUS_CODE_TIMEOUT,
@@ -274,9 +279,7 @@ class RequestsCrawler(CrawlerInterface):
         headers = RequestsCrawler.get_request_headers_default()
         headers["User-Agent"] = user_agent
 
-        # status code 403 means they do not like our user agent.
-        # status code 429 means you are rate limited.
-
+        response = None
         try:
             with requests.get(
                 url=url,
@@ -285,18 +288,42 @@ class RequestsCrawler(CrawlerInterface):
                 verify=False,
                 stream=True,
             ) as response:
-                if (
-                    (response.status_code >= 200 and response.status_code < 400)
-                    or response.status_code == 403
-                    or response.status_code == 429
-                ):
-                    return True
-                else:
-                    return False
+                response = PageResponseObject(
+                    url,
+                    text=None,
+                    status_code=response.status_code,
+                    request_url=url,
+                )
+
+        except requests.Timeout:
+            WebLogger.debug("Url:{} timeout".format(url))
+            response = PageResponseObject(
+                url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url=url,
+            )
+
+        except requests.exceptions.ConnectionError:
+            WebLogger.debug("Url:{} connection error".format(url))
+            response = PageResponseObject(
+                url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                request_url=url,
+            )
 
         except Exception as E:
-            print("Exception: {}".format(str(E)))
-            return False
+            WebLogger.exc(E, "Url:{} General exception".format(url))
+
+            response = PageResponseObject(
+                url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_EXCEPTION,
+                request_url=url,
+            )
+
+        return response
 
 
 class CurlCffiCrawler(CrawlerInterface):
@@ -652,6 +679,33 @@ class SeleniumDriver(CrawlerInterface):
         """
         raise NotImplementedError("Provide selenium driver implementation!")
 
+    def after_load(self):
+        """
+        To be implemented by subordinate selenium crawlers
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+
+        if "settings" in self.settings and "delay_s" in self.settings["settings"]:
+            delay_s = self.settings["settings"]["delay_s"]
+            time.sleep(delay_s)
+
+        REJECT_TEXTS = ["REJECT ALL", "Reject all", "Odrzuć", "Odrzuć wszystko"]
+
+        if self.request.url.find("youtube.com/@"):
+            # Try each reject button text
+            for text in REJECT_TEXTS:
+                try:
+                    reject_button = WebDriverWait(driver, 5).until(
+                        EC.element_to_be_clickable((By.XPATH, f"//button[contains(text(), '{text}')]"))
+                    )
+                    reject_button.click()
+                    print(f"Clicked reject button with text: '{text}'")
+                    break  # Exit the loop after successful click
+                except Exception:
+                    continue
+
     def run(self):
         """
         To obtain RSS page you have to run real, full blown browser.
@@ -663,22 +717,23 @@ class SeleniumDriver(CrawlerInterface):
         if not self.is_valid():
             return
 
-        try:
-            from selenium.common.exceptions import TimeoutException
-        except Exception as E:
-            print(str(E))
-            selenium_feataure_enabled = False
-
-        self.driver = self.get_driver()
-        if not self.driver:
-            return
-
         self.response = PageResponseObject(
             self.request.url,
             text=None,
             status_code=HTTP_STATUS_CODE_EXCEPTION,
             request_url=self.request.url,
         )
+
+        try:
+            from selenium.common.exceptions import TimeoutException
+        except Exception as E:
+            self.response.add_error(str(E))
+            print(str(E))
+            selenium_feataure_enabled = False
+
+        self.driver = self.get_driver()
+        if not self.driver:
+            return
 
         try:
             # add 10 seconds for start of browser, etc.
@@ -688,9 +743,7 @@ class SeleniumDriver(CrawlerInterface):
 
             self.driver.get(self.request.url)
 
-            if "settings" in self.settings and "delay_s" in self.settings["settings"]:
-                delay_s = self.settings["settings"]["delay_s"]
-                time.sleep(delay_s)
+            self.after_load()
 
             self.process_response()
 
@@ -711,16 +764,28 @@ class SeleniumDriver(CrawlerInterface):
                 request_url=self.request.url,
             )
             self.response.add_error("Url:{} Page timeout".format(self.request.url))
+
         except Exception as E:
-            print(E, "Url:{}".format(self.request.url))
-            WebLogger.exc(E, "Url:{}".format(self.request.url))
-            self.response = PageResponseObject(
-                self.request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url=self.request.url,
-            )
-            self.response.add_error("Url:{} exception".format(self.request.url))
+            str_exc = str(E)
+            if str_exc.find("net::ERR_NAME_NOT_RESOLVED") >= 0:
+                WebLogger.debug("Url:{} connection error".format(self.request.url))
+                self.response = PageResponseObject(
+                    self.request.url,
+                    text=None,
+                    status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                    request_url=self.request.url,
+                )
+                self.response.add_error("Url:{} Connection error".format(self.request.url))
+            else:
+                print(E, "Url:{}".format(self.request.url))
+                WebLogger.exc(E, "Url:{}".format(self.request.url))
+                self.response = PageResponseObject(
+                    self.request.url,
+                    text=None,
+                    status_code=HTTP_STATUS_CODE_EXCEPTION,
+                    request_url=self.request.url,
+                )
+                self.response.add_error("Url:{} exception".format(self.request.url))
 
         return self.response
 
@@ -862,6 +927,10 @@ class SeleniumChromeHeadless(SeleniumDriver):
         options.add_argument("--headless=new")
         options.add_argument("--lang=en-US")
 
+        # sometimes two selenium browser clash when accessing user data directory
+        temp_user_data_dir = tempfile.mkdtemp()
+        options.add_argument(f"--user-data-dir={temp_user_data_dir}")
+
         # options to enable performance log, to read status code
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
@@ -873,8 +942,9 @@ class SeleniumChromeHeadless(SeleniumDriver):
         try:
             driver = webdriver.Chrome(service=service, options=options)
             return driver
-        except Exception as e:
-            WebLogger.error(f"Failed to initialize WebDriver: {e}")
+        except Exception as E:
+            WebLogger.error(f"Failed to initialize WebDriver: {E}")
+            self.response.add_error(str(E))
             return None
 
     def is_valid(self):
@@ -957,6 +1027,10 @@ class SeleniumChromeFull(SeleniumDriver):
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-gpu")
 
+        # sometimes two selenium browser clash when accessing user data directory
+        temp_user_data_dir = tempfile.mkdtemp()
+        options.add_argument(f"--user-data-dir={temp_user_data_dir}")
+
         # options to enable performance log, to read status code
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
@@ -1013,6 +1087,10 @@ class SeleniumUndetected(SeleniumDriver):
 
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
         options.add_argument("--lang={}".format("en-US"))
+
+        # sometimes two selenium browser clash when accessing user data directory
+        temp_user_data_dir = tempfile.mkdtemp()
+        options.add_argument(f"--user-data-dir={temp_user_data_dir}")
 
         try:
             return uc.Chrome(options=options)
@@ -1087,6 +1165,11 @@ class SeleniumWireFull(SeleniumDriver):
         options.add_argument("disable-infobars")
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-gpu")
+
+        # sometimes two selenium browser clash when accessing user data directory
+        temp_user_data_dir = tempfile.mkdtemp()
+        options.add_argument(f"--user-data-dir={temp_user_data_dir}")
+
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
         try:

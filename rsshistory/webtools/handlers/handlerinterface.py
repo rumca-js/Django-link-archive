@@ -18,6 +18,7 @@ class HandlerInterface(DefaultContentPage):
         )
         self.h = None
         self.response = None
+        self.streams = {}
         self.dead = None
         self.code = None  # social media handle, ID of channel, etc.
         self.settings = settings
@@ -77,6 +78,15 @@ class HandlerInterface(DefaultContentPage):
             if binary:
                 return calculate_hash_binary(binary)
 
+    def get_streams(self):
+        if "Text" not in self.streams:
+            if self.response is not None:
+                self.streams["Text"] = self.response.get_text()
+
+                if self.streams["Text"] is None:
+                    self.streams["Binary"] = self.response.get_binary()
+        return self.streams
+
     def get_contents_body_hash(self):
         return self.get_contents_hash()
 
@@ -134,6 +144,9 @@ class HandlerInterface(DefaultContentPage):
         """ """
         return
 
+    def get_rating(self):
+        return
+
     def get_thumbs_up(self):
         return
 
@@ -144,26 +157,58 @@ class HandlerInterface(DefaultContentPage):
         thumbs_up = self.get_thumbs_up()
         thumbs_down = self.get_thumbs_down()
 
-        if thumbs_up and thumbs_down:
+        if thumbs_up is not None and thumbs_down is not None:
             all = thumbs_down + thumbs_up
 
             return thumbs_up / all
+
+    def get_upvote_diff(self):
+        thumbs_up = self.get_thumbs_up()
+        thumbs_down = self.get_thumbs_down()
+        if thumbs_up is not None and thumbs_down is not None:
+            return thumbs_up - thumbs_down
 
     def get_upvote_view_ratio(self):
         thumbs_up = self.get_thumbs_up()
         views = self.get_view_count()
 
-        if thumbs_up and views:
+        if thumbs_up is not None and views is not None and views > 0:
             return thumbs_up / views
 
+    def get_user_stars(self):
+        """
+        stars / favourites
+        """
+        pass
+
+    def get_followers_count(self):
+        """
+        followers / subscribers
+        """
+        pass
+
     def get_json_data(self):
+        """
+        Called to obtain link json data (dynamic data)
+        """
+        pass
+
+    def get_social_data(self):
+        """
+        This function returns:
+         - social data, if it has them
+         - nothing in case of error
+        """
         json_obj = {}
 
-        json_obj["thumbs_up"] = None
-        json_obj["thumbs_down"] = None
-        json_obj["view_count"] = None
-        json_obj["rating"] = None
-        json_obj["upvote_ratio"] = None  # (thumbs_up - thumbs_down)
-        json_obj["upvote_view_ratio"] = None  # (thumbs_up / views)
+        json_obj["thumbs_up"] = self.get_thumbs_up()
+        json_obj["thumbs_down"] = self.get_thumbs_down()
+        json_obj["view_count"] = self.get_view_count()
+        json_obj["rating"] = self.get_rating()
+        json_obj["upvote_ratio"] = self.get_upvote_ratio()
+        json_obj["upvote_diff"] = self.get_upvote_diff()
+        json_obj["upvote_view_ratio"] = self.get_upvote_view_ratio()
+        json_obj["stars"] = self.get_user_stars()
+        json_obj["followers_count"] = self.get_followers_count()
 
         return json_obj

@@ -120,6 +120,8 @@ def status_code_to_text(status_code):
         return "HTTP_STATUS_GONE(410)"
     elif status_code == 418:
         return "HTTP_STATUS_IM_A_TEAPOT(418)"
+    elif status_code == 429:
+        return "HTTP_STATUS_TOO_MANY_REQUESTS(419)"
     elif status_code == 451:
         return "HTTP_STATUS_UNAVAILABLE_LEGAL_REASONS(451)"
     elif status_code == 500:
@@ -705,6 +707,15 @@ class PageResponseObject(object):
 
     def get_encoding(self):
         return self.encoding
+
+    def get_hash(self):
+        text = self.get_text()
+        if text:
+            return calculate_hash(text)
+
+        binary = self.get_binary()
+        if binary:
+            return calculate_hash_binary(binary)
 
 
 def get_request_to_bytes(request, script):

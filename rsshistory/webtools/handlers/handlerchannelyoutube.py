@@ -18,6 +18,7 @@ class YouTubeChannelHandler(DefaultChannelHandler):
     def __init__(self, url=None, contents=None, settings=None, url_builder=None):
         self.html_url = None  # channel html page contains useful info
         self.rss_url = None
+        self.social_data = {}
 
         super().__init__(
             url,
@@ -61,6 +62,7 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if (
             short_url.startswith("www.youtube.com/@")
             or short_url.startswith("youtube.com/@")
+            or short_url.startswith("m.youtube.com/@")
             or short_url.startswith("www.youtube.com/user")
             or short_url.startswith("youtube.com/user")
         ):
@@ -202,15 +204,29 @@ class YouTubeChannelHandler(DefaultChannelHandler):
         if not feed:
             return
 
-        settings = {}
-        settings["handler_class"] = HttpPageHandler
-
-        self.rss_url = self.url_builder(url=feed, settings=settings)
+        self.rss_url = self.get_page_url(feed)
         self.rss_url.get_response()
         return self.rss_url
 
+    def get_streams(self):
+        if self.rss_url:
+            response = self.rss_url.get_response()
+            if response is not None:
+                self.streams["RSS"] = response.get_text()
+        if self.html_url:
+            response = self.html_url.get_response()
+            if response is not None:
+                self.streams["HTML"] = response.get_text()
+
+        return self.streams
+
     def get_html_url(self):
-        return None
+        if False:
+            # TODO disabled
+            crawler_name = self.settings.get("name")
+            self.html_url = self.get_page_url(self.url, crawler_name=crawler_name)
+            self.html_url.get_response()
+            return self.html_url
 
     def get_entries(self):
         rss_url = self.get_rss_url()
@@ -271,3 +287,25 @@ class YouTubeChannelHandler(DefaultChannelHandler):
             return self.url
         else:
             return self.get_channel_url()
+
+    def get_json_data(self):
+        entries = self.get_entries()
+        for entry in entries:
+            u = self.url_builder(url = entry["link"])
+            u.get_response()
+            h = u.get_handler()
+            if h:
+                props = h.get_properties()
+                if props:
+                    self.social_data["followers_count"] = props.get("channel_follower_count")
+                    if self.social_data["followers_count"]:
+                        return
+
+            return # TODO?
+
+    def get_followers_count(self):
+        return self.social_data.get("followers_count")
+
+    def get_social_data(self):
+        if len(self.social_data) != 0:
+            return super().get_social_data()
