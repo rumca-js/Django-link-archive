@@ -6,9 +6,17 @@ from utils.dateutils import DateUtils
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..models import KeyWords, DataExport
-from ..views import get_search_term, ViewPage
+from ..views import get_search_term, ViewPage, SimpleViewPage
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
+
+
+class FakeRequest(object):
+    def __init__(self, is_authenticated=False, is_staff=False):
+        self.user = Users.objects.create(username="test", is_authenticated=is_authenticated, is_staff=is_staff)
+
+        self.GET = {}
+
 
 
 class GenericViewsTest(FakeInternetTestCase):
@@ -22,6 +30,109 @@ class GenericViewsTest(FakeInternetTestCase):
         term = get_search_term(themap)
 
         self.assertEqual(term, "something1 = else & something2 = else2")
+
+
+class SimpleViewPageTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.user = User.objects.create_user(
+            username="testuser",
+            password="testpassword",
+            is_staff=True,
+        )
+
+    def test_is_allowed__none(self):
+        page = SimpleViewPage(None)
+        self.assertFalse(page.is_allowed())
+
+    def test_is_allowed__all_authenticated(self):
+        request = FakeRequest(is_authenticated=True, is_staff=False)
+        page = SimpleViewPage(request=request, view_access_type=ConfigurationEntry.ACCESS_TYPE_ALL)
+        self.assertTrue(page.is_allowed())
+
+    def test_is_allowed__all_authenticated__staff(self):
+        request = FakeRequest(is_authenticated=True, is_staff=True)
+        page = SimpleViewPage(request=request, view_access_type=ConfigurationEntry.ACCESS_TYPE_ALL)
+        self.assertTrue(page.is_allowed())
+
+    def test_is_allowed__logged__authenticated(self):
+        request = FakeRequest(is_authenticated=True, is_staff=False)
+        page = SimpleViewPage(request=request, view_access_type=ConfigurationEntry.ACCESS_TYPE_LOGGED)
+        self.assertTrue(page.is_allowed())
+
+    def test_is_allowed__logged__authenticated__staff(self):
+        request = FakeRequest(is_authenticated=True, is_staff=True)
+        page = SimpleViewPage(request=request, view_access_type=ConfigurationEntry.ACCESS_TYPE_LOGGED)
+        self.assertTrue(page.is_allowed())
+
+    def test_is_allowed__staff_authenticated(self):
+        request = FakeRequest(is_authenticated=True, is_staff=False)
+        page = SimpleViewPage(request=request, view_access_type=ConfigurationEntry.ACCESS_TYPE_STAFF)
+        self.assertFalse(page.is_allowed())
+
+    def test_is_allowed__staff_authenticated__staff(self):
+        request = FakeRequest(is_authenticated=True, is_staff=True)
+        page = SimpleViewPage(request=request, view_access_type=ConfigurationEntry.ACCESS_TYPE_STAFF)
+        self.assertTrue(page.is_allowed())
+
+    def test_access_rights__nouser__all(self):
+        config_entry = Configuration.get_object().config_entry
+        config_entry.view_access_type = ConfigurationEntry.ACCESS_TYPE_ALL
+        Configuration.get_object().config_entry = config_entry
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entries".format(LinkDatabase.name))
+        response = self.client.get(url)
+        page_source = response.content.decode("utf-8")
+
+        access_text = "You don't have permissions"
+
+        self.assertFalse(page_source.find(access_text) >= 0)
+
+    def test_access_rights__nouser__auth(self):
+        config_entry = Configuration.get_object().config_entry
+        config_entry.view_access_type = ConfigurationEntry.ACCESS_TYPE_LOGGED
+        Configuration.get_object().config_entry = config_entry
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entries".format(LinkDatabase.name))
+        response = self.client.get(url)
+        page_source = response.content.decode("utf-8")
+
+        access_text = "You don't have permissions"
+
+        self.assertTrue(page_source.find(access_text) >= 0)
+
+    def test_access_rights__authenticated__all(self):
+        config_entry = Configuration.get_object().config_entry
+        config_entry.view_access_type = ConfigurationEntry.ACCESS_TYPE_ALL
+        Configuration.get_object().config_entry = config_entry
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entries".format(LinkDatabase.name))
+        response = self.client.get(url)
+        page_source = response.content.decode("utf-8")
+
+        access_text = "You don't have permissions"
+
+        self.assertFalse(page_source.find(access_text) >= 0)
+
+    def test_access_rights__authenticated__logged(self):
+        config_entry = Configuration.get_object().config_entry
+        config_entry.view_access_type = ConfigurationEntry.ACCESS_TYPE_LOGGED
+        Configuration.get_object().config_entry = config_entry
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entries".format(LinkDatabase.name))
+        response = self.client.get(url)
+        page_source = response.content.decode("utf-8")
+
+        access_text = "You don't have permissions"
+
+        self.assertFalse(page_source.find(access_text) >= 0)
 
 
 class ViewPageTest(FakeInternetTestCase):
@@ -46,6 +157,7 @@ class ViewPageTest(FakeInternetTestCase):
         self.assertTrue(context["view"])
         self.assertTrue(context["user_config"])
         self.assertTrue(context["config"])
+
 
 
 class ViewsTest(FakeInternetTestCase):

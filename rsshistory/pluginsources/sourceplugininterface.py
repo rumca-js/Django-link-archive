@@ -2,9 +2,9 @@ from utils.dateutils import DateUtils
 
 from ..models import AppLogging, UserTags
 from ..controllers import (
-   EntryDataBuilder,
-   SourceDataController,
-   BackgroundJobController
+    EntryDataBuilder,
+    SourceDataController,
+    BackgroundJobController,
 )
 from ..configuration import Configuration
 from ..pluginurl.urlhandler import UrlHandlerEx
@@ -90,7 +90,10 @@ class SourcePluginInterface(object):
             new_properties = url_ex.get_properties()
             if new_properties and c.new_entries_merge_data:
                 for key in new_properties:
-                    if properties.get(key, None) == None and new_properties.get(key, None) != None:
+                    if (
+                        properties.get(key, None) == None
+                        and new_properties.get(key, None) != None
+                    ):
                         properties[key] = new_properties[key]
 
         if source:

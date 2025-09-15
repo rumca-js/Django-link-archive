@@ -371,7 +371,9 @@ class BackgroundJobController(BackgroundJob):
             return
 
         properties = {"permament": True}
-        return BackgroundJobController.link_add(url=source.url, properties=properties, source=source)
+        return BackgroundJobController.link_add(
+            url=source.url, properties=properties, source=source
+        )
 
     def download_file(url=None, user=None):
         if url is None:

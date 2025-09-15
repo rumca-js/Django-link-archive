@@ -195,7 +195,9 @@ class SourceExportHistory(models.Model):
         if input_date is not None:
             process_date = input_date
 
-        exists = SourceExportHistory.objects.filter(date=process_date, export=export).exists()
+        exists = SourceExportHistory.objects.filter(
+            date=process_date, export=export
+        ).exists()
         if not exists:
             SourceExportHistory.objects.create(date=process_date, export=export)
 

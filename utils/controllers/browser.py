@@ -14,10 +14,10 @@ class BrowserController(object):
                 print("Error")
 
         browser_config = {
-            "crawler" : self.browser.crawler,
-            "name" : self.browser.name,
-            "priority" : self.browser.priority,
-            "settings" : settings,
+            "crawler": self.browser.crawler,
+            "name": self.browser.name,
+            "priority": self.browser.priority,
+            "settings": settings,
         }
 
         return browser_config

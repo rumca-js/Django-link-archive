@@ -76,6 +76,9 @@ class SourcesViewsTests(FakeInternetTestCase):
         data = {"url": test_link}
         full_data = SourceDataController.get_full_information(data)
         full_data["enabled"] = True
+        full_data["entries_backgroundcolor_alpha"] = 0.0
+        full_data["entries_backgroundcolor"] = "#ffffff"
+        full_data["entries_alpha"] = 1.0
 
         limited_data = {}
         for key in full_data:
@@ -127,6 +130,9 @@ class SourcesViewsTests(FakeInternetTestCase):
         data = {"url": test_link}
         full_data = SourceDataController.get_full_information(data)
         full_data["enabled"] = True
+        full_data["entries_backgroundcolor_alpha"] = 0.0
+        full_data["entries_backgroundcolor"] = "#ffffff"
+        full_data["entries_alpha"] = 1.0
 
         limited_data = {}
         for key in full_data:
@@ -178,6 +184,9 @@ class SourcesViewsTests(FakeInternetTestCase):
         data = {"url": test_link}
         full_data = SourceDataController.get_full_information(data)
         full_data["enabled"] = True
+        full_data["entries_backgroundcolor_alpha"] = 0.0
+        full_data["entries_backgroundcolor"] = "#ffffff"
+        full_data["entries_alpha"] = 1.0
 
         limited_data = {}
         for key in full_data:
@@ -233,6 +242,9 @@ class SourcesViewsTests(FakeInternetTestCase):
         full_data["enabled"] = True
         full_data["category_name"] = "test1"
         full_data["subcategory_name"] = "test2"
+        full_data["entries_backgroundcolor_alpha"] = 0.0
+        full_data["entries_backgroundcolor"] = "#ffffff"
+        full_data["entries_alpha"] = 1.0
 
         limited_data = {}
         for key in full_data:
@@ -308,6 +320,9 @@ class SourcesViewsTests(FakeInternetTestCase):
 
         data = {"url": test_link}
         full_data = SourceDataController.get_full_information(data)
+        full_data["entries_backgroundcolor_alpha"] = 0.0
+        full_data["entries_backgroundcolor"] = "#ffffff"
+        full_data["entries_alpha"] = 1.0
 
         limited_data = {}
         for key in full_data:

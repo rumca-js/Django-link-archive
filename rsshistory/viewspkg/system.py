@@ -937,7 +937,9 @@ def json_search_container(request):
 
     for searchview in SearchView.objects.filter(user=False):
         row = {}
-        row["link"] = reverse(f"{LinkDatabase.name}:entries") + "?view=" + str(searchview.id)
+        row["link"] = (
+            reverse(f"{LinkDatabase.name}:entries") + "?view=" + str(searchview.id)
+        )
         row["icon"] = search_icon
         row["title"] = searchview.name
         rows.append(row)
@@ -958,7 +960,9 @@ def json_global_container(request):
     tag_icon = static("{}/icons/icons8-tags-100.png".format(LinkDatabase.name))
     domains_icon = static("{}/icons/icons8-www-64.png".format(LinkDatabase.name))
     keywords_icon = static("{}/icons/icons8-letters-96.png".format(LinkDatabase.name))
-    categories_icon = static("{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name))
+    categories_icon = static(
+        "{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name)
+    )
     sources_icon = static("{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name))
 
     row = {}
@@ -1002,7 +1006,9 @@ def json_global_container(request):
 def json_personal_container(request):
     data = {}
 
-    read_later_icon = static("{}/icons/icons8-bookmarks-100.png".format(LinkDatabase.name))
+    read_later_icon = static(
+        "{}/icons/icons8-bookmarks-100.png".format(LinkDatabase.name)
+    )
     user_tags_icon = static("{}/icons/icons8-tags-100.png".format(LinkDatabase.name))
     user_browse_icon = static("{}/icons/icons8-link-90.png".format(LinkDatabase.name))
     user_search_icon = static("{}/icons/icons8-link-90.png".format(LinkDatabase.name))
@@ -1028,7 +1034,9 @@ def json_personal_container(request):
 
     for searchview in SearchView.objects.filter(user=True):
         row = {}
-        row["link"] = reverse(f"{LinkDatabase.name}:entries") + "?view=" + str(searchview.id)
+        row["link"] = (
+            reverse(f"{LinkDatabase.name}:entries") + "?view=" + str(searchview.id)
+        )
         row["icon"] = user_search_icon
         row["title"] = searchview.name
         rows.append(row)
@@ -1069,9 +1077,15 @@ def json_tools_container(request):
     data = {}
 
     add_icon = static("{}/icons/icons8-add-link-96.png".format(LinkDatabase.name))
-    download_url_icon = static("{}/icons/icons8-download-page-96.png".format(LinkDatabase.name))
-    download_music_url_icon = static("{}/icons/icons8-download-music-96.png".format(LinkDatabase.name))
-    download_video_url_icon = static("{}/icons/icons8-download-video-96.png".format(LinkDatabase.name))
+    download_url_icon = static(
+        "{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)
+    )
+    download_music_url_icon = static(
+        "{}/icons/icons8-download-music-96.png".format(LinkDatabase.name)
+    )
+    download_video_url_icon = static(
+        "{}/icons/icons8-download-video-96.png".format(LinkDatabase.name)
+    )
     radar_icon = static("{}/icons/icons8-radar-64.png".format(LinkDatabase.name))
 
     user_obj = UserConfig.get_or_create(request.user)
@@ -1151,7 +1165,9 @@ def json_users_container(request):
     user_obj = UserConfig.get_or_create(request.user)
 
     login_icon = static("{}/icons/icons8-login-100.png".format(LinkDatabase.name))
-    configuration_icon = static("{}/icons/icons8-configuration-67.png".format(LinkDatabase.name))
+    configuration_icon = static(
+        "{}/icons/icons8-configuration-67.png".format(LinkDatabase.name)
+    )
     accounts_icon = static("{}/icons/account.png".format(LinkDatabase.name))
     logout_icon = static("{}/icons/icons8-logout-100.png".format(LinkDatabase.name))
 
@@ -1159,7 +1175,11 @@ def json_users_container(request):
 
     if not user_obj.is_authenticated():
         row = {}
-        row["link"] = reverse(f"{LinkDatabase.name}:login") + "?next=" + reverse(f"{LinkDatabase.name}:index")
+        row["link"] = (
+            reverse(f"{LinkDatabase.name}:login")
+            + "?next="
+            + reverse(f"{LinkDatabase.name}:index")
+        )
         row["icon"] = login_icon
         row["title"] = "Login"
         rows.append(row)
@@ -1177,7 +1197,11 @@ def json_users_container(request):
         rows.append(row)
 
         row = {}
-        row["link"] = reverse(f"{LinkDatabase.name}:logout") + "?next=" + reverse(f"{LinkDatabase.name}:index")
+        row["link"] = (
+            reverse(f"{LinkDatabase.name}:logout")
+            + "?next="
+            + reverse(f"{LinkDatabase.name}:index")
+        )
         row["icon"] = logout_icon
         row["title"] = "Logout"
         rows.append(row)

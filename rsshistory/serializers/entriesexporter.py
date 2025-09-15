@@ -298,6 +298,7 @@ def entry_to_json(user_config, entry, tags=False):
     json_entry["permanent"] = entry.permanent
     json_entry["author"] = entry.author
     json_entry["album"] = entry.album
+    json_entry["language"] = entry.language
     json_entry["page_rating_contents"] = entry.page_rating_contents
     json_entry["page_rating_votes"] = entry.page_rating_votes
     json_entry["age"] = entry.age
@@ -312,7 +313,9 @@ def entry_to_json(user_config, entry, tags=False):
             json_entry["source__title"] = entry.source.title
             json_entry["source__url"] = entry.source.url
             json_entry["backgroundcolor"] = entry.source.entries_backgroundcolor
-            json_entry["backgroundcolor_alpha"] = entry.source.entries_backgroundcolor_alpha
+            json_entry["backgroundcolor_alpha"] = (
+                entry.source.entries_backgroundcolor_alpha
+            )
             json_entry["alpha"] = entry.source.entries_alpha
 
     if user_config.show_icons:

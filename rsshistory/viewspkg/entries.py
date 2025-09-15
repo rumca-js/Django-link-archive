@@ -178,6 +178,11 @@ class EntriesSearchListView(object):
         if not self.user and self.request and self.request.user:
             self.user = self.request.user
 
+    def get(self, *args, **kwargs):
+        p = SimpleViewPage(self.request)
+        if not p.is_allowed():
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
     def get_time_diff(self):
         return time.time() - self.start_time
 
@@ -188,6 +193,10 @@ class EntriesSearchListView(object):
         """
         API: Returns queryset
         """
+        p = SimpleViewPage(self.request)
+        if not p.is_allowed():
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
         search_view = self.get_search_view()
 
         self.get_time_diff_text("EntriesSearchListView:get_queryset")
@@ -195,7 +204,9 @@ class EntriesSearchListView(object):
 
         # TODO can we check if filtered objects are none?
         try:
-            queryset = self.get_filtered_objects().order_by(*self.get_order_by()).distinct()
+            queryset = (
+                self.get_filtered_objects().order_by(*self.get_order_by()).distinct()
+            )
         except Exception as E:
             self.errors.append("Cannot obtain filtered objects {}".format(str(E)))
             return self.get_nonequery_set()
@@ -382,9 +393,8 @@ class EntryDetailView(generic.DetailView):
         API: Used to redirect if user does not have rights
         """
 
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
+        p = SimpleViewPage(self.request)
+        if not p.is_allowed():
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
         view = super().get(*args, **kwargs)
@@ -443,9 +453,8 @@ class EntryArchivedDetailView(generic.DetailView):
         API: Used to redirect if user does not have rights
         """
 
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
+        p = SimpleViewPage(self.request)
+        if not p.is_allowed():
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
         view = super().get(*args, **kwargs)
@@ -492,19 +501,19 @@ def json_entry_menu(request, pk):
         for button in object_controller.get_edit_menu_buttons():
             if button.is_shown():
                 buttons.append(button.get_map())
-        json_data["menu"].append({"name" : "Edit", "buttons" : buttons})
+        json_data["menu"].append({"name": "Edit", "buttons": buttons})
 
         buttons = []
         for button in object_controller.get_view_menu_buttons():
             if button.is_shown():
                 buttons.append(button.get_map())
-        json_data["menu"].append({"name" : "View", "buttons" : buttons})
+        json_data["menu"].append({"name": "View", "buttons": buttons})
 
         buttons = []
         for button in object_controller.get_advanced_menu_buttons():
             if button.is_shown():
                 buttons.append(button.get_map())
-        json_data["menu"].append({"name" : "Advanced", "buttons" : buttons})
+        json_data["menu"].append({"name": "Advanced", "buttons": buttons})
 
     return JsonResponse(json_data, json_dumps_params={"indent": 4})
 
@@ -1054,7 +1063,7 @@ def entry_json(request, pk):
 
     entry_json = entry_to_json(user_config, entry, tags=True)
 
-    read_laters = ReadLater.objects.filter(entry = entry, user=request.user)
+    read_laters = ReadLater.objects.filter(entry=entry, user=request.user)
     entry_json["read_later"] = read_laters.exists()
 
     full_json = {}
@@ -1110,10 +1119,12 @@ def handle_json_view(request, view_to_use):
             for entry in page_obj:
                 entry_json = entry_to_json(user_config, entry, tags=show_tags)
 
-                read_laters = ReadLater.objects.filter(entry = entry, user=request.user)
+                read_laters = ReadLater.objects.filter(entry=entry, user=request.user)
                 entry_json["read_later"] = read_laters.exists()
 
-                visits = UserEntryVisitHistory.objects.filter(entry=entry, user=request.user)
+                visits = UserEntryVisitHistory.objects.filter(
+                    entry=entry, user=request.user
+                )
                 entry_json["visited"] = visits.exists()
 
                 json_obj["entries"].append(entry_json)
@@ -1349,7 +1360,9 @@ def archive_entries_remove_all(request):
     json_obj["status"] = True
 
     if ArchiveLinkDataController.objects.all().count() > 1000:
-        BackgroundJobController.create_single_job("truncate", "ArchiveLinkDataController")
+        BackgroundJobController.create_single_job(
+            "truncate", "ArchiveLinkDataController"
+        )
         json_obj["message"] = "Added remove job"
     else:
         ArchiveLinkDataController.truncate()

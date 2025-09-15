@@ -1268,7 +1268,9 @@ class TruncateTableJobHandler(BaseJobHandler):
             BackgroundJob.JOB_TRUNCATE_TABLE, subject="LinkDataController", args=args
         )
         BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_TRUNCATE_TABLE, subject="ArchiveLinkDataController", args=args
+            BackgroundJob.JOB_TRUNCATE_TABLE,
+            subject="ArchiveLinkDataController",
+            args=args,
         )
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_TRUNCATE_TABLE, subject="SourceDataController", args=args
@@ -1310,7 +1312,9 @@ class TruncateTableJobHandler(BaseJobHandler):
             BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserSearchHistory", args=args
         )
         BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserEntryTransitionHistory", args=args
+            BackgroundJob.JOB_TRUNCATE_TABLE,
+            subject="UserEntryTransitionHistory",
+            args=args,
         )
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserEntryVisitHistory", args=args

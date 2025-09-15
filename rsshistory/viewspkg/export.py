@@ -72,6 +72,8 @@ def data_export_edit(request, pk):
         form = DataExportForm(request.POST, instance=objs[0])
         if form.is_valid():
             form.save()
+            return redirect("{}:data-exports".format(LinkDatabase.name))
+
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")

@@ -121,15 +121,15 @@ def get_search_view(request):
 
 
 class SimpleViewPage(object):
-    def __init__(self, request, view_access_type=None):
+    def __init__(self, request, view_access_type=ConfigurationEntry.ACCESS_TYPE_LOGGED):
         self.request = request
         self.view_access_type = view_access_type
 
     def printx(self, text):
         pass
-        #if self.request:
+        # if self.request:
         #    print("Url:{}: {}".format(self.request.build_absolute_uri(), text))
-        #else:
+        # else:
         #    print("{}".format(text))
 
     def is_allowed(self):
@@ -192,14 +192,14 @@ class SimpleViewPage(object):
         if not self.request:
             return False
 
-        config = ConfigurationEntry.get()
+        config_entry = Configuration.get_object().config_entry
         if (
-            config.view_access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
+            config_entry.view_access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
             and not self.request.user.is_superuser
         ):
             return False
         if (
-            config.view_access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
+            config_entry.view_access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
             and not self.request.user.is_authenticated
         ):
             return False
@@ -344,9 +344,8 @@ class ViewPage(SimpleViewPage):
 
 class GenericListView(generic.ListView):
     def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
+        p = SimpleViewPage(self.request)
+        if not p.is_allowed():
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
         return super().get(*args, **kwargs)
@@ -360,9 +359,8 @@ class GenericListView(generic.ListView):
         return context
 
     def get_queryset(self):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
+        p = SimpleViewPage(self.request)
+        if not p.is_allowed():
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
         return super().get_queryset()
@@ -402,9 +400,8 @@ class UserGenericListView(GenericListView):
         return self.search_user
 
     def get_queryset(self):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
+        p = SimpleViewPage(self.request)
+        if not p.is_allowed():
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
         user = self.get_user()

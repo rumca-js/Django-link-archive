@@ -7,7 +7,7 @@ from datetime import datetime, date, timedelta, time
 from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
-from django.core.validators import MinValueValidator,MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.urls import reverse
 from django.conf import settings
@@ -21,7 +21,7 @@ from ..apps import LinkDatabase
 
 def batch_remove(model, query, batch_size):
     while True:
-        batch_ids = list(query.values_list('id', flat=True)[:batch_size])
+        batch_ids = list(query.values_list("id", flat=True)[:batch_size])
         if not batch_ids:
             break
 
@@ -255,7 +255,6 @@ class ConfigurationEntry(models.Model):
         default=True,
         help_text="Keep link social data in the database.",
     )
-
 
     # database link contents
 
@@ -492,13 +491,13 @@ class ConfigurationEntry(models.Model):
 
     entries_visit_alpha = models.FloatField(
         default=0.6,
-        validators = [MinValueValidator(0), MaxValueValidator(1)],
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
         help_text="Alpha of visited entries.",
     )
 
     entries_dead_alpha = models.FloatField(
         default=0.6,
-        validators = [MinValueValidator(0), MaxValueValidator(1)],
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
         help_text="Alpha of dead entries.",
     )
 
@@ -818,9 +817,7 @@ class AppLogging(models.Model):
                 "AppLogging::{}:{}\n{}".format(level, info_text, detail_text)
             )
         else:
-            LinkDatabase.info(
-                "AppLogging::{}:{}".format(level, info_text)
-            )
+            LinkDatabase.info("AppLogging::{}:{}".format(level, info_text))
 
         AppLogging.cleanup_overflow()
 

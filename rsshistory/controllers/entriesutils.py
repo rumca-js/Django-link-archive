@@ -89,12 +89,12 @@ class EntriesCleanup(object):
                 if url != "":
                     entries = LinkDataController.objects.filter(link__icontains=url)
                     entries.delete()
-                    #while entries.exists():
+                    # while entries.exists():
                     #    entries[:BATCH_SIZE].delete()
 
                     domains = DomainsController.objects.filter(domain__icontains=url)
                     domains.delete()
-                    #while domains.exists():
+                    # while domains.exists():
                     #    domains[:BATCH_SIZE].delete()
 
         return True
@@ -155,8 +155,8 @@ class EntriesCleanup(object):
 
             if entries:
                 for entry in entries:
-                   AppLogging.debug("Removing source entry:{}".format(entry.link))
-                #while entries.exists():
+                    AppLogging.debug("Removing source entry:{}".format(entry.link))
+                # while entries.exists():
                 #    entries[:BATCH_SIZE].delete()
 
         AppLogging.debug("Removing general entries")
@@ -181,8 +181,8 @@ class EntriesCleanup(object):
 
             if entries:
                 for entry in entries:
-                   AppLogging.debug("Removing source entry:{}".format(entry.link))
-                #while entries.exists():
+                    AppLogging.debug("Removing source entry:{}".format(entry.link))
+                # while entries.exists():
                 #    entries[:BATCH_SIZE].delete()
 
         AppLogging.debug("Removing general entries")
@@ -205,7 +205,7 @@ class EntriesCleanup(object):
         if config.days_to_move_to_archive == 0:
             entries = ArchiveLinkDataController.objects.all()
             entries.delete()
-            #while entries.exists():
+            # while entries.exists():
             #    entries[:BATCH_SIZE].delete()
 
         return True
@@ -2037,7 +2037,7 @@ class EntryDataBuilder(object):
 
     def add_domain(self, entry):
         # TODO
-        #url = UrlLocation(entry.link).get_domain()
+        # url = UrlLocation(entry.link).get_domain()
         #    if "source" in self.link_data:
         #        BackgroundJobController.link_add(
         #            url=url, source=self.link_data["source"]

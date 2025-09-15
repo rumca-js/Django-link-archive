@@ -1,4 +1,4 @@
-#import atexit
+# import atexit
 from django.apps import AppConfig
 
 
@@ -14,7 +14,7 @@ class LinkDatabase(AppConfig):
 
     def ready(self):
         # print("App Ready {}".format(LinkDatabase.name))
-        #atexit.register(cleanup_on_exit)
+        # atexit.register(cleanup_on_exit)
         pass
 
     def info(message):

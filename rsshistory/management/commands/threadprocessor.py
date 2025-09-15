@@ -8,6 +8,7 @@ I have tried some things for background processing:
    I was running big long running tasks, and celery I think is not for that
  - this - I can clearly see threads - by name. Is much closer to what I wanted to achieve
 """
+
 import time
 import importlib
 import traceback
@@ -29,11 +30,13 @@ def process_app(processor, tasks_info):
     # Importing tasks and processor modules
     try:
         tasks_module = importlib.import_module(f"{app_name}.tasks")
-        threadprocessors_module = importlib.import_module(f"{app_name}.threadprocessors")
+        threadprocessors_module = importlib.import_module(
+            f"{app_name}.threadprocessors"
+        )
     except ModuleNotFoundError as e:
         print("Module import failed for app: %s", app_name)
         return
-    
+
     # Retrieving the processor class
     try:
         processor_class = getattr(threadprocessors_module, processor_class_name)
@@ -51,11 +54,10 @@ def process_app(processor, tasks_info):
 
 
 class Command(BaseCommand):
-    help = 'Runs a background worker indefinitely'
+    help = "Runs a background worker indefinitely"
 
     def add_arguments(self, parser):
-        parser.add_argument('--thread', type=str, help='Thread name')
-
+        parser.add_argument("--thread", type=str, help="Thread name")
 
     def handle(self, *args, **options):
         thread = options["thread"]
@@ -69,10 +71,12 @@ class Command(BaseCommand):
             more_jobs = False
 
             for workspace in get_workspaces():
-                more_jobs_now = process_app(f"{workspace}.threadprocessors.{thread}", settings.TASKS_INFO)
+                more_jobs_now = process_app(
+                    f"{workspace}.threadprocessors.{thread}", settings.TASKS_INFO
+                )
                 if more_jobs_now:
                     more_jobs = True
 
             if not more_jobs:
                 print(f"{thread}: Waiting")
-                time.sleep(10) # 10 sec
+                time.sleep(10)  # 10 sec

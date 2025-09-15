@@ -36,7 +36,7 @@ class SourceReader(object):
 
         print("Fetching entries")
         self.fetch(self.day_limit, self.server_location)
-        #asyncio.run(fetch(self.db, self.parser, self.day_limit))
+        # asyncio.run(fetch(self.db, self.parser, self.day_limit))
         date_now = DateUtils.get_datetime_now_utc()
         print("Current time:{}".format(date_now))
 
@@ -44,7 +44,9 @@ class SourceReader(object):
         """
         fetch time is used to not spam servers every time you refresh anything
         """
-        sources = SourcesTableController(self.conn).filter(conditions=[SourcesTable.enabled == True])
+        sources = SourcesTableController(self.conn).filter(
+            conditions=[SourcesTable.enabled == True]
+        )
 
         for source in sources:
             date_now = DateUtils.get_datetime_now_utc()

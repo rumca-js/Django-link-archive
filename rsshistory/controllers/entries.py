@@ -59,7 +59,8 @@ class LinkDataController(LinkDataModel):
             )
         else:
             return reverse(
-                "{}:json-entry-unbookmark".format(LinkDatabase.name), args=[str(self.id)]
+                "{}:json-entry-unbookmark".format(LinkDatabase.name),
+                args=[str(self.id)],
             )
 
     def get_dead_url(self):
@@ -129,7 +130,7 @@ class LinkDataController(LinkDataModel):
         entries = LinkDataController.objects.all()
         entries.delete()
 
-        #if entries.exists():
+        # if entries.exists():
         #    entries[:BATCH_SIZE].delete()
 
         return True
@@ -274,7 +275,7 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
         entries = ArchiveLinkDataController.objects.all()
 
         entries.delete()
-        #if entries.exists():
+        # if entries.exists():
         #    entries[:BATCH_SIZE].delete()
 
         return True

@@ -121,7 +121,7 @@ def search_history_remove(request, pk):
 
     json_obj["status"] = False
 
-    entries = UserSearchHistory.objects.filter(id = pk)
+    entries = UserSearchHistory.objects.filter(id=pk)
     if entries.exists():
         json_obj["status"] = True
         entries.delete()
@@ -138,7 +138,7 @@ def user_search_history_remove(request, pk):
 
     json_obj["status"] = False
 
-    entries = UserSearchHistory.objects.filter(id = pk, user=request.user)
+    entries = UserSearchHistory.objects.filter(id=pk, user=request.user)
     if entries.exists():
         json_obj["status"] = True
         entries.delete()
@@ -246,7 +246,9 @@ def history_remove_all(request):
         json_obj["message"] += "Removed all entries for UserSearchHistory."
 
     if UserEntryTransitionHistory.objects.all().count() > 1000:
-        BackgroundJobController.create_single_job("truncate", "UserEntryTransitionHistory")
+        BackgroundJobController.create_single_job(
+            "truncate", "UserEntryTransitionHistory"
+        )
         json_obj["message"] += "Added remove job for UserEntryTransitionHistory."
     else:
         UserEntryTransitionHistory.objects.all().delete()

@@ -27,6 +27,7 @@ from .models import (
     Credentials,
     Browser,
     SearchView,
+    SocialData,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
@@ -106,7 +107,7 @@ class ConfigForm(forms.ModelForm):
             "instance_title",
             "instance_description",
             "instance_internet_location",
-            #"admin_user",
+            # "admin_user",
             "logging_level",
             "initialization_type",
             "view_access_type",
@@ -190,7 +191,7 @@ class ConfigForm(forms.ModelForm):
         self.long_widget("instance_title")
         self.long_widget("instance_description")
         self.long_widget("instance_internet_location")
-        #self.long_widget("admin_user")
+        # self.long_widget("admin_user")
         self.long_widget("favicon_internet_url")
         self.long_widget("internet_status_test_url")
         self.long_widget("time_zone")
@@ -204,7 +205,6 @@ class ConfigForm(forms.ModelForm):
 
 class DataExportForm(forms.ModelForm):
     """
-    Category choice form
     """
 
     class Meta:
@@ -229,6 +229,28 @@ class DataExportForm(forms.ModelForm):
             "format_sources_opml",
             "output_zip",
             "output_sqlite",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class SocialDataForm(forms.ModelForm):
+    """
+    """
+
+    class Meta:
+        model = SocialData
+        fields = [
+            "thumbs_up",
+            "thumbs_down",
+            "view_count",
+            "rating",
+            "upvote_ratio",
+            "upvote_diff",
+            "upvote_view_ratio",
+            "stars",
+            "followers_count",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -726,7 +748,9 @@ class SourceForm(forms.ModelForm):
         self.fields["url"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["favicon"].widget.attrs.update(size=self.init.get_cols_size())
 
-        self.fields["entries_backgroundcolor"].widget = forms.TextInput(attrs={"type" : "color", "value" : ""})
+        self.fields["entries_backgroundcolor"].widget = forms.TextInput(
+            attrs={"type": "color", "value": ""}
+        )
 
         names = SourceControllerBuilder.get_plugin_names()
         # self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))

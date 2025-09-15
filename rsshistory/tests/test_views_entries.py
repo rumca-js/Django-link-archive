@@ -500,7 +500,9 @@ class EntriesViewsTests(FakeInternetTestCase):
         )
 
         self.client.login(username="testuser", password="testpassword")
-        url = reverse("{}:json-entry-bookmark".format(LinkDatabase.name), args=[entry.id])
+        url = reverse(
+            "{}:json-entry-bookmark".format(LinkDatabase.name), args=[entry.id]
+        )
 
         # call user action
         response = self.client.get(url)
@@ -540,7 +542,9 @@ class EntriesViewsTests(FakeInternetTestCase):
         UserBookmarks.objects.create(entry=entry, user=self.user)
 
         self.client.login(username="testuser", password="testpassword")
-        url = reverse("{}:json-entry-unbookmark".format(LinkDatabase.name), args=[entry.id])
+        url = reverse(
+            "{}:json-entry-unbookmark".format(LinkDatabase.name), args=[entry.id]
+        )
 
         # call user action
         response = self.client.get(url)

@@ -188,4 +188,3 @@ class SystemOperationTest(FakeInternetTestCase):
         is_time = controller.is_time_to_cleanup()
 
         self.assertFalse(is_time)
-

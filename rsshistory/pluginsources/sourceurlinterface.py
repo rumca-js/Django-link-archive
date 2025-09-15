@@ -18,6 +18,7 @@ from ..pluginurl.urlhandler import UrlHandlerEx
 class SourceUrlInterface(object):
     """
     Provides interface between Source and URL Properties
+    Used by forms creator
     """
 
     def __init__(self, url, browser=None):

@@ -1,5 +1,6 @@
 from ..sqlmodel import ConfigurationEntry
 
+
 class ConfigurationEntryController(object):
     def __init__(self, db, session=None):
         self.conn = db

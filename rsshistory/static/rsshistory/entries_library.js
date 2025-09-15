@@ -778,7 +778,10 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
             </div>`;
     }
     let tags_text = getEntryTagStrings(entry);
-    let tags = `<div class="text-reset mx-2">${tags_text}</div>`;
+    let language_text = "";
+    if (entry.language != null) {
+        language_text = `Language:${entry.language}`;
+    }
     let source__title = getEntrySourceTitle(entry);
     let date_published = getEntryDatePublished(entry);
     let title_safe = getEntryTitleSafe(entry);
@@ -813,7 +816,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
 		       >
                         ${source__title} ${date_published} ${author}
                     </div>
-                    ${tags}
+                    <div class="text-reset mx-2">${tags_text} ${language_text}</div>
                 </div>
 
                 <div class="mx-2 ms-auto" entryBadges="true">
@@ -853,7 +856,10 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
             </div>`;
     }
     let tags_text = getEntryTagStrings(entry);
-    let tags = `<div class="text-reset mx-2">${tags_text}</div>`;
+    let language_text = "";
+    if (entry.language != null) {
+        language_text = `Language:${entry.language}`;
+    }
     let title_safe = getEntryTitleSafe(entry);
     let entry_link = getEntryLink(entry);
     let hover_title = title_safe + " " + tags_text;
@@ -872,7 +878,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                <div class="mx-2">
                   <span style="font-weight:bold" class="text-reset" entryTitle="true">${title_safe}</span>
                   <div class="text-reset text-decoration-underline" entryDetails="true">@ ${entry.link}</div>
-                  ${tags}
+                  <div class="text-reset mx-2">${tags_text} ${language_text}</div>
                </div>
 
                <div class="mx-2 ms-auto">
@@ -924,7 +930,10 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
     `;
 
     let tags_text = getEntryTagStrings(entry);
-    let tags = `<div class="text-reset mx-2">${tags_text}</div>`;
+    let language_text = "";
+    if (entry.language != null) {
+        language_text = `Language:${entry.language}`;
+    }
 
     let title_safe = getEntryTitleSafe(entry);
     let hover_title = title_safe + " " + tags_text;
@@ -946,7 +955,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
                 <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                     <span style="font-weight: bold" class="text-primary" entryTitle="true">${title_safe}</span>
                     <div class="link-list-item-description" entryDetails="true">${source__title}</div>
-                    ${tags}
+                    <div class="text-reset mx-2">${tags_text} ${language_text}</div>
                 </div>
             </div>
         </a>
@@ -978,7 +987,10 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
     `;
 
     let tags_text = getEntryTagStrings(entry);
-    let tags = `<div class="text-reset mx-2">${tags_text}</div>`;
+    let language_text = "";
+    if (entry.language != null) {
+        language_text = `Language:${entry.language}`;
+    }
 
     let source__title = getEntrySourceTitle(entry);
     let title_safe = getEntryTitleSafe(entry);
@@ -1001,7 +1013,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
                 <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
                     <span style="font-weight: bold" class="text-primary" entryTitle="true">${title_safe}</span>
                     <div class="link-list-item-description" entryDetails="true">${source__title}</div>
-                    ${tags}
+                    <div class="text-reset mx-2">${tags_text} ${language_text}</div>
                 </div>
             </div>
         </a>

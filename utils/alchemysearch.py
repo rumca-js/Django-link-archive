@@ -12,7 +12,7 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
     return 1 if true
     """
 
-    def __init__(self, table, ignore_case = False):
+    def __init__(self, table, ignore_case=False):
         self.table = table
         self.ignore_case = ignore_case
 
@@ -96,7 +96,18 @@ class AlchemyRowHandler(object):
 
 
 class AlchemySearch(object):
-    def __init__(self, db, search_term, row_handler=None, table=None, rows_per_page=None, page=None, ignore_case=True, order_by=None, init_conditions=None):
+    def __init__(
+        self,
+        db,
+        search_term,
+        row_handler=None,
+        table=None,
+        rows_per_page=None,
+        page=None,
+        ignore_case=True,
+        order_by=None,
+        init_conditions=None,
+    ):
         self.db = db
         self.search_term = search_term
 
@@ -122,13 +133,21 @@ class AlchemySearch(object):
         destination_metadata = MetaData()
 
         if self.table:
-            self.destination_table = Table(self.table, destination_metadata, autoload_with=self.db)
+            self.destination_table = Table(
+                self.table, destination_metadata, autoload_with=self.db
+            )
         else:
-            self.destination_table = Table("linkdatamodel", destination_metadata, autoload_with=self.db)
+            self.destination_table = Table(
+                "linkdatamodel", destination_metadata, autoload_with=self.db
+            )
 
     def get_query_conditions(self):
-        symbol_evaluator = AlchemySymbolEvaluator(self.destination_table, self.ignore_case)
-        equation_evaluator = AlchemyEquationEvaluator(self.search_term, symbol_evaluator)
+        symbol_evaluator = AlchemySymbolEvaluator(
+            self.destination_table, self.ignore_case
+        )
+        equation_evaluator = AlchemyEquationEvaluator(
+            self.search_term, symbol_evaluator
+        )
 
         search = OmniSearch(self.search_term, equation_evaluator=equation_evaluator)
         combined_query_conditions = search.get_combined_query()
@@ -140,7 +159,9 @@ class AlchemySearch(object):
         print(combined_query_conditions)
 
         if combined_query_conditions is not None and self.init_conditions is not None:
-            combined_query_conditions = and_(combined_query_conditions, self.init_conditions)
+            combined_query_conditions = and_(
+                combined_query_conditions, self.init_conditions
+            )
         elif self.init_conditions is not None:
             combined_query_conditions = self.init_conditions
 
@@ -162,7 +183,7 @@ class AlchemySearch(object):
 
             # Execute the query
             result = connection.execute(stmt)
-            
+
             # Fetch all results
             rows = result.fetchall()
 

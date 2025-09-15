@@ -2,14 +2,7 @@ import urllib.parse
 
 from django.urls import reverse
 from django.templatetags.static import static
-
-from ...webtools import UrlLocation, InputContent, status_code_to_text
 from utils.dateutils import DateUtils
-
-from ...apps import LinkDatabase
-from ...models import ConfigurationEntry, UserConfig, ReadLater
-from ...controllers import LinkDataController, SearchEngineGoogleCache
-from ...configuration import Configuration
 from utils.services import (
     TranslateBuilder,
     InternetArchiveBuilder,
@@ -18,6 +11,18 @@ from utils.services import (
     W3CValidator,
     BuildWith,
 )
+
+from ...webtools import UrlLocation, InputContent, status_code_to_text
+
+from ...configuration import Configuration
+from ...apps import LinkDatabase
+from ...models import (
+    ConfigurationEntry,
+    UserConfig,
+    ReadLater,
+    SocialData,
+)
+from ...controllers import LinkDataController, SearchEngineGoogleCache
 
 
 class EntryButton(object):
@@ -55,12 +60,12 @@ class EntryButton(object):
 
     def get_map(self):
         return {
-           "name" : self.name,
-           "id" : self.id,
-           "action" : self.action,
-           "image" : self.image,
-           "access" : self.access,
-           "title" : self.title,
+            "name": self.name,
+            "id": self.id,
+            "action": self.action,
+            "image": self.image,
+            "access": self.access,
+            "title": self.title,
         }
 
 
@@ -192,6 +197,37 @@ class EntryGenericPlugin(object):
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Resets entry local data",
+                    static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
+                ),
+            )
+
+        if self.user.is_staff:
+            social = SocialData.get(self.entry)
+            if social:
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Edit social data",
+                        reverse(
+                            "{}:social-data-edit".format(LinkDatabase.name),
+                            args=[self.entry.id],
+                        ),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Edits social data",
+                        static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
+                    ),
+                )
+
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Update social data",
+                    reverse(
+                        "{}:social-data-update".format(LinkDatabase.name),
+                        args=[self.entry.id],
+                    ),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Updates social data",
                     static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
                 ),
             )
@@ -340,7 +376,9 @@ class EntryGenericPlugin(object):
                             ConfigurationEntry.ACCESS_TYPE_ALL,
                             "Adds to read later list",
                             static(
-                                "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
+                                "{}/icons/icons8-bookmark-100.png".format(
+                                    LinkDatabase.name
+                                )
                             ),
                         ),
                     )
@@ -356,7 +394,9 @@ class EntryGenericPlugin(object):
                             ConfigurationEntry.ACCESS_TYPE_ALL,
                             "Removes from read later list",
                             static(
-                                "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
+                                "{}/icons/icons8-bookmark-100.png".format(
+                                    LinkDatabase.name
+                                )
                             ),
                         ),
                     )

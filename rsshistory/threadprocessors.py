@@ -253,7 +253,7 @@ class RefreshProcessor(CeleryTaskInterface):
         BackgroundJobHistory.mark_done(job_name=RefreshJobHandler.get_job(), subject="")
         handler.process()
 
-        #self.display_memory_diff()
+        # self.display_memory_diff()
         gc.collect()
         self.display_memory_diff()
 
@@ -357,7 +357,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
 
         items = self.get_handler_and_object()
         if len(items) == 0:
-            #AppLogging.debug("{}: No jobs".format(self.get_name()))
+            # AppLogging.debug("{}: No jobs".format(self.get_name()))
             return False
 
         try:

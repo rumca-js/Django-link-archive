@@ -47,7 +47,6 @@ class SystemOperationController(object):
         if not remote_server:
             return False
 
-
         try:
             with requests.get(remote_server) as response:
                 if response and response.status_code != 200:
@@ -214,7 +213,8 @@ class SystemOperationController(object):
         # job without subject is main job
 
         jobs = BackgroundJobController.objects.filter(
-            job=BackgroundJob.JOB_CLEANUP, subject="",
+            job=BackgroundJob.JOB_CLEANUP,
+            subject="",
         )
         if jobs.exists():
             return False

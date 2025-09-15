@@ -152,7 +152,9 @@ def edit(request, pk):
 
     p.context["form"] = form
 
-    p.context["form_description_post"] = """
+    p.context[
+        "form_description_post"
+    ] = """
     <ul>
        <li>Github supports token setup</li>
        <li>E-mail supports username/password setup</li>

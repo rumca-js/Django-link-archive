@@ -50,7 +50,6 @@ class DataExportTests(FakeInternetTestCase):
             "export_data": "export-dtype-daily-data",
             "local_path": "./",
             "remote_path": "something.git",
-            "user": "",
             "password": "",
             "user": None,
             "export_time": time(0, 0),

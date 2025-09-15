@@ -168,7 +168,7 @@ class BackgroundJobHistory(models.Model):
 
     class Meta:
         ordering = [
-            "-date_created", # most recent up top
+            "-date_created",  # most recent up top
         ]
 
     def remove_old(job_name):

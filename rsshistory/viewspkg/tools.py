@@ -42,7 +42,12 @@ from ..forms import (
     UrlContentsForm,
     LinkPropertiesForm,
 )
-from ..views import ViewPage, SimpleViewPage, get_request_browser, get_request_url_with_browser
+from ..views import (
+    ViewPage,
+    SimpleViewPage,
+    get_request_browser,
+    get_request_url_with_browser,
+)
 from ..pluginurl.urlhandler import UrlHandlerEx
 
 

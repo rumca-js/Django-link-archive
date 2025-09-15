@@ -19,6 +19,30 @@ class SocialDataTest(FakeInternetTestCase):
             username="TestUser", password="testpassword", is_staff=True
         )
 
+    def test_create(self):
+
+        entry = LinkDataController.objects.create(
+            source_url="https://notsupported.com",
+            link="https://notsupported.com/watch?v=bookmarked",
+            title="The first link",
+            bookmarked=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        data = {"followers_count" : None,
+                "rating" : None,
+                "stars" : None,
+                "thumbs_down" : 457784,
+                "thumbs_up": 15783577,
+                "upvote_ratio": 0.9718136922145872,
+                "upvote_view_ratio": 0.006968351041263936,
+                "view_count": 2265037583,
+                "entry" : entry}
+        item = SocialData.objects.create(**data)
+
+        self.assertEqual(SocialData.objects.all().count(), 1)
+
     def test_get__unsupported(self):
 
         entry = LinkDataController.objects.create(
@@ -84,8 +108,7 @@ class SocialDataTest(FakeInternetTestCase):
         # call tested function
         social_data = SocialData.get(entry)
 
-        self.assertTrue(social_data)
-        self.assertIn("stars", social_data)
+        self.assertFalse(social_data)
 
     def test_get__youtube(self):
         entry = LinkDataController.objects.create(
@@ -100,7 +123,7 @@ class SocialDataTest(FakeInternetTestCase):
         # call tested function
         social_data = SocialData.get(entry)
 
-        self.assertTrue(social_data)
+        self.assertFalse(social_data)
 
     def test_get__reddit(self):
         entry = LinkDataController.objects.create(
@@ -114,7 +137,19 @@ class SocialDataTest(FakeInternetTestCase):
         # call tested function
         social_data = SocialData.get(entry)
 
+        self.assertFalse(social_data)
+
+    def test_update__github(self):
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://github.com/rumca-js/Django-link-archive",
+        )
+
+        # call tested function
+        social_data = SocialData.update(entry)
+
         self.assertTrue(social_data)
+        self.assertTrue(social_data.stars)
 
     def test_update__youtube(self):
         entry = LinkDataController.objects.create(
@@ -126,7 +161,7 @@ class SocialDataTest(FakeInternetTestCase):
             language="en",
         )
 
-        social_data = SocialData.objects.create(view_count = 1)
+        social_data = SocialData.objects.create(view_count=1, entry=entry)
 
         # call tested function
         social_data = SocialData.update(entry)

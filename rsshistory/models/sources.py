@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-from django.core.validators import MinValueValidator,MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from ..webtools import UrlLocation
 
@@ -157,17 +157,19 @@ class SourceDataModel(models.Model):
 
     entries_backgroundcolor_alpha = models.FloatField(
         default=0.0,
-        validators = [MinValueValidator(0), MaxValueValidator(1)],
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
         help_text="Background color alpha needs to be 1.0 to be visible",
     )
 
     entries_backgroundcolor = models.CharField(
-        max_length=1000, blank=True, help_text="Background color to be applied for a source"
+        max_length=1000,
+        blank=True,
+        help_text="Background color to be applied for a source",
     )
 
     entries_alpha = models.FloatField(
         default=1.0,
-        validators = [MinValueValidator(0), MaxValueValidator(1)],
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
         help_text="Alpha of entire entry",
     )
 
@@ -223,20 +225,34 @@ class SourceDataModel(models.Model):
             source.category = None
             source.subcategory = None
 
-            if (not source.category_name or source.category_name == "") and (source.subcategory_name and source.subcategory_name != ""):
-                AppLogging.error("Source:{} Incorrectly defined source categories".format(source.id))
+            if (not source.category_name or source.category_name == "") and (
+                source.subcategory_name and source.subcategory_name != ""
+            ):
+                AppLogging.error(
+                    "Source:{} Incorrectly defined source categories".format(source.id)
+                )
                 source.save()
                 continue
 
             category = SourceCategories.ensure(source.category_name)
             if not category:
-                AppLogging.error("Source:{} Cannot create category with name {}".format(source.id, source.category_name))
+                AppLogging.error(
+                    "Source:{} Cannot create category with name {}".format(
+                        source.id, source.category_name
+                    )
+                )
                 source.save()
                 continue
 
-            subcategory = SourceSubCategories.ensure(source.category_name, source.subcategory_name)
-            if not  subcategory:
-                AppLogging.error("Source:{} Cannot create category with name {} subcategory name {}".format(source.id, source.category_name, source.subcategory_name))
+            subcategory = SourceSubCategories.ensure(
+                source.category_name, source.subcategory_name
+            )
+            if not subcategory:
+                AppLogging.error(
+                    "Source:{} Cannot create category with name {} subcategory name {}".format(
+                        source.id, source.category_name, source.subcategory_name
+                    )
+                )
                 source.save()
                 continue
 

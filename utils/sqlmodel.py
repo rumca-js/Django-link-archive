@@ -178,7 +178,6 @@ class SourcesTable(Base):
     auto_update_favicon: Mapped[bool] = mapped_column(default=True)
 
 
-
 class SourceOperationalData(Base):
     __tablename__ = "sourceoperationaldata"
 
@@ -380,7 +379,9 @@ class ConfigurationEntry(Base):
     number_of_update_entries: Mapped[int] = mapped_column(default=1)
 
     remote_webtools_server_location: Mapped[Optional[str]] = mapped_column(default="")
-    internet_status_test_url: Mapped[Optional[str]] = mapped_column(default="https://google.com")
+    internet_status_test_url: Mapped[Optional[str]] = mapped_column(
+        default="https://google.com"
+    )
 
     track_user_actions: Mapped[bool] = mapped_column(default=False)
     track_user_searches: Mapped[bool] = mapped_column(default=False)

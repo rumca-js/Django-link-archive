@@ -29,6 +29,7 @@ from .viewspkg import (
     blockentry,
     searchviews,
     credentials,
+    social,
 )
 
 # register app namespace
@@ -240,6 +241,9 @@ urlpatterns = [
     path("keywords/", keywords.keywords, name="keywords",),
     path("keyword-remove", keywords.keyword_remove, name="keyword-remove",),
     path("keywords-remove-all/", keywords.keywords_remove_all, name="keywords-remove-all",),
+    # social
+    path("social-data-edit/<int:pk>/", social.social_data_edit, name="social-data-edit"),
+    path("social-data-update/<int:pk>/", social.social_data_update, name="social-data-update"),
     # entry rules
     path("entry-rule-add", entryrules.entry_rule_add, name="entry-rule-add"),
     path("entry-rule-edit/<int:pk>/", entryrules.entry_rule_edit, name="entry-rule-edit"),

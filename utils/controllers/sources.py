@@ -90,7 +90,6 @@ class SourcesTableController(object):
             session.commit()
 
 
-
 class SourceDataBuilder(object):
     def __init__(self, conn, link=None, link_data=None, manual_entry=False):
         self.conn = conn
