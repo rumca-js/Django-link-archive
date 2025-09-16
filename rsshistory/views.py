@@ -193,9 +193,15 @@ class SimpleViewPage(object):
             return False
 
         config_entry = Configuration.get_object().config_entry
+
         if (
             config_entry.view_access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
             and not self.request.user.is_superuser
+        ):
+            return False
+        if (
+            config_entry.view_access_type == ConfigurationEntry.ACCESS_TYPE_STAFF
+            and not self.request.user.is_staff
         ):
             return False
         if (

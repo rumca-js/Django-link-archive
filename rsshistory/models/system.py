@@ -45,9 +45,10 @@ class ConfigurationEntry(models.Model):
     ACCESS_TYPE_STAFF = "access-type-staff"
 
     ACCESS_TYPES = (
-        (ACCESS_TYPE_ALL, ACCESS_TYPE_ALL),                     #
-        (ACCESS_TYPE_LOGGED, ACCESS_TYPE_LOGGED),               #
-        (ACCESS_TYPE_OWNER, ACCESS_TYPE_OWNER),                 #
+        (ACCESS_TYPE_ALL, ACCESS_TYPE_ALL),
+        (ACCESS_TYPE_LOGGED, ACCESS_TYPE_LOGGED),
+        (ACCESS_TYPE_STAFF, ACCESS_TYPE_STAFF),
+        (ACCESS_TYPE_OWNER, ACCESS_TYPE_OWNER),
     )
 
     DISPLAY_TYPE_STANDARD = "standard"

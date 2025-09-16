@@ -113,6 +113,9 @@ def entries_generic(request, link, data_scope):
         data = {"search": request.GET["search"]}
 
     search_view = get_search_view(request)
+    if not search_view:
+        p.context["summary_text"] = "Missing search view"
+        return p.render("summary_present.html")
 
     # data_scope = "Scope: " + data_scope
     data_scope = "Scope: " + search_view.name
@@ -128,6 +131,7 @@ def entries_generic(request, link, data_scope):
     filter_form.auto_fetch = search_view.auto_fetch
 
     context = get_generic_search_init_context(request, filter_form)
+
 
     p.context.update(context)
     p.context["query_page"] = link
