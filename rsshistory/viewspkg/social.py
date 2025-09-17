@@ -1,6 +1,7 @@
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
 
 from ..apps import LinkDatabase
 from ..models import SocialData, ConfigurationEntry
@@ -25,10 +26,6 @@ def social_data_edit(request, pk):
 
     entry = entries[0]
 
-    if not SocialData.is_supported(entry):
-        p.context["summary_text"] = "Social data not supported"
-        return p.render("summary_present.html")
-
     socials = SocialData.objects.filter(entry=entry)
 
     if not socials.exists():
@@ -41,7 +38,7 @@ def social_data_edit(request, pk):
         if form.is_valid():
             form.save()
 
-            return redirect("{}:entry".format(LinkDatabase.name), args=[social.entry.id])
+            return reverse("{}:entry-detail".format(LinkDatabase.name), args=[social.entry.id])
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")

@@ -98,21 +98,16 @@ class SocialData(models.Model):
         from ..configuration import Configuration
         from ..controllers import BackgroundJobController
 
-        if not SocialData.is_supported(entry):
-            return
-
         social = SocialData.get_from_model(entry)
         if social:
             return social
 
+        if not SocialData.is_supported(entry):
+            return
+
         BackgroundJobController.link_download_social_data(entry)
 
     def update(entry):
-        if not SocialData.is_supported(entry):
-            social_data = SocialData.objects.filter(entry=entry)
-            if social_data.exists():
-                social_data.delete()
-
         new_social = SocialData.get_from_server(entry)
         if new_social:
             social_data = SocialData.objects.filter(entry=entry)

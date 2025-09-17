@@ -202,35 +202,34 @@ class EntryGenericPlugin(object):
             )
 
         if self.user.is_staff:
-            social = SocialData.get(self.entry)
-            if social:
-                buttons.append(
-                    EntryButton(
-                        self.user,
-                        "Edit social data",
-                        reverse(
-                            "{}:social-data-edit".format(LinkDatabase.name),
-                            args=[self.entry.id],
-                        ),
-                        ConfigurationEntry.ACCESS_TYPE_OWNER,
-                        "Edits social data",
-                        static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
-                    ),
-                )
-
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Update social data",
+                    "Edit social data",
                     reverse(
-                        "{}:social-data-update".format(LinkDatabase.name),
+                        "{}:social-data-edit".format(LinkDatabase.name),
                         args=[self.entry.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Updates social data",
+                    "Edits social data",
                     static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
                 ),
             )
+
+            if SocialData.is_supported(self.entry):
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Update social data",
+                        reverse(
+                            "{}:social-data-update".format(LinkDatabase.name),
+                            args=[self.entry.id],
+                        ),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Updates social data",
+                        static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
+                    ),
+                )
 
         if config.entry_update_via_internet and self.user.is_authenticated:
             buttons.append(

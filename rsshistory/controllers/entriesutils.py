@@ -677,6 +677,9 @@ class EntryUpdater(object):
         url = EntryUrlInterface(entry.link, browser=self.browser)
         props = url.get_props()
 
+        if url.is_server_error():
+            raise IOError(f"{self.link}: Crawling server error")
+
         handler = UrlHandlerEx(url=entry.link)
         if handler.is_blocked():
             if entry.is_removable():
@@ -767,6 +770,8 @@ class EntryUpdater(object):
 
         url = EntryUrlInterface(entry.link, browser=self.browser)
         props = url.get_props()
+        if url.is_server_error():
+            raise IOError(f"{self.link}: Crawling server error")
 
         handler = UrlHandlerEx(url=entry.link)
         if handler.is_blocked():
@@ -1646,6 +1651,9 @@ class EntryDataBuilder(object):
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
         link_data = url.get_props()
 
+        if url.is_server_error():
+            raise IOError(f"{self.link}: Crawling server error")
+
         if self.source_is_auto and not url.is_valid():
             self.errors.append("Url:{}. Url is not valid".format(self.link))
             AppLogging.debug(
@@ -1705,6 +1713,9 @@ class EntryDataBuilder(object):
         )
 
         link_data = url.get_props()
+
+        if url.is_server_error():
+            raise IOError(f"{self.link}: Crawling server error")
 
         if url.is_blocked():
             self.errors.append("Url:{}. Url is blocked".format(self.link))

@@ -11,6 +11,8 @@ from ..webtools import (
     HTTP_STATUS_USER_AGENT,
     HTTP_STATUS_TOO_MANY_REQUESTS,
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
+    HTTP_STATUS_CODE_EXCEPTION,
+    HTTP_STATUS_CODE_SERVER_ERROR,
 )
 from ..apps import LinkDatabase
 from ..models import AppLogging, EntryRules, BlockEntry, Browser
@@ -173,6 +175,9 @@ class UrlHandlerEx(object):
                     )
                     continue
 
+                if self.is_server_error():
+                    raise IOError(f"{self.url}: Crawling server error")
+
                 """
                 # TODO if not valid -> we can retry using a different crawler
                 if response is valid (or 403, or redirect?).
@@ -302,6 +307,9 @@ class UrlHandlerEx(object):
             if status_code == HTTP_STATUS_CODE_PAGE_UNSUPPORTED:
                 return False
 
+            if status_code == HTTP_STATUS_CODE_SERVER_ERROR:
+                return False
+
             return self.is_status_code_invalid(status_code)
 
     def get_contents(self):
@@ -351,6 +359,17 @@ class UrlHandlerEx(object):
             return False
 
         return True
+
+    def is_server_error(self):
+        if not self.all_properties:
+            return False
+
+        response = self.get_section("Response")
+        if not response:
+            return False
+
+        status_code = response.get("status_code")
+        return status_code == HTTP_STATUS_CODE_EXCEPTION
 
     def is_blocked(self):
         reason = EntryRules.is_url_blocked(self.url)

@@ -7,6 +7,7 @@ from ..webtools import (
     DefaultContentPage,
     HttpPageHandler,
     RemoteServer,
+    HTTP_STATUS_CODE_EXCEPTION,
 )
 
 from ..apps import LinkDatabase
@@ -108,12 +109,9 @@ class EntryUrlInterface(object):
         if not self.all_properties:
             return False
 
-        server = RemoteServer("https://")
+        server = RemoteServer("")
         response = server.read_properties_section("Response", self.all_properties)
-        if "is_valid" in response:
-            return response["is_valid"]
-
-        return True
+        return response.get("is_valid")
 
     def is_blocked(self):
         if not self.handler:
@@ -123,6 +121,15 @@ class EntryUrlInterface(object):
             return True
 
         return False
+
+    def is_server_error(self):
+        if not self.all_properties:
+            return False
+
+        server = RemoteServer("")
+        response = server.read_properties_section("Response", self.all_properties)
+        status_code = response.get("status_code")
+        return status_code == HTTP_STATUS_CODE_EXCEPTION
 
     def fix_properties(self, input_props=None, source_obj=None):
         if not input_props:

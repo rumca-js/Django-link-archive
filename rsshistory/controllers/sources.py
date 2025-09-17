@@ -230,7 +230,8 @@ class SourceDataController(SourceDataModel):
     def get_full_information(data):
         from ..pluginsources.sourceurlinterface import SourceUrlInterface
 
-        info = SourceUrlInterface(data["url"]).get_props()
+        source_interface = SourceUrlInterface(data["url"])
+        info = source_interface.get_props()
 
         if data["url"].find("http://") >= 0:
             data["url"] = data["url"].replace("http://", "https://")
@@ -434,6 +435,10 @@ class SourceDataBuilder(object):
         rss_url = self.link
 
         h = UrlHandlerEx(rss_url)
+        if h.is_server_error():
+            self.errors.append("Url:{}. Crawling server error".format(self.link))
+            return
+
         if not h.is_valid():
             self.errors.append("Url:{}. Link is not valid".format(self.link))
             return

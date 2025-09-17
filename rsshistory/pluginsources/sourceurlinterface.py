@@ -24,8 +24,15 @@ class SourceUrlInterface(object):
     def __init__(self, url, browser=None):
         self.url = UrlHandlerEx.get_cleaned_link(url)
         self.browser = browser
+        self.url_ex = None
+        self.all_properties = None
 
     def get_props(self, input_props=None):
+        self.url_ex = self.get_url(input_props)
+        self.all_properties = self.url_ex.get_properties()
+        return self.get_props_from_url(self.url_ex)
+
+    def get_url(self, input_props=None):
         if not input_props:
             input_props = {}
 
@@ -38,7 +45,7 @@ class SourceUrlInterface(object):
             entries = url_ex.get_section("Entries")
 
             if len(entries) > 0:
-                return self.get_props_internal(url_ex)
+                return url_ex
             else:
                 if "feeds" in properties:
                     for feed in properties["feeds"]:
@@ -47,11 +54,11 @@ class SourceUrlInterface(object):
                         if all_properties:
                             entries = url_ex_new.get_section("Entries")
                             if len(entries) > 0:
-                                return self.get_props_internal(url_ex_new)
+                                return url_ex_new
 
-            return self.get_props_internal(url_ex)
+            return url_ex
 
-    def get_props_internal(self, url_ex, input_props=None):
+    def get_props_from_url(self, url_ex, input_props=None):
         if not input_props:
             input_props = {}
 

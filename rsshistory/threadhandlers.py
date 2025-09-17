@@ -559,6 +559,17 @@ class LinkAddJobHandler(BaseJobHandler):
         if "browser_obj" in data:
             browser = data["browser_obj"]
 
+        if (
+            link.endswith(".htm")
+            or link.endswith(".html")
+            or link.endswith(".php")
+            or link.endswith(".jpeg")
+            or link.endswith(".jpg")
+            or link.endswith(".png")
+            or link.endswith(".js")
+        ):
+            return True
+
         # Add the link
         b = EntryDataBuilder()
         entry = b.build(link=link, source_is_auto=True, browser=browser)
