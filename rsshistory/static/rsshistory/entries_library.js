@@ -171,6 +171,17 @@ function getEntryDislikeDataText(data) {
 }
 
 
+function FillSocialData(entry_id, social_data) {
+    let entry_parameters = getEntryDislikeDataText(social_data);
+
+    // entry_list_social.set(entry.id, entry_parameters);
+
+    let upvote_ratio_div = `<div>${entry_parameters}</div>`;
+
+    $(`[entry="${entry_id}"] [entryDetails="true"]`).append(upvote_ratio_div);
+}
+
+
 function getEntryParameters(entry, entry_dislike_data=null) {
    html_out = "";
 
@@ -811,9 +822,9 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                 <div class="mx-2">
                     <span style="font-weight:bold" class="text-reset" entryTitle="true">${title_safe}</span>
                     <div 
-		       class="text-reset"
-		       entryDetails="true"
-		       >
+                      class="text-reset"
+                       entryDetails="true"
+                    >
                         ${source__title} ${date_published} ${author}
                     </div>
                     <div class="text-reset mx-2">${tags_text} ${language_text}</div>
@@ -1019,6 +1030,10 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
         </a>
     `;
 }
+
+/**
+ Django specific
+ */
 
 
 function getEntryVisitsBar(entry) {

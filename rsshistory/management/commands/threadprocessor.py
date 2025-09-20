@@ -19,22 +19,14 @@ from django.conf import settings
 from workspace import get_workspaces
 
 
-def process_app(processor, tasks_info):
-    # Parsing the processor string
-    try:
-        app_name, processor_file_name, processor_class_name = processor.split(".")
-    except ValueError as e:
-        print("Processor string format error: %s", processor)
-        return
-
+def process_workspace(workspace, processor_class_name, tasks_info, check_memory):
     # Importing tasks and processor modules
     try:
-        tasks_module = importlib.import_module(f"{app_name}.tasks")
         threadprocessors_module = importlib.import_module(
-            f"{app_name}.threadprocessors"
+            f"{workspace}.threadprocessors"
         )
     except ModuleNotFoundError as e:
-        print("Module import failed for app: %s", app_name)
+        print("Module import failed for workspace: %s", workspace)
         return
 
     # Retrieving the processor class
@@ -46,9 +38,9 @@ def process_app(processor, tasks_info):
 
     # Call the task with the processor class
     try:
-        return tasks_module.process_job_task(processor_class, tasks_info)
+        return threadprocessors_module.process_job_task(processor_class, tasks_info, check_memory)
     except Exception as e:
-        print("Error while processing jobs for: ", str(e), processor)
+        print("Error while processing jobs for: ", str(e), processor_class)
         error_text = traceback.format_exc()
         print(error_text)
 
@@ -64,15 +56,25 @@ class Command(BaseCommand):
 
         print(f"{thread}: Starting...")
 
+        iteration = 1
+        check_memory = False
+
         while True:
             # Do background work
             print(f"{thread}: Refresh")
 
+            iteration += 1
+            if iteration > 5:
+                check_memory = True
+
             more_jobs = False
 
             for workspace in get_workspaces():
-                more_jobs_now = process_app(
-                    f"{workspace}.threadprocessors.{thread}", settings.TASKS_INFO
+                more_jobs_now = process_workspace(
+                     workspace,
+                     thread,
+                     settings.TASKS_INFO,
+                     check_memory,
                 )
                 if more_jobs_now:
                     more_jobs = True

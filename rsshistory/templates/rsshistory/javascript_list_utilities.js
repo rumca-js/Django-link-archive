@@ -203,10 +203,13 @@ function performSearch(search_term = '', page = '', attempt = 1) {
 
    document.title = original_title + " " + currentSearch;
    
-   let i = 0;
-   titleSpinner = setInterval(() => {
-      document.title = `${spinnerFrames[i++ % spinnerFrames.length]}` + original_title + " " + currentSearch;
-   }, 200);
+   if (titleSpinner == null)
+   {
+      let i = 0;
+      titleSpinner = setInterval(() => {
+         document.title = `${spinnerFrames[i++ % spinnerFrames.length]}` + original_title + " " + currentSearch;
+      }, 200);
+   }
 
    page = page || currentUrl.searchParams.get('page') || '1';
 
@@ -257,6 +260,8 @@ function performSearch(search_term = '', page = '', attempt = 1) {
       enableFilterButton();
 
       clearInterval(titleSpinner);
+      titleSpinner = null;
+
       document.title = original_title + " " + currentSearch;
    }, timeout_s = 50000);
 }
@@ -310,20 +315,6 @@ $(document).on('click', '.btnFilterTrigger', function(e) {
 
     showSuggestions = false;
 
-    performSearch(search_term, page);
-});
-
-
-//-----------------------------------------------
-$(document).on('click', '.btnNavigation', function(e) {
-    e.preventDefault();
-    
-    let page = $(this).data("page");
-    let currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set("page", page);
-    window.history.pushState({}, '', currentUrl);
-
-    var search_term = $(this).data('search') || $('#id_search').val();
     performSearch(search_term, page);
 });
 

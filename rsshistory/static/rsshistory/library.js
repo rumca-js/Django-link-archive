@@ -39,6 +39,15 @@ class UrlLocation {
   getProtocolless() {
     return sanitizeLink(this.url.href.replace(`${this.url.protocol}//`, ''));
   }
+
+  getDomain() {
+    const protocolless = this.getProtocolless();
+    const firstSlashIndex = protocolless.indexOf('/');
+    if (firstSlashIndex === -1) {
+      return protocolless;
+    }
+    return protocolless.substring(0, firstSlashIndex);
+  }
 }
 
 
@@ -326,6 +335,15 @@ function fixStupidGoogleRedirects(input_url) {
         return input_url;
     }
 
+    return input_url;
+}
+
+
+function fixStupidYoutubeRedirects(input_url) {
+    if (!input_url) {
+        return null;
+    }
+
     if (input_url.includes("www.youtube.com/redirect")) {
         const url = new URL(input_url);
         let redirectURL = url.searchParams.get('q');
@@ -336,6 +354,28 @@ function fixStupidGoogleRedirects(input_url) {
         else {
             return input_url;
         }
+    }
+
+    return input_url;
+}
+
+function fixStupidMicrosoftSafeLinks(input_url) {
+    if (!input_url) {
+        return null;
+    }
+
+    try {
+        const parsedUrl = new URL(input_url);
+
+        if (parsedUrl.hostname.endsWith("safelinks.protection.outlook.com")) {
+            const originalUrl = parsedUrl.searchParams.get("url");
+
+            if (originalUrl) {
+                return decodeURIComponent(originalUrl);
+            }
+        }
+    } catch (e) {
+        console.error("Error parsing URL:", e);
     }
 
     return input_url;
@@ -360,6 +400,8 @@ function sanitizeLinkGeneral(link) {
 function sanitizeLink(link) {
    link = sanitizeLinkGeneral(link);
    link = fixStupidGoogleRedirects(link);
+   link = fixStupidYoutubeRedirects(link);
+   link = fixStupidMicrosoftSafeLinks(link);
    link = sanitizeLinkGeneral(link);
 
    return link;
@@ -389,6 +431,11 @@ function getYouTubeVideoId(url) {
     } catch (e) {
         return null;
     }
+}
+
+
+function isYouTubeVideo(url) {
+    return (getYouTubeVideoId(url) != null);
 }
 
 
@@ -451,6 +498,30 @@ function getOdyseeVideoId(url) {
     const url_object = new URL(url);
     const videoId = url_object.pathname.split('/').pop();
     return videoId;
+}
+
+
+function isSocialMediaSupported(entry) {
+    let page = new UrlLocation(entry.link)
+    let domain = page.getDomain()
+    if (!domain) {
+        return false;
+    }
+
+    if (domain.includes("youtube.com")) {
+        return true;
+    }
+    if (domain.includes("github.com")) {
+        return true;
+    }
+    if (domain.includes("reddit.com")) {
+        return true;
+    }
+    if (domain.includes("news.ycombinator.com")) {
+        return true;
+    }
+
+    return false
 }
 
 

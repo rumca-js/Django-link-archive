@@ -78,9 +78,8 @@ $(document).on('click', '.btnNavigation', function(e) {
     currentUrl.searchParams.set('page', currentPage);
     window.history.pushState({}, '', currentUrl);
 
-    animateToTop();
-
-    performSearch();
+    var search_term = $(this).data('search') || $('#id_search').val();
+    performSearch(search_term, currentPage);
 });
 
 

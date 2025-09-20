@@ -20,17 +20,17 @@ class SocialData(models.Model):
         on_delete=models.CASCADE,
     )
 
-    thumbs_up = models.IntegerField(
+    thumbs_up = models.BigIntegerField(
         null=True,
         blank=True,
     )
 
-    thumbs_down = models.IntegerField(
+    thumbs_down = models.BigIntegerField(
         null=True,
         blank=True,
     )
 
-    view_count = models.IntegerField(
+    view_count = models.BigIntegerField(
         null=True,
         blank=True,
     )
@@ -59,12 +59,12 @@ class SocialData(models.Model):
         help_text="(Thumbs up - thumbs diff) / view count.",
     )
 
-    stars = models.IntegerField(
+    stars = models.BigIntegerField(
         null=True,
         blank=True,
     )
 
-    followers_count = models.IntegerField(
+    followers_count = models.BigIntegerField(
         null=True,
         blank=True,
     )

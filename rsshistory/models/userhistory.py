@@ -494,6 +494,62 @@ class UserEntryVisitHistory(models.Model):
                 entry.delete()
 
 
+class SearchHistory(models.Model):
+    """
+    Just a search history, global
+    """
+
+    search_query = models.CharField(max_length=1000)
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-date"]
+
+
+class EntryVisitHistory(models.Model):
+    """
+    Keeps info how many times user entered link,
+    """
+
+    visits = models.IntegerField(blank=True, null=True)
+    date_last_visit = models.DateTimeField(blank=True, null=True)
+
+    entry = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.CASCADE,
+        related_name="visits_counterx",
+    )
+
+    class Meta:
+        ordering = ["-date_last_visit"]
+
+
+class EntryTransitionHistory(models.Model):
+    """
+    Keeps history of which link goes to where. From can be blank at start
+    """
+
+    counter = models.IntegerField(default=0)
+
+    entry_from = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="transitions_fromx",
+    )
+    entry_to = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="transitions_tox",
+    )
+
+    class Meta:
+        ordering = ["-counter"]
+
+
 class EntryHitUserSearchHistory(models.Model):
     """
     User searches for something. Then clicks a link. That is a hit.
