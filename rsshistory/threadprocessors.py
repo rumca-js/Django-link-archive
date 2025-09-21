@@ -33,6 +33,7 @@ from .models import (
     AppLogging,
     BackgroundJob,
     BackgroundJobHistory,
+    ConfigurationEntry,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .controllers import (
@@ -77,11 +78,13 @@ from .threadhandlers import (
 from .configuration import Configuration
 
 
-class CeleryTaskInterface(object):
-    def __init__(self):
+class ThreadProcessorInterface(object):
+    def __init__(self, tasks_info=None, check_memory=False):
         c = Configuration.get_object()
         self.start_processing_time = None
         self.start_memory = c.get_memory_usage()
+        self.check_memory = check_memory
+        self.tasks_info = tasks_info
 
     def run(self):
         raise NotImplementedError("Not implemented")
@@ -202,7 +205,7 @@ class CeleryTaskInterface(object):
         return []
 
 
-class RefreshProcessor(CeleryTaskInterface):
+class RefreshProcessor(ThreadProcessorInterface):
     """!
     One of the most important tasks.
     It checks what needs to be done, and produces 'new' tasks'.
@@ -211,9 +214,8 @@ class RefreshProcessor(CeleryTaskInterface):
     Mostly it should only add background jobs, and nothing more!
     """
 
-    def __init__(self, tasks_info=None):
-        super().__init__()
-        self.tasks_info = tasks_info
+    def __init__(self, tasks_info=None, check_memory=False):
+        super().__init__(tasks_info=tasks_info, check_memory=check_memory)
 
     def run(self):
         self.run_one_job()
@@ -227,9 +229,10 @@ class RefreshProcessor(CeleryTaskInterface):
         if c.is_memory_limit_reached():
             gc.collect()
 
-            AppLogging.error(
-                "{}: Memory limit reached at start, leaving".format(self.get_name())
-            )
+            if self.check_memory:
+                AppLogging.error(
+                    "{}: Memory limit reached at start, leaving".format(self.get_name())
+                )
             return
 
         config = c.config_entry
@@ -255,20 +258,22 @@ class RefreshProcessor(CeleryTaskInterface):
 
         # self.display_memory_diff()
         gc.collect()
-        self.display_memory_diff()
+
+        if self.check_memory:
+            self.display_memory_diff()
 
     def get_supported_jobs(self):
         return [BackgroundJob.JOB_REFRESH]
 
 
-class GenericJobsProcessor(CeleryTaskInterface):
+class GenericJobsProcessor(ThreadProcessorInterface):
     """!
     @note Uses handler priority when processing jobs.
     """
 
-    def __init__(self, timeout_s=60 * 1, tasks_info=None):
+    def __init__(self, timeout_s=60 * 1, tasks_info=None, check_memory=False):
         """ """
-        super().__init__()
+        super().__init__(tasks_info=tasks_info, check_memory=check_memory)
         self.timeout_s = timeout_s
         self.tasks_info = tasks_info
 
@@ -288,7 +293,8 @@ class GenericJobsProcessor(CeleryTaskInterface):
 
             c = Configuration.get_object()
             if c.is_memory_limit_reached():
-                AppLogging.error("{}: Memory limit reached".format(self.get_name()))
+                if self.check_memory:
+                    AppLogging.error("{}: Memory limit reached".format(self.get_name()))
                 return
 
             index += 1
@@ -567,9 +573,6 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
     If too many jobs are here, they might starve other things
     """
 
-    def __init__(self, tasks_info=None):
-        super().__init__(tasks_info=tasks_info)
-
     def get_supported_jobs(self):
         jobs = []
 
@@ -637,9 +640,6 @@ class OneTaskProcessor(GenericJobsProcessor):
     that captures all necessar data.
     """
 
-    def __init__(self):
-        super().__init__()
-
     def run(self):
         for processor in self.get_processors():
             processor_object = processor()
@@ -647,3 +647,45 @@ class OneTaskProcessor(GenericJobsProcessor):
 
         leftover_processor = LeftOverJobsProcessor()
         leftover_processor.run()
+
+
+def process_jobs_task(Processor, tasks_info, check_memory):
+    """!
+    Processes all jobs for task
+    """
+    c = Configuration.get_object()
+    if not c.config_entry.enable_background_jobs:
+        return
+
+    c.config_entry = ConfigurationEntry.get()
+
+    handler = Processor(tasks_info=tasks_info, check_memory=check_memory)
+
+    handler.run()
+
+    more_jobs = handler.is_more_jobs()
+
+    gc.collect()
+
+    return more_jobs
+
+
+def process_job_task(Processor, tasks_info, check_memory):
+    """!
+    Processes on job for task
+    """
+    c = Configuration.get_object()
+    if not c.config_entry.enable_background_jobs:
+        return
+
+    c.config_entry = ConfigurationEntry.get()
+
+    handler = Processor(tasks_info=tasks_info, check_memory=check_memory)
+
+    status = handler.run_one_job()
+
+    more_jobs = handler.is_more_jobs()
+
+    gc.collect()
+
+    return more_jobs
