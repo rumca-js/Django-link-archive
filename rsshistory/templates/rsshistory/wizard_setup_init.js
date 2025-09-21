@@ -56,7 +56,7 @@ function setupFor(url, button_element, button_text) {
         $("#config-line").html(`${error_icon} Configuring... ERROR`);
       }
       $(button_element).prop("disabled", false).html(button_text);
-  };
+  });
 }
 
 $("#btnFetchNews").click(function() {
