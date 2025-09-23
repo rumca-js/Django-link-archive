@@ -27,6 +27,25 @@ function escapeHtml(unsafe)
 }
 
 
+function hexToRgb(hex) {
+    // Remove "#" if present
+    hex = hex.replace(/^#/, "");
+
+    // Parse shorthand format (#RGB)
+    if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+    }
+
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+
+    return [r, g, b];
+}
+
+
+
 class UrlLocation {
   constructor(urlString) {
     try {
@@ -375,7 +394,6 @@ function fixStupidMicrosoftSafeLinks(input_url) {
             }
         }
     } catch (e) {
-        console.error("Error parsing URL:", e);
     }
 
     return input_url;
@@ -408,37 +426,6 @@ function sanitizeLink(link) {
 }
 
 
-function getYouTubeVideoId(url) {
-    try {
-        const urlObj = new URL(url);
-        const hostname = urlObj.hostname;
-
-        if (hostname.includes("youtu.be")) {
-            return urlObj.pathname.slice(1);
-        }
-
-        if (urlObj.searchParams.has("v")) {
-            return urlObj.searchParams.get("v");
-        }
-
-        const paths = urlObj.pathname.split("/");
-        const validPrefixes = ["embed", "shorts", "v"];
-        if (validPrefixes.includes(paths[1]) && paths[2]) {
-            return paths[2];
-        }
-
-        return null;
-    } catch (e) {
-        return null;
-    }
-}
-
-
-function isYouTubeVideo(url) {
-    return (getYouTubeVideoId(url) != null);
-}
-
-
 function getYouTubeChannelId(url) {
     try {
         const urlObj = new URL(url);
@@ -459,27 +446,6 @@ function getYouTubeChannelUrl(url) {
     let id = getYouTubeChannelId(url);
     if (id)
         return `https://www.youtube.com/channel/${id}`;
-}
-
-
-function getYouTubeEmbedDiv(youtubeUrl) {
-    const videoId = getYouTubeVideoId(youtubeUrl);
-    if (videoId) {
-        const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-        const frameHtml = `
-            <div class="youtube_player_container mb-4">
-                <iframe 
-                    src="${embedUrl}" 
-                    frameborder="0" 
-                    allowfullscreen 
-                    class="youtube_player_frame w-100" 
-                    style="aspect-ratio: 16 / 9;"
-                    referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
-            </div>
-        `;
-        return frameHtml;
-    }
 }
 
 
@@ -522,6 +488,284 @@ function isSocialMediaSupported(entry) {
     }
 
     return false
+}
+
+
+/*------- SERVICES --------------- */
+function getArchiveOrgLink(link) {
+    let currentDate = new Date();
+    let formattedDate = currentDate.toISOString().split('T')[0].replace(/-/g, ''); // Format: YYYYMMDD
+
+    return `https://web.archive.org/web/${formattedDate}000000*/${link}`;
+}
+
+
+function getW3CValidatorLink(link) {
+    return `https://validator.w3.org/nu/?doc=${encodeURIComponent(link)}`;
+}
+
+
+function getSchemaValidatorLink(link) {
+    return `https://validator.schema.org/#url=${encodeURIComponent(link)}`;
+}
+
+
+function getWhoIsLink(link) {
+    let domain = link.replace(/^https?:\/\//, ''); // Remove 'http://' or 'https://'
+
+    return `https://who.is/whois/${domain}`;
+}
+
+
+function getBuiltWithLink(link) {
+    let domain = link.replace(/^https?:\/\//, ''); // Remove 'http://' or 'https://'
+
+    return `https://builtwith.com/${domain}`;
+}
+
+
+function getGoogleTranslateLink(link) {
+
+    let reminder = '?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp';
+    if (link.indexOf("http://") != -1) {
+       reminder = '?_x_tr_sch=http&_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp';
+    }
+
+    if (link.indexOf("?") != -1) {
+        let queryParams = link.split("?")[1];
+        reminder += '&' + queryParams;
+    }
+
+    let domain = link.replace(/^https?:\/\//, '').split('/')[0]; // Extract the domain part
+
+    domain = domain.replace(/-/g, '--').replace(/\./g, '-');
+
+    let translateUrl = `https://${domain}.translate.goog/` + reminder;
+
+    return translateUrl;
+}
+
+
+function GetServiceLinks(link) {
+    return [
+        {name: "Archive.org", link : getArchiveOrgLink(link)},
+        {name: "W3C Validator", link: getW3CValidatorLink(link)},
+        {name: "Schema.org", link: getSchemaValidatorLink(link)},
+        {name: "Who.is", link: getWhoIsLink(link)},
+        {name: "Built.with", link: getBuiltWithLink(link)},
+        {name: "Google translate", link: getGoogleTranslateLink(link)},
+    ];
+}
+
+
+function GetAllServicableLinks(link) {
+    let service_links = GetServiceLinks(link);
+
+    const handler = getUrlHandler(link);
+    if (handler)
+    {
+       const feeds = handler.getFeeds();
+
+       for (const feed of feeds) {
+           const safeFeed = sanitizeLink(feed);
+           service_links.push({
+               name: "RSS",
+               link: safeFeed
+           });
+       }
+    }
+
+    return service_links;
+}
+
+/*------- SERVICES --------------- */
+
+
+async function unPackFile(zip, fileBlob, extension=".db", unpackAs='uint8array') {
+    console.log("unPackFile");
+
+    let percentComplete = 0;
+
+    try {
+        const fileNames = Object.keys(zip.files);
+        const totalFiles = fileNames.length;
+        let processedFiles = 0;
+
+        let dataReady = null; // Placeholder for the data that will be processed
+        
+        for (const fileName of fileNames) {
+            processedFiles++;
+            percentComplete = Math.round((processedFiles / totalFiles) * 100);
+
+            // You can put some progressbar here
+
+            if (fileName.endsWith(extension)) {
+                const dbFile = await zip.files[fileName].async(unpackAs);
+                dataReady = dbFile;
+                return dataReady;
+            }
+        }
+
+        console.error("No database file found in the ZIP.");
+    } catch (error) {
+        console.error("Error reading ZIP file:", error);
+    }
+}
+
+
+async function requestFileChunks(file_name, attempt = 1) {
+    file_name = file_name + "?i=" + getFileVersion();
+    console.log("Requesting file chunks: " + file_name);
+
+    try {
+        const response = await fetch(file_name);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file: ${file_name}, status:${response.statusText}`);
+        }
+
+        const contentLength = response.headers.get("Content-Length");
+        const totalSize = contentLength ? parseInt(contentLength, 10) : 0;
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let receivedBytes = 0;
+
+        const chunks = [];
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                break;
+            }
+            if (value) {
+                receivedBytes += value.length;
+                const percentComplete = ((receivedBytes / totalSize) * 100).toFixed(2);
+
+		// You can put some progressbar here
+
+                chunks.push(value);
+            }
+        }
+
+        const blob = new Blob(chunks);
+
+        return blob;
+    } catch (error) {
+        console.error("Error in requestFileChunks:", error);
+    }
+}
+
+async function requestFileChunksUintArray(file_name, attempt = 1) {
+    file_name = file_name + "?i=" + getFileVersion();
+    console.log("Requesting file: " + file_name);
+
+    try {
+        const response = await fetch(file_name);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file: ${file_name}, status: ${response.statusText}`);
+        }
+
+        const contentLength = response.headers.get("Content-Length");
+        const totalSize = contentLength ? parseInt(contentLength, 10) : 0;
+
+        const reader = response.body.getReader();
+        let receivedBytes = 0;
+
+        const chunks = [];
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                break;
+            }
+            if (value) {
+                receivedBytes += value.length;
+                const percentComplete = ((receivedBytes / totalSize) * 100).toFixed(2);
+
+                // Use the percentComplete for a progress bar update here
+
+                chunks.push(value);
+            }
+        }
+
+        // Combine all chunks into a single Uint8Array
+        const totalBytes = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+        const uint8Array = new Uint8Array(totalBytes);
+
+        let offset = 0;
+        for (const chunk of chunks) {
+            uint8Array.set(chunk, offset);
+            offset += chunk.length;
+        }
+
+        return uint8Array;
+
+    } catch (error) {
+        console.error("Error in requestFileChunks:", error);
+    }
+}
+
+
+async function requestFile(fileName, attempt = 1) {
+    fileName = fileName + "?i=" + getFileVersion();
+
+    console.log("Requesting file: " + fileName);
+
+    const response = await fetch(fileName);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch file: ${fileName}, status: ${response.statusText}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+
+    return new Uint8Array(buffer);
+}
+
+
+async function getFilePartsList(file_name) {
+    let numeric = 0;
+    let parts = [];
+
+    let exists = await checkIfFileExists(file_name);
+    if (exists) {
+        parts.push(file_name);
+        return parts;
+    }
+    
+    while (true) {
+        let partName = `${file_name}${String(numeric).padStart(2, '0')}`;
+        let partExists = await checkIfFileExists(partName);
+        
+        if (!partExists) {
+            break;
+        }
+        
+        parts.push(partName);
+        numeric++;
+    }
+    
+    return parts;
+}
+
+
+async function requestFileChunksFromList(parts) {
+    let chunks = [];
+    
+    for (let part of parts) {
+        let chunk = await requestFileChunks(part);
+        chunks.push(chunk);
+    }
+    
+    return new Blob(chunks);
+}
+
+
+async function requestFileChunksMultipart(file_name) {
+    let chunks = await getFilePartsList(file_name);
+
+    return await requestFileChunksFromList(chunks);
 }
 
 
@@ -671,3 +915,18 @@ function getDynamicJson(url_address, callback = null, errorInHtml = false, retry
 
     getDynamicJsonRequestTracker[url_address].xhr = xhr;
 }
+
+
+/*
+module.exports = {
+    UrlLocation,
+    sanitizeLink,
+    fixStupidGoogleRedirects,
+    fixStupidYoutubeRedirects,
+    fixStupidMicrosoftSafeLinks,
+    getYouTubeVideoId,
+    getYouTubeChannelId,
+    getChannelUrl,
+    getOdyseeVideoId,
+};
+*/

@@ -145,7 +145,7 @@ function getEntryVisitedBadge(entry, overflow=false) {
 }
 
 
-function getEntryDislikeDataText(data) {
+function getEntrySocialDataText(data) {
    let html_out = "";
 
    let { thumbs_up, thumbs_down, view_count, upvote_ratio, upvote_diff, upvote_view_ratio, stars, followers_count } = data;
@@ -172,7 +172,7 @@ function getEntryDislikeDataText(data) {
 
 
 function FillSocialData(entry_id, social_data) {
-    let entry_parameters = getEntryDislikeDataText(social_data);
+    let entry_parameters = getEntrySocialDataText(social_data);
 
     // entry_list_social.set(entry.id, entry_parameters);
 
@@ -196,7 +196,10 @@ function getEntryParameters(entry, entry_dislike_data=null) {
    html_out += getEntryReadLaterBadge(entry);
 
    if (entry_dislike_data) {
-      html_out += getEntryDislikeDataText(entry_dislike_data);
+      html_out += getEntrySocialDataText(entry_dislike_data);
+   }
+   else {
+      html_out += getEntrySocialDataText(entry);
    }
 
    return html_out;
@@ -399,70 +402,27 @@ function getGoogleTranslateLink(link) {
 function GetEditMenu(entry) {
     let link = entry.link;
 
-    let translate_link = getGoogleTranslateLink(link);
-    let archive_link = getArchiveOrgLink(link);
-    let w3c_link = getW3CValidatorLink(link);
-    let schema_link = getSchemaValidatorLink(link);
-    let who_is_link = getWhoIsLink(link);
-    let builtwith_link = getBuiltWithLink(link);
+    links = GetAllServicableLinks(link);
 
-    let text = 
+    let html = 
     `<div class="dropdown mx-1">
         <button class="btn btn-primary" type="button" id="#entryViewDrop" data-bs-toggle="dropdown" aria-expanded="false">
           View
         </button>
         <ul class="dropdown-menu">`;
 
-    text += `
-        <li>
-          <a href="${translate_link}" id="Edit" class="dropdown-item" title="Edit entry">
-             View translate
+    links.forEach(function(item) {
+       html += ` <li>
+          <a href="${item.link}" id="Edit" class="dropdown-item" title="${item.name}">
+             ${item.name}
           </a>
         </li>
-    `;
+	    `;
+    });
 
-    text += `
-        <li>
-          <a href="${archive_link}" id="Archive-org" class="dropdown-item" title="View archived version on archive.org">
-             View archive.org
-          </a>
-        </li>
-    `;
+    html += `</ul></div>`;
 
-    text += `
-        <li>
-          <a href="${w3c_link}" id="w3c-validator" class="dropdown-item" title="Edit entry">
-             W3C validator
-          </a>
-        </li>
-    `;
-
-    text += `
-        <li>
-          <a href="${schema_link}" id="Schama-Validator" class="dropdown-item" title="Edit entry">
-             Schema validator
-          </a>
-        </li>
-    `;
-
-    text += `
-        <li>
-          <a href="${who_is_link}" id="Who-Is" class="dropdown-item" title="Edit entry">
-             Who Is validator
-          </a>
-        </li>
-    `;
-    text += `
-        <li>
-          <a href="${builtwith_link}" id="Bulit with" class="dropdown-item" title="Edit entry">
-             Built with
-          </a>
-        </li>
-    `;
-
-    text += `</div>`;
-
-    return text;
+    return html;
 }
 
 
@@ -623,19 +583,21 @@ function getEntryFullTextStandard(entry) {
 
 
 function getEntryFullTextYouTube(entry) {
-    const videoId = getYouTubeVideoId(entry.link);
+    embedUrl = entry.link;
 
-    const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+    let handler = new YouTubeVideoHandler(entry.link);
+    if (handler.isHandledBy())
+    {
+        embedUrl = handler.getEmbedUrl();
+    }
 
     let text = `<div entry="${entry.id}" class="entry-detail">`;
 
-    if (videoId) {
-        text += `
-          <div class="youtube_player_container">
-              <iframe src="${embedUrl}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe>
-          </div>
-        `;
-    }
+    text += `
+      <div class="youtube_player_container">
+          <iframe src="${embedUrl}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    `;
 
     text += getEntryBodyText(entry);
 
@@ -672,12 +634,11 @@ function getEntryDetailText(entry) {
 
     const protocol_less = new UrlLocation(entry.link).getProtocolless();
 
-    if (protocol_less.startsWith("www.youtube.com/watch"))
+    let handler = new YouTubeVideoHandler(entry.link);
+    if (handler.isHandledBy())
+    {
         text = getEntryFullTextYouTube(entry);
-    else if (protocol_less.startsWith("youtube.com/watch"))
-        text = getEntryFullTextYouTube(entry);
-    else if (protocol_less.startsWith("m.youtube.com/watch"))
-        text = getEntryFullTextYouTube(entry);
+    }
     else if (protocol_less.startsWith("odysee.com/"))
         text = getEntryFullTextOdysee(entry);
     else
@@ -701,23 +662,6 @@ function getEntryTagStrings(entry) {
    return tag_string;
 }
 
-
-function hexToRgb(hex) {
-    // Remove "#" if present
-    hex = hex.replace(/^#/, "");
-
-    // Parse shorthand format (#RGB)
-    if (hex.length === 3) {
-        hex = hex.split('').map(c => c + c).join('');
-    }
-
-    const bigint = parseInt(hex, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-
-    return [r, g, b];
-}
 
 `
  - If this is not valid, then we have display style to dead
@@ -960,10 +904,19 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
             style="text-overflow: ellipsis; max-width: 18%; min-width: 18%; width: auto; aspect-ratio: 1 / 1; text-decoration: none; display:flex; flex-direction:column; ${invalid_style}"
         >
             <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
-                <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
+                <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%" id="entryTumbnail">
                     ${thumbnail_text}
                 </div>
-                <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                <div
+		   style="
+                      flex: 0 0 auto;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      white-space: normal;
+                      line-height: 1.2em;
+                      max-height: 4.8em;
+			  "
+	           id="entryDetails">
                     <span style="font-weight: bold" class="text-primary" entryTitle="true">${title_safe}</span>
                     <div class="link-list-item-description" entryDetails="true">${source__title}</div>
                     <div class="text-reset mx-2">${tags_text} ${language_text}</div>
