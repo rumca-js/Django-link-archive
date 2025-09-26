@@ -24,7 +24,8 @@ function resetSearch(text = '') {
 
 
 function fillEditForm(token) {
-    $("#formResponse").html(form_text);
+    $("#formDiv").html(form_text);
+    $("#formDiv").removeAttr("style")
 
     let action_url = `{% url 'rsshistory:source-add' %}`;
 
@@ -38,46 +39,23 @@ function fillEditForm(token) {
 }
 
 
-let currentGetEditForm = 0;
 function getRealEditForm(page_url, browser, attempt = 1) {
     $("#formResponse").html(`Obtaining form for link :${page_url}`);
 
     let url = `{% url 'rsshistory:source-add-form' %}?link=${page_url}&browser=${browser}`;
-    let requestCurrentGetEditForm = ++currentGetEditForm;
-    
-    $.ajax({
-       url: url,
-       type: 'GET',
-       timeout: 10000,
-       success: function(data) {
-           if (requestCurrentGetEditForm != currentGetEditForm)
-           {
-               return;
-           }
 
-           form_text = data;
-           form_text = form_text.replace('btnFetch', 'btnAddLink');
+    getSourceAddForm(page_url, browser, function(data) {
+        form_text = data;
+        form_text = form_text.replace('btnFetch', 'btnAddLink');
            
-           // TODO you do not have to hide it.
-           // we can use different id_link names here.
-           let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-           $("#formDiv").html("");
+        // TODO you do not have to hide it.
+        // we can use different id_link names here.
+        let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        fillEditForm(csrfToken);
 
-           fillEditForm(csrfToken);
-       },
-       error: function(xhr, status, error) {
-           if (requestCurrentGetEditForm != currentGetEditForm)
-           {
-               return;
-           }
-           
-           if (attempt < 3) {
-               getRealEditForm(page_url, browser, attempt + 1);
-               addError("Could not obtain edit form, retry.");
-           } else {
-               addError("Could not obtain edit form");
-           }
-       }
+        $('#Errors').html("")
+        $('#Suggestions').html("")
+        $('#formResponse').html("")
     });
 }
 
@@ -140,7 +118,7 @@ function fillLinkSuggestions(data) {
 
 
 function fetchLinkSuggestions(page_url) {
-    getLinkInputSuggestionsJson(page_url, function(data) {
+    getSourceInputSuggestionsJson(page_url, function(data) {
         fillLinkSuggestions(data);
     });
 }
@@ -222,5 +200,16 @@ $("#btnAddLink").click(function(event) {
 
 
 $('#theForm input[name="link"]').on('input', function() {
+    onInputChanged();
+});
+
+
+$(document).on('click', '.suggestion-link', function(event) {
+    event.preventDefault();
+    let element = $('#theForm input[name="link"]');
+    let text = $(this).text();
+    console.log(`Clicked on element ${text}`);
+    element.val(text);
+
     onInputChanged();
 });

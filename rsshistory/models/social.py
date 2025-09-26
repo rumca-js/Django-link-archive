@@ -151,17 +151,20 @@ class SocialData(models.Model):
             if len(json_obj) == 0:
                 return
 
-            # indicator of unsupported on crawler buddy
-            all_values_are_none = True
-            for key, value in json_obj.items():
-                if value is not None:
-                    all_values_are_none = False
-
-            if all_values_are_none:
+            if SocialData.is_all_none(json_obj):
                 return
 
             json_obj["entry"] = entry
             return json_obj
+
+    def is_all_none(json_obj):
+        # indicator of unsupported on crawler buddy
+        all_values_are_none = True
+        for key, value in json_obj.items():
+            if value is not None:
+                all_values_are_none = False
+
+        return all_values_are_none
 
     def cleanup(cfg=None):
         from ..configuration import Configuration

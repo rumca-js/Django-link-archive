@@ -140,8 +140,8 @@ function fillEntryDislikes(entries) {
            // https://github.com/rumca-js/crawler-buddy/issues/176 is solved
 
            setTimeout(() => {
-             getEntryDislikeData(entry.id, function (data) {
-                let entry_parameters = getEntryDislikeDataText(data);
+             getEntrySocialData(entry.id, function (data) {
+                let entry_parameters = getEntrySocialDataText(data);
                 entry_list_social.set(entry.id, entry_parameters);
   
                 let upvote_ratio_div = `<div>${entry_parameters}</div>`;

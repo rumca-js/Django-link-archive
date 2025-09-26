@@ -493,19 +493,20 @@ def download_video_pk(request, pk):
 
 def is_url_allowed(request):
     def is_url_allowed_internal(p, url):
+        # TODO use Remote?
         u = UrlHandlerEx(url)
         status = u.is_allowed()
 
         if status:
             p.context["summary_text"] = (
-                "{} is allowed by <a href='{}'>robots.txt</a>".format(
-                    url, c.get_robots_txt_url()
+                "{} is allowed by robots.txt".format(
+                    url
                 )
             )
         else:
             p.context["summary_text"] = (
-                "{} is NOT allowed by <a href='{}'>robots.txt</a>".format(
-                    url, c.get_robots_txt_url()
+                "{} is NOT allowed by robots.txt".format(
+                    url
                 )
             )
         return p.render("summary_present.html")
@@ -741,68 +742,84 @@ def cleanup_link_json(request):
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
-
-def link_input_suggestions_json(request):
-    p = ViewPage(request)
-    p.set_title("Cleanup Link")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
-    if data is not None:
-        return data
-
+def get_suggestions(original_link):
     data = {}
     links = set()
-
     errors = []
 
+    cleaned_link = UrlHandlerEx.get_cleaned_link(original_link)
+
+    location = UrlLocation(original_link)
+
+    links.add(cleaned_link)
+
+    u = Url(cleaned_link)
+    links.add(u.get_clean_url())
+
+    config = Configuration.get_object().config_entry
+    if config.accept_domain_links:
+        links.add(location.get_domain())
+
+    if original_link.endswith("/"):
+        errors.append("Link should not end with slash")
+
+    if not config.accept_domain_links and location.is_domain():
+        errors.append(
+            "This is domain link, and system is configured not to accept that"
+        )
+
+    if not config.accept_non_domain_links and not location.is_domain():
+        errors.append(
+            "This is not a domain link, and system is configured not to accept that"
+        )
+
+    if config.prefer_non_www_links and original_link.find("www") >= 0:
+        errors.append("This link has www inside")
+
+    if config.prefer_https_links and original_link.find("http://") >= 0:
+        errors.append("This link has http inside, prefer https")
+
+    if original_link.find("http://") >= 0:
+        links.add(location.get_protocol_url("https"))
+
+    if original_link.find("www.") >= 0:
+        link = original_link.replace("www.", "")
+        links.add(link)
+
+    links.discard(None)
+    links -= {original_link}
+
+    data["links"] = sorted(links)
+    data["errors"] = errors
+    data["status"] = True
+
+    return data
+
+
+def link_input_suggestions_json(request):
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
+
     if "link" in request.GET:
-        original_link = request.GET["link"]
-        cleaned_link = UrlHandlerEx.get_cleaned_link(original_link)
+        data = get_suggestions(request.GET["link"])
 
-        location = UrlLocation(original_link)
+    return JsonResponse(data, json_dumps_params={"indent": 4})
 
-        links.add(cleaned_link)
 
-        u = Url(cleaned_link)
-        links.add(u.get_clean_url())
+def source_input_suggestions_json(request):
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
 
-        config = Configuration.get_object().config_entry
-        if config.accept_domain_links:
-            links.add(location.get_domain())
-
-        if original_link.endswith("/"):
-            errors.append("Link should not end with slash")
-
-        if not config.accept_domain_links and location.is_domain():
-            errors.append(
-                "This is domain link, and system is configured not to accept that"
-            )
-
-        if not config.accept_non_domain_links and not location.is_domain():
-            errors.append(
-                "This is not a domain link, and system is configured not to accept that"
-            )
-
-        if config.prefer_non_www_links and original_link.find("www") >= 0:
-            errors.append("This link has www inside")
-
-        if config.prefer_https_links and original_link.find("http://") >= 0:
-            errors.append("This link has http inside, prefer https")
-
-        if original_link.find("http://") >= 0:
-            links.add(location.get_protocol_url("https"))
-
-        if original_link.find("www.") >= 0:
-            link = original_link.replace("www.", "")
-            links.add(link)
-
-        links.discard(None)
-        links -= {original_link}
-
-        data["links"] = sorted(links)
-        data["errors"] = errors
-        data["status"] = True
-    else:
-        data["status"] = False
+    if "link" in request.GET:
+        link = request.GET["link"]
+        data = get_suggestions(link)
+        url = Url(link)
+        feeds = url.get_feeds()
+        for feed in feeds:
+            if feed not in data["links"] and feed != link:
+                data["links"].append(feed)
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
 

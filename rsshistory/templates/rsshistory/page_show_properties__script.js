@@ -280,3 +280,14 @@ $(document).on('submit', '#theForm', function(event) {
 $('#theForm input[name="link"]').on('input', function() {
     onInputChanged();
 });
+
+
+$(document).on('click', '.suggestion-link', function(event) {
+    event.preventDefault();
+    let element = $('#theForm input[name="link"]');
+    let text = $(this).text();
+    console.log(`Clicked on element ${text}`);
+    element.val(text);
+
+    onInputChanged();
+});

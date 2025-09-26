@@ -1,5 +1,5 @@
 
-function getEntryDislikeData(entry_id, callback = null) {
+function getEntrySocialData(entry_id, callback = null) {
     let url_address = "{% url 'rsshistory:entry-dislikes' 117 %}".replace("117", entry_id);
 
     getDynamicJson(url_address, function (data) {
@@ -46,6 +46,17 @@ function isSource(source_link, callback=null) {
 
 function getLinkInputSuggestionsJson(page_url, callback=null) {
     let url_address = `{% url 'rsshistory:link-input-suggestions-json' %}?link=${encodeURIComponent(page_url)}`;
+
+    getDynamicJson(url_address, function (data) { 
+       if (callback) {
+         callback(data);
+       }
+    });
+}
+
+
+function getSourceInputSuggestionsJson(page_url, callback=null) {
+    let url_address = `{% url 'rsshistory:source-input-suggestions-json' %}?link=${encodeURIComponent(page_url)}`;
 
     getDynamicJson(url_address, function (data) { 
        if (callback) {
@@ -163,6 +174,16 @@ function jsonReadLaterClear(callback=null) {
 
 function jsonReadLaterRemove(entry_id, callback=null) {
     let url_address = "{% url 'rsshistory:json-read-later-remove' 1017 %}".replace("1017", entry_id);
+
+    getDynamicJson(url_address, function(data) {
+       if (callback) {
+         callback(data);
+       }
+    });
+}
+
+function getSourceAddForm(page_url, browser, callback=null) {
+    let url_address = `{% url 'rsshistory:source-add-form' %}?link=${page_url}&browser=${browser}`;
 
     getDynamicJson(url_address, function(data) {
        if (callback) {

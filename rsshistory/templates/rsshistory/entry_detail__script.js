@@ -147,8 +147,8 @@ function fillEntryParameters() {
 }
 
 
-function getThisEntryDislikeData(attempt = 1) {
-   getEntryDislikeData({{object.id}}, function (data) {
+function getThisEntrySocialData(attempt = 1) {
+   getEntrySocialData({{object.id}}, function (data) {
        if (data) {
            entry_dislike_data = data;
            fillEntryParameters();
@@ -494,7 +494,7 @@ $(document).on('click', '#cancelTagEdit', function() {
 getEntryProperties();
 getEntryRelated();
 getThisEntryOperationalParameters();
-getThisEntryDislikeData();
+getThisEntrySocialData();
 getIsEntryDownloaded();
 getEntryTags();
 getEntryMenu();

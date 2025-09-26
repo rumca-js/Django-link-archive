@@ -123,6 +123,20 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_is_url_allowed__link(self):
+        MockRequestCounter.mock_page_requests = 0
+        url = (
+            reverse("{}:is-url-allowed".format(LinkDatabase.name))
+            + "?link=https://www.linkedin.com"
+        )
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
     def test_cleanup_link(self):
         MockRequestCounter.mock_page_requests = 0
         url = (

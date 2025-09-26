@@ -12,7 +12,12 @@ from utils.services import (
     BuildWith,
 )
 
-from ...webtools import UrlLocation, InputContent, status_code_to_text
+from ...webtools import (
+    UrlLocation,
+    InputContent,
+    status_code_to_text,
+    Url,
+)
 
 from ...configuration import Configuration
 from ...apps import LinkDatabase
@@ -402,11 +407,11 @@ class EntryGenericPlugin(object):
 
         translate_url = TranslateBuilder.get(self.entry.link).get_translate_url()
 
-        p = UrlLocation(self.entry.link)
-        p_up = p.up(skip_internal=True)
+        location = UrlLocation(self.entry.link)
+        location_up = location.up(skip_internal=True)
 
-        if p_up:
-            search_url = p_up.url
+        if location_up:
+            search_url = location_up.url
             buttons.append(
                 EntryButton(
                     self.user,
@@ -442,13 +447,13 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "🔍 Source Entry",
+                    "🔍 Source Entries",
                     reverse(
                         "{}:entries".format(LinkDatabase.name),
                     )
                     + "?search=link+%3D%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "Source Entry: {}".format(self.entry.source.title),
+                    "Source Entries: {}".format(self.entry.source.title),
                 ),
             )
 
@@ -495,7 +500,7 @@ class EntryGenericPlugin(object):
                 ),
             )
         else:
-            domain_url = UrlLocation(self.entry.link).get_domain()
+            domain_url = location.get_domain()
 
             buttons.append(
                 EntryButton(
@@ -535,6 +540,57 @@ class EntryGenericPlugin(object):
                 "https://archive.org/offshoot_assets/favicon.ico",
             ),
         )
+
+        domain_url = location.get_domain()
+        if domain_url:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Domain",
+                    domain_url,
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "Domain link {}".format(domain_url),
+                    static(
+                        "{}/icons/icons8-external-link-128.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
+
+        if self.entry.source:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Source",
+                    self.entry.source.url,
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "Source link {}".format(self.entry.source.url),
+                    static(
+                        "{}/icons/icons8-external-link-128.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
+
+        url = Url(self.entry.link)
+        feeds = set(url.get_feeds())
+
+        if self.entry.source:
+            url_source = Url(self.entry.source.url)
+            source_feeds =  set(url_source.get_feeds())
+            feeds.update(source_feeds)
+
+        for feed in feeds:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "RSS",
+                    feed,
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "RSS link {}".format(feed),
+                    static(
+                        "{}/icons/icons8-external-link-128.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
 
         return buttons
 

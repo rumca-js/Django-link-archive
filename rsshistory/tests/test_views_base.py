@@ -40,12 +40,6 @@ class BasicViewTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_get_menu(self):
-        url = reverse("{}:get-menu".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
     def test_json_search_container(self):
         url = reverse("{}:json-search-container".format(LinkDatabase.name))
         response = self.client.get(url)

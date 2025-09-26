@@ -12,26 +12,6 @@ function getErrorIcon() {
   return "❌";
 }
 
-function initializeSources(button_element, button_text) {
-  let spinner_container = getSpinnerContainer();
-  let success_icon = getSuccessIcon();
-  let error_icon = getErrorIcon();
-
-  let source_link = "{% url 'rsshistory:sources' %}";
-
-  $("#setupSpace").append(`<p id="source-line">${spinner_container} Creating sources...</p>`);
-
-  jsonSourcesInitialize(function(data) {
-      if (data.status) {
-         $("#source-line").html(`${success_icon} Creating sources... OK`);
-         $("#setupSpace").append(`<p>You can enable some sources <a href=${source_link}>Sources</a></p>`);
-      }
-      else {
-         $("#source-line").html(`${error_icon} Creating sources... ERROR`);
-      }
-      $(button_element).prop("disabled", false).html(button_text);
-  });
-}
 
 function setupFor(url, button_element, button_text) {
   $(button_element).prop("disabled", true);
@@ -58,6 +38,31 @@ function setupFor(url, button_element, button_text) {
       $(button_element).prop("disabled", false).html(button_text);
   });
 }
+
+
+function initializeSources(button_element, button_text) {
+  let spinner_container = getSpinnerContainer();
+  let success_icon = getSuccessIcon();
+  let error_icon = getErrorIcon();
+
+  let source_link = "{% url 'rsshistory:sources' %}";
+
+  $("#setupSpace").append(`<p id="source-line">${spinner_container} Creating sources...</p>`);
+
+  jsonSourcesInitialize(function(data) {
+      if (data.status) {
+         $("#source-line").html(`${success_icon} Creating sources... OK`);
+         $("#setupSpace").append(`
+	    <p>You can enable some sources <a href=${source_link}>Sources</a></p>
+            <p>You can enable list blocks filter domains using easy list, etc.</p>`);
+      }
+      else {
+         $("#source-line").html(`${error_icon} Creating sources... ERROR`);
+      }
+      $(button_element).prop("disabled", false).html(button_text);
+  });
+}
+
 
 $("#btnFetchNews").click(function() {
  setupFor("{% url 'rsshistory:json-wizard-setup-news' %}", "#btnFetchNews", "Setup News Reader");

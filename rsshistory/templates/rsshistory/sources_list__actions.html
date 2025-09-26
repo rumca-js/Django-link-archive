@@ -53,6 +53,14 @@
              <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="dropdown-item" title="Shows new sources only">
               New sources</a>
           </li>
+          <li>
+             <a href="{% url 'rsshistory:sources' %}?search=export_to_cms+%3D%3D+True" class="dropdown-item" title="Shows disabled sources only">
+              Exported to CMS</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:sources' %}?search=export_to_cms+%3D%3D+False" class="dropdown-item" title="Shows disabled sources only">
+              Not exported</a>
+          </li>
        </ul>
    </div>
 

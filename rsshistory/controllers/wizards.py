@@ -351,7 +351,8 @@ def system_setup_for_search_engine(request):
     setup_views_for_search_engine()
     common_initialize_entry_rules()
 
-    # we want blocklist to be enabled for search engine
-    BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
+    # we don't want blocklist to be enabled for search engine
+    # blocklist initialization takes a lot of time, there is a lot of entries
+    # BackgroundJobController.create_single_job(BackgroundJobController.JOB_INITIALIZE)
 
     return True
