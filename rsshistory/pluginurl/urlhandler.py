@@ -439,7 +439,12 @@ class UrlHandlerEx(object):
         return True
 
     def is_allowed(self):
-        return True
+        response = self.get_section("Response")
+        if not response:
+            return False
+
+        if not response["is_allowed"]:
+            return False
 
     def get_response(self):
         self.get_properties()

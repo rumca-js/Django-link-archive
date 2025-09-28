@@ -277,9 +277,19 @@ class ConfigurationEntry(models.Model):
         default=True, help_text="Allow adding links that are not domains to the system."
     )
 
+    auto_crawl_sources = models.BooleanField(
+        default=False,
+        help_text="Automatically crawls links in sources. Finds links in RSS sources and adds them."
+    )
+
     auto_scan_new_entries = models.BooleanField(
         default=False,
         help_text="Automatically scan for new links in descriptions and content when a link is added.",
+    )
+
+    auto_scan_updated_entries = models.BooleanField(
+        default=False,
+        help_text="Automatically scan updated entries.",
     )
 
     # TODO rename to merge_data_for_new_entries

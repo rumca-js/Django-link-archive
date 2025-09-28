@@ -699,6 +699,24 @@ class EntryGenericPlugin(object):
             ),
         )
 
+        url_location = UrlLocation(self.entry.link)
+
+        if url_location:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Robots.txt",
+                    url_location.get_robots_txt_url(),
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "Robots link {}".format(url_location.get_robots_txt_url()),
+                    static(
+                        "{}/icons/icons8-external-link-128.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
+
+        return buttons
+
         return buttons
 
     def get_parameters(self):

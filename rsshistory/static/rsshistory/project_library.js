@@ -45,7 +45,7 @@ function setDisplayMode() {
 
 
 function SetMenuStatusLine() {
-       if (common_indicators.read_later_queue.status) {
+       if (common_indicators.check_later_queue.status) {
            showElement("#PersonalMenuPill");
            showElement(".readLaterElement");
        }

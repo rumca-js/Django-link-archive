@@ -130,6 +130,7 @@ class FakeInternetData(object):
             "body_hash": b"01001012",
             "hash": b"01001012",
             "is_valid": True,
+            "is_allowed": True,
         }
         self.text_data = "Something"
         self.binary_data = None

@@ -688,6 +688,10 @@ class EntryUpdater(object):
 
         entry_changed = self.is_entry_changed(url.all_properties)
 
+        config = Configuration.get_object().config_entry
+        if config.auto_scan_updated_entries:
+            BackgroundJobController.link_scan(entry.link)
+
         self.update_entry(url.all_properties)
 
         # we may not support update for some types. PDFs, other resources on the web
@@ -780,6 +784,10 @@ class EntryUpdater(object):
                 AppLogging.warning(f"Url:{link} Removing link. Blocked by a rule.")
                 entry.delete()
                 return
+
+        config = Configuration.get_object().config_entry
+        if config.auto_scan_updated_entries:
+            BackgroundJobController.link_scan(entry.link)
 
         entry_changed = self.is_entry_changed(url.all_properties)
 
@@ -1530,6 +1538,52 @@ class EntryWrapper(object):
                 self.move_entry(self.entry)
 
 
+class EntryCrawler(object):
+    def __init__(self, link, contents, source=None):
+        self.link = link
+        self.contents = contents
+        self.source = source
+
+    def get_links(self):
+        """
+        Adds links from description of that link.
+        Store link as-is.
+        """
+        config = Configuration.get_object().config_entry
+
+        if config.auto_crawl_sources:
+            links = self.get_crawl_links()
+
+            for link in links:
+                BackgroundJobController.link_add(
+                    url=link, source=self.source
+                )
+
+    def get_crawl_links(self):
+        links = set()
+
+        parser = ContentLinkParser(
+            self.link, self.contents
+        )
+
+        config = Configuration.get_object().config_entry
+
+        if config.accept_non_domain_links:
+            links = set(parser.get_links())
+
+        if config.accept_domain_links:
+            links = set(parser.get_domains())
+
+            p = UrlLocation(self.link)
+            domain = p.get_domain()
+            if domain and domain != self.link:
+                links.add(domain)
+
+        links -= {self.link}
+
+        return links
+
+
 class EntryDataBuilder(object):
     """
     - sometimes we want to call this object directly, sometimes it should be redirected to "add link background job"
@@ -2071,48 +2125,32 @@ class EntryDataBuilder(object):
         Adds links from description of that link.
         Store link as-is.
         """
-        if not self.allow_recursion:
-            """
-            We cannot allow to undefinitely traverse Internet and find all domains
-            """
-            return
+        config = Configuration.get_object().config_entry
 
         link_data = self.link_data
 
-        config = Configuration.get_object().config_entry
+        if config.auto_crawl_sources:
+            link = link_data.get("link")
+            source = link_data.get("source")
 
-        if config.accept_non_domain_links or config.accept_domain_links:
-            links = set()
+            description = link_data.get("description")
 
-            if config.accept_domain_links:
-                p = UrlLocation(link_data["link"])
-                domain = p.get_domain()
-                links.add(domain)
+            crawler = EntryCrawler(link_data["link"], description, source)
 
-            if config.auto_scan_new_entries:
-                if "description" in link_data:
-                    parser = ContentLinkParser(
-                        link_data["link"], link_data["description"]
-                    )
-                    description_links = parser.get_links()
+            links = crawler.get_links()
 
-                    for link in description_links:
-                        links.add(link)
+            contents = link_data.get("contents")
+            crawler = EntryCrawler(link_data["link"], contents, source)
 
-                if "contents" in link_data:
-                    parser = ContentLinkParser(link_data["link"], link_data["contents"])
-                    contents_links = parser.get_links()
-
-                    for link in contents_links:
-                        links.add(link)
+            links.update(crawler.get_links())
 
             for link in links:
-                if "source" in link_data:
-                    BackgroundJobController.link_add(
-                        url=link, source=link_data["source"]
-                    )
-                else:
-                    BackgroundJobController.link_add(url=link)
+                BackgroundJobController.link_add(
+                    url=link, source=source
+                )
+
+        if config.auto_scan_new_entries:
+            BackgroundJobController.link_scan(link_data["link"])
 
     def add_keywords(self, entry):
         config = Configuration.get_object().config_entry

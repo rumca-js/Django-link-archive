@@ -38,7 +38,7 @@ def social_data_edit(request, pk):
         if form.is_valid():
             form.save()
 
-            return reverse("{}:entry-detail".format(LinkDatabase.name), args=[social.entry.id])
+            return HttpResponseRedirect("{}:entry-detail".format(LinkDatabase.name), args=[social.entry.id])
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")

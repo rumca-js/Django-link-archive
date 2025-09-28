@@ -495,6 +495,7 @@ def is_url_allowed(request):
     def is_url_allowed_internal(p, url):
         # TODO use Remote?
         u = UrlHandlerEx(url)
+        u.get_response()
         status = u.is_allowed()
 
         if status:

@@ -857,10 +857,10 @@ def json_indicators(request):
     indicators["is_reading"]["message"] = f"Sources queue:{sources_queue_size}"
     indicators["is_reading"]["status"] = sources_are_fetched
 
-    indicators["read_later_queue"] = {}
-    indicators["read_later_queue"][
+    indicators["check_later_queue"] = {}
+    indicators["check_later_queue"][
         "message"
-    ] = f"Check later queue {read_later_queue_size}"
+    ] = f"Check later queue {check_later_queue_size}"
     indicators["check_later_queue"]["status"] = check_later
 
     indicators["sources_error"] = {}
@@ -907,7 +907,7 @@ def get_menu(request):
     # even not logged users need to be able to see something
 
     if request.user.is_authenticated:
-        p.context["is_read_later"] = (
+        p.context["is_check_later"] = (
             ReadLater.objects.filter(user=request.user).count() != 0
         )
 
@@ -1029,7 +1029,7 @@ def json_personal_container(request):
         row = {}
         row["link"] = reverse(f"{LinkDatabase.name}:read-later-entries")
         row["icon"] = read_later_icon
-        row["title"] = "Read later"
+        row["title"] = "Check later"
         rows.append(row)
 
     for searchview in SearchView.objects.filter(user=True):
