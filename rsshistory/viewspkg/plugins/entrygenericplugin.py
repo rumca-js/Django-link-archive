@@ -372,13 +372,13 @@ class EntryGenericPlugin(object):
                     buttons.append(
                         EntryButton(
                             self.user,
-                            "Read later",
+                            "Check later",
                             reverse(
                                 "{}:json-read-later-add".format(LinkDatabase.name),
                                 args=[self.entry.id],
                             ),
                             ConfigurationEntry.ACCESS_TYPE_ALL,
-                            "Adds to read later list",
+                            "Adds to check later list",
                             static(
                                 "{}/icons/icons8-bookmark-100.png".format(
                                     LinkDatabase.name
@@ -390,13 +390,13 @@ class EntryGenericPlugin(object):
                     buttons.append(
                         EntryButton(
                             self.user,
-                            "Do not read later",
+                            "Do not check later",
                             reverse(
                                 "{}:json-read-later-remove".format(LinkDatabase.name),
                                 args=[read_laters[0].id],
                             ),
                             ConfigurationEntry.ACCESS_TYPE_ALL,
-                            "Removes from read later list",
+                            "Removes from check later list",
                             static(
                                 "{}/icons/icons8-bookmark-100.png".format(
                                     LinkDatabase.name

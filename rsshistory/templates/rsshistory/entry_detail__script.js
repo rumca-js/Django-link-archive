@@ -450,12 +450,12 @@ $(document).on('click', '#Reset-local-data', function(event) {
     getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-entry-reset-local-data' object.id %}", '#entryStatusLine');
 });
 
-$(document).on('click', '#Read-later', function(event) {
+$(document).on('click', '#Check-later', function(event) {
     event.preventDefault();
     getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-read-later-add' object.id %}", '#entryStatusLine');
 });
 
-$(document).on('click', '#Do-not-read-later', function(event) {
+$(document).on('click', '#Do-not-check-later', function(event) {
     event.preventDefault();
     getDynamicJsonContentWithRefresh("{% url 'rsshistory:json-read-later-remove' object.id %}", '#entryStatusLine');
 });

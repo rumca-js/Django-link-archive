@@ -848,8 +848,8 @@ def json_indicators(request):
 
     is_backgroundjobs_error = error_jobs.count() > 0
     is_configuration_error = False
-    read_later_queue_size = ReadLater.objects.filter(user=request.user).count()
-    read_later = read_later_queue_size > 0
+    check_later_queue_size = ReadLater.objects.filter(user=request.user).count()
+    check_later = check_later_queue_size > 0
 
     indicators = {}
 
@@ -860,8 +860,8 @@ def json_indicators(request):
     indicators["read_later_queue"] = {}
     indicators["read_later_queue"][
         "message"
-    ] = f"Read later queue {read_later_queue_size}"
-    indicators["read_later_queue"]["status"] = read_later
+    ] = f"Check later queue {read_later_queue_size}"
+    indicators["check_later_queue"]["status"] = check_later
 
     indicators["sources_error"] = {}
     indicators["sources_error"]["message"] = f"Sources error"
