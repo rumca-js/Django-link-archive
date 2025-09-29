@@ -93,6 +93,9 @@ class SourceGenericPlugin(SourcePluginInterface):
             entries = request_server.read_properties_section(
                 "Entries", self.all_properties
             )
+            if entries is None:
+                return []
+
             for entry in entries:
                 entry["date_published"] = DateUtils.parse_datetime(
                     entry["date_published"]

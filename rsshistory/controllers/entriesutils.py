@@ -1553,11 +1553,7 @@ class EntryCrawler(object):
 
         if config.auto_crawl_sources:
             links = self.get_crawl_links()
-
-            for link in links:
-                BackgroundJobController.link_add(
-                    url=link, source=self.source
-                )
+            return links
 
     def get_crawl_links(self):
         links = set()
@@ -2091,25 +2087,17 @@ class EntryDataBuilder(object):
 
     def add_addition_link_data(self, entry):
         link_data = self.link_data
+        config = Configuration.get_object().config_entry
 
         self.add_sub_links(entry)
         # self.add_keywords(entry) # TODO
-        # self.add_domain(entry) # TODO
         self.add_socialdata(entry)
+
+        if config.auto_scan_new_entries:
+            BackgroundJobController.link_scan(link_data["link"])
 
         if entry:
             self.download_thumbnail(entry.thumbnail)
-
-    def add_domain(self, entry):
-        # TODO
-        # url = UrlLocation(entry.link).get_domain()
-        #    if "source" in self.link_data:
-        #        BackgroundJobController.link_add(
-        #            url=url, source=self.link_data["source"]
-        #        )
-        #    else:
-        #        BackgroundJobController.link_add(url=url)
-        pass
 
     def add_socialdata(self, entry):
         SocialData.get(entry)
@@ -2128,29 +2116,40 @@ class EntryDataBuilder(object):
         config = Configuration.get_object().config_entry
 
         link_data = self.link_data
+        source = link_data.get("source")
+
+        links = self.get_sub_links(entry)
+
+        for link in links:
+            BackgroundJobController.link_add(url=link, source=source)
+
+    def get_sub_links(self, entry):
+        config = Configuration.get_object().config_entry
+
+        link_data = self.link_data
+        link = link_data.get("link")
+        links = set()
 
         if config.auto_crawl_sources:
-            link = link_data.get("link")
             source = link_data.get("source")
 
+            if config.accept_domain_links:
+                p = UrlLocation(link)
+                domain = p.get_domain()
+                if domain and domain != link:
+                    links.add(domain)
+
             description = link_data.get("description")
-
             crawler = EntryCrawler(link_data["link"], description, source)
-
-            links = crawler.get_links()
+            links.update(crawler.get_links())
 
             contents = link_data.get("contents")
             crawler = EntryCrawler(link_data["link"], contents, source)
-
             links.update(crawler.get_links())
 
-            for link in links:
-                BackgroundJobController.link_add(
-                    url=link, source=source
-                )
+        links -= {link}
 
-        if config.auto_scan_new_entries:
-            BackgroundJobController.link_scan(link_data["link"])
+        return links
 
     def add_keywords(self, entry):
         config = Configuration.get_object().config_entry
