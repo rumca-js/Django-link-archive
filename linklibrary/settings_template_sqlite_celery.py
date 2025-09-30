@@ -21,35 +21,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-SECRET_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+SECRET_KEY = os.environ.get("SECRET_KEY", 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
 FERNET_KEY=base64.urlsafe_b64encode(b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG') == "1"
 
-# Add necessary hosts here
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", os.environ.get('ALLOWED_IP')]
 
-DB_DB = os.environ["DB_DB"]
-DB_USER = os.environ["DB_USER"]
-DB_PASSWORD = os.environ["DB_PASSWORD"]
+DB_DB = os.environ.get("DB_DB")
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_SERVER=os.environ.get("DB_SERVER")
 
-RABBIT_SERVER=os.environ["RABBIT_SERVER"]
-MEMCACHED_SERVER=os.environ["MEMCACHED_SERVER"]
-MEMCACHED_PORT=os.environ["MEMCACHED_PORT"]
-DB_SERVER=os.environ["DB_SERVER"]
+RABBIT_SERVER=os.environ.get("RABBIT_SERVER")
+MEMCACHED_SERVER=os.environ.get("MEMCACHED_SERVER")
+MEMCACHED_PORT=os.environ.get("MEMCACHED_PORT")
 CELERY_BROKER_URL = f'amqp://guest:guest@{RABBIT_SERVER}'
 
-
-if "CRAWLER_BUDDY_SERVER" in os.environ:
-    CRAWLER_BUDDY_SERVER = os.environ["CRAWLER_BUDDY_SERVER"]
-else:
-    CRAWLER_BUDDY_SERVER = None
-
-if "CRAWLER_BUDDY_PORT" in os.environ:
-    CRAWLER_BUDDY_PORT = os.environ["CRAWLER_BUDDY_PORT"]
-else:
-    CRAWLER_BUDDY_PORT = None
+CRAWLER_BUDDY_SERVER = os.environ.get("CRAWLER_BUDDY_SERVER")
+CRAWLER_BUDDY_PORT = os.environ.get("CRAWLER_BUDDY_PORT")
 
 if CRAWLER_BUDDY_SERVER and CRAWLER_BUDDY_PORT:
     CRAWLER_BUDDY_URL = CRAWLER_BUDDY_SERVER + ":" + str(CRAWLER_BUDDY_PORT)
@@ -148,7 +139,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 USE_TZ = True
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -162,13 +152,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
-        "LOCATION": f"{MEMCACHED_SERVER}:{MEMCACHED_PORT}",
-    }
-}
 
+if MEMCACHED_SERVER:
+	CACHES = {
+	    "default": {
+	        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+	        "LOCATION": f"{MEMCACHED_SERVER}:{MEMCACHED_PORT}",
+	    }
+	}
 
 WORKSPACES = [ "rsshistory"]
 TASKS_INFO = [
