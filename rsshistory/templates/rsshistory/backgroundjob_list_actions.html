@@ -1,0 +1,42 @@
+{% load static %}
+
+{% if user.is_staff %}
+    <a href="{% url 'rsshistory:backgroundjob-add' %}" title="Add a new job" class="btn btn-primary" role="button" title="Add background job">
+    {% include "rsshistory/icon_add.html" %}
+    </a>
+    <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="btn btn-primary" role="button">
+    {% include "rsshistory/icon_update.html" %}
+    </a>
+    <a href="{% url 'rsshistory:backgroundjobs-enable-all' %}" title="Enables all background jobs" class="btn btn-primary" role="button" title="Enable all">
+    {% include "rsshistory/icon_enable.html" %}
+    </a>
+    <a href="{% url 'rsshistory:backgroundjobs-disable-all' %}" title="Disable all background jobs" class="btn btn-primary" role="button" title="Disable all">
+    {% include "rsshistory/icon_disable.html" %}
+    </a>
+    <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="btn btn-primary" role="button" title="Remove all">
+    <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
+    </a>
+
+      <div class="dropdown">
+          <button class="btn btn-primary" type="button" id="#filtersDrop" data-bs-toggle="dropdown" aria-expanded="false">
+            Filters
+          </button>
+      
+          <ul class="dropdown-menu">
+             <li>
+                <a href="{% url 'rsshistory:backgroundjobs' %}" class="dropdown-item" title="Shows all jobs">
+                 All</a>
+             </li>
+             <li>
+                <a href="{% url 'rsshistory:backgroundjobs' %}?enabled=1" class="dropdown-item" title="Shows active jobs only">
+                 Enabled</a>
+             </li>
+             <li>
+                <a href="{% url 'rsshistory:backgroundjobs' %}?disabled=1" class="dropdown-item" title="Shows inactive jobs only">
+                 Disabled</a>
+             </li>
+          </ul>
+      </div>
+
+{% endif %}
+
