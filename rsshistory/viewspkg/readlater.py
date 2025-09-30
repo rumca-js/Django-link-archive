@@ -87,7 +87,7 @@ def read_later_add(request, pk):
 
         if ReadLater.objects.filter(entry=entry, user=request.user).count() == 0:
             read_later = ReadLater.objects.create(entry=entry, user=request.user)
-            data["message"] = "Added successfully to read queue"
+            data["message"] = "Added successfully to check queue"
             data["status"] = True
         else:
             data["message"] = "Already in queue"
@@ -101,7 +101,7 @@ def read_later_add(request, pk):
 
 def read_later_remove(request, pk):
     p = ViewPage(request)
-    p.set_title("Removes entry from read queue list")
+    p.set_title("Removes entry from check queue list")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
     if data is not None:
         return data
@@ -116,7 +116,7 @@ def read_later_remove(request, pk):
         if read_laters.count() > 0:
             read_laters.delete()
 
-            data["message"] = "Successfully removed from read queue"
+            data["message"] = "Successfully removed from check queue"
             data["status"] = True
         else:
             data["message"] = "Cannot find such entry"
@@ -136,6 +136,6 @@ def json_read_later_clear(request):
     ReadLater.objects.filter(user=request.user).delete()
 
     data = {}
-    data["message"] = "Successfully removed read queue"
+    data["message"] = "Successfully removed check queue"
     data["status"] = True
     return JsonResponse(data, json_dumps_params={"indent": 4})

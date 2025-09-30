@@ -13,6 +13,7 @@ from ..webtools import (
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
     HTTP_STATUS_CODE_EXCEPTION,
     HTTP_STATUS_CODE_SERVER_ERROR,
+    HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS,
 )
 from ..apps import LinkDatabase
 from ..models import AppLogging, EntryRules, BlockEntry, Browser
@@ -125,8 +126,6 @@ class UrlHandlerEx(object):
     def get_properties_internal(self):
         config_entry = Configuration.get_object().config_entry
         if config_entry.remote_webtools_server_location:
-            request_server = RemoteServer(config_entry.remote_webtools_server_location)
-
             if self.is_remote_server_down():
                 AppLogging.error(
                     "Cannot ping remote server: {}".format(
@@ -136,6 +135,7 @@ class UrlHandlerEx(object):
                 return
 
             mode_mapping = self.browsers
+            request_server = RemoteServer(config_entry.remote_webtools_server_location)
 
             return self.get_properties_internal_mode_mapping(
                 request_server, mode_mapping
@@ -273,6 +273,9 @@ class UrlHandlerEx(object):
             return properties["thumbnail"]
 
     def is_status_code_invalid(self, status_code):
+        """
+        Only page statuses
+        """
         if status_code >= 200 and status_code <= 400:
             return False
 
@@ -281,6 +284,8 @@ class UrlHandlerEx(object):
         if status_code == HTTP_STATUS_USER_AGENT:
             return False
         if status_code == HTTP_STATUS_TOO_MANY_REQUESTS:
+            return False
+        if status_code == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
             return False
 
         return True
@@ -308,7 +313,11 @@ class UrlHandlerEx(object):
                 return False
 
             if status_code == HTTP_STATUS_CODE_SERVER_ERROR:
-                return False
+                #server error might be on one crawler, but does not have to be in another
+                return True
+
+            if status_code == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
+                return True
 
             return self.is_status_code_invalid(status_code)
 
@@ -360,6 +369,21 @@ class UrlHandlerEx(object):
 
         return True
 
+    def is_invalid(self):
+        response = self.get_section("Response")
+        if not response:
+            return False
+
+        if response["is_invalid"]:
+            return True
+
+        blocked = self.is_blocked()
+        if blocked:
+            AppLogging.error("Url:{} not valid:{}".format(self.url, blocked))
+            return True
+
+        return False
+
     def is_server_error(self):
         if not self.all_properties:
             return False
@@ -369,7 +393,11 @@ class UrlHandlerEx(object):
             return False
 
         status_code = response.get("status_code")
-        return status_code == HTTP_STATUS_CODE_EXCEPTION
+
+        if status_code == HTTP_STATUS_CODE_SERVER_ERROR:
+            return True
+        if status_code == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
+            return True
 
     def is_blocked(self):
         reason = EntryRules.is_url_blocked(self.url)
@@ -443,8 +471,7 @@ class UrlHandlerEx(object):
         if not response:
             return False
 
-        if not response["is_allowed"]:
-            return False
+        return response.get("is_allowed")
 
     def get_response(self):
         self.get_properties()

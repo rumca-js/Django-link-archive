@@ -27,7 +27,7 @@ class EntryUrlInterface(object):
     Provides interface between Entry and URL properties.
     """
 
-    def __init__(self, url, log=False, ignore_errors=False, browser=None):
+    def __init__(self, url, log=False, ignore_errors=False, browser=None, handler=None):
         """
         Some scenarios, like manual entry should log why it is impossible to check
         TODO maybe add ignore_errors, so we could add any kind of link?
@@ -39,7 +39,7 @@ class EntryUrlInterface(object):
         self.browser = None
 
         self.url = UrlHandlerEx.get_cleaned_link(url)
-        self.handler = None
+        self.handler = handler
 
     def get_response(self):
         return self.response
@@ -54,14 +54,17 @@ class EntryUrlInterface(object):
         if self.browser:
             browsers = [browser.get_setup()]
 
-        url_ex = UrlHandlerEx(self.url, browsers=browsers)
-        self.handler = url_ex
+        if not self.handler:
+            self.handler = UrlHandlerEx(self.url, browsers=browsers)
+        else:
+            if browsers:
+                self.handler.browsers = browsers
 
-        self.all_properties = url_ex.get_properties()
+        self.all_properties = self.handler.get_properties()
 
         if self.all_properties:
-            properties = url_ex.get_section("Properties")
-            response = url_ex.get_section("Response")
+            properties = self.handler.get_section("Properties")
+            response = self.handler.get_section("Response")
 
             # TODO properties["date_dead_since"] = DateUtils.get_datetime_now_utc()
 

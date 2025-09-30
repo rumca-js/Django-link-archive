@@ -66,6 +66,7 @@ HTTP_STATUS_CODE_TIMEOUT = 604
 HTTP_STATUS_CODE_FILE_TOO_BIG = 612
 HTTP_STATUS_CODE_PAGE_UNSUPPORTED = 613
 HTTP_STATUS_CODE_SERVER_ERROR = 614
+HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS = 615
 
 
 class WebLogger(object):
@@ -121,7 +122,7 @@ def status_code_to_text(status_code):
     elif status_code == 418:
         return "HTTP_STATUS_IM_A_TEAPOT(418)"
     elif status_code == 429:
-        return "HTTP_STATUS_TOO_MANY_REQUESTS(419)"
+        return "HTTP_STATUS_TOO_MANY_REQUESTS(429)"
     elif status_code == 451:
         return "HTTP_STATUS_UNAVAILABLE_LEGAL_REASONS(451)"
     elif status_code == 500:

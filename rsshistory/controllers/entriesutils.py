@@ -571,7 +571,7 @@ class EntryUpdater(object):
 
         return True
 
-    def update_entry(self, all_properties):
+    def update_entry_common_fields(self, all_properties):
         entry = self.entry
 
         request_server = RemoteServer("https://")
@@ -605,8 +605,6 @@ class EntryUpdater(object):
                 elif properties["date_published"] < entry.date_published:
                     entry.date_published = properties["date_published"]
 
-        entry.date_update_last = DateUtils.get_datetime_now_utc()
-
         # if server says that entry was last modified in 2006, then it was present in 2006!
         if entry.date_last_modified:
             if (
@@ -624,11 +622,36 @@ class EntryUpdater(object):
 
         entry.save()
 
-        c = Configuration.get_object()
-        config = c.config_entry
+    def enhance_entry_location(self):
+        if not self.entry:
+            return
 
-        if config.keep_social_data:
-            BackgroundJobController.link_download_social_data(entry)
+        EntryRules.check_all(self.entry)
+
+        try:
+            self.entry.refresh_from_db()
+        except Exception as E:
+            return
+
+        w = EntryWrapper(entry=self.entry)
+        w.evaluate() # moves to archive, deletes if time for it
+
+        if w.entry is None:
+            return
+
+        try:
+            self.entry.refresh_from_db()
+        except Exception as E:
+            AppLogging.error("After evaluation - removed")
+            return
+
+        if not w.is_current_entry_perfect():
+            if w.entry.link.startswith("http"):
+                w.check_https_http_availability()
+                w.check_www_nonww_availability()
+
+        # entry could have been moved to archive
+        self.entry = w.entry
 
     def update_data(self):
         from ..pluginurl import EntryUrlInterface
@@ -645,96 +668,83 @@ class EntryUpdater(object):
         if not self.entry:
             return
 
-        EntryRules.check_all(self.entry)
+        self.enhance_entry_location()
 
         try:
             self.entry.refresh_from_db()
         except Exception as E:
             return
 
-        w = EntryWrapper(entry=self.entry)
-        w.evaluate()
+        entry = self.entry
 
-        if w.entry is None:
-            return
-
-        try:
-            self.entry.refresh_from_db()
-        except Exception as E:
-            AppLogging.error("After evaluation - removed")
-            return
-
-        if not w.is_current_entry_perfect():
-            if w.entry.link.startswith("http"):
-                w.check_https_http_availability()
-                w.check_www_nonww_availability()
-
-        if not w.entry:
-            return
-
-        entry = w.entry
-
-        url = EntryUrlInterface(entry.link, browser=self.browser)
-        props = url.get_props()
+        url = UrlHandlerEx(self.entry.link)
+        url.get_response()
 
         if url.is_server_error():
-            raise IOError(f"{self.link}: Crawling server error")
+            raise IOError(f"{self.entry.link}: Crawling server error")
 
-        handler = UrlHandlerEx(url=entry.link)
-        if handler.is_blocked():
+        if url.is_blocked():
             if entry.is_removable():
+                AppLogging.warning(f"Url:{self.entry.link} Removing link. Blocked by a rule.")
                 entry.delete()
                 return
 
+        props = None
+        url_interface = None
+
         entry_changed = self.is_entry_changed(url.all_properties)
 
-        config = Configuration.get_object().config_entry
-        if config.auto_scan_updated_entries:
-            BackgroundJobController.link_scan(entry.link)
+        entry.date_update_last = DateUtils.get_datetime_now_utc()
+        entry.save()
 
-        self.update_entry(url.all_properties)
+        if not entry_changed:
+            return
 
-        # we may not support update for some types. PDFs, other resources on the web
-        if props and len(props) > 0:
-            if "title" in props and props["title"] is not None:
-                if not entry.title:
-                    entry.title = props["title"]
+        self.update_entry_common_fields(url.all_properties)
 
-            if "description" in props and props["description"] is not None:
-                if not entry.description:
-                    entry.description = props["description"]
+        if url.is_valid():
+            url_interface = EntryUrlInterface(entry.link, browser=self.browser, handler=url)
+            props = url_interface.get_props()
 
-            if "thumbnail" in props and props["thumbnail"] is not None:
-                # always update
-                entry.thumbnail = props["thumbnail"]
+            # we may not support update for some types. PDFs, other resources on the web
+            if props and len(props) > 0:
+                title = props.get("title")
+                if title:
+                    if not entry.title:
+                        entry.title = title
 
-            if "language" in props and props["language"] is not None:
-                if not entry.language:
-                    entry.language = props["language"]
+                description = props.get("description")
+                if description:
+                    if not entry.description:
+                        entry.description = description
 
-            if "date_published" in props and props["date_published"] is not None:
-                if not entry.date_published:
-                    entry.date_published = props["date_published"]
+                thumbnail = props.get("thumbnail")
+                if thumbnail:
+                    # always update
+                    entry.thumbnail = thumbnail
 
-        if entry.date_dead_since:
-            entry.date_dead_since = None
+                language = props.get("language")
+                if language:
+                    if not entry.language:
+                        entry.language = language
+
+                date_published = props.get("date_published")
+                if date_published:
+                    if not entry.date_published:
+                        entry.date_published = date_published
+
+            if entry.date_dead_since:
+                entry.date_dead_since = None
+
+            entry.save()
 
         self.update_calculated_vote()
 
-        if not url.is_valid():
+        if url.is_invalid():
             self.handle_invalid_response(url)
-            return
-
-        if props and len(props) > 0:
-            self.check_for_sources(entry, url)
-            BackgroundJobController.link_scan(entry=entry)
-
-            if entry_changed:
-                self.add_links_from_url(entry, url)
-
-            self.store_thumbnail(entry)
-
-        entry.save()
+        elif url.is_valid():
+            self.perform_additional_update_elements(url)
+        # else - when crawler exception
 
     def reset_data(self):
         from ..pluginurl import EntryUrlInterface
@@ -743,90 +753,95 @@ class EntryUpdater(object):
         if not self.entry:
             return
 
-        EntryRules.check_all(self.entry)
+        self.enhance_entry_location()
 
         try:
             self.entry.refresh_from_db()
         except Exception as E:
             return
 
-        w = EntryWrapper(entry=self.entry)
-        w.evaluate()
+        entry = self.entry
 
-        if w.entry is None:
-            return
+        url = UrlHandlerEx(self.entry.link)
+        url.get_response()
 
-        try:
-            self.entry.refresh_from_db()
-        except Exception as E:
-            AppLogging.error("After evaluation - removed")
-            return
-
-        if not w.is_current_entry_perfect():
-            if w.entry.link.startswith("http"):
-                w.check_https_http_availability()
-                w.check_www_nonww_availability()
-
-        if not w.entry:
-            return
-
-        entry = w.entry
-
-        url = EntryUrlInterface(entry.link, browser=self.browser)
-        props = url.get_props()
         if url.is_server_error():
-            raise IOError(f"{self.link}: Crawling server error")
+            raise IOError(f"{self.entry.link}: Crawling server error")
 
-        handler = UrlHandlerEx(url=entry.link)
-        if handler.is_blocked():
-            link = entry.link
+        if url.is_blocked():
             if entry.is_removable():
-                AppLogging.warning(f"Url:{link} Removing link. Blocked by a rule.")
+                AppLogging.warning(f"Url:{self.entry.link} Removing link. Blocked by a rule.")
                 entry.delete()
                 return
 
-        config = Configuration.get_object().config_entry
-        if config.auto_scan_updated_entries:
-            BackgroundJobController.link_scan(entry.link)
+        props = None
+        url_interface = None
 
         entry_changed = self.is_entry_changed(url.all_properties)
 
-        self.update_entry(url.all_properties)
+        entry.date_update_last = DateUtils.get_datetime_now_utc()
+        entry.save()
 
-        # we may not support update for some types. PDFs, other resources on the web
-        if props and len(props) > 0:
-            if "title" in props and props["title"] is not None:
-                entry.title = props["title"]
+        if not entry_changed:
+            return
 
-            if "description" in props and props["description"] is not None:
-                entry.description = props["description"]
+        self.update_entry_common_fields(url.all_properties)
 
-            if "thumbnail" in props and props["thumbnail"] is not None:
-                entry.thumbnail = props["thumbnail"]
+        if url.is_valid():
+            url_interface = EntryUrlInterface(entry.link, browser=self.browser, handler=url)
+            props = url_interface.get_props()
 
-            if "language" in props and props["language"] is not None:
-                entry.language = props["language"]
+            # we may not support update for some types. PDFs, other resources on the web
+            if props and len(props) > 0:
+                title = props.get("title")
+                if title:
+                    entry.title = title
 
-            if "date_published" in props and props["date_published"] is not None:
-                if not entry.date_published:
-                    entry.date_published = props["date_published"]
+                description = props.get("description")
+                if description:
+                    entry.description = description
 
-        if entry.date_dead_since is not None:
-            entry.date_dead_since = None
+                thumbnail = props.get("thumbnail")
+                if thumbnail:
+                    entry.thumbnail = thumbnail
+
+                language = props.get("language")
+                if language:
+                    entry.language = language
+
+                date_published = props.get("date_published")
+                if date_published:
+                    if not entry.date_published:
+                        entry.date_published = date_published
+
+            if entry.date_dead_since is not None:
+                entry.date_dead_since = None
+
+            entry.save()
 
         self.update_calculated_vote()
 
-        if not url.is_valid():
+        if url.is_invalid():
             self.handle_invalid_response(url)
-            return
+        elif url.is_valid():
+            self.perform_additional_update_elements(url)
+        # else - when crawler exception
 
-        if props and len(props) > 0:
-            if entry_changed:
-                self.add_links_from_url(entry, url)
+    def perform_additional_update_elements(self, url):
+        entry = self.entry
 
-            self.check_for_sources(entry, url)
-            BackgroundJobController.link_scan(entry=entry)
-            self.store_thumbnail(entry)
+        c = Configuration.get_object()
+        config = c.config_entry
+
+        if config.auto_scan_updated_entries:
+            BackgroundJobController.link_scan(entry=self.entry)
+
+        if config.keep_social_data:
+            BackgroundJobController.link_download_social_data(entry)
+
+        self.add_links_from_url(entry, url)
+
+        self.store_thumbnail(entry)
 
     def store_thumbnail(self, entry):
         if entry.page_rating_votes > 0:  # TODO should that be configurable?
@@ -837,40 +852,20 @@ class EntryUpdater(object):
             if config.auto_store_thumbnails:
                 ModelFilesBuilder().build(file_name=entry.thumbnail)
 
-    def add_links_from_url(self, entry, url_interface):
-        properties = url_interface.all_properties
+    def add_links_from_url(self, entry, url):
+        properties = url.all_properties
 
         if not properties:
             return
 
         server = RemoteServer("https://")
-        contents = server.read_properties_section("Contents", properties)
+        contents = server.read_properties_section("Contents", properties) # TODO obsolete method Contents
 
         scanner = EntryScanner(url=entry.link, entry=entry, contents=contents)
         scanner.run()
 
     def reset_local_data(self):
         self.update_calculated_vote()
-
-    def check_for_sources(self, entry, url_interface):
-        conf = Configuration.get_object().config_entry
-
-        if not conf.auto_create_sources:
-            return
-
-        url_handler = url_interface.h
-
-        if not url_handler:
-            return
-
-        if not url_handler.p:
-            return
-
-        if url_handler.is_html():
-            rss_urls = url_handler.p.get_rss_urls()
-
-            for rss_url in rss_urls:
-                SourceDataBuilder(link=rss_url).build_from_link()
 
     def calculate_vote(self):
         """
@@ -930,7 +925,7 @@ class EntryUpdater(object):
 
         entry.save()
 
-    def handle_invalid_response(self, url_entry_interface):
+    def handle_invalid_response(self, url):
         entry = self.entry
 
         entry.page_rating = 0
@@ -960,10 +955,10 @@ class EntryUpdater(object):
 
         entry.page_rating_contents = 0
 
-        if url_entry_interface.all_properties:
+        if url.all_properties:
             server = RemoteServer("")
             response = server.read_properties_section(
-                "Response", url_entry_interface.all_properties
+                "Response", url.all_properties
             )
             if response:
                 entry.status_code = response["status_code"]
@@ -2100,7 +2095,9 @@ class EntryDataBuilder(object):
             self.download_thumbnail(entry.thumbnail)
 
     def add_socialdata(self, entry):
-        SocialData.get(entry)
+        config = Configuration.get_object().config_entry
+        if config.new_entries_fetch_social_data:
+            SocialData.get(entry)
 
     def download_thumbnail(self, thumbnail_path):
         if thumbnail_path:
