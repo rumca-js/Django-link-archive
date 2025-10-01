@@ -25,6 +25,7 @@ Personal link database, link aggregator, with RSS functionality.
  - keywords entry analysis to find trends
  - kiosk mode. Auto refresh when URL is appended with param "auto-refresh" set to millisecond value
  - small foot-print. I am running this thing on RPI5
+ - removes tracking from urls
 
 ## Services
 
