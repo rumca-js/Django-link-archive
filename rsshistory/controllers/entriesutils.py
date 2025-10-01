@@ -599,11 +599,17 @@ class EntryUpdater(object):
         if properties:
             if "page_rating" in properties:
                 entry.page_rating_contents = int(properties["page_rating"])
-            if "date_published" in properties and properties["date_published"]:
+            date_published = properties.get("date_published")
+            try:
+                date_published = DateUtils.parse_datetime(date_published)
+            except Exception as E:
+                date_published = None
+
+            if date_published:
                 if not entry.date_published:
-                    entry.date_published = properties["date_published"]
-                elif properties["date_published"] < entry.date_published:
-                    entry.date_published = properties["date_published"]
+                    entry.date_published = date_published
+                elif date_published < entry.date_published:
+                    entry.date_published = date_published
 
         # if server says that entry was last modified in 2006, then it was present in 2006!
         if entry.date_last_modified:
@@ -1547,8 +1553,17 @@ class EntryCrawler(object):
         config = Configuration.get_object().config_entry
 
         if config.auto_crawl_sources:
-            links = self.get_crawl_links()
+            links = self.get_sanitized_links()
             return links
+
+    def get_sanitized_links(self):
+        result_links = set()
+        links = self.get_crawl_links()
+        for link in links:
+            link = UrlLocation.get_cleaned_link(link)
+            result_links.add(link)
+
+        return links
 
     def get_crawl_links(self):
         links = set()

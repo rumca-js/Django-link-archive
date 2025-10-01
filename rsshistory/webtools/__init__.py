@@ -35,6 +35,7 @@ from .handlers import (
 from .crawlers import (
     CrawlerInterface,
     RequestsCrawler,
+    SeleniumDriver,
     SeleniumChromeHeadless,
     SeleniumChromeFull,
     SeleniumUndetected,
@@ -45,7 +46,6 @@ from .remoteserver import RemoteServer
 from .crawlerscript import (
     ScriptCrawlerParser,
 )
-
 
 from .contentmoderation import (
     UrlPropertyValidator,

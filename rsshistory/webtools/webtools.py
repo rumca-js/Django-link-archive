@@ -39,6 +39,8 @@ import html
 import traceback
 import re
 import json
+import base64
+from collections import OrderedDict
 from dateutil import parser
 import urllib.request, urllib.error, urllib.parse
 from bs4 import BeautifulSoup
@@ -59,6 +61,10 @@ HTTP_STATUS_UNKNOWN = 0
 HTTP_STATUS_OK = 200
 HTTP_STATUS_USER_AGENT = 403
 HTTP_STATUS_TOO_MANY_REQUESTS = 429
+HTTP_STATUS_SSL_CERTIFICATE_ERROR = 495
+
+# standard HTTP status codes are up to 600
+# we define our own internal error types
 
 HTTP_STATUS_CODE_EXCEPTION = 600
 HTTP_STATUS_CODE_CONNECTION_ERROR = 603
@@ -66,7 +72,7 @@ HTTP_STATUS_CODE_TIMEOUT = 604
 HTTP_STATUS_CODE_FILE_TOO_BIG = 612
 HTTP_STATUS_CODE_PAGE_UNSUPPORTED = 613
 HTTP_STATUS_CODE_SERVER_ERROR = 614
-HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS = 615
+HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS = 615 # this server too many requests
 
 
 class WebLogger(object):
@@ -122,7 +128,7 @@ def status_code_to_text(status_code):
     elif status_code == 418:
         return "HTTP_STATUS_IM_A_TEAPOT(418)"
     elif status_code == 429:
-        return "HTTP_STATUS_TOO_MANY_REQUESTS(429)"
+        return "HTTP_STATUS_TOO_MANY_REQUESTS(419)"
     elif status_code == 451:
         return "HTTP_STATUS_UNAVAILABLE_LEGAL_REASONS(451)"
     elif status_code == 500:
@@ -147,6 +153,8 @@ def status_code_to_text(status_code):
         return "HTTP_STATUS_CODE_PAGE_UNSUPPORTED(613)"
     elif status_code == 614:
         return "HTTP_STATUS_CODE_SERVER_ERROR(614)"
+    elif status_code == 615:
+        return "HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS(615)"
     else:
         return str(status_code)
 
@@ -330,6 +338,9 @@ class ResponseHeaders(object):
     def __init__(self, headers):
         self.headers = dict(headers)
 
+    def get(self, field):
+        return self.headers.get(field)
+
     def is_headers_empty(self):
         return len(self.headers) == 0
 
@@ -357,7 +368,7 @@ class ResponseHeaders(object):
             date = self.headers["last-modified"]
 
         if date:
-            return date_str_to_date(date)
+            return date_str_to_date(str(date))
 
     def get_clean_headers(self):
         self.headers["Content-Type"] = self.get_content_type()
@@ -469,6 +480,9 @@ class PageResponseObject(object):
         self.status_code = status_code
         self.crawler_data = None
         self.crawl_time_s = None
+        self.recognized_content_type = None
+        self.body_hash = None
+        self.is_allowed_internal = True
 
         if self.status_code is None:
             self.status_code = 0
@@ -523,13 +537,37 @@ class PageResponseObject(object):
 
     def set_headers(self, headers):
         self.headers = ResponseHeaders(headers=headers)
+        self.recognized_content_type = self.get_content_type()
+
+    def set_recognized_content_type(self, recognized_type):
+        self.recognized_content_type = recognized_type
+
+    def get_recognized_content_type(self):
+        if not self.recognized_content_type:
+            self.recognized_content_type = self.headers.get_content_type()
+            if self.recognized_content_type:
+                wh = self.recognized_content_type.find(";")
+                if wh >= 0:
+                    self.recognized_content_type = self.recognized_content_type[:wh]
+
+        return self.recognized_content_type
+
+    def set_body_hash(self, body_hash):
+        self.body_hash = body_hash
+
+    def get_body_hash(self):
+        return self.body_hash
 
     def set_crawler(self, crawler_data):
         self.crawler_data = dict(crawler_data)
         self.crawler_data["crawler"] = type(self.crawler_data["crawler"]).__name__
 
     def get_content_type(self):
-        return self.headers.get_content_type()
+        content_type = self.headers.get_content_type()
+        if content_type is None:
+            return self.recognized_content_type
+
+        return content_type
 
     def get_content_type_keys(self):
         return self.headers.get_content_type_keys()
@@ -602,13 +640,48 @@ class PageResponseObject(object):
         return self.headers.get_redirect_url()
 
     def is_this_status_ok(self):
-        if self.status_code == 0:
+        if self.status_code is None:
             return False
 
-        if self.status_code == None:
+        if self.status_code == HTTP_STATUS_UNKNOWN:
             return False
 
-        return self.status_code >= 200 and self.status_code < 300
+        # 300 are redirects - we don't know if these are valid
+
+        return self.status_code >= 200 and self.status_code < 400
+
+    def is_this_status_nok(self):
+        """
+        This function informs that status code is so bad, that further communication does not make any sense
+        """
+        if self.status_code is None:
+            return True
+
+        if self.status_code == HTTP_STATUS_UNKNOWN:
+            # we do not know status of page yet
+            return False
+
+        if self.status_code == HTTP_STATUS_USER_AGENT:
+            # if current agent is rejected, does not mean page (source) is invalid
+            return False
+
+        if self.status_code == HTTP_STATUS_TOO_MANY_REQUESTS:
+            # too many requests - we don't know what the page is
+            return False
+
+        if self.status_code == HTTP_STATUS_CODE_SERVER_ERROR:
+            # server error - we don't know what the page is
+            return False
+
+        if self.status_code == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
+            # too many requests - we don't know what the page is
+            return False
+
+        if self.status_code < 200:
+            return True
+
+        if self.status_code >= 400:
+            return True
 
     def is_this_status_redirect(self):
         """
@@ -619,23 +692,21 @@ class PageResponseObject(object):
             self.status_code > 300 and self.status_code < 400
         ) or self.status_code == 403
 
-    def is_this_status_nok(self):
-        """
-        This function informs that status code is so bad, that further communication does not make any sense
-        """
-        if self.status_code is None:
+    def is_valid(self):
+        # TODO this needs to check if it is 200 and 400
+        if self.is_this_status_ok():
             return True
 
-        if self.is_this_status_redirect():
-            return False
+        return False
 
-        return self.status_code < 200 or self.status_code >= 400
-
-    def is_valid(self):
+    def is_invalid(self):
         if self.is_this_status_nok():
-            return False
+            return True
 
-        return True
+        return False
+
+    def is_allowed(self):
+        return self.is_allowed_internal
 
     def get_status_code(self):
         return self.status_code
@@ -646,8 +717,22 @@ class PageResponseObject(object):
     def get_binary(self):
         return self.binary
 
+    def get_streams(self):
+        if self.text is not None:
+            return [self.text]
+        elif self.binary:
+            return [self.binary]
+
+        return []
+
     def get_headers(self):
-        return self.headers.get_clean_headers()
+        clean_headers = self.headers.get_clean_headers()
+        content_type = self.headers.get_content_type()
+        if content_type is None:
+            if self.recognized_content_type:
+                clean_headers["Content-Type"] = self.recognized_content_type
+
+        return clean_headers
 
     def set_text(self, text, encoding=None):
         if encoding:
@@ -717,6 +802,76 @@ class PageResponseObject(object):
         binary = self.get_binary()
         if binary:
             return calculate_hash_binary(binary)
+
+
+class InputContent(object):
+    def __init__(self, text):
+        self.text = text
+
+    def htmlify(self):
+        """
+        Use iterative approach. There is one thing to keep in mind:
+         - text can contain <a href=" links already
+
+        So some links needs to be translated. Some do not.
+
+        @return text with https links changed into real links
+        """
+        self.text = self.strip_html_attributes()
+        self.text = self.linkify("https://")
+        self.text = self.linkify("http://")
+        return self.text
+
+    def strip_html_attributes(self):
+        soup = BeautifulSoup(self.text, "html.parser")
+
+        for tag in soup.find_all(True):
+            if tag.name == "a":
+                # Preserve "href" attribute for anchor tags
+                tag.attrs = {"href": tag.get("href")}
+            elif tag.name == "img":
+                # Preserve "src" attribute for image tags
+                tag.attrs = {"src": tag.get("src")}
+            else:
+                # Remove all other attributes
+                tag.attrs = {}
+
+        self.text = str(soup)
+        return self.text
+
+    def linkify(self, protocol="https://"):
+        """
+        @return text with https links changed into real links
+        """
+        if self.text.find(protocol) == -1:
+            return self.text
+
+        import re
+
+        result = ""
+        i = 0
+
+        while i < len(self.text):
+            pattern = r"{}\S+(?![\w.])".format(protocol)
+            match = re.match(pattern, self.text[i:])
+            if match:
+                url = match.group()
+                # Check the previous 10 characters
+                preceding_chars = self.text[max(0, i - 10) : i]
+
+                # We do not care who write links using different char order
+                if '<a href="' not in preceding_chars and "<img" not in preceding_chars:
+                    result += f'<a href="{url}">{url}</a>'
+                else:
+                    result += url
+                i += len(url)
+            else:
+                result += self.text[i]
+                i += 1
+
+        self.text = result
+
+        return result
 
 
 def get_request_to_bytes(request, script):
@@ -827,71 +982,93 @@ def get_response_from_bytes(all_bytes):
     return response
 
 
-class InputContent(object):
-    def __init__(self, text):
-        self.text = text
+def json_encode_field(byte_property):
+    return base64.b64encode(byte_property).decode("utf-8")
 
-    def htmlify(self):
-        """
-        Use iterative approach. There is one thing to keep in mind:
-         - text can contain <a href=" links already
 
-        So some links needs to be translated. Some do not.
+def json_decode_field(data):
+    return base64.b64decode(data)
 
-        @return text with https links changed into real links
-        """
-        self.text = self.strip_html_attributes()
-        self.text = self.linkify("https://")
-        self.text = self.linkify("http://")
-        return self.text
 
-    def strip_html_attributes(self):
-        soup = BeautifulSoup(self.text, "html.parser")
+def response_to_json(response, with_streams=False):
+    """
+    """
+    response_data = OrderedDict()
 
-        for tag in soup.find_all(True):
-            if tag.name == "a":
-                # Preserve "href" attribute for anchor tags
-                tag.attrs = {"href": tag.get("href")}
-            elif tag.name == "img":
-                # Preserve "src" attribute for image tags
-                tag.attrs = {"src": tag.get("src")}
-            else:
-                # Remove all other attributes
-                tag.attrs = {}
+    if response:
+        response_data["url"] = response.url
+        response_data["request_url"] = response.request_url
+        response_data["headers"] = response.get_headers()
 
-        self.text = str(soup)
-        return self.text
+        response_data["is_valid"] = response.is_valid()
+        response_data["is_invalid"] = response.is_invalid()
+        response_data["is_allowed"] = response.is_allowed()
 
-    def linkify(self, protocol="https://"):
-        """
-        @return text with https links changed into real links
-        """
-        if self.text.find(protocol) == -1:
-            return self.text
+        response_data["status_code"] = response.get_status_code()
+        response_data["status_code_str"] = status_code_to_text(
+            response.get_status_code()
+        )
 
-        import re
+        response_data["crawl_time_s"] = response.crawl_time_s
+        response_data["Content-Type"] = response.get_content_type()
+        response_data["Recognized-Content-Type"] = response.get_recognized_content_type()
+        response_data["Content-Length"] = response.get_content_length()
+        response_data["Last-Modified"] = response.get_last_modified()
+        response_data["Charset"] = response.get_encoding()
+        contents_hash = response.get_hash()
+        if contents_hash:
+            response_data["hash"] = json_encode_field(contents_hash)
+        else:
+            response_data["hash"] = None
+        body_hash = response.get_body_hash()
+        if body_hash:
+            response_data["body_hash"] = json_encode_field(body_hash)
+        else:
+            response_data["body_hash"] = None
 
-        result = ""
-        i = 0
+        if len(response.errors) > 0:
+            response_data["errors"] = []
+            for error in response.errors:
+                response_data["errors"].append(error)
 
-        while i < len(self.text):
-            pattern = r"{}\S+(?![\w.])".format(protocol)
-            match = re.match(pattern, self.text[i:])
-            if match:
-                url = match.group()
-                # Check the previous 10 characters
-                preceding_chars = self.text[max(0, i - 10) : i]
+        if with_streams:
+            response_data["streams"] = response.get_streams()
+            response_data["text"] = response.get_text()
+            response_data["binary"] = json_encode_field(response.get_binary())
+    else:
+        response_data["is_valid"] = False
+        response_data["status_code"] = HTTP_STATUS_CODE_EXCEPTION
+        response_data["status_code_str"] = status_code_to_text(HTTP_STATUS_CODE_EXCEPTION)
 
-                # We do not care who write links using different char order
-                if '<a href="' not in preceding_chars and "<img" not in preceding_chars:
-                    result += f'<a href="{url}">{url}</a>'
-                else:
-                    result += url
-                i += len(url)
-            else:
-                result += self.text[i]
-                i += 1
+    return response_data
 
-        self.text = result
 
-        return result
+def json_to_response(json_data, with_streams=False):
+    url = json_data.get("url")
+    request_url = json_data.get("request_url")
+    streams = json_data.get("streams")
+    text = json_data.get("text")
+    binary = json_data.get("binary")
+    status_code = json_data.get("status_code")
+    encoding = json_data.get("Charset")
+    headers = json_data.get("headers")
+    body_hash = json_data.get("body_hash")
+
+    if binary:
+        binary = base64.b64decode(binary)
+    if body_hash:
+        body_hash = base64.b64decode(body_hash)
+
+    response = PageResponseObject(
+        url=url,  # received url
+        binary=binary,
+        text=text,
+        status_code=status_code,
+        encoding=encoding,
+        headers=headers,
+        request_url=request_url,
+    )
+
+    response.body_hash = body_hash
+
+    return response

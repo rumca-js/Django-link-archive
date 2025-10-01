@@ -680,7 +680,6 @@ def add_entry_json(request):
                 return JsonResponse(data, json_dumps_params={"indent": 4})
 
             data["pk"] = entry.id
-            AppLogging.error("Created entry:{}".format(entry.id))  # TODO
 
             if UserBookmarks.add(user=request.user, entry=entry):
                 entry.make_bookmarked()

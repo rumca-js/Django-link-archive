@@ -129,10 +129,8 @@ class EntryUrlInterface(object):
         if not self.all_properties:
             return False
 
-        server = RemoteServer("")
-        response = server.read_properties_section("Response", self.all_properties)
-        status_code = response.get("status_code")
-        return status_code == HTTP_STATUS_CODE_EXCEPTION
+        if self.handler.is_server_error():
+            return True
 
     def fix_properties(self, input_props=None, source_obj=None):
         if not input_props:

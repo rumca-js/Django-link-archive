@@ -396,8 +396,6 @@ class UrlHandlerEx(object):
 
         if status_code == HTTP_STATUS_CODE_SERVER_ERROR:
             return True
-        if status_code == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
-            return True
 
     def is_blocked(self):
         reason = EntryRules.is_url_blocked(self.url)

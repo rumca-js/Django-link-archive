@@ -94,8 +94,11 @@ class DateUtils(object):
         return date
 
     def parse_datetime(timestamp):
+        if not timestamp:
+            return
+
         date = parser.parse(timestamp)
-        return date
+        return DateUtils.to_utc_date(date)
 
     def get_datetime_year(datetime):
         return datetime.strftime("%Y")

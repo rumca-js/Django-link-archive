@@ -982,7 +982,7 @@ class ContentLinkParser(ContentInterface):
 
     def __init__(self, url, contents):
         super().__init__(url=url, contents=contents)
-        self.url = UrlLocation(url).get_clean_url()
+        self.url = UrlLocation(url).get_no_arg_link()
 
     def get_links(self):
         links = set()
@@ -1645,7 +1645,7 @@ class HtmlPage(ContentInterface):
         canonical_tag = self.soup.find("link", rel="canonical")
         if canonical_tag:
             canonical_link = canonical_tag.get("href")
-            if canonical_link.endswith("/"):
+            if canonical_link and canonical_link.endswith("/"):
                 return canonical_link[:-1]
             return canonical_link
 

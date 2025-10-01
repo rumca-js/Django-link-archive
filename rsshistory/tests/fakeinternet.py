@@ -27,6 +27,11 @@ from ..webtools import (
     WebConfig,
     CrawlerInterface,
     RemoteServer,
+    HTTP_STATUS_USER_AGENT,
+    HTTP_STATUS_TOO_MANY_REQUESTS,
+    HTTP_STATUS_CODE_EXCEPTION,
+    HTTP_STATUS_CODE_SERVER_ERROR,
+    HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS,
 )
 
 from ..models import (
@@ -130,6 +135,7 @@ class FakeInternetData(object):
             "body_hash": b"01001012",
             "hash": b"01001012",
             "is_valid": True,
+            "is_invalid": False,
             "is_allowed": True,
         }
         self.text_data = "Something"
@@ -201,37 +207,38 @@ class FakeInternetData(object):
             self.properties["album"] = None
             self.properties["page_rating"] = 0
             self.properties["thumbnail"] = None
+        elif self.url == "https://page-with-http-status-615.com":
+            self.response["status_code"] = HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS
+        elif self.url == "https://page-with-http-status-614.com":
+            self.response["status_code"] = HTTP_STATUS_CODE_SERVER_ERROR
+        elif self.url == "https://page-with-http-status-600.com":
+            self.response["status_code"] = HTTP_STATUS_CODE_EXCEPTION
         elif self.url == "https://page-with-http-status-500.com":
             self.response["status_code"] = 500
-            self.response["is_valid"] = False
+        elif self.url == "https://page-with-http-status-429.com":
+            self.response["status_code"] = HTTP_STATUS_TOO_MANY_REQUESTS
+        elif self.url == "https://page-with-http-status-403.com":
+            self.response["status_code"] = HTTP_STATUS_USER_AGENT
         elif self.url == "https://page-with-http-status-400.com":
             self.response["status_code"] = 400
-            self.response["is_valid"] = False
         elif self.url == "https://page-with-http-status-300.com":
             self.response["status_code"] = 300
-            self.response["is_valid"] = True
         elif self.url == "https://page-with-http-status-200.com":
             self.response["status_code"] = 200
-            self.response["is_valid"] = True
         elif self.url == "https://page-with-http-status-100.com":
             self.response["status_code"] = 100
-            self.response["is_valid"] = False
         elif self.url == "http://page-with-http-status-500.com":
             self.response["status_code"] = 500
-            self.response["is_valid"] = False
         elif self.url == "http://page-with-http-status-400.com":
             self.response["status_code"] = 400
-            self.response["is_valid"] = False
         elif self.url == "http://page-with-http-status-300.com":
             self.response["status_code"] = 300
         elif self.url == "http://page-with-http-status-200.com":
             self.response["status_code"] = 200
         elif self.url == "http://page-with-http-status-100.com":
             self.response["status_code"] = 100
-            self.response["is_valid"] = False
         elif self.url == "https://www.youtube.com/watch?v=666":
             self.response["status_code"] = 500
-            self.response["is_valid"] = False
         elif self.url == "https://invalid.rsspage.com/rss.xml":
             self.response["status_code"] = 500
         elif (
@@ -287,6 +294,28 @@ class FakeInternetData(object):
 
         if self.url.find("reddit") >= 0:
             self.properties["language"] = "en"
+
+        if self.response["status_code"] > 200 and self.response["status_code"] < 400:
+            self.response["is_valid"] = True
+            self.response["is_invalid"] = False
+        elif self.response["status_code"] < 200:
+            self.response["is_valid"] = False
+            self.response["is_invalid"] = True
+        elif self.response["status_code"] == HTTP_STATUS_USER_AGENT:
+            self.response["is_valid"] = False
+            self.response["is_invalid"] = False
+        elif self.response["status_code"] == HTTP_STATUS_TOO_MANY_REQUESTS:
+            self.response["is_valid"] = False
+            self.response["is_invalid"] = False
+        elif self.response["status_code"] == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
+            self.response["is_valid"] = False
+            self.response["is_invalid"] = False
+        elif self.response["status_code"] == HTTP_STATUS_CODE_SERVER_ERROR:
+            self.response["is_valid"] = False
+            self.response["is_invalid"] = False
+        elif self.response["status_code"] >= 400:
+            self.response["is_valid"] = False
+            self.response["is_invalid"] = True
 
         return self.get_all_properties()
 

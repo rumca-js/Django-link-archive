@@ -8,6 +8,7 @@ import json
 import traceback
 import time
 from pathlib import Path
+import shutil
 import os
 import subprocess
 import threading
@@ -71,7 +72,7 @@ class RequestsCrawler(CrawlerInterface):
         self.response = PageResponseObject(
             self.request.url,
             text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
             request_url=self.request.url,
         )
 
@@ -338,7 +339,7 @@ class CurlCffiCrawler(CrawlerInterface):
         self.response = PageResponseObject(
             self.request.url,
             text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
             request_url=self.request.url,
         )
 
@@ -445,7 +446,7 @@ class HttpxCrawler(CrawlerInterface):
         self.response = PageResponseObject(
             self.request.url,
             text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
             request_url=self.request.url,
         )
 
@@ -544,7 +545,7 @@ class StealthRequestsCrawler(CrawlerInterface):
         self.response = PageResponseObject(
             self.request.url,
             text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
             request_url=self.request.url,
         )
 
@@ -633,6 +634,7 @@ class SeleniumDriver(CrawlerInterface):
      - how can we make for the driver to be persistent? we do not want to start driver again and again
      - we could not be running in parallel new drivers
     """
+    counter = 0
 
     def __init__(
         self,
@@ -651,6 +653,7 @@ class SeleniumDriver(CrawlerInterface):
         )
         self.driver = None
         self.driver_executable = driver_executable
+        self.user_dir = None
 
     def set_settings(self, settings):
         super().set_settings(settings)
@@ -722,7 +725,7 @@ class SeleniumDriver(CrawlerInterface):
         self.response = PageResponseObject(
             self.request.url,
             text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
             request_url=self.request.url,
         )
 
@@ -737,6 +740,8 @@ class SeleniumDriver(CrawlerInterface):
         if not self.driver:
             return
 
+        SeleniumDriver.counter += 1
+
         try:
             # add 10 seconds for start of browser, etc.
             selenium_timeout = self.timeout_s
@@ -748,9 +753,6 @@ class SeleniumDriver(CrawlerInterface):
             self.after_load()
 
             self.process_response()
-
-            if not self.is_response_valid():
-                return self.response
 
         except TimeoutException:
             error_text = traceback.format_exc()
@@ -780,6 +782,16 @@ class SeleniumDriver(CrawlerInterface):
                 self.response.add_error(
                     "Url:{} Connection error".format(self.request.url)
                 )
+            elif str_exc.find("net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH") >= 0:
+                print(E, "Url:{}".format(self.request.url))
+                WebLogger.exc(E, "Url:{}".format(self.request.url))
+                self.response = PageResponseObject(
+                    self.request.url,
+                    text=None,
+                    status_code=HTTP_STATUS_SSL_CERTIFICATE_ERROR,
+                    request_url=self.request.url,
+                )
+                self.response.add_error("Url:{} ssl certificate error".format(self.request.url))
             else:
                 print(E, "Url:{}".format(self.request.url))
                 WebLogger.exc(E, "Url:{}".format(self.request.url))
@@ -873,12 +885,25 @@ class SeleniumDriver(CrawlerInterface):
             WebLogger.error(str(E))  # TODO
             WebLogger.debug(str(E))
 
-        try:
-            if self.driver:
-                self.driver.quit()
-        except Exception as E:
-            WebLogger.error(str(E))  # TODO
-            WebLogger.debug(str(E))
+        SeleniumDriver.counter -= 1
+        WebLogger.debug("Selenium drivers count:{} ".format(SeleniumDriver.counter))
+
+        if SeleniumDriver.counter == 0:
+            try:
+                if self.driver:
+                    self.driver.quit()
+            except Exception as E:
+                WebLogger.error(str(E))  # TODO
+                WebLogger.debug(str(E))
+
+        if self.user_dir:
+            try:
+                shutil.rmtree(self.user_dir, ignore_errors=True)
+            except Exception as E:
+                WebLogger.error(str(E))  # TODO
+                WebLogger.debug(str(E))
+
+            self.user_dir = None
 
 
 class SeleniumChromeHeadless(SeleniumDriver):
@@ -932,8 +957,9 @@ class SeleniumChromeHeadless(SeleniumDriver):
         options.add_argument("--lang=en-US")
 
         # sometimes two selenium browser clash when accessing user data directory
-        temp_user_data_dir = tempfile.mkdtemp()
-        options.add_argument(f"--user-data-dir={temp_user_data_dir}")
+        self.user_dir = tempfile.mkdtemp()
+        print(f"using data dir {self.user_dir}")
+        options.add_argument(f"--user-data-dir={self.user_dir}")
 
         # options to enable performance log, to read status code
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
@@ -1032,8 +1058,9 @@ class SeleniumChromeFull(SeleniumDriver):
         options.add_argument("--disable-gpu")
 
         # sometimes two selenium browser clash when accessing user data directory
-        temp_user_data_dir = tempfile.mkdtemp()
-        options.add_argument(f"--user-data-dir={temp_user_data_dir}")
+        self.user_dir = tempfile.mkdtemp()
+        print(f"Using user data dir {self.user_dir}")
+        options.add_argument(f"--user-data-dir={self.user_dir}")
 
         # options to enable performance log, to read status code
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
@@ -1093,8 +1120,8 @@ class SeleniumUndetected(SeleniumDriver):
         options.add_argument("--lang={}".format("en-US"))
 
         # sometimes two selenium browser clash when accessing user data directory
-        temp_user_data_dir = tempfile.mkdtemp()
-        options.add_argument(f"--user-data-dir={temp_user_data_dir}")
+        self.user_dir = tempfile.mkdtemp()
+        options.add_argument(f"--user-data-dir={self.user_dir}")
 
         try:
             return uc.Chrome(options=options)
@@ -1288,7 +1315,7 @@ class ScriptCrawler(CrawlerInterface):
         self.response = PageResponseObject(
             self.request.url,
             text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
             request_url=self.request.url,
         )
 
@@ -1378,7 +1405,7 @@ class ScriptCrawler(CrawlerInterface):
         self.response = PageResponseObject(
             self.request.url,
             text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
             request_url=self.request.url,
         )
 
@@ -1575,7 +1602,7 @@ class SeleniumBase(CrawlerInterface):
         self.response = PageResponseObject(
             self.request.url,
             text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
             request_url=self.request.url,
         )
 
@@ -1614,7 +1641,7 @@ class BotasaurusCrawler(CrawlerInterface):
         self.response = PageResponseObject(
             self.request.url,
             text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            status_code=HTTP_STATUS_CODE_SERVER_ERROR,
             request_url=self.request.url,
         )
 
