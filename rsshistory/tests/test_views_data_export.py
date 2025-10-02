@@ -51,7 +51,7 @@ class DataExportTests(FakeInternetTestCase):
             "local_path": "./",
             "remote_path": "something.git",
             "password": "",
-            "user": None,
+            "user": "",
             "export_time": time(0, 0),
             "format_json": False,
             "format_md": False,
@@ -63,6 +63,9 @@ class DataExportTests(FakeInternetTestCase):
 
         # call user action
         response = self.client.post(url, data=form_data)
+
+        #page_source = response.content.decode("utf-8")
+        #print("Contents: {}".format(page_source))
 
         self.assertEqual(response.status_code, 302)
 

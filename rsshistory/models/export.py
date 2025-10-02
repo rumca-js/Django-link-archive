@@ -60,6 +60,7 @@ class DataExport(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         null=True,
+        blank=True,
         related_name=str(LinkDatabase.name) + "_exports",
         help_text="This instance user for which data will be exported. Example: bookmarks might be for each user separately. Can be empty",
     )
