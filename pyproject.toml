@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linklibrary"
-version = "0.10.4"
+version = "2.19.5"
 description = "Link Archive"
 authors = ["Iwan Grozny <renegat@renegat0x0.ddns.net>"]
 license = "GPL3"
@@ -13,7 +13,7 @@ django-user-agents = "^0.4.0"
 pymemcache = "^4.0.0"
 celery = "^5.5.3"
 python-dateutil = "^2.8.2"
-yt-dlp = "^2024.12.23"
+yt-dlp = "^2025.9.5"
 waybackpy = "^3.0.6"
 sqlalchemy = "^2.0.38"
 tldextract = "^5.1.2"
