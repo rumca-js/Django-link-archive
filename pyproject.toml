@@ -19,6 +19,7 @@ sqlalchemy = "^2.0.38"
 tldextract = "^5.1.2"
 sympy = "^1.14.0"
 spacy = "3.7.5"
+url-cleaner="*"
 
 # Do we need this?
 pytz = "^2024.2"
