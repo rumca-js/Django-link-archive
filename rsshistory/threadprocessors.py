@@ -240,27 +240,30 @@ class RefreshProcessor(ThreadProcessorInterface):
             AppLogging.debug("{}: Job queue is locked".format(self.get_name()))
             return
 
-        systemcontroller = SystemOperationController()
-        systemcontroller.refresh(self.get_name())
+        try:
+            systemcontroller = SystemOperationController()
+            systemcontroller.refresh(self.get_name())
 
-        if systemcontroller.is_remote_server_down():
-            return
+            if systemcontroller.is_remote_server_down():
+                return
 
-        if not systemcontroller.is_internet_ok():
-            return
+            if not systemcontroller.is_internet_ok():
+                return
 
-        config = Configuration.get_object()
+            config = Configuration.get_object()
 
-        handler = RefreshJobHandler(config)
+            handler = RefreshJobHandler(config)
 
-        BackgroundJobHistory.mark_done(job_name=RefreshJobHandler.get_job(), subject="")
-        handler.process()
+            BackgroundJobHistory.mark_done(job_name=RefreshJobHandler.get_job(), subject="")
+            handler.process()
 
-        # self.display_memory_diff()
-        gc.collect()
+            # self.display_memory_diff()
+            gc.collect()
 
-        if self.check_memory:
-            self.display_memory_diff()
+            if self.check_memory:
+                self.display_memory_diff()
+        except Exception as E:
+            AppLogging.exc(E, "{}: Exception while refreshing")
 
     def get_supported_jobs(self):
         return [BackgroundJob.JOB_REFRESH]

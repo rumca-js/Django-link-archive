@@ -387,6 +387,35 @@ class SourcesViewsTests(FakeInternetTestCase):
         self.assertEqual(SourceOperationalData.objects.count(), 0)
         self.assertEqual(BackgroundJobController.objects.count(), 0)
 
+    def test_source_enable_all(self):
+        SourceDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:sources-enable-all".format(LinkDatabase.name))
+
+        # call user action
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_source_disable_all(self):
+        SourceDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:sources-disable-all".format(LinkDatabase.name))
+
+        # call user action
+        response = self.client.get(url)
+
+        # print(response.text.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+
+
     def test_sources_remove_disabled(self):
         SourceDataController.objects.all().delete()
 

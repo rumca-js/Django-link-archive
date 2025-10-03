@@ -32,6 +32,8 @@ from ..webtools import (
     HTTP_STATUS_CODE_EXCEPTION,
     HTTP_STATUS_CODE_SERVER_ERROR,
     HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS,
+    json_encode_field,
+    json_decode_field,
 )
 
 from ..models import (
@@ -132,8 +134,8 @@ class FakeInternetData(object):
             "status_code": 200,
             "Content-Length": 200,
             "Content-Type": "text/html",
-            "body_hash": b"01001012",
-            "hash": b"01001012",
+            "body_hash": json_encode_field(b"01001012"),
+            "hash": json_encode_field(b"01001012"),
             "is_valid": True,
             "is_invalid": False,
             "is_allowed": True,
@@ -146,7 +148,7 @@ class FakeInternetData(object):
         data = []
         data.append({"name": "Properties", "data": self.properties})
         data.append({"name": "Text", "data": {"Contents": self.text_data}})
-        data.append({"name": "Binary", "data": {"Contents": self.binary_data}})
+        data.append({"name": "Binary", "data": {"Contents": json_encode_field(self.binary_data)}})
         data.append({"name": "Settings", "data": None})
         data.append({"name": "Response", "data": self.response})
         data.append({"name": "Headers", "data": {}})

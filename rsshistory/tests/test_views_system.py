@@ -177,7 +177,7 @@ class SystemViewsTest(FakeInternetTestCase):
 
         self.assertIn("indicators", data)
         self.assertIn("is_reading", data["indicators"])  # source reading indication
-        self.assertIn("read_later_queue", data["indicators"])  # used by menu
+        self.assertIn("check_later_queue", data["indicators"])  # used by menu
         self.assertIn("sources_error", data["indicators"])
         self.assertIn("internet_error", data["indicators"])
         self.assertIn("crawling_server_error", data["indicators"])

@@ -161,7 +161,7 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_is_time_to_cleanup__no__not_the_time(self):
         config_entry = Configuration.get_object().config_entry
-        config_entry.cleanup_time = datetime.now() + timedelta(hours=1)
+        config_entry.cleanup_time = (datetime.now() + timedelta(hours=1)).time()
         config_entry.save()
 
         Configuration.get_object().config_entry = config_entry

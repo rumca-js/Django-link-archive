@@ -115,7 +115,7 @@ migrate:
 update: update-instances migrate static
 
 test: migrations-check
-	@poetry run python manage.py test $(APP_NAME).tests -v 2
+	@poetry run python manage.py test $(APP_NAME).tests -v 2 2>&1 | tee test_output.txt
 
 oncommit: reformat test
 

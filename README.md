@@ -252,6 +252,14 @@ User actions are tracked by the system, only if it is configured so:
  - system stores limited amount of search queries, the user can select previous queries from combobox
  - system stores order of visits on entries. This allows to provide "related" section for each entry. For example if you vist entry "X" after "Y", then "X" will appear on "Y" related section
 
+## Automated capture of links
+
+It is a neat idea that links you visit should automatically, magically be inserted in the database.
+
+We can achieve it by using mitmproxy, but it requires adding a certificate into each client browser. Maybe there is a different kind of proxy that mitigates it. I have not solved this path yet.
+
+You can install browser web extension, like Tampermonkey, which allows you to define custom script to call this server each time a page is loaded (with Url).
+
 ## Rationale
 
 Many programs exists, but most of them have some limitations.
