@@ -6,6 +6,7 @@ from ..models import (
     UserConfig,
     EntryRules,
     SearchView,
+    UserSearchHistory,
 )
 from .backgroundjob import BackgroundJobController
 
@@ -219,6 +220,28 @@ def common_initialize_entry_rules():
     )
 
 
+def setup_search_suggestions(request):
+    UserSearchHistory.objects.create(
+            search_query = "link=https://www.youtube.com",
+            user=request.user,
+    )
+
+    UserSearchHistory.objects.create(
+            search_query = "link=https://github.com",
+            user=request.user,
+    )
+
+    UserSearchHistory.objects.create(
+            search_query = "link=https://reddit.com",
+            user=request.user,
+    )
+
+    UserSearchHistory.objects.create(
+            search_query = "link=https://x.com",
+            user=request.user,
+    )
+
+
 def system_setup_for_news(request):
     """
     Displays form, or textarea of available links.
@@ -260,6 +283,7 @@ def system_setup_for_news(request):
 
     setup_views_for_news()
     common_initialize_entry_rules()
+    setup_search_suggestions(request)
 
     return True
 
@@ -305,6 +329,7 @@ def system_setup_for_gallery(request):
 
     setup_views_for_gallery()
     common_initialize_entry_rules()
+    setup_search_suggestions(request)
 
     return True
 
@@ -356,6 +381,7 @@ def system_setup_for_search_engine(request):
 
     setup_views_for_search_engine()
     common_initialize_entry_rules()
+    setup_search_suggestions(request)
 
     # we don't want blocklist to be enabled for search engine
     # blocklist initialization takes a lot of time, there is a lot of entries

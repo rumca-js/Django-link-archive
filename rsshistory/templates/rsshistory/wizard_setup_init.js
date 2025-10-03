@@ -27,37 +27,18 @@ function setupFor(url, button_element, button_text) {
   $("#setupSpace").append(`<p id="config-line">${spinner_container} Configuring...</p>`);
 
   getDynamicJson(url, function (data) {
+      let source_link = "{% url 'rsshistory:sources' %}";
+
       if (data.status) {
         $("#buttonsSpace").hide();
         $("#config-line").html(`${success_icon} Configuring... OK`);
-        initializeSources(button_element, button_text);
-      }
-      else {
-        $("#config-line").html(`${error_icon} Configuring... ERROR`);
-      }
-      $(button_element).prop("disabled", false).html(button_text);
-  });
-}
 
-
-function initializeSources(button_element, button_text) {
-  let spinner_container = getSpinnerContainer();
-  let success_icon = getSuccessIcon();
-  let error_icon = getErrorIcon();
-
-  let source_link = "{% url 'rsshistory:sources' %}";
-
-  $("#setupSpace").append(`<p id="source-line">${spinner_container} Creating sources...</p>`);
-
-  jsonSourcesInitialize(function(data) {
-      if (data.status) {
-         $("#source-line").html(`${success_icon} Creating sources... OK`);
          $("#setupSpace").append(`
-	    <p>You can enable some sources <a href=${source_link}>Sources</a></p>
+	    <p>You can start by adding sources <a href=${source_link}>Sources</a></p>
             <p>You can enable list blocks filter domains using easy list, etc.</p>`);
       }
       else {
-         $("#source-line").html(`${error_icon} Creating sources... ERROR`);
+        $("#config-line").html(`${error_icon} Configuring... ERROR`);
       }
       $(button_element).prop("disabled", false).html(button_text);
   });
