@@ -27,7 +27,7 @@ function setupFor(url, button_element, button_text) {
   $("#setupSpace").append(`<p id="config-line">${spinner_container} Configuring...</p>`);
 
   getDynamicJson(url, function (data) {
-      if (data.status === 200) {
+      if (data.status) {
         $("#buttonsSpace").hide();
         $("#config-line").html(`${success_icon} Configuring... OK`);
         initializeSources(button_element, button_text);
