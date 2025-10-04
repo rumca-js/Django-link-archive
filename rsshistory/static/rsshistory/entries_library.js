@@ -125,7 +125,7 @@ function getEntryReadLaterBadge(entry, overflow=false) {
 
     let badge_text = entry.read_later ? `
         <span class="badge text-bg-warning" style="${style}" title="Check Later">
-           R
+           L
         </span>` : '';
     return badge_text;
 }
