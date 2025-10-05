@@ -659,6 +659,11 @@ class EntryUpdater(object):
         # entry could have been moved to archive
         self.entry = w.entry
 
+        config = Configuration.get_object().config_entry
+        if config.enable_domain_support:
+            DomainsController.add(self.entry.link)
+
+
     def update_data(self):
         from ..pluginurl import EntryUrlInterface
         from ..pluginurl import UrlHandlerEx
@@ -1675,10 +1680,6 @@ class EntryDataBuilder(object):
         entry = wrapper.create(link_data)
 
         if entry:
-            config = Configuration.get_object().config_entry
-            if config.enable_domain_support:
-                DomainsController.add(entry.link)
-
             BackgroundJobController.entry_update_data(entry=entry, browser=self.browser)
             BackgroundJobController.link_scan(entry=entry, browser=browser)
             BackgroundJobController.link_save(entry.link)
@@ -1868,6 +1869,8 @@ class EntryDataBuilder(object):
 
         self.link_data["link"] = UrlHandlerEx.get_cleaned_link(self.link_data["link"])
         self.link = self.link_data["link"]
+
+        self.add_domain()
 
         if self.is_too_old():
             return
@@ -2145,12 +2148,6 @@ class EntryDataBuilder(object):
         if config.auto_crawl_sources:
             source = link_data.get("source")
 
-            if config.accept_domain_links:
-                p = UrlLocation(link)
-                domain = p.get_domain()
-                if domain and domain != link:
-                    links.add(domain)
-
             description = link_data.get("description")
             crawler = EntryCrawler(link_data["link"], description, source)
             links.update(crawler.get_links())
@@ -2162,6 +2159,18 @@ class EntryDataBuilder(object):
         links -= {link}
 
         return links
+
+    def add_domain(self):
+        config = Configuration.get_object().config_entry
+        link_data = self.link_data
+        link = link_data.get("link")
+
+        if config.auto_crawl_sources:
+            if config.accept_domain_links:
+                p = UrlLocation(link)
+                domain = p.get_domain()
+                if domain and domain != link:
+                    BackgroundJobController.link_add(domain)
 
     def add_keywords(self, entry):
         config = Configuration.get_object().config_entry

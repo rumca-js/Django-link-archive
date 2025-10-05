@@ -153,7 +153,7 @@ class UserHistoryViewsTest(FakeInternetTestCase):
         UserEntryVisitHistory.visited(self.entry_linkedin, self.user)
 
         url = (
-            reverse("{}:user-search-history-remove".format(LinkDatabase.name), args=history.id)
+            reverse("{}:user-search-history-remove".format(LinkDatabase.name), args=[history.id])
         )
 
         # call tested function

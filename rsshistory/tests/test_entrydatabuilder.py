@@ -198,6 +198,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config.accept_non_domain_links = False
         config.accept_domain_links = True
         config.auto_scan_new_entries = True
+        config.auto_crawl_sources = True
         config.save()
 
         EntryRules.objects.all().delete()
@@ -221,6 +222,8 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b.link_data = link_data
         # call tested function
         entry = b.build_from_props()
+
+        self.assertFalse(entry) # entry is not created, because of config
 
         objs = LinkDataController.objects.all()
         domains = DomainsController.objects.all()
