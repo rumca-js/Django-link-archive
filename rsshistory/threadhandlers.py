@@ -63,7 +63,7 @@ from .controllers import (
     EntriesCleanup,
     EntryUpdater,
     EntriesUpdater,
-    EntryScanner,
+    EntryPageCrawler,
     ModelFilesBuilder,
     SourceDataBuilder,
     SystemOperationController,
@@ -1427,18 +1427,15 @@ class LinkScanJobHandler(BaseJobHandler):
 
         cfg = self.get_args_cfg(obj)
 
-        p = UrlHandlerEx(link)
-        contents = p.get_contents()
-
         entry = None
         if "entry_obj" in cfg:
             entry = cfg["entry_obj"]
 
         if entry:
-            scanner = EntryScanner(entry=entry, contents=contents)
+            scanner = EntryPageCrawler(entry=entry)
             scanner.run()
         else:
-            scanner = EntryScanner(url=link, contents=contents)
+            scanner = EntryPageCrawler(url=link)
             scanner.run()
 
         return True

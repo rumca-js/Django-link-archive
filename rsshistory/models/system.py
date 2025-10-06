@@ -117,6 +117,10 @@ class ConfigurationEntry(models.Model):
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_admin_user",
         null=True,
+        blank=True,
+        help_text=(
+            "Admin user that is used to perform actions, be it link adding, tagging"
+        )
     )
 
     view_access_type = models.CharField(
@@ -252,6 +256,11 @@ class ConfigurationEntry(models.Model):
         default=False, help_text="Enable archiving of sources using archive.org."
     )
 
+    enable_crawling = models.BooleanField(
+        default=False,
+        help_text="Automatically crawls links in sources. Finds links in RSS sources and adds them."
+    )
+
     keep_social_data = models.BooleanField(
         default=True,
         help_text="Keep link social data in the database.",
@@ -279,17 +288,17 @@ class ConfigurationEntry(models.Model):
 
     auto_crawl_sources = models.BooleanField(
         default=False,
-        help_text="Automatically crawls links in sources. Finds links in RSS sources and adds them."
+        help_text="Crawling. Automatically finds links from sources (domain, links in RSS)."
     )
 
     auto_scan_new_entries = models.BooleanField(
         default=False,
-        help_text="Automatically scan for new links in descriptions and content when a link is added.",
+        help_text="Crawling. Scans new entry for new links.",
     )
 
     auto_scan_updated_entries = models.BooleanField(
         default=False,
-        help_text="Automatically scan updated entries.",
+        help_text="Crawling. Scans updated entries for new links.",
     )
 
     # TODO rename to merge_data_for_new_entries

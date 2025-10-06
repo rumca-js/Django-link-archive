@@ -170,12 +170,6 @@ def configuration_advanced_page(request):
             f"Data import directory does not exist:{configuration_entry.data_import_path}"
         )
 
-    if (
-        configuration_entry.admin_user != ""
-        and User.objects.filter(username=configuration_entry.admin_user).count() == 0
-    ):
-        errors.append(f"Admin user does not exist:{configuration_entry.admin_user}")
-
     if configuration_entry.instance_internet_location == "":
         errors.append(f"Instance Internet location was not configured properly")
 

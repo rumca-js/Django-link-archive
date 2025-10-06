@@ -107,7 +107,7 @@ class ConfigForm(forms.ModelForm):
             "instance_title",
             "instance_description",
             "instance_internet_location",
-            # "admin_user",
+            "admin_user",
             "logging_level",
             "initialization_type",
             "view_access_type",
@@ -127,6 +127,7 @@ class ConfigForm(forms.ModelForm):
             "enable_file_support",
             "enable_link_archiving",
             "enable_source_archiving",
+            "enable_crawling",
             # database link contents
             "accept_domain_links",
             "accept_non_domain_links",
@@ -135,9 +136,9 @@ class ConfigForm(forms.ModelForm):
             "prefer_https_links",
             "prefer_non_www_links",
             "keep_social_data",
-            "auto_crawl_sources",
-            "auto_scan_new_entries",
-            "auto_scan_updated_entries",
+            "auto_crawl_sources", # crawl
+            "auto_scan_new_entries", # crawl
+            "auto_scan_updated_entries", # crawl
             "new_entries_merge_data",
             "new_entries_use_clean_data",
             "new_entries_fetch_social_data",

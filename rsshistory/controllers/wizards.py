@@ -256,6 +256,7 @@ def system_setup_for_news(request):
     c.accept_dead_links = False
     c.accpte_ip_addresses = False
     c.auto_crawl_sources = False
+    c.enable_crawling = False
     c.auto_scan_new_entries = False
     c.auto_scan_updated_entries = False
     c.accept_non_domain_links = True
@@ -302,6 +303,7 @@ def system_setup_for_gallery(request):
     c.accept_dead_links = False
     c.accpte_ip_addresses = False
     c.auto_crawl_sources = False
+    c.enable_crawling = False
     c.auto_scan_new_entries = False
     c.auto_scan_updated_entries = False
     c.accept_non_domain_links = True
@@ -348,6 +350,7 @@ def system_setup_for_search_engine(request):
     c.accept_dead_links = False
     c.accpte_ip_addresses = False
     c.auto_crawl_sources = True
+    c.enable_crawling = True
     c.auto_scan_new_entries = True
     c.auto_scan_updated_entries = True
     c.accept_non_domain_links = True

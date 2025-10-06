@@ -54,7 +54,6 @@ from ..controllers import (
     SourceDataController,
     BackgroundJobController,
     SearchEngines,
-    EntryScanner,
     SystemOperationController,
 )
 from ..forms import (

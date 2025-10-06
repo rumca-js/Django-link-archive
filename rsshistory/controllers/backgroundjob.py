@@ -202,7 +202,7 @@ class BackgroundJobController(BackgroundJob):
 
     def link_add(url, source=None, tag="", user=None, properties=None, browser=None):
         from ..configuration import Configuration
-        from .entriesutils import EntryWrapper
+        from .entrywrapper import EntryWrapper
 
         """
         It handles only automatic additions.
