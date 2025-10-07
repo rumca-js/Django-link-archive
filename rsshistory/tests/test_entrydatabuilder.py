@@ -195,6 +195,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
+        config.enable_crawling = True
         config.accept_non_domain_links = False
         config.accept_domain_links = True
         config.auto_scan_new_entries = True

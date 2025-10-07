@@ -120,6 +120,8 @@ class EntryPageCrawler(object):
         if self.entry:
             source = self.entry.source
 
+        links = set()
+
         crawler = EntryContentsCrawler(self.url, description, source)
         links.update(crawler.get_links())
 

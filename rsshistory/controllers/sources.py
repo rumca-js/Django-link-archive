@@ -279,7 +279,7 @@ class SourceDataController(SourceDataModel):
         if not self.enabled:
             return
 
-        from .entriesutils import EntryWrapper
+        from .entrywrapper import EntryWrapper
 
         self.enabled = False
         self.save()

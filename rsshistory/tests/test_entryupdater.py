@@ -8,7 +8,7 @@ from ..controllers import (
     LinkDataController,
     EntryUpdater,
     BackgroundJobController,
-    DomainController,
+    DomainsController,
 )
 from ..models import UserTags, UserVotes, EntryRules
 from ..configuration import Configuration
@@ -25,6 +25,8 @@ class EntryUpdaterTest(FakeInternetTestCase):
         conf.prefer_non_www_links = True
         conf.prefer_https = True
         conf.auto_scan_new_entries = True
+        conf.auto_scan_updated_entries = True
+        conf.enable_crawling = True
         conf.save()
 
         self.user = User.objects.create_user(
@@ -653,7 +655,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_reset_data__adds_scan_job(self):
         MockRequestCounter.mock_page_requests = 0
@@ -690,7 +692,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
         self.assertEqual(scan_jobs.count(), 1)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_reset_data__removes_old_dead_entry(self):
         MockRequestCounter.mock_page_requests = 0
@@ -818,7 +820,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].description, "some description")
         self.assertEqual(entries[0].manual_status_code, 0)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_update_data__creates_domain(self):
         MockRequestCounter.mock_page_requests = 0
@@ -859,4 +861,4 @@ class EntryUpdaterTest(FakeInternetTestCase):
         # call tested function
         u.update_data()
 
-        self.assertEqual(DomainController.objects.all(), 1)
+        self.assertEqual(DomainsController.objects.all().count(), 1)

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from utils.dateutils import DateUtils
 
 from ..controllers import (
-    EntryScanner,
+    EntryPageCrawler,
     SourceDataController,
     DomainsController,
     LinkDataController,
@@ -16,7 +16,7 @@ from ..configuration import Configuration
 from .fakeinternet import FakeInternetTestCase, DjangoRequestObject
 
 
-class EntryScannerTest(FakeInternetTestCase):
+class EntryPageCrawlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
         self.setup_configuration()
@@ -104,7 +104,7 @@ class EntryScannerTest(FakeInternetTestCase):
     def test_run__nodata(self):
         link_name = "https://youtube.com/v=12345"
 
-        b = EntryScanner(url=link_name)
+        b = EntryPageCrawler(url=link_name)
         b.run()
 
         self.assertEqual(BackgroundJobController.objects.all().count(), 0)
@@ -112,7 +112,7 @@ class EntryScannerTest(FakeInternetTestCase):
     def test_run__nodata(self):
         link_name = "https://www.geekwire.com/feed"
 
-        b = EntryScanner(url=link_name)
+        b = EntryPageCrawler(url=link_name)
         b.run()
 
         self.assertEqual(BackgroundJobController.objects.all().count(), 0)

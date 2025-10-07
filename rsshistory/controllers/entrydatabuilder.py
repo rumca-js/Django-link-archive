@@ -331,6 +331,7 @@ class EntryDataBuilder(object):
         return False
 
     def build_from_props_internal(self):
+        from .entryupdater import EntryUpdater
         entry = None
 
         # we obtain links from various places. We do not want technical links with no data, redirect, CDN or other
@@ -400,6 +401,9 @@ class EntryDataBuilder(object):
                     BackgroundJobController.entry_reset_data(entry)
                 elif c.new_entries_merge_data:
                     BackgroundJobController.entry_update_data(entry)
+
+                updater = EntryUpdater(entry=entry)
+                updater.reset_local_data()
 
                 self.add_addition_link_data(entry)
 

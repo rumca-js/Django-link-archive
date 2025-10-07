@@ -612,6 +612,7 @@ def disable_all_sources(request):
         return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
     else:
         p.context["summary_text"] = "No source to remove"
+        return p.render("summary_present.html")
 
 
 def wayback_save(request, pk):
