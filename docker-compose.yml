@@ -11,13 +11,8 @@ services:
     depends_on:
       dbserver:
         condition: service_healthy
-      rabbitmq:
-        condition: service_started
     environment:
       # could be localhost
-      RABBIT_SERVER: rabbitmq
-      MEMCACHED_SERVER: memcached
-      MEMCACHED_PORT: 11211
       DB_SERVER: dbserver
       DB_DB: control
       DB_USER: power
@@ -30,26 +25,6 @@ services:
       CRAWLER_BUDDY_PORT: 3000
       SECRET_KEY: "xxxxxxxxxxxxx"
       DEBUG: 1
-    networks:
-      - shared_network
-
-  rabbitmq:
-    #image: rabbitmq 
-    image: rabbitmq:3-management
-    ports:
-      - 5672:5672
-    volumes:
-      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-    depends_on:
-      dbserver:
-        condition: service_healthy
-    networks:
-      - shared_network
-
-  memcached:
-    image: memcached:latest
-    ports:
-      - "11211:11211"
     networks:
       - shared_network
 
