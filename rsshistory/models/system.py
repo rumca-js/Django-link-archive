@@ -646,6 +646,9 @@ class SystemOperation(models.Model):
 class UserConfig(models.Model):
     # TODO move this to relation towards Users
     username = models.CharField(max_length=500, unique=True)
+    karma = models.IntegerField(default=0)
+    birth_date = models.DateField(null=True, blank=True, help_text="Format: 2024-03-28")
+
     display_style = models.CharField(
         max_length=500, null=True, default="style-light", choices=STYLE_TYPES
     )
@@ -656,13 +659,15 @@ class UserConfig(models.Model):
         choices=ConfigurationEntry.DISPLAY_TYPE_CHOICES,
     )
     show_icons = models.BooleanField(default=True)
-    thumbnails_as_icons = models.BooleanField(default=True)
     small_icons = models.BooleanField(default=True)
-    links_per_page = models.IntegerField(default=100)
-    karma = models.IntegerField(default=0)
-    birth_date = models.DateField(null=True, help_text="Format: 2024-03-28")
+    thumbnails_as_icons = models.BooleanField(default=True)
+    entries_direct_links = models.BooleanField(
+        default=False,
+        help_text="If true links lead directly to entry link, not to preview.",
+    )
     links_per_page = models.IntegerField(default=100)
     sources_per_page = models.IntegerField(default=100)
+
     debug_mode = models.BooleanField(
         default=False, help_text="Enable debug mode to see errors more clearly."
     )

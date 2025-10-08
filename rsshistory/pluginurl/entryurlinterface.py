@@ -1,14 +1,8 @@
 from utils.dateutils import DateUtils
 from utils.inputcontent import InputContent
-from ..webtools import (
-    HtmlPage,
-    RssPage,
-    UrlLocation,
-    DefaultContentPage,
-    HttpPageHandler,
-    RemoteServer,
-    HTTP_STATUS_CODE_EXCEPTION,
-)
+from webtoolkit import RemoteServer
+
+from webtoolkit import UrlLocation
 
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController

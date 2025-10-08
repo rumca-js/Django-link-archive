@@ -1,11 +1,10 @@
 import traceback
 import requests
 
+from webtoolkit import RemoteServer
+
 from ..webtools import (
     Url,
-    UrlLocation,
-    RemoteServer,
-    PageOptions,
     HTTP_STATUS_UNKNOWN,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
     HTTP_STATUS_USER_AGENT,

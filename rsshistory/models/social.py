@@ -4,13 +4,11 @@ from django.db import DataError
 
 from datetime import timedelta
 from utils.dateutils import DateUtils
+from webtoolkit import RemoteServer
+from webtoolkit import UrlLocation
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
-from ..webtools import (
-    RemoteServer,
-    UrlLocation,
-)
 from .system import AppLogging
 
 

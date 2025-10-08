@@ -5,9 +5,7 @@ import base64
 from django.db import models
 from django.db.models import Q, F
 
-from ..webtools import (
-    RemoteServer,
-)
+from webtoolkit import RemoteServer
 from utils.dateutils import DateUtils
 
 from ..models import (

@@ -71,7 +71,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.age, None)
         # self.assertEqual(entry.date_update_last, date_updated)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_update_data__adds_scan_job(self):
         MockRequestCounter.mock_page_requests = 0
@@ -109,7 +109,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
         self.assertEqual(scan_jobs.count(), 1)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_update_data__promotes_http_to_https(self):
         MockRequestCounter.mock_page_requests = 0
@@ -219,7 +219,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_update_data__removes_old_dead_entry(self):
         MockRequestCounter.mock_page_requests = 0
@@ -396,7 +396,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].description, "some description")
         self.assertEqual(entries[0].manual_status_code, 0)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_update_data__updates_thumbnail(self):
         MockRequestCounter.mock_page_requests = 0
@@ -566,7 +566,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.age, 15)
         # self.assertEqual(entry.date_update_last, date_updated)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_update_data__sets_age(self):
         MockRequestCounter.mock_page_requests = 0

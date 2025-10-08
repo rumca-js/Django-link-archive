@@ -3,7 +3,7 @@ from django.urls import reverse
 import django.utils
 import traceback
 
-from ..webtools import UrlLocation
+from webtoolkit import UrlLocation
 
 
 class Domains(models.Model):

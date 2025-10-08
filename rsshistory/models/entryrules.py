@@ -6,9 +6,7 @@ from datetime import date
 from django.db import models
 from django.db.models import Q
 
-from ..webtools import (
-    UrlLocation,
-)
+from webtoolkit import UrlLocation
 
 from .entries import LinkDataModel
 from .browser import Browser

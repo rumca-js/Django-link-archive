@@ -1187,7 +1187,7 @@ def json_users_container(request):
         row = {}
         row["link"] = reverse(f"{LinkDatabase.name}:user-config")
         row["icon"] = accounts_icon
-        row["title"] = "Admin"
+        row["title"] = "Account"
         rows.append(row)
 
         row = {}

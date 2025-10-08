@@ -1,11 +1,7 @@
 from django.db import models
 from django.db.models import Q, F
 
-from ..webtools import (
-    ContentLinkParser,
-    UrlLocation,
-    RemoteServer,
-)
+from webtoolkit import RemoteServer, UrlLocation, ContentLinkParser
 
 from ..configuration import Configuration
 from ..apps import LinkDatabase
@@ -111,6 +107,7 @@ class EntryPageCrawler(object):
             props = request_server.read_properties_section("Properties", self.properties)
             description = props.get("description")
         else:
+            from ..pluginurl import UrlHandlerEx
             handler = UrlHandlerEx(self.url)
             handler.get_response()
             contents = handler.get_contents()

@@ -30,7 +30,7 @@ function isEntryValid(entry) {
 
 
 function getEntryLink(entry) {
-    return show_pure_links ? entry.link : entry.link_absolute;
+    return entries_direct_links ? entry.link : entry.link_absolute;
 }
 
 

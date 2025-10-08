@@ -16,6 +16,7 @@ import urllib.parse
 import tempfile
 
 from utils.basictypes import fix_path_for_os
+from webtoolkit import RemoteServer
 
 from ..webtools import (
     PageResponseObject,
@@ -1373,7 +1374,6 @@ class ScriptCrawler(CrawlerInterface):
             )
 
         import requests
-        from ..remoteserver import RemoteServer
 
         url = f"{remote_server}/findj?url={self.request.url}"
         response = requests.get(url)

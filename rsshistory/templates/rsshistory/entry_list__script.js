@@ -159,11 +159,11 @@ function fillEntryDislikes(entries) {
 
 
 $(document).on("click", '#showPureLinks', function(e) {
-   if (!show_pure_links) {
-      show_pure_links = true;
+   if (!entries_direct_links) {
+      entries_direct_links = true;
    }
    else {
-      show_pure_links = false;
+      entries_direct_links = false;
    }
 
    fillListData();

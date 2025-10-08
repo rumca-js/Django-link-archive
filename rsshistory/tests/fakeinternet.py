@@ -26,7 +26,6 @@ from ..webtools import (
     WebLogger,
     WebConfig,
     CrawlerInterface,
-    RemoteServer,
     HTTP_STATUS_USER_AGENT,
     HTTP_STATUS_TOO_MANY_REQUESTS,
     HTTP_STATUS_CODE_EXCEPTION,
@@ -35,6 +34,8 @@ from ..webtools import (
     json_encode_field,
     json_decode_field,
 )
+
+from webtools import RemoteServer
 
 from ..models import (
     AppLogging,

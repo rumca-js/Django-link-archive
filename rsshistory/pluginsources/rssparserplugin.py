@@ -1,7 +1,8 @@
 import os
 import re
 
-from ..webtools import ContentLinkParser, UrlLocation
+from webtoolkit import ContentLinkParser
+from webtoolkit import UrlLocation
 
 from ..models import UserTags
 from ..configuration import Configuration

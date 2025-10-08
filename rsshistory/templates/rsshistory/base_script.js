@@ -34,6 +34,7 @@ function applyConfiguration() {
     view_small_icons = "{{user_config.small_icons}}" == "True";
     debug_mode = "{{user_config.debug_mode}}" == "True";
     user_age = {{user_config.get_age}};
+    entries_direct_links = {{user_config.entries_direct_links}};
 
     entries_visit_alpha = {{config.entries_visit_alpha}};
     entries_dead_alpha = {{config.entries_dead_alpha}};

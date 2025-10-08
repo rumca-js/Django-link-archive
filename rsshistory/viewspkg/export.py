@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 
-from ..webtools import UrlLocation
+from webtoolkit import UrlLocation
 from utils.dateutils import DateUtils
 from utils.services.waybackmachine import WaybackMachine
 from utils.services import ReadingListFile

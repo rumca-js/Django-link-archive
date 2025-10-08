@@ -1,6 +1,6 @@
 import re
 
-from ..webtools import UrlLocation
+from webtoolkit import UrlLocation
 
 from .sourceparseplugin import BaseParsePlugin
 

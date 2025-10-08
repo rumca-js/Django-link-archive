@@ -8,7 +8,7 @@ from django.templatetags.static import static
 from django.utils import timezone
 from django.conf import settings
 
-from ..webtools import UrlLocation
+from webtoolkit import UrlLocation
 from utils.dateutils import DateUtils
 from utils.controllers import GenericEntryController
 

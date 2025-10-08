@@ -3,8 +3,8 @@ import re
 import os
 import time
 
-from ..webtools import UrlLocation, HtmlPage
 from utils.dateutils import DateUtils
+from webtoolkit import UrlLocation
 
 from ..models import AppLogging
 from ..controllers import LinkDataController, BackgroundJobController

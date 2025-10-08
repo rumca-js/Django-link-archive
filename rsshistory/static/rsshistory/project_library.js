@@ -15,7 +15,7 @@ let search_suggestions = [];
 let common_indicators = null;
 
 let highlight_bookmarks = false;
-let show_pure_links = false;
+let entries_direct_links = false;
 let default_page_size = 200;
 let sort_function = "-date_published";
 

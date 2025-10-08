@@ -8,7 +8,9 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
-from ..webtools import Url, UrlLocation, HttpPageHandler
+from webtoolkit import UrlLocation
+
+from ..webtools import Url 
 from utils.omnisearch import SingleSymbolEvaluator
 
 from ..apps import LinkDatabase

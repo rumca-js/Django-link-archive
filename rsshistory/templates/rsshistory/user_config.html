@@ -2,18 +2,16 @@
 {% load static %}
 {% block content %}
 
-<div class="container">
-    <a id="clear-list" href="{% url 'rsshistory:user-api-keys' %}" class="btn btn-primary">
-        <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-          API keys</a>
-    <a id="clear-list" href="{% url 'rsshistory:user-credentials' %}" class="btn btn-primary">
-        <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-          Credentials</a>
-</div>
+<a id="clear-list" href="{% url 'rsshistory:user-api-keys' %}" class="btn btn-primary">
+<img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+  API keys</a>
+<a id="clear-list" href="{% url 'rsshistory:user-credentials' %}" class="btn btn-primary">
+<img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+  Credentials</a>
 
-<h1>User configuration: [{{ user_object.user.username }}]</h1>
+<h1>[{{user_object.karma}}] {{ user_object.user.username }}</h1>
 
-<form action="{{config_form.action_url}}" method="{{config_form.method}}"
+<form action="{{config_form.action_url}}" method="{{config_form.method}}">
       {% csrf_token %}
       {% for field in config_form %}
          <div class="form-group row">
@@ -34,9 +32,7 @@
 
 {% with object=user_object.user %}
 <div>User ID:{{object.id}}</div>
-<div>Karma: {{user_object.karma}}</div>
 <div>User name:{{object.username}}</div>
-<div>Password:<span title="{{object.password}}">password</span></div>
 <div>e-mail:{{object.email}}</div>
 <div>Staff:{{object.is_staff}}</div>
 <div>Active:{{object.is_active}}</div>

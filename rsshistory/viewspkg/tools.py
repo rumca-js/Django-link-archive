@@ -10,12 +10,9 @@ from django.db.models import Q
 
 from collections import OrderedDict
 
+from webtoolkit import RemoteServer, UrlLocation, ContentLinkParser
+
 from ..webtools import (
-    ContentLinkParser,
-    RssPage,
-    UrlLocation,
-    HttpPageHandler,
-    RemoteServer,
     Url,
 )
 

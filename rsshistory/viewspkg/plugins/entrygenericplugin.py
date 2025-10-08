@@ -12,8 +12,8 @@ from utils.services import (
     BuildWith,
 )
 
+from webtoolkit import UrlLocation
 from ...webtools import (
-    UrlLocation,
     InputContent,
     status_code_to_text,
     Url,

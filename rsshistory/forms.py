@@ -374,16 +374,16 @@ class UserConfigForm(forms.ModelForm):
         model = UserConfig
         fields = [
             "show_icons",
-            "thumbnails_as_icons",
             "small_icons",
+            "thumbnails_as_icons",
+            "entries_direct_links",
             "display_type",
             "display_style",
             "links_per_page",
             "sources_per_page",
             "birth_date",
+            "debug_mode",
         ]
-        # fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type', 'theme', 'links_per_page']
-        # widgets = {
         # }
         # widgets = {
         #    # DateTimeInput widget does not work my my Android phone

@@ -73,3 +73,41 @@ class UserThingsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+
+class UserConfigTest(FakeInternetTestCase):
+
+    def test_user_configs(self):
+        url = reverse("{}:user-configs".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_config(self):
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:user-config".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_config__post(self):
+        self.client.login(username="testuser", password="testpassword")
+
+        post_data = {"show_icons": True,
+                     "small_icons" : True,
+                     "thumbnails_as_icons" : True,
+                     "entries_direct_links" : True,
+                     "display_type" : True,
+                     "display_style" : True,
+                     "links_per_page" : 10,
+                     "sources_per_page" : 10,
+                     "debug_mode": False,
+                     }
+
+        url = reverse("{}:user-config".format(LinkDatabase.name))
+
+        # call user action
+        response = self.client.post(url, data=post_data)
+
+        self.assertEqual(response.status_code, 200)

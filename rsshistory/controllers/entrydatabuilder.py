@@ -4,9 +4,7 @@ import ipaddress
 from django.db import models
 from django.db.models import Q, F
 
-from ..webtools import (
-    UrlLocation,
-)
+from webtoolkit import UrlLocation
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -19,7 +17,7 @@ from ..configuration import Configuration
 from ..apps import LinkDatabase
 from .entries import LinkDataController
 from .entrywrapper import EntryWrapper
-from .entriesutils import add_all_domains
+from .entriesutils import add_all_domains, EntryContentsCrawler
 from .backgroundjob import BackgroundJobController
 from .domains import DomainsController
 from .sources import SourceDataController
