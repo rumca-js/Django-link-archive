@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linklibrary"
-version = "2.20.0"
+version = "2.20.3"
 description = "Link Archive"
 authors = ["Iwan Grozny <renegat@renegat0x0.ddns.net>"]
 license = "GPL3"
@@ -35,7 +35,7 @@ chardet = "^5.2.0"
 # TODO do we need this?
 lxml="^5.4.0"
 brutefeedparser="*"
-webtoolkit="0.0.3"
+webtoolkit="0.0.4"
 cryptography="^45.0.3"
 
 [tool.poetry.group.dev.dependencies]
