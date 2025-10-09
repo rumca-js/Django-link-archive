@@ -34,9 +34,7 @@ class EntryUpdater(object):
         if not all_properties:
             return True
 
-        request_server = RemoteServer("https://")
-
-        response = request_server.read_properties_section("Response", all_properties)
+        response = RemoteServer.read_properties_section("Response", all_properties)
 
         if "Last-Modified" in response:
             last_modified_date = response["Last-Modified"]
@@ -80,10 +78,8 @@ class EntryUpdater(object):
     def update_entry_common_fields(self, all_properties):
         entry = self.entry
 
-        request_server = RemoteServer("https://")
-
-        response = request_server.read_properties_section("Response", all_properties)
-        properties = request_server.read_properties_section(
+        response = RemoteServer.read_properties_section("Response", all_properties)
+        properties = RemoteServer.read_properties_section(
             "Properties", all_properties
         )
 
@@ -473,8 +469,7 @@ class EntryUpdater(object):
         entry.page_rating_contents = 0
 
         if url.all_properties:
-            server = RemoteServer("")
-            response = server.read_properties_section(
+            response = RemoteServer.read_properties_section(
                 "Response", url.all_properties
             )
             if response:

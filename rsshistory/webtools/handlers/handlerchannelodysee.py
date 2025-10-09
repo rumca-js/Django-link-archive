@@ -1,5 +1,5 @@
 from ..webtools import WebLogger
-from ..urllocation import UrlLocation
+from webtoolkit import UrlLocation
 
 from .handlerhttppage import HttpPageHandler
 from .defaulturlhandler import DefaultChannelHandler

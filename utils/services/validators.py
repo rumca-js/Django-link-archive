@@ -1,6 +1,6 @@
 import urllib.parse
 
-from rsshistory.webtools import UrlLocation
+from webtoolkit import UrlLocation
 
 
 class Validator(object):

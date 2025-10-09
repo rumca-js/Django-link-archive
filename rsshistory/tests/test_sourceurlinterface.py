@@ -1,5 +1,3 @@
-from ..webtools import HtmlPage, RssPage, HttpPageHandler
-
 from ..models import SourceDataModel
 from ..pluginsources.sourceurlinterface import SourceUrlInterface
 

@@ -1,10 +1,8 @@
 import traceback
 
-from ..webtools import PageResponseObject
 from ..webtools import WebLogger
 
-from ..urllocation import UrlLocation
-from ..pages import RssPage
+from webtoolkit import RssPage, UrlLocation, PageResponseObject
 
 from .handlerhttppage import HttpPageHandler
 from .defaulturlhandler import DefaultChannelHandler

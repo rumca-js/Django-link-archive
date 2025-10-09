@@ -35,7 +35,7 @@ from ..webtools import (
     json_decode_field,
 )
 
-from webtools import RemoteServer
+from webtoolkit import RemoteServer
 
 from ..models import (
     AppLogging,
@@ -372,6 +372,9 @@ class FakeInternetTestCase(TestCase):
 
         RemoteServer.get_getj = self.get_getj
         RemoteServer.get_socialj = self.get_socialj
+        RemoteServer.get_feedsj = self.get_feedsj
+        RemoteServer.get_pingj = self.get_pingj
+
         UrlHandlerEx.ping = (
             FakeInternetTestCase.ping
         )  # TODO this is not needed any more
@@ -420,6 +423,12 @@ class FakeInternetTestCase(TestCase):
         if url.find("reddit.com") >= 0:
             return {"upvote_ratio": 5}
         return None
+
+    def get_feedsj(self, url, settings=None):
+        return []
+
+    def get_pingj(self, url, settings=None):
+        return True
 
     def check_crawling_server(self, thread_id):
         return True

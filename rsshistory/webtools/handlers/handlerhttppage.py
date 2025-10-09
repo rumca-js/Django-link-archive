@@ -24,11 +24,11 @@ from ..webtools import (
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
     HTTP_STATUS_CODE_SERVER_ERROR,
 )
-from ..urllocation import UrlLocation
-from ..pages import (
+from webtoolkit import (
     HtmlPage,
     RssPage,
     PageFactory,
+    UrlLocation,
 )
 from ..webconfig import WebConfig
 

@@ -7,7 +7,6 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from ..webtools import Url
 from webtoolkit import UrlLocation
 from utils.dateutils import DateUtils
 
@@ -210,7 +209,7 @@ class BackgroundJobController(BackgroundJob):
         """
         input_url = url
 
-        url = Url.get_cleaned_link(url)
+        url = UrlLocation.get_cleaned_link(url)
 
         if not url:
             return

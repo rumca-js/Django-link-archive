@@ -350,8 +350,7 @@ class UrlHandlerEx(object):
         if len(properties) == 0:
             return
 
-        request_server = RemoteServer("test")
-        return request_server.read_properties_section(section_name, properties)
+        return RemoteServer.read_properties_section(section_name, properties)
 
     def is_valid(self):
         response = self.get_section("Response")
@@ -473,5 +472,4 @@ class UrlHandlerEx(object):
     def get_response(self):
         self.get_properties()
         config_entry = Configuration.get_object().config_entry
-        server = RemoteServer(config_entry.remote_webtools_server_location)
-        return server.get_response(self.all_properties)
+        return RemoteServer.get_response(self.all_properties)

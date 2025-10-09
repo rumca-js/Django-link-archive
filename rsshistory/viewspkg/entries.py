@@ -15,7 +15,6 @@ from django.views.decorators.csrf import csrf_exempt
 from utils.dateutils import DateUtils
 from utils.omnisearch import SingleSymbolEvaluator
 from utils.services import WaybackMachine
-from webtoolkit import RemoteServer
 from webtoolkit import UrlLocation
 
 from ..apps import LinkDatabase

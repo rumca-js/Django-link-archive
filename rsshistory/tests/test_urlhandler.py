@@ -1,8 +1,10 @@
+from webtoolkit import (
+    RssPage,
+    HtmlPage,
+)
 from ..models import Browser, EntryRules
 
 from ..webtools import (
-    RssPage,
-    HtmlPage,
     HttpPageHandler,
     YouTubeVideoHandler,
     ScriptCrawler,

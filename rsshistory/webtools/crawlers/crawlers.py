@@ -16,7 +16,12 @@ import urllib.parse
 import tempfile
 
 from utils.basictypes import fix_path_for_os
-from webtoolkit import RemoteServer
+
+from webtoolkit import (
+    RssPage,
+    HtmlPage,
+    RemoteServer,
+)
 
 from ..webtools import (
     PageResponseObject,
@@ -32,10 +37,6 @@ from ..webtools import (
     HTTP_STATUS_CODE_FILE_TOO_BIG,
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
     HTTP_STATUS_CODE_SERVER_ERROR,
-)
-from ..pages import (
-    RssPage,
-    HtmlPage,
 )
 from .crawlerinterface import CrawlerInterface
 
@@ -1382,8 +1383,7 @@ class ScriptCrawler(CrawlerInterface):
             try:
                 data = response.json()
 
-                server = RemoteServer("")
-                self.response = server.get_response(data)
+                self.response = RemoteServer.get_response(data)
 
                 return self.response
 

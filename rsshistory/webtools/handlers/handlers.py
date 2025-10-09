@@ -1,7 +1,7 @@
 import json
 
-from ..urllocation import UrlLocation
-from ..pages import RssPage
+from webtoolkit import RssPage, UrlLocation
+
 from ..webtools import (
     WebLogger,
 )

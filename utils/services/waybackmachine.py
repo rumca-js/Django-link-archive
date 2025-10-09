@@ -4,7 +4,8 @@ from datetime import datetime, date, timedelta
 
 from waybackpy import WaybackMachineCDXServerAPI, WaybackMachineSaveAPI
 
-from rsshistory.webtools import UrlLocation, HttpRequestBuilder, HttpPageHandler
+from rsshistory.webtools import HttpRequestBuilder, HttpPageHandler
+from webtoolkit import UrlLocation
 from utils.logger import get_logger
 
 

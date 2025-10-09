@@ -286,6 +286,11 @@ class ConfigurationEntry(models.Model):
         default=True, help_text="Allow adding links that are not domains to the system."
     )
 
+    accept_unknown_links = models.BooleanField(
+        default=True,
+        help_text="Allow adding links with unknown status to the database.",
+    )
+
     auto_crawl_sources = models.BooleanField(
         default=False,
         help_text="Crawling. Automatically finds links from sources (domain, links in RSS)."

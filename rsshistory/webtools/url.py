@@ -16,6 +16,14 @@ import urllib.robotparser
 import asyncio
 import base64
 
+from webtoolkit import (
+    ContentInterface,
+    DefaultContentPage,
+    RssPage,
+    HtmlPage,
+    UrlLocation,
+)
+
 from .webtools import (
     PageOptions,
     WebLogger,
@@ -29,13 +37,6 @@ from .webtools import (
     response_to_json,
 )
 from .webconfig import WebConfig
-from .urllocation import UrlLocation
-from .pages import (
-    ContentInterface,
-    DefaultContentPage,
-    RssPage,
-    HtmlPage,
-)
 from .crawlers import (
     RequestsCrawler,
 )

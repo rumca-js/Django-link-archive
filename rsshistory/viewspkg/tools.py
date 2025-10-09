@@ -10,11 +10,7 @@ from django.db.models import Q
 
 from collections import OrderedDict
 
-from webtoolkit import RemoteServer, UrlLocation, ContentLinkParser
-
-from ..webtools import (
-    Url,
-)
+from webtoolkit import UrlLocation, ContentLinkParser, Url
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -728,9 +724,6 @@ def cleanup_link_json(request):
 
         links.add(cleaned_link)
 
-        u = Url(cleaned_link)
-        links.add(u.get_clean_url())
-
         links -= {original_link}
 
         data["links"] = sorted(links)
@@ -750,9 +743,6 @@ def get_suggestions(original_link):
     location = UrlLocation(original_link)
 
     links.add(cleaned_link)
-
-    u = Url(cleaned_link)
-    links.add(u.get_clean_url())
 
     config = Configuration.get_object().config_entry
     if config.accept_domain_links:

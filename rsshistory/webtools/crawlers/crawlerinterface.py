@@ -9,7 +9,7 @@ from ..webtools import (
     WebLogger,
 )
 
-from ..ipc import (
+from webtoolkit.ipc import (
     string_to_command,
 )
 

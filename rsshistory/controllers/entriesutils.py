@@ -102,9 +102,8 @@ class EntryPageCrawler(object):
         description = None
 
         if self.properties:
-            request_server = RemoteServer("https://")
-            contents = request_server.read_properties_section("Contents", self.properties)
-            props = request_server.read_properties_section("Properties", self.properties)
+            contents = RemoteServer.read_properties_section("Contents", self.properties)
+            props = RemoteServer.read_properties_section("Properties", self.properties)
             description = props.get("description")
         else:
             from ..pluginurl import UrlHandlerEx

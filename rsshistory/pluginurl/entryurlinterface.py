@@ -106,8 +106,7 @@ class EntryUrlInterface(object):
         if not self.all_properties:
             return False
 
-        server = RemoteServer("")
-        response = server.read_properties_section("Response", self.all_properties)
+        response = RemoteServer.read_properties_section("Response", self.all_properties)
         return response.get("is_valid")
 
     def is_blocked(self):
@@ -185,8 +184,7 @@ class EntryUrlInterface(object):
         """
 
         is_domain = UrlLocation(self.url).is_domain()
-        request_server = RemoteServer(c.remote_webtools_server_location)
-        properties = request_server.read_properties_section(
+        properties = RemoteServer.read_properties_section(
             "Properties", self.all_properties
         )
         if is_domain and properties and "favicon" in properties:

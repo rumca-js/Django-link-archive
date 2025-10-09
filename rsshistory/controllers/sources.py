@@ -6,7 +6,7 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from ..webtools import UrlLocation
+from webtoolkit import UrlLocation
 from utils.dateutils import DateUtils
 
 from ..models import (

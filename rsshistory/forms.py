@@ -132,6 +132,7 @@ class ConfigForm(forms.ModelForm):
             "accept_domain_links",
             "accept_non_domain_links",
             "accept_ip_links",
+            "accept_unknown_links",
             "accept_dead_links",
             "prefer_https_links",
             "prefer_non_www_links",

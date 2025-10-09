@@ -1,5 +1,3 @@
-from ...webtools import HtmlPage
-
 from ...pluginurl.urlhandler import UrlHandler
 
 from .entryyoutubeplugin import EntryYouTubePlugin

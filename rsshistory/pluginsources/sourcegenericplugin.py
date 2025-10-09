@@ -91,8 +91,7 @@ class SourceGenericPlugin(SourcePluginInterface):
 
             source = self.get_source()
 
-            request_server = RemoteServer(c.remote_webtools_server_location)
-            entries = request_server.read_properties_section(
+            entries = RemoteServer.read_properties_section(
                 "Entries", self.all_properties
             )
             if entries is None:
@@ -167,8 +166,7 @@ class SourceGenericPlugin(SourcePluginInterface):
             if not self.all_properties:
                 return calculate_hash("")
 
-            request_server = RemoteServer(c.remote_webtools_server_location)
-            response = request_server.read_properties_section(
+            response = RemoteServer.read_properties_section(
                 "Response", self.all_properties
             )
             encoded_hash = response["body_hash"]
