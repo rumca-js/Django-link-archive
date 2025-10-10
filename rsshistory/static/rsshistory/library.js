@@ -426,47 +426,6 @@ function sanitizeLink(link) {
 }
 
 
-function getYouTubeChannelId(url) {
-    try {
-        const urlObj = new URL(url);
-        const hostname = urlObj.hostname;
-
-        if (urlObj.searchParams.has("channel_id")) {
-            return urlObj.searchParams.get("channel_id");
-        }
-
-        return null;
-    } catch (e) {
-        return null;
-    }
-}
-
-
-function getYouTubeChannelUrl(url) {
-    let id = getYouTubeChannelId(url);
-    if (id)
-        return `https://www.youtube.com/channel/${id}`;
-}
-
-
-function getChannelUrl(url) {
-    let channelid = null;
-    if (!url)
-        return;
-
-    channelid = getYouTubeChannelUrl(url);
-    if (channelid)
-        return channelid;
-}
-
-
-function getOdyseeVideoId(url) {
-    const url_object = new URL(url);
-    const videoId = url_object.pathname.split('/').pop();
-    return videoId;
-}
-
-
 function isSocialMediaSupported(entry) {
     let page = new UrlLocation(entry.link)
     let domain = page.getDomain()
@@ -491,94 +450,20 @@ function isSocialMediaSupported(entry) {
 }
 
 
-/*------- SERVICES --------------- */
-function getArchiveOrgLink(link) {
-    let currentDate = new Date();
-    let formattedDate = currentDate.toISOString().split('T')[0].replace(/-/g, ''); // Format: YYYYMMDD
+async function checkIfFileExists(url) {
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
 
-    return `https://web.archive.org/web/${formattedDate}000000*/${link}`;
-}
-
-
-function getW3CValidatorLink(link) {
-    return `https://validator.w3.org/nu/?doc=${encodeURIComponent(link)}`;
-}
-
-
-function getSchemaValidatorLink(link) {
-    return `https://validator.schema.org/#url=${encodeURIComponent(link)}`;
-}
-
-
-function getWhoIsLink(link) {
-    let domain = link.replace(/^https?:\/\//, ''); // Remove 'http://' or 'https://'
-
-    return `https://who.is/whois/${domain}`;
-}
-
-
-function getBuiltWithLink(link) {
-    let domain = link.replace(/^https?:\/\//, ''); // Remove 'http://' or 'https://'
-
-    return `https://builtwith.com/${domain}`;
-}
-
-
-function getGoogleTranslateLink(link) {
-
-    let reminder = '?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp';
-    if (link.indexOf("http://") != -1) {
-       reminder = '?_x_tr_sch=http&_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp';
+        if (response.ok) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.error("Error checking if database exists:", error);
+        return false;
     }
-
-    if (link.indexOf("?") != -1) {
-        let queryParams = link.split("?")[1];
-        reminder += '&' + queryParams;
-    }
-
-    let domain = link.replace(/^https?:\/\//, '').split('/')[0]; // Extract the domain part
-
-    domain = domain.replace(/-/g, '--').replace(/\./g, '-');
-
-    let translateUrl = `https://${domain}.translate.goog/` + reminder;
-
-    return translateUrl;
 }
-
-
-function GetServiceLinks(link) {
-    return [
-        {name: "Archive.org", link : getArchiveOrgLink(link)},
-        {name: "W3C Validator", link: getW3CValidatorLink(link)},
-        {name: "Schema.org", link: getSchemaValidatorLink(link)},
-        {name: "Who.is", link: getWhoIsLink(link)},
-        {name: "Built.with", link: getBuiltWithLink(link)},
-        {name: "Google translate", link: getGoogleTranslateLink(link)},
-    ];
-}
-
-
-function GetAllServicableLinks(link) {
-    let service_links = GetServiceLinks(link);
-
-    const handler = getUrlHandler(link);
-    if (handler)
-    {
-       const feeds = handler.getFeeds();
-
-       for (const feed of feeds) {
-           const safeFeed = sanitizeLink(feed);
-           service_links.push({
-               name: "RSS",
-               link: safeFeed
-           });
-       }
-    }
-
-    return service_links;
-}
-
-/*------- SERVICES --------------- */
 
 
 async function unPackFile(zip, fileBlob, extension=".db", unpackAs='uint8array') {

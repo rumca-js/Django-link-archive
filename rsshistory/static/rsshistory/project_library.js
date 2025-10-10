@@ -1,25 +1,3 @@
-// Things that come from config
-let entries_visit_alpha=1.0;
-let entries_dead_alpha=0.5;
-
-// user configuration things
-let view_display_style = "style-light";
-let view_display_type = "standard";
-let view_show_icons = false;
-let view_small_icons = false;
-let user_age = 18;
-let debug_mode = false;
-
-// other global variables
-let search_suggestions = [];
-let common_indicators = null;
-
-let highlight_bookmarks = false;
-let entries_direct_links = false;
-let default_page_size = 200;
-let sort_function = "-date_published";
-
-
 function add_text(error_line, text) {
     let result = "";
     if (error_line == "") {
@@ -136,8 +114,6 @@ function hideElement(element) {
 
 
 function setLightMode() {
-    view_display_style = "style-light";
-
     const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
     if (linkElement) {
         // TODO replace rsshistory with something else
@@ -166,8 +142,6 @@ function setLightMode() {
 
 
 function setDarkMode() {
-    view_display_style = "style-dark";
-
     const linkElement = document.querySelector('link[rel="stylesheet"][href*="styles.css_style-"]');
     if (linkElement) {
         //linkElement.href = "/django/rsshistory/css/styles.css_style-dark.css";
