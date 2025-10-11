@@ -27,12 +27,21 @@
          View
        </button>
        <ul class="dropdown-menu">
-          <li>
-             <button id="showPureLinks" class="dropdown-item">Show Pure Links</button>
-          </li>
-          <li>
-             <button id="highlightBookmarks" class="dropdown-item">Highlight Bookmarks</button>
-          </li>
+                <li>
+                    <div class="dropdown-item form-check">
+                        <input class="form-check-input me-2" type="checkbox" id="showIcons">
+                        <label class="form-check-label" for="showIcons">Show icons</label>
+                    </div>
+                </li>
+
+                <li><hr class="dropdown-divider"></li>
+
+                <li>
+                    <div class="dropdown-item form-check">
+                        <input class="form-check-input me-2" type="checkbox" id="directLinks">
+                        <label class="form-check-label" for="directLinks" title="Links lead directly to URL">Direct links</label>
+                    </div>
+                </li>
        </ul>
    </div>
 
@@ -41,15 +50,24 @@
          Display
        </button>
        <ul class="dropdown-menu">
-          <li>
-             <button id="displayStandard" class="dropdown-item">Display standard</button>
-          </li>
-          <li>
-             <button id="displayGallery" class="dropdown-item">Display gallery</button>
-          </li>
-          <li>
-             <button id="displaySearchEngine" class="dropdown-item">Display search engine</button>
-          </li>
+                <li>
+                    <div class="dropdown-item form-check">
+                        <input class="form-check-input me-2" type="radio" name="viewMode" id="viewStandard" value="standard">
+                        <label class="form-check-label" for="viewStandard">Standard</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="dropdown-item form-check">
+                        <input class="form-check-input me-2" type="radio" name="viewMode" id="viewGallery" value="gallery">
+                        <label class="form-check-label" for="viewGallery">Gallery</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="dropdown-item form-check">
+                        <input class="form-check-input me-2" type="radio" name="viewMode" id="viewSearchEngine" value="search-engine">
+                        <label class="form-check-label" for="viewSearchEngine">Search engine</label>
+                    </div>
+                </li>
        </ul>
    </div>
 
@@ -58,12 +76,18 @@
          Mode
        </button>
        <ul class="dropdown-menu">
-          <li>
-             <button id="displayLight" class="dropdown-item">Display light</button>
-          </li>
-          <li>
-             <button id="displayDark" class="dropdown-item">Display dark</button>
-          </li>
+                <li>
+                    <div class="dropdown-item form-check">
+                        <input class="form-check-input me-2" type="radio" name="theme" id="displayLight" value="style-light">
+                        <label class="form-check-label" for="displayLight">Light</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="dropdown-item form-check">
+                        <input class="form-check-input me-2" type="radio" name="theme" id="displayDark" value="style-dark">
+                        <label class="form-check-label" for="displayDark">Dark</label>
+                    </div>
+                </li>
        </ul>
    </div>
    

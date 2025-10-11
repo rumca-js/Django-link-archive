@@ -33,31 +33,56 @@ function applyConfiguration() {
     view_show_icons = "{{user_config.show_icons}}" == "True";
     view_small_icons = "{{user_config.small_icons}}" == "True";
     debug_mode = "{{user_config.debug_mode}}" == "True";
+
     user_age = {{user_config.get_age}};
-    entries_direct_links = {{user_config.entries_direct_links}};
+    entries_direct_links = "{{user_config.entries_direct_links}}" == "True";
 
     entries_visit_alpha = {{config.entries_visit_alpha}};
     entries_dead_alpha = {{config.entries_dead_alpha}};
+}
+
+
+function updateWidgets() {
+    $('#showIcons').prop('checked', view_show_icons);
+    $('#directLinks').prop('checked', entries_direct_links);
+
+    $('input[name="viewMode"][value="' + view_display_type + '"]').prop('checked', true);
+    $('input[name="theme"][value="' + view_display_style + '"]').prop('checked', true);
+    $('input[name="order"][value="' + sort_function + '"]').prop('checked', true);
 
     setDisplayMode();
 }
 
 
+//-----------------------------------------------
+$(document).on('click', '#showIcons', function(e) {
+    view_show_icons = $(this).is(':checked');
 
-///-----
-$(document).ready(function() {
+    fillListData();
+});
 
-    $("#btnFetch").click(function(event) {
-        event.preventDefault();
-        putSpinnerOnIt($(this));
-    });
 
-    getBasicPageElements();
-    applyConfiguration();
+//-----------------------------------------------
+$(document).on('click', '#directLinks', function(e) {
+    entries_direct_links = $(this).is(':checked');
 
-    setInterval(function() {
-        getBasicPageElements();
-    }, 300000);
+    fillListData();
+});
+
+
+//-----------------------------------------------
+$(document).on('change', 'input[name="viewMode"]', function () {
+    view_display_type = $(this).val();
+    fillListData();
+});
+
+
+$(document).on('change', 'input[name="theme"]', function () {
+    view_display_style = $(this).val();
+
+    setDisplayMode();
+
+    fillListData();
 });
 
 
@@ -123,4 +148,25 @@ $(document).on('click', '#dropdownButton', function(e) {
         hideSearchSuggestions();
     }
 });
+
+
+///-----
+$(document).ready(function() {
+
+    $("#btnFetch").click(function(event) {
+        event.preventDefault();
+        putSpinnerOnIt($(this));
+    });
+
+    applyConfiguration();
+
+    updateWidgets();
+
+    getBasicPageElements();
+
+    setInterval(function() {
+        getBasicPageElements();
+    }, 300000);
+});
+
 
