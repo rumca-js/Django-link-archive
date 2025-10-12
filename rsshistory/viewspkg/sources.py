@@ -47,7 +47,7 @@ from ..views import (
     get_request_browser_id,
 )
 from ..configuration import Configuration
-from ..pluginurl import UrlHandlerEx, UrlHandler
+from ..pluginurl import UrlHandlerEx
 from ..pluginsources import SourceControllerBuilder
 from ..serializers import InstanceExporter, JsonImporter
 
@@ -109,10 +109,10 @@ class SourceDetailView(generic.DetailView):
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
 
         context["additional_links"] = []
-        handler = UrlHandler.get_type(self.object.url)
-        if type(handler) == UrlHandler.youtube_channel_handler:
+        handler = Url.get_type(self.object.url)
+        if type(handler) == Url.youtube_channel_handler:
             context["additional_links"].append(handler.get_channel_url())
-        if type(handler) == UrlHandler.odysee_channel_handler:
+        if type(handler) == Url.odysee_channel_handler:
             context["additional_links"].append(handler.get_channel_url())
 
         c = Configuration.get_object()

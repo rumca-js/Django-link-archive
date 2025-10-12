@@ -3,9 +3,7 @@ import hashlib
 import base64
 
 from utils.dateutils import DateUtils
-from webtoolkit import RemoteServer, ContentLinkParser
-
-from ..webtools import calculate_hash
+from webtoolkit import RemoteServer, ContentLinkParser, calculate_hash
 
 from ..apps import LinkDatabase
 from ..configuration import Configuration

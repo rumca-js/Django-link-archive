@@ -2,7 +2,7 @@ import json
 
 from webtoolkit import RssPage, UrlLocation
 
-from ..webtools import (
+from ..webtoolsx import (
     WebLogger,
 )
 

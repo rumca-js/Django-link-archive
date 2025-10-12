@@ -2,7 +2,7 @@
 Similar project: https://pypi.org/project/abstract-webtools/
 """
 
-from .webtools import *
+from .webtoolsx import WebLogger
 from .webconfig import WebConfig
 
 from .url import (

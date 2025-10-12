@@ -1,6 +1,6 @@
 import traceback
 
-from ..webtools import WebLogger
+from ..webtoolsx import WebLogger
 
 from webtoolkit import RssPage, UrlLocation, PageResponseObject
 

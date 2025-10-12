@@ -3,15 +3,16 @@ import os
 import base64
 from pathlib import Path
 
-from ..webtools import (
+from webtoolkit import (
     PageRequestObject,
     PageResponseObject,
-    WebLogger,
 )
-
 from webtoolkit.ipc import (
     string_to_command,
 )
+
+from ..webtoolsx import WebLogger
+
 
 default_user_agent = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"

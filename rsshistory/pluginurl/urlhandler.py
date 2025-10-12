@@ -1,10 +1,9 @@
 import traceback
 import requests
 
-from webtoolkit import RemoteServer
-
-from ..webtools import (
-    Url,
+from webtoolkit import (
+    RemoteServer,
+    UrlLocation,
     HTTP_STATUS_UNKNOWN,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
     HTTP_STATUS_USER_AGENT,
@@ -14,89 +13,10 @@ from ..webtools import (
     HTTP_STATUS_CODE_SERVER_ERROR,
     HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS,
 )
+
 from ..apps import LinkDatabase
 from ..models import AppLogging, EntryRules, BlockEntry, Browser
 from ..configuration import Configuration
-
-
-class UrlHandler(Url):
-    """
-    Provides handler, controller for a link. Should inherit title & description API, just like
-    webtools Url.
-
-    You can extend it, provide more handlers.
-
-    The controller job is to provide usefull information about link.
-    """
-
-    def __init__(self, url=None, settings=None, url_builder=None):
-        if not url_builder:
-            url_builder = UrlHandler
-
-        super().__init__(url, settings=settings, url_builder=url_builder)
-
-        if not url or url == "":
-            lines = traceback.format_stack()
-            line_text = ""
-            for line in lines:
-                line_text += line
-
-            AppLogging.error(
-                "Invalid use of UrlHandler API {};Lines:{}".format(url, line_text)
-            )
-
-            return
-
-    def get_init_page_options(self, init_options=None):
-        o = super().get_init_page_options(init_options)
-
-        browser_mapping = Browser.get_browser_setup()
-        if browser_mapping != []:
-            o.mode_mapping = browser_mapping
-
-        rules = EntryRules.get_url_rules(self.url)
-        if len(rules) > 0:
-            for rule in rules:
-                if rule.browser:
-                    o.bring_to_front(rule.browser.get_setup())
-
-        return o
-
-    def is_valid(self):
-        if not super().is_valid():
-            return False
-
-        if self.is_blocked():
-            return False
-
-        return True
-
-    def is_blocked(self):
-        if EntryRules.is_url_blocked(self.url):
-            return True
-
-        properties = self.get_properties()
-        if not properties:
-            return True
-
-        properties["contents"] = self.get_contents()
-        if EntryRules.is_dict_blocked(properties):
-            return True
-
-        if not self.is_url_valid():
-            return True
-
-        if not self.is_allowed():
-            return False
-
-    def is_url_valid(self):
-        if not super().is_url_valid():
-            return False
-
-        return True
-
-    def __str__(self):
-        return "{}".format(self.options)
 
 
 class UrlHandlerEx(object):
@@ -451,7 +371,7 @@ class UrlHandlerEx(object):
         return status
 
     def get_cleaned_link(url):
-        return Url.get_cleaned_link(url)
+        return UrlLocation.get_cleaned_link(url)
 
     def is_remote_server_down(self):
         config_entry = Configuration.get_object().config_entry

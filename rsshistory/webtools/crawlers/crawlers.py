@@ -21,11 +21,7 @@ from webtoolkit import (
     RssPage,
     HtmlPage,
     RemoteServer,
-)
-
-from ..webtools import (
     PageResponseObject,
-    WebLogger,
     get_response_from_bytes,
     HTTP_STATUS_UNKNOWN,
     HTTP_STATUS_OK,
@@ -37,6 +33,10 @@ from ..webtools import (
     HTTP_STATUS_CODE_FILE_TOO_BIG,
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
     HTTP_STATUS_CODE_SERVER_ERROR,
+)
+
+from ..webtoolsx import (
+    WebLogger,
 )
 from .crawlerinterface import CrawlerInterface
 

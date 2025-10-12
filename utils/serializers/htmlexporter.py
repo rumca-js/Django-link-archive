@@ -1,7 +1,8 @@
 from pathlib import Path
+from webtoolkit import InputContent
 
 from ..basictypes import fix_path_for_os
-from rsshistory.webtools import Url, YouTubeVideoHandler, InputContent
+from rsshistory.webtools import Url, YouTubeVideoHandler
 
 
 def fix_entry_link_name(link):

@@ -1,7 +1,7 @@
 import argparse
 import json
 
-from .webtools import PageRequestObject
+from webtoolkit import PageRequestObject
 from .crawlers import CrawlerInterface
 
 

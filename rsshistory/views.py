@@ -17,7 +17,6 @@ from .models import (
 )
 from .apps import LinkDatabase
 from .configuration import Configuration
-from .pluginurl.urlhandler import UrlHandler
 from .pluginurl.urlhandler import UrlHandlerEx
 
 

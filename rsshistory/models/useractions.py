@@ -16,7 +16,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from ..webtools import InputContent
+from webtoolkit import InputContent
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel

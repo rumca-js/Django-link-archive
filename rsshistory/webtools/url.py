@@ -22,11 +22,7 @@ from webtoolkit import (
     RssPage,
     HtmlPage,
     UrlLocation,
-)
-
-from .webtools import (
     PageOptions,
-    WebLogger,
     URL_TYPE_RSS,
     URL_TYPE_CSS,
     URL_TYPE_JAVASCRIPT,
@@ -35,6 +31,10 @@ from .webtools import (
     URL_TYPE_UNKNOWN,
     status_code_to_text,
     response_to_json,
+)
+
+from .webtoolsx import (
+    WebLogger,
 )
 from .webconfig import WebConfig
 from .crawlers import (

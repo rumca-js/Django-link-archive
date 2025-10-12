@@ -1,4 +1,4 @@
-from ...pluginurl.urlhandler import UrlHandler
+from ...webtools import Url
 
 from .entryyoutubeplugin import EntryYouTubePlugin
 from .entryodyseeplugin import EntryOdyseePlugin
@@ -15,12 +15,12 @@ class EntryPreviewBuilder(object):
     """
 
     def get(entry, user=None):
-        h = UrlHandler.get_type(entry.link)
+        h = Url.get_type(entry.link)
 
-        if type(h) is UrlHandler.youtube_video_handler:
+        if type(h) is Url.youtube_video_handler:
             return EntryYouTubePlugin(entry, user)
 
-        if type(h) is UrlHandler.odysee_video_handler:
+        if type(h) is Url.odysee_video_handler:
             return EntryOdyseePlugin(entry, user)
 
         return EntryGenericPlugin(entry, user)
