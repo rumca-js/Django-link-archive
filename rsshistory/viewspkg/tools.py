@@ -10,7 +10,7 @@ from django.db.models import Q
 
 from collections import OrderedDict
 
-from webtoolkit import UrlLocation, ContentLinkParser, Url
+from webtoolkit import UrlLocation, ContentLinkParser, RemoteUrl
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -803,7 +803,7 @@ def source_input_suggestions_json(request):
     if "link" in request.GET:
         link = request.GET["link"]
         data = get_suggestions(link)
-        url = Url(link)
+        url = RemoteUrl(link)
         feeds = url.get_feeds()
         for feed in feeds:
             if feed not in data["links"] and feed != link:

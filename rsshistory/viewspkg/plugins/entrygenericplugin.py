@@ -12,7 +12,7 @@ from utils.services import (
     BuildWith,
 )
 
-from webtoolkit import UrlLocation, Url, InputContent, status_code_to_text
+from webtoolkit import UrlLocation, RemoteUrl, InputContent, status_code_to_text
 
 from ...configuration import Configuration
 from ...apps import LinkDatabase
@@ -566,11 +566,11 @@ class EntryGenericPlugin(object):
             )
 
         loc = config.remote_webtools_server_location
-        url = Url(self.entry.link, remote_server_location=loc)
+        url = RemoteUrl(self.entry.link, remote_server_location=loc)
         feeds = set(url.get_feeds())
 
         if self.entry.source:
-            url_source = Url(self.entry.source.url, remote_server_location=loc)
+            url_source = RemoteUrl(self.entry.source.url, remote_server_location=loc)
             source_feeds =  set(url_source.get_feeds())
             feeds.update(source_feeds)
 

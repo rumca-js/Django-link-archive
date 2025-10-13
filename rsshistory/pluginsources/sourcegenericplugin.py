@@ -173,6 +173,8 @@ class SourceGenericPlugin(SourcePluginInterface):
             return base64.b64decode(encoded_hash)
 
     def get_contents(self):
+        # TODO this should be get_response
+
         if self.contents:
             return self.contents
 
@@ -186,17 +188,18 @@ class SourceGenericPlugin(SourcePluginInterface):
             url_ex = UrlHandlerEx(page_link)
             self.all_properties = url_ex.get_properties()
 
-            if not self.all_properties:
-                AppLogging.error("Url:{} Could not obtain contents".format(page_link))
+            if not url_ex.is_valid():
+                AppLogging.error("Url:{} Response is not valid".format(page_link),
+                    detail_text = url_ex.get_properties())
                 self.dead = True
                 return
 
-            contents = url_ex.get_section("Text")
-            if contents and "Contents" in contents:
-                self.contents = contents["Contents"]
-            else:
-                self.contents = contents
+            if not self.all_properties:
+                AppLogging.error("Url:{} Could not obtain properties".format(page_link))
+                self.dead = True
+                return
 
+            self.contents = url_ex.get_text()
             if not self.contents:
                 AppLogging.error("Url:{} Could not obtain contents".format(page_link))
                 self.dead = True

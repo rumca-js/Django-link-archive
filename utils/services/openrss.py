@@ -1,5 +1,5 @@
 from rsshistory.webtools import HttpPageHandler
-from webtoolkit import UrlLocation, RssPage, Url
+from webtoolkit import UrlLocation, RssPage, RemoteUrl
 
 
 class OpenRss(object):
@@ -10,8 +10,7 @@ class OpenRss(object):
         p = UrlLocation(self.url)
         url_procolles = p.get_protocolless()
 
-        u = Url("https://openrss.org/" + url_procolles)
-        u.options.mode = "standard"
+        u = RemoteUrl("", "https://openrss.org/" + url_procolles)
         u.get_response()
 
         handler = u.get_handler()

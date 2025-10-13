@@ -104,6 +104,8 @@ class UrlHandlerEx(object):
                 """
 
                 if self.is_another_request_necessary():
+                    AppLogging.warning("Url:{} Trying another crawler".format(self.url),
+                       detail_text = str(self.all_properties))
                     continue
 
                 if self.all_properties:
@@ -247,20 +249,21 @@ class UrlHandlerEx(object):
         return self.get_text()
 
     def get_text(self):
-        contents_data = self.get_section("Text")
+        contents_data = self.get_section("Streams")
         if not contents_data:
             return
 
-        if "Contents" in contents_data:
-            return contents_data["Contents"]
+        for item in contents_data:
+            if item != "Binary":
+                return contents_data[item]
 
     def get_binary(self):
-        contents_data = self.get_section("Binary")
+        contents_data = self.get_section("Streams")
         if not contents_data:
             return
 
-        if "Contents" in contents_data:
-            return contents_data["Contents"]
+        if "Binary" in contents_data:
+            return contents_data["Binary"]
 
     def get_section(self, section_name):
         properties = self.get_properties()

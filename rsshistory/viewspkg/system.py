@@ -1201,6 +1201,9 @@ def json_users_container(request):
         rows.append(row)
 
     data["rows"] = rows
-    data["title"] = "User"
+    if not user_obj.is_authenticated():
+        data["title"] = "Login"
+    else:
+        data["title"] = "User"
 
     return JsonResponse(data, json_dumps_params={"indent": 4})

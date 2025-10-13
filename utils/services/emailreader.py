@@ -16,6 +16,8 @@ from email.header import decode_header
 from email.utils import parsedate_to_datetime
 from email.utils import parseaddr
 
+from utils.dateutils import DateUtils
+
 
 class Email(object):
     def __init__(self):
@@ -99,7 +101,9 @@ class EmailReader(object):
         date_header = msg["Date"]
         if date_header:
             try:
-                return parsedate_to_datetime(date_header)
+                date = parsedate_to_datetime(date_header)
+                date = DateUtils.to_utc_date(date)
+                return date
             except Exception as e:
                 print(f"Failed to parse email date: {e}")
 

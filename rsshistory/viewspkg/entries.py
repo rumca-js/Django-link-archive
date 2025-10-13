@@ -302,6 +302,9 @@ class EntriesSearchListView(object):
         if self.conditions:
             return self.conditions
 
+        if not self.query_filter:
+            return None
+
         filter_conditions = self.query_filter.get_conditions()
 
         if filter_conditions is None:
