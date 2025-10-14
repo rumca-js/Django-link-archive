@@ -13,18 +13,10 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
-from ..webtools import (
-    YouTubeVideoHandler,
-    YouTubeJsonHandler,
-    YouTubeChannelHandler,
-    OdyseeVideoHandler,
-    OdyseeChannelHandler,
-    HttpPageHandler,
-    Url,
-    HttpRequestBuilder,
+
+from webtoolkit import (
+    RemoteServer,
     PageResponseObject,
-    WebLogger,
-    WebConfig,
     CrawlerInterface,
     HTTP_STATUS_USER_AGENT,
     HTTP_STATUS_TOO_MANY_REQUESTS,
@@ -35,7 +27,18 @@ from ..webtools import (
     json_decode_field,
 )
 
-from webtoolkit import RemoteServer
+from ..webtools import (
+    YouTubeVideoHandler,
+    YouTubeJsonHandler,
+    YouTubeChannelHandler,
+    OdyseeVideoHandler,
+    OdyseeChannelHandler,
+    HttpPageHandler,
+    Url,
+    HttpRequestBuilder,
+    WebLogger,
+    WebConfig,
+)
 
 from ..models import (
     AppLogging,

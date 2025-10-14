@@ -59,10 +59,10 @@ hr {
 }
 
 .link-detail-thumbnail {
-     max-width: 20%;
-     min-width: 15%;
-     max-height: 20%;
-     min-height: 15%;
+     max-width: 50%;
+     min-width: 45%;
+     max-height: 50%;
+     min-height: 45%;
 }
 
 .link-detail-description img {
@@ -99,6 +99,12 @@ hr {
     /* icon image of generic icons. related icons, etc */
     height:4em;
     width:4em;
+    object-fit:cover;
+    object-position:0 0;
+}
+.icon-big {
+    /* icon image of generic icons. related icons, etc */
+    width:30%;
     object-fit:cover;
     object-position:0 0;
 }

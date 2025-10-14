@@ -224,7 +224,7 @@ function updateEntryProperties() {
     $("#entryTagContainer").html(tag_string);
 
     $("#entryTitle").html(entry.title);
-    $("#entryDescription").html(getEntryDescription(entry));
+    $("#entryDescription").html(getEntryDescriptionSafe(entry));
     $("#entryLanguage").html(entry.language);
     $("#entryAuthor").html(entry.author);
     $("#entryAlbum").html(entry.album);

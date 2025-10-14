@@ -190,7 +190,7 @@ class SourceGenericPlugin(SourcePluginInterface):
 
             if not url_ex.is_valid():
                 AppLogging.error("Url:{} Response is not valid".format(page_link),
-                    detail_text = url_ex.get_properties())
+                    detail_text = str(url_ex.get_properties()))
                 self.dead = True
                 return
 

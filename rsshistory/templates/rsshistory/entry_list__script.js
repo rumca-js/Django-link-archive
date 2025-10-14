@@ -1,31 +1,6 @@
 {% load static %}
 
 
-function fillOneEntry(entry) {
-    let datePublishedStr = "";
-    if (entry.date_published) {
-        let datePublished = new Date(entry.date_published);
-        if (!isNaN(datePublished)) {
-            datePublishedStr = datePublished.toLocaleString();
-        }
-    }
-
-    const templateMap = {
-        "standard": entryStandardTemplate,
-        "gallery": entryGalleryTemplate,
-        "search-engine": entrySearchEngineTemplate
-    };
-
-    const templateFunc = templateMap[view_display_type];
-    if (!templateFunc) {
-        return;
-    }
-    var template_text = templateFunc(entry, view_show_icons, view_small_icons);
-
-    return template_text;
-}
-
-
 function fillEntryList(entries) {
     let htmlOutput = '';
 
@@ -38,7 +13,7 @@ function fillEntryList(entries) {
 
     if (entries && entries.length > 0) {
         entries.forEach(entry => {
-            const listItem = fillOneEntry(entry);
+            const listItem = getOneEntryEntryText(entry);
 
             if (listItem) {
                 htmlOutput += listItem;
