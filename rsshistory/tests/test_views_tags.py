@@ -173,6 +173,8 @@ class UserTagsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_tag_show_all(self):
+        self.client.login(username="testuser", password="testpassword")
+
         entry = LinkDataController.objects.create(
             source_url="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -192,6 +194,8 @@ class UserTagsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_tag_show_actual(self):
+        self.client.login(username="testuser", password="testpassword")
+
         entry = LinkDataController.objects.create(
             source_url="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -211,6 +215,8 @@ class UserTagsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_user_tags_show(self):
+        self.client.login(username="testuser", password="testpassword")
+
         entry = LinkDataController.objects.create(
             source_url="https://linkedin.com",
             link="https://linkedin.com/test",
