@@ -1,17 +1,7 @@
 {% load static %}
 
 
-function fillQueueList(queue) {
-    let htmlOutput = '';
-
-    if (queue && queue.length > 0) {
-        queue.forEach(entry => {
-           htmlOutput += getEntryVisitsBar(entry);
-        });
-    }
-
-    return htmlOutput;
-}
+view_display_type = "visits";
 
 
 function fillListData() {
@@ -25,8 +15,8 @@ function fillListData() {
         $('#pagination').html("");
         return;
     }
+    var finished_text = getEntriesList(queue);
 
-    var finished_text = fillQueueList(queue);
     $('#listData').html(finished_text);
     let pagination = GetPaginationNav(data.page, data.num_pages, data.count);
     $('#pagination').html(pagination);

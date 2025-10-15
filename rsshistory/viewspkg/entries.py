@@ -1057,7 +1057,7 @@ def entry_json(request, pk):
     entry = entries[0]
     user_config = UserConfig.get(request.user)
 
-    entry_json = entry_to_json(user_config, entry, tags=True)
+    entry_json = entry_to_json(user_config, entry, tags=True, social=True)
 
     read_laters = ReadLater.objects.filter(entry=entry, user=request.user)
     entry_json["read_later"] = read_laters.exists()
@@ -1113,7 +1113,7 @@ def handle_json_view(request, view_to_use):
 
         if page_num <= p.num_pages:
             for entry in page_obj:
-                entry_json = entry_to_json(user_config, entry, tags=show_tags)
+                entry_json = entry_to_json(user_config, entry, tags=True, social=True)
 
                 read_laters = ReadLater.objects.filter(entry=entry, user=request.user)
                 entry_json["read_later"] = read_laters.exists()

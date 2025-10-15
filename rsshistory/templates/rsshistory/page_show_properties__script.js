@@ -7,6 +7,9 @@ let page_warnings = null;
 let page_notes = null;
 
 
+view_display_type = "standard";
+
+
 function addError(error) {
     $('#Errors').append(`<div class="alert alert-danger">${error}</div>`);
 }
@@ -74,11 +77,7 @@ function fillDataProperty(property) {
 	}
     }
     else if (property.name == "Entries") {
-        for (const [key, entryObject] of Object.entries(property.data)) {
-            htmlOutput += `<h4>${entryObject.title}</h4>`;
-            htmlOutput += displayProperty(entryObject);
-            htmlOutput += `<hr/>`;
-        }
+        htmlOutput += getEntriesList(property.data);
     }
     else {
         for (const [key, value] of Object.entries(property.data)) {

@@ -2,6 +2,7 @@ import logging
 from string import Template
 
 from django.db.models import Q
+from django.forms.models import model_to_dict
 
 from utils.serializers.converters import (
     ModelCollectionConverter,
@@ -14,7 +15,10 @@ from utils.serializers.converters import (
 from utils.serializers import (
     HtmlExporter,
 )
+
 from ..controllers import SourceDataController, LinkDataController
+from rsshistory.models import SocialData
+
 
 
 class EntriesExporter(object):
@@ -259,7 +263,7 @@ class MainExporter(object):
         return entries.order_by(*self.get_order_columns())
 
 
-def entry_to_json(user_config, entry, tags=False):
+def entry_to_json(user_config, entry, tags=False, social=False):
     json_entry = {}
     json_entry["id"] = entry.id
 
@@ -329,12 +333,19 @@ def entry_to_json(user_config, entry, tags=False):
             if not json_entry["thumbnail"] and entry.source:
                 json_entry["thumbnail"] = entry.source.get_favicon()
 
-    if hasattr(entry, "tags"):
+    if tags and hasattr(entry, "tags"):
         tags = set()
         if entry.tags:
             for tag in entry.tags.all():
                 tags.add(tag.tag)
 
         json_entry["tags"] = list(tags)
+
+    if social:
+        social = SocialData.get(entry)
+        if social:
+            social_dict = model_to_dict(social)
+            for key, value in social_dict.items():
+                json_entry.setdefault(key, value)
 
     return json_entry

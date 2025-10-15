@@ -78,8 +78,6 @@ function fillListData() {
         $('#listData').html(finished_text);
         let pagination = GetPaginationNav(data.page, data.num_pages, data.count);
         $('#pagination').html(pagination);
-
-        fillEntryDislikes(entries);
     }
 
     fillErrors(data.errors);
@@ -101,31 +99,6 @@ function fillErrors(errors) {
 	   text += `<div>${error}</div>`;
    });
    $('#queryInfo').html(text);
-}
-
-
-function fillEntryDislikes(entries) {
-    entry_list_social = new Map();
-
-    if (entries && entries.length > 0) {
-        for(let i = 0; i < entries.length; i++) {
-           const entry = entries[i];
-
-           // TODO setTimeout will not be necessary if
-           // https://github.com/rumca-js/crawler-buddy/issues/176 is solved
-
-           setTimeout(() => {
-             getEntrySocialData(entry.id, function (data) {
-                let entry_parameters = getEntrySocialDataText(data);
-                entry_list_social.set(entry.id, entry_parameters);
-  
-                let upvote_ratio_div = `<div>${entry_parameters}</div>`;
-
-                $(`[entry="${entry.id}"] [entryDetails="true"]`).append(upvote_ratio_div);
-             })
-	   }, i * 100);
-        };
-    }
 }
 
 

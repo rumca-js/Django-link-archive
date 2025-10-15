@@ -1,5 +1,5 @@
 from utils.dateutils import DateUtils
-from ..webtools import calculate_hash
+from webtoolkit import calculate_hash
 
 from ..models import (
     SourceCategories,

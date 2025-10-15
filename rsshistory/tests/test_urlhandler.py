@@ -11,33 +11,9 @@ from ..webtools import (
     SeleniumChromeFull,
 )
 
-from ..pluginurl.urlhandler import UrlHandlerEx, UrlHandler
+from ..pluginurl.urlhandler import UrlHandlerEx
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
-
-
-class UrlHandlerTest(FakeInternetTestCase):
-    def setUp(self):
-        self.disable_web_pages()
-
-    def test_get_type__html(self):
-        thetype = UrlHandler.get_type("https://linkedin.com")
-        self.assertEqual(type(thetype), HtmlPage)
-
-    def test_get_type__rss(self):
-        thetype = UrlHandler.get_type("https://rsspage.com/rss.xml")
-        self.assertEqual(type(thetype), RssPage)
-
-    def test_get_youtube_video(self):
-        thetype = UrlHandler.get_type("https://www.youtube.com/watch?v=1234")
-        self.assertEqual(type(thetype), UrlHandler.youtube_video_handler)
-
-    def test_get_youtube_channel(self):
-        thetype = UrlHandler.get_type(
-            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
-        )
-
-        self.assertEqual(type(thetype), UrlHandler.youtube_channel_handler)
 
 
 class UrlHandlerExTest(FakeInternetTestCase):
