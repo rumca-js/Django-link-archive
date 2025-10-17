@@ -138,7 +138,7 @@ class EntryDataBuilder(object):
         from ..pluginurl import EntryUrlInterface
 
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
-        link_data = url.get_props()
+        self.link_data = url.get_props()
 
         if url.is_server_error():
             raise IOError(f"{self.link}: Crawling server error")
@@ -150,19 +150,18 @@ class EntryDataBuilder(object):
             )
             return
 
-        if not link_data:
-            if Configuration.get_object().config_entry.debug_mode:
-                self.errors.append(
-                    "Url:{}. Could not obtain link service properties".format(self.link)
-                )
-                AppLogging.debug(
-                    'Could not obtain properties for:<a href="{}">{}</a>'.format(
-                        self.get_absolute_url(), self.link
-                    )
-                )
+
+        if not self.is_enabled_to_store(url.handler):
+            self.errors.append(
+               "Url:{}. Could not obtain link service properties".format(self.link)
+            )
+            AppLogging.debug(
+               'Could not obtain properties for:<a href="{}">{}</a>'.format(
+                    self.get_absolute_url(), self.link
+               )
+            )
             return
 
-        self.link_data = link_data
         return self.build_from_props(ignore_errors=self.ignore_errors)
 
     def build_from_normal_link(self):
@@ -181,63 +180,29 @@ class EntryDataBuilder(object):
             self.link_data = {}
 
         self.link_data["link"] = self.link
-
-        # we do not want to obtain properties for non-domain entries, if we capture only
-        # domains
-        if not self.is_enabled_to_store():
-            self.errors.append("Url:{}. Not enabled to store".format(self.link))
-            return
-
-        rule = EntryRules.is_url_blocked(self.link_data["link"])
-        if rule:
-            self.errors.append(
-                "Url:{}. Link was rejected because of a rule. {}".format(
-                    self.link, rule
-                )
-            )
-            return
+        config_entry = Configuration.get_object().config_entry
 
         url = EntryUrlInterface(
             self.link, ignore_errors=self.ignore_errors, browser=self.browser
         )
 
-        link_data = url.get_props()
+        self.link_data = url.get_props()
+
+        # we do not want to obtain properties for non-domain entries, if we capture only
+        # domains
+        if not self.is_enabled_to_store(url.handler):
+            self.errors.append("Url:{}. Not enabled to store".format(self.link))
+            return
 
         if url.is_server_error():
             raise IOError(f"{self.link}: Crawling server error")
-
-        if url.is_blocked():
-            self.errors.append("Url:{}. Url is blocked".format(self.link))
-            AppLogging.debug(
-                "Url:{} Could not obtain properties for {}".format(self.link, self.link)
-            )
-            return
-
-        if self.source_is_auto and not url.is_valid():
-            self.errors.append("Url:{}. Url is not valid".format(self.link))
-            AppLogging.debug(
-                "Url:{} Could not obtain properties for {}".format(self.link, self.link)
-            )
-            return
-
-        if not link_data:
-            if Configuration.get_object().config_entry.debug_mode:
-                self.errors.append(
-                    "Url:{}. Could not obtain properties".format(self.link)
-                )
-                AppLogging.debug(
-                    "Url:{} Could not obtain properties for {}".format(
-                        self.link, self.link
-                    )
-                )
-            return
 
         self.merge_link_data(link_data)
 
         if self.link_data:
             return self.build_from_props_internal()
         else:
-            if Configuration.get_object().config_entry.debug_mode:
+            if config_entry.debug_mode:
                 self.errors.append(
                     "Url:{}. Could not obtain properties for link.".format(self.link)
                 )
@@ -309,6 +274,9 @@ class EntryDataBuilder(object):
             self.result = entry
             return entry
 
+        if not self.is_enabled_to_store():
+            return
+
         entry = self.build_from_props_internal()
         self.result = entry
         return entry
@@ -333,77 +301,39 @@ class EntryDataBuilder(object):
         entry = None
 
         # we obtain links from various places. We do not want technical links with no data, redirect, CDN or other
-        if not self.is_link_data_valid_for_auto_add(self.link_data):
-            self.errors.append(
-                "Url:{}. Link is not valid for auto add".format(self.link)
-            )
-            return
-
         self.link_data = self.get_clean_link_data()
-        rule = EntryRules.is_url_blocked(self.link_data["link"])
-        if rule:
-            self.errors.append(
-                "Url:{}. Link was rejected because of a rule. {}".format(
-                    self.link, rule
-                )
-            )
-            return
-
-        # TODO - what if there are many places and we do not want people to insert
-        # bad stuff?
-        if self.source_is_auto:
-            if "title" not in self.link_data or not self.link_data["title"]:
-                self.errors.append(
-                    "Url:{}. Link was rejected not title.".format(self.link)
-                )
-                return
-
-            if EntryRules.is_dict_blocked(self.link_data):
-                self.errors.append(
-                    "Url:{}. Link was rejected due contents rule - by checking properties.".format(
-                        self.link
-                    )
-                )
-                return
-
-            if len(self.link_data["link"]) > LinkDataController.get_field_length(
-                "link"
-            ):
-                self.errors.append("Url:{}. Link too long".format(self.link))
-                return
 
         # if self.source_is_auto:
         #    self.link_data["link"] = self.link_data["link"].lower()
 
         c = Configuration.get_object().config_entry
 
-        if self.is_enabled_to_store():
-            date = None
-            if "date_published" in self.link_data:
-                date = self.link_data["date_published"]
-            wrapper = EntryWrapper(link=self.link_data["link"], date=date)
-            entry = wrapper.get()
+        date = None
+        if "date_published" in self.link_data:
+            date = self.link_data["date_published"]
+        wrapper = EntryWrapper(link=self.link_data["link"], date=date)
+        entry = wrapper.get()
 
-            if entry:
-                return entry
+        if entry:
+            return entry
 
-            self.link_data = self.check_and_set_source_object()
-            self.link_data = self.set_domain_object()
+        self.link_data = self.check_and_set_source_object()
+        self.link_data = self.set_domain_object()
 
-            entry = self.add_entry_internal()
+        entry = self.add_entry_internal()
 
-            # TODO if object just created
-            if entry:
-                c = Configuration.get_object().config_entry
-                if c.new_entries_use_clean_data:
-                    BackgroundJobController.entry_reset_data(entry)
-                elif c.new_entries_merge_data:
-                    BackgroundJobController.entry_update_data(entry)
+        # TODO if object just created
+        if entry:
+            c = Configuration.get_object().config_entry
+            if c.new_entries_use_clean_data:
+                BackgroundJobController.entry_reset_data(entry)
+            elif c.new_entries_merge_data:
+                BackgroundJobController.entry_update_data(entry)
 
-                updater = EntryUpdater(entry=entry)
-                updater.reset_local_data()
+            updater = EntryUpdater(entry=entry)
+            updater.reset_local_data()
 
-                self.add_addition_link_data(entry)
+            self.add_addition_link_data(entry)
 
         return entry
 
@@ -478,17 +408,42 @@ class EntryDataBuilder(object):
 
         return link_data
 
-    def is_enabled_to_store(self):
+    def is_enabled_to_store(self, url_handler=None):
         # manual entry is always enabled
         if not self.source_is_auto:
             return True
 
+        if "link" not in self.link_data or not self.link_data["link"]:
+            self.errors.append(
+                "Url:{}. Link was rejected - missing link.".format(self.link)
+            )
+            return False
+
+        if "title" not in self.link_data or not self.link_data["title"]:
+            self.errors.append(
+                "Url:{}. Link was rejected - missing title.".format(self.link)
+            )
+            return False
+
+        if len(self.link_data["link"]) > LinkDataController.get_field_length(
+            "link"
+        ):
+            self.errors.append("Url:{}. Link too long".format(self.link))
+            return False
+
+        if url_handler and url_handler.is_valid():
+            self.errors.append("Url:{}. Url is not valid".format(self.link))
+            AppLogging.debug(
+                "Url:{} Could not obtain properties for {}".format(self.link, self.link)
+            )
+            return False
+
         config = Configuration.get_object().config_entry
         link = self.link_data["link"]
 
-        p = UrlLocation(link)
-        is_domain = p.is_domain()
-        domain = p.get_domain_only()
+        location = UrlLocation(link)
+        is_domain = location.is_domain()
+        domain = location.get_domain_only()
 
         if not config.accept_non_domain_links:
             if is_domain and config.accept_domain_links:
@@ -501,8 +456,7 @@ class EntryDataBuilder(object):
                 return False
 
         # we do not store link services, we can store only what is behind those links
-        p = UrlLocation(link)
-        if p.is_link_service():
+        if location.is_link_service():
             return False
 
         # heavier checks last
@@ -512,6 +466,41 @@ class EntryDataBuilder(object):
         if not config.accept_ip_links:
             if self.is_ipv4(domain):
                 return False
+
+        rule = EntryRules.is_url_blocked(self.link_data["link"])
+        if rule:
+            self.errors.append(
+                "Url:{}. Link was rejected because of a rule. {}".format(
+                    self.link, rule
+                )
+            )
+            return False
+
+        if EntryRules.is_dict_blocked(self.link_data):
+            self.errors.append(
+                "Url:{}. Link was rejected due contents rule - by checking properties.".format(
+                    self.link
+                )
+            )
+            return False
+
+        if not self.is_link_data_valid_for_auto_add(self.link_data):
+            self.errors.append(
+                "Url:{}. Link is not valid for auto add".format(self.link)
+            )
+            return False
+
+        if not config.accept_same_hashes:
+            if url_handler:
+                response = url_handler.get_response()
+
+                hash = response.get_hash()
+                body_hash = response.get_body_hash()
+
+                if hash and LinkDataController.objects.filter(contents_hash = hash).count() > 0:
+                    return False
+                if body_hash and LinkDataController.objects.filter(body_hash = body_hash).count() > 0:
+                    return False
 
         return True
 

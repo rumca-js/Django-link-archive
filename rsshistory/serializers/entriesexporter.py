@@ -311,6 +311,8 @@ def entry_to_json(user_config, entry, tags=False, social=False):
     json_entry["source__url"] = ""
     json_entry["backgroundcolor"] = None
     json_entry["alpha"] = 1.0
+    json_entry["contents_hash"] = entry.contents_hash
+    json_entry["body_hash"] = entry.body_hash
 
     if hasattr(entry, "source"):
         if entry.source:

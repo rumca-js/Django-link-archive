@@ -134,6 +134,7 @@ class ConfigForm(forms.ModelForm):
             "accept_ip_links",
             "accept_unknown_links",
             "accept_dead_links",
+            "accept_same_hashes",
             "prefer_https_links",
             "prefer_non_www_links",
             "keep_social_data",

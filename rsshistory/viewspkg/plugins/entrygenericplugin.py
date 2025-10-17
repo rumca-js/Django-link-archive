@@ -777,7 +777,6 @@ class EntryGenericPlugin(object):
 
         if self.entry.age:
             parameters.append(EntryParameter("Age", self.entry.age, html_id="entryAge"))
-
         if self.entry.author:
             parameters.append(
                 EntryParameter("Author", self.entry.author, html_id="entryAuthor")
@@ -785,6 +784,14 @@ class EntryGenericPlugin(object):
         if self.entry.album:
             parameters.append(
                 EntryParameter("Album", self.entry.album, html_id="entryAlbum")
+            )
+        if self.entry.contents_hash:
+            parameters.append(
+                EntryParameter("Contents hash", self.entry.contents_hash, html_id="entryContentsHash")
+            )
+        if self.entry.body_hash:
+            parameters.append(
+                EntryParameter("Body hash", self.entry.body_hash, html_id="entryBodyHash")
             )
 
         status_code_str = status_code_to_text(self.entry.status_code)

@@ -289,6 +289,11 @@ class ConfigurationEntry(models.Model):
         help_text="Allow adding links with unknown status to the database.",
     )
 
+    accept_same_hashes = models.BooleanField(
+        default=False,
+        help_text="Allow adding pages with same hashes.",
+    )
+
     auto_crawl_sources = models.BooleanField(
         default=False,
         help_text="Crawling. Automatically finds links from sources (domain, links in RSS)."

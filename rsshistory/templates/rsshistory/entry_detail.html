@@ -1,6 +1,7 @@
 {% extends base_generic %}
 {% load static %}
 {% block content %}
+   <script src="{% static 'rsshistory/entries_library.js' %}?=4"></script>
 
    {% include "rsshistory/entry_detail__frame.html" %}
 
@@ -41,8 +42,6 @@
    <div id="entryRelated" class="list-group">
        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
    </div>
-
-   <script src="{% static 'rsshistory/entries_library.js' %}?=4"></script>
 
    <script>
    {% include "rsshistory/entry_detail__script.js" %}

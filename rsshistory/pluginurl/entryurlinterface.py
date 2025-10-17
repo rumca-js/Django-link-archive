@@ -58,17 +58,17 @@ class EntryUrlInterface(object):
 
         if self.all_properties:
             properties = self.handler.get_section("Properties")
-            response = self.handler.get_section("Response")
+            response = self.handler.get_response()
 
             # TODO properties["date_dead_since"] = DateUtils.get_datetime_now_utc()
 
             props = properties
 
             if props:
-                if response and "status_code" in response:
-                    props["status_code"] = response["status_code"]
-                else:
-                    props["status_code"] = 0
+                if response:
+                    props["status_code"] = response.get_status_code()
+                    props["contents_hash"] = response.get_hash()
+                    props["body_hash"] = response.get_body_hash()
 
         # we do not trim description here. We might need it later, when adding link we scan
         # description for URLs

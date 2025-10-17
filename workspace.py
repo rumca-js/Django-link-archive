@@ -137,6 +137,13 @@ def update_workspace(source_app, destination_app):
 
     snapshot.restore()
 
+    p = Path(destination_app) / "migrations"
+    if not p.exists():
+        p.mkdir(parents=True, exist_ok=True)
+    p = p / "__init__.py"
+    if not p.exists():
+        p.touch(exist_ok=True)
+
 
 def create_workspace(source_app, destination_app):
     print("Processing app:{}".format(destination_app))

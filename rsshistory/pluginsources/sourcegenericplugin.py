@@ -189,8 +189,6 @@ class SourceGenericPlugin(SourcePluginInterface):
             self.all_properties = url_ex.get_properties()
 
             if not url_ex.is_valid():
-                AppLogging.error("Url:{} Response is not valid".format(page_link),
-                    detail_text = str(url_ex.get_properties()))
                 self.dead = True
                 return
 
@@ -201,7 +199,6 @@ class SourceGenericPlugin(SourcePluginInterface):
 
             self.contents = url_ex.get_text()
             if not self.contents:
-                AppLogging.error("Url:{} Could not obtain contents".format(page_link))
                 self.dead = True
                 return
 

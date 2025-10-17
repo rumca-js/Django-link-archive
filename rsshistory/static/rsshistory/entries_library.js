@@ -235,8 +235,8 @@ function getEntrySourceTitle(entry) {
 
 function getEntrySourceUrl(entry) {
     let source_url = "";
-    if (entry.source_url) {
-       source_url = entry.source_url;
+    if (entry.source__url) {
+       source_url = entry.source__url;
     }
     return source_url;
 }
@@ -248,16 +248,22 @@ function getEntrySourceInfo(entry) {
 
     let html = "";
 
-    if (source_title) {
-        html += `<div><a href="${source_url}">${source_title}</a></div>`;
+    if (source_title && source_url) {
+        html += `<a href="${source_url}" title="${source_url}">${source_title}</a>`;
     }
     else if (source_url) {
-        html += `<div><a href="${source_url}">Source URL</a></div>`;
+        html += `<a href="${source_url}" title="${source_url}">Source URL</a>`;
+    }
+    else if (source_title) {
+        html += `<span>${source_title}</span>`;
     }
 
-    let channel_url = getChannelUrl(entry.source_url);
-    if (channel_url)
-        html += `<div><a href="${channel_url}">Channel</a></div>`;
+    if (entry.source_url) {
+       let channel_url = getChannelUrl(entry.source_url);
+       if (channel_url) {
+           html += `<a href="${channel_url}" title="${channel_url}">Channel</a>`;
+       }
+    }
 
     return html;
 }
@@ -879,6 +885,7 @@ function entryContentCentricTemplate(entry, show_icons = true, small_icons = fal
    
     let invalid_style = getEntryDisplayStyle(entry);
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
+    let source_info = getEntrySourceInfo(entry);
 
     let thumbnail = getEntryThumbnail(entry);
 
@@ -914,18 +921,38 @@ function entryContentCentricTemplate(entry, show_icons = true, small_icons = fal
     return `
         <div 
             entry="${entry.id}"
-            title="${hover_title}"
             style="${invalid_style} text-decoration: none"
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
         >
-            <a class="d-flex mx-2" href="${entry_link}">
-
+            <a class="d-flex mx-2"
+	       href="${entry_link}"
+               title="${hover_title}"
+	    >
                <div class="text-wrap">
                   <span style="font-weight:bold" class="h3 text-body" entryTitle="true">${title_safe}</span>
                   <div class="text-body text-decoration-underline">@ ${entry.link}</div>
                </div>
-
             </a>
+
+            <div class="mx-2">
+               <a href="${entry_link}" title="${hover_title}">
+               ${thumbnail_text}
+	       </a>
+            </div>
+
+            <!--div class="mx-2">
+              ${view_menu}
+            </div-->
+
+            <div class="mx-2">
+               ${source_info} ${tags_text} ${language_text}
+            </div>
+	    
+            <div class="mx-2 entry-social">${social}</div>
+
+            <div class="mx-2 link-detail-description">
+              ${description}
+            </div>
 
             <div class="mx-2 ms-auto">
                ${badge_text}
@@ -933,27 +960,6 @@ function entryContentCentricTemplate(entry, show_icons = true, small_icons = fal
                ${badge_age}
                ${badge_dead}
                ${badge_read_later}
-            </div>
-
-            <div class="mx-2">
-               ${thumbnail_text}
-            </div>
-
-            <!--div class="mx-2">
-              ${view_menu}
-            </div-->
-
-            <div class="mx-2" entryDetails="true">
-            </div>
-
-            <div class="mx-2">
-               ${tags_text} ${language_text}
-            </div>
-
-            <div class="mx-2 entry-social">${social}</div>
-
-            <div class="mx-2 link-detail-description">
-              ${description}
             </div>
         </div>
     `;

@@ -2,6 +2,8 @@
 {% load static %}
 {% block content %}
 
+  <script src="{% static 'rsshistory/entries_library.js' %}?=17"></script>
+
   {% include "rsshistory/entry_list__actions.html" %}
 
   {% include "rsshistory/form_filter_oneliner_element.html" %}
@@ -17,8 +19,6 @@
 
   <div id="queryInfo">
   </div>
-
-  <script src="{% static 'rsshistory/entries_library.js' %}?=17"></script>
 
   <script>
   {% include "rsshistory/entry_list__script.js" %}
