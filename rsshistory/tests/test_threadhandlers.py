@@ -249,11 +249,11 @@ class LinkAddJobHandlerTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
-        ob = BackgroundJobController.link_add("https://manually-added-link.com")
-        self.assertTrue(ob)
+        job = BackgroundJobController.link_add("https://manually-added-link.com")
+        self.assertTrue(job)
 
         handler = LinkAddJobHandler()
-        handler.process(ob)
+        handler.process(job)
 
         persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
