@@ -65,10 +65,13 @@ class UrlHandlerEx(object):
         name = ""
 
         # try default server setup
-        self.all_properties = request_server.get_getj(self.url)
-        if self.all_properties:
-            if not self.is_another_request_necessary():
-                return self.all_properties
+        #self.all_properties = request_server.get_getj(self.url)
+        #if self.all_properties:
+        #    if not self.is_another_request_necessary():
+        #        return self.all_properties
+        # TODO reaneble this code?
+        # it may result in two selenium calls one at start
+        # if so we could skip those from mode_mapping
 
         if mode_mapping and len(mode_mapping) > 0:
             for crawler_data in mode_mapping:
@@ -101,6 +104,9 @@ class UrlHandlerEx(object):
                 # TODO if not valid -> we can retry using a different crawler
                 if response is valid (or 403, or redirect?).
                 but we have not normal properties, like title, retry using next crawler?
+
+                Requests are blocked by some sites (politico?)
+                Stealth requests does not work for others (reddit gives 503).
                 """
 
                 if self.is_another_request_necessary():

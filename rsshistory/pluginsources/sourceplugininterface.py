@@ -54,7 +54,7 @@ class SourcePluginInterface(object):
         AppLogging.debug("Stopping processing source:{}".format(source.url))
 
         self.set_operational_info(
-            stop_time, self.num_read_entries, total_time.total_seconds(), self.hash
+            stop_time, self.num_read_entries, total_time.total_seconds(), self.get_hash(), self.get_body_hash()
         )
 
     def read_entries(self):
@@ -68,13 +68,16 @@ class SourcePluginInterface(object):
     def get_hash(self):
         pass
 
+    def get_body_hash(self):
+        pass
+
     def set_operational_info(
-        self, stop_time, num_entries, total_seconds, hash_value, valid=True
+        self, stop_time, num_entries, total_seconds, hash_value, body_hash, valid=True
     ):
         source = self.get_source()
 
         source.set_operational_info(
-            stop_time, num_entries, total_seconds, hash_value, valid
+            stop_time, num_entries, total_seconds, hash_value, body_hash, valid
         )
 
     def enhance_properties(self, properties):

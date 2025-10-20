@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linklibrary"
-version = "2.20.5"
+version = "2.22.2"
 description = "Link Archive"
 authors = ["Iwan Grozny <renegat@renegat0x0.ddns.net>"]
 license = "GPL3"
@@ -12,7 +12,7 @@ Django = "^5.2.0"
 django-user-agents = "^0.4.0"
 pymemcache = "^4.0.0"
 python-dateutil = "^2.8.2"
-yt-dlp = "^2025.9.5"
+yt-dlp = "^2025.10.14"
 waybackpy = "^3.0.6"
 sqlalchemy = "^2.0.38"
 tldextract = "^5.1.2"
@@ -35,7 +35,7 @@ chardet = "^5.2.0"
 # TODO do we need this?
 lxml="^5.4.0"
 brutefeedparser="*"
-webtoolkit="0.0.12"
+webtoolkit="0.0.26"
 cryptography="^45.0.3"
 
 [tool.poetry.group.dev.dependencies]

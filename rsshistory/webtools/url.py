@@ -690,13 +690,13 @@ class Url(ContentInterface):
         if self.get_contents_hash():
             response_data["hash"] = self.property_encode(self.get_contents_hash())
         else:
-            response_data["hash"] = ""
+            response_data["hash"] = None
         if self.get_contents_body_hash():
             response_data["body_hash"] = self.property_encode(
                 self.get_contents_body_hash()
             )
         else:
-            response_data["body_hash"] = ""
+            response_data["body_hash"] = None
 
         return response_data
 

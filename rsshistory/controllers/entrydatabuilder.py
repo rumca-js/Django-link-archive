@@ -445,6 +445,12 @@ class EntryDataBuilder(object):
             if self.is_ipv4(domain):
                 return False
 
+        is_domain = location.is_domain()
+        if is_domain and not config.accept_domain_links:
+            return False
+        elif not is_domain and not config.accept_non_domain_links:
+            return False
+
         rule = EntryRules.is_url_blocked(link)
         if rule:
             self.errors.append(
@@ -461,6 +467,13 @@ class EntryDataBuilder(object):
         if not self.source_is_auto:
             return True
 
+        config = Configuration.get_object().config_entry
+        link = self.link_data["link"]
+
+        location = UrlLocation(link)
+        is_domain = location.is_domain()
+        domain = location.get_domain_only()
+
         if "title" not in self.link_data or not self.link_data["title"]:
             self.errors.append(
                 "Url:{}. Link was rejected - missing title.".format(self.link)
@@ -473,23 +486,6 @@ class EntryDataBuilder(object):
                 "Url:{} Could not obtain properties for {}".format(self.link, self.link)
             )
             return False
-
-        config = Configuration.get_object().config_entry
-        link = self.link_data["link"]
-
-        location = UrlLocation(link)
-        is_domain = location.is_domain()
-        domain = location.get_domain_only()
-
-        if not config.accept_non_domain_links:
-            if is_domain and config.accept_domain_links:
-                pass
-            elif not is_domain and config.accept_domain_links:
-                return False
-            elif "bookmarked" in self.link_data and self.link_data["bookmarked"]:
-                pass
-            else:
-                return False
 
         # we do not store link services, we can store only what is behind those links
         if location.is_link_service():

@@ -125,6 +125,11 @@ class SourceDataController(SourceDataModel):
         if obj:
             return obj.page_hash
 
+    def get_body_hash(self):
+        obj = self.get_dynamic_data()
+        if obj:
+            return obj.body_hash
+
     def get_import_seconds(self):
         obj = self.get_dynamic_data()
         if obj:
@@ -136,7 +141,7 @@ class SourceDataController(SourceDataModel):
             return obj.number_of_entries
 
     def set_operational_info(
-        self, date_fetched, number_of_entries, import_seconds, hash_value, valid=True
+        self, date_fetched, number_of_entries, import_seconds, hash_value, body_hash, valid=True
     ):
         dynamic_data = self.get_dynamic_data()
         if dynamic_data:
@@ -146,6 +151,9 @@ class SourceDataController(SourceDataModel):
 
             if valid:
                 dynamic_data.page_hash = hash_value
+                if body_hash == "":
+                    body_hash = None
+                dynamic_data.body_hash = body_hash
 
             if valid:
                 dynamic_data.consecutive_errors = 0
@@ -163,39 +171,19 @@ class SourceDataController(SourceDataModel):
 
             dynamic_data.save()
         else:
-            # previously we could have dangling data without relation
-            op_datas = SourceOperationalData.objects.filter(source_obj=self)
-
             consecutive_errors = 0
             if not valid:
                 consecutive_errors += 1
 
-            if not op_datas.exists():
-                SourceOperationalData.objects.create(
-                    date_fetched=date_fetched,
-                    import_seconds=import_seconds,
-                    number_of_entries=number_of_entries,
-                    page_hash=hash_value,
-                    consecutive_errors=consecutive_errors,
-                    source_obj=self,
-                )
-            else:
-                dynamic_data = op_datas[0]
-                dynamic_data.date_fetched = date_fetched
-                dynamic_data.import_seconds = import_seconds
-                dynamic_data.number_of_entries = number_of_entries
-                dynamic_data.source_obj = self
-
-                if valid:
-                    dynamic_data.page_hash = hash_value
-
-                if valid:
-                    dynamic_data.consecutive_errors = 0
-                else:
-                    dynamic_data.consecutive_errors += 0
-
-                dynamic_data.save()
-
+            SourceOperationalData.objects.create(
+                date_fetched=date_fetched,
+                import_seconds=import_seconds,
+                number_of_entries=number_of_entries,
+                page_hash=hash_value,
+                body_hash=body_hash,
+                consecutive_errors=consecutive_errors,
+                source_obj=self,
+            )
         return dynamic_data
 
     def get_domain(self):

@@ -31,7 +31,6 @@ class SourceGenericPlugin(SourcePluginInterface):
         self.contents = None
         self.content_handler = None
         self.response = None
-        self.hash = None
 
     def check_for_data(self):
         source = self.get_source()
@@ -43,10 +42,10 @@ class SourceGenericPlugin(SourcePluginInterface):
 
         self.start_time = DateUtils.get_datetime_now_utc()
 
-        self.hash = self.get_hash()
-
         if source:
             source.update_data()
+
+        self.get_contents()
 
         if self.is_page_ok_to_read():
             self.read_data_from_container_elements()
@@ -55,9 +54,9 @@ class SourceGenericPlugin(SourcePluginInterface):
         total_time = stop_time - self.start_time
         total_time.total_seconds()
 
-        if self.hash:
+        if self.get_hash():
             self.set_operational_info(
-                stop_time, self.num_read_entries, total_time.total_seconds(), self.hash
+                stop_time, self.num_read_entries, total_time.total_seconds(), self.get_hash(), self.get_body_hash()
             )
             return True
 
@@ -70,7 +69,8 @@ class SourceGenericPlugin(SourcePluginInterface):
                 stop_time,
                 self.num_read_entries,
                 total_time.total_seconds(),
-                self.hash,
+                self.get_hash(),
+                self.get_body_hash(),
                 valid=False,
             )
             return False
@@ -85,7 +85,7 @@ class SourceGenericPlugin(SourcePluginInterface):
 
         if c.remote_webtools_server_location:
             if not self.all_properties:
-                return calculate_hash("")
+                return []
 
             source = self.get_source()
 
@@ -138,12 +138,17 @@ class SourceGenericPlugin(SourcePluginInterface):
     def is_page_ok_to_read(self):
         source = self.get_source()
 
-        if self.hash and source.get_page_hash() == self.hash:
+        if self.get_hash() and source.get_page_hash() == self.get_hash():
             AppLogging.debug(
                 "Url:{} Title:{}. Not changed.".format(source.url, source.title)
             )
             return False
-        elif not self.hash:
+        elif self.get_body_hash() and source.get_body_hash() == self.get_body_hash():
+            AppLogging.debug(
+                "Url:{} Title:{}. Not changed.".format(source.url, source.title)
+            )
+            return False
+        elif not self.get_hash():
             AppLogging.debug(
                 "Url:{} Title:{}. Cannot obtain hash, skipping ".format(
                     source.url, source.title
@@ -154,29 +159,25 @@ class SourceGenericPlugin(SourcePluginInterface):
         return True
 
     def get_hash(self):
-        self.get_contents()
+        if self.response is None:
+            return
 
-        if not self.contents:
-            return calculate_hash("")
+        return self.response.get_hash()
 
-        c = Configuration.get_object().config_entry
-        if c.remote_webtools_server_location:
-            if not self.all_properties:
-                return calculate_hash("")
+    def get_body_hash(self):
+        if self.response is None:
+            return
 
-            response = RemoteServer.read_properties_section(
-                "Response", self.all_properties
-            )
-            encoded_hash = response["body_hash"]
-            if not encoded_hash:
-                encoded_hash = response["hash"]
-            return base64.b64decode(encoded_hash)
+        return self.response.get_body_hash()
 
     def get_contents(self):
         # TODO this should be get_response
 
         if self.contents:
             return self.contents
+
+        if self.response is not None:
+            return self.response.get_text()
 
         if self.dead:
             return
@@ -187,6 +188,7 @@ class SourceGenericPlugin(SourcePluginInterface):
         if c.remote_webtools_server_location:
             url_ex = UrlHandlerEx(page_link)
             self.all_properties = url_ex.get_properties()
+            self.response = url_ex.get_response()
 
             if not url_ex.is_valid():
                 self.dead = True

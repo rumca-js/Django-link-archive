@@ -595,7 +595,7 @@ def enable_all_sources(request):
 
         return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
     else:
-        p.context["summary_text"] = "No source to remove"
+        p.context["summary_text"] = "No source to enable"
         return p.render("summary_present.html")
 
 
@@ -613,7 +613,7 @@ def disable_all_sources(request):
 
         return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
     else:
-        p.context["summary_text"] = "No source to remove"
+        p.context["summary_text"] = "No source to disable"
         return p.render("summary_present.html")
 
 

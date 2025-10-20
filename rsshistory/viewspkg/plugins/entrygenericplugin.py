@@ -12,7 +12,13 @@ from utils.services import (
     BuildWith,
 )
 
-from webtoolkit import UrlLocation, RemoteUrl, InputContent, status_code_to_text
+from webtoolkit import (
+    UrlLocation,
+    RemoteUrl,
+    InputContent,
+    status_code_to_text,
+    json_encode_field,
+)
 
 from ...configuration import Configuration
 from ...apps import LinkDatabase
@@ -786,12 +792,14 @@ class EntryGenericPlugin(object):
                 EntryParameter("Album", self.entry.album, html_id="entryAlbum")
             )
         if self.entry.contents_hash:
+            hash = json_encode_field(self.entry.contents_hash)
             parameters.append(
-                EntryParameter("Contents hash", self.entry.contents_hash, html_id="entryContentsHash")
+                EntryParameter("Contents hash", hash, html_id="entryContentsHash")
             )
         if self.entry.body_hash:
+            hash = json_encode_field(self.entry.body_hash)
             parameters.append(
-                EntryParameter("Body hash", self.entry.body_hash, html_id="entryBodyHash")
+                EntryParameter("Body hash", hash, html_id="entryBodyHash")
             )
 
         status_code_str = status_code_to_text(self.entry.status_code)
