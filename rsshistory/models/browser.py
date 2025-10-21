@@ -3,21 +3,10 @@ import json
 from django.db import models
 from django.conf import settings
 
-from ..webtools import WebConfig
 from .system import AppLogging
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
-
-
-def get_browser_choices():
-    result = []
-
-    browsers = WebConfig.get_browsers()
-    for browser in browsers:
-        result.append((browser, browser))
-
-    return result
 
 
 class Browser(models.Model):
@@ -28,7 +17,7 @@ class Browser(models.Model):
     priority = models.IntegerField(default=0)
 
     name = models.CharField(default="", max_length=2000)
-    crawler = models.CharField(choices=get_browser_choices(), max_length=2000)
+    crawler = models.CharField(max_length=2000)
 
     settings = models.CharField(
         max_length=2000, blank=True
@@ -38,15 +27,6 @@ class Browser(models.Model):
         ordering = ["-enabled", "priority", "name"]
 
     def save(self, *args, **kwargs):
-        browsers = WebConfig.get_browsers()
-        if self.crawler not in browsers:
-            AppLogging.error(
-                "Cannot add crawler {}, since it is not supported by webtools".format(
-                    self.crawler
-                )
-            )
-            return
-
         if not self.is_valid():
             AppLogging.error(
                 "Browser cannot be saved due to errors".format(self.crawler)
@@ -72,8 +52,10 @@ class Browser(models.Model):
 
         start_index = Browser.objects.all().count()
 
-        mapping = WebConfig.get_init_crawler_config()
-        for index, browser_config in enumerate(mapping):
+        server = Configuration.get_object().get_remote_server()
+        crawlers_data = server.get_infoj()
+
+        for index, browser_config in enumerate(crawlers_data["crawlers"]):
             settings = {}
             try:
                 settings = json.dumps(browser_config["settings"])
@@ -87,21 +69,20 @@ class Browser(models.Model):
                 conf = Browser.objects.create(
                     enabled=enabled,
                     name=browser_config["name"],
-                    crawler=browser_config["crawler"].__name__,
+                    crawler=browser_config["crawler"],
                     priority=start_index + index,
                     settings=settings,
                 )
 
-    def get_browser_setup(string=False):
+    def get_browser_setup():
         """
-        sets WebConfig browser config according to model
         """
         browser_mapping = []
         for browser in Browser.objects.all():
             if not browser.enabled:
                 continue
 
-            browser_config = browser.get_setup(string)
+            browser_config = browser.get_setup()
             if "enabled" in browser_config:
                 del browser_config["enabled"]
 
@@ -109,7 +90,7 @@ class Browser(models.Model):
 
         return browser_mapping
 
-    def get_setup(self, string=False):
+    def get_setup(self):
         settings = {}
         if self.settings != None and self.settings != "":
             try:
@@ -117,13 +98,8 @@ class Browser(models.Model):
             except ValueError as E:
                 AppLogging.exc(E, "Cannot load browser settings")
 
-        if string:
-            crawler = self.crawler
-        else:
-            crawler = Browser.get_crawler_from_string(self.crawler)
-
         browser_config = {
-            "crawler": crawler,
+            "crawler": self.crawler,
             "name": self.name,
             "priority": self.priority,
             "settings": settings,
@@ -167,9 +143,6 @@ class Browser(models.Model):
             if browser.priority != i:
                 browser.priority = i
                 browser.save()
-
-    def get_crawler_from_string(crawler_string):
-        return WebConfig.get_crawler_from_string(crawler_string)
 
     def __str__(self):
         return "{}".format(

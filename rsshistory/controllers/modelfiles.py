@@ -1,5 +1,4 @@
 import base64
-from ..webtools import Url
 
 from ..models import ModelFiles
 from ..configuration import Configuration

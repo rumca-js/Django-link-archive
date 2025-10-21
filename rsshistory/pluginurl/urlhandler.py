@@ -31,7 +31,7 @@ class UrlHandlerEx(object):
 
         self.browsers = browsers
         if not browsers:
-            self.browsers = Browser.get_browser_setup(string=True)
+            self.browsers = Browser.get_browser_setup()
             self.browsers = self.get_browsers()
 
         self.all_properties = None
@@ -43,8 +43,8 @@ class UrlHandlerEx(object):
         return self.get_properties_internal()
 
     def get_properties_internal(self):
-        config_entry = Configuration.get_object().config_entry
-        if config_entry.remote_webtools_server_location:
+        remote_server = Configuration.get_object().get_remote_server()
+        if remote_server:
             if self.is_remote_server_down():
                 AppLogging.error(
                     "Cannot ping remote server: {}".format(
@@ -54,10 +54,9 @@ class UrlHandlerEx(object):
                 return
 
             mode_mapping = self.browsers
-            request_server = RemoteServer(config_entry.remote_webtools_server_location)
 
             return self.get_properties_internal_mode_mapping(
-                request_server, mode_mapping
+                remote_server, mode_mapping
             )
 
     def get_properties_internal_mode_mapping(self, request_server, mode_mapping):
@@ -373,8 +372,7 @@ class UrlHandlerEx(object):
         return "{}".format(self.options)
 
     def ping(url, timeout_s=20):
-        config_entry = Configuration.get_object().config_entry
-        remote_server = RemoteServer(config_entry.remote_webtools_server_location)
+        remote_server = Configuration.get_object().get_remote_server()
         status = remote_server.get_pingj(url)
 
         return status

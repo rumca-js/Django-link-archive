@@ -6,6 +6,8 @@ import os
 from django.contrib.auth.models import User
 from django.conf import settings
 
+from webtoolkit import RemoteServer
+
 from utils.dateutils import DateUtils
 from utils.logger import set_logger
 
@@ -22,7 +24,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.22.1"
+__version__ = "2.22.2"
 
 
 class Configuration(object):
@@ -325,3 +327,8 @@ class Configuration(object):
         )
 
         return day_to_move
+
+    def get_remote_server(self):
+        config_entry = self.config_entry
+        if config_entry.remote_webtools_server_location:
+            return RemoteServer(config_entry.remote_webtools_server_location)

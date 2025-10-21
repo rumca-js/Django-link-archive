@@ -1,5 +1,4 @@
-from rsshistory.webtools import HttpPageHandler
-from webtoolkit import UrlLocation, RssPage, RemoteUrl
+from webtoolkit import UrlLocation, RssPage, RemoteUrl, HttpPageHandler
 
 
 class OpenRss(object):

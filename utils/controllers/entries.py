@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy import delete, desc, asc
-from rsshistory.webtools import Url
+from webtoolkit import RemoteUrl
 
 from utils.sqlmodel import (
     EntriesTable,
