@@ -4,8 +4,7 @@ from django.db import DataError
 
 from datetime import timedelta
 from utils.dateutils import DateUtils
-from webtoolkit import RemoteServer
-from webtoolkit import UrlLocation
+from webtoolkit import RemoteServer, UrlLocation
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
@@ -142,7 +141,7 @@ class SocialData(models.Model):
             link = config.remote_webtools_server_location
             remote_server = RemoteServer(link)
 
-            json_obj = remote_server.get_socialj(entry.link)
+            json_obj = remote_server.get_socialj(url=entry.link)
             if not json_obj:
                 return
 

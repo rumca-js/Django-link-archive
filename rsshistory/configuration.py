@@ -24,7 +24,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.22.2"
+__version__ = "2.22.3"
 
 
 class Configuration(object):
@@ -150,7 +150,6 @@ class Configuration(object):
 
     def apply_webconfig(self):
         from .models import Browser
-        from .webtools import WebConfig
 
         self.apply_web_logger()
 
@@ -158,10 +157,7 @@ class Configuration(object):
             Browser.read_browser_setup()
 
     def apply_web_logger(self):
-        from .webtools import WebConfig
-        from .models import AppLogging
-
-        WebConfig.use_logger(AppLogging)
+        pass
 
     def get_export_path(self, append=False):
         directory = Path(ConfigurationEntry.get().data_export_path)

@@ -48,6 +48,7 @@ class Browser(models.Model):
         """
         Reads default WebConfig browser config, and applies it to model
         """
+        from ..configuration import Configuration
         # Browser.objects.all().delete()
 
         start_index = Browser.objects.all().count()

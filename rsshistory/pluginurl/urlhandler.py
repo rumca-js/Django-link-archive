@@ -4,6 +4,7 @@ import requests
 from webtoolkit import (
     RemoteServer,
     UrlLocation,
+    PageRequestObject,
     HTTP_STATUS_UNKNOWN,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
     HTTP_STATUS_USER_AGENT,
@@ -83,11 +84,10 @@ class UrlHandlerEx(object):
                     )
                 )
 
-                self.all_properties = request_server.get_getj(
-                    self.url,
-                    name=crawler_data["name"],
-                    settings=crawler_data,
-                )
+                request = PageRequestObject(self.url)
+                request.crawler_name = crawler_data["name"]
+
+                self.all_properties = request_server.get_getj(request)
                 if not self.all_properties:
                     AppLogging.warning(
                         "Url:{} Could not communicate with remote server, crawler_data:{}".format(
@@ -116,7 +116,9 @@ class UrlHandlerEx(object):
                 if self.all_properties:
                     return self.all_properties
         else:
-            self.all_properties = request_server.get_getj(self.url)
+            request = PageRequestObject(self.url)
+
+            self.all_properties = request_server.get_getj(request)
             if not self.all_properties:
                 AppLogging.warning(
                     "Url:{} Could not communicate with remote server".format(self.url)
@@ -373,7 +375,8 @@ class UrlHandlerEx(object):
 
     def ping(url, timeout_s=20):
         remote_server = Configuration.get_object().get_remote_server()
-        status = remote_server.get_pingj(url)
+        request = PageRequestObject(url)
+        status = remote_server.get_pingj(request)
 
         return status
 

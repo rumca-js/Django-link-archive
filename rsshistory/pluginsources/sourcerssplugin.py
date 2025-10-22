@@ -4,11 +4,6 @@ from bs4 import BeautifulSoup
 
 from webtoolkit import RssPage, RssContentReader
 
-from ..webtools import (
-    HttpPageHandler,
-    YouTubeChannelHandler,
-)
-
 from ..models import AppLogging
 from ..apps import LinkDatabase
 from ..configuration import Configuration
@@ -26,15 +21,6 @@ class BaseRssPlugin(SourceGenericPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
         source = self.get_source()
-
-    def is_rss(self, handler):
-        if type(handler) is YouTubeChannelHandler:
-            return True
-
-        if type(handler) is HttpPageHandler and handler.is_rss():
-            return True
-
-        return False
 
     def get_contents_size_limit(self):
         return 800

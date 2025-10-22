@@ -9,8 +9,8 @@ from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
 from webtoolkit import UrlLocation
+from webtoolkit import OdyseeVideoHandler, YouTubeVideoJsonHandler
 
-from ..webtools import Url 
 from utils.omnisearch import SingleSymbolEvaluator
 
 from ..apps import LinkDatabase
@@ -109,10 +109,11 @@ class SourceDetailView(generic.DetailView):
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
 
         context["additional_links"] = []
-        handler = Url.get_type(self.object.url)
-        if type(handler) == Url.youtube_channel_handler:
+        handler = YouTubeVideoJsonHandler(entry.link)
+        if handler.is_handled_by():
             context["additional_links"].append(handler.get_channel_url())
-        if type(handler) == Url.odysee_channel_handler:
+        handler = OdyseeVideoHandler(entry.link)
+        if handler.is_handled_by():
             context["additional_links"].append(handler.get_channel_url())
 
         c = Configuration.get_object()
@@ -270,7 +271,7 @@ def source_add_form(request):
 
     url = UrlHandlerEx.get_cleaned_link(url)
 
-    if not Url.is_protocolled_link(url):
+    if not UrlLocation.is_protocolled_link(url):
         p.context["summary_text"] = (
             "Only protocolled links are allowed. Link:{}".format(url)
         )

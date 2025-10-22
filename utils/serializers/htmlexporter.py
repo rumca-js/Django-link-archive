@@ -1,8 +1,8 @@
 from pathlib import Path
 from webtoolkit import InputContent
+from webtoolkit import YouTubeVideoJsonHandler
 
 from ..basictypes import fix_path_for_os
-from rsshistory.webtools import Url, YouTubeVideoHandler
 
 
 def fix_entry_link_name(link):
@@ -117,11 +117,9 @@ class HtmlEntryExporter(object):
         return text
 
     def get_preview(self):
-        url = Url(self.entry.link)
-        handler = url.get_handler()
+        h = YouTubeVideoJsonHandler(url=self.entry.link)
 
-        if type(handler) is Url.youtube_video_handler:
-            h = YouTubeVideoHandler(url=self.entry.link)
+        if h.is_handled_by():
             return '<div class="youtube_player_container"><iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'.format(
                 h.get_link_embed()
             )

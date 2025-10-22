@@ -1,6 +1,5 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy import delete, desc, asc
-from webtoolkit import RemoteUrl
 
 from utils.sqlmodel import (
     EntriesTable,
@@ -148,7 +147,7 @@ class EntryDataBuilder(object):
         if rss_url.endswith("/"):
             rss_url = rss_url[:-1]
 
-        h = Url(rss_url)
+        h = RemoteUrl(rss_url)
         if not h.is_valid():
             return
 
