@@ -17,7 +17,6 @@ class Browser(models.Model):
     priority = models.IntegerField(default=0)
 
     name = models.CharField(default="", max_length=2000)
-    crawler = models.CharField(max_length=2000)
 
     settings = models.CharField(
         max_length=2000, blank=True
@@ -29,7 +28,7 @@ class Browser(models.Model):
     def save(self, *args, **kwargs):
         if not self.is_valid():
             AppLogging.error(
-                "Browser cannot be saved due to errors".format(self.crawler)
+                "Browser cannot be saved due to errors".format(self.name)
             )
             return
 
@@ -70,7 +69,6 @@ class Browser(models.Model):
                 conf = Browser.objects.create(
                     enabled=enabled,
                     name=browser_config["name"],
-                    crawler=browser_config["crawler"],
                     priority=start_index + index,
                     settings=settings,
                 )
@@ -100,7 +98,6 @@ class Browser(models.Model):
                 AppLogging.exc(E, "Cannot load browser settings")
 
         browser_config = {
-            "crawler": self.crawler,
             "name": self.name,
             "priority": self.priority,
             "settings": settings,

@@ -16,6 +16,7 @@ from utils.dateutils import DateUtils
 
 from webtoolkit import (
     RemoteServer,
+    PageRequestObject,
     PageResponseObject,
     CrawlerInterface,
     HTTP_STATUS_USER_AGENT,
@@ -25,17 +26,7 @@ from webtoolkit import (
     HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS,
     json_encode_field,
     json_decode_field,
-)
 
-from ..webtools import (
-    YouTubeVideoHandler,
-    YouTubeJsonHandler,
-    YouTubeChannelHandler,
-    OdyseeVideoHandler,
-    OdyseeChannelHandler,
-    HttpPageHandler,
-    Url,
-    HttpRequestBuilder,
     WebLogger,
     WebConfig,
 )
@@ -160,7 +151,15 @@ class FakeInternetData(object):
 
         return data
 
-    def get_getj(self, name="", settings=None):
+    def get_getj(self, request=None, url=None):
+        if url and not request:
+            request = PageRequestObject(url)
+            request.url = url
+            request.url = request.url.strip()
+
+        if not request or not request.url:
+            return
+
         if self.url == "https://linkedin.com":
             self.properties["title"] = "Https LinkedIn Page title"
             self.properties["description"] = "Https LinkedIn Page description"
@@ -372,6 +371,8 @@ class FakeInternetTestCase(TestCase):
         WebConfig.get_crawler_from_mapping = (
             FakeInternetTestCase.get_crawler_from_mapping
         )
+        WebConfig.get_crawler_from_string = 
+            FakeInternetTestCase.get_crawler_from_string
 
         RemoteServer.get_getj = self.get_getj
         RemoteServer.get_socialj = self.get_socialj
@@ -407,16 +408,20 @@ class FakeInternetTestCase(TestCase):
 
         return True
 
-    def get_getj(self, url, name="", settings=None):
+    def get_getj(self, request=None, url=None):
         # print("FakeInternet:get_getj: Url:{}".format(url))
         # return json.loads(remote_server_json)
-        MockRequestCounter.requested(url=url, info=settings)
+        MockRequestCounter.requested(url=url, info=request)
 
         data = FakeInternetData(url)
-        return data.get_getj(name, settings)
+        return data.get_getj(url=url)
 
-    def get_socialj(self, url):
+    def get_socialj(self, request=None, url=None):
+        if request:
+            url = request.url
+
         MockRequestCounter.requested(url=url)
+
         if url.find("youtube.com") >= 0:
             return {"view_count": 15, "thumbs_up": 1, "thumbs_down": 0}
         if url.find("github.com") >= 0:
@@ -427,10 +432,10 @@ class FakeInternetTestCase(TestCase):
             return {"upvote_ratio": 5}
         return None
 
-    def get_feedsj(self, url, settings=None):
+    def get_feedsj(self, request=None, url=None):
         return []
 
-    def get_pingj(self, url, settings=None):
+    def get_pingj(self, request=None, url=None):
         return True
 
     def check_crawling_server(self, thread_id):
@@ -457,6 +462,10 @@ class FakeInternetTestCase(TestCase):
         crawler.crawler_data = crawler_data
 
         return crawler
+
+    def get_crawler_from_string(string):
+        print("oi")
+        return DefaultCrawler
 
     def setup_configuration(self):
         # each suite should start with a default configuration entry

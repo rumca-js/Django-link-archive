@@ -24,7 +24,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "2.22.3"
+__version__ = "2.23.0"
 
 
 class Configuration(object):
@@ -45,8 +45,6 @@ class Configuration(object):
         self.config_entry = ConfigurationEntry.get()
         self.get_context()
         self.nlps = {}
-
-        self.apply_webconfig()
 
     def get_context_minimal():
         return {
@@ -147,17 +145,6 @@ class Configuration(object):
         from .models import AppLoggingController
 
         set_logger(LinkDatabase.name, AppLoggingController())
-
-    def apply_webconfig(self):
-        from .models import Browser
-
-        self.apply_web_logger()
-
-        if not Browser.objects.all().exists():
-            Browser.read_browser_setup()
-
-    def apply_web_logger(self):
-        pass
 
     def get_export_path(self, append=False):
         directory = Path(ConfigurationEntry.get().data_export_path)

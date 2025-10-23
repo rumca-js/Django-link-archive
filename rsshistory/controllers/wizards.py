@@ -1,4 +1,5 @@
 from django.conf import settings
+
 from ..configuration import Configuration
 
 from ..models import (
@@ -7,6 +8,7 @@ from ..models import (
     EntryRules,
     SearchView,
     UserSearchHistory,
+    Browser,
 )
 from .backgroundjob import BackgroundJobController
 
@@ -285,6 +287,7 @@ def system_setup_for_news(request):
     setup_views_for_news()
     common_initialize_entry_rules()
     setup_search_suggestions(request)
+    Browser.read_browser_setup()
 
     return True
 
@@ -332,6 +335,7 @@ def system_setup_for_gallery(request):
     setup_views_for_gallery()
     common_initialize_entry_rules()
     setup_search_suggestions(request)
+    Browser.read_browser_setup()
 
     return True
 
@@ -385,6 +389,7 @@ def system_setup_for_search_engine(request):
     setup_views_for_search_engine()
     common_initialize_entry_rules()
     setup_search_suggestions(request)
+    Browser.read_browser_setup()
 
     # we don't want blocklist to be enabled for search engine
     # blocklist initialization takes a lot of time, there is a lot of entries

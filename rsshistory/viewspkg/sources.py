@@ -109,10 +109,10 @@ class SourceDetailView(generic.DetailView):
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
 
         context["additional_links"] = []
-        handler = YouTubeVideoJsonHandler(entry.link)
+        handler = YouTubeVideoJsonHandler(self.object.url)
         if handler.is_handled_by():
             context["additional_links"].append(handler.get_channel_url())
-        handler = OdyseeVideoHandler(entry.link)
+        handler = OdyseeVideoHandler(self.object.url)
         if handler.is_handled_by():
             context["additional_links"].append(handler.get_channel_url())
 

@@ -137,7 +137,7 @@ class UrlHandlerEx(object):
             for rule in rules:
                 if rule.browser:
                     browsers = self.bring_to_front(
-                        browsers, rule.browser.get_setup(True)
+                        browsers, rule.browser.get_setup()
                     )
 
         return browsers

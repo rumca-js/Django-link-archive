@@ -3,14 +3,9 @@ import argparse
 from webtoolkit import (
     RssPage,
     HtmlPage,
+    RemoteUrl,
 )
 from utils.services import OpenRss
-
-from rsshistory.webtools import (
-    Url,
-    WebConfig,
-    HttpPageHandler,
-)
 
 
 class PageDisplay(object):
@@ -20,12 +15,7 @@ class PageDisplay(object):
         else:
             verbose = False
 
-        # if parser.args.remote_server:
-        #    options.mode_mapping = WebConfig.get_init_crawler_config(
-        #        remote_server=parser.args.remote_server
-        #    )
-
-        u = Url(url)
+        u = RemoteUrl(url)
         u.get_response()
 
         properties = u.get_properties(full=True)

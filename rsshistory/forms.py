@@ -1005,13 +1005,11 @@ class BrowserEditForm(forms.ModelForm):
             "enabled",
             "name",
             "priority",
-            "crawler",
             "settings",
         ]
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
-        self.fields["crawler"].widget.attrs["readonly"] = True
 
         self.fields["settings"].widget = forms.Textarea(attrs={"rows": 10, "cols": 20})
