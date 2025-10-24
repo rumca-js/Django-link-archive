@@ -28,7 +28,6 @@ from webtoolkit import (
     json_decode_field,
 
     WebLogger,
-    WebConfig,
 )
 
 from ..models import (
@@ -367,12 +366,6 @@ class FakeInternetTestCase(TestCase):
 
     def disable_web_pages(self):
         WebLogger.web_logger = AppLogging
-        WebConfig.get_default_crawler = FakeInternetTestCase.get_default_crawler
-        WebConfig.get_crawler_from_mapping = (
-            FakeInternetTestCase.get_crawler_from_mapping
-        )
-        WebConfig.get_crawler_from_string = 
-            FakeInternetTestCase.get_crawler_from_string
 
         RemoteServer.get_getj = self.get_getj
         RemoteServer.get_socialj = self.get_socialj

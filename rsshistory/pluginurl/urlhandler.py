@@ -287,6 +287,9 @@ class UrlHandlerEx(object):
         if not response:
             return False
 
+        if "is_valid" not in response:
+            return False
+
         if not response["is_valid"]:
             return False
 
@@ -302,7 +305,7 @@ class UrlHandlerEx(object):
         if not response:
             return False
 
-        if response["is_invalid"]:
+        if "is_invalid" in response and response["is_invalid"]:
             return True
 
         blocked = self.is_blocked()
