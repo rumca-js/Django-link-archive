@@ -271,7 +271,7 @@ def source_add_form(request):
 
     url = UrlHandlerEx.get_cleaned_link(url)
 
-    if not UrlLocation.is_protocolled_link(url):
+    if not UrlLocation(url).is_protocolled_link():
         p.context["summary_text"] = (
             "Only protocolled links are allowed. Link:{}".format(url)
         )

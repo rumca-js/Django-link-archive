@@ -55,6 +55,7 @@ class UrlHandlerEx(object):
                 return
 
             mode_mapping = self.browsers
+            AppLogging.debug("Browser mapping", detail_text=mode_mapping)
 
             return self.get_properties_internal_mode_mapping(
                 remote_server, mode_mapping
@@ -97,6 +98,8 @@ class UrlHandlerEx(object):
                     continue
 
                 if self.is_server_error():
+                    AppLogging.debug(f"{self.url}: Crawling server error",
+                               detail_text = str(self.all_properties))
                     raise IOError(f"{self.url}: Crawling server error")
 
                 """
@@ -327,6 +330,8 @@ class UrlHandlerEx(object):
 
         if status_code == HTTP_STATUS_CODE_SERVER_ERROR:
             return True
+
+        return False
 
     def is_blocked(self):
         reason = EntryRules.is_url_blocked(self.url)

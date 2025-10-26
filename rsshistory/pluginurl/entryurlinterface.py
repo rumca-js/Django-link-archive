@@ -1,7 +1,6 @@
 from utils.dateutils import DateUtils
-from utils.inputcontent import InputContent
-from webtoolkit import RemoteServer
 
+from webtoolkit import RemoteServer, ContentText
 from webtoolkit import UrlLocation
 
 from ..apps import LinkDatabase
@@ -137,8 +136,8 @@ class EntryUrlInterface(object):
                 )
 
         if not self.is_property_set(input_props, "description"):
-            cm = InputContent(input_props["description"])
-            input_props["description"] = cm.strip_html_attrs()
+            cm = ContentText(input_props["description"])
+            input_props["description"] = cm.noattrs()
 
         age = EntryRules.get_age_for_dictionary(input_props)
         if age:

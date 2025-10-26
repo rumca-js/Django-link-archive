@@ -16,7 +16,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from webtoolkit import InputContent
+from webtoolkit import ContentText
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
@@ -455,7 +455,7 @@ class UserComments(models.Model):
         return UserComments.objects.create(user=user, entry=entry, comment=comment)
 
     def get_comment(self):
-        return InputContent(self.comment).htmlify()
+        return ContentText(self.comment).htmlify()
 
     def cleanup(cfg=None):
         if cfg and "verify" in cfg:

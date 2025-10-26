@@ -41,20 +41,20 @@ from ..controllers import SystemOperationController
 from ..configuration import Configuration
 from ..pluginurl import UrlHandlerEx
 
-from .fake.remoteserver import (
+from webtoolkit.tests.fake.remoteserver import (
     remote_server_json,
 )
-from .fake.geekwirecom import (
+from webtoolkit.tests.fake.geekwirecom import (
     geekwire_feed,
 )
-from .fake.firebog import (
+from webtoolkit.tests.fake.firebog import (
     firebog_adguard_list,
     firebog_w3kbl_list,
     firebog_tick_lists,
     firebog_malware,
 )
 
-from .fake.instance import (
+from webtoolkit.tests.fake.instance import (
     instance_entries_json,
     instance_sources_json_empty,
     instance_entries_json_empty,

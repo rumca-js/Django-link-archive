@@ -15,7 +15,7 @@ from utils.services import (
 from webtoolkit import (
     UrlLocation,
     RemoteUrl,
-    InputContent,
+    ContentText,
     status_code_to_text,
     json_encode_field,
 )
@@ -903,4 +903,4 @@ class EntryGenericPlugin(object):
         if not description or description == "":
             return ""
 
-        return """{}""".format(InputContent(description).htmlify())
+        return """{}""".format(ContentText(description).htmlify())

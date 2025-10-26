@@ -13,8 +13,6 @@ class LinkDatabase(AppConfig):
     verbose_name = "Personal link database"
 
     def ready(self):
-        # print("App Ready {}".format(LinkDatabase.name))
-        # atexit.register(cleanup_on_exit)
         pass
 
     def info(message):
