@@ -41,9 +41,6 @@ from ..controllers import SystemOperationController
 from ..configuration import Configuration
 from ..pluginurl import UrlHandlerEx
 
-from webtoolkit.tests.fake.remoteserver import (
-    remote_server_json,
-)
 from webtoolkit.tests.fake.geekwirecom import (
     geekwire_feed,
 )
@@ -371,6 +368,7 @@ class FakeInternetTestCase(TestCase):
         RemoteServer.get_socialj = self.get_socialj
         RemoteServer.get_feedsj = self.get_feedsj
         RemoteServer.get_pingj = self.get_pingj
+        RemoteServer.get_infoj = self.get_infoj
 
         UrlHandlerEx.ping = (
             FakeInternetTestCase.ping
@@ -402,8 +400,6 @@ class FakeInternetTestCase(TestCase):
         return True
 
     def get_getj(self, request=None, url=None):
-        # print("FakeInternet:get_getj: Url:{}".format(url))
-        # return json.loads(remote_server_json)
         MockRequestCounter.requested(url=url, info=request)
 
         data = FakeInternetData(url)
@@ -430,6 +426,18 @@ class FakeInternetTestCase(TestCase):
 
     def get_pingj(self, request=None, url=None):
         return True
+
+    def get_infoj(self):
+      data = {"crawlers": [
+        {
+          "enabled": True,
+          "name": "DefaultCrawler",
+          "settings": {
+            "timeout_s": 20
+          }
+        }
+        ]
+     }
 
     def check_crawling_server(self, thread_id):
         return True

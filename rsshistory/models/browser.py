@@ -15,8 +15,8 @@ class Browser(models.Model):
 
     enabled = models.BooleanField(default=True)
     priority = models.IntegerField(default=0)
-
     name = models.CharField(default="", max_length=2000)
+    ignore_errors = models.BooleanField(default=False)
 
     settings = models.CharField(
         max_length=2000, blank=True
@@ -45,10 +45,9 @@ class Browser(models.Model):
 
     def read_browser_setup():
         """
-        Reads default WebConfig browser config, and applies it to model
+        Reads configuration from the remote
         """
         from ..configuration import Configuration
-        # Browser.objects.all().delete()
 
         start_index = Browser.objects.all().count()
 
@@ -73,7 +72,7 @@ class Browser(models.Model):
                     settings=settings,
                 )
 
-    def get_browser_setup():
+    def get_browsers():
         """
         """
         browser_mapping = []
@@ -100,6 +99,7 @@ class Browser(models.Model):
         browser_config = {
             "name": self.name,
             "priority": self.priority,
+            "ignore_errors": self.ignore_errors,
             "settings": settings,
         }
 

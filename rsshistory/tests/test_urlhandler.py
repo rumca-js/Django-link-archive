@@ -4,13 +4,6 @@ from webtoolkit import (
 )
 from ..models import Browser, EntryRules
 
-from ..webtools import (
-    HttpPageHandler,
-    YouTubeVideoHandler,
-    ScriptCrawler,
-    SeleniumChromeFull,
-)
-
 from ..pluginurl.urlhandler import UrlHandlerEx
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
@@ -25,13 +18,11 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         browser1 = Browser.objects.create(
             name="test1",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
         browser2 = Browser.objects.create(
             name="test2",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
@@ -54,13 +45,11 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         browser1 = Browser.objects.create(
             name="test1",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
         browser2 = Browser.objects.create(
             name="test2",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
@@ -89,13 +78,11 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         browser1 = Browser.objects.create(
             name="test1",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
         browser2 = Browser.objects.create(
             name="test2",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
@@ -117,13 +104,11 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         browser1 = Browser.objects.create(
             name="test1",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
         browser2 = Browser.objects.create(
             name="test2",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
@@ -146,13 +131,11 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         browser1 = Browser.objects.create(
             name="test1",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
         browser2 = Browser.objects.create(
             name="test2",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
@@ -187,13 +170,11 @@ class UrlHandlerExTest(FakeInternetTestCase):
     def test_get_properties__browsers(self):
         browser1 = Browser.objects.create(
             name="test1",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something", "timeout_s" : 20}',
         )
 
         browser2 = Browser.objects.create(
             name="test2",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something", "timeout_s" : 20}',
         )
 

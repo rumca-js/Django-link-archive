@@ -687,3 +687,11 @@ class BackgroundJobController(BackgroundJob):
         entries = LinkDataModel.objects.filter(id=entry_id)
         if entries.exists():
             return entries[0]
+
+    def cleanup(cfg):
+        pass
+
+    def truncate(cfg):
+        if "enabled" in cfg:
+            jobs = BackgroundJobController.objects.filter(*cfg)
+            jobs.delete()

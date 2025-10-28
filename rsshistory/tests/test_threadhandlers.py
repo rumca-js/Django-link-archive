@@ -233,6 +233,83 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         self.assertEqual(DomainsController.objects.all().count(), 0)
 
 
+class TruncateTableJobHandlerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
+
+    def truncate_sources__all(self):
+
+        source = SourceDataController.objects.create(
+            url="https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        )
+
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_TRUNCATE_TABLE,
+            subject="SourceDataController",
+        )
+
+        handler = TruncateTableJobHandler()
+        handler.process(job)
+
+        self.assertEqual(SourceDataController.objects.all().count(), 0)
+
+    def truncate_sources__disabled(self):
+
+        source = SourceDataController.objects.create(
+            url="https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
+            enabled=False
+        )
+
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_TRUNCATE_TABLE,
+            subject="SourceDataController",
+            args=json.dumps({"enabled": False}),
+        )
+
+        handler = TruncateTableJobHandler()
+        handler.process(job)
+
+        self.assertEqual(SourceDataController.objects.all().count(), 0)
+
+    def truncate_jobs__all(self):
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_CLEANUP,
+            subject="DomainsController",
+        )
+
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_TRUNCATE_TABLE,
+            subject="BackgroundJobController",
+        )
+
+        handler = TruncateTableJobHandler()
+        handler.process(job)
+
+        self.assertEqual(SourceDataController.objects.all().count(), 0)
+
+    def truncate_jobs__disabled(self):
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_CLEANUP,
+            subject="DomainsController",
+            enabled=False,
+        )
+
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_TRUNCATE_TABLE,
+            subject="BackgroundJobController",
+            args=json.dumps({"enabled": False}),
+        )
+
+        handler = TruncateTableJobHandler()
+        handler.process(job)
+
+        self.assertEqual(SourceDataController.objects.all().count(), 0)
+
+
 class LinkAddJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()

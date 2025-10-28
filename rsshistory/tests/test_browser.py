@@ -1,13 +1,5 @@
 from ..models import Browser
 
-from ..webtools import (
-    RequestsCrawler,
-    SeleniumChromeHeadless,
-    SeleniumChromeFull,
-    SeleniumUndetected,
-    ScriptCrawler,
-    StealthRequestsCrawler,
-)
 from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
@@ -59,7 +51,7 @@ class BrowserTest(FakeInternetTestCase):
         browsers = Browser.objects.all()
         self.assertEqual(init_value, browsers.count())
 
-    def test_get_browser_setup__default(self):
+    def test_get_browsers_default(self):
         Browser.read_browser_setup()
         browsers = Browser.objects.all()
         self.assertTrue(browsers.count() > 0)
@@ -71,7 +63,7 @@ class BrowserTest(FakeInternetTestCase):
         self.assertEqual(setup[0]["name"], "RequestsCrawler")
         self.assertEqual(setup[0]["crawler"], RequestsCrawler)
 
-    def test_get_browser_setup__string(self):
+    def test_get_browsers_string(self):
         Browser.read_browser_setup()
         browsers = Browser.objects.all()
         self.assertTrue(browsers.count() > 0)

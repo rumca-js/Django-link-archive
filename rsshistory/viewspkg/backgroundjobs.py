@@ -223,6 +223,26 @@ def backgroundjob_remove(request, pk):
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
 
+def backgroundjobs_remove_disabled(request):
+    p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if not p.is_allowed():
+        return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+    json_obj = {}
+    json_obj["status"] = True
+
+    jobs = BackgroundJobController.objects.filter(enabled=False)
+
+    if jobs.count() > 1000:
+        BackgroundJobController.create_single_job("truncate", "BackgroundJobController", cfg={"enabled":False})
+        json_obj["message"] = "Added remove job"
+    else:
+        jobs.delete()
+        json_obj["message"] = "Removed all disabled jobs"
+
+    return JsonResponse(json_obj, json_dumps_params={"indent": 4})
+
+
 def backgroundjobs_remove_all(request):
     p = SimpleViewPage(request, ConfigurationEntry.ACCESS_TYPE_STAFF)
     if not p.is_allowed():

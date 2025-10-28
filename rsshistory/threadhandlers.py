@@ -1169,6 +1169,9 @@ class CleanupJobHandler(BaseJobHandler):
             BackgroundJob.JOB_CLEANUP, subject="SystemOperation", args=args
         )
         BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_CLEANUP, subject="BackgroundJobController", args=args
+        )
+        BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CLEANUP, subject="UserTags", args=args
         )
         BackgroundJobController.create_single_job(
@@ -1238,6 +1241,8 @@ class CleanupJobHandler(BaseJobHandler):
             SystemOperationController.cleanup(cfg)
         if table == "all" or table == "Gateway":
             Gateway.cleanup(cfg)
+        if table == "all" or table == "BackgroundJobController":
+            BackgroundJobController.cleanup(cfg)
 
         if table == "all" or table == "UserTags":
             UserTags.cleanup(cfg)
@@ -1306,6 +1311,9 @@ class TruncateTableJobHandler(BaseJobHandler):
         )
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_TRUNCATE_TABLE, subject="SystemOperation", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_TRUNCATE_TABLE, subject="BackgroundJobController", args=args
         )
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_TRUNCATE_TABLE, subject="UserTags", args=args
@@ -1380,6 +1388,8 @@ class TruncateTableJobHandler(BaseJobHandler):
             SystemOperationController.truncate(cfg)
         if table == "all" or table == "Gateway":
             Gateway.truncate(cfg)
+        if table == "all" or table == "Gateway":
+            BackgroundJobController.truncate(cfg)
 
         if table == "all" or table == "UserTags":
             UserTags.truncate(cfg)

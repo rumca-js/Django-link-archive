@@ -1,5 +1,5 @@
 from utils.dateutils import DateUtils
-from ..webtools import YouTubeVideoHandler
+from webtoolkit import YouTubeVideoHandler
 
 from ..pluginurl.entryurlinterface import EntryUrlInterface
 from ..controllers import SourceDataController

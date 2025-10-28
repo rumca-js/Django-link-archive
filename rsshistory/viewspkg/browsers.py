@@ -139,6 +139,33 @@ def enable(request, pk):
         return p.render("go_back.html")
 
 
+def browser_add(request):
+    p = ViewPage(request)
+    p.set_title("Add browser")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    if request.method == "POST":
+        form = BrowserEditForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse("{}:browsers".format(LinkDatabase.name))
+            )
+        else:
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
+
+    form = BrowserEditForm()
+    form.method = "POST"
+    form.action_url = reverse("{}:browser-add".format(LinkDatabase.name))
+
+    p.context["form"] = form
+
+    return p.render("form_basic.html")
+
+
 def edit(request, pk):
     p = ViewPage(request)
     p.set_title("Edit browser")

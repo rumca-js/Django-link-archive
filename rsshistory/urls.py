@@ -151,6 +151,7 @@ urlpatterns = [
     path("backgroundjobs-disable-all/", backgroundjobs.backgroundjobs_disable_all, name="backgroundjobs-disable-all",),
     path("backgroundjob-remove/<int:pk>/", backgroundjobs.backgroundjob_remove, name="backgroundjob-remove",),
     path("backgroundjobs-remove/<str:job_type>/", backgroundjobs.backgroundjobs_remove, name="backgroundjobs-remove",),
+    path("backgroundjobs-remove-disabled/", backgroundjobs.backgroundjobs_remove_disabled, name="backgroundjobs-remove-disabled",),
     path("backgroundjobs-remove-all/", backgroundjobs.backgroundjobs_remove_all, name="backgroundjobs-remove-all",),
     # domains
     path("domains/", domains.domains, name="domains",),
@@ -265,6 +266,7 @@ urlpatterns = [
     path("user-credentials/", credentials.UserListView.as_view(), name="user-credentials",),
     # browser
     path("browsers/", browsers.BrowserListView.as_view(), name="browsers",),
+    path("browser-add/", browsers.browser_add, name="browser-add",),
     path("browser-read/", browsers.read_browser_setup, name="browser-read",),
     path("browser-apply/", browsers.apply_browser_setup, name="browser-apply",),
     path("browser-enable/<int:pk>/", browsers.enable, name="browser-enable",),

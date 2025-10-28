@@ -32,7 +32,7 @@ class UrlHandlerEx(object):
 
         self.browsers = browsers
         if not browsers:
-            self.browsers = Browser.get_browser_setup()
+            self.browsers = Browser.get_browsers()
             self.browsers = self.get_browsers()
 
         self.all_properties = None
@@ -97,7 +97,9 @@ class UrlHandlerEx(object):
                     )
                     continue
 
-                if self.is_server_error():
+                ignore_errors = crawler_data.get("ignore_errors")
+
+                if self.is_server_error() and not ignore_errors:
                     AppLogging.debug(f"{self.url}: Crawling server error",
                                detail_text = str(self.all_properties))
                     raise IOError(f"{self.url}: Crawling server error")

@@ -1005,6 +1005,7 @@ class BrowserEditForm(forms.ModelForm):
             "enabled",
             "name",
             "priority",
+            "ignore_errors",
             "settings",
         ]
 

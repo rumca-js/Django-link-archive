@@ -2,7 +2,6 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
-from ..webtools import SeleniumChromeHeadless, SeleniumChromeFull
 
 from ..controllers import (
     SourceDataController,
@@ -26,12 +25,10 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.browser = Browser.objects.create(
             name="RequestsCrawler",
-            crawler="SeleniumChromeHeadless",
             settings='{"test_setting" : "something"}',
         )
         self.browser_selenium = Browser.objects.create(
             name="SeleniumChromeHeadless",
-            crawler="SeleniumChromeHeadless",
             settings='{"test_setting" : "something"}',
         )
         self.browser.refresh_from_db()

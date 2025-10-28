@@ -3,6 +3,9 @@
 {% block content %}
 
 <div class="container">
+    <a href="{% url 'rsshistory:browser-add' %}" title="Add a new browser" class="btn btn-primary" role="button">
+       {% include "rsshistory/icon_add.html" %}
+    </a>
     <a href="{% url 'rsshistory:browser-read' %}" title="Reads browser setup from webtools" class="btn btn-primary" role="button">
         Read
     </a>
@@ -28,7 +31,6 @@
                     {% endif %}
                     Prio:{{browser.priority}}
                     Name:{{browser.name}}
-                    Crawler:{{browser.crawler}}
 		 </a>
              </div>
 
