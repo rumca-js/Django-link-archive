@@ -8,7 +8,7 @@ from django.templatetags.static import static
 from django.utils import timezone
 from django.conf import settings
 
-from webtoolkit import UrlLocation
+from webtoolkit import UrlLocation, is_status_code_valid, is_status_code_invalid
 from utils.dateutils import DateUtils
 from utils.controllers import GenericEntryController
 
@@ -626,11 +626,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         return True
 
     def is_status_code_valid(self):
-        from ..pluginurl import UrlHandlerEx
-
-        handler = UrlHandlerEx(self.link)
-
-        if handler.is_status_code_invalid(self.status_code):
+        if is_status_code_invalid(self.status_code):
             return False
 
         return True

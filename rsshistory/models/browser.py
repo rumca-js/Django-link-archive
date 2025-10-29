@@ -73,37 +73,7 @@ class Browser(models.Model):
                 )
 
     def get_browsers():
-        """
-        """
-        browser_mapping = []
-        for browser in Browser.objects.all():
-            if not browser.enabled:
-                continue
-
-            browser_config = browser.get_setup()
-            if "enabled" in browser_config:
-                del browser_config["enabled"]
-
-            browser_mapping.append(browser_config)
-
-        return browser_mapping
-
-    def get_setup(self):
-        settings = {}
-        if self.settings != None and self.settings != "":
-            try:
-                settings = json.loads(self.settings)
-            except ValueError as E:
-                AppLogging.exc(E, "Cannot load browser settings")
-
-        browser_config = {
-            "name": self.name,
-            "priority": self.priority,
-            "ignore_errors": self.ignore_errors,
-            "settings": settings,
-        }
-
-        return browser_config
+        return Browser.objects.filter(enabled=True)
 
     def reset_priorities():
         browsers = list(Browser.objects.all().order_by("priority"))

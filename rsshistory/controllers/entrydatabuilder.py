@@ -4,7 +4,7 @@ import ipaddress
 from django.db import models
 from django.db.models import Q, F
 
-from webtoolkit import UrlLocation
+from webtoolkit import UrlLocation, is_status_code_invalid
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -118,8 +118,6 @@ class EntryDataBuilder(object):
         return entry
 
     def build_from_link(self, link=None, ignore_errors=False):
-        from ..pluginurl import UrlHandlerEx
-
         if link:
             self.link = link
 
@@ -127,7 +125,7 @@ class EntryDataBuilder(object):
         TODO extract this to a separate class?
         """
         self.ignore_errors = ignore_errors
-        self.link = UrlHandlerEx.get_cleaned_link(self.link)
+        self.link = UrlLocation.get_cleaned_link(self.link)
         if not self.link:
             return
 
@@ -241,14 +239,11 @@ class EntryDataBuilder(object):
         )
 
     def is_link_data_valid_for_auto_add(self, link_data):
-        from ..pluginurl import UrlHandlerEx
-
         if not self.is_property_set(link_data, "title"):
             return False
 
         if "status_code" in link_data and link_data["status_code"]:
-            h = UrlHandlerEx(link_data["link"])
-            if h.is_status_code_invalid(link_data["status_code"]):
+            if is_status_code_invalid(link_data["status_code"]):
                 return False
 
         if "is_valid" in link_data and not link_data["is_valid"]:
@@ -257,8 +252,6 @@ class EntryDataBuilder(object):
         return True
 
     def build_from_props(self, ignore_errors=False):
-        from ..pluginurl import UrlHandlerEx
-
         self.ignore_errors = ignore_errors
 
         if "link" not in self.link_data:
@@ -270,7 +263,7 @@ class EntryDataBuilder(object):
 
         obj = None
 
-        self.link_data["link"] = UrlHandlerEx.get_cleaned_link(self.link_data["link"])
+        self.link_data["link"] = UrlLocation.get_cleaned_link(self.link_data["link"])
         self.link = self.link_data["link"]
 
         if not self.is_enabled_to_store_link():

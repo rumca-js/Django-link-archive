@@ -5,6 +5,7 @@ from webtoolkit import (
     RemoteServer,
     UrlLocation,
     PageRequestObject,
+    is_status_code_valid,
     HTTP_STATUS_UNKNOWN,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
     HTTP_STATUS_USER_AGENT,
@@ -44,6 +45,8 @@ class UrlHandlerEx(object):
         return self.get_properties_internal()
 
     def get_properties_internal(self):
+        config_entry = Configuration.get_object().config_entry
+
         remote_server = Configuration.get_object().get_remote_server()
         if remote_server:
             if self.is_remote_server_down():
@@ -54,52 +57,37 @@ class UrlHandlerEx(object):
                 )
                 return
 
-            mode_mapping = self.browsers
-            AppLogging.debug("Browser mapping", detail_text=mode_mapping)
-
             return self.get_properties_internal_mode_mapping(
-                remote_server, mode_mapping
+                remote_server, self.browsers
             )
 
-    def get_properties_internal_mode_mapping(self, request_server, mode_mapping):
+    def get_properties_internal_mode_mapping(self, request_server, browsers):
         config_entry = Configuration.get_object().config_entry
         name = ""
 
-        # try default server setup
-        #self.all_properties = request_server.get_getj(self.url)
-        #if self.all_properties:
-        #    if not self.is_another_request_necessary():
-        #        return self.all_properties
-        # TODO reaneble this code?
-        # it may result in two selenium calls one at start
-        # if so we could skip those from mode_mapping
+        # Here was code to call "default" crawler from crawler buddy
+        # This might end up with 2 selenium calls, where here, one later
 
-        if mode_mapping and len(mode_mapping) > 0:
-            for crawler_data in mode_mapping:
-                if "name" in crawler_data:
-                    name = crawler_data["name"]
-
+        if browsers and len(browsers) > 0:
+            for browser in browsers:
                 AppLogging.debug(
-                    "Url:{} Remote server request.\nCrawler:{}\nSettings:{}".format(
-                        self.url, name, crawler_data["settings"]
+                    "Url:{} Remote server request.\nBrowser:{}".format(
+                        self.url, browser,
                     )
                 )
 
-                request = PageRequestObject(self.url)
-                request.crawler_name = crawler_data["name"]
+                request = self.browser_to_request(browser)
 
                 self.all_properties = request_server.get_getj(request)
                 if not self.all_properties:
                     AppLogging.warning(
-                        "Url:{} Could not communicate with remote server, crawler_data:{}".format(
-                            self.url, str(crawler_data)
+                        "Url:{} Could not communicate with remote server, Browser:{}".format(
+                            self.url, browser
                         )
                     )
                     continue
 
-                ignore_errors = crawler_data.get("ignore_errors")
-
-                if self.is_server_error() and not ignore_errors:
+                if self.is_server_error() and not browser.ignore_errors:
                     AppLogging.debug(f"{self.url}: Crawling server error",
                                detail_text = str(self.all_properties))
                     raise IOError(f"{self.url}: Crawling server error")
@@ -134,6 +122,11 @@ class UrlHandlerEx(object):
 
         return self.all_properties
 
+    def browser_to_request(self, browser):
+        request = PageRequestObject(self.url)
+        request.crawler_name = browser.name
+        return request
+
     def get_browsers(self):
         browsers = self.browsers
 
@@ -142,18 +135,23 @@ class UrlHandlerEx(object):
             for rule in rules:
                 if rule.browser:
                     browsers = self.bring_to_front(
-                        browsers, rule.browser.get_setup()
+                        browsers, rule.browser.id
                     )
 
         return browsers
 
-    def bring_to_front(self, browsers, input_data):
-        result = [input_data]
-        for mode_data in browsers:
-            if mode_data == input_data:
+    def bring_to_front(self, browsers, browser_id):
+        result = []
+
+        id_browsers = Browsers.objects.filter(id = browser_id)
+        if id_browsers.exists():
+            result.append(id_browsers[0])
+
+        for browser in browsers:
+            if browser.id == browser_id:
                 continue
 
-            result.append(mode_data)
+            result.append(browser)
 
         return result
 
@@ -205,24 +203,6 @@ class UrlHandlerEx(object):
         if "thumbnail" in properties:
             return properties["thumbnail"]
 
-    def is_status_code_invalid(self, status_code):
-        """
-        Only page statuses
-        """
-        if status_code >= 200 and status_code <= 400:
-            return False
-
-        if status_code == HTTP_STATUS_UNKNOWN:
-            return False
-        if status_code == HTTP_STATUS_USER_AGENT:
-            return False
-        if status_code == HTTP_STATUS_TOO_MANY_REQUESTS:
-            return False
-        if status_code == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
-            return False
-
-        return True
-
     def is_another_request_necessary(self):
         """
         Commonly, if user agent is not welcome
@@ -233,11 +213,6 @@ class UrlHandlerEx(object):
 
         if "status_code" in response:
             status_code = response["status_code"]
-            if status_code == HTTP_STATUS_USER_AGENT:
-                return True
-
-            if status_code == HTTP_STATUS_TOO_MANY_REQUESTS:
-                return True
 
             if status_code == HTTP_STATUS_CODE_CONNECTION_ERROR:
                 return False
@@ -245,14 +220,10 @@ class UrlHandlerEx(object):
             if status_code == HTTP_STATUS_CODE_PAGE_UNSUPPORTED:
                 return False
 
-            if status_code == HTTP_STATUS_CODE_SERVER_ERROR:
-                #server error might be on one crawler, but does not have to be in another
-                return True
+            # even though we receive 404 the site might detect our bot
+            # so we can attempt with other crawlers
 
-            if status_code == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
-                return True
-
-            return self.is_status_code_invalid(status_code)
+            return not is_status_code_valid(status_code)
 
     def get_contents(self):
         """
