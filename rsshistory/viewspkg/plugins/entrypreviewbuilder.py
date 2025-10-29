@@ -1,4 +1,4 @@
-from webtoolkit import OdyseeVideoHandler, YouTubeVideoJsonHandler
+from webtoolkit import OdyseeVideoHandler, YouTubeVideoHandler
 
 from .entryyoutubeplugin import EntryYouTubePlugin
 from .entryodyseeplugin import EntryOdyseePlugin
@@ -15,7 +15,7 @@ class EntryPreviewBuilder(object):
     """
 
     def get(entry, user=None):
-        youtube_handler = YouTubeVideoJsonHandler(entry.link)
+        youtube_handler = YouTubeVideoHandler(entry.link)
         if youtube_handler.is_handled_by():
             return EntryYouTubePlugin(entry, user)
 

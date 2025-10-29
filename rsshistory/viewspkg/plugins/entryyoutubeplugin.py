@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.templatetags.static import static
 
-from webtoolkit import YouTubeVideoJsonHandler
+from webtoolkit import YouTubeVideoHandler
 
 from ...apps import LinkDatabase
 from ...models import ConfigurationEntry
@@ -86,7 +86,7 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         return buttons
 
     def get_video_code(self):
-        h = YouTubeVideoJsonHandler(self.entry.link)
+        h = YouTubeVideoHandler(self.entry.link)
         return h.get_video_code()
 
     def get_frame(self):
@@ -94,7 +94,7 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         @note Some YouTube videos will not play without referrerpolicy.
         """
 
-        h = YouTubeVideoJsonHandler(self.entry.link)
+        h = YouTubeVideoHandler(self.entry.link)
         return '<iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe>'.format(
             h.get_link_embed()
         )

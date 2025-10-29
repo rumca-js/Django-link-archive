@@ -1,6 +1,6 @@
 from pathlib import Path
 from webtoolkit import InputContent
-from webtoolkit import YouTubeVideoJsonHandler
+from webtoolkit import YouTubeVideoHandler
 
 from ..basictypes import fix_path_for_os
 
@@ -117,7 +117,7 @@ class HtmlEntryExporter(object):
         return text
 
     def get_preview(self):
-        h = YouTubeVideoJsonHandler(url=self.entry.link)
+        h = YouTubeVideoHandler(url=self.entry.link)
 
         if h.is_handled_by():
             return '<div class="youtube_player_container"><iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'.format(
