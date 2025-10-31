@@ -186,7 +186,13 @@ class SourceGenericPlugin(SourcePluginInterface):
 
         c = Configuration.get_object().config_entry
         if c.remote_webtools_server_location:
-            url_ex = UrlHandlerEx(page_link)
+
+            entry = self.get_source_entry()
+            if entry:
+                url_ex = UrlHandlerEx(entry=entry)
+            else:
+                url_ex = UrlHandlerEx(url=page_link)
+
             self.all_properties = url_ex.get_properties()
             self.response = url_ex.get_response()
 
@@ -205,6 +211,17 @@ class SourceGenericPlugin(SourcePluginInterface):
                 return
 
             return self.contents
+
+    def get_source_entry(self):
+        source = self.get_source()
+
+        if not source.url:
+            return
+
+        entries = LinkDataController.objects.filter(link = source.url)
+        if entries.exists():
+            for entry in entries:
+                return entry
 
     def get_address(self):
         source = self.get_source()

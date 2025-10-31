@@ -100,46 +100,26 @@ function getIsEntryDownloaded(attempt = 1) {
 
 
 let currentEntryOperationalParamters = 0;
-function getThisEntryOperationalParameters(attempt = 1) {
-    getEntryOperationalParamters({{object.id}}, function (data) {
-        let html_out = "";
+function fillEntryOperationalParameters(attempt = 1) {
+   if (entry_json_data == null)
+   {
+       return;
+   }
+   let entry = entry_json_data.link;
 
-        if (data) {
-          if (data.status) {
-              data.parameters.forEach(parameter => {
-                  let title = parameter.title || parameter.name;
-                  let name = escapeHtml(parameter.name);
-                  let description = escapeHtml(parameter.description);
+   let param_text = getEntryOpParameters(entry);
 
-                  html_out += `<div class="text-nowrap mx-1"
-                      title="${title}"
-                      >
-                         <strong>${name}:</strong>
-                         ${description}
-                      </div>`;
-              });
-
-              if (html_out) {
-                  html_out = "<h1>Parameters</h1>" + html_out;
-              }
-
-              $("#entryOperationalParameters").html(html_out);
-          }
-        }
-    });
+   $("#entryOperationalParameters").html(param_text);
 }
 
 
 function fillEntryParameters() {
    console.log(`fillEntryParameters ${entry_json_data} ${entry_dislike_data}`);
 
-   console.log("entry parameters 0");
    if (entry_json_data == null)
    {
-       console.log("entry parameters 1");
        return;
    }
-   console.log("entry parameters 2");
    let entry = entry_json_data.link;
 
    let parameters = getEntryParameters(entry, entry_dislike_data);
@@ -244,6 +224,7 @@ function updateEntryProperties() {
     $('#editTagsButton').show();
 
     fillEntryParameters();
+    fillEntryOperationalParameters();
 }
 
 
@@ -493,7 +474,6 @@ $(document).on('click', '#cancelTagEdit', function() {
 
 getEntryProperties();
 getEntryRelated();
-getThisEntryOperationalParameters();
 getThisEntrySocialData();
 getIsEntryDownloaded();
 getEntryTags();

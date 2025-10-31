@@ -449,6 +449,7 @@ class LinkInputForm(forms.Form):
 class LinkPropertiesForm(forms.Form):
     link = forms.CharField(label="Link", max_length=500)
     browser = forms.IntegerField(widget=forms.Select(choices=()), required=False)
+    handler_name = forms.CharField(label="Handler type", max_length=500)
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)

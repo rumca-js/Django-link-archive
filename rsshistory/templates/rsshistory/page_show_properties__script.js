@@ -134,11 +134,14 @@ function fillData(data) {
 
 
 let currentgetPageProperties = 0;
-function getPageProperties(page_url, browser, attempt = 1) {
+function getPageProperties(page_url, attempt = 1) {
     let requestgetPageProperties = ++currentgetPageProperties;
 
+    const browser = $('#id_browser').val();
+    const handler_name = $('#id_handler_name').val();
+
     let encodedPageUrl = encodeURIComponent(page_url);
-    let url = `{% url 'rsshistory:json-page-properties' %}?link=${encodedPageUrl}&browser=${browser}`;
+    let url = `{% url 'rsshistory:json-page-properties' %}?link=${encodedPageUrl}&browser=${browser}&handler_name=${handler_name}`;
 
     let spinner_text = getSpinnerText(`Fetching... ${url}`);
     $("#formResponse").html(spinner_text);
@@ -174,7 +177,7 @@ function getPageProperties(page_url, browser, attempt = 1) {
            }
            if (attempt < 3) {
                addError("Could not obtain information. Retry");
-               getPageProperties(page_url, browser, attempt + 1);
+               getPageProperties(page_url, attempt + 1);
            } else {
                addError("Could not obtain information. Error");
                $('.btnFilterTrigger').prop("disabled", false);
@@ -212,7 +215,6 @@ function fetchLinkSuggestions(page_url) {
 
 function OnUserInput() {
     const page_url = $('#id_link').val();
-    const browser = $('#id_browser').val();
 
     $('#Errors').html("")
     $('#formResponse').html("")
@@ -223,7 +225,7 @@ function OnUserInput() {
 
     $('.btnFilterTrigger').prop("disabled", true);
 
-    getPageProperties(page_url, browser);
+    getPageProperties(page_url);
 }
 
 

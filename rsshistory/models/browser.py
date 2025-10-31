@@ -6,7 +6,6 @@ from django.conf import settings
 from .system import AppLogging
 
 from ..apps import LinkDatabase
-from .entries import LinkDataModel
 
 
 class Browser(models.Model):
@@ -17,6 +16,7 @@ class Browser(models.Model):
     priority = models.IntegerField(default=0)
     name = models.CharField(default="", max_length=2000)
     ignore_errors = models.BooleanField(default=False)
+    handler_name = models.CharField(blank=True, max_length=2000)
 
     settings = models.CharField(
         max_length=2000, blank=True

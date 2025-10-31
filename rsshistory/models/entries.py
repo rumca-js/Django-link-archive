@@ -17,6 +17,7 @@ from ..apps import LinkDatabase
 from .sources import SourceDataModel
 from .system import AppLogging
 from .domains import Domains
+from .browser import Browser
 
 
 class BaseLinkDataModel(models.Model):
@@ -725,7 +726,7 @@ class LinkDataModel(BaseLinkDataController):
     source = models.ForeignKey(
         SourceDataModel,
         on_delete=models.SET_NULL,
-        related_name="link_source",
+        related_name="entries",
         null=True,
         blank=True,
     )
@@ -736,6 +737,14 @@ class LinkDataModel(BaseLinkDataController):
         null=True,
         blank=True,
     )
+    last_browser = models.ForeignKey(
+        Browser,
+        on_delete=models.SET_NULL,
+        related_name="entries",
+        null=True,
+        blank=True,
+    )
+
     # user who added entry
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -761,7 +770,7 @@ class ArchiveLinkDataModel(BaseLinkDataController):
     source = models.ForeignKey(
         SourceDataModel,
         on_delete=models.SET_NULL,
-        related_name="archive_source",
+        related_name="archive_entries",
         null=True,
         blank=True,
     )
@@ -772,6 +781,14 @@ class ArchiveLinkDataModel(BaseLinkDataController):
         null=True,
         blank=True,
     )
+    last_browser = models.ForeignKey(
+        Browser,
+        on_delete=models.SET_NULL,
+        related_name="archive_entries",
+        null=True,
+        blank=True,
+    )
+
     # user who added entry
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

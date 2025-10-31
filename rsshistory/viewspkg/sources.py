@@ -8,8 +8,12 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
-from webtoolkit import UrlLocation
-from webtoolkit import OdyseeVideoHandler, YouTubeVideoHandler
+from webtoolkit import (
+    OdyseeVideoHandler,
+    YouTubeVideoHandler,
+    is_status_code_invalid,
+    UrlLocation,
+)
 
 from utils.omnisearch import SingleSymbolEvaluator
 
@@ -344,7 +348,7 @@ def source_add_form(request):
     # errors
     if not page.is_protocolled_link():
         errors.append("Not a protocolled link. Forget http:// or https:// etc.?")
-    if u.is_status_code_invalid(status_code):
+    if is_status_code_invalid(status_code):
         errors.append("Information about page availability could not be obtained")
     if EntryRules.is_url_blocked(link):
         errors.append("Entry is blocked by entry rules")

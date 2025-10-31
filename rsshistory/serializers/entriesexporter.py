@@ -4,7 +4,7 @@ from string import Template
 from django.db.models import Q
 from django.forms.models import model_to_dict
 
-from webtoolkit import json_encode_field
+from webtoolkit import json_encode_field, status_code_to_text
 
 from utils.serializers.converters import (
     ModelCollectionConverter,
@@ -292,6 +292,7 @@ def entry_to_json(user_config, entry, tags=False, social=False):
         json_entry["description_safe"] = "Not appropriate"
     else:
         json_entry["description_safe"] = entry.get_description_safe()
+
     json_entry["link"] = entry.link
     json_entry["link_absolute"] = entry.get_absolute_url()
     json_entry["is_valid"] = entry.is_valid()
@@ -308,13 +309,21 @@ def entry_to_json(user_config, entry, tags=False, social=False):
     json_entry["page_rating_contents"] = entry.page_rating_contents
     json_entry["page_rating_votes"] = entry.page_rating_votes
     json_entry["age"] = entry.age
+    json_entry["status_code"] = entry.status_code
+    json_entry["status_code_str"] = status_code_to_text(entry.status_code)
 
     json_entry["source__title"] = ""
     json_entry["source__url"] = ""
     json_entry["backgroundcolor"] = None
     json_entry["alpha"] = 1.0
+
     json_entry["contents_hash"] = json_encode_field(entry.contents_hash)
     json_entry["body_hash"] = json_encode_field(entry.body_hash)
+
+    if entry.last_browser:
+        json_entry["last_browser"] = str(entry.last_browser)
+    else:
+        json_entry["last_browser"] = ""
 
     if hasattr(entry, "source"):
         if entry.source:

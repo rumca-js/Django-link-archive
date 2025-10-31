@@ -10,7 +10,12 @@ from django.db.models import Q
 
 from collections import OrderedDict
 
-from webtoolkit import UrlLocation, ContentLinkParser, RemoteUrl
+from webtoolkit import (
+    UrlLocation,
+    ContentLinkParser,
+    RemoteUrl,
+    is_status_code_invalid,
+)
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -91,7 +96,7 @@ def get_errors(page_url):
         errors.append("Information about page availability could not be obtained")
     if response:
         code = response.get_status_code()
-        if page_url.is_status_code_invalid(code):
+        if is_status_code_invalid(code):
             errors.append("Invalid status code")
 
     if page_url.is_blocked():

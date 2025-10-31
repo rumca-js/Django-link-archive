@@ -89,17 +89,19 @@ def get_request_url_with_browser(input_map):
     browser = get_request_browser(input_map)
 
     if browser:
-        browsers = [browser.get_setup()]
+        browsers = [browser]
     else:
         browsers = None
 
     page_link = input_map["link"]
+    handler_name = None
 
-    settings = {}
-    if "html" in input_map:
-        settings["handler_class"] = "HttpPageHandler"  # TODO should not be hardcoded?
+    if browser:
+        request = UrlHandlerEx.browser_to_request(page_link, browser)
 
-    url_ex = UrlHandlerEx(page_link, settings=settings, browsers=browsers)
+    handler_name = input_map.get("handler_name")
+
+    url_ex = UrlHandlerEx(page_link, browsers=browsers, handler_name=handler_name)
     return url_ex
 
 

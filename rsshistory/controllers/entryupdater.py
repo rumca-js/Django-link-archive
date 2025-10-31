@@ -193,11 +193,8 @@ class EntryUpdater(object):
 
         entry = self.entry
 
-        url = UrlHandlerEx(self.entry.link)
+        url = UrlHandlerEx(entry = self.entry)
         url.get_response()
-
-        if url.is_server_error():
-            raise IOError(f"{self.entry.link}: Crawling server error")
 
         if url.is_blocked():
             if entry.is_removable():
@@ -278,11 +275,8 @@ class EntryUpdater(object):
 
         entry = self.entry
 
-        url = UrlHandlerEx(self.entry.link)
+        url = UrlHandlerEx(entry=self.entry)
         url.get_response()
-
-        if url.is_server_error():
-            raise IOError(f"{self.entry.link}: Crawling server error")
 
         if url.is_blocked():
             if entry.is_removable():

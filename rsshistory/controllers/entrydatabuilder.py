@@ -194,6 +194,9 @@ class EntryDataBuilder(object):
         )
 
         self.link_data = url.get_props()
+        if not self.link_data:
+            self.errors.append("Url:{}. Could not obtain link data".format(self.link))
+            return
 
         # we do not want to obtain properties for non-domain entries, if we capture only
         # domains

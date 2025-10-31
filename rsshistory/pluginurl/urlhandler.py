@@ -24,12 +24,18 @@ from ..configuration import Configuration
 class UrlHandlerEx(object):
     """ """
 
-    def __init__(self, url=None, settings=None, browsers=None):
-        self.url = url
+    def __init__(self, url=None, browsers=None, last_browser=None, entry=None, handler_name=None):
+        if entry and not url:
+            url = entry.link
 
-        self.settings = settings
-        if not self.settings:
-            self.settings = {}
+        self.url = url
+        self.entry = entry
+
+        self.handler_name = handler_name
+        if entry:
+            self.last_browser = entry.last_browser
+        else:
+            self.last_browser = last_browser
 
         self.browsers = browsers
         if not browsers:
@@ -70,13 +76,15 @@ class UrlHandlerEx(object):
 
         if browsers and len(browsers) > 0:
             for browser in browsers:
+                self.last_browser = browser
+
                 AppLogging.debug(
                     "Url:{} Remote server request.\nBrowser:{}".format(
                         self.url, browser,
                     )
                 )
 
-                request = self.browser_to_request(browser)
+                request = UrlHandlerEx.browser_to_request(self.url, browser)
 
                 self.all_properties = request_server.get_getj(request)
                 if not self.all_properties:
@@ -107,6 +115,10 @@ class UrlHandlerEx(object):
                     continue
 
                 if self.all_properties:
+                    if self.entry:
+                        self.entry.last_browser = self.last_browser
+                        self.entry.save()
+
                     return self.all_properties
         else:
             request = PageRequestObject(self.url)
@@ -122,13 +134,22 @@ class UrlHandlerEx(object):
 
         return self.all_properties
 
-    def browser_to_request(self, browser):
-        request = PageRequestObject(self.url)
+    def browser_to_request(url, browser, handler_name = None):
+        request = PageRequestObject(url)
         request.crawler_name = browser.name
+        if browser.handler_name:
+            request.handler_name = browser.handler_name
+        if handler_name:
+            request.handler_name = handler_name
         return request
 
     def get_browsers(self):
         browsers = self.browsers
+
+        if self.last_browser:
+            browsers = self.bring_to_front(
+                 browsers, self.last_browser.id
+            )
 
         rules = EntryRules.get_url_rules(self.url)
         if len(rules) > 0:
@@ -143,7 +164,7 @@ class UrlHandlerEx(object):
     def bring_to_front(self, browsers, browser_id):
         result = []
 
-        id_browsers = Browsers.objects.filter(id = browser_id)
+        id_browsers = Browser.objects.filter(id = browser_id)
         if id_browsers.exists():
             result.append(id_browsers[0])
 
