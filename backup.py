@@ -707,10 +707,10 @@ def main():
 
     if args.workspace:
         all = sorted(list(get_workspaces()))
-        if args.workspace in all:
-            workspaces = [args.workspace]
-        else:
-            print("No such workspace!")
+        if not args.workspace in all:
+            print("{} No such workspace!".format(args.workspace))
+
+        workspaces = [args.workspace]
     else:
         workspaces = get_workspaces()
 
