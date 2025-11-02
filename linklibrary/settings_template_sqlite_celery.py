@@ -162,7 +162,7 @@ if MEMCACHED_SERVER:
 	}
 
 WORKSPACES = [ "rsshistory"]
-TASKS_INFO = [
+PROCESSORS_INFO = [
         [300.0, "RefreshProcessor"],
         [60.0, "SourceJobsProcessor"],
         [60.0, "WriteJobsProcessor"],

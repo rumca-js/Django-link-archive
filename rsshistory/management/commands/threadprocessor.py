@@ -19,7 +19,7 @@ from django.conf import settings
 from workspace import get_workspaces
 
 
-def process_workspace(workspace, processor_class_name, tasks_info, check_memory):
+def process_workspace(workspace, processor_class_name, processors_list, thread_name, check_memory):
     # Importing tasks and processor modules
     try:
         threadprocessors_module = importlib.import_module(
@@ -38,7 +38,10 @@ def process_workspace(workspace, processor_class_name, tasks_info, check_memory)
 
     # Call the task with the processor class
     try:
-        return threadprocessors_module.process_job_task(processor_class, tasks_info, check_memory)
+        return threadprocessors_module.process_job_task(Processor=processor_class,
+                                                        processors_list=processors_list,
+                                                        thread_name=thread_name,
+                                                        check_memory=check_memory)
     except Exception as e:
         print("Error while processing jobs for: ", str(e), processor_class)
         error_text = traceback.format_exc()
@@ -49,10 +52,12 @@ class Command(BaseCommand):
     help = "Runs a background worker indefinitely"
 
     def add_arguments(self, parser):
-        parser.add_argument("--thread", type=str, help="Thread name")
+        parser.add_argument("--process", type=str, help="Process name")
+        parser.add_argument("--thread", type=str, help="Thread in process")
 
     def handle(self, *args, **options):
         thread = options["thread"]
+        process = options["process"]
 
         print(f"{thread}: Starting...")
 
@@ -71,10 +76,11 @@ class Command(BaseCommand):
 
             for workspace in get_workspaces():
                 more_jobs_now = process_workspace(
-                     workspace,
-                     thread,
-                     settings.TASKS_INFO,
-                     check_memory,
+                     workspace=workspace,
+                     processor_class_name=process,
+                     processors_list=settings.PROCESSORS_INFO,
+                     thread_name=thread,
+                     check_memory=check_memory,
                 )
                 if more_jobs_now:
                     more_jobs = True

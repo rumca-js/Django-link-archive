@@ -77,19 +77,23 @@ from .threadhandlers import (
 from .configuration import Configuration
 
 
-class ThreadProcessorInterface(object):
-    def __init__(self, tasks_info=None, check_memory=False):
+class ProcessorInterface(object):
+    def __init__(self, processors_list=None, thread_name=None, check_memory=False):
         c = Configuration.get_object()
         self.start_processing_time = None
         self.start_memory = c.get_memory_usage()
         self.check_memory = check_memory
-        self.tasks_info = tasks_info
+        self.processors_list = processors_list
+        self.thread_name = thread_name
 
     def run(self):
         raise NotImplementedError("Not implemented")
 
     def get_name(self):
-        return self.__class__.__name__
+        if self.thread_name:
+            return "{}@{}".format(self.__class__.__name__, self.thread_name)
+        else:
+            return self.__class__.__name__
 
     def get_handlers(self):
         """
@@ -168,11 +172,7 @@ class ThreadProcessorInterface(object):
         if virtual_diff > 0:
             AppLogging.warning(f"{name}: More memory virtual memory {virtual_diff}")
 
-    def get_handler_and_object(self):
-        """
-        TODO select should be based on priority
-        """
-
+    def get_query_conditions(self):
         jobs = self.get_supported_jobs()
         if len(jobs) == 0:
             return []
@@ -185,6 +185,19 @@ class ThreadProcessorInterface(object):
                 jobs_conditions |= Q(job=ajob)
 
             query_conditions &= jobs_conditions
+
+        if self.thread_name:
+            query_conditions &= (Q(task=self.thread_name) | Q(task__isnull=True))
+
+        return query_conditions
+
+    def get_handler_and_object(self):
+        """
+        TODO select should be based on priority
+        """
+        query_conditions = self.get_query_conditions()
+
+        # AppLogging.debug("Query conditions:{}".format(query_conditions))
 
         # order is in meta
         objs = BackgroundJobController.objects.filter(query_conditions)
@@ -204,7 +217,7 @@ class ThreadProcessorInterface(object):
         return []
 
 
-class RefreshProcessor(ThreadProcessorInterface):
+class RefreshProcessor(ProcessorInterface):
     """!
     One of the most important tasks.
     It checks what needs to be done, and produces 'new' tasks'.
@@ -213,8 +226,8 @@ class RefreshProcessor(ThreadProcessorInterface):
     Mostly it should only add background jobs, and nothing more!
     """
 
-    def __init__(self, tasks_info=None, check_memory=False):
-        super().__init__(tasks_info=tasks_info, check_memory=check_memory)
+    def __init__(self, processors_list=None, thread_name=None, check_memory=False):
+        super().__init__(processors_list=processors_list, thread_name=thread_name, check_memory=check_memory)
 
     def run(self):
         self.run_one_job()
@@ -268,16 +281,15 @@ class RefreshProcessor(ThreadProcessorInterface):
         return [BackgroundJob.JOB_REFRESH]
 
 
-class GenericJobsProcessor(ThreadProcessorInterface):
+class GenericJobsProcessor(ProcessorInterface):
     """!
     @note Uses handler priority when processing jobs.
     """
 
-    def __init__(self, timeout_s=60 * 1, tasks_info=None, check_memory=False):
+    def __init__(self, processors_list=None, thread_name=None, check_memory=False, timeout_s=60 * 1):
         """ """
-        super().__init__(tasks_info=tasks_info, check_memory=check_memory)
+        super().__init__(processors_list=processors_list, thread_name=thread_name, check_memory=check_memory)
         self.timeout_s = timeout_s
-        self.tasks_info = tasks_info
 
     def run(self):
         if not self.perform_run_checks():
@@ -426,7 +438,7 @@ class GenericJobsProcessor(ThreadProcessorInterface):
             handler = handler_class(config)
 
             if obj:
-                obj.task = self.get_name()
+                obj.task = self.thread_name
                 obj.save()
 
             if handler:
@@ -452,31 +464,6 @@ class GenericJobsProcessor(ThreadProcessorInterface):
                     deleted = True
 
     def get_supported_jobs(self):
-        return []
-
-    def get_handler_and_object(self):
-        """
-        TODO select should be based on priority
-        """
-
-        jobs = self.get_supported_jobs()
-
-        query_conditions = Q(enabled=True)
-        if len(jobs) > 0:
-            jobs_conditions = Q()
-
-            for ajob in jobs:
-                jobs_conditions |= Q(job=ajob)
-
-            query_conditions &= jobs_conditions
-
-        # order is in meta
-        objs = BackgroundJobController.objects.filter(query_conditions)
-        if objs.exists():
-            obj = objs.first()
-
-            handler = self.get_job_handler(obj)
-            return [obj, handler]
         return []
 
     def get_job_handler(self, obj):
@@ -578,7 +565,7 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
     def get_supported_jobs(self):
         jobs = []
 
-        if not self.tasks_info:
+        if not self.processors_list:
             AppLogging.error("Task info not yet ready")
             return
 
@@ -608,7 +595,7 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
         TODO remove hardcoded code
         """
         processors = []
-        for task_info in self.tasks_info:
+        for task_info in self.processors_list:
             processor = processor_from_id(task_info[1])
 
             if processor:
@@ -651,7 +638,7 @@ class OneTaskProcessor(GenericJobsProcessor):
         leftover_processor.run()
 
 
-def process_jobs_task(Processor, tasks_info, check_memory):
+def process_jobs_task(Processor, processors_list, thread_name, check_memory):
     """!
     Processes all jobs for task
     """
@@ -661,7 +648,7 @@ def process_jobs_task(Processor, tasks_info, check_memory):
 
     c.config_entry = ConfigurationEntry.get()
 
-    handler = Processor(tasks_info=tasks_info, check_memory=check_memory)
+    handler = Processor(processors_list=processors_list, thread_name=thread_name, check_memory=check_memory)
 
     handler.run()
 
@@ -672,7 +659,7 @@ def process_jobs_task(Processor, tasks_info, check_memory):
     return more_jobs
 
 
-def process_job_task(Processor, tasks_info, check_memory):
+def process_job_task(Processor, processors_list, thread_name, check_memory):
     """!
     Processes on job for task
     """
@@ -682,7 +669,7 @@ def process_job_task(Processor, tasks_info, check_memory):
 
     c.config_entry = ConfigurationEntry.get()
 
-    handler = Processor(tasks_info=tasks_info, check_memory=check_memory)
+    handler = Processor(processors_list=processors_list, thread_name=thread_name, check_memory=check_memory)
 
     status = handler.run_one_job()
 

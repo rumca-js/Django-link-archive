@@ -28,7 +28,10 @@ function getTemplate(job) {
 
           ${!job.enabled ? '[DISABLED]' : ''}
 
-          ${job.priority} <b>${job.job}</b>
+          ${job.priority}
+
+          <b>${job.job}</b>
+          ${job.task}
 
           ${job.subject}
 

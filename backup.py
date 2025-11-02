@@ -707,8 +707,10 @@ def main():
 
     if args.workspace:
         all = sorted(list(get_workspaces()))
-        if not args.workspace in all:
-            print("{} No such workspace!".format(args.workspace))
+        if args.workspace not in all:
+            answer = input("No such workspace! Do you want to make the export?")
+            if answer != "y":
+                return
 
         workspaces = [args.workspace]
     else:

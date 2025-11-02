@@ -67,7 +67,13 @@ class SourceListView(object):
         self.query_filter = SourceFilter(
             self.request.GET, user=self.user, init_objects=self.get_init_query_set()
         )
-        return self.query_filter.get_filtered_objects()
+        objects = self.query_filter.get_filtered_objects()
+
+        order_by = self.get_order_by()
+        if order_by:
+            return objects.order_by(*order_by)
+
+        return objects
 
     def get_init_query_set(self):
         return SourceDataController.objects.all()
@@ -83,6 +89,10 @@ class SourceListView(object):
     def get_title(self):
         return "Sources"
 
+    def get_order_by(self):
+        order = self.request.GET.get("order")
+        if order:
+            return order.split(",")
 
 class SourcesEnabledListView(SourceListView):
     def get_init_query_set(self):
@@ -182,8 +192,6 @@ def sources(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:sources".format(LinkDatabase.name))
 
-    # TODO jquery that
-    # user_choices = UserSearchHistory.get_user_choices(request.user)
     user_choices = []
     context = get_generic_search_init_context(request, filter_form, user_choices)
 
