@@ -4,6 +4,7 @@
 let entry_json_data = null;
 let entry_related_data = null;
 let entry_dislike_data = null;
+let entry_operational = null;
 let is_downloading = false;
 let is_updating = false;
 let is_resetting = false;
@@ -99,15 +100,26 @@ function getIsEntryDownloaded(attempt = 1) {
 }
 
 
-let currentEntryOperationalParamters = 0;
+function getThisEntryOperationalParameters(attempt = 1) {
+    getEntryOperationalParamters({{object.id}}, function (data) {
+        let html_out = "";
+
+        if (data) {
+          if (data.status) {
+              entry_operational = data.parameters;
+              fillEntryOperationalParameters();
+          }
+        }
+    });
+}
+
+
 function fillEntryOperationalParameters(attempt = 1) {
-   if (entry_json_data == null)
+   if (entry_operational == null)
    {
        return;
    }
-   let entry = entry_json_data.link;
-
-   let param_text = getEntryOpParameters(entry);
+   let param_text = getEntryOpParameters(entry_operational);
 
    $("#entryOperationalParameters").html(param_text);
 }
@@ -149,9 +161,6 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, errorInHtml 
        type: 'GET',
        timeout: 10000,
        success: function(data) {
-           //if (getDynamicContentRequestTracker[url_address] !== requestId) {
-           //    return;
-           //}
            $(htmlElement).html(data.message);
 
            if (data.status) {
@@ -162,10 +171,6 @@ function getDynamicJsonContentWithRefresh(url_address, htmlElement, errorInHtml 
            }
        },
        error: function(xhr, status, error) {
-           //if (getDynamicContentRequestTracker[url_address] !== requestId) {
-           //    return;
-           //}
-           //getDynamicJsonContentWithRefresh(url_address, htmlElement, errorInHtml);
        }
     });
 }
@@ -478,3 +483,4 @@ getThisEntrySocialData();
 getIsEntryDownloaded();
 getEntryTags();
 getEntryMenu();
+getThisEntryOperationalParameters();

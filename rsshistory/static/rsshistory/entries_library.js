@@ -560,7 +560,7 @@ function getEntryOpParameters(entry) {
 
     text += `
     <h3>Parameters</h3>
-    <div title="Points:Page rating|User rating|Page contents rating">Points: ${entry.page_rating}|${entry.page_rating_votes}|${entry.page_rating_contents}</div>
+    <div title="Points:Page rating|User rating|Page contents rating|Number of total visits">Points: ${entry.page_rating}|${entry.page_rating_votes}|${entry.page_rating_contents}|${entry.page_rating_visits}</div>
     `;
 
     if (entry.date_created) {
@@ -568,8 +568,8 @@ function getEntryOpParameters(entry) {
         text += `<div>Creation date:${date_created}</div>`;
     }
 
-    if (entry.date_updated) {
-        date_updated = parseDate(entry.date_updated);
+    if (entry.date_update_last) {
+        date_updated = parseDate(entry.date_update_last);
         text += `<div>Update date:${date_updated}</div>`;
     }
     if (entry.date_last_modified) {
@@ -635,6 +635,14 @@ function getEntryOpParameters(entry) {
 
     if (entry.permanent != null) {
        text += `<div>Permanent: ${entry.permanent}</div>`;
+    }
+
+    if (entry.user_bookmarked != null) {
+       text += `<div>User Bookmarked: ${entry.user_bookmarked}</div>`;
+    }
+
+    if (entry.user_visits != null) {
+       text += `<div>User Visits: ${entry.user_visits}</div>`;
     }
 
     return text;

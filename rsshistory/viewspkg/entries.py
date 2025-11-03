@@ -19,7 +19,7 @@ from webtoolkit import UrlLocation
 
 from ..apps import LinkDatabase
 
-from ..serializers import entry_to_json
+from ..serializers import entry_to_json, entry_parameters_json
 
 from ..models import (
     BaseLinkDataController,
@@ -1057,7 +1057,7 @@ def entry_json(request, pk):
     entry = entries[0]
     user_config = UserConfig.get(request.user)
 
-    entry_json = entry_to_json(user_config, entry, tags=True, social=True)
+    entry_json = entry_to_json(user_config, entry, with_tags=True, with_social=True)
 
     read_laters = ReadLater.objects.filter(entry=entry, user=request.user)
     entry_json["read_later"] = read_laters.exists()
@@ -1113,7 +1113,7 @@ def handle_json_view(request, view_to_use):
 
         if page_num <= p.num_pages:
             for entry in page_obj:
-                entry_json = entry_to_json(user_config, entry, tags=True, social=True)
+                entry_json = entry_to_json(user_config, entry, with_tags=True, with_social=True)
 
                 read_laters = ReadLater.objects.filter(entry=entry, user=request.user)
                 entry_json["read_later"] = read_laters.exists()
@@ -1515,18 +1515,12 @@ def entry_op_parameters(request, pk):
     if not entries.exists():
         return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
+    user_config = UserConfig.get(request.user)
     entry = entries[0]
+    parameters = entry_parameters_json(user_config, entry)
 
-    object_controller = EntryPreviewBuilder.get(entry, request.user)
-    for parameter in object_controller.get_parameters_operation():
-        adict = {}
-
-        adict["name"] = parameter.name
-        adict["title"] = parameter.title
-        adict["description"] = parameter.description
-
-        json_obj["parameters"].append(adict)
-        json_obj["status"] = True
+    json_obj["parameters"] = parameters
+    json_obj["status"] = True
 
     return JsonResponse(json_obj, json_dumps_params={"indent": 4})
 
@@ -1559,7 +1553,7 @@ def entry_related_json(request, pk):
         entries = UserEntryTransitionHistory.get_related_list(request.user, entry_main)
 
         for entry in entries:
-            entry_json = entry_to_json(user_config, entry, tags=show_tags)
+            entry_json = entry_to_json(user_config, entry, with_tags=show_tags)
 
             json_obj["entries"].append(entry_json)
 

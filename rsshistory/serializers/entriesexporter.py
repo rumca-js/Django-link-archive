@@ -19,7 +19,12 @@ from utils.serializers import (
 )
 
 from ..controllers import SourceDataController, LinkDataController
-from rsshistory.models import SocialData
+from rsshistory.models import (
+   SocialData,
+   UserTags,
+   UserBookmarks,
+   UserEntryVisitHistory,
+)
 
 
 
@@ -265,7 +270,7 @@ class MainExporter(object):
         return entries.order_by(*self.get_order_columns())
 
 
-def entry_to_json(user_config, entry, tags=False, social=False):
+def entry_to_json(user_config, entry, with_tags=False, with_social=False, with_visits=False):
     json_entry = {}
     json_entry["id"] = entry.id
 
@@ -308,6 +313,8 @@ def entry_to_json(user_config, entry, tags=False, social=False):
     json_entry["language"] = entry.language
     json_entry["page_rating_contents"] = entry.page_rating_contents
     json_entry["page_rating_votes"] = entry.page_rating_votes
+    json_entry["page_rating_visits"] = entry.page_rating_visits
+    json_entry["page_rating"] = entry.page_rating
     json_entry["age"] = entry.age
     json_entry["status_code"] = entry.status_code
     json_entry["status_code_str"] = status_code_to_text(entry.status_code)
@@ -346,7 +353,7 @@ def entry_to_json(user_config, entry, tags=False, social=False):
             if not json_entry["thumbnail"] and entry.source:
                 json_entry["thumbnail"] = entry.source.get_favicon()
 
-    if tags and hasattr(entry, "tags"):
+    if with_tags and hasattr(entry, "tags"):
         tags = set()
         if entry.tags:
             for tag in entry.tags.all():
@@ -354,11 +361,86 @@ def entry_to_json(user_config, entry, tags=False, social=False):
 
         json_entry["tags"] = list(tags)
 
-    if social:
+        user_tags = set()
+        user_tags_objects = UserTags.objects.filter(user = user_config.user, entry=entry)
+        for tag in user_tags_objects:
+           user_tags.add(tag.tag)
+
+        json_entry["user_tags"] = list(tags)
+
+    bookmarks = UserBookmarks.objects.filter(user=user_config.user, entry=entry)
+    json_entry["user_bookmarked"] = bookmarks.count() > 0
+
+    if with_social:
         social = SocialData.get(entry)
         if social:
             social_dict = model_to_dict(social)
             for key, value in social_dict.items():
                 json_entry.setdefault(key, value)
+
+    if with_visits:
+        visits = UserEntryVisitHistory.objects.filter(user=user_config.user, entry=entry)
+        if visits.exists():
+            json_entry["user_visits"] = visits[0].visits
+        else:
+            json_entry["user_visits"] = 0
+
+    return json_entry
+
+
+def entry_parameters_json(user_config, entry):
+    json_entry = {}
+    json_entry["id"] = entry.id
+
+    user_inappropate = (
+        entry.age != 0 and entry.age != None and entry.age > user_config.get_age()
+    )
+
+    json_entry["is_valid"] = entry.is_valid()
+    json_entry["date_created"] = entry.date_created
+    json_entry["date_published"] = entry.date_published
+    json_entry["date_dead_since"] = entry.date_dead_since
+    json_entry["date_update_last"] = entry.date_update_last
+    json_entry["date_last_modified"] = entry.date_last_modified
+    json_entry["bookmarked"] = entry.bookmarked
+    json_entry["permanent"] = entry.permanent
+    json_entry["author"] = entry.author
+    json_entry["album"] = entry.album
+    json_entry["language"] = entry.language
+    json_entry["page_rating_contents"] = entry.page_rating_contents
+    json_entry["page_rating_votes"] = entry.page_rating_votes
+    json_entry["page_rating_visits"] = entry.page_rating_visits
+    json_entry["page_rating"] = entry.page_rating
+    json_entry["age"] = entry.age
+    json_entry["status_code"] = entry.status_code
+    json_entry["status_code_str"] = status_code_to_text(entry.status_code)
+
+    json_entry["backgroundcolor"] = None
+    json_entry["alpha"] = 1.0
+
+    json_entry["contents_hash"] = json_encode_field(entry.contents_hash)
+    json_entry["body_hash"] = json_encode_field(entry.body_hash)
+
+    if entry.last_browser:
+        json_entry["last_browser"] = str(entry.last_browser)
+    else:
+        json_entry["last_browser"] = ""
+
+    if hasattr(entry, "source"):
+        if entry.source:
+            json_entry["backgroundcolor"] = entry.source.entries_backgroundcolor
+            json_entry["backgroundcolor_alpha"] = (
+                entry.source.entries_backgroundcolor_alpha
+            )
+            json_entry["alpha"] = entry.source.entries_alpha
+
+    bookmarks = UserBookmarks.objects.filter(user=user_config.user, entry=entry)
+    json_entry["user_bookmarks"] = bookmarks.count() > 0
+
+    visits = UserEntryVisitHistory.objects.filter(user=user_config.user, entry=entry)
+    if visits.exists():
+        json_entry["user_visits"] = visits[0].visits
+    else:
+        json_entry["user_visits"] = 0
 
     return json_entry

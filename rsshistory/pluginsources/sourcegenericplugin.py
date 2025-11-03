@@ -210,6 +210,13 @@ class SourceGenericPlugin(SourcePluginInterface):
                 self.dead = True
                 return
 
+            source = self.get_source()
+            if source:
+                thumbnail = url_ex.get_thumbnail()
+                if thumbnail:
+                    source.favicon = thumbnail
+                    source.save()
+
             return self.contents
 
     def get_source_entry(self):
