@@ -251,8 +251,8 @@ function getEntrySourceTitle(entry) {
 
 function getEntrySourceUrl(entry) {
     let source_url = "";
-    if (entry.source__url) {
-       source_url = entry.source__url;
+    if (entry.source_url) {
+       source_url = entry.source_url;
     }
     return source_url;
 }
@@ -340,7 +340,7 @@ function getEntryDescription(entry) {
   if (!entry.description)
     return "";
 
-  const content = new InputContent(entry.description);
+  const content = new ContentDisplay(entry.description);
   let content_text = content.htmlify();
 
   content_text = content_text.replace(/(\r\n|\r|\n)/g, "<br>");
@@ -352,17 +352,17 @@ function getEntryDescriptionSafe(entry) {
   if (!entry.description)
     return "";
 
-  let content = new InputContent(entry.description);
+  let content = new ContentDisplay(entry.description);
   let content_text = content.nohtml();
 
-  content = new InputContent(content_text);
+  content = new ContentDisplay(content_text);
   content_text = content.noattrs();
 
-  content = new InputContent(content_text);
+  content = new ContentDisplay(content_text);
   content_text = content.linkify();
 
   if (entry.thumbnail != null) {
-    content = new InputContent(content_text);
+    content = new ContentDisplay(content_text);
     content_text = content.removeImgs(entry.thumbnail);
   }
 
@@ -856,7 +856,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
                         ${source__title} ${date_published} ${author}
                     </div>
                     <div class="text-reset mx-2">${tags_text} ${language_text}</div>
-		    <div class="entry-social">${social}</div>
+                    <div class="entry-social">${social}</div>
                 </div>
 
                 <div class="mx-2 ms-auto" entryBadges="true">
@@ -920,7 +920,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                   <span style="font-weight:bold" class="text-reset" entryTitle="true">${title_safe}</span>
                   <div class="text-reset text-decoration-underline" entryDetails="true">@ ${entry.link}</div>
                   <div class="text-reset mx-2">${tags_text} ${language_text}</div>
-		  <div class="entry-social">${social}</div>
+                  <div class="entry-social">${social}</div>
                </div>
 
                <div class="mx-2 ms-auto">
@@ -988,9 +988,9 @@ function entryContentCentricTemplate(entry, show_icons = true, small_icons = fal
             class="my-1 p-1 list-group-item list-group-item-action ${bookmark_class} border rounded"
         >
             <a class="d-flex mx-2"
-	       href="${entry_link}"
+               href="${entry_link}"
                title="${hover_title}"
-	    >
+            >
                <div class="text-wrap">
                   <span style="font-weight:bold" class="h3 text-body" entryTitle="true">${title_safe}</span>
                   <div class="text-body text-decoration-underline">@ ${entry.link}</div>
@@ -1000,7 +1000,7 @@ function entryContentCentricTemplate(entry, show_icons = true, small_icons = fal
             <div class="mx-2">
                <a href="${entry_link}" title="${hover_title}">
                ${thumbnail_text}
-	       </a>
+               </a>
             </div>
 
             <!--div class="mx-2">
@@ -1106,7 +1106,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
                     <span style="font-weight: bold" class="text-primary" entryTitle="true">${title_safe}</span>
                     <div class="link-list-item-description" entryDetails="true">${source__title}</div>
                     <div class="text-reset mx-2">${tags_text} ${language_text}</div>
-		    <div class="entry-social">${social}</div>
+                    <div class="entry-social">${social}</div>
                 </div>
             </div>
         </a>
@@ -1170,7 +1170,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
                     <span style="font-weight: bold" class="text-primary" entryTitle="true">${title_safe}</span>
                     <div class="link-list-item-description" entryDetails="true">${source__title}</div>
                     <div class="text-reset mx-2">${tags_text} ${language_text}</div>
-		    <div class="entry-social">${social}</div>
+                    <div class="entry-social">${social}</div>
                 </div>
             </div>
         </a>
