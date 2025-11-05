@@ -258,16 +258,15 @@ class UrlHandlerEx(object):
             return
 
         for item in contents_data:
-            if item != "Binary":
-                return contents_data[item]
+           return item["text"]
 
     def get_binary(self):
         contents_data = self.get_section("Streams")
         if not contents_data:
             return
 
-        if "Binary" in contents_data:
-            return contents_data["Binary"]
+        for item in contents_data:
+           return item["binary"]
 
     def get_section(self, section_name):
         properties = self.get_properties()

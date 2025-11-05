@@ -92,7 +92,10 @@ class EntryUpdater(object):
             if "status_code" in response:
                 entry.status_code = response["status_code"]
             if "body_hash" in response:
-                body_hash = base64.b64decode(response["body_hash"])
+                if response["body_hash"]:
+                    body_hash = base64.b64decode(response["body_hash"])
+                else:
+                    body_hash = None
                 entry.body_hash = body_hash
             if "hash" in response:
                 contents_hash = base64.b64decode(response["hash"])

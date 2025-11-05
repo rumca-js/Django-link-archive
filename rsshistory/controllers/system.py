@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from django.conf import settings
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -9,6 +11,7 @@ from ..models import (
 )
 from ..configuration import Configuration
 from .backgroundjob import BackgroundJobController
+from ..pluginurl import UrlHandlerEx
 
 
 class SystemOperationController(object):
@@ -64,18 +67,16 @@ class SystemOperationController(object):
         except Exception as E:
             AppLogging.exc(E)
 
-    def cleanup(cfg=None, thread_ids=None):
-        if thread_ids:
-            # delete any obsolte
-            current_thread_ids = SystemOperationController.get_threads()
-
-            diff_elements = set(current_thread_ids) - set(thread_ids)
-            for diff in diff_elements:
-                rows = SystemOperation.objects.filter(thread_id=diff)
-                rows.delete()
-            return
-
+    def cleanup(cfg=None):
         thread_ids = SystemOperationController.get_threads()
+
+        # delete any obsolte
+        current_thread_ids = SystemOperationController.get_modele_threads()
+
+        diff_elements = set(current_thread_ids) - set(thread_ids)
+        for diff in diff_elements:
+            rows = SystemOperation.objects.filter(thread_id=diff)
+            rows.delete()
 
         check_types = SystemOperation.objects.values_list(
             "check_type", flat=True
@@ -110,8 +111,6 @@ class SystemOperationController(object):
         test_page_url = config_entry.internet_status_test_url
         if test_page_url == "" or not test_page_url:
             return True
-
-        from ..pluginurl import UrlHandlerEx
 
         if not UrlHandlerEx.ping(test_page_url):
             AppLogging.error("Cannot ping test page {}".format(test_page_url))
@@ -193,6 +192,19 @@ class SystemOperationController(object):
         return [thread_id, date, status]
 
     def get_threads():
+        result = set()
+
+        processors_infos = settings.PROCESSORS_INFO
+
+        for processors_info in processors_infos:
+            processor_name = processors_info[1]
+            thread_name = processors_info[2]
+
+            result.add("{}@{}".format(processor_name, thread_name))
+
+        return sorted(result)
+
+    def get_model_threads():
         result = set()
 
         rows = SystemOperation.objects.all()
