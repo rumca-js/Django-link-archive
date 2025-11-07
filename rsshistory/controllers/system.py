@@ -71,7 +71,7 @@ class SystemOperationController(object):
         thread_ids = SystemOperationController.get_threads()
 
         # delete any obsolte
-        current_thread_ids = SystemOperationController.get_modele_threads()
+        current_thread_ids = SystemOperationController.get_model_threads()
 
         diff_elements = set(current_thread_ids) - set(thread_ids)
         for diff in diff_elements:
@@ -200,9 +200,17 @@ class SystemOperationController(object):
             processor_name = processors_info[1]
             thread_name = processors_info[2]
 
-            result.add("{}@{}".format(processor_name, thread_name))
+            complete_name = SystemOperationController.get_thread_name(processor_name, thread_name)
+
+            result.add(complete_name)
 
         return sorted(result)
+
+    def get_thread_name(processor_name, thread_name):
+        if thread_name:
+            return "{}@{}".format(processor_name, thread_name)
+        else:
+            return "{}".format(processor_name)
 
     def get_model_threads():
         result = set()

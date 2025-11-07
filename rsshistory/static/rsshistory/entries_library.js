@@ -25,6 +25,9 @@ function isStatusCodeValid(entry) {
 
 
 function isEntryValid(entry) {
+    if (entry.is_valid == null) {
+	return true;
+    }
     return entry.is_valid;
 }
 

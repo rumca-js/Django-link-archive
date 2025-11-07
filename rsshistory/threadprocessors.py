@@ -90,10 +90,8 @@ class ProcessorInterface(object):
         raise NotImplementedError("Not implemented")
 
     def get_name(self):
-        if self.thread_name:
-            return "{}@{}".format(self.__class__.__name__, self.thread_name)
-        else:
-            return self.__class__.__name__
+        self.process_name = self.__class__.__name__
+        return SystemOperationController.get_thread_name(self.process_name, self.thread_name)
 
     def get_handlers(self):
         """

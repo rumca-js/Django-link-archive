@@ -4,17 +4,21 @@
 
 <div class="title-link-container">
    {% if user_config.show_icons %}
+        {% if entry_object %}
 	<a href="{% url 'rsshistory:entry-detail' entry_object.id %}">
 		<div class="title-thumbnail-container">
 	           <img src="{{object.get_favicon}}" class="border rounded title-thumbnail"/>
 		</div>
-	 </a>
+	</a>
+        {% endif%}
    {% endif %}
 
    <div class="mx-2 title-text-content">
 		<div>
 			<h1 class="link-title" title="{{ object.url }}">
+				{% if entry_object %}
 				<a href="{% url 'rsshistory:entry-detail' entry_object.id %}">
+				{% endif %}
 				 {{ object.title }}
 				 </a>
 			</h1>

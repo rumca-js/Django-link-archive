@@ -35,7 +35,7 @@ chardet = "^5.2.0"
 # TODO do we need this?
 lxml="^5.4.0"
 brutefeedparser="*"
-webtoolkit="0.0.106"
+webtoolkit="0.0.113"
 cryptography="^45.0.3"
 
 [tool.poetry.group.dev.dependencies]

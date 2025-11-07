@@ -150,14 +150,7 @@ class SourceDetailView(generic.DetailView):
         return context
 
     def create_entry(self, url):
-        builder = EntryDataBuilder()
-        entry = builder.build_simple(link=url)
-
-        if entry:
-            if entry.is_archive_entry():
-                entry = EntryWrapper(entry=entry).move_from_archive()
-
-            return entry
+        BackgroundJobController.link_add(url=url, source=self.object, properties={"permament" : True})
 
 
 def get_generic_search_init_context(request, form, user_choices):

@@ -70,34 +70,37 @@ function fillDataProperty(property) {
     }
     else if (property.name == "Binary") {
     }
+    else if (property.name == "PropertiesHash") {
+    }
     else if (property.name == "Streams") {
         for (const [key, stream_data] of Object.entries(property.data)) {
             let escapedContents = escapeHtml(stream_data);
             htmlOutput += getCollapsedPropertyItem(key, escapedContents);
-	}
+        }
     }
     else if (property.name == "Entries") {
         htmlOutput += getEntriesList(property.data);
     }
     else {
         for (const [key, value] of Object.entries(property.data)) {
-            if (key != "contents")
-            {
-                if (key == "settings") {
-                   let props = displayProperty(value);
-                   htmlOutput += `
-                   <div>
-                     <strong>${key}:</strong> <div class="cotainer">${props}</div>
-                   </div>
-                   `;
-                }
-                else {
-                   htmlOutput += `
-                   <div>
-                       <strong>${key}:</strong> ${value ?? "N/A"}
-                   </div>
-                    `;
-                }
+            if (key == "contents" || key == "text" || key == "binary") {
+                continue
+            }
+
+            if (key == "settings") {
+               let props = displayProperty(value);
+               htmlOutput += `
+               <div>
+                 <strong>${key}:</strong> <div class="cotainer">${props}</div>
+               </div>
+               `;
+            }
+            else {
+               htmlOutput += `
+               <div>
+                   <strong>${key}:</strong> ${value ?? "N/A"}
+               </div>
+                `;
             }
         }
     }
