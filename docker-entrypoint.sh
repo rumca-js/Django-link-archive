@@ -46,14 +46,14 @@ touch /app/linklibrary/initialized.txt
 mkdir -p /app/linklibrary/lesson-11/broker/queue
 
 echo "Starting workers"
-poetry run python manage.py threadprocessor --thread RefreshProcessor &
-poetry run python manage.py threadprocessor --thread SourceJobsProcessor &
-poetry run python manage.py threadprocessor --thread WriteJobsProcessor &
-poetry run python manage.py threadprocessor --thread ImportJobsProcessor &
-poetry run python manage.py threadprocessor --thread SystemJobsProcessor &
-poetry run python manage.py threadprocessor --thread UpdateJobsProcessor &
-poetry run python manage.py threadprocessor --thread LeftOverJobsProcessor &
-poetry run python manage.py threadprocessor --thread BlockJobsProcessor &
+poetry run python manage.py threadprocessor --process RefreshProcessor &
+poetry run python manage.py threadprocessor --process SourceJobsProcessor &
+poetry run python manage.py threadprocessor --process WriteJobsProcessor &
+poetry run python manage.py threadprocessor --process ImportJobsProcessor &
+poetry run python manage.py threadprocessor --process SystemJobsProcessor &
+poetry run python manage.py threadprocessor --process UpdateJobsProcessor &
+poetry run python manage.py threadprocessor --process LeftOverJobsProcessor &
+poetry run python manage.py threadprocessor --process BlockJobsProcessor &
 
 echo "Starting web server"
 poetry run python manage.py runserver 0.0.0.0:8000

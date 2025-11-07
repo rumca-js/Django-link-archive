@@ -198,7 +198,10 @@ class SystemOperationController(object):
 
         for processors_info in processors_infos:
             processor_name = processors_info[1]
-            thread_name = processors_info[2]
+            if len(processors_info) > 2:
+                thread_name = processors_info[2]
+            else:
+                thread_name = None
 
             complete_name = SystemOperationController.get_thread_name(processor_name, thread_name)
 
