@@ -35,6 +35,9 @@ def process_workspace(workspace, processor_class_name, processors_list, thread_n
     except AttributeError as e:
         print("Processor class not found: ", str(e), processor_class_name)
         return
+    except TypeError as e:
+        print("Processor class not found: ", str(e), processor_class_name)
+        return
 
     # Call the task with the processor class
     try:

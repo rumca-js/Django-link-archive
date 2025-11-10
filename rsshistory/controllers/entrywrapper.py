@@ -386,7 +386,7 @@ class EntryWrapper(object):
         return is_archive
 
     def is_current_entry_perfect(self):
-        from ..pluginurl import UrlHandlerEx, EntryUrlInterface
+        from ..pluginurl import UrlHandler, EntryUrlInterface
 
         entry = self.entry
 
@@ -397,7 +397,7 @@ class EntryWrapper(object):
             if entry.link.startswith("https://www"):
                 return False
 
-            ping_status = UrlHandlerEx.ping(entry.link)
+            ping_status = UrlHandler.ping(entry.link)
 
             return ping_status
 
@@ -408,7 +408,7 @@ class EntryWrapper(object):
 
         @returns new object, or None object has not been changed
         """
-        from ..pluginurl import UrlHandlerEx, EntryUrlInterface
+        from ..pluginurl import UrlHandler, EntryUrlInterface
 
         if not self.entry:
             return
@@ -424,7 +424,7 @@ class EntryWrapper(object):
         if entry.is_https():
             http_url = entry.get_http_url()
 
-            ping_status = UrlHandlerEx.ping(entry.link)
+            ping_status = UrlHandler.ping(entry.link)
 
             if not ping_status:
                 url = EntryUrlInterface(http_url)

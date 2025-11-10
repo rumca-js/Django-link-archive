@@ -10,7 +10,7 @@ from ..configuration import Configuration
 from ..models import AppLogging, UserTags, BaseLinkDataController
 from ..controllers import EntryDataBuilder, SourceDataController
 from ..controllers import LinkDataController, BackgroundJobController
-from ..pluginurl.urlhandler import UrlHandlerEx
+from ..pluginurl.urlhandler import UrlHandler
 
 from .sourceplugininterface import SourcePluginInterface
 
@@ -189,9 +189,9 @@ class SourceGenericPlugin(SourcePluginInterface):
 
             entry = self.get_source_entry()
             if entry:
-                url_ex = UrlHandlerEx(entry=entry)
+                url_ex = UrlHandler(entry=entry)
             else:
-                url_ex = UrlHandlerEx(url=page_link)
+                url_ex = UrlHandler(url=page_link)
 
             self.all_properties = url_ex.get_properties()
             self.response = url_ex.get_response()

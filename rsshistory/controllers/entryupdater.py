@@ -174,7 +174,7 @@ class EntryUpdater(object):
 
     def update_data(self):
         from ..pluginurl import EntryUrlInterface
-        from ..pluginurl import UrlHandlerEx
+        from ..pluginurl import UrlHandler
 
         """
         Fetches new information about page, and uses valid fields to set this object,
@@ -196,7 +196,7 @@ class EntryUpdater(object):
 
         entry = self.entry
 
-        url = UrlHandlerEx(entry = self.entry)
+        url = UrlHandler(entry = self.entry)
         url.get_response()
 
         if url.is_blocked():
@@ -264,7 +264,7 @@ class EntryUpdater(object):
 
     def reset_data(self):
         from ..pluginurl import EntryUrlInterface
-        from ..pluginurl import UrlHandlerEx
+        from ..pluginurl import UrlHandler
 
         if not self.entry:
             return
@@ -278,7 +278,7 @@ class EntryUpdater(object):
 
         entry = self.entry
 
-        url = UrlHandlerEx(entry=self.entry)
+        url = UrlHandler(entry=self.entry)
         url.get_response()
 
         if url.is_blocked():

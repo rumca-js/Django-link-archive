@@ -39,7 +39,7 @@ from ..models import (
 )
 from ..controllers import SystemOperationController
 from ..configuration import Configuration
-from ..pluginurl import UrlHandlerEx
+from ..pluginurl import UrlHandler
 
 from webtoolkit.tests.fake.geekwirecom import (
     geekwire_feed,
@@ -370,7 +370,7 @@ class FakeInternetTestCase(TestCase):
         RemoteServer.get_pingj = self.get_pingj
         RemoteServer.get_infoj = self.get_infoj
 
-        UrlHandlerEx.ping = (
+        UrlHandler.ping = (
             FakeInternetTestCase.ping
         )  # TODO this is not needed any more
 

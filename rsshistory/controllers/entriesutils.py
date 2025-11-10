@@ -106,8 +106,8 @@ class EntryPageCrawler(object):
             props = RemoteServer.read_properties_section("Properties", self.properties)
             description = props.get("description")
         else:
-            from ..pluginurl import UrlHandlerEx
-            handler = UrlHandlerEx(self.url)
+            from ..pluginurl import UrlHandler
+            handler = UrlHandler(self.url)
             handler.get_response()
             contents = handler.get_contents()
             description = handler.get_description()

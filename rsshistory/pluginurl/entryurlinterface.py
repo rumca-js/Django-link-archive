@@ -8,7 +8,7 @@ from ..controllers import SourceDataController
 from ..configuration import Configuration
 from ..models import AppLogging, EntryRules
 
-from .urlhandler import UrlHandlerEx
+from .urlhandler import UrlHandler
 
 
 class YouTubeException(Exception):
@@ -31,7 +31,7 @@ class EntryUrlInterface(object):
         self.all_properties = None
         self.browser = None
 
-        self.url = UrlHandlerEx.get_cleaned_link(url)
+        self.url = UrlHandler.get_cleaned_link(url)
         self.handler = handler
 
     def get_response(self):
@@ -48,7 +48,7 @@ class EntryUrlInterface(object):
             browsers = [browser.get_setup()]
 
         if not self.handler:
-            self.handler = UrlHandlerEx(self.url, browsers=browsers)
+            self.handler = UrlHandler(self.url, browsers=browsers)
         else:
             if browsers:
                 self.handler.browsers = browsers

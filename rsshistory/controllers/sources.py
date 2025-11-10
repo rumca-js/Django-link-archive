@@ -350,7 +350,7 @@ class SourceDataController(SourceDataModel):
 
             # TODO implement this. I thin Url does not support binary well yet
             if False:
-                u = UrlHandlerEx(new_thumbnail)
+                u = UrlHandler(new_thumbnail)
                 if not u.is_valid():
                     return
 
@@ -359,7 +359,7 @@ class SourceDataController(SourceDataModel):
             self.favicon = new_thumbnail
 
         if not changed and False:
-            u = UrlHandlerEx(self.favicon)
+            u = UrlHandler(self.favicon)
             if not u.is_valid():
                 self.favicon = None
 
@@ -418,11 +418,11 @@ class SourceDataBuilder(object):
         return source
 
     def build_from_link(self):
-        from ..pluginurl import UrlHandlerEx
+        from ..pluginurl import UrlHandler
 
         rss_url = self.link
 
-        h = UrlHandlerEx(rss_url)
+        h = UrlHandler(rss_url)
         if h.is_server_error():
             self.errors.append("Url:{}. Crawling server error".format(self.link))
             return

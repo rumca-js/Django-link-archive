@@ -4,12 +4,12 @@ from webtoolkit import (
 )
 from ..models import Browser, EntryRules
 
-from ..pluginurl.urlhandler import UrlHandlerEx
+from ..pluginurl.urlhandler import UrlHandler
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
-class UrlHandlerExTest(FakeInternetTestCase):
+class UrlHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -32,7 +32,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         test_link = "https://rsspage.com/rss.xml"
 
         # call tested function
-        handler = UrlHandlerEx(test_link)
+        handler = UrlHandler(test_link)
 
         mapping = handler.browsers
 
@@ -65,7 +65,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         test_link = "https://rsspage.com/rss.xml"
 
         # call tested function
-        handler = UrlHandlerEx(test_link)
+        handler = UrlHandler(test_link)
 
         mapping = handler.browsers
 
@@ -92,7 +92,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         test_link = "https://rsspage.com/rss.xml"
 
         # call tested function
-        handler = UrlHandlerEx(test_link, browsers=[setup1])
+        handler = UrlHandler(test_link, browsers=[setup1])
 
         mapping = handler.browsers
 
@@ -117,7 +117,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         test_link = "https://rsspage.com/rss.xml"
 
-        handler = UrlHandlerEx(test_link)
+        handler = UrlHandler(test_link)
 
         # call tested function
         mapping = handler.get_browsers()
@@ -144,7 +144,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
         test_link = "https://rsspage.com/rss.xml"
 
-        handler = UrlHandlerEx(
+        handler = UrlHandler(
             test_link,
             browsers=[setup1, setup2],
             settings={"handler_class": "HttpPageHandler"},
@@ -160,7 +160,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
 
     def test_get_properties__no_browser(self):
         Browser.objects.all().delete()
-        handler = UrlHandlerEx("https://rsspage.com/rss.xml")
+        handler = UrlHandler("https://rsspage.com/rss.xml")
 
         # call tested function
         properties = handler.get_properties()
@@ -183,7 +183,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
             browser=browser1,
         )
 
-        handler = UrlHandlerEx("https://rsspage.com/rss.xml")
+        handler = UrlHandler("https://rsspage.com/rss.xml")
 
         # call tested function
         properties = handler.get_properties()
@@ -205,7 +205,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cleaned_link = UrlHandlerEx.get_cleaned_link("https://linkedin.com")
+        cleaned_link = UrlHandler.get_cleaned_link("https://linkedin.com")
 
         self.assertEqual(cleaned_link, "https://linkedin.com")
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
@@ -214,7 +214,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cleaned_link = UrlHandlerEx.get_cleaned_link(
+        cleaned_link = UrlHandler.get_cleaned_link(
             "https://www.google.com/url?q=https://forum.ddopl.com/&sa=Udupa"
         )
 
@@ -225,7 +225,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cleaned_link = UrlHandlerEx.get_cleaned_link(
+        cleaned_link = UrlHandler.get_cleaned_link(
             "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://worldofwarcraft.blizzard.com/&ved=2ahUKEwjtx56Pn5WFAxU2DhAIHYR1CckQFnoECCkQAQ&usg=AOvVaw1pDkx5K7B5loKccvg_079-"
         )
 
@@ -236,7 +236,7 @@ class UrlHandlerExTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cleaned_link = UrlHandlerEx.get_cleaned_link(
+        cleaned_link = UrlHandler.get_cleaned_link(
             "https://www.youtube.com/redirect?event=lorum&redir_token=ipsum&q=https%3A%2F%2Fcorridordigital.com%2F&v=LeB9DcFT810"
         )
 
@@ -247,11 +247,11 @@ class UrlHandlerExTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cleaned_link = UrlHandlerEx.get_cleaned_link("https://www.YouTube.com/Test")
+        cleaned_link = UrlHandler.get_cleaned_link("https://www.YouTube.com/Test")
         self.assertEqual(cleaned_link, "https://www.youtube.com/Test")
 
         # call tested function
-        cleaned_link = UrlHandlerEx.get_cleaned_link("https://www.YouTube.com/Test/")
+        cleaned_link = UrlHandler.get_cleaned_link("https://www.YouTube.com/Test/")
         self.assertEqual(cleaned_link, "https://www.youtube.com/Test")
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
@@ -263,25 +263,25 @@ class UrlHandlerExTest(FakeInternetTestCase):
             block=True,
         )
 
-        url = UrlHandlerEx("https://linkedin.com")
+        url = UrlHandler("https://linkedin.com")
         # call tested function
         self.assertFalse(url.is_blocked())
 
-        url = UrlHandlerEx("https://casino.com")
+        url = UrlHandler("https://casino.com")
         # call tested function
         self.assertTrue(url.is_blocked())
 
     def test_get_text__valid(self):
-        url = UrlHandlerEx("https://linkedin.com")
+        url = UrlHandler("https://linkedin.com")
         # call tested function
         self.assertTrue(url.get_text())
 
     def test_get_binary__invalid(self):
-        url = UrlHandlerEx("https://linkedin.com")
+        url = UrlHandler("https://linkedin.com")
         # call tested function
         self.assertFalse(url.get_binary())
 
     def test_get_binary__valid(self):
-        url = UrlHandlerEx("https://binary.com/file")
+        url = UrlHandler("https://binary.com/file")
         # call tested function
         self.assertTrue(url.get_binary())

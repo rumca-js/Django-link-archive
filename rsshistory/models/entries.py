@@ -307,9 +307,9 @@ class BaseLinkDataController(BaseLinkDataModel):
             self.language = self.source.language
             self.save()
         else:
-            from ..pluginurl import UrlHandlerEx
+            from ..pluginurl import UrlHandler
 
-            handler = UrlHandlerEx(self.link)
+            handler = UrlHandler(self.link)
             if handler.is_valid():
                 language = handler.get_language()
                 if language != None:

@@ -69,7 +69,7 @@ from .controllers import (
     SystemOperationController,
 )
 from .configuration import Configuration
-from .pluginurl import UrlHandlerEx
+from .pluginurl import UrlHandler
 from .serializers import JsonImporter
 from .updatemgr import UpdateManager
 

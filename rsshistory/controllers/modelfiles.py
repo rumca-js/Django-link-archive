@@ -9,7 +9,7 @@ class ModelFilesBuilder(object):
         pass
 
     def build(self, file_name=None):
-        from ..pluginurl import UrlHandlerEx
+        from ..pluginurl import UrlHandler
 
         if file_name is None:
             return
@@ -20,7 +20,7 @@ class ModelFilesBuilder(object):
         if not c.enabled_file_support:
             return
 
-        p = UrlHandlerEx(url=file_name)
+        p = UrlHandler(url=file_name)
         binary_data = p.get_section("Binary")
         if not binary_data:
             # consume

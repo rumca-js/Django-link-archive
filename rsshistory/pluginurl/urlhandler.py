@@ -21,7 +21,7 @@ from ..models import AppLogging, EntryRules, BlockEntry, Browser
 from ..configuration import Configuration
 
 
-class UrlHandlerEx(object):
+class UrlHandler(object):
     """ """
 
     def __init__(self, url=None, browsers=None, last_browser=None, entry=None, handler_name=None):
@@ -84,7 +84,7 @@ class UrlHandlerEx(object):
                     )
                 )
 
-                request = UrlHandlerEx.browser_to_request(self.url, browser)
+                request = UrlHandler.browser_to_request(self.url, browser)
 
                 self.all_properties = request_server.get_getj(request)
                 if not self.all_properties:
@@ -387,7 +387,7 @@ class UrlHandlerEx(object):
     def is_remote_server_down(self):
         config_entry = Configuration.get_object().config_entry
         if config_entry.remote_webtools_server_location:
-            if not UrlHandlerEx.ping(config_entry.remote_webtools_server_location):
+            if not UrlHandler.ping(config_entry.remote_webtools_server_location):
                 return True
 
     def is_url_valid(self):

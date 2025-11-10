@@ -144,7 +144,7 @@ class LinkDataController(LinkDataModel):
         return info
 
     def get_clean_data(props):
-        from ..pluginurl import UrlHandlerEx
+        from ..pluginurl import UrlHandler
 
         result = {}
         test = LinkDataController()
@@ -160,7 +160,7 @@ class LinkDataController(LinkDataModel):
         result = LinkDataController.get_clean_field(result, "album")
 
         if "link" in result:
-            result["link"] = UrlHandlerEx.get_cleaned_link(result["link"])
+            result["link"] = UrlHandler.get_cleaned_link(result["link"])
 
         if "tags" in result:
             del result["tags"]

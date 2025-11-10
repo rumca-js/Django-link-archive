@@ -11,7 +11,7 @@ from ..models import (
 )
 from ..configuration import Configuration
 from .backgroundjob import BackgroundJobController
-from ..pluginurl import UrlHandlerEx
+from ..pluginurl import UrlHandler
 
 
 class SystemOperationController(object):
@@ -112,7 +112,7 @@ class SystemOperationController(object):
         if test_page_url == "" or not test_page_url:
             return True
 
-        if not UrlHandlerEx.ping(test_page_url):
+        if not UrlHandler.ping(test_page_url):
             AppLogging.error("Cannot ping test page {}".format(test_page_url))
             return False
         return True
@@ -198,7 +198,7 @@ class SystemOperationController(object):
 
         for processors_info in processors_infos:
             processor_name = processors_info[1]
-            if len(processors_info) > 2:
+            if len(processors_info) > 1:
                 thread_name = processors_info[2]
             else:
                 thread_name = None

@@ -11,7 +11,7 @@ from ..models import (
 )
 from ..configuration import Configuration
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
-from ..pluginurl.urlhandler import UrlHandlerEx
+from ..pluginurl.urlhandler import UrlHandler
 
 
 class SourceUrlInterface(object):
@@ -21,7 +21,7 @@ class SourceUrlInterface(object):
     """
 
     def __init__(self, url, browser=None):
-        self.url = UrlHandlerEx.get_cleaned_link(url)
+        self.url = UrlHandler.get_cleaned_link(url)
         self.browser = browser
         self.url_ex = None
         self.all_properties = None
@@ -35,7 +35,7 @@ class SourceUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        url_ex = UrlHandlerEx(self.url)
+        url_ex = UrlHandler(self.url)
 
         all_properties = url_ex.get_properties()
 
@@ -48,7 +48,7 @@ class SourceUrlInterface(object):
             else:
                 if "feeds" in properties:
                     for feed in properties["feeds"]:
-                        url_ex_new = UrlHandlerEx(feed)
+                        url_ex_new = UrlHandler(feed)
                         all_properties = url_ex_new.get_properties()
                         if all_properties:
                             entries = url_ex_new.get_section("Entries")

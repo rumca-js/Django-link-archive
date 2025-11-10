@@ -12,7 +12,7 @@ from ..controllers import (
     SourceDataBuilder,
     BackgroundJobController,
 )
-from ..pluginurl import UrlHandlerEx
+from ..pluginurl import UrlHandler
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -114,7 +114,7 @@ class SourceDataControllerTest(FakeInternetTestCase):
 
         new_favicon = "https://www.codeproject.com/App_Themes/Std/Img/logo100x30.gif"
 
-        rss = UrlHandlerEx("https://www.codeproject.com/WebServices/NewsRSS.aspx")
+        rss = UrlHandler("https://www.codeproject.com/WebServices/NewsRSS.aspx")
 
         # call tested function
         source.update_data(update_with=rss)

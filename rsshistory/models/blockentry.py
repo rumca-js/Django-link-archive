@@ -122,22 +122,22 @@ class BlockEntryList(models.Model):
         BlockEntryList.update_all()
 
     def update_all():
-        from ..pluginurl import UrlHandlerEx
+        from ..pluginurl import UrlHandler
 
         # this creates new lists
         BlockEntryList.read_lists_group(BlockEntryList.STARTUP_ENTRY_LIST)
 
         for alist in BlockEntryList.objects.all():
-            if not UrlHandlerEx.ping(alist.url):
+            if not UrlHandler.ping(alist.url):
                 alist.delete()
             else:
                 alist.update()
 
     def update(self):
-        from ..pluginurl import UrlHandlerEx
+        from ..pluginurl import UrlHandler
         from ..controllers import BackgroundJobController
 
-        if not UrlHandlerEx.ping(self.url):
+        if not UrlHandler.ping(self.url):
             return False
 
         self.processed = False
@@ -154,9 +154,9 @@ class BlockEntryList(models.Model):
         BlockEntryList.initialize()
 
     def read_lists_group(lists_group):
-        from ..pluginurl import UrlHandlerEx
+        from ..pluginurl import UrlHandler
 
-        url = UrlHandlerEx(lists_group)
+        url = UrlHandler(lists_group)
         contents = url.get_text()
         if contents:
             lines = contents.split("\n")
@@ -182,9 +182,9 @@ class BlockEntryList(models.Model):
         """
         @note Called from initialize block list
         """
-        from ..pluginurl import UrlHandlerEx
+        from ..pluginurl import UrlHandler
 
-        handler = UrlHandlerEx(self.url)
+        handler = UrlHandler(self.url)
         contents = handler.get_contents()
         if contents:
             reader = BlockListReader(contents)

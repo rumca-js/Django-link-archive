@@ -46,7 +46,7 @@ from ..views import (
     get_request_browser,
     get_request_url_with_browser,
 )
-from ..pluginurl.urlhandler import UrlHandlerEx
+from ..pluginurl.urlhandler import UrlHandler
 
 
 def get_errors(page_url):
@@ -60,7 +60,7 @@ def get_errors(page_url):
     config = Configuration.get_object().config_entry
 
     domain = location.get_domain()
-    u = UrlHandlerEx(link)
+    u = UrlHandler(link)
     is_allowed = u.is_allowed()
 
     # warnings
@@ -209,7 +209,7 @@ def get_scan_contents_links(link, contents):
 
 def page_scan_link(request):
     def render_page_scan_input(url, link, template="form_basic.html"):
-        h = UrlHandlerEx(link)
+        h = UrlHandler(link)
         contents = h.get_contents()
 
         links = get_scan_contents_links(link, contents)
@@ -492,7 +492,7 @@ def download_video_pk(request, pk):
 def is_url_allowed(request):
     def is_url_allowed_internal(p, url):
         # TODO use Remote?
-        u = UrlHandlerEx(url)
+        u = UrlHandler(url)
         u.get_response()
         status = u.is_allowed()
 
@@ -696,7 +696,7 @@ def cleanup_link(request):
         if form.is_valid():
             link = form.cleaned_data["link"]
 
-            link = UrlHandlerEx.get_cleaned_link(link)
+            link = UrlHandler.get_cleaned_link(link)
 
             summary_text = 'Cleaned up link: <a href="{}">{}</a>'.format(link, link)
 
@@ -725,7 +725,7 @@ def cleanup_link_json(request):
 
     if "link" in request.GET:
         original_link = request.GET["link"]
-        cleaned_link = UrlHandlerEx.get_cleaned_link(original_link)
+        cleaned_link = UrlHandler.get_cleaned_link(original_link)
 
         links.add(cleaned_link)
 
@@ -743,7 +743,7 @@ def get_suggestions(original_link):
     links = set()
     errors = []
 
-    cleaned_link = UrlHandlerEx.get_cleaned_link(original_link)
+    cleaned_link = UrlHandler.get_cleaned_link(original_link)
 
     location = UrlLocation(original_link)
 

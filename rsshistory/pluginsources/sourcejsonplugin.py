@@ -10,7 +10,7 @@ from ..controllers import (
 )
 from ..models import AppLogging
 from ..apps import LinkDatabase
-from ..pluginurl import UrlHandlerEx
+from ..pluginurl import UrlHandler
 
 from ..configuration import Configuration
 from ..serializers.instanceimporter import InstanceImporter
@@ -53,7 +53,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             contents = self.get_contents()
         else:
             address = url
-            contents = UrlHandlerEx(address).get_contents()
+            contents = UrlHandler(address).get_contents()
 
         if not contents:
             AppLogging.error("Could not load JSON {} - no data".format(address))
@@ -177,7 +177,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         """
         recent_url = self.get_entries_recent_url(source_json)
         print("Getting recent link list from url:{}".format(recent_url))
-        recent_entries_list_contents = UrlHandlerEx(recent_url).get_contents()
+        recent_entries_list_contents = UrlHandler(recent_url).get_contents()
 
         if not recent_entries_list_contents:
             AppLogging.error(

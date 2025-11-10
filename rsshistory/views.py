@@ -17,7 +17,7 @@ from .models import (
 )
 from .apps import LinkDatabase
 from .configuration import Configuration
-from .pluginurl.urlhandler import UrlHandlerEx
+from .pluginurl.urlhandler import UrlHandler
 
 
 def get_search_term(themap):
@@ -97,11 +97,11 @@ def get_request_url_with_browser(input_map):
     handler_name = None
 
     if browser:
-        request = UrlHandlerEx.browser_to_request(page_link, browser)
+        request = UrlHandler.browser_to_request(page_link, browser)
 
     handler_name = input_map.get("handler_name")
 
-    url_ex = UrlHandlerEx(page_link, browsers=browsers, handler_name=handler_name)
+    url_ex = UrlHandler(page_link, browsers=browsers, handler_name=handler_name)
     return url_ex
 
 

@@ -71,7 +71,7 @@ from ..queryfilters import EntryFilter, DjangoEquationProcessor
 from ..configuration import Configuration
 from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
-from ..pluginurl import UrlHandlerEx
+from ..pluginurl import UrlHandler
 
 
 def get_generic_search_init_context(request, form):
@@ -581,7 +581,7 @@ def func_display_data_form(request, p, data):
 
     domain = page.get_domain()
 
-    u = UrlHandlerEx(link)
+    u = UrlHandler(link)
 
     is_allowed = u.is_allowed()
 
@@ -650,7 +650,7 @@ def add_entry_json(request):
         data["errors"] = ["User is cannot add links"]
     else:
         link = request.GET.get("link", "")
-        link = UrlHandlerEx.get_cleaned_link(link)
+        link = UrlHandler.get_cleaned_link(link)
 
         if not link or link == "":
             data["errors"] = ["Link is empty"]

@@ -51,7 +51,7 @@ from ..views import (
     get_request_browser_id,
 )
 from ..configuration import Configuration
-from ..pluginurl import UrlHandlerEx
+from ..pluginurl import UrlHandler
 from ..pluginsources import SourceControllerBuilder
 from ..serializers import InstanceExporter, JsonImporter
 
@@ -116,7 +116,7 @@ class SourceDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context = ViewPage(self.request).init_context(context)
 
-        handler = UrlHandlerEx(self.object.url)
+        handler = UrlHandler(self.object.url)
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.favicon
@@ -274,7 +274,7 @@ def source_add_form(request):
     if "link" in request.GET:
         url = request.GET["link"]
 
-    url = UrlHandlerEx.get_cleaned_link(url)
+    url = UrlHandler.get_cleaned_link(url)
 
     if not UrlLocation(url).is_protocolled_link():
         p.context["summary_text"] = (
@@ -317,7 +317,7 @@ def source_add_form(request):
     domain = page.get_domain()
     config = Configuration.get_object().config_entry
 
-    u = UrlHandlerEx(link)
+    u = UrlHandler(link)
     is_allowed = u.is_allowed()
 
     # warnings
