@@ -134,6 +134,27 @@ class UrlHandler(object):
 
         return self.all_properties
 
+    def is_another_request_necessary(self):
+        """
+        Commonly, if user agent is not welcome
+        """
+        response = self.get_response()
+        if not response:
+            return False
+
+        status_code = response.status_code
+
+        if status_code == HTTP_STATUS_CODE_CONNECTION_ERROR:
+            return False
+
+        if status_code == HTTP_STATUS_CODE_PAGE_UNSUPPORTED:
+            return False
+
+        # even though we receive 404 the site might detect our bot
+        # so we can attempt with other crawlers
+
+        return not is_status_code_valid(status_code)
+
     def browser_to_request(url, browser, handler_name = None):
         request = PageRequestObject(url)
         request.crawler_name = browser.name
@@ -176,75 +197,30 @@ class UrlHandler(object):
 
         return result
 
-    def get_title(self):
+    def get_simple_properties(self):
         properties = self.get_section("Properties")
         if not properties:
             return
 
-        if "title" in properties:
-            return properties["title"]
+        return properties
+
+    def get_title(self):
+        return self.get_simple_properties().get("title")
 
     def get_description(self):
-        properties = self.get_section("Properties")
-        if not properties:
-            return
-
-        if "description" in properties:
-            return properties["description"]
+        return self.get_simple_properties().get("description")
 
     def get_language(self):
-        properties = self.get_section("Properties")
-        if not properties:
-            return
-
-        if "language" in properties:
-            return properties["language"]
+        return self.get_simple_properties().get("language")
 
     def get_author(self):
-        properties = self.get_section("Properties")
-        if not properties:
-            return
-
-        if "author" in properties:
-            return properties["author"]
+        return self.get_simple_properties().get("author")
 
     def get_album(self):
-        properties = self.get_section("Properties")
-        if not properties:
-            return
-
-        if "album" in properties:
-            return properties["album"]
+        return self.get_simple_properties().get("album")
 
     def get_thumbnail(self):
-        properties = self.get_section("Properties")
-        if not properties:
-            return
-
-        if "thumbnail" in properties:
-            return properties["thumbnail"]
-
-    def is_another_request_necessary(self):
-        """
-        Commonly, if user agent is not welcome
-        """
-        response = self.get_section("Response")
-        if not response:
-            return False
-
-        if "status_code" in response:
-            status_code = response["status_code"]
-
-            if status_code == HTTP_STATUS_CODE_CONNECTION_ERROR:
-                return False
-
-            if status_code == HTTP_STATUS_CODE_PAGE_UNSUPPORTED:
-                return False
-
-            # even though we receive 404 the site might detect our bot
-            # so we can attempt with other crawlers
-
-            return not is_status_code_valid(status_code)
+        return self.get_simple_properties().get("thumbnail")
 
     def get_contents(self):
         """
@@ -279,14 +255,11 @@ class UrlHandler(object):
         return RemoteServer.read_properties_section(section_name, properties)
 
     def is_valid(self):
-        response = self.get_section("Response")
+        response = self.get_response()
         if not response:
             return False
 
-        if "is_valid" not in response:
-            return False
-
-        if not response["is_valid"]:
+        if not response.is_valid():
             return False
 
         blocked = self.is_blocked()
@@ -297,12 +270,12 @@ class UrlHandler(object):
         return True
 
     def is_invalid(self):
-        response = self.get_section("Response")
+        response = self.get_response()
         if not response:
             return False
 
-        if "is_invalid" in response and response["is_invalid"]:
-            return True
+        if not response.is_invalid():
+            return False
 
         blocked = self.is_blocked()
         if blocked:
@@ -315,11 +288,11 @@ class UrlHandler(object):
         if not self.all_properties:
             return False
 
-        response = self.get_section("Response")
+        response = self.get_response()
         if not response:
             return False
 
-        status_code = response.get("status_code")
+        status_code = response.status_code
 
         if status_code == HTTP_STATUS_CODE_SERVER_ERROR:
             return True
@@ -343,7 +316,7 @@ class UrlHandler(object):
             if reason:
                 return reason
 
-        if not self.is_url_valid():
+        if self.is_invalid():
             return True
 
         if not self.is_allowed():
@@ -365,8 +338,8 @@ class UrlHandler(object):
         if status:
             return "Dict block: {}".format(status)
 
-        if not self.is_url_valid():
-            return "Url not valid"
+        if self.is_invalid():
+            return "Url is not valid"
 
         if not self.is_allowed():
             return "Not Allowed"
@@ -390,15 +363,12 @@ class UrlHandler(object):
             if not UrlHandler.ping(config_entry.remote_webtools_server_location):
                 return True
 
-    def is_url_valid(self):
-        return True
-
     def is_allowed(self):
-        response = self.get_section("Response")
+        response = self.get_response()
         if not response:
             return False
 
-        return response.get("is_allowed")
+        return response.is_allowed()
 
     def get_response(self):
         self.get_properties()

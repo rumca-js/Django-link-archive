@@ -31,11 +31,11 @@ psycopg2-binary = "*" # for raspberry install python3-psycopyg2
 psutil="*"
 
 # TODO do we need this?
-chardet = "^5.2.0"
+#chardet = "^5.2.0"
 # TODO do we need this?
-lxml="^5.4.0"
-brutefeedparser="*"
-webtoolkit="0.0.115"
+#lxml="^5.4.0"
+#brutefeedparser="*"
+webtoolkit="0.0.120"
 cryptography="^45.0.3"
 
 [tool.poetry.group.dev.dependencies]

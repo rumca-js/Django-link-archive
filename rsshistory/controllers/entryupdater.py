@@ -98,8 +98,11 @@ class EntryUpdater(object):
                     body_hash = None
                 entry.body_hash = body_hash
             if "hash" in response:
-                contents_hash = base64.b64decode(response["hash"])
-                entry.contents_hash = contents_hash
+                if response["hash"]:
+                    contents_hash = base64.b64decode(response["hash"])
+                    entry.contents_hash = contents_hash
+                else:
+                    entry.contents_hash = None
 
         if properties:
             if "page_rating" in properties:
