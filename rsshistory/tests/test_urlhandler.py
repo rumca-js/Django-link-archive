@@ -26,9 +26,6 @@ class UrlHandlerTest(FakeInternetTestCase):
             settings='{"test_setting" : "something"}',
         )
 
-        setup1 = browser1.get_setup()
-        setup2 = browser2.get_setup()
-
         test_link = "https://rsspage.com/rss.xml"
 
         # call tested function
@@ -59,9 +56,6 @@ class UrlHandlerTest(FakeInternetTestCase):
             browser=browser2,
         )
 
-        setup1 = browser1.get_setup()
-        setup2 = browser2.get_setup()
-
         test_link = "https://rsspage.com/rss.xml"
 
         # call tested function
@@ -86,13 +80,10 @@ class UrlHandlerTest(FakeInternetTestCase):
             settings='{"test_setting" : "something"}',
         )
 
-        setup1 = browser1.get_setup()
-        setup2 = browser2.get_setup()
-
         test_link = "https://rsspage.com/rss.xml"
 
         # call tested function
-        handler = UrlHandler(test_link, browsers=[setup1])
+        handler = UrlHandler(test_link, browsers=[browser1])
 
         mapping = handler.browsers
 
@@ -111,9 +102,6 @@ class UrlHandlerTest(FakeInternetTestCase):
             name="test2",
             settings='{"test_setting" : "something"}',
         )
-
-        setup1 = browser1.get_setup()
-        setup2 = browser2.get_setup()
 
         test_link = "https://rsspage.com/rss.xml"
 
@@ -139,14 +127,11 @@ class UrlHandlerTest(FakeInternetTestCase):
             settings='{"test_setting" : "something"}',
         )
 
-        setup1 = browser1.get_setup()
-        setup2 = browser2.get_setup()
-
         test_link = "https://rsspage.com/rss.xml"
 
         handler = UrlHandler(
             test_link,
-            browsers=[setup1, setup2],
+            browsers=[browser1, browser],
             settings={"handler_class": "HttpPageHandler"},
         )
 

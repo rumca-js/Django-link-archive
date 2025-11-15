@@ -428,16 +428,17 @@ class FakeInternetTestCase(TestCase):
         return True
 
     def get_infoj(self):
-      data = {"crawlers": [
-        {
-          "enabled": True,
-          "name": "DefaultCrawler",
-          "settings": {
-            "timeout_s": 20
-          }
-        }
-        ]
-     }
+        data = {"crawlers": [
+            {
+                "enabled": True,
+                "name": "DefaultCrawler",
+                "settings": {
+                    "timeout_s": 20
+                    }
+                }
+            ]
+                }
+        return data
 
     def check_crawling_server(self, thread_id):
         return True

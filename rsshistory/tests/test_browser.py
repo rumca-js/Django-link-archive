@@ -14,7 +14,6 @@ class BrowserTest(FakeInternetTestCase):
 
         browser = Browser.objects.create(
             name="test",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something',  # invalid
         )
 
@@ -61,7 +60,6 @@ class BrowserTest(FakeInternetTestCase):
         self.assertTrue(len(setup) > 0)
 
         self.assertEqual(setup[0]["name"], "RequestsCrawler")
-        self.assertEqual(setup[0]["crawler"], RequestsCrawler)
 
     def test_get_browsers_string(self):
         Browser.read_browser_setup()
@@ -73,44 +71,12 @@ class BrowserTest(FakeInternetTestCase):
         self.assertTrue(len(setup) > 0)
 
         self.assertEqual(setup[0]["name"], "RequestsCrawler")
-        self.assertEqual(setup[0]["crawler"], "RequestsCrawler")
-
-    def test_get_setup__standard(self):
-        Browser.objects.all().delete()
-
-        browser = Browser.objects.create(
-            name="test",
-            crawler="RequestsCrawler",
-            settings='{"test_setting" : "something"}',
-        )
-
-        # call tested function
-        setup = browser.get_setup()
-        self.assertTrue(setup["name"], "test")
-        self.assertTrue(setup["crawler"], RequestsCrawler)
-        self.assertTrue(setup["settings"]["test_setting"], "something")
-
-    def test_get_setup__string(self):
-        Browser.objects.all().delete()
-
-        browser = Browser.objects.create(
-            name="test",
-            crawler="RequestsCrawler",
-            settings='{"test_setting" : "something"}',
-        )
-
-        # call tested function
-        setup = browser.get_setup(string=True)
-        self.assertTrue(setup["name"], "test")
-        self.assertTrue(setup["crawler"], RequestsCrawler)
-        self.assertTrue(setup["settings"]["test_setting"], "something")
 
     def test_is_valid(self):
         Browser.objects.all().delete()
 
         browser = Browser.objects.create(
             name="test",
-            crawler="RequestsCrawler",
             settings='{"test_setting" : "something"}',
         )
 
