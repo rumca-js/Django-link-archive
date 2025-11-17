@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linklibrary"
-version = "2.22.2"
+version = "2.24.9"
 description = "Link Archive"
 authors = ["Iwan Grozny <renegat@renegat0x0.ddns.net>"]
 license = "GPL3"
