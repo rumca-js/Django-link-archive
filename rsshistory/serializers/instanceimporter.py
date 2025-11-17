@@ -59,7 +59,7 @@ class InstanceImporter(object):
         from ..pluginurl import UrlHandler
 
         u = UrlHandler(self.url)
-        instance_text = u.get_contents()
+        instance_text = u.get_text()
         if not instance_text:
             return
 

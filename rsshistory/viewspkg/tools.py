@@ -210,7 +210,7 @@ def get_scan_contents_links(link, contents):
 def page_scan_link(request):
     def render_page_scan_input(url, link, template="form_basic.html"):
         h = UrlHandler(link)
-        contents = h.get_contents()
+        contents = h.get_text()
 
         links = get_scan_contents_links(link, contents)
 

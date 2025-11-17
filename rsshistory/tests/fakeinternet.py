@@ -29,18 +29,6 @@ from webtoolkit import (
 
     WebLogger,
 )
-
-from ..models import (
-    AppLogging,
-    ConfigurationEntry,
-    Browser,
-    EntryRules,
-    SearchView,
-)
-from ..controllers import SystemOperationController
-from ..configuration import Configuration
-from ..pluginurl import UrlHandler
-
 from webtoolkit.tests.fake.geekwirecom import (
     geekwire_feed,
 )
@@ -67,6 +55,20 @@ from webtoolkit.tests.fake.instance import (
     instance_sources_page_2,
 )
 
+from webtoolkit.tests.fakeresponse import FakeInternetData
+from webtoolkit.tests.mocks import MockRequestCounter
+
+from ..models import (
+    AppLogging,
+    ConfigurationEntry,
+    Browser,
+    EntryRules,
+    SearchView,
+)
+from ..controllers import SystemOperationController
+from ..configuration import Configuration
+from ..pluginurl import UrlHandler
+
 
 class DjangoRequestObject(object):
     """
@@ -77,263 +79,10 @@ class DjangoRequestObject(object):
         self.user = user
 
 
-class MockRequestCounter(object):
-    mock_page_requests = 0
-    request_history = []
-
-    def requested(url, info=None, settings=None):
-        """
-        Info can be a dict
-        """
-        if info:
-            MockRequestCounter.request_history.append({"url": url, "info": info})
-        elif settings:
-            MockRequestCounter.request_history.append(
-                {"url": url, "settings": settings}
-            )
-        else:
-            MockRequestCounter.request_history.append({"url": url})
-        MockRequestCounter.mock_page_requests += 1
-
-    def reset():
-        MockRequestCounter.mock_page_requests = 0
-        MockRequestCounter.request_history = []
-
-
 class DefaultCrawler(CrawlerInterface):
 
     def run(self):
         MockRequestCounter.requested(self.request.url)
-
-
-class FakeInternetData(object):
-    def __init__(self, url):
-        self.url = url
-        self.properties = {
-            "link": self.url,
-            "title": "Title",
-            "description": "Description",
-            "date_published": DateUtils.get_datetime_now_iso(),
-            "author": "Description",
-            "language": "Language",
-            "album": "Description",
-            "page_rating": 80,
-            "thumbnail": None,
-        }
-
-        self.response = {
-            "status_code": 200,
-            "Content-Length": 200,
-            "Content-Type": "text/html",
-            "body_hash": json_encode_field(b"01001012"),
-            "hash": json_encode_field(b"01001012"),
-            "is_valid": True,
-            "is_invalid": False,
-            "is_allowed": True,
-        }
-        self.text_data = "Something"
-        self.binary_data = None
-        self.entries = []
-
-    def get_all_properties(self):
-        data = []
-        data.append({"name": "Properties", "data": self.properties})
-        data.append({"name": "Text", "data": {"Contents": self.text_data}})
-        data.append({"name": "Binary", "data": {"Contents": json_encode_field(self.binary_data)}})
-        data.append({"name": "Settings", "data": None})
-        data.append({"name": "Response", "data": self.response})
-        data.append({"name": "Headers", "data": {}})
-        data.append({"name": "Entries", "data": self.entries})
-
-        return data
-
-    def get_getj(self, request=None, url=None):
-        if url and not request:
-            request = PageRequestObject(url)
-            request.url = url
-            request.url = request.url.strip()
-
-        if not request or not request.url:
-            return
-
-        if self.url == "https://linkedin.com":
-            self.properties["title"] = "Https LinkedIn Page title"
-            self.properties["description"] = "Https LinkedIn Page description"
-        elif self.url == "https://m.youtube.com/watch?v=1234":
-            self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-            self.properties["feeds"] = [
-                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id",
-            ]
-            self.properties["title"] = "YouTube 1234 video"
-            self.properties["language"] = None
-        elif self.url == "https://www.youtube.com/watch?v=1234":
-            self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-            self.properties["feeds"] = [
-                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id",
-            ]
-            self.properties["title"] = "YouTube 1234 video"
-            self.properties["language"] = None
-        elif self.url == "https://youtu.be/1234":
-            self.properties["link"] = "https://www.youtube.com/watch?v=1234"
-            self.properties["feeds"] = [
-                "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id",
-            ]
-            self.properties["title"] = "YouTube 1234 video"
-            self.properties["language"] = None
-        elif self.url == "https://www.reddit.com/r/searchengines/":
-            self.properties["feeds"] = ["https://www.reddit.com/r/searchengines/.rss"]
-        elif self.url == "https://www.reddit.com/r/searchengines":
-            self.properties["feeds"] = ["https://www.reddit.com/r/searchengines/.rss"]
-        elif self.url == "https://www.reddit.com/r/searchengines/.rss":
-            self.set_entries(10)
-        elif self.url == "https://page-with-rss-link.com":
-            self.properties["title"] = "Page with RSS link"
-            self.properties["feeds"] = ["https://page-with-rss-link.com/feed"]
-        elif self.url == "https://page-with-rss-link.com/feed":
-            self.set_entries(10)
-            self.response["Content-Type"] = "application/rss+xml"
-            self.properties["title"] = "Page with RSS link - RSS contents"
-        elif self.url == "https://www.codeproject.com/WebServices/NewsRSS.aspx":
-            self.set_entries(13)
-            self.response["Content-Type"] = "application/rss+xml"
-            self.properties["thumbnail"] = (
-                "https://www.codeproject.com/App_Themes/Std/Img/logo100x30.gif"
-            )
-        elif self.url == "https://no-props-page.com":
-            self.properties["title"] = None
-            self.properties["description"] = None
-            self.properties["date_published"] = None
-            self.properties["author"] = None
-            self.properties["language"] = None
-            self.properties["album"] = None
-            self.properties["page_rating"] = 0
-            self.properties["thumbnail"] = None
-        elif self.url == "https://page-with-http-status-615.com":
-            self.response["status_code"] = HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS
-        elif self.url == "https://page-with-http-status-614.com":
-            self.response["status_code"] = HTTP_STATUS_CODE_SERVER_ERROR
-        elif self.url == "https://page-with-http-status-600.com":
-            self.response["status_code"] = HTTP_STATUS_CODE_EXCEPTION
-        elif self.url == "https://page-with-http-status-500.com":
-            self.response["status_code"] = 500
-        elif self.url == "https://page-with-http-status-429.com":
-            self.response["status_code"] = HTTP_STATUS_TOO_MANY_REQUESTS
-        elif self.url == "https://page-with-http-status-403.com":
-            self.response["status_code"] = HTTP_STATUS_USER_AGENT
-        elif self.url == "https://page-with-http-status-400.com":
-            self.response["status_code"] = 400
-        elif self.url == "https://page-with-http-status-300.com":
-            self.response["status_code"] = 300
-        elif self.url == "https://page-with-http-status-200.com":
-            self.response["status_code"] = 200
-        elif self.url == "https://page-with-http-status-100.com":
-            self.response["status_code"] = 100
-        elif self.url == "http://page-with-http-status-500.com":
-            self.response["status_code"] = 500
-        elif self.url == "http://page-with-http-status-400.com":
-            self.response["status_code"] = 400
-        elif self.url == "http://page-with-http-status-300.com":
-            self.response["status_code"] = 300
-        elif self.url == "http://page-with-http-status-200.com":
-            self.response["status_code"] = 200
-        elif self.url == "http://page-with-http-status-100.com":
-            self.response["status_code"] = 100
-        elif self.url == "https://www.youtube.com/watch?v=666":
-            self.response["status_code"] = 500
-        elif self.url == "https://invalid.rsspage.com/rss.xml":
-            self.response["status_code"] = 500
-        elif (
-            self.url
-            == "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
-        ):
-            self.set_entries(13)
-            self.response["Content-Type"] = "application/rss+xml"
-            self.properties["feeds"] = [self.url]
-        elif (
-            self.url
-            == "https://www.youtube.com/feeds/videos.xml?channel_id=NOLANGUAGETIMESAMTIMESAM"
-        ):
-            self.set_entries(13, language=None)
-            self.response["Content-Type"] = "application/rss+xml"
-            self.properties["feeds"] = [self.url]
-            self.properties["language"] = None
-        elif self.url.startswith("https://odysee.com/$/rss"):
-            self.set_entries(13)
-            self.response["Content-Type"] = "application/rss+xml"
-            self.properties["feeds"] = [self.url]
-        elif self.url == "https://www.geekwire.com/feed":
-            self.text_data = geekwire_feed
-            self.response["Content-Type"] = "application/rss+xml"
-            self.properties["feeds"] = [self.url]
-        elif (
-            self.url
-            == "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id"
-        ):
-            self.set_entries(13)
-            self.response["Content-Type"] = "application/rss+xml"
-            self.properties["feeds"] = [self.url]
-        elif self.url == "https://instance.com/apps/rsshistory/sources-json":
-            self.properties["title"] = "Instance Proxy"
-        elif self.url == "https://v.firebog.net/hosts/AdguardDNS.txt":
-            self.text_data = firebog_adguard_list
-        elif self.url == "https://v.firebog.net/hosts/static/w3kbl.txt":
-            self.text_data = firebog_w3kbl_list
-        elif self.url == "https://v.firebog.net/hosts/lists.php?type=tick":
-            self.text_data = firebog_tick_lists
-        elif self.url == "https://v.firebog.net/hosts/RPiList-Malware.txt":
-            self.text_data = firebog_malware
-        elif self.url == "https://casino.com":
-            self.properties["title"] = "Casino Casino Casino"
-            self.properties["description"] = "Casino Casino Casino"
-        elif self.url == "https://nfsw.com":
-            self.properties["title"] = "AI NSFW girlfriend"
-            self.properties["description"] = "AI NSFW girlfriend"
-        elif self.url == "https://binary.com/file":
-            self.properties["title"] = ""
-            self.properties["description"] = ""
-            self.binary_data = "text".encode()
-
-        if self.url.find("reddit") >= 0:
-            self.properties["language"] = "en"
-
-        if self.response["status_code"] > 200 and self.response["status_code"] < 400:
-            self.response["is_valid"] = True
-            self.response["is_invalid"] = False
-        elif self.response["status_code"] < 200:
-            self.response["is_valid"] = False
-            self.response["is_invalid"] = True
-        elif self.response["status_code"] == HTTP_STATUS_USER_AGENT:
-            self.response["is_valid"] = False
-            self.response["is_invalid"] = False
-        elif self.response["status_code"] == HTTP_STATUS_TOO_MANY_REQUESTS:
-            self.response["is_valid"] = False
-            self.response["is_invalid"] = False
-        elif self.response["status_code"] == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
-            self.response["is_valid"] = False
-            self.response["is_invalid"] = False
-        elif self.response["status_code"] == HTTP_STATUS_CODE_SERVER_ERROR:
-            self.response["is_valid"] = False
-            self.response["is_invalid"] = False
-        elif self.response["status_code"] >= 400:
-            self.response["is_valid"] = False
-            self.response["is_invalid"] = True
-
-        return self.get_all_properties()
-
-    def set_entries(self, number=1, language="en"):
-        for item in range(0, number):
-            properties = {}
-            properties["link"] = self.url + str(item)
-            properties["title"] = "Title" + str(item)
-            properties["description"] = "Description" + str(item)
-            properties["date_published"] = DateUtils.get_datetime_now_iso()
-            properties["author"] = "Description"
-            properties["language"] = language
-            properties["album"] = "Description"
-            properties["page_rating"] = 80
-            properties["thumbnail"] = None
-
-            self.entries.append(properties)
 
 
 class FakeInternetTestCase(TestCase):
@@ -400,32 +149,31 @@ class FakeInternetTestCase(TestCase):
         return True
 
     def get_getj(self, request=None, url=None):
-        MockRequestCounter.requested(url=url, info=request)
+        # print("FakeInternet:get_getj: Url:{}".format(url))
 
-        data = FakeInternetData(url)
-        return data.get_getj(url=url)
+        if url and not request:
+            request = PageRequestObject(url)
+            request.url = url
+            request.url = request.url.strip()
 
-    def get_socialj(self, request=None, url=None):
-        if request:
-            url = request.url
+        MockRequestCounter.requested(url=request.url, info=request)
 
+        data = FakeInternetData(request.url)
+        return data.get_getj(request=request, url=url)
+
+    def get_socialj(self, url):
         MockRequestCounter.requested(url=url)
 
-        if url.find("youtube.com") >= 0:
-            return {"view_count": 15, "thumbs_up": 1, "thumbs_down": 0}
-        if url.find("github.com") >= 0:
-            return {"stars": 5}
-        if url.find("news.ycombinator.com") >= 0:
-            return {"upvote_diff": 5}
-        if url.find("reddit.com") >= 0:
-            return {"upvote_ratio": 5}
-        return None
+        data = FakeInternetData(url)
+        return data.get_socialj(url)
 
-    def get_feedsj(self, request=None, url=None):
-        return []
+    def get_feedsj(self, url, settings=None):
+        data = FakeInternetData(url)
+        return data.get_feedsj(url, settings=settings)
 
-    def get_pingj(self, request=None, url=None):
-        return True
+    def get_pingj(self, url, settings=None):
+        data = FakeInternetData(url)
+        return data.ping(url, settings=settings)
 
     def get_infoj(self):
         data = {"crawlers": [

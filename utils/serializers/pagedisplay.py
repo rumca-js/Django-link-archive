@@ -18,7 +18,7 @@ class PageDisplay(object):
         u = RemoteUrl(url)
         u.get_response()
 
-        properties = u.get_properties(full=True)
+        properties = u.get_properties()
 
         for section in properties:
             section_name = section["name"]

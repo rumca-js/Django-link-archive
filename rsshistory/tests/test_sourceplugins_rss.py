@@ -255,7 +255,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.print_errors()
 
-        self.assertTrue(plugin.hash)
+        self.assertTrue(plugin.get_hash())
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 

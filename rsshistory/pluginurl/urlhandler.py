@@ -3,6 +3,7 @@ import requests
 
 from webtoolkit import (
     RemoteServer,
+    RemoteUrl,
     UrlLocation,
     PageRequestObject,
     is_status_code_valid,
@@ -86,7 +87,7 @@ class UrlHandler(object):
 
                 request = UrlHandler.browser_to_request(self.url, browser)
 
-                self.all_properties = request_server.get_getj(request)
+                self.all_properties = request_server.get_getj(request=request)
                 if not self.all_properties:
                     AppLogging.warning(
                         "Url:{} Could not communicate with remote server, Browser:{}".format(
@@ -123,7 +124,7 @@ class UrlHandler(object):
         else:
             request = PageRequestObject(self.url)
 
-            self.all_properties = request_server.get_getj(request)
+            self.all_properties = request_server.get_getj(request=request)
             if not self.all_properties:
                 AppLogging.warning(
                     "Url:{} Could not communicate with remote server".format(self.url)
@@ -222,27 +223,15 @@ class UrlHandler(object):
     def get_thumbnail(self):
         return self.get_simple_properties().get("thumbnail")
 
-    def get_contents(self):
-        """
-        @depricated
-        """
-        return self.get_text()
-
     def get_text(self):
-        contents_data = self.get_section("Streams")
-        if not contents_data:
-            return
-
-        for item in contents_data:
-           return item["text"]
+        response = self.get_response()
+        if response:
+            return response.get_text()
 
     def get_binary(self):
-        contents_data = self.get_section("Streams")
-        if not contents_data:
-            return
-
-        for item in contents_data:
-           return item["binary"]
+        response = self.get_response()
+        if response:
+            return response.get_binary()
 
     def get_section(self, section_name):
         properties = self.get_properties()
@@ -310,7 +299,7 @@ class UrlHandler(object):
             if not properties:
                 return True
 
-            properties["contents"] = self.get_contents()
+            properties["contents"] = self.get_text()
 
             reason = EntryRules.is_dict_blocked(properties)
             if reason:
@@ -373,4 +362,4 @@ class UrlHandler(object):
     def get_response(self):
         self.get_properties()
         config_entry = Configuration.get_object().config_entry
-        return RemoteServer.get_response(self.all_properties)
+        return RemoteUrl(all_properties = self.all_properties).get_response()

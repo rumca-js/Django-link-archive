@@ -185,7 +185,7 @@ class BlockEntryList(models.Model):
         from ..pluginurl import UrlHandler
 
         handler = UrlHandler(self.url)
-        contents = handler.get_contents()
+        contents = handler.get_text()
         if contents:
             reader = BlockListReader(contents)
             AppLogging.debug("Reading block list {}".format(self.url))

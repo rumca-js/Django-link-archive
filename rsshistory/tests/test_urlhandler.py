@@ -34,8 +34,8 @@ class UrlHandlerTest(FakeInternetTestCase):
         mapping = handler.browsers
 
         self.assertEqual(len(mapping), 2)
-        self.assertEqual(mapping[0]["name"], "test1")
-        self.assertEqual(mapping[1]["name"], "test2")
+        self.assertEqual(mapping[0].name, "test1")
+        self.assertEqual(mapping[1].name, "test2")
 
     def test_constructor__default_browsers__entry_rules(self):
         Browser.objects.all().delete()
@@ -64,8 +64,8 @@ class UrlHandlerTest(FakeInternetTestCase):
         mapping = handler.browsers
 
         self.assertEqual(len(mapping), 2)
-        self.assertEqual(mapping[0]["name"], "test2")
-        self.assertEqual(mapping[1]["name"], "test1")
+        self.assertEqual(mapping[0].name, "test2")
+        self.assertEqual(mapping[1].name, "test1")
 
     def test_constructor__arg_browsers(self):
         Browser.objects.all().delete()
@@ -88,7 +88,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         mapping = handler.browsers
 
         self.assertEqual(len(mapping), 1)
-        self.assertEqual(mapping[0]["name"], "test1")
+        self.assertEqual(mapping[0].name, "test1")
 
     def test_get_browsers(self):
         Browser.objects.all().delete()
@@ -111,8 +111,8 @@ class UrlHandlerTest(FakeInternetTestCase):
         mapping = handler.get_browsers()
 
         self.assertEqual(len(mapping), 2)
-        self.assertEqual(mapping[0]["name"], "test1")
-        self.assertEqual(mapping[1]["name"], "test2")
+        self.assertEqual(mapping[0].name, "test1")
+        self.assertEqual(mapping[1].name, "test2")
 
     def test_get_ready_browser(self):
         Browser.objects.all().delete()
@@ -131,7 +131,7 @@ class UrlHandlerTest(FakeInternetTestCase):
 
         handler = UrlHandler(
             test_link,
-            browsers=[browser1, browser],
+            browsers=[browser1, browser2],
             settings={"handler_class": "HttpPageHandler"},
         )
 
@@ -140,8 +140,8 @@ class UrlHandlerTest(FakeInternetTestCase):
 
         self.assertTrue(len(browsers) > 0)
 
-        self.assertEqual(browsers[0]["name"], "test1")
-        self.assertEqual(browsers[0]["settings"]["handler_class"], "HttpPageHandler")
+        self.assertEqual(browsers[0].name, "test1")
+        self.assertEqual(browsers[0].settings["handler_class"], "HttpPageHandler")
 
     def test_get_properties__no_browser(self):
         Browser.objects.all().delete()

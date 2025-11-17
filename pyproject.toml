@@ -35,7 +35,7 @@ psutil="*"
 # TODO do we need this?
 #lxml="^5.4.0"
 #brutefeedparser="*"
-webtoolkit="0.0.120"
+webtoolkit="0.0.127"
 cryptography="^45.0.3"
 
 [tool.poetry.group.dev.dependencies]

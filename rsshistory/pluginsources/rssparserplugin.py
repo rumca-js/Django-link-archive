@@ -53,7 +53,7 @@ class RssParserPlugin(BaseRssPlugin):
     def get_page_links(self, entry_properties):
         url = entry_properties["link"]
         h = UrlHandler(url)
-        contents = h.get_contents()
+        contents = h.get_text()
 
         result = set()
         if not contents:
