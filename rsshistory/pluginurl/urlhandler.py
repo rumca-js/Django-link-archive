@@ -305,9 +305,6 @@ class UrlHandler(object):
             if reason:
                 return reason
 
-        if self.is_invalid():
-            return True
-
         if not self.is_allowed():
             return True
 

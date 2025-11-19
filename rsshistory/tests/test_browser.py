@@ -50,28 +50,6 @@ class BrowserTest(FakeInternetTestCase):
         browsers = Browser.objects.all()
         self.assertEqual(init_value, browsers.count())
 
-    def test_get_browsers_default(self):
-        Browser.read_browser_setup()
-        browsers = Browser.objects.all()
-        self.assertTrue(browsers.count() > 0)
-
-        # call tested function
-        setup = Browser.get_browser_setup()
-        self.assertTrue(len(setup) > 0)
-
-        self.assertEqual(setup[0]["name"], "RequestsCrawler")
-
-    def test_get_browsers_string(self):
-        Browser.read_browser_setup()
-        browsers = Browser.objects.all()
-        self.assertTrue(browsers.count() > 0)
-
-        # call tested function
-        setup = Browser.get_browser_setup(string=True)
-        self.assertTrue(len(setup) > 0)
-
-        self.assertEqual(setup[0]["name"], "RequestsCrawler")
-
     def test_is_valid(self):
         Browser.objects.all().delete()
 

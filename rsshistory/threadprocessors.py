@@ -173,7 +173,7 @@ class ProcessorInterface(object):
     def get_query_conditions(self):
         jobs = self.get_supported_jobs()
         if len(jobs) == 0:
-            return []
+            return Q()
 
         query_conditions = Q(enabled=True)
         if len(jobs) > 0:
