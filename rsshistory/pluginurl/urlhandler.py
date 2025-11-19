@@ -51,6 +51,19 @@ class UrlHandler(object):
 
         return self.get_properties_internal()
 
+    def get_properties(self):
+        properties = self.get_section("Properties")
+        if not properties:
+            return
+
+        return properties
+
+    def get_all_properties(self):
+        if self.all_properties:
+            return self.all_properties
+
+        return self.get_properties_internal()
+
     def get_properties_internal(self):
         config_entry = Configuration.get_object().config_entry
 
@@ -198,30 +211,23 @@ class UrlHandler(object):
 
         return result
 
-    def get_simple_properties(self):
-        properties = self.get_section("Properties")
-        if not properties:
-            return
-
-        return properties
-
     def get_title(self):
-        return self.get_simple_properties().get("title")
+        return self.get_properties().get("title")
 
     def get_description(self):
-        return self.get_simple_properties().get("description")
+        return self.get_properties().get("description")
 
     def get_language(self):
-        return self.get_simple_properties().get("language")
+        return self.get_properties().get("language")
 
     def get_author(self):
-        return self.get_simple_properties().get("author")
+        return self.get_properties().get("author")
 
     def get_album(self):
-        return self.get_simple_properties().get("album")
+        return self.get_properties().get("album")
 
     def get_thumbnail(self):
-        return self.get_simple_properties().get("thumbnail")
+        return self.get_properties().get("thumbnail")
 
     def get_text(self):
         response = self.get_response()
@@ -234,7 +240,7 @@ class UrlHandler(object):
             return response.get_binary()
 
     def get_section(self, section_name):
-        properties = self.get_properties()
+        properties = self.get_all_properties()
         if not properties:
             return
 

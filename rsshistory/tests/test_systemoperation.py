@@ -122,7 +122,7 @@ class SystemOperationTest(FakeInternetTestCase):
         ]
 
         # call tested function
-        SystemOperationController.cleanup(cfg={}, thread_ids=thread_ids)
+        SystemOperationController.cleanup(cfg={})
 
         rows = SystemOperation.objects.all()
 

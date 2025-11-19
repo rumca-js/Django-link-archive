@@ -134,7 +134,7 @@ def json_page_properties(request):
         return JsonResponse(data, json_dumps_params={"indent": 4})
 
     url_ex = get_request_url_with_browser(request.GET)
-    all_properties = url_ex.get_properties()
+    all_properties = url_ex.get_all_properties()
 
     if not all_properties:
         data = OrderedDict()

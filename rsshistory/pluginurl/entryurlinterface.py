@@ -53,10 +53,10 @@ class EntryUrlInterface(object):
             if browsers:
                 self.handler.browsers = browsers
 
-        self.all_properties = self.handler.get_properties()
+        self.all_properties = self.handler.get_all_properties()
 
         if self.all_properties:
-            properties = self.handler.get_section("Properties")
+            properties = self.handler.get_properties()
             response = self.handler.get_response()
 
             # TODO properties["date_dead_since"] = DateUtils.get_datetime_now_utc()
@@ -105,8 +105,8 @@ class EntryUrlInterface(object):
         if not self.all_properties:
             return False
 
-        response = RemoteServer.read_properties_section("Response", self.all_properties)
-        return response.get("is_valid")
+        response = self.handler.get_response()
+        return response.is_valid()
 
     def is_blocked(self):
         if not self.handler:
