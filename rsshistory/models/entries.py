@@ -357,8 +357,6 @@ class BaseLinkDataController(BaseLinkDataModel):
         if self.thumbnail:
             return self.thumbnail
 
-        return self.get_favicon()
-
     def get_export_names():
         """
         Provides object export names. No dependencies towards other objects

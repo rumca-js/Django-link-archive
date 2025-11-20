@@ -343,15 +343,9 @@ def entry_to_json(user_config, entry, with_tags=False, with_social=False, with_v
             json_entry["alpha"] = entry.source.entries_alpha
 
     if user_config.show_icons:
-        if user_inappropate:
-            json_entry["thumbnail"] = None
-        else:
-            if user_config.thumbnails_as_icons:
-                json_entry["thumbnail"] = entry.get_thumbnail()
-            else:
-                json_entry["thumbnail"] = entry.get_favicon()
-            if not json_entry["thumbnail"] and entry.source:
-                json_entry["thumbnail"] = entry.source.get_favicon()
+        if not user_inappropate:
+            json_entry["thumbnail"] = entry.get_thumbnail()
+            json_entry["favicon"] = entry.get_favicon()
 
     if with_tags and hasattr(entry, "tags"):
         tags = set()

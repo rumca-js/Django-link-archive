@@ -193,7 +193,7 @@ class SourceGenericPlugin(SourcePluginInterface):
             else:
                 url_ex = UrlHandler(url=page_link)
 
-            self.all_properties = url_ex.get_properties()
+            self.all_properties = url_ex.get_all_properties()
             self.response = url_ex.get_response()
 
             if not url_ex.is_valid():

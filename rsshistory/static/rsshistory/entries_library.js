@@ -237,6 +237,33 @@ function getEntryThumbnail(entry) {
 }
 
 
+function getEntryFavicon(entry) {
+    if (!canUserView(entry))
+    {
+        return;
+    }
+
+    let thumbnail = entry.favicon;
+
+    return thumbnail;
+}
+
+
+function getEntryThumbnailOrFavicon(entry) {
+    if (!canUserView(entry))
+    {
+        return;
+    }
+
+    let thumbnail = entry.thumbnail;
+    if (thumbnail == null) {
+        thumbnail = entry.favicon;
+    }
+
+    return thumbnail;
+}
+
+
 function getEntryLinkText(entry) {
     let link = entry.link;
     return `<div class="text-reset text-decoration-underline">@ ${link}</div>`;
@@ -791,6 +818,23 @@ function getEntryDisplayStyle(entry, mark_visited=true) {
 }
 
 
+function getEntryThumbnailBadge(entry, img_location, small_icons=false) {
+    if (view_show_icons == null) {
+        return "";
+    }
+
+    let thumbnail = img_location;
+
+    const iconClass = small_icons ? 'icon-small' : 'icon-normal';
+    let img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
+    
+    thumbnail_text = `
+            <div style="position: relative; display: inline-block;">
+                ${img_text}
+            </div>`;
+}
+
+
 function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let page_rating_votes = entry.page_rating_votes;
 
@@ -803,7 +847,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
 
     let invalid_style = getEntryDisplayStyle(entry);
     let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
-    let thumbnail = getEntryThumbnail(entry);
+    let thumbnail = getEntryThumbnailOrFavicon(entry);
 
     let img_text = '';
     if (show_icons) {
@@ -888,7 +932,7 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
     let invalid_style = getEntryDisplayStyle(entry);
     let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
 
-    let thumbnail = getEntryThumbnail(entry);
+    let thumbnail = getEntryThumbnailOrFavicon(entry);
 
     let thumbnail_text = '';
     if (show_icons) {
@@ -954,20 +998,24 @@ function entryContentCentricTemplate(entry, show_icons = true, small_icons = fal
     let source_info = getEntrySourceInfo(entry);
 
     let thumbnail = getEntryThumbnail(entry);
+    let img_badge = "";
+    if (!thumbnail) {
+       img_badge = getEntryThumbnailBadge()
+    }
 
     let thumbnail_text = '';
-    if (show_icons) {
+    if (show_icons && thumbnail) {
         const iconClass = small_icons ? 'icon-normal' : 'icon-big';
         if (isMobile()) {
            thumbnail_text = `
-               <div style="position: relative; display: inline-block;">
-                   <img src="${thumbnail}" style="width:100%; max-height:100%; object-fit:cover"/>
+               <div style="position: relative; display: inline-block; width:100%;">
+                   <img src="${thumbnail}" style="width:100%; max-height:100%; min-width:20%; object-fit:cover"/>
                </div>`;
 	}
         else {
            thumbnail_text = `
-               <div style="position: relative; display: inline-block;">
-                   <img src="${thumbnail}" style="width:50%; max-height:100%; object-fit:cover"/>
+               <div style="position: relative; display: inline-block; width:100%;">
+                   <img src="${thumbnail}" style="width:40%; max-height:100%; min-width:20%; object-fit:cover"/>
                </div>`;
 	}
     }
@@ -1000,7 +1048,7 @@ function entryContentCentricTemplate(entry, show_icons = true, small_icons = fal
                </div>
             </a>
 
-            <div class="mx-2">
+            <div class="mx-2" style="text-align:center;">
                <a href="${entry_link}" title="${hover_title}">
                ${thumbnail_text}
                </a>
@@ -1058,7 +1106,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
     let thumbnail = "";
     if (show_icons)
     {
-       thumbnail = getEntryThumbnail(entry);
+       thumbnail = getEntryThumbnailOrFavicon(entry);
     }
 
     let thumbnail_text = `
@@ -1133,7 +1181,7 @@ function entryGalleryTemplateMobile(entry, show_icons = true, small_icons = fals
     let thumbnail = "";
     if (show_icons)
     {
-       thumbnail = getEntryThumbnail(entry);
+       thumbnail = getEntryThumbnailOrFavicon(entry);
     }
     let thumbnail_text = `
         <img src="${thumbnail}" style="width:100%; max-height:100%; object-fit:cover"/>
