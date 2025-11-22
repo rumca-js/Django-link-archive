@@ -12,15 +12,25 @@ class Browser(models.Model):
     EMPTY_FORM = -1
     AUTO = -2
 
-    enabled = models.BooleanField(default=True)
-    priority = models.IntegerField(default=0)
-    name = models.CharField(default="", max_length=2000)
-    ignore_errors = models.BooleanField(default=False)
-    handler_name = models.CharField(blank=True, max_length=2000)
+    enabled = models.BooleanField(default=True, help_text="enabled")
+    priority = models.IntegerField(default=0, help_text="priority")
+    ignore_errors = models.BooleanField(default=False, help_text="ignore errors")
 
+    user_agent = models.CharField(default="", max_length=2000, help_text="User agent")
+    request_headers = models.CharField(default="", max_length=2000, help_text="Request headers")
+    timeout_s = models.IntegerField(null=True, blank=True, help_text="Timeout")
+    delay_s = models.IntegerField(null=True, blank=True, help_text="Delay after reading, useful for JavaScript loading")
+    ssl_verify = models.BooleanField(default=False, help_text="Verify SSL certificates and errors")
+    respect_robots_txt = models.BooleanField(default=False, help_text="Respect robots.txt settings")
+    accept_types = models.CharField(blank=True, max_length=2000, help_text="Accept MIME types")
+    bytes_limit = models.IntegerField(null=True, blank=True, help_text="Bytes limit")
     settings = models.CharField(
-        max_length=2000, blank=True
+        max_length=2000, blank=True, help_text="Settings JSON"
     )  # json map inside. script path, port etc
+    cookies = models.CharField(blank=True, max_length=2000, help_text="Cookies JSON map")
+    name = models.CharField(default="", max_length=2000, help_text="Crawler name")
+    handler_name = models.CharField(blank=True, max_length=2000, help_text="Handler name")
+
 
     class Meta:
         ordering = ["-enabled", "priority", "name"]

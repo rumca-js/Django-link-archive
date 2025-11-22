@@ -1,5 +1,6 @@
 import traceback
 import requests
+import json
 
 from webtoolkit import (
     RemoteServer,
@@ -98,7 +99,7 @@ class UrlHandler(object):
                     )
                 )
 
-                request = UrlHandler.browser_to_request(self.url, browser)
+                request = self.browser_to_request(browser)
 
                 self.all_properties = request_server.get_getj(request=request)
                 if not self.all_properties:
@@ -169,13 +170,39 @@ class UrlHandler(object):
 
         return not is_status_code_valid(status_code)
 
-    def browser_to_request(url, browser, handler_name = None):
-        request = PageRequestObject(url)
+    def browser_to_request(self, browser):
+        request = PageRequestObject(self.url)
+
+        request.user_agent = browser.user_agent
+        if browser.request_headers:
+            try:
+                request.request_headers = json.loads(browser.request_headers)
+            except Exception as E:
+                print(E)
+        request.timeout_s = browser.timeout_s
+        request.delay_s = browser.delay_s
+        request.ssl_verify = browser.ssl_verify
+        request.respect_robots = browser.respect_robots_txt
+        request.accept_types = browser.accept_types
+        request.bytes_limit = browser.bytes_limit
+
+        if browser.cookies:
+            try:
+                request.cookies = json.loads(browser.cookies)
+            except Exception as E:
+                print(E)
+        if browser.settings:
+            try:
+                request.settings = json.loads(browser.settings)
+            except Exception as E:
+                print(E)
+
         request.crawler_name = browser.name
-        if browser.handler_name:
+        if self.handler_name:
+            request.handler_name = self.handler_name
+        elif browser.handler_name:
             request.handler_name = browser.handler_name
-        if handler_name:
-            request.handler_name = handler_name
+
         return request
 
     def get_browsers(self):

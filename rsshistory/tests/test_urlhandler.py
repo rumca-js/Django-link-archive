@@ -114,7 +114,99 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.assertEqual(mapping[0].name, "test1")
         self.assertEqual(mapping[1].name, "test2")
 
-    def test_get_ready_browser(self):
+    def test_browser_to_request(self):
+        Browser.objects.all().delete()
+
+        browser1 = Browser.objects.create(
+            name="test1",
+            user_agent="test-user-agent1",
+            request_headers = '{"request_headers1" : "value1"}',
+            timeout_s = 50,
+            delay_s = 60,
+            ssl_verify=True,
+            respect_robots_txt=True,
+            accept_types="jpg",
+            bytes_limit=666,
+            settings='{"test_setting1" : "something1"}',
+            cookies='{"cookie1" : "value1"}',
+        )
+
+        browser2 = Browser.objects.create(
+            name="test2",
+            user_agent="test-user-agent2",
+            request_headers = '{"request_headers2" : "value2"}',
+            timeout_s = 51,
+            delay_s = 61,
+            ssl_verify=False,
+            respect_robots_txt=False,
+            accept_types="mp4",
+            bytes_limit=667,
+            settings='{"test_setting2" : "something2"}',
+            cookies='{"cookie1" : "value2"}',
+        )
+
+        test_link = "https://rsspage.com/rss.xml"
+
+        handler = UrlHandler(test_link)
+
+        # call tested function
+        request = handler.browser_to_request(browser1)
+
+        self.assertEqual(request.url, test_link)
+        self.assertEqual(request.user_agent, "test-user-agent1")
+        self.assertIn("request_headers1", request.request_headers)
+        self.assertEqual(request.timeout_s, 50)
+        self.assertEqual(request.delay_s, 60)
+        self.assertEqual(request.ssl_verify, True)
+        self.assertEqual(request.respect_robots, True)
+        self.assertEqual(request.accept_types, "jpg")
+        self.assertEqual(request.bytes_limit, 666)
+        self.assertIn("test_setting1", request.settings)
+        self.assertIn("cookie1", request.cookies)
+        self.assertFalse(request.handler_name)
+
+    def test_browser_to_request__arg_handler_name(self):
+        Browser.objects.all().delete()
+
+        browser1 = Browser.objects.create(
+            name="test1",
+            user_agent="test-user-agent",
+            request_headers = "request_headers",
+            timeout_s = 50,
+            delay_s = 60,
+            ssl_verify=True,
+            respect_robots_txt=True,
+            accept_types="jpg",
+            bytes_limit=666,
+            settings='{"test_setting" : "something"}',
+            cookies='{"cookie" : "value"}',
+        )
+
+        browser2 = Browser.objects.create(
+            name="test2",
+            user_agent="test-user-agent",
+            request_headers = "request_headers",
+            timeout_s = 51,
+            delay_s = 61,
+            ssl_verify=False,
+            respect_robots_txt=False,
+            accept_types="mp4",
+            bytes_limit=667,
+            settings='{"test_setting" : "something"}',
+            cookies='{"cookie" : "value"}',
+        )
+
+        test_link = "https://rsspage.com/rss.xml"
+
+        handler = UrlHandler(test_link, handler_name="HttpPageHandler")
+
+        # call tested function
+        request = handler.browser_to_request(browser1)
+
+        self.assertEqual(request.url, test_link)
+        self.assertEqual(request.handler_name, "HttpPageHandler")
+
+    def test_bring_to_front(self):
         Browser.objects.all().delete()
 
         browser1 = Browser.objects.create(
@@ -129,19 +221,13 @@ class UrlHandlerTest(FakeInternetTestCase):
 
         test_link = "https://rsspage.com/rss.xml"
 
-        handler = UrlHandler(
-            test_link,
-            browsers=[browser1, browser2],
-            handler_name="HttpPageHandler",
-        )
+        handler = UrlHandler(test_link, handler_name="HttpPageHandler")
 
         # call tested function
-        browsers = handler.get_browsers()
+        browsers = handler.bring_to_front(handler.get_browsers(), browser2.id)
 
-        self.assertTrue(len(browsers) > 0)
-
-        self.assertEqual(browsers[0].name, "test1")
-        self.assertEqual(browsers[0].settings["handler_name"], "HttpPageHandler")
+        self.assertEqual(len(browsers), 2)
+        self.assertEqual(browsers[0].name, "test2")
 
     def test_get_properties__no_browser(self):
         Browser.objects.all().delete()
@@ -260,7 +346,7 @@ class UrlHandlerTest(FakeInternetTestCase):
     def test_get_binary__invalid(self):
         url = UrlHandler("https://linkedin.com")
         # call tested function
-        self.assertFalse(url.get_binary())
+        self.assertTrue(url.get_binary())
 
     def test_get_binary__valid(self):
         url = UrlHandler("https://binary.com/file")

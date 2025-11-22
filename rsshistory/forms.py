@@ -1007,6 +1007,17 @@ class BrowserEditForm(forms.ModelForm):
             "name",
             "priority",
             "ignore_errors",
+            "ssl_verify",
+            "respect_robots_txt",
+            "timeout_s",
+            "delay_s",
+            "user_agent",
+            "request_headers",
+            "accept_types",
+            "bytes_limit",
+            "settings",
+            "cookies",
+            "handler_name",
             "settings",
         ]
 
