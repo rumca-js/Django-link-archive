@@ -79,12 +79,6 @@ class DjangoRequestObject(object):
         self.user = user
 
 
-class DefaultCrawler(CrawlerInterface):
-
-    def run(self):
-        MockRequestCounter.requested(self.request.url)
-
-
 class FakeInternetTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -177,45 +171,26 @@ class FakeInternetTestCase(TestCase):
 
     def get_infoj(self):
         data = {"crawlers": [
-            {
-                "enabled": True,
-                "name": "DefaultCrawler",
-                "settings": {
-                    "timeout_s": 20
-                    }
+                {
+                   "enabled": True,
+                   "name": "MockCrawler",
+                   "settings": {
+                       "timeout_s": 20
+                   }
+                },
+                {
+                   "enabled": True,
+                   "name": "MockCrawler",
+                   "settings": {
+                       "timeout_s": 27
+                   }
                 }
-            ]
-                }
+                ]
+               }
         return data
 
     def check_crawling_server(self, thread_id):
         return True
-
-    def get_default_crawler(url):
-        crawler = DefaultCrawler(url=url)
-
-        crawler_data = {
-            "name": "DefaultCrawler",
-            "crawler": crawler,
-            "settings": {
-                "timeout_s": 10,
-            },
-        }
-
-        return crawler_data
-
-    def get_crawler_from_mapping(request, crawler_data):
-        if "settings" in crawler_data:
-            crawler = DefaultCrawler(request=request, settings=crawler_data["settings"])
-        else:
-            crawler = DefaultCrawler(request=request)
-        crawler.crawler_data = crawler_data
-
-        return crawler
-
-    def get_crawler_from_string(string):
-        print("oi")
-        return DefaultCrawler
 
     def setup_configuration(self):
         # each suite should start with a default configuration entry

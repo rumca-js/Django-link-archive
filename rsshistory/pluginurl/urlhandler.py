@@ -296,8 +296,8 @@ class UrlHandler(object):
         if not response:
             return False
 
-        if not response.is_invalid():
-            return False
+        if response.is_invalid():
+            return True
 
         blocked = self.is_blocked()
         if blocked:

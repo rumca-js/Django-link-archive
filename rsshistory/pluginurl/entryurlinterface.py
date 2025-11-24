@@ -101,14 +101,16 @@ class EntryUrlInterface(object):
 
         return input_props
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         if not self.all_properties:
             return False
 
         response = self.handler.get_response()
-        return response.is_valid()
+        if response:
+            return response.is_valid()
+        return False
 
-    def is_blocked(self):
+    def is_blocked(self) -> bool:
         if not self.handler:
             return False
 
@@ -200,5 +202,5 @@ class EntryUrlInterface(object):
 
         return input_props
 
-    def is_property_set(self, input_props, property):
+    def is_property_set(self, input_props, property) -> bool:
         return property in input_props and input_props[property]

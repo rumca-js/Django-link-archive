@@ -26,8 +26,10 @@ class BrowserTest(FakeInternetTestCase):
         # call tested function
         Browser.read_browser_setup()
 
+        remote_crawlers = self.get_infoj()["crawlers"]
+
         browsers = Browser.objects.all()
-        self.assertTrue(browsers.count() > 5)
+        self.assertEqual(browsers.count(), len(remote_crawlers)
 
         self.assertEqual(browsers[0].priority, 0)
         self.assertEqual(browsers[1].priority, 1)
@@ -64,8 +66,10 @@ class BrowserTest(FakeInternetTestCase):
     def test_prio_up(self):
         Browser.read_browser_setup()
 
+        remote_crawlers = self.get_infoj()["crawlers"]
+
         browsers = Browser.objects.all()
-        self.assertTrue(browsers.count() > 5)
+        self.assertEqual(browsers.count(), len(remote_crawlers))
 
         first = browsers[0]
         second = browsers[1]
@@ -88,9 +92,10 @@ class BrowserTest(FakeInternetTestCase):
 
     def test_prio_down(self):
         Browser.read_browser_setup()
+        remote_crawlers = self.get_infoj()["crawlers"]
 
         browsers = Browser.objects.all()
-        self.assertTrue(browsers.count() > 5)
+        self.assertRequal(browsers.count(), len(remote_crawlers))
 
         first = browsers[0]
         second = browsers[1]

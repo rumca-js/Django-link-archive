@@ -306,7 +306,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].status_code, 500)
         self.assertEqual(entries[0].manual_status_code, 0)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_update_data__clears_stale_entry_status(self):
         MockRequestCounter.mock_page_requests = 0
@@ -442,7 +442,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             entries[0].thumbnail, "https://youtube.com/files/1234-thumbnail.png"
         )
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_update_data__removes_by_url__casinos(self):
         MockRequestCounter.mock_page_requests = 0
@@ -618,7 +618,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entry.age, 15)
         # self.assertEqual(entry.date_update_last, date_updated)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_reset_data__fills_properties(self):
         MockRequestCounter.mock_page_requests = 0
