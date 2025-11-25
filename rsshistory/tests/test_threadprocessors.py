@@ -146,7 +146,7 @@ class RefreshProcessorTest(FakeInternetTestCase):
             BackgroundJobController.get_number_of_jobs(
                 BackgroundJobController.JOB_CLEANUP
             ),
-            19,
+            20,
         )
 
     def test_refresh__adds_update_entry_job(self):

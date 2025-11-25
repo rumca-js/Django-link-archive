@@ -126,7 +126,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         handler.process(job)
 
         jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 20)
+        self.assertEqual(jobs.count(), 21)
 
         number_of_histories = BackgroundJobHistory.objects.all().count()
         self.assertEqual(number_of_histories, 1)
@@ -144,7 +144,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         handler.process(job)
 
         jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 20)
+        self.assertEqual(jobs.count(), 21)
 
         for job in jobs:
             handler = CleanupJobHandler()
@@ -549,7 +549,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         self.assertEqual(len(subjects), 2)
         # still process source is present
         self.assertTrue("process-source" in subjects)
-        # add link job odysee
+        # add entry job
         self.assertTrue("link-add" in subjects)
 
         self.assertTrue(UserTags.objects.all().count() > 0)

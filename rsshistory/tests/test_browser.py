@@ -29,7 +29,7 @@ class BrowserTest(FakeInternetTestCase):
         remote_crawlers = self.get_infoj()["crawlers"]
 
         browsers = Browser.objects.all()
-        self.assertEqual(browsers.count(), len(remote_crawlers)
+        self.assertEqual(browsers.count(), len(remote_crawlers))
 
         self.assertEqual(browsers[0].priority, 0)
         self.assertEqual(browsers[1].priority, 1)
@@ -95,7 +95,7 @@ class BrowserTest(FakeInternetTestCase):
         remote_crawlers = self.get_infoj()["crawlers"]
 
         browsers = Browser.objects.all()
-        self.assertRequal(browsers.count(), len(remote_crawlers))
+        self.assertEqual(browsers.count(), len(remote_crawlers))
 
         first = browsers[0]
         second = browsers[1]

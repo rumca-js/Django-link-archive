@@ -76,6 +76,12 @@ class UserThingsTest(FakeInternetTestCase):
 
 
 class UserConfigTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword", is_staff=True
+        )
 
     def test_user_configs(self):
         url = reverse("{}:user-configs".format(LinkDatabase.name))

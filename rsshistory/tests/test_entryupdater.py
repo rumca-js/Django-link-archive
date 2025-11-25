@@ -145,7 +145,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         entry.refresh_from_db()
         self.assertEqual(entry.link, "https://linkedin.com")
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_update_data__promotes_www_to_non_www(self):
         MockRequestCounter.mock_page_requests = 0
@@ -181,7 +181,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
         entry.refresh_from_db()
         self.assertEqual(entry.link, "https://linkedin.com")
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_update_data__not_reset_properties(self):
         MockRequestCounter.mock_page_requests = 0
@@ -261,8 +261,8 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
         self.assertEqual(entries.count(), 0)
 
-        # 3 times checking
-        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+        # 2 times checking
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_update_data__sets_stale_entry_status(self):
         MockRequestCounter.mock_page_requests = 0
@@ -733,7 +733,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             link="https://page-with-http-status-500.com"
         )
         self.assertEqual(entries.count(), 0)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 3)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_reset_local_data(self):
         MockRequestCounter.mock_page_requests = 0

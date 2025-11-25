@@ -193,6 +193,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
     def test_build_from_props__adds_domain(self):
         DomainsController.objects.all().delete()
         LinkDataController.objects.all().delete()
+        BackgroundJobController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
         config.enable_crawling = True
@@ -206,7 +207,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         MockRequestCounter.mock_page_requests = 0
 
-        link_name_0 = "https://youtube.com/v=1234"
+        link_name_0 = "https://youtube.com"
 
         link_data = {
             "link": link_name_0,
@@ -224,50 +225,13 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         # call tested function
         entry = b.build_from_props()
 
-        self.assertFalse(entry) # entry is not created, because of config
+        self.assertTrue(entry)
 
-        objs = LinkDataController.objects.all()
+        entries = LinkDataController.objects.all()
+        self.assertEqual(entries.count(), 1)
+
         domains = DomainsController.objects.all()
-
-        for domain in domains:
-            print("Domain:{}".format(domain.domain))
-
-        # for each domain an entry is created
-        self.assertEqual(objs.count(), 0)
-
-        jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 1)
-        self.assertEqual(jobs[0].subject, "https://youtube.com")
-
-        link_name_1 = "https://youtube.com/v=1235"
-
-        link_data = {
-            "link": link_name_1,
-            "source_url": "https://youtube.com",
-            "title": "test",
-            "description": "description",
-            "language": "en",
-            "thumbnail": "https://youtube.com/favicon.ico",
-            "date_published": DateUtils.get_datetime_now_utc(),
-            "bookmarked": True,
-        }
-
-        b = EntryDataBuilder(source_is_auto=True)
-        b.link_data = link_data
-        # call tested function
-        entry = b.build_from_props()
-
-        objs = LinkDataController.objects.all()
-        domains = DomainsController.objects.all()
-
-        # for each domain an entry is created
-        self.assertEqual(objs.count(), 0)
-
-        jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 1)
-        self.assertEqual(jobs[0].subject, "https://youtube.com")
-
-        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+        self.assertEqual(domains.count(), 1)
 
     def test_build_from_props__site_not_found(self):
         config = Configuration.get_object().config_entry

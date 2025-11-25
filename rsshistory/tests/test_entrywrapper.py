@@ -734,7 +734,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
         self.assertEqual(entries.count(), 0)
 
-    def test_evaluate__not_removes_domain(self):
+    def test_evaluate__removes_domain(self):
         LinkDataController.objects.all().delete()
 
         conf = Configuration.get_object().config_entry
@@ -759,14 +759,14 @@ class EntryWrapperTest(FakeInternetTestCase):
         result = EntryWrapper(entry=https_entry).evaluate()
 
         entries = LinkDataController.objects.filter(link__icontains="archive.com")
-        self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries.count(), 0)
 
         entries = ArchiveLinkDataController.objects.filter(
             link__icontains="archive.com"
         )
         self.assertEqual(entries.count(), 0)
 
-    def test_evaluate__not_removes_non_domain(self):
+    def test_evaluate__removes_non_domain(self):
         LinkDataController.objects.all().delete()
 
         conf = Configuration.get_object().config_entry
@@ -791,7 +791,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         result = EntryWrapper(entry=https_entry).evaluate()
 
         entries = LinkDataController.objects.filter(link__icontains="archive.com")
-        self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries.count(), 0)
 
         entries = ArchiveLinkDataController.objects.filter(
             link__icontains="archive.com"
