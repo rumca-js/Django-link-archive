@@ -428,7 +428,7 @@ class OmniSearchWithDefault(OmniSearch):
             query = self.get_combined_query_simple()
 
         if query is None:
-            self.errors.append("Query is none")
+            self.errors.append("Could not calculate query")
 
         return query
 
@@ -450,8 +450,9 @@ class OmniSearchWithDefault(OmniSearch):
         return result
 
     def get_errors(self):
-        self.errors.extend(self.symbol_evaluator.errors)
-        return self.errors
+        errors = list(self.errors)
+        errors.extend(self.symbol_evaluator.errors)
+        return errors
 
 
 class DjangoEquationProcessor:

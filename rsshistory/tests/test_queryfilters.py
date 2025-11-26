@@ -334,7 +334,12 @@ class OmniSearchWithDefaultTest(FakeInternetTestCase):
         self.assertTrue("link" in conditions)
         self.assertEqual(conditions["link"], "https://test.com")
 
-        self.assertEqual(len(c.get_errors()), 1)
+        errors = c.get_errors()
+        print(errors)
+
+        self.assertEqual(len(errors), 2)
+        self.assertIn("Could not calculate query", errors)
+        self.assertIn("Cannot evaluate symbol:link == https://test.com", errors)
 
     def test_get_query_result__processor_evaluator__eq(self):
         LinkDataController.objects.create(link="https://test.com")
@@ -426,7 +431,7 @@ class OmniSearchFilterTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_get_filtered_objects_one_property(self):
+    def test_get_filtered_objects__one_property(self):
         LinkDataController.objects.create(link="https://test1.com")
         LinkDataController.objects.create(link="https://test2.com")
 
@@ -443,7 +448,7 @@ class OmniSearchFilterTest(FakeInternetTestCase):
 
         self.assertEqual(qs.count(), 1)
 
-    def test_get_filtered_objects_with_double_quotes(self):
+    def test_get_filtered_objects__with_double_quotes(self):
         LinkDataController.objects.create(
             link="https://test.com", author="Sombody Anybody"
         )
@@ -456,12 +461,13 @@ class OmniSearchFilterTest(FakeInternetTestCase):
 
         processor.set_translation_mapping(["link", "author"])
 
+        # call tested function
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))
 
         self.assertEqual(qs.count(), 1)
 
-    def test_get_filtered_objects_with_single_quotes(self):
+    def test_get_filtered_objects__with_single_quotes(self):
         LinkDataController.objects.create(
             link="https://test.com", author="Sombody Anybody"
         )
@@ -474,12 +480,13 @@ class OmniSearchFilterTest(FakeInternetTestCase):
 
         processor.set_translation_mapping(["link", "author"])
 
+        # call tested function
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))
 
         self.assertEqual(qs.count(), 1)
 
-    def test_get_filtered_objects_two_properties(self):
+    def test_get_filtered_objects__two_properties(self):
         LinkDataController.objects.create(
             link="https://test1.com", title="One title", description="One description"
         )
@@ -501,7 +508,7 @@ class OmniSearchFilterTest(FakeInternetTestCase):
 
         self.assertEqual(qs.count(), 1)
 
-    def test_get_filtered_objects_with_no_equal(self):
+    def test_get_filtered_objects__default_search(self):
         LinkDataController.objects.create(
             link="https://test.com", author="Sombody Anybody"
         )
@@ -512,11 +519,15 @@ class OmniSearchFilterTest(FakeInternetTestCase):
         args = {"search": "Sombody"}
         processor = OmniSearchFilter(args, init_objects=qs)
 
-        processor.set_translation_mapping(["link", "author"])
+        processor.set_default_search_symbols(["link__contains", "author__contains"])
 
+        # call tested function
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))
 
+        print(processor.get_errors())
+
+        self.assertEqual(len(processor.get_errors()), 0)
         self.assertEqual(qs.count(), 1)
 
     def test_get_filtered_objects__with_error_search(self):
@@ -533,8 +544,15 @@ class OmniSearchFilterTest(FakeInternetTestCase):
 
         processor.set_translation_mapping(["link", "author"])
 
+        # call tested function
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))
 
-        self.assertEqual(qs.count(), 1)
-        self.assertEqual(len(processor.get_errors()), 1)
+        errors = processor.get_errors()
+        print(errors)
+
+        self.assertEqual(qs.count(), 0)
+
+        self.assertEqual(len(errors), 2)
+        self.assertIn("Could not calculate query", errors)
+        self.assertIn("Cannot evaluate symbol:linkx==test.com", errors)
