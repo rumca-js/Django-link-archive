@@ -1,8 +1,11 @@
 """
 POSTGRES backup script.
 
- - Creates and restores backups.
+ - Creates and restores backups (custom format, SQLITE format)
  - Check against data corruption with analyze, vacuum and reindex
+
+SQLITE format can be analyzed and modified by linkarchivetools
+https://github.com/rumca-js/linkarchivetools
 
 What to do:
  - run vacuum, which shows problems with data
