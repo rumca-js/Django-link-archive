@@ -185,6 +185,8 @@ class UrlHandler(object):
         request.respect_robots = browser.respect_robots_txt
         request.accept_types = browser.accept_types
         request.bytes_limit = browser.bytes_limit
+        request.http_proxy = browser.http_proxy
+        request.https_proxy = browser.https_proxy
 
         if browser.cookies:
             try:

@@ -148,6 +148,11 @@ class SocialData(models.Model):
             if len(json_obj) == 0:
                 return
 
+            if isinstance(json_obj, list):
+                # JSON needs to be a map of elements
+                # list indicates a problem
+                return
+
             if SocialData.is_all_none(json_obj):
                 return
 

@@ -107,6 +107,7 @@ class BaseLinkDataModel(models.Model):
 
     contents_hash = models.BinaryField(max_length=30, null=True)
     body_hash = models.BinaryField(max_length=30, null=True)
+    meta_hash = models.BinaryField(max_length=30, null=True)
 
     class Meta:
         abstract = True

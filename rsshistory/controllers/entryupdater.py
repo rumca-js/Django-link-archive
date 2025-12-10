@@ -5,7 +5,7 @@ import base64
 from django.db import models
 from django.db.models import Q, F
 
-from webtoolkit import RemoteServer
+from webtoolkit import RemoteServer, RemoteUrl
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -34,6 +34,8 @@ class EntryUpdater(object):
         if not all_properties:
             return True
 
+        remote_url = RemoteUrl(all_properties = all_properties)
+
         response = RemoteServer.read_properties_section("Response", all_properties)
 
         if "Last-Modified" in response:
@@ -49,26 +51,22 @@ class EntryUpdater(object):
 
                 return False
 
-        body_hash = response["body_hash"]
+        body_hash = remote_url.get_body_hash()
         if body_hash:
             if not entry.body_hash:
                 return True
-
-            body_hash = base64.b64decode(body_hash)
 
             if entry.body_hash == body_hash:
                 return False
 
             return True
 
-        contents_hash = response["hash"]
-        if contents_hash:
-            if not entry.contents_hash:
+        meta_hash = remote_url.get_meta_hash()
+        if meta_hash:
+            if not entry.meta_hash:
                 return True
 
-            contents_hash = base64.b64decode(contents_hash)
-
-            if entry.contents_hash == contents_hash:
+            if entry.meta_hash == meta_hash:
                 return False
 
             return True
@@ -78,10 +76,10 @@ class EntryUpdater(object):
     def update_entry_common_fields(self, all_properties):
         entry = self.entry
 
+        remote_url = RemoteUrl(all_properties = all_properties)
+        properties = remote_url.get_properties()
+
         response = RemoteServer.read_properties_section("Response", all_properties)
-        properties = RemoteServer.read_properties_section(
-            "Properties", all_properties
-        )
 
         if response:
             if "Last-Modified" in response and response["Last-Modified"]:
@@ -91,18 +89,9 @@ class EntryUpdater(object):
                 entry.date_last_modified = DateUtils.get_datetime_now_utc()
             if "status_code" in response:
                 entry.status_code = response["status_code"]
-            if "body_hash" in response:
-                if response["body_hash"]:
-                    body_hash = base64.b64decode(response["body_hash"])
-                else:
-                    body_hash = None
-                entry.body_hash = body_hash
-            if "hash" in response:
-                if response["hash"]:
-                    contents_hash = base64.b64decode(response["hash"])
-                    entry.contents_hash = contents_hash
-                else:
-                    entry.contents_hash = None
+            entry.body_hash = remote_url.get_body_hash()
+            entry.contents_hash = remote_url.get_hash()
+            entry.meta_hash = remote_url.get_meta_hash()
 
         if properties:
             if "page_rating" in properties:

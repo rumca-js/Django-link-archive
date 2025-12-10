@@ -24,6 +24,8 @@ class Browser(models.Model):
     respect_robots_txt = models.BooleanField(default=False, help_text="Respect robots.txt settings")
     accept_types = models.CharField(blank=True, max_length=2000, help_text="Accept MIME types")
     bytes_limit = models.IntegerField(null=True, blank=True, help_text="Bytes limit")
+    http_proxy = models.IntegerField(null=True, blank=True, help_text="HTTP proxy")
+    https_proxy = models.IntegerField(null=True, blank=True, help_text="HTTPs proxy")
     settings = models.CharField(
         max_length=2000, blank=True, help_text="Settings JSON"
     )  # json map inside. script path, port etc

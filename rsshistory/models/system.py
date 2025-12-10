@@ -326,6 +326,16 @@ class ConfigurationEntry(models.Model):
         help_text="New entries will fetch social data",
     )
 
+    browse_entries_fetch_social_data = models.BooleanField(
+        default=False,
+        help_text="Viewing entries list will fetch social data",
+    )
+
+    browse_entry_fetch_social_data = models.BooleanField(
+        default=False,
+        help_text="Viewing entry datail page will fetch social data",
+    )
+
     entry_update_via_internet = models.BooleanField(
         default=True,
         help_text="Use the Internet to check the status of entries during updates. Otherwise entriy data will not be fetched by Internet",
