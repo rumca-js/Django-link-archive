@@ -47,6 +47,17 @@ class EntryYouTubePlugin(EntryGenericPlugin):
             ),
         )
 
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Url viewer",
+                "https://rumca-js.github.io/url?url={}".format(self.entry.link),
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Url preview",
+                "{}/icons/icons8-youtube-music-96.png".format(LinkDatabase.name)
+            ),
+        )
+
         return buttons
 
     def get_advanced_menu_buttons(self):

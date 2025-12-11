@@ -657,6 +657,11 @@ function getEntryOpParameters(entry) {
        <div>Contents hash: ${entry.contents_hash}</div>
        `;
     }
+    if (entry.meta_hash) {
+       text += `
+       <div>Meta hash: ${entry.meta_hash}</div>
+       `;
+    }
     if (entry.body_hash) {
        text += `
        <div>Body hash: ${entry.body_hash}</div>
@@ -745,6 +750,8 @@ function getEntryDetailOdyseePreview(entry) {
 
 
 function getOneEntryEntryText(entry) {
+    console.log(`view_display_type ${view_display_type}`);
+
     const templateMap = {
         "standard": entryStandardTemplate,
         "gallery": entryGalleryTemplate,
@@ -1253,10 +1260,11 @@ function getEntryVisitsBar(entry, show_icons=true, small_icons=true) {
         img_text = `<img src="${thumbnail}" class="rounded ${iconClass}" />`;
     }
     let link_text = getEntryLinkText(entry);
+    let tags_text = getEntryTagStrings(entry);
 
     let text = `
          <a
-         class="list-group-item list-group-item-action"
+         class="my-1 p-1 list-group-item list-group-item-action border rounded"
          href="${link_absolute}" title="${title}">
              ${badge_text}
              ${badge_star}
@@ -1268,10 +1276,17 @@ function getEntryVisitsBar(entry, show_icons=true, small_icons=true) {
                ${img_text}
 
                <div class="mx-2">
-                  ${title_safe}
-                  Visits:${number_of_visits}
-                  Date of the last visit:${date_last_visit}
-		  ${link_text}
+                  <span style="font-weight:bold" class="text-reset" entryTitle="true">${title_safe}</span>
+		  <div>
+		    ${link_text}
+		  </div>
+		  <div>
+		     ${tags_text}
+		  </div>
+		  <div>
+                    Visits:${number_of_visits},
+                    Date of the last visit:${date_last_visit}
+		  </div>
                </div>
              </div>
          </a>

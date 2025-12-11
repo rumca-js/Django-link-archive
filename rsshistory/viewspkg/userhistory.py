@@ -46,9 +46,7 @@ def visit_to_json(user_config, visit_data):
         visit_data.delete()
         return
 
-    data = entry_to_json(user_config, entry)
-    data["date_last_visit"] = visit_data.date_last_visit
-    data["number_of_visits"] = visit_data.visits
+    data = entry_to_json(user_config, entry, with_visits=True, with_tags=True)
 
     return data
 

@@ -24,6 +24,7 @@ from ..models import (
 from ..configuration import Configuration
 from ..threadhandlers import (
     CleanupJobHandler,
+    TruncateTableJobHandler,
     LinkAddJobHandler,
     SourceAddJobHandler,
     LinkScanJobHandler,
@@ -505,15 +506,14 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
 
         subjects = BackgroundJobController.objects.values_list("job", flat=True)
 
-        self.assertEqual(len(subjects), 2)
+        self.assertEqual(len(subjects), 1)
         # still process source is present
         self.assertTrue("process-source" in subjects)
-        # add link job odysee
-        self.assertTrue("link-add" in subjects)
 
+        self.assertEqual(UserTags.objects.all().count(), 0)
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_process__source_known(self):
+    def test_process__source_valid_auto_tag(self):
         MockRequestCounter.mock_page_requests = 0
 
         LinkDataController.objects.all().delete()
@@ -546,14 +546,12 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
 
         subjects = BackgroundJobController.objects.values_list("job", flat=True)
 
-        self.assertEqual(len(subjects), 2)
-        # still process source is present
+        self.assertEqual(len(subjects), 1)
+        # jobs are removed by processors
         self.assertTrue("process-source" in subjects)
-        # add entry job
-        self.assertTrue("link-add" in subjects)
 
         self.assertTrue(UserTags.objects.all().count() > 0)
-        self.assertTrue(LinkDataController.objects.all().count() > 0)
+        self.assertTrue(LinkDataController.objects.all().count(), 13)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 

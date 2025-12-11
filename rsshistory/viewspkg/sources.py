@@ -553,7 +553,7 @@ def remove_all_sources(request):
     sources = SourceDataController.objects.all()
 
     if sources.count() > 1000:
-        BackgroundJobController.create_single_job("truncate", "SourceDataController")
+        BackgroundJobController.create_single_job(BackgroundJobController.JOB_TRUNCATE_TABLE, "SourceDataController")
         json_obj["message"] = "Added remove job"
     else:
         for source in sources:
@@ -576,7 +576,7 @@ def remove_disabled(request):
         cfg = {}
         cfg["enabled"] = False
         BackgroundJobController.create_single_job(
-            "truncate", "SourceDataController", cfg=cfg
+            BackgroundJobController.JOB_TRUNCATE_TABLE, "SourceDataController", cfg=cfg
         )
         json_obj["message"] = "Added remove job"
     else:

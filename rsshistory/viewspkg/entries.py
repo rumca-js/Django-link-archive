@@ -122,7 +122,6 @@ def entries_generic(request, link, data_scope):
 
     context = get_generic_search_init_context(request, filter_form)
 
-
     p.context.update(context)
     p.context["query_page"] = link
     p.context["search_suggestions_page"] = reverse(
@@ -1057,6 +1056,10 @@ def entry_json(request, pk):
     entry = entries[0]
     user_config = UserConfig.get(request.user)
 
+    config_entry = Configuration.get_object().config_entry
+    if config_entry.browse_entry_fetch_social_data:
+        SocialData.get(entry)
+
     entry_json = entry_to_json(user_config, entry, with_tags=True, with_social=True)
 
     read_laters = ReadLater.objects.filter(entry=entry, user=request.user)
@@ -1088,6 +1091,7 @@ def handle_json_view(request, view_to_use):
     view_to_use.get_time_diff_text("handle_json_view start")
 
     user_config = UserConfig.get(request.user)
+    config_entry = Configuration.get_object().config_entry
 
     if view_to_use:
         view_to_use.get_time_diff_text("handle_json_view get queryset")
@@ -1113,6 +1117,9 @@ def handle_json_view(request, view_to_use):
 
         if page_num <= p.num_pages:
             for entry in page_obj:
+                if config_entry.browse_entries_fetch_social_data:
+                    SocialData.get(entry)
+
                 entry_json = entry_to_json(user_config, entry, with_tags=True, with_social=True)
 
                 read_laters = ReadLater.objects.filter(entry=entry, user=request.user)

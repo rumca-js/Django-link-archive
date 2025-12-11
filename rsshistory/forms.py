@@ -137,7 +137,7 @@ class ConfigForm(forms.ModelForm):
             "accept_same_hashes",
             "prefer_https_links",
             "prefer_non_www_links",
-            "keep_social_data",
+            "enable_social_data",
             "auto_crawl_sources", # crawl
             "auto_scan_new_entries", # crawl
             "auto_scan_updated_entries", # crawl

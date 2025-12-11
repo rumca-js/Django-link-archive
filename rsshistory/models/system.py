@@ -259,9 +259,9 @@ class ConfigurationEntry(models.Model):
         help_text="Automatically crawls links in sources. Finds links in RSS sources and adds them."
     )
 
-    keep_social_data = models.BooleanField(
+    enable_social_data = models.BooleanField(
         default=True,
-        help_text="Keep link social data in the database.",
+        help_text="Enable social data for links.",
     )
 
     # database link contents
@@ -333,6 +333,11 @@ class ConfigurationEntry(models.Model):
 
     browse_entry_fetch_social_data = models.BooleanField(
         default=False,
+        help_text="Viewing entry datail page will fetch social data",
+    )
+
+    entry_update_fetches_social_data = models.BooleanField(
+        default=True,
         help_text="Viewing entry datail page will fetch social data",
     )
 

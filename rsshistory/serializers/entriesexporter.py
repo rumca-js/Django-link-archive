@@ -326,6 +326,7 @@ def entry_to_json(user_config, entry, with_tags=False, with_social=False, with_v
 
     json_entry["contents_hash"] = json_encode_field(entry.contents_hash)
     json_entry["body_hash"] = json_encode_field(entry.body_hash)
+    json_entry["meta_hash"] = json_encode_field(entry.meta_hash)
 
     if entry.last_browser:
         json_entry["last_browser"] = str(entry.last_browser)
@@ -366,7 +367,7 @@ def entry_to_json(user_config, entry, with_tags=False, with_social=False, with_v
     json_entry["user_bookmarked"] = bookmarks.count() > 0
 
     if with_social:
-        social = SocialData.get(entry)
+        social = SocialData.get_from_model(entry)
         if social:
             social_dict = model_to_dict(social)
             for key, value in social_dict.items():
@@ -375,9 +376,12 @@ def entry_to_json(user_config, entry, with_tags=False, with_social=False, with_v
     if with_visits:
         visits = UserEntryVisitHistory.objects.filter(user=user_config.user, entry=entry)
         if visits.exists():
-            json_entry["user_visits"] = visits[0].visits
+            visit = visits[0]
+            json_entry["number_of_visits"] = visit.visits
+            json_entry["date_last_visit"] = visit.date_last_visit
         else:
-            json_entry["user_visits"] = 0
+            json_entry["number_of_visits"] = 0
+            json_entry["date_last_visit"] = None
 
     return json_entry
 
@@ -414,6 +418,7 @@ def entry_parameters_json(user_config, entry):
 
     json_entry["contents_hash"] = json_encode_field(entry.contents_hash)
     json_entry["body_hash"] = json_encode_field(entry.body_hash)
+    json_entry["meta_hash"] = json_encode_field(entry.meta_hash)
 
     if entry.last_browser:
         json_entry["last_browser"] = str(entry.last_browser)

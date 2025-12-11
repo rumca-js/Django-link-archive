@@ -31,13 +31,11 @@ function getTemplate(job) {
           ${job.priority}
 
           <b>${job.job}</b>
-          ${job.task}
 
-          ${job.subject}
-
-          ${job.user}
-
-          ${job.args}
+          Task:${job.task}
+	  Subject:${job.subject}
+	  User:${job.user}
+	  Args:${job.args}
        </div>
 
        ${link_affected_text}

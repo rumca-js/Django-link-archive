@@ -341,7 +341,7 @@ class EntryUpdater(object):
         if config.auto_scan_updated_entries:
             BackgroundJobController.link_scan(entry=self.entry)
 
-        if config.keep_social_data:
+        if config.entry_update_fetches_social_data:
             BackgroundJobController.link_download_social_data(entry)
 
         self.add_links_from_url(entry, url)

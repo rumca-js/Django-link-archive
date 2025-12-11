@@ -33,6 +33,7 @@ from ..threadprocessors import (
     SourceJobsProcessor,
     LeftOverJobsProcessor,
     RefreshProcessor,
+    SystemJobsProcessor,
 )
 
 from .fakeinternet import FakeInternetTestCase
@@ -724,6 +725,99 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
 
         self.assertEqual(items, [])
 
+    def test_get_handler_and_object_job_disabled(self):
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE, enabled=False
+        )
+
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_IMPORT_DAILY_DATA
+        )
+
+        mgr = SourceJobsProcessor()
+
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertFalse(handler_obj)
+        self.assertFalse(hander)
+
+
+class SystenJobProcessorTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+        self.setup_configuration()
+
+    def test_get_handler_and_object__cleanup_default(self):
+        BackgroundJobController.objects.all().delete()
+
+        self.obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_CLEANUP,
+            enabled=True,
+        )
+
+        mgr = SystemJobsProcessor()
+        # call tested function
+        items = mgr.get_handler_and_object()
+        handler_obj = items[0]
+        handler = items[1]
+
+        self.assertEqual(handler_obj, self.obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_CLEANUP)
+
+    def test_get_handler_and_object__cleanup_tablename(self):
+        BackgroundJobController.objects.all().delete()
+
+        self.obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_CLEANUP,
+            subject="SourceDataController",
+            enabled=True,
+        )
+
+        mgr = SystemJobsProcessor()
+        # call tested function
+        items = mgr.get_handler_and_object()
+        handler_obj = items[0]
+        handler = items[1]
+
+        self.assertEqual(handler_obj, self.obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_CLEANUP)
+
+    def test_get_handler_and_object__truncate_default(self):
+        BackgroundJobController.objects.all().delete()
+
+        self.obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_TRUNCATE_TABLE,
+            enabled=True,
+        )
+
+        mgr = SystemJobsProcessor()
+        # call tested function
+        items = mgr.get_handler_and_object()
+        handler_obj = items[0]
+        handler = items[1]
+
+        self.assertEqual(handler_obj, self.obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_TRUNCATE_TABLE)
+
+    def test_get_handler_and_object__truncate_tablename(self):
+        BackgroundJobController.objects.all().delete()
+
+        self.obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_TRUNCATE_TABLE,
+            subject="SourceDataController",
+            enabled=True,
+        )
+
+        mgr = SystemJobsProcessor()
+        # call tested function
+        items = mgr.get_handler_and_object()
+        handler_obj = items[0]
+        handler = items[1]
+
+        self.assertEqual(handler_obj, self.obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_TRUNCATE_TABLE)
+
 
 class LeftOverJobsProcessorTest(FakeInternetTestCase):
     def setUp(self):
@@ -789,3 +883,5 @@ class LeftOverJobsProcessorTest(FakeInternetTestCase):
         self.assertEqual(
             LinkDataController.objects.filter(link="https://test.com").count(), 1
         )
+
+

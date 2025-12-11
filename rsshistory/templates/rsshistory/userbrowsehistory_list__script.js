@@ -1,10 +1,9 @@
 {% load static %}
 
 
-view_display_type = "visits";
-
-
 function fillListData() {
+    view_display_type = "visits";
+
     let data = object_list_data;
     $('#listData').html("");
 

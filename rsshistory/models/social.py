@@ -72,7 +72,7 @@ class SocialData(models.Model):
         from ..configuration import Configuration
 
         config = Configuration.get_object().config_entry
-        if not config.keep_social_data:
+        if not config.enable_social_data:
             return False
 
         page = UrlLocation(entry.link)
@@ -175,7 +175,7 @@ class SocialData(models.Model):
 
         BATCH_SIZE = 1000
 
-        if config.keep_social_data:
+        if config.enable_social_data:
             if config.days_to_remove_social_data == 0:
                 return
 
@@ -193,7 +193,7 @@ class SocialData(models.Model):
                     break
                 SocialData.objects.filter(id__in=old_ids).delete()
 
-        if not config.keep_social_data:
+        if not config.enable_social_data:
             SocialData.truncate(cfg)
 
         return True

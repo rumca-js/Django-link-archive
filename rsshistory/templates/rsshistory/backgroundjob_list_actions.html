@@ -13,9 +13,6 @@
     <a href="{% url 'rsshistory:backgroundjobs-disable-all' %}" title="Disable all background jobs" class="btn btn-primary" role="button" title="Disable all">
     {% include "rsshistory/icon_disable.html" %}
     </a>
-    <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="btn btn-primary" role="button" title="Remove all">
-    <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
-    </a>
 
       <div class="dropdown">
           <button class="btn btn-primary" type="button" id="#filtersDrop" data-bs-toggle="dropdown" aria-expanded="false">
@@ -36,6 +33,23 @@
                  Disabled</a>
              </li>
           </ul>
+      </div>
+      <div class="dropdown">
+          <button class="btn btn-primary" type="button" id="#actionsDrop" data-bs-toggle="dropdown" aria-expanded="false">
+            Actions
+          </button>
+      
+          <ul class="dropdown-menu">
+             <li>
+                <a href="{% url 'rsshistory:backgroundjobs-remove-disabled' %}" class="dropdown-item" title="Delete disabled">
+                 Delete disabled</a>
+             </li>
+             <li>
+                <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="btn btn-primary" role="button" title="Remove all">
+                <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
+                </a>
+             </li>
+	  </ul>
       </div>
 
 {% endif %}
