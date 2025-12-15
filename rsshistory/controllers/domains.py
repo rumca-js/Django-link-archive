@@ -176,6 +176,23 @@ class DomainsController(Domains):
 
             tld = os.path.splitext(domain_only_text)[1][1:]
 
+            max_domain_len = Domains._meta.get_field("domain").max_length
+            max_main_len = Domains._meta.get_field("main").max_length
+            max_subdomain_len = Domains._meta.get_field("subdomain").max_length
+            max_suffix_len = Domains._meta.get_field("suffix").max_length
+            max_tld_len = Domains._meta.get_field("tld").max_length
+
+            if domain_only_text and len(domain_only_text) > max_domain_len:
+                AppLogging.error(f"Domain too long: {domain_only_text} max:{max_domain_len}")
+            if domain_data.domain and len(domain_data.domain) > max_main_len:
+                AppLogging.error(f"Domain too long: {domain_data.domain} max:{max_main_len}")
+            if domain_data.subdomain and len(domain_data.subdomain) > max_subdomain_len:
+                AppLogging.error(f"SubDomain too long {domain_data.subdomain} max:{max_subdomain_len}")
+            if domain_data.suffix and len(domain_data.suffix) > max_suffix_len:
+                AppLogging.error(f"Suffix too long: {domain_data.suffix} max:{max_suffix_len}")
+            if tld and len(tld) > max_tld_len:
+                AppLogging.error(f"TLD too long {tld} max:{max_tld_len}")
+
             ob = DomainsController.objects.create(
                 domain=domain_only_text,
                 main=domain_data.domain,

@@ -50,6 +50,10 @@
               Disabled</a>
           </li>
           <li>
+             <a href="{% url 'rsshistory:sources' %}?order=fetch_period" class="dropdown-item" title="Order by import seconds">
+              Order by fetch period</a>
+          </li>
+          <li>
              <a href="{% url 'rsshistory:sources' %}?order=-dynamic_data__import_seconds" class="dropdown-item" title="Order by import seconds">
               Order by import seconds</a>
           </li>

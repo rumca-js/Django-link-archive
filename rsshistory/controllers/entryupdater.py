@@ -205,54 +205,55 @@ class EntryUpdater(object):
         entry.date_update_last = DateUtils.get_datetime_now_utc()
         entry.save()
 
-        if not entry_changed:
-            return
+        if entry_changed:
+            self.update_entry_common_fields(url.all_properties)
 
-        self.update_entry_common_fields(url.all_properties)
+            if url.is_valid():
+                url_interface = EntryUrlInterface(entry.link, browser=self.browser, handler=url)
+                props = url_interface.get_props()
+
+                # we may not support update for some types. PDFs, other resources on the web
+                if props and len(props) > 0:
+                    title = props.get("title")
+                    if title:
+                        if not entry.title:
+                            entry.title = title
+
+                    description = props.get("description")
+                    if description:
+                        if not entry.description:
+                            entry.description = description
+
+                    thumbnail = props.get("thumbnail")
+                    if thumbnail:
+                        # always update
+                        entry.thumbnail = thumbnail
+
+                    language = props.get("language")
+                    if language:
+                        if not entry.language:
+                            entry.language = language
+
+                    date_published = props.get("date_published")
+                    if date_published:
+                        if not entry.date_published:
+                            entry.date_published = date_published
+
+                if entry.date_dead_since:
+                    entry.date_dead_since = None
+
+                entry.save()
+
+            self.reset_local_data()
+
+            if url.is_invalid():
+                self.handle_invalid_response(url)
+            elif url.is_valid():
+                self.perform_additional_update_elements__for_changed_entry(url)
+            # else - when crawler exception
 
         if url.is_valid():
-            url_interface = EntryUrlInterface(entry.link, browser=self.browser, handler=url)
-            props = url_interface.get_props()
-
-            # we may not support update for some types. PDFs, other resources on the web
-            if props and len(props) > 0:
-                title = props.get("title")
-                if title:
-                    if not entry.title:
-                        entry.title = title
-
-                description = props.get("description")
-                if description:
-                    if not entry.description:
-                        entry.description = description
-
-                thumbnail = props.get("thumbnail")
-                if thumbnail:
-                    # always update
-                    entry.thumbnail = thumbnail
-
-                language = props.get("language")
-                if language:
-                    if not entry.language:
-                        entry.language = language
-
-                date_published = props.get("date_published")
-                if date_published:
-                    if not entry.date_published:
-                        entry.date_published = date_published
-
-            if entry.date_dead_since:
-                entry.date_dead_since = None
-
-            entry.save()
-
-        self.reset_local_data()
-
-        if url.is_invalid():
-            self.handle_invalid_response(url)
-        elif url.is_valid():
-            self.perform_additional_update_elements(url)
-        # else - when crawler exception
+            self.perform_additional_update_elements(url, entry)
 
     def reset_data(self):
         from ..pluginurl import EntryUrlInterface
@@ -287,52 +288,59 @@ class EntryUpdater(object):
         entry.date_update_last = DateUtils.get_datetime_now_utc()
         entry.save()
 
-        if not entry_changed:
-            return
+        if entry_changed:
+            self.update_entry_common_fields(url.all_properties)
 
-        self.update_entry_common_fields(url.all_properties)
+            if url.is_valid():
+                url_interface = EntryUrlInterface(entry.link, browser=self.browser, handler=url)
+                props = url_interface.get_props()
+
+                # we may not support update for some types. PDFs, other resources on the web
+                if props and len(props) > 0:
+                    title = props.get("title")
+                    if title:
+                        entry.title = title
+
+                    description = props.get("description")
+                    if description:
+                        entry.description = description
+
+                    thumbnail = props.get("thumbnail")
+                    if thumbnail:
+                        entry.thumbnail = thumbnail
+
+                    language = props.get("language")
+                    if language:
+                        entry.language = language
+
+                    date_published = props.get("date_published")
+                    if date_published:
+                        if not entry.date_published:
+                            entry.date_published = date_published
+
+                if entry.date_dead_since is not None:
+                    entry.date_dead_since = None
+
+                entry.save()
+
+            self.reset_local_data()
+
+            if url.is_invalid():
+                self.handle_invalid_response(url)
+            elif url.is_valid():
+                self.perform_additional_update_elements__for_changed_entry(url)
+            # else - when crawler exception
 
         if url.is_valid():
-            url_interface = EntryUrlInterface(entry.link, browser=self.browser, handler=url)
-            props = url_interface.get_props()
+            self.perform_additional_update_elements(url, entry)
 
-            # we may not support update for some types. PDFs, other resources on the web
-            if props and len(props) > 0:
-                title = props.get("title")
-                if title:
-                    entry.title = title
+    def perform_additional_update_elements(self, url, entry):
+        c = Configuration.get_object()
+        config = c.config_entry
+        if config.entry_update_fetches_social_data:
+            BackgroundJobController.link_download_social_data(entry)
 
-                description = props.get("description")
-                if description:
-                    entry.description = description
-
-                thumbnail = props.get("thumbnail")
-                if thumbnail:
-                    entry.thumbnail = thumbnail
-
-                language = props.get("language")
-                if language:
-                    entry.language = language
-
-                date_published = props.get("date_published")
-                if date_published:
-                    if not entry.date_published:
-                        entry.date_published = date_published
-
-            if entry.date_dead_since is not None:
-                entry.date_dead_since = None
-
-            entry.save()
-
-        self.reset_local_data()
-
-        if url.is_invalid():
-            self.handle_invalid_response(url)
-        elif url.is_valid():
-            self.perform_additional_update_elements(url)
-        # else - when crawler exception
-
-    def perform_additional_update_elements(self, url):
+    def perform_additional_update_elements__for_changed_entry(self, url):
         entry = self.entry
 
         c = Configuration.get_object()
@@ -340,9 +348,6 @@ class EntryUpdater(object):
 
         if config.auto_scan_updated_entries:
             BackgroundJobController.link_scan(entry=self.entry)
-
-        if config.entry_update_fetches_social_data:
-            BackgroundJobController.link_download_social_data(entry)
 
         self.add_links_from_url(entry, url)
 

@@ -48,11 +48,11 @@ class SourceDataController(SourceDataModel):
         if cfg:
             if "enabled" in cfg:
                 if cfg["enabled"] == True:
-                    sources = SourceDataModel.objects.filter(enabled=True)
+                    sources = SourceDataController.objects.filter(enabled=True)
                 else:
-                    sources = SourceDataModel.objects.filter(enabled=False)
+                    sources = SourceDataController.objects.filter(enabled=False)
             else:
-                sources = SourceDataModel.objects.all()
+                sources = SourceDataController.objects.all()
 
         if sources.exists():
             for source in sources:

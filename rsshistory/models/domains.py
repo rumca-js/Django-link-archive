@@ -16,7 +16,7 @@ class Domains(models.Model):
     domain = models.CharField(max_length=1000, unique=True)
     main = models.CharField(max_length=200, null=True)
     subdomain = models.CharField(max_length=200, null=True)
-    suffix = models.CharField(max_length=20, null=True)
+    suffix = models.CharField(max_length=100, null=True)
     tld = models.CharField(max_length=20, null=True)
 
     # entry = models.ForeignKey(
@@ -78,7 +78,7 @@ class Domains(models.Model):
 
 
 class DomainsSuffixes(models.Model):
-    suffix = models.CharField(max_length=20, null=True, unique=True)
+    suffix = models.CharField(max_length=100, null=True, unique=True)
 
     def add(suffix):
         suffixes = DomainsSuffixes.objects.filter(suffix=suffix)
