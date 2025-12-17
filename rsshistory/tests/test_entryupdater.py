@@ -111,6 +111,44 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
+    def test_update_data__adds_download_social_data_job(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source_url="",
+            link="https://linkedin.com",
+            title=None,
+            description=None,
+            source=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain=None,
+            thumbnail=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.update_data()
+
+        scan_jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_DOWNLOAD_SOCIAL
+        )
+        self.assertEqual(scan_jobs.count(), 1)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
     def test_update_data__promotes_http_to_https(self):
         MockRequestCounter.mock_page_requests = 0
 

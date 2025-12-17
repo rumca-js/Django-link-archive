@@ -394,6 +394,40 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         job = jobs[0]
         self.assertEqual(job.job, BackgroundJobController.JOB_LINK_RESET_DATA)
 
+    def test_cleanup__does_not_remove_valid(self):
+        job_name = BackgroundJobController.JOB_CLEANUP
+        job = BackgroundJobController.objects.create(job=job_name)
+
+        # call tested function
+        BackgroundJobController.cleanup({})
+
+        jobs = BackgroundJobController.objects.filter(job=job_name)
+        self.assertTrue(jobs.exists())
+
+    def test_cleanup__clears_invalid(self):
+        job_name = "certainly-not-implemented"
+        job = BackgroundJobController.objects.create(job=job_name)
+
+        # call tested function
+        BackgroundJobController.cleanup({})
+
+        jobs = BackgroundJobController.objects.filter(job=job_name)
+        self.assertFalse(jobs.exists())
+
+    def test_is_job_valid__true(self):
+        job_name = BackgroundJobController.JOB_CLEANUP
+        job = BackgroundJobController.objects.create(job=job_name)
+
+        # call tested function
+        self.assertTrue(BackgroundJobController.is_job_valid(job))
+
+    def test_is_job_valid__false(self):
+        job_name = "certainly-not-implemented"
+        job = BackgroundJobController.objects.create(job=job_name)
+
+        # call tested function
+        self.assertFalse(BackgroundJobController.is_job_valid(job))
+
 
 class BackgroundJobHistoryTest(FakeInternetTestCase):
     def setUp(self):
@@ -403,6 +437,7 @@ class BackgroundJobHistoryTest(FakeInternetTestCase):
     def test_mark_done(self):
         BackgroundJobHistory.objects.all().delete()
 
+        # call tested function
         BackgroundJobHistory.mark_done(job_name=BackgroundJobController.JOB_CLEANUP)
 
         jobs = BackgroundJobHistory.objects.all()

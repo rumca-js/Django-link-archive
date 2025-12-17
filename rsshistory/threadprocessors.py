@@ -172,6 +172,9 @@ class ProcessorInterface(object):
 
     def get_query_conditions(self):
         jobs = self.get_supported_jobs()
+        if not jobs:
+            return Q()
+
         if len(jobs) == 0:
             return Q()
 
@@ -539,6 +542,7 @@ class UpdateJobsProcessor(GenericJobsProcessor):
     def get_supported_jobs(self):
         return [
             BackgroundJob.JOB_LINK_UPDATE_DATA,
+            BackgroundJob.JOB_LINK_DOWNLOAD_SOCIAL,
         ]
 
 

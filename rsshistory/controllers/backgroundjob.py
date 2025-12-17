@@ -6,6 +6,7 @@ import traceback
 from django.db import models
 from django.urls import reverse
 from django.db.models import Q
+from django.conf import settings
 
 from webtoolkit import UrlLocation
 from utils.dateutils import DateUtils
@@ -689,7 +690,31 @@ class BackgroundJobController(BackgroundJob):
             return entries[0]
 
     def cleanup(cfg):
-        pass
+        jobs = BackgroundJobController.objects.all()
+        for job in jobs:
+            is_valid = BackgroundJobController.is_job_valid(job)
+
+            if not is_valid:
+                AppLogging.error(f"Removing job:{job}. The job, or processors are incorrectly configured")
+                job.delete()
+
+    def is_job_valid(job):
+        from ..threadprocessors import processor_from_id
+
+        processors_infos = settings.PROCESSORS_INFO
+
+        picked_up = False
+        for processors_info in processors_infos:
+            processor = processor_from_id(processors_info[1])
+            if processor:
+                processor_obj = processor(processors_list=processors_infos)
+                conditions = processor_obj.get_query_conditions()
+
+                filtered = BackgroundJobController.objects.filter(Q(id=job.id) & conditions)
+                if filtered.exists():
+                    picked_up = True
+
+        return picked_up
 
     def truncate(cfg):
         if "enabled" in cfg:

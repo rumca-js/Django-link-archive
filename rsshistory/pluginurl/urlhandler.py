@@ -353,7 +353,11 @@ class UrlHandler(object):
         if not properties:
             return "Missing properties"
 
-        properties["contents"] = self.get_contents()
+        response = self.get_response()
+        if not response:
+            return "No response"
+
+        properties["contents"] = response.get_text()
 
         status = EntryRules.is_dict_blocked(properties)
         if status:
