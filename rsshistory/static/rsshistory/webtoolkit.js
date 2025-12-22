@@ -397,7 +397,8 @@ class YouTubeChannelHandler {
     }
 
     getUrl() {
-        if (!this.channelId) return null;
+        if (!this.channelId) 
+	    return self.originalUrl;
         return `https://www.youtube.com/channel/${this.channelId}`;
     }
 

@@ -51,6 +51,24 @@ class GenericViewsTest(FakeInternetTestCase):
 
         self.assertEqual(term, "something1 = else & something2 = else2")
 
+    def test_get_request_url_with_browser__no_handler(self):
+        test_link = "https://google.com"
+        themap = {"link", test_link, "browser": 1}
+
+        # call tested function
+        url = get_request_url_with_browser(themap)
+        self.assertEqual(url.url, test_link)
+        self.assertFalse(url.request.handler_name)
+
+    def test_get_request_url_with_browser__handler(self):
+        test_link = "https://google.com"
+        themap = {"link", test_link, "browser": 1, "handler" : "HttpPageHandler"}
+
+        # call tested function
+        url = get_request_url_with_browser(themap)
+        self.assertEqual(url.url, test_link)
+        self.assertEqual(url.request.handler_name, "HttpPageHandler")
+
 
 class SimpleViewPageTest(FakeInternetTestCase):
     def setUp(self):

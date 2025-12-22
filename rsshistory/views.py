@@ -97,7 +97,7 @@ def get_request_url_with_browser(input_map):
     handler_name = None
 
     if browser:
-        request = UrlHandler.browser_to_request(page_link, browser)
+        request = UrlHandler(page_link).browser_to_request(browser)
 
     handler_name = input_map.get("handler_name")
 

@@ -11,6 +11,7 @@ from django.core.paginator import Paginator
 from webtoolkit import (
     OdyseeVideoHandler,
     YouTubeVideoHandler,
+    YouTubeChannelHandler,
     is_status_code_invalid,
     UrlLocation,
 )
@@ -739,15 +740,13 @@ def import_youtube_links_for_source(request, pk):
 
     source_obj = SourceDataController.objects.get(id=pk)
 
-    url = str(source_obj.url)
-    wh = url.find("=")
-
-    if wh == -1:
-        p.context["summary_text"] = "Could not obtain code from a video"
+    handler = YouTubeChannelHandler(source_obj.url)
+    if not handler.is_handled_by():
+        p.context["summary_text"] = f"Url {source_obj.url} Not a YouTube channel"
         return p.render("summary_present.html")
 
-    code = url[wh + 1 :]
-    channel = "https://www.youtube.com/channel/{}".format(code)
+    channel = handler.get_channel_url()
+
     ytdlp = YTDLP(channel)
     print(
         "Searching for links for source {} channel {}".format(source_obj.title, channel)
