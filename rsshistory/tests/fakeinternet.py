@@ -113,11 +113,10 @@ class FakeInternetTestCase(TestCase):
         RemoteServer.get_pingj = self.get_pingj
         RemoteServer.get_infoj = self.get_infoj
 
-        UrlHandler.ping = (
-            FakeInternetTestCase.ping
-        )  # TODO this is not needed any more
+        UrlHandler.ping = FakeInternetTestCase.ping
+        # TODO this is not needed any more
 
-        SystemOperationController.check_crawling_server = self.check_crawling_server
+        SystemOperationController.is_crawling_response_ok = self.is_crawling_response_ok
 
         c = Configuration.get_object()
         c.config_entry = ConfigurationEntry.get()
@@ -189,7 +188,7 @@ class FakeInternetTestCase(TestCase):
                }
         return data
 
-    def check_crawling_server(self, thread_id):
+    def is_crawling_response_ok(self, crawling_server):
         return True
 
     def setup_configuration(self):

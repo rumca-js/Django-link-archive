@@ -21,7 +21,7 @@ class SystemOperationController(object):
 
         if self.is_it_time_to_ping():
             self.check_internet(thread_id)
-            self.check_crawling_sever(thread_id)
+            self.check_crawling_server(thread_id)
         else:
             SystemOperation.add_by_thread(thread_id)
 
@@ -37,7 +37,7 @@ class SystemOperationController(object):
                 status=False,
             )
 
-    def check_crawling_sever(self, thread_id):
+    def check_crawling_server(self, thread_id):
         """
         We do not want to use crawling server to check crawling server status
         """
@@ -51,21 +51,26 @@ class SystemOperationController(object):
             return False
 
         try:
-            with requests.get(remote_server) as response:
-                if response and response.status_code != 200:
-                    SystemOperation.add_by_thread(
-                        thread_id,
-                        check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
-                        status=False,
-                    )
-                else:
-                    SystemOperation.add_by_thread(
-                        thread_id,
-                        check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
-                        status=True,
-                    )
+            if self.is_crawling_response_ok(remote_server):
+                SystemOperation.add_by_thread(
+                    thread_id,
+                    check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
+                    status=True,
+                )
+            else:
+                SystemOperation.add_by_thread(
+                    thread_id,
+                    check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
+                    status=False,
+                )
         except Exception as E:
             AppLogging.exc(E)
+
+    def is_crawling_response_ok(remote_server):
+        with requests.get(remote_server) as response:
+             if response and response.status_code != 200:
+                 return True
+        return False
 
     def cleanup(cfg=None):
         thread_ids = SystemOperationController.get_threads()
@@ -224,7 +229,7 @@ class SystemOperationController(object):
 
         return sorted(result)
 
-    def is_time_to_cleanup(self):
+    def is_time_to_cleanup(self) -> bool:
         today = datetime.today().date()
 
         config_entry = Configuration.get_object().config_entry

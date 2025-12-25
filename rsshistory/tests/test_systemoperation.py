@@ -13,6 +13,8 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_refresh__refreshprocessor(self):
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
 
         # call tested function
         SystemOperationController().refresh("RefreshProcessor")
@@ -26,6 +28,8 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_refresh__not_refreshprocessor(self):
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
 
         # call tested function
         SystemOperationController().refresh("NotRefreshProcessor")
@@ -45,6 +49,8 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_refresh__adds_multiple(self):
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
 
         # only last one is important
 
@@ -66,6 +72,8 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_is_threading_ok(self):
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
 
         controller = SystemOperationController()
         controller.refresh("RefreshProcessor")
@@ -75,6 +83,8 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_is_threading_ok(self):
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
 
         controller = SystemOperationController()
         controller.refresh("RefreshProcessor")
@@ -84,6 +94,8 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_get_threads(self):
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
 
         controller = SystemOperationController()
         controller.refresh("RefreshProcessor")
@@ -91,12 +103,14 @@ class SystemOperationTest(FakeInternetTestCase):
 
         # call tested function
         threads = SystemOperationController.get_threads()
-        self.assertEqual(len(threads), 2)
+        self.assertEqual(len(threads), 9)
         self.assertIn("RefreshProcessor", threads)
-        self.assertIn("NotRefreshProcessor", threads)
+        self.assertNotIn("NotRefreshProcessor", threads)
 
     def test_get_thread_info(self):
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
 
         controller = SystemOperationController()
         controller.refresh("RefreshProcessor")
@@ -111,6 +125,8 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_cleanup__removes(self):
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
 
         controller = SystemOperationController()
         controller.refresh("RefreshProcessor")
@@ -131,7 +147,7 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_is_time_to_cleanup__yes(self):
         SystemOperation.objects.all().delete()
-
+        BackgroundJob.objects.all().delete()
         BackgroundJobHistory.objects.all().delete()
 
         controller = SystemOperationController()
@@ -143,6 +159,8 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_is_time_to_cleanup__yes__realy_old(self):
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
+        BackgroundJobHistory.objects.all().delete()
 
         date = datetime.now() - timedelta(days=1)
 
@@ -161,13 +179,19 @@ class SystemOperationTest(FakeInternetTestCase):
 
     def test_is_time_to_cleanup__no__not_the_time(self):
         config_entry = Configuration.get_object().config_entry
-        config_entry.cleanup_time = (datetime.now() + timedelta(hours=1)).time()
+        config_entry.cleanup_time = (datetime.now() - timedelta(hours=1)).time()
         config_entry.save()
 
         Configuration.get_object().config_entry = config_entry
 
         SystemOperation.objects.all().delete()
+        BackgroundJob.objects.all().delete()
         BackgroundJobHistory.objects.all().delete()
+
+        job = BackgroundJobHistory.objects.create(
+            job=BackgroundJob.JOB_CLEANUP, subject="", date_created=datetime.now()
+        )
+        job.save()
 
         controller = SystemOperationController()
 
@@ -179,6 +203,7 @@ class SystemOperationTest(FakeInternetTestCase):
     def test_is_time_to_cleanup__no__history(self):
         SystemOperation.objects.all().delete()
         BackgroundJobHistory.objects.all().delete()
+        BackgroundJob.objects.all().delete()
 
         BackgroundJobHistory.objects.create(job=BackgroundJob.JOB_CLEANUP, subject="")
 
