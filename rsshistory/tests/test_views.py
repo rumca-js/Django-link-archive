@@ -8,7 +8,12 @@ from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..models import KeyWords, DataExport, ConfigurationEntry
 from ..configuration import Configuration
-from ..views import get_search_term, ViewPage, SimpleViewPage
+from ..views import (
+   ViewPage,
+   SimpleViewPage,
+   get_search_term,
+   get_request_url_with_browser
+)
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -53,21 +58,21 @@ class GenericViewsTest(FakeInternetTestCase):
 
     def test_get_request_url_with_browser__no_handler(self):
         test_link = "https://google.com"
-        themap = {"link", test_link, "browser": 1}
+        themap = {"link": test_link, "browser": 1}
 
         # call tested function
         url = get_request_url_with_browser(themap)
         self.assertEqual(url.url, test_link)
-        self.assertFalse(url.request.handler_name)
+        self.assertFalse(url.handler_name)
 
     def test_get_request_url_with_browser__handler(self):
         test_link = "https://google.com"
-        themap = {"link", test_link, "browser": 1, "handler" : "HttpPageHandler"}
+        themap = {"link": test_link, "browser": 1, "handler_name" : "HttpPageHandler"}
 
         # call tested function
         url = get_request_url_with_browser(themap)
         self.assertEqual(url.url, test_link)
-        self.assertEqual(url.request.handler_name, "HttpPageHandler")
+        self.assertEqual(url.handler_name, "HttpPageHandler")
 
 
 class SimpleViewPageTest(FakeInternetTestCase):

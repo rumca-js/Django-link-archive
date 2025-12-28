@@ -41,6 +41,8 @@ class UserThingsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_user_comments(self):
+        self.client.login(username="testuser", password="testpassword")
+
         entry = LinkDataController.objects.create(
             source_url="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -58,6 +60,8 @@ class UserThingsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_user_search_history(self):
+        self.client.login(username="testuser", password="testpassword")
+
         entry = LinkDataController.objects.create(
             source_url="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -84,6 +88,7 @@ class UserConfigTest(FakeInternetTestCase):
         )
 
     def test_user_configs(self):
+        self.client.login(username="testuser", password="testpassword")
         url = reverse("{}:user-configs".format(LinkDatabase.name))
         response = self.client.get(url)
 

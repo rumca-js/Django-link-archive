@@ -60,8 +60,7 @@ def get_errors(page_url):
     config = Configuration.get_object().config_entry
 
     domain = location.get_domain()
-    u = UrlHandler(link)
-    is_allowed = u.is_allowed()
+    is_allowed = page_url.is_allowed()
 
     # warnings
     if config.prefer_https_links and link.find("http://") >= 0:

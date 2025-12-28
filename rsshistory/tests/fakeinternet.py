@@ -142,7 +142,11 @@ class FakeInternetTestCase(TestCase):
         return True
 
     def get_getj(self, request=None, url=None):
-        # print("FakeInternet:get_getj: Url:{}".format(url))
+        #AppLogging.error("stack", stack=True)
+        if url:
+            print("FakeInternet:get_getj: Url:{}".format(url))
+        elif request.url:
+            print("FakeInternet:get_getj: Url:{}".format(request.url))
 
         if url and not request:
             request = PageRequestObject(url)
@@ -154,17 +158,29 @@ class FakeInternetTestCase(TestCase):
         data = FakeInternetData(request.url)
         return data.get_getj(request=request, url=url)
 
-    def get_socialj(self, url):
+    def get_socialj(self, request=None, url=None):
+        if url:
+            print("FakeInternet:get_socialj: Url:{}".format(url))
+        elif request.url:
+            print("FakeInternet:get_socialj: Url:{}".format(request.url))
         MockRequestCounter.requested(url=url)
 
         data = FakeInternetData(url)
         return data.get_socialj(url)
 
-    def get_feedsj(self, url, settings=None):
+    def get_feedsj(self, request=None, url=None):
+        if url:
+            print("FakeInternet:get_feedsj: Url:{}".format(url))
+        elif request.url:
+            print("FakeInternet:get_feedsj: Url:{}".format(request.url))
         data = FakeInternetData(url)
         return data.get_feedsj(url, settings=settings)
 
-    def get_pingj(self, url, settings=None):
+    def get_pingj(self, request=None, url=None):
+        if url:
+            print("FakeInternet:get_pingj: Url:{}".format(url))
+        elif request.url:
+            print("FakeInternet:get_pingj: Url:{}".format(request.url))
         data = FakeInternetData(url)
         return data.ping(url, settings=settings)
 
@@ -179,7 +195,7 @@ class FakeInternetTestCase(TestCase):
                 },
                 {
                    "enabled": True,
-                   "name": "MockCrawler",
+                   "name": "MockCrawler2",
                    "settings": {
                        "timeout_s": 27
                    }

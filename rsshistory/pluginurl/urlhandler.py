@@ -63,7 +63,8 @@ class UrlHandler(object):
         if self.all_properties:
             return self.all_properties
 
-        return self.get_properties_internal()
+        self.all_properties = self.get_properties_internal()
+        return self.all_properties
 
     def get_properties_internal(self):
         config_entry = Configuration.get_object().config_entry
@@ -143,6 +144,12 @@ class UrlHandler(object):
                 AppLogging.warning(
                     "Url:{} Could not communicate with remote server".format(self.url)
                 )
+
+            if self.all_properties:
+                if self.entry:
+                    self.entry.last_browser = self.last_browser
+                    self.entry.save()
+                return self.all_properties
 
         if not self.all_properties:
             self.all_properties = []

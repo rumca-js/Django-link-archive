@@ -84,7 +84,7 @@
         </a>
     </li>
     <li class="list-group-item text-nowrap mx-2">Export to CMS: {{ object.export_to_cms }}</li>
-    {% object.get_favicon %}
+    {% if object.get_favicon %}
        <li class="list-group-item text-nowrap mx-2">Favicon: <a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">
             <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
             Link</a>
