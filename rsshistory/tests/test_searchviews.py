@@ -70,7 +70,7 @@ class SearchViewTest(FakeInternetTestCase):
         )
 
         # call tested function
-        self.assertEqual(search_view.reset_priority(), 0)
+        self.assertEqual(search_view.reset_priority(), 1)
 
         search_view = SearchView.objects.create(
             name="test2",
@@ -81,4 +81,4 @@ class SearchViewTest(FakeInternetTestCase):
         )
 
         # call tested function
-        self.assertEqual(search_view.reset_priority(), 1)
+        self.assertEqual(search_view.reset_priority(), 2)

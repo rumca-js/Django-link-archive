@@ -65,7 +65,7 @@ class SourceUrlInterface(object):
 
         if all_properties:
             properties = url_ex.get_section("Properties")
-            response = url_ex.get_section("Response")
+            response = url_ex.get_response()
             entries = url_ex.get_section("Entries")
 
             if properties:
@@ -75,22 +75,20 @@ class SourceUrlInterface(object):
                 props["description"] = properties["description"]
                 props["language"] = properties["language"]
                 props["favicon"] = properties["thumbnail"]
-                props["status_code"] = response["status_code"]
+                props["status_code"] = response.status_code
 
-                if len(entries) > 0:
+                if response.is_content_rss():
                     props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+                elif len(entries) > 0:
+                    props["source_type"] = SourceDataModel.SOURCE_TYPE_DEFAULT
                 else:
-                    props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
                     if "Content-Type":
-                        content_type = response["Content-Type"]
+                        content_type = response.get_content_type()
                         if content_type:
-                            if content_type.find("html") >= 1:
-                                props["source_type"] = SourceDataModel.SOURCE_TYPE_PARSE
-                            if content_type.find("json") >= 1:
+                            if content_type.lower().find("json") >= 1:
                                 props["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
-                        else:
-                            # This is default mode. It will use default crawling method
-                            props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+                if "source_type" not in props or props["source_type"] is None:
+                    props["source_type"] = SourceDataModel.SOURCE_TYPE_PARSE
         else:
             props = {}
 

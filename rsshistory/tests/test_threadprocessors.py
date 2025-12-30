@@ -737,10 +737,9 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
         mgr = SourceJobsProcessor()
 
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertFalse(handler_obj)
-        self.assertFalse(hander)
+        self.assertEqual(items, [])
 
 
 class SystenJobProcessorTest(FakeInternetTestCase):

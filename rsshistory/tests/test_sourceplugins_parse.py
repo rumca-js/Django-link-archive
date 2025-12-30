@@ -30,38 +30,39 @@ class BaseParsePluginTest(FakeInternetTestCase):
         )
 
     def test_is_link_valid_html(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside.html"))
+        plugin = BaseParsePlugin(self.source_youtube.id)
+        self.assertTrue(plugin.is_link_valid("https://youtube.com/location/inside.html"))
 
     def test_is_link_valid_htm(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside.htm"))
+        plugin = BaseParsePlugin(self.source_youtube.id)
+        self.assertTrue(plugin.is_link_valid("https://youtube.com/location/inside.htm"))
 
     def test_is_link_valid_ending_dash(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside/"))
+        plugin = BaseParsePlugin(self.source_youtube.id)
+        self.assertTrue(plugin.is_link_valid("https://youtube.com/location/inside/"))
 
     def test_is_link_valid_ending_noext(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside"))
+        plugin = BaseParsePlugin(self.source_youtube.id)
+        self.assertTrue(plugin.is_link_valid("https://youtube.com/location/inside"))
 
     # check if false
 
     def test_is_link_valid_outside_location(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://github.com/location/inside"))
+        plugin = BaseParsePlugin(self.source_youtube.id)
+        self.assertTrue(plugin.is_link_valid("https://github.com/location/inside"))
 
     def test_is_link_valid_js(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.js"))
+        plugin = BaseParsePlugin(self.source_youtube.id)
+        self.assertFalse(plugin.is_link_valid("https://youtube.com/location/inside.js"))
 
     def test_is_link_valid_css(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
+        plugin = BaseParsePlugin(self.source_youtube.id)
+        self.assertFalse(plugin.is_link_valid("https://youtube.com/location/inside.css"))
 
     def test_get_hash(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.get_hash())
+        plugin = BaseParsePlugin(self.source_youtube.id)
+        plugin.get_contents()
+        self.assertTrue(plugin.get_hash())
 
 
 class RssParserPluginTest(FakeInternetTestCase):
@@ -89,8 +90,9 @@ class RssParserPluginTest(FakeInternetTestCase):
         self.assertTrue(jobs.count() > 0)
 
     def test_get_hash(self):
-        parse = RssParserPlugin(self.source_youtube.id)
-        self.assertTrue(parse.get_hash())
+        plugin = RssParserPlugin(self.source_youtube.id)
+        plugin.get_contents()
+        self.assertTrue(plugin.get_hash())
 
 
 class HackerNewsParserPluginTest(FakeInternetTestCase):
@@ -137,5 +139,6 @@ class HackerNewsParserPluginTest(FakeInternetTestCase):
         self.assertEqual(jobs.count(), len(props))
 
     def test_get_hash(self):
-        parse = HackerNewsParserPlugin(self.source.id)
-        self.assertTrue(parse.get_hash())
+        plugin = HackerNewsParserPlugin(self.source.id)
+        plugin.get_contents()
+        self.assertTrue(plugin.get_hash())

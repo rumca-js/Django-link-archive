@@ -105,6 +105,7 @@ class SourceSubCategories(models.Model):
 
 
 class SourceDataModel(models.Model):
+    SOURCE_TYPE_DEFAULT = "BaseDefaultPlugin"
     SOURCE_TYPE_RSS = "BaseRssPlugin"
     SOURCE_TYPE_JSON = "BaseSourceJsonPlugin"
     SOURCE_TYPE_PARSE = "BaseParsePlugin"
@@ -113,6 +114,7 @@ class SourceDataModel(models.Model):
 
     SOURCES_TYPES = (
         (SOURCE_TYPE_RSS, SOURCE_TYPE_RSS),
+        (SOURCE_TYPE_DEFAULT, SOURCE_TYPE_DEFAULT),
         (SOURCE_TYPE_JSON, SOURCE_TYPE_JSON),
         (SOURCE_TYPE_PARSE, SOURCE_TYPE_PARSE),
         (SOURCE_TYPE_YOUTUBE, SOURCE_TYPE_YOUTUBE),

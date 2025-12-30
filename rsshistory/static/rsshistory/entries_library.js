@@ -646,7 +646,6 @@ function getEntryOpParameters(entry) {
        <div>Visits: ${entry.visits}</div>
        `;
     }
-
     if (entry.last_browser) {
        text += `
        <div>Last browser: ${entry.last_browser}</div>
@@ -667,17 +666,17 @@ function getEntryOpParameters(entry) {
        <div>Body hash: ${entry.body_hash}</div>
        `;
     }
-
     if (entry.permanent != null) {
        text += `<div>Permanent: ${entry.permanent}</div>`;
     }
-
     if (entry.user_bookmarked != null) {
        text += `<div>User Bookmarked: ${entry.user_bookmarked}</div>`;
     }
-
     if (entry.user_visits != null) {
        text += `<div>User Visits: ${entry.user_visits}</div>`;
+    }
+    if (entry.thumbnail != null) {
+       text += `<div><a href="${entry.thumbnail}>Thumbnail</a></div>`;
     }
 
     return text;
@@ -695,7 +694,7 @@ function getEntryDetailThumbnailPreview(entry) {
        if (canUserView(entry))
        {
           text = `
-          <div><img src="${entry.thumbnail}" style="max-width:30%;"/></div>
+       
           `;
        }
     }

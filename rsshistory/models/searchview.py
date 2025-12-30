@@ -191,6 +191,7 @@ class SearchView(models.Model):
     def reset_priority(self):
         count = SearchView.objects.all().count()
         self.priority = count
+        return self.priority
 
     def prio_up(self):
         views = list(SearchView.objects.all().order_by("priority"))

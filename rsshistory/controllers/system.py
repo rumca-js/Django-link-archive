@@ -66,7 +66,15 @@ class SystemOperationController(object):
         except Exception as E:
             AppLogging.exc(E)
 
-    def is_crawling_response_ok(remote_server):
+            SystemOperation.add_by_thread(
+                thread_id,
+                check_type=SystemOperation.CHECK_TYPE_CRAWLING_SERVER,
+                status=False,
+            )
+
+            return False
+
+    def is_crawling_response_ok(self, remote_server):
         with requests.get(remote_server) as response:
              if response and response.status_code != 200:
                  return True
