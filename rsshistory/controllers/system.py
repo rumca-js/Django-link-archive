@@ -41,8 +41,6 @@ class SystemOperationController(object):
         """
         We do not want to use crawling server to check crawling server status
         """
-        import requests
-
         config_entry = Configuration.get_object().config_entry
 
         remote_server = config_entry.remote_webtools_server_location
@@ -75,6 +73,7 @@ class SystemOperationController(object):
             return False
 
     def is_crawling_response_ok(self, remote_server):
+        import requests
         with requests.get(remote_server) as response:
              if response and response.status_code != 200:
                  return True

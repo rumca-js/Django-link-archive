@@ -509,18 +509,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         mgr = GenericJobsProcessor()
 
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertTrue(handler_obj)
-        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_IMPORT_DAILY_DATA)
-
-        if handler_obj:
-            handler_obj.delete()
-
-        # call tested function
         items = mgr.get_handler_and_object()
 
-        self.assertFalse(items)
+        self.assertEqual(items, [])
 
     def test_run__adds_link(self):
         LinkDataController.objects.all().delete()

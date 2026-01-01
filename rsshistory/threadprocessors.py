@@ -196,6 +196,10 @@ class ProcessorInterface(object):
         """
         TODO select should be based on priority
         """
+        jobs = self.get_supported_jobs()
+        if not jobs:
+            return []
+
         query_conditions = self.get_query_conditions()
 
         # AppLogging.debug("Query conditions:{}".format(query_conditions))
