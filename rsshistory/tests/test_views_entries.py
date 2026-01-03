@@ -11,6 +11,7 @@ from ..controllers import (
     DomainsController,
     ArchiveLinkDataController,
     EntryDataBuilder,
+    BackgroundJobController,
 )
 from ..models import (
     UserEntryVisitHistory,
@@ -1065,7 +1066,10 @@ class EntriesDetailViews(FakeInternetTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+        social_jobs = BackgroundJobController.objects.filter(job=BackgroundJobController.JOB_LINK_DOWNLOAD_SOCIAL)
+        self.assertEqual(social_jobs.count(), 1)
 
     def test_entry_dislikes__reddit(self):
         MockRequestCounter.mock_page_requests = 0
@@ -1080,7 +1084,10 @@ class EntriesDetailViews(FakeInternetTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+        social_jobs = BackgroundJobController.objects.filter(job=BackgroundJobController.JOB_LINK_DOWNLOAD_SOCIAL)
+        self.assertEqual(social_jobs.count(), 1)
 
     def test_entry_dislikes__github(self):
         MockRequestCounter.mock_page_requests = 0
@@ -1095,7 +1102,10 @@ class EntriesDetailViews(FakeInternetTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+        social_jobs = BackgroundJobController.objects.filter(job=BackgroundJobController.JOB_LINK_DOWNLOAD_SOCIAL)
+        self.assertEqual(social_jobs.count(), 1)
 
     def test_entry_status(self):
         LinkDataController.objects.all().delete()

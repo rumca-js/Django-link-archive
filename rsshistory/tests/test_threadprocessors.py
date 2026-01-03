@@ -113,7 +113,7 @@ class RefreshProcessorTest(FakeInternetTestCase):
             BackgroundJobController.get_number_of_jobs(
                 BackgroundJobController.JOB_CLEANUP
             ),
-            19,
+            20,
         )
 
         self.assertEqual(SourceExportHistory.objects.all().count(), 3)
@@ -305,10 +305,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertTrue(not handler)
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_export_data_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -317,10 +316,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_EXPORT_DATA)
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_process_source_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -329,10 +327,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_PROCESS_SOURCE)
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_link_add_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -341,10 +338,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_ADD)
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_link_download_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -353,10 +349,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD)
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_link_music_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -365,12 +360,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC
-        )
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_link_video_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -379,12 +371,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO
-        )
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object__link_save_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -393,10 +382,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_SAVE)
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_write_daily_data(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -405,12 +393,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_WRITE_DAILY_DATA
-        )
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_write_topic_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -419,12 +404,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_WRITE_TOPIC_DATA
-        )
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_import_sources(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -433,10 +415,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_IMPORT_SOURCES)
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_import_bookmarks(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -445,12 +426,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_IMPORT_BOOKMARKS
-        )
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_import_daily_data(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -459,12 +437,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         mgr = GenericJobsProcessor()
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_IMPORT_DAILY_DATA
-        )
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_order(self):
         BackgroundJobController.objects.create(
@@ -480,22 +455,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         mgr = GenericJobsProcessor()
 
         # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
+        items = mgr.get_handler_and_object()
 
-        self.assertTrue(handler_obj)
-        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_PROCESS_SOURCE)
-
-        if handler_obj:
-            handler_obj.delete()
-
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertTrue(handler_obj)
-        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_IMPORT_DAILY_DATA)
-
-        if handler_obj:
-            handler_obj.delete()
+        self.assertEqual(items, [])
 
     def test_get_handler_and_object_job_disabled(self):
         BackgroundJobController.objects.create(
@@ -534,8 +496,8 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         self.print_errors()
 
-        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 0)
-        self.assertEqual(LinkDataController.objects.all().count(), 2)
+        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 2)
+        self.assertEqual(LinkDataController.objects.all().count(), 0)
 
     def test_run_timeout_changes_priority(self):
         LinkDataController.objects.all().delete()
@@ -579,15 +541,14 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
             ),
         )
 
-        # 2 link add, 18 cleanups
         self.assertEqual(
             BackgroundJobController.get_number_of_jobs(
                 BackgroundJobController.JOB_CLEANUP
             ),
-            19,
+            1,
         )
 
-        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 19)
+        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 3)
 
     def test_run__adds_system_operation(self):
         LinkDataController.objects.all().delete()

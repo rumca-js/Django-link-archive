@@ -75,7 +75,7 @@ class SystemOperationController(object):
     def is_crawling_response_ok(self, remote_server):
         import requests
         with requests.get(remote_server) as response:
-             if response and response.status_code != 200:
+             if response and response.status_code == 200:
                  return True
         return False
 

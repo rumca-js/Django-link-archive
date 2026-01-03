@@ -85,6 +85,8 @@ class BlockEntryViewsTest(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
     def test_block_list_initialize(self):
+        BlockEntry.objects.create(url="google.com")
+
         url = reverse("{}:block-entries".format(LinkDatabase.name))
 
         # call tested function
