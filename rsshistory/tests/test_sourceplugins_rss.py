@@ -234,16 +234,16 @@ class BaseRssPluginTest(FakeInternetTestCase):
         # 1 rss parent, we do not make additional requests
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_check_for_data(self):
+    def test_check_for_data__no_additional_data(self):
         MockRequestCounter.mock_page_requests = 0
 
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
         config.accept_non_domain_links = True
-        config.auto_create_sources = True
         config.accept_domain_links = False
-        config.new_entries_merge_data = True
+        config.auto_create_sources = True
+        config.new_entries_merge_data = False
         config.new_entries_use_clean_data = False
         config.save()
 
@@ -258,6 +258,56 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertTrue(plugin.get_hash())
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_check_for_data__use_clean_data(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        LinkDataController.objects.all().delete()
+
+        config = Configuration.get_object().config_entry
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
+        config.auto_create_sources = True
+        config.new_entries_merge_data = False
+        config.new_entries_use_clean_data = True
+        config.save()
+
+        self.assertTrue(self.source_rss)
+
+        plugin = BaseRssPlugin(self.source_rss.id)
+        # call tested function
+        plugin.check_for_data()
+
+        self.print_errors()
+
+        self.assertTrue(plugin.get_hash())
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 14)
+
+    def test_check_for_data__use_merge_data(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        LinkDataController.objects.all().delete()
+
+        config = Configuration.get_object().config_entry
+        config.accept_non_domain_links = True
+        config.accept_domain_links = False
+        config.auto_create_sources = True
+        config.new_entries_merge_data = True
+        config.new_entries_use_clean_data = False
+        config.save()
+
+        self.assertTrue(self.source_rss)
+
+        plugin = BaseRssPlugin(self.source_rss.id)
+        # call tested function
+        plugin.check_for_data()
+
+        self.print_errors()
+
+        self.assertTrue(plugin.get_hash())
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 14)
 
     def test_get_hash(self):
         plugin = BaseRssPlugin(self.source_rss.id)

@@ -18,7 +18,7 @@ class PageDisplay(object):
         u = RemoteUrl(url)
         u.get_response()
 
-        properties = u.get_properties()
+        properties = u.get_all_properties()
 
         for section in properties:
             section_name = section["name"]
@@ -35,31 +35,46 @@ class PageDisplay(object):
             if section_name == "Headers" and not verbose:
                 continue
 
+            if section_name == "PropertiesHash" and not verbose:
+                continue
+
             # if section_name == "Response" and not verbose:
             #    continue
 
-            print("-------------")
+            print(f"------{section_name}-------")
 
-            for key in section_properties:
-                value = section_properties[key]
+            if section_properties:
+                if isinstance(section_properties, list):
+                    for item in section_properties:
+                        print(item)
 
-                if isinstance(value, str):
-                    print("{}:{}".format(key, value))
-                elif value is None:
-                    print("{}:{}".format(key, value))
-                elif isinstance(value, bool):
-                    print("{}:{}".format(key, value))
-                elif isinstance(value, int):
-                    print("{}:{}".format(key, value))
-                elif isinstance(value, dict):
-                    print(key)
-                    for inner_key, inner_value in value.items():
-                        print("  {}:{}".format(inner_key, inner_value))
-                else:
-                    print(f"{key} has an unsupported type: {type(value)}")
+                elif isinstance(section_properties, dict):
+                    for key in section_properties.keys():
+                        value = section_properties[key]
 
-                    print("RSS path:{}".format(Url.find_rss_url(u)))
-
+                        if section_name == "Response" and key == "text":
+                            print("{}:{}".format(key, "..."))
+                        elif section_name == "Response" and key == "binary":
+                            print("{}:{}".format(key, "..."))
+                        else:
+                            if isinstance(value, str):
+                                print("{}:{}".format(key, value))
+                            elif value is None:
+                                print("{}:{}".format(key, value))
+                            elif isinstance(value, bool):
+                                print("{}:{}".format(key, value))
+                            elif isinstance(value, int):
+                                print("{}:{}".format(key, value))
+                            elif isinstance(value, dict):
+                                for inner_key, inner_value in value.items():
+                                    if section_name == "Streams" and inner_key == "text":
+                                        print("  {}:{}".format(inner_key, "..."))
+                                    elif section_name == "Streams" and inner_key == "binary":
+                                        print("  {}:{}".format(inner_key, "..."))
+                                    else:
+                                        print("  {}:{}".format(inner_key, inner_value))
+                            else:
+                                print(f"{key} has an unsupported type: {type(value)}")
 
 class PageDisplayParser(object):
     """
