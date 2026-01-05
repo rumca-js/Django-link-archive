@@ -105,7 +105,8 @@ class SystemViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        # we do not initialize block lists
+        # we do not do anything - block lists are not initialized, they take really long time to
+        # initialize
         self.assertEqual(BackgroundJobController.get_number_of_jobs(), 0)
 
     def test_json_wizard_setup_gallery(self):
@@ -117,7 +118,8 @@ class SystemViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        # we do not initialize block lists
+        # we do not do anything - block lists are not initialized, they take really long time to
+        # initialize
         self.assertEqual(BackgroundJobController.get_number_of_jobs(), 0)
 
     def test_json_wizard_setup_search_engine(self):
@@ -128,8 +130,9 @@ class SystemViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        # we initialize block lists - it will take while
-        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 1)
+        # we do not do anything - block lists are not initialized, they take really long time to
+        # initialize
+        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 0)
 
     def test_is_system_ok(self):
         # system should not be ok

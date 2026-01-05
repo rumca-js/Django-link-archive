@@ -329,6 +329,9 @@ class EntriesViewsTests(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
+        config = Configuration.get_object().config_entry
+        config.enable_domain_support = True
+
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:entry-add-json".format(LinkDatabase.name))
@@ -346,9 +349,11 @@ class EntriesViewsTests(FakeInternetTestCase):
         domains = DomainsController.objects.filter(domain="linkedin.com")
 
         self.assertEqual(entries.count(), 1)
-        self.assertEqual(domains.count(), 1)
+        self.assertEqual(domains.count(), 0)
 
-        entries[0].domain = domains[0]
+        # update job should update domains
+        jobs = BackgroundJobController.objects.filter(job=BackgroundJobController.JOB_LINK_UPDATE_DATA)
+        self.assertEqual(jobs.count(), 1)
 
     def test_entry_add_ext(self):
         LinkDataController.objects.all().delete()

@@ -1,3 +1,4 @@
+import json
 from webtoolkit import (
     HtmlPage,
     RssPage,
@@ -29,7 +30,12 @@ class SourceUrlInterface(object):
     def get_props(self, input_props=None):
         self.url_ex = self.get_url(input_props)
         self.all_properties = self.url_ex.get_properties()
-        return self.get_props_from_url(self.url_ex)
+        response = self.url_ex.get_response()
+        is_json = response.is_content_json()
+        if is_json:
+            return self.get_props_from_json(self.url_ex)
+        else:
+            return self.get_props_from_url(self.url_ex)
 
     def get_url(self, input_props=None):
         if not input_props:
@@ -83,32 +89,55 @@ class SourceUrlInterface(object):
                     props["source_type"] = SourceDataModel.SOURCE_TYPE_DEFAULT
                 else:
                     if "Content-Type":
-                        content_type = response.get_content_type()
-                        if content_type:
-                            if content_type.lower().find("json") >= 1:
-                                props["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
+                        is_json = response.is_content_json()
+                        if is_json:
+                            props["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
                 if "source_type" not in props or props["source_type"] is None:
                     props["source_type"] = SourceDataModel.SOURCE_TYPE_PARSE
         else:
             props = {}
 
-        if "remove_after_days" not in props:
-            props["remove_after_days"] = 0
-        if "fetch_period" not in props:
-            props["fetch_period"] = "3600"
-        if "age" not in props:
-            props["age"] = 0
         if "status_code" not in props:
             if self.u:
                 props["status_code"] = self.u.get_status_code()
-        if "language" not in props or props["language"] is None:
-            props["language"] = ""
-        if "category_name" not in props or props["category_name"] is None:
-            props["category_name"] = "New"
-        if "subcategory_name" not in props or props["subcategory_name"] is None:
-            props["subcategory_name"] = "New"
+
+        self.fix_props(url_ex, props)
 
         return props
+
+    def get_props_from_json(self, url_ex, input_props=None):
+        if not input_props:
+            input_props = {}
+
+        response = url_ex.get_response()
+        text = response.get_text()
+        json_object = json.loads(text)
+
+        if "source" in json_object:
+            props = json_object["source"]
+        else:
+            return self.get_props_from_url(self.url_ex)
+
+        self.fix_props(url_ex, props)
+        return props
+
+    def fix_props(self, url_ex, input_props):
+        if "remove_after_days" not in input_props:
+            input_props["remove_after_days"] = 0
+        if "fetch_period" not in input_props:
+            input_props["fetch_period"] = "3600"
+        if "age" not in input_props:
+            input_props["age"] = 0
+        if "status_code" not in input_props:
+            input_props["status_code"] = 0
+        if "language" not in input_props or input_props["language"] is None:
+            input_props["language"] = ""
+        if "category_name" not in input_props or input_props["category_name"] is None:
+            input_props["category_name"] = "New"
+        if "subcategory_name" not in input_props or input_props["subcategory_name"] is None:
+            input_props["subcategory_name"] = "New"
+
+        return input_props
 
     def is_property_set(self, input_props, property):
         return property in input_props and input_props[property]

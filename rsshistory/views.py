@@ -121,6 +121,16 @@ def get_search_view(request):
     return search_view
 
 
+def get_form_errors(form):
+    error_message = "\n".join(
+        [
+            "{}: {}".format(field, ", ".join(errors))
+            for field, errors in form.errors.items()
+        ]
+    )
+    return error_message
+
+
 class SimpleViewPage(object):
     def __init__(self, request, view_access_type=ConfigurationEntry.ACCESS_TYPE_LOGGED):
         self.request = request

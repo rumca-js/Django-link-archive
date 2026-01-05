@@ -28,7 +28,7 @@ class SearchViewTests(FakeInternetTestCase):
         # redirect to view the link again
         self.assertEqual(response.status_code, 200)
 
-    def test_entry_rule_edit__post(self):
+    def test_searchview_edit__post(self):
         searchview = SearchView.objects.create()
 
         self.client.login(username="testuser", password="testpassword")
@@ -38,14 +38,20 @@ class SearchViewTests(FakeInternetTestCase):
         )
 
         form_data = {
-            "enabled": False,
-            "rule_name": "test_rule_edited",
-            "trigger_text": "",
-            "trigger_text_hits": 1,
-            "trigger_text_fields": "",
+            "name": "",
+            "default": False,
+            "icon": "test",
+            "order_by" : "test",
+            "entry_limit": 200,
+            "date_published_day_limit" : 5,
+            "date_created_day_limit":5,
         }
 
         # call user action
         response = self.client.post(url, data=form_data)
+
+        page_source = response.content.decode("utf-8")
+        print("Contents: {}".format(page_source))
+        print(response)
 
         self.assertEqual(response.status_code, 302)

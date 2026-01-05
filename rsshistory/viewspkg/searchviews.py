@@ -14,7 +14,7 @@ from ..models import (
     ConfigurationEntry,
 )
 from ..configuration import Configuration
-from ..views import ViewPage, SimpleViewPage, GenericListView
+from ..views import ViewPage, SimpleViewPage, GenericListView, get_form_errors
 from ..forms import SearchViewForm
 from ..queryfilters import DjangoEquationProcessor
 
@@ -91,27 +91,31 @@ def searchview_edit(request, pk):
 
     if request.method == "POST":
         form = SearchViewForm(request.POST, instance=objs[0])
-        if not form.is_valid():
-            p.context["summary_text"] = "Form is invalid"
-            return p.render("summary_present.html")
+        is_valid = form.is_valid()
 
         errors = get_form_condition_errors(form)
+        form_errors = get_form_errors(form)
 
         if objs[0].default and not form.cleaned_data["default"]:
             p.context["summary_text"] = "Cannot disable default view!"
             return p.render("go_back.html")
+
+        elif not is_valid:
+            p.context["summary_text"] = "Form is invalid: {}".format(form_errors)
+            return p.render("summary_present.html")
 
         elif errors and len(errors) > 0:
             error_message = "\n".join(errors)
             p.context["summary_text"] = "Form is invalid: {}".format(error_message)
             return p.render("summary_present.html")
 
-        elif form.is_valid():
+        elif is_valid:
             form.save()
 
             return HttpResponseRedirect(
                 reverse("{}:searchview".format(LinkDatabase.name), args=[pk])
             )
+
 
     form = SearchViewForm(instance=objs[0])
     form.method = "POST"

@@ -490,21 +490,29 @@ def download_video_pk(request, pk):
 
 def is_url_allowed(request):
     def is_url_allowed_internal(p, url):
-        # TODO use Remote?
-        u = UrlHandler(url)
-        u.get_response()
-        status = u.is_allowed()
+        config = Configuration.get_object().config_entry
+        loc = config.remote_webtools_server_location
+        url = RemoteUrl(url=link, remote_server_location=loc)
+
+        response = url.get_response()
+        status = response.is_allowed()
 
         if status:
             p.context["summary_text"] = (
                 "{} is allowed by robots.txt".format(
-                    url
+                    link
+                )
+            )
+        elif status is None:
+            p.context["summary_text"] = (
+                "{} Unknown status".format(
+                    link
                 )
             )
         else:
             p.context["summary_text"] = (
                 "{} is NOT allowed by robots.txt".format(
-                    url
+                    link
                 )
             )
         return p.render("summary_present.html")
@@ -516,7 +524,7 @@ def is_url_allowed(request):
         return data
 
     if request.method == "GET":
-        if "page" not in request.GET:
+        if "link" not in request.GET:
             form = LinkInputForm(request=request)
             form.method = "POST"
             form.action_url = reverse("{}:is-url-allowed".format(LinkDatabase.name))
@@ -525,7 +533,7 @@ def is_url_allowed(request):
             return p.render("form_oneliner.html")
 
         else:
-            url = request.GET["page"]
+            url = request.GET["link"]
 
             return is_url_allowed_internal(p, url)
 
@@ -807,7 +815,10 @@ def source_input_suggestions_json(request):
     if "link" in request.GET:
         link = request.GET["link"]
         data = get_suggestions(link)
-        url = RemoteUrl(link)
+
+        loc = config.remote_webtools_server_location
+        url = RemoteUrl(link, remote_server_location=loc)
+
         feeds = url.get_feeds()
         for feed in feeds:
             if feed not in data["links"] and feed != link:
