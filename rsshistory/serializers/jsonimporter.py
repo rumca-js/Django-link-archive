@@ -148,9 +148,6 @@ class MapImporter(object):
             if self.is_import("import_entries"):
                 # This instance can have their own settings for import, may decide what is
                 # accepted and not. Let the builder deal with it
-
-                LinkDatabase.info("Import ids {}".format(self.is_import("import_ids")))
-
                 if "id" in clean_data:
                     LinkDatabase.info(
                         "Importing link:{} ID:{}".format(
@@ -168,10 +165,6 @@ class MapImporter(object):
 
                 if not entry:
                     AppLogging.error("Cannot build entry {}".format(clean_data["link"]))
-                else:
-                    LinkDatabase.info(
-                        "Added Link:{} ID:{}".format(entry.link, entry.id)
-                    )
 
                 if entry and entry.is_archive_entry():
                     entry = EntryWrapper.move_from_archive(entry)

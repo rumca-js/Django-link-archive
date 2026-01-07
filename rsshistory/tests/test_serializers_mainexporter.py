@@ -11,7 +11,7 @@ from ..controllers import (
 )
 from ..datawriter import DataWriterConfiguration
 from ..configuration import Configuration
-from ..models import DataExport
+from ..models import DataExport, SourceDataModel
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -73,27 +73,33 @@ class MainExporterTest(FakeInternetTestCase):
         """
         domains are permanent, links can be bookmarked
         """
+        source3 = SourceDataModel.objects.create(url="https://link-3.com")
+
         entry1 = LinkDataController.objects.create(
             link="https://link-1.com/test",
             title="The first link",
             bookmarked=False,
-            permanent=False,
+            #permanent=False,
         )
         entry2 = LinkDataController.objects.create(
             link="https://link-2.com/test",
             title="The first link",
             bookmarked=True,
-            permanent=False,
+            #permanent=False,
         )
         entry3 = LinkDataController.objects.create(
             link="https://link-3.com",
             title="The first link",
             bookmarked=False,
             permanent=True,
+            source = source3,
         )
 
     def test_main_exporter__bookmarks(self):
         conf = Configuration.get_object()
+
+        bookmarks = LinkDataController.objects.filter(bookmarked=True)
+        self.assertEqual(bookmarks.count(), 1)
 
         data_writer_config = DataWriterConfiguration(
             conf, self.export_bookmarks, Path("./data/test/daily_data")
@@ -106,6 +112,9 @@ class MainExporterTest(FakeInternetTestCase):
     def test_main_exporter__parmanents(self):
         conf = Configuration.get_object()
 
+        permanent = LinkDataController.objects.filter(permanent=True)
+        self.assertEqual(permanent.count(), 1)
+
         data_writer_config = DataWriterConfiguration(
             conf, self.export_permanents, Path("./data/test/daily_data")
         )
@@ -116,6 +125,11 @@ class MainExporterTest(FakeInternetTestCase):
 
     def test_main_exporter__both(self):
         conf = Configuration.get_object()
+
+        bookmarks = LinkDataController.objects.filter(bookmarked=True)
+        self.assertEqual(bookmarks.count(), 1)
+        permanent = LinkDataController.objects.filter(permanent=True)
+        self.assertEqual(permanent.count(), 1)
 
         data_writer_config = DataWriterConfiguration(
             conf, self.export_both, Path("./data/test/daily_data")

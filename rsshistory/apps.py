@@ -15,6 +15,9 @@ class LinkDatabase(AppConfig):
     def ready(self):
         pass
 
+    def debug(message):
+        print("[{}] {}".format(LinkDatabase.name, message))
+
     def info(message):
         print("[{}] {}".format(LinkDatabase.name, message))
 
