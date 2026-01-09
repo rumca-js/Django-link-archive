@@ -489,7 +489,7 @@ def download_video_pk(request, pk):
 
 
 def is_url_allowed(request):
-    def is_url_allowed_internal(p, url):
+    def is_url_allowed_internal(p, link):
         config = Configuration.get_object().config_entry
         loc = config.remote_webtools_server_location
         url = RemoteUrl(url=link, remote_server_location=loc)

@@ -146,6 +146,7 @@ class ConfigForm(forms.ModelForm):
             "new_entries_fetch_social_data",
             "browse_entries_fetch_social_data",
             "browse_entry_fetch_social_data",
+            "entry_update_fetches_social_data",
             "entry_update_via_internet",
             "log_remove_entries",
             "auto_create_sources",
