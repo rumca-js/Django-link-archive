@@ -535,6 +535,17 @@ class ScannerForm(forms.Form):
         super().__init__(*args, **kwargs)
 
 
+class ScannerContentsForm(forms.Form):
+    # fmt: off
+    body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':75}))
+    url = forms.CharField(label="link", max_length=500, help_text="Url can be empty, but may be used to calculate relative paths", required=False)
+    # fmt: on
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+
+
 class ContentsForm(forms.Form):
     # fmt: off
     body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':75}))

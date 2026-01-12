@@ -91,6 +91,44 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_page_scan_contents__post(self):
+        url = reverse("{}:page-scan-contents".format(LinkDatabase.name))
+
+        form_data = {
+            "url" : "https://test.com",
+            "body", 'test test <a href="https://whatever.com">Test</a>'
+        }
+
+        # call tested function
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_add_many_links(self):
+        url = reverse("{}:page-add-many-links".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_add_many_links__post(self):
+        BackgroundJobController.objects.all().delete()
+
+        url = reverse("{}:page-add-many-links".format(LinkDatabase.name))
+
+        form_data = {
+            "tags" : "test, test2",
+            "body", 'test test <a href="https://whatever.com">Test</a>'
+        }
+
+        # call tested function
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(BackgroundJobController.objects.all().count(), 1)
+
     def test_download_url(self):
         url = reverse("{}:download-url".format(LinkDatabase.name))
 

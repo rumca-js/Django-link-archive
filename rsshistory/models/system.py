@@ -296,17 +296,17 @@ class ConfigurationEntry(models.Model):
 
     auto_crawl_sources = models.BooleanField(
         default=False,
-        help_text="Crawling. Automatically finds links from sources (domain, links in RSS)."
+        help_text="Crawling. Automatically finds new links from added entry links (not contents)."
     )
 
     auto_scan_new_entries = models.BooleanField(
         default=False,
-        help_text="Crawling. Scans new entry for new links.",
+        help_text="Crawling. Scans new entries, contents for new links.",
     )
 
     auto_scan_updated_entries = models.BooleanField(
         default=False,
-        help_text="Crawling. Scans updated entries for new links.",
+        help_text="Crawling. Scans updated entries, contents for new links.",
     )
 
     # TODO rename to merge_data_for_new_entries

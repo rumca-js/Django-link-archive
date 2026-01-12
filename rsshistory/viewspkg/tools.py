@@ -37,6 +37,7 @@ from ..configuration import Configuration
 from ..forms import (
     LinkInputForm,
     ScannerForm,
+    ScannerContentsForm,
     UrlContentsForm,
     LinkPropertiesForm,
 )
@@ -297,10 +298,9 @@ def page_scan_contents(request):
         form = ScannerForm(request.POST, request=request)
         if form.is_valid():
             contents = form.cleaned_data["body"]
-            tag = form.cleaned_data["tag"]
+            link = form.cleaned_data["url"]
 
-            link = "https://"  # TODO this might not work for some URLs
-            links = get_scan_contents_links(link, contents)
+            links = get_scan_contents_links(url=link, contents=contents)
 
             form = create_scanner_form(request, links)
             p.context["form"] = form
@@ -311,7 +311,7 @@ def page_scan_contents(request):
         return p.render("form_basic.html")
 
     else:
-        form = ScannerForm(request=request)
+        form = ScannerContentsForm(request=request)
 
         form.method = "POST"
         form.action_url = reverse("{}:page-scan-contents".format(LinkDatabase.name))

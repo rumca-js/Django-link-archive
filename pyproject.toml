@@ -19,20 +19,16 @@ tldextract = "^5.1.2"
 sympy = "^1.14.0"
 spacy = "3.7.5"
 url-cleaner="0.1.5"
+webtoolkit="0.0.182"
 
-# Do we need this?
-pytz = "^2024.2"
-# Do we need this?
-beautifulsoup4 = "^4.13.3"
-
-requests = "^2.32.3"
 #psycopg2 = "*" # for raspberry install python3-psycopyg2
 psycopg2-binary = "*" # for raspberry install python3-psycopyg2
 psutil="*"
 
 # TODO do we need this?
-#chardet = "^5.2.0"
-webtoolkit="0.0.178"
+requests = "^2.32.3"
+pytz = "^2024.2"
+beautifulsoup4 = "^4.13.3"
 cryptography="^45.0.3"
 
 [tool.poetry.group.dev.dependencies]

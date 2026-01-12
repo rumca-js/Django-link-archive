@@ -79,11 +79,9 @@ class UrlHandler(object):
                 )
                 return
 
-            return self.get_properties_internal_mode_mapping(
-                remote_server, self.browsers
-            )
+            return self.get_properties_internal_mode_mapping(self.browsers)
 
-    def get_properties_internal_mode_mapping(self, request_server, browsers):
+    def get_properties_internal_mode_mapping(self, browsers):
         config_entry = Configuration.get_object().config_entry
         name = ""
 
@@ -102,7 +100,8 @@ class UrlHandler(object):
 
                 request = self.browser_to_request(browser)
 
-                self.all_properties = request_server.get_getj(request=request)
+                self.perform_call(request)
+
                 if not self.all_properties:
                     AppLogging.warning(
                         "Url:{} Could not communicate with remote server, Browser:{}".format(
@@ -139,7 +138,8 @@ class UrlHandler(object):
         else:
             request = PageRequestObject(self.url)
 
-            self.all_properties = request_server.get_getj(request=request)
+            self.perform_call(request)
+
             if not self.all_properties:
                 AppLogging.warning(
                     "Url:{} Could not communicate with remote server".format(self.url)
@@ -155,6 +155,19 @@ class UrlHandler(object):
             self.all_properties = []
 
         return self.all_properties
+
+    def perform_call(self, request):
+        config_entry = Configuration.get_object().config_entry
+        location = config_entry.remote_webtools_server_location
+        while True:
+            url = RemoteUrl(url=self.url, remote_server_location=location, request=request)
+            response = url.get_response()
+            self.all_properties = url.get_all_properties()
+
+            if response and response.get_status_code() == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
+                AppLogging.debug("Too many requests")
+                continue
+            break
 
     def is_another_request_necessary(self):
         """
@@ -285,6 +298,10 @@ class UrlHandler(object):
 
         return RemoteServer.read_properties_section(section_name, properties)
 
+    def get_properties_section(self):
+        url = RemoteUrl(url=self.url, all_properties=self.all_properties)
+        return url.get_properties()
+
     def is_valid(self):
         response = self.get_response()
         if not response:
@@ -337,7 +354,7 @@ class UrlHandler(object):
 
         config_entry = Configuration.get_object().config_entry
         if config_entry.remote_webtools_server_location:
-            properties = self.get_section("Properties")
+            properties = self.get_properties_section()
             if not properties:
                 return True
 
@@ -356,7 +373,7 @@ class UrlHandler(object):
         if EntryRules.is_url_blocked(self.url):
             return "EntryUrl Url block"
 
-        properties = self.get_section("Properties")
+        properties = self.get_properties_section()
         if not properties:
             return "Missing properties"
 
