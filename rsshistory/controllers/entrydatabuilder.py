@@ -148,21 +148,10 @@ class EntryDataBuilder(object):
             raise IOError(f"{self.link}: Crawling server error")
 
         if self.source_is_auto and not url.is_valid():
-            self.errors.append("Url:{}. Url is not valid".format(self.link))
-            AppLogging.debug(
-                "Url:{} Could not obtain properties for {}".format(self.link, self.link)
-            )
+            self.errors.append("Url:{}. Url is not valid. Check status code, etc.".format(self.link))
             return
 
         if not self.is_enabled_to_store(url.handler):
-            self.errors.append(
-               "Url:{}. Could not obtain link service properties".format(self.link)
-            )
-            AppLogging.debug(
-               'Could not obtain properties for:<a href="{}">{}</a>'.format(
-                    self.get_absolute_url(), self.link
-               )
-            )
             return
 
         return self.build_from_props(ignore_errors=self.ignore_errors)
@@ -201,7 +190,6 @@ class EntryDataBuilder(object):
         # we do not want to obtain properties for non-domain entries, if we capture only
         # domains
         if not self.is_enabled_to_store(url.handler):
-            self.errors.append("Url:{}. Not enabled to store".format(self.link))
             return
 
         if url.is_server_error():
@@ -478,17 +466,16 @@ class EntryDataBuilder(object):
 
         if url_handler and not url_handler.is_valid():
             self.errors.append("Url:{}. Url is not valid".format(self.link))
-            AppLogging.debug(
-                "Url:{} Could not obtain properties for {}".format(self.link, self.link)
-            )
             return False
 
         # we do not store link services, we can store only what is behind those links
         if location.is_link_service():
+            self.errors.append("Url:{}. Url is link service".format(self.link))
             return False
 
         # heavier checks last
         if self.is_live_video():
+            self.errors.append("Url:{}. Url is live video".format(self.link))
             return False
 
         if EntryRules.is_dict_blocked(self.link_data):
@@ -513,8 +500,14 @@ class EntryDataBuilder(object):
                 body_hash = response.get_body_hash()
 
                 if hash and LinkDataController.objects.filter(contents_hash = hash).count() > 0:
+                    self.errors.append(
+                        "Url:{}. Not accepting same hashes".format(self.link)
+                    )
                     return False
                 if body_hash and LinkDataController.objects.filter(body_hash = body_hash).count() > 0:
+                    self.errors.append(
+                        "Url:{}. Not accepting same hashes - body".format(self.link)
+                    )
                     return False
 
         return True

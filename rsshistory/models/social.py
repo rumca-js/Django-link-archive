@@ -4,7 +4,8 @@ from django.db import DataError
 
 from datetime import timedelta
 from utils.dateutils import DateUtils
-from webtoolkit import RemoteServer, UrlLocation
+from webtoolkit import RemoteServer, RemoteUrl, UrlLocation
+import webtoolkit
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
@@ -92,6 +93,9 @@ class SocialData(models.Model):
         return False
 
     def get(entry):
+        """
+        Returns social data from memory, or adds social data job
+        """
         from ..configuration import Configuration
         from ..controllers import BackgroundJobController
 
@@ -105,6 +109,9 @@ class SocialData(models.Model):
         BackgroundJobController.link_download_social_data(entry)
 
     def update(entry):
+        """
+        Adds entry social data from web server
+        """
         new_social = SocialData.get_from_server(entry)
         if new_social:
             social_data = SocialData.objects.filter(entry=entry)
@@ -117,6 +124,9 @@ class SocialData(models.Model):
                 AppLogging.exc(E, info_text = "Data:{}".format(new_social))
 
     def get_from_model(entry):
+        """
+        Returns social data from model
+        """
         from ..configuration import Configuration
 
         config = Configuration.get_object().config_entry
@@ -128,6 +138,9 @@ class SocialData(models.Model):
             return social_data
 
     def get_from_server(entry):
+        """
+        Returns social data from server
+        """
         from ..configuration import Configuration
         from ..controllers import SystemOperationController
 
@@ -136,22 +149,33 @@ class SocialData(models.Model):
         if config.remote_webtools_server_location:
             controller = SystemOperationController()
             if controller.is_remote_server_down():
-                return
+                raise IOError("Remote server is down")
 
             link = config.remote_webtools_server_location
             remote_server = RemoteServer(link)
+            index = 0
+            while True:
+                index += 1
+                if index > 4:
+                    raise IOError(f"Could not obtain response from server about link entry ID:{entry.id} entry link:{entry.link} ")
 
-            json_obj = remote_server.get_socialj(url=entry.link)
-            if not json_obj:
-                return
+                json_obj = remote_server.get_socialj(url=entry.link)
+                if not json_obj:
+                    raise IOError("Invalid social data response from remote server - no json object")
 
-            if len(json_obj) == 0:
-                return
+                if len(json_obj) == 0:
+                    raise IOError("Invalid social data response from remote server - json object length is null")
 
-            if isinstance(json_obj, list):
-                # JSON needs to be a map of elements
-                # list indicates a problem
-                return
+                if isinstance(json_obj, list):
+                    # it should be map, not list
+                    url = RemoteUrl(url=entry.link, all_properties=json_obj)
+                    status_code = url.get_status_code()
+                    if status_code == webtoolkit.HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
+                        continue
+
+                    raise IOError(f"Invalid social data response from remote server - a list. Entry id:{entry.id} link:{entry.link} status_code:{status_code}")
+
+                break
 
             if SocialData.is_all_none(json_obj):
                 return
@@ -160,6 +184,9 @@ class SocialData(models.Model):
             return json_obj
 
     def is_all_none(json_obj):
+        """
+        Returns indication if json object elements are all true
+        """
         # indicator of unsupported on crawler buddy
         all_values_are_none = True
         for key, value in json_obj.items():
@@ -169,6 +196,9 @@ class SocialData(models.Model):
         return all_values_are_none
 
     def cleanup(cfg=None):
+        """
+        Cleans up the table
+        """
         from ..configuration import Configuration
 
         config = Configuration.get_object().config_entry
@@ -199,6 +229,9 @@ class SocialData(models.Model):
         return True
 
     def truncate(cfg=None):
+        """
+        Truncates the table
+        """
         BATCH_SIZE = 1000
 
         social_datas = SocialData.objects.all()

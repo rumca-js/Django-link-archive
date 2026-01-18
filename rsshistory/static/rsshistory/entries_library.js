@@ -12,10 +12,6 @@ function isStatusCodeValid(entry) {
     if (entry.status_code >= 200 && entry.status_code < 400)
         return true;
 
-    // unknown status is valid (undetermined, not invalid)
-    if (entry.status_code == 0)
-        return true;
-
     // user agent, means that something is valid, but behind paywall
     if (entry.status_code == 403)
         return true;
@@ -24,9 +20,24 @@ function isStatusCodeValid(entry) {
 }
 
 
+function isStatusCodeInValid(entry) {
+    // user agent, means that something is valid, but behind paywall
+    if (entry.status_code == 403)
+        return false;
+
+    if (entry.status_code < 200 && entry.status_code >= 400)
+        return true;
+
+    return false;
+}
+
+
 function isEntryValid(entry) {
-    if (entry.is_valid == null) {
-	return true;
+    if (entry.is_valid === null) {
+        if (isStatusCodeValid(entry) || entry.manual_status_code == 200) {
+           return true;
+        }
+        return false;
     }
     return entry.is_valid;
 }
@@ -70,7 +81,8 @@ function getEntryAuthorText(entry) {
         return entry.author + " / " + entry.album;
     }
     else if (entry.author) {
-        return entry.author;
+        let author = getEntryAuthorSafe(entry);
+        return author;
     }
     else if (entry.album) {
         return entry.album;
@@ -366,6 +378,12 @@ function getEntryTitleSafe(entry) {
 }
 
 
+function getEntryAuthorSafe(entry) {
+    let author = entry.author;
+    return escapeHtml(entry.author);
+}
+
+
 function getEntryDescription(entry) {
   if (!entry.description)
     return "";
@@ -613,7 +631,8 @@ function getEntryOpParameters(entry) {
     }
 
     if (entry.author) {
-        text += `<div>Author: ${entry.author}</div>`;
+        let author = getEntryAuthorSafe(entry);
+        text += `<div>Author: ${author}</div>`;
     }
     if (entry.album) {
         text += `<div>Album: ${entry.album}</div>`;
@@ -694,7 +713,7 @@ function getEntryDetailThumbnailPreview(entry) {
        if (canUserView(entry))
        {
           text = `
-       
+          <div><img src="${entry.thumbnail}" style="max-width:30%;"/></div>
           `;
        }
     }
@@ -749,8 +768,6 @@ function getEntryDetailOdyseePreview(entry) {
 
 
 function getOneEntryEntryText(entry) {
-    console.log(`view_display_type ${view_display_type}`);
-
     const templateMap = {
         "standard": entryStandardTemplate,
         "gallery": entryGalleryTemplate,
@@ -760,6 +777,7 @@ function getOneEntryEntryText(entry) {
         "realated": getEntryRelatedBar,
         "visits": getEntryVisitsBar,
         "text": getEntryTextBar,
+        "links-only": getEntryLinkTemplate,
     };
 
     const templateFunc = templateMap[view_display_type];
@@ -883,7 +901,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let author = entry.author;
     if (author && author != source__title)
     {
-       "by " + escapeHtml(entry.author);
+       "by " + getEntryAuthorSafe(entry);
     }
     else
     {
@@ -985,6 +1003,23 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                </div>
             </div>
         </a>
+    `;
+}
+
+
+function getEntryLinkTemplate(entry, show_icons = true, small_icons = false) {
+    let tags_text = getEntryTagStrings(entry);
+    let title_safe = getEntryTitleSafe(entry);
+    let hover_title = title_safe + " " + tags_text;
+
+    return `
+        <div
+            href="${entry.link}"
+            entry="${entry.id}"
+            title="${hover_title}"
+         >
+            ${entry.link}
+        </div>
     `;
 }
 
@@ -1469,11 +1504,6 @@ function getEntriesList(entries) {
 
     return htmlOutput;
 }
-
-
-/**
- Django specific
- */
 
 
 /*

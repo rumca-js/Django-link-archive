@@ -88,6 +88,11 @@ def get_generic_search_init_context(request, form):
     context["entry_query_names"] = LinkDataController.get_query_names()
     context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
 
+    styles = []
+    for style in ConfigurationEntry.DISPLAY_TYPE_CHOICES:
+        styles.append(style[0])
+    context["display_styles"] = styles
+
     return context
 
 

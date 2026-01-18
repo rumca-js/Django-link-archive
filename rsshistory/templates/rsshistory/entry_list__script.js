@@ -130,33 +130,21 @@ $(document).on("click", '#highlightBookmarks', function(e) {
 });
 
 
-$(document).on("click", '#displayStandard', function(e) {
-    view_display_type = "standard";
+$(document).on("click", 'input[name="viewMode"]', function(e) {
+    view_display_type = $(this).val();
     fillListData();
 });
 
 
-$(document).on("click", '#displayGallery', function(e) {
-    view_display_type = "gallery";
-    fillListData();
-});
+$(document).on('change', 'input[name="theme"]', function () {
+    view_display_style = $(this).val();
 
-
-$(document).on("click", '#displaySearchEngine', function(e) {
-    view_display_type = "search-engine";
-    fillListData();
-});
-
-
-$(document).on("click", '#displayLight', function(e) {
-    setLightMode();
-
-    fillListData();
-});
-
-
-$(document).on("click", '#displayDark', function(e) {
-    setDarkMode();
+    if (view_display_style == "style-light") {
+        setLightMode();
+    }
+    else {
+        setDarkMode();
+    }
 
     fillListData();
 });

@@ -173,6 +173,16 @@ class SourceDataModel(models.Model):
         help_text="Alpha of entire entry",
     )
 
+    xpath = models.CharField(max_length=100, blank=True, help_text="If configured, adds only links which match this python regular expression pattern")
+
+    proxy_location = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Proxy location for the source. Proxy location will be used instead of normal processing.",
+    )
+
+    auto_update_favicon = models.BooleanField(default=True)
+
     credentials = models.ForeignKey(
         Credentials,
         on_delete=models.CASCADE,
@@ -196,14 +206,6 @@ class SourceDataModel(models.Model):
         blank=True,
         null=True,
     )
-
-    proxy_location = models.CharField(
-        max_length=200,
-        blank=True,
-        help_text="Proxy location for the source. Proxy location will be used instead of normal processing.",
-    )
-
-    auto_update_favicon = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["-enabled", "-dynamic_data__consecutive_errors", "title"]

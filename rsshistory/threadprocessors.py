@@ -208,9 +208,9 @@ class ProcessorInterface(object):
         objs = BackgroundJobController.objects.filter(query_conditions)
         if objs.exists():
             obj = objs.first()
-
-            handler = self.get_job_handler(obj)
-            return [obj, handler]
+            if obj:
+                handler = self.get_job_handler(obj)
+                return [obj, handler]
         return []
 
     def get_job_handler(self, obj):

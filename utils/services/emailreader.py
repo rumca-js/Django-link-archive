@@ -92,9 +92,32 @@ class EmailReader(object):
         return mail
 
     def extract_email_author(self, msg):
-        name, addr = parseaddr(msg["From"])
-        decoded_name = self.decode_mime_words(name)
-        return f"{decoded_name} <{addr}>" if decoded_name else addr
+        # Try From
+        from_header = msg.get("From")
+        if from_header:
+            name, addr = parseaddr(from_header)
+            name = self.decode_mime_words(name)
+            if addr:
+                return f"{name} <{addr}>" if name else addr
+
+        # Fallback to Sender
+        sender = msg.get("Sender")
+        if sender:
+            name, addr = parseaddr(sender)
+            name = self.decode_mime_words(name)
+            if addr:
+                return f"{name} <{addr}>" if name else addr
+
+        # Fallback to Reply-To
+        reply_to = msg.get("Reply-To")
+        if reply_to:
+            name, addr = parseaddr(reply_to)
+            name = self.decode_mime_words(name)
+            if addr:
+                return f"{name} <{addr}>" if name else addr
+
+        # Last resort: return decoded name only
+        return self.decode_mime_words(from_header) if from_header else None
 
     def extract_email_date(self, msg):
         # Extract and parse the sent date

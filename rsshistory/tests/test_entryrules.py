@@ -38,13 +38,13 @@ class EntryUpdaterTest(FakeInternetTestCase):
             enabled=True,
             block=True,
             rule_name="Rule1",
-            trigger_rule_url=".test1.com, .test2.com",
+            trigger_rule_url=".*\.test1\.com.*, .*\.test2\.com.*",
         )
         EntryRules.objects.create(
             enabled=True,
             block=True,
             rule_name="Rule2",
-            trigger_rule_url=".test3.com, .test4.com",
+            trigger_rule_url=".*\.test3\.com.*, .*\.test4\.com.*",
         )
 
         # call tested function
@@ -65,13 +65,13 @@ class EntryUpdaterTest(FakeInternetTestCase):
             enabled=True,
             block=False,
             rule_name="Rule1",
-            trigger_rule_url=".test1.com, .test2.com",
+            trigger_rule_url=".*\.test1\.com.*, .*\.test2\.com.*",
         )
         EntryRules.objects.create(
             enabled=True,
             block=False,
             rule_name="Rule2",
-            trigger_rule_url=".test3.com, .test4.com",
+            trigger_rule_url=".*\.test3\.com.*, .*\.test4\.com.*",
         )
 
         # call tested function
@@ -159,7 +159,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             block=False,
             browser=self.browser,
             rule_name="Rule1",
-            trigger_rule_url=".test1.com, .test2.com",
+            trigger_rule_url=".*\.test1\.com.*, .*\.test2\.com.*",
         )
 
         # call tested function
@@ -189,7 +189,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             block=False,
             browser=self.browser,
             rule_name="Rule1",
-            trigger_rule_url=".test1.com, .test2.com",
+            trigger_rule_url=".*\.test1\.com.*, .*\.test2\.com.*",
         )
 
         self.assertTrue(therule.is_valid())
@@ -202,7 +202,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
             enabled=True,
             block=True,
             rule_name="Rule1",
-            trigger_rule_url=".test1.com, .test2.com",
+            trigger_rule_url=".*\.test1\.com.*, .*\.test2\.com.*",
         )
 
         entry = LinkDataController.objects.create(link="https://something.test1.com")

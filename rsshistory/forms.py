@@ -757,6 +757,7 @@ class SourceForm(forms.ModelForm):
             "favicon",
             "auto_update_favicon",
             "credentials",
+            "xpath",
             "proxy_location",
         ]
         widgets = {}
@@ -767,6 +768,7 @@ class SourceForm(forms.ModelForm):
 
         self.fields["url"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["favicon"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["xpath"].widget.attrs.update(size=self.init.get_cols_size())
 
         self.fields["entries_backgroundcolor"].widget = forms.TextInput(
             attrs={"type": "color", "value": ""}

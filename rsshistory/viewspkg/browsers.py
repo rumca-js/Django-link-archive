@@ -7,7 +7,7 @@ from ..controllers import (
     LinkDataController,
 )
 from ..models import ConfigurationEntry, Browser
-from ..views import ViewPage, SimpleViewPage, GenericListView
+from ..views import ViewPage, SimpleViewPage, GenericListView, get_form_errors
 from ..apps import LinkDatabase
 from ..forms import BrowserEditForm
 
@@ -175,7 +175,7 @@ def edit(request, pk):
 
     browsers = Browser.objects.filter(id=pk)
     if not browsers.exists():
-        p.context["summary_text"] = "Could not find such domain"
+        p.context["summary_text"] = "Could not find such browser"
         return p.render("go_back.html")
 
     browser = browsers[0]
@@ -185,11 +185,12 @@ def edit(request, pk):
         p.context["form"] = form
 
         if form.is_valid():
-            domain = form.save()
+            browser = form.save()
 
             return redirect("{}:browsers".format(LinkDatabase.name))
 
-        p.context["summary_text"] = "Could not edit domain {}".format(form.cleaned_data)
+        errors = get_form_errors(form)
+        p.context["summary_text"] = f"Could not edit browser {errors} {form.cleaned_data}"
         return p.render("go_back.html")
     else:
         form = BrowserEditForm(instance=browser)

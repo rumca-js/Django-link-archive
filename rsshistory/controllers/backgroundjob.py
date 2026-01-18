@@ -208,8 +208,6 @@ class BackgroundJobController(BackgroundJob):
         """
         It handles only automatic additions.
         """
-        input_url = url
-
         url = UrlLocation.get_cleaned_link(url)
 
         if not url:

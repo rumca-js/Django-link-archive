@@ -55,12 +55,14 @@ class ConfigurationEntry(models.Model):
     DISPLAY_TYPE_GALLERY = "gallery"
     DISPLAY_TYPE_SEARCH_ENGINE = "search-engine"
     DISPLAY_TYPE_CONTENT_CENTRIC = "content-centric"
+    DISPLAY_TYPE_LINKS_ONLY = "links-only"
 
     DISPLAY_TYPE_CHOICES = (
         (DISPLAY_TYPE_STANDARD, DISPLAY_TYPE_STANDARD),
         (DISPLAY_TYPE_GALLERY, DISPLAY_TYPE_GALLERY),
         (DISPLAY_TYPE_SEARCH_ENGINE, DISPLAY_TYPE_SEARCH_ENGINE),
         (DISPLAY_TYPE_CONTENT_CENTRIC, DISPLAY_TYPE_CONTENT_CENTRIC),
+        (DISPLAY_TYPE_LINKS_ONLY, DISPLAY_TYPE_LINKS_ONLY),
     )
 
     SEARCH_BUTTON_ALL = "search-button-all"
@@ -289,8 +291,11 @@ class ConfigurationEntry(models.Model):
         help_text="Allow adding links with unknown status to the database.",
     )
 
+    # this might be stupid. Some pages are blocked, and return some stupid javascript, or something
+    # which is the same for all pages... not sure.
+    # What about sites protected by cloudflare... it could return same "protected by" version of site.
     accept_same_hashes = models.BooleanField(
-        default=False,
+        default=True,
         help_text="Allow adding pages with same hashes.",
     )
 

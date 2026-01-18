@@ -8,6 +8,7 @@ from webtoolkit import (
     UrlLocation,
     PageRequestObject,
     is_status_code_valid,
+    status_code_to_text,
     HTTP_STATUS_UNKNOWN,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
     HTTP_STATUS_USER_AGENT,
@@ -125,8 +126,15 @@ class UrlHandler(object):
                 """
 
                 if self.is_another_request_necessary():
-                    AppLogging.warning("Url:{} Trying another crawler".format(self.url),
-                       detail_text = str(self.all_properties))
+                    response = self.get_response()
+                    if response:
+                        status_code = response.get_status_code()
+                        status_code_str = status_code_to_text(status_code)
+                        AppLogging.warning(f"Url:{self.url} status_code:{status_code_str} browser:{browser}. Trying another browser",
+                           detail_text = str(self.all_properties))
+                    else:
+                        AppLogging.warning(f"Url:{self.url} browser:{browser}. Trying another browser.",
+                           detail_text = str(self.all_properties))
                     continue
 
                 if self.all_properties:
@@ -159,7 +167,14 @@ class UrlHandler(object):
     def perform_call(self, request):
         config_entry = Configuration.get_object().config_entry
         location = config_entry.remote_webtools_server_location
+        index = 0
+
         while True:
+            index += 1
+
+            if index > 4:
+                raise IOError(f"Could not obtain response from remote server for {request.url}")
+
             url = RemoteUrl(url=self.url, remote_server_location=location, request=request)
             response = url.get_response()
             self.all_properties = url.get_all_properties()
@@ -231,17 +246,19 @@ class UrlHandler(object):
         browsers = self.browsers
 
         if self.last_browser:
-            browsers = self.bring_to_front(
-                 browsers, self.last_browser.id
-            )
+            if self.last_browser.enabled:
+                browsers = self.bring_to_front(
+                     browsers, self.last_browser.id
+                )
 
         rules = EntryRules.get_url_rules(self.url)
         if len(rules) > 0:
             for rule in rules:
                 if rule.browser:
-                    browsers = self.bring_to_front(
-                        browsers, rule.browser.id
-                    )
+                    if rule.browser.enabled:
+                        browsers = self.bring_to_front(
+                            browsers, rule.browser.id
+                        )
 
         return browsers
 

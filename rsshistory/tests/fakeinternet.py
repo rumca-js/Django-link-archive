@@ -187,15 +187,13 @@ class FakeInternetTestCase(TestCase):
     def get_infoj(self):
         data = {"crawlers": [
                 {
-                   "enabled": True,
-                   "name": "MockCrawler",
+                   "crawler_name": "MockCrawler",
                    "settings": {
                        "timeout_s": 20
                    }
                 },
                 {
-                   "enabled": True,
-                   "name": "MockCrawler2",
+                   "crawler_name": "MockCrawler2",
                    "settings": {
                        "timeout_s": 27
                    }

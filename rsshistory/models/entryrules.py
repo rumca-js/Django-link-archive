@@ -2,6 +2,7 @@
 Defined by user, by GUI
 """
 
+import re
 from datetime import date
 from django.db import models
 from django.db.models import Q
@@ -120,8 +121,8 @@ class EntryRules(models.Model):
 
     def is_url_triggering(self, url):
         rule_urls = self.get_rule_urls()
-        for rule_url in rule_urls:
-            if url.find(rule_url) >= 0:
+        for rule_pattern in rule_urls:
+            if re.search(rule_pattern, url):
                 return True
 
         return False

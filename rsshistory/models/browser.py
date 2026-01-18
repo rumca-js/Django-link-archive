@@ -16,8 +16,8 @@ class Browser(models.Model):
     priority = models.IntegerField(default=0, help_text="priority")
     ignore_errors = models.BooleanField(default=False, help_text="ignore errors")
 
-    user_agent = models.CharField(default="", max_length=2000, help_text="User agent")
-    request_headers = models.CharField(default="", max_length=2000, help_text="Request headers")
+    user_agent = models.CharField(default="", blank=True, max_length=2000, help_text="User agent")
+    request_headers = models.CharField(default="", blank=True, max_length=2000, help_text="Request headers")
     timeout_s = models.IntegerField(null=True, blank=True, help_text="Timeout")
     delay_s = models.IntegerField(null=True, blank=True, help_text="Delay after reading, useful for JavaScript loading")
     ssl_verify = models.BooleanField(default=False, help_text="Verify SSL certificates and errors")
@@ -73,13 +73,11 @@ class Browser(models.Model):
             except ValueError as E:
                 AppLogging.exc(E, "Cannot dumps browser settings")
 
-            enabled = browser_config["enabled"]
-
-            browsers = Browser.objects.filter(name=browser_config["name"])
+            browsers = Browser.objects.filter(name=browser_config["crawler_name"])
             if not browsers.exists():
                 conf = Browser.objects.create(
-                    enabled=enabled,
-                    name=browser_config["name"],
+                    enabled=True,
+                    name=browser_config["crawler_name"],
                     priority=start_index + index,
                     settings=settings,
                 )

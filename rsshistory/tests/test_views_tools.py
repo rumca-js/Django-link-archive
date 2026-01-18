@@ -96,7 +96,7 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         form_data = {
             "url" : "https://test.com",
-            "body", 'test test <a href="https://whatever.com">Test</a>'
+            "body": 'test test <a href="https://whatever.com">Test</a>'
         }
 
         # call tested function

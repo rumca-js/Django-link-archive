@@ -275,6 +275,7 @@ def system_setup_for_news(request):
     c.prefer_https_links = False
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_STANDARD
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_RECENT
+    c.accept_same_hashes = True
     if settings.CRAWLER_BUDDY_URL:
         c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
 
@@ -323,6 +324,7 @@ def system_setup_for_gallery(request):
     c.prefer_https_links = False
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_GALLERY
     c.default_search_behavior = ConfigurationEntry.SEARCH_BUTTON_ALL
+    c.accept_same_hashes = True
     if settings.CRAWLER_BUDDY_URL:
         c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
 
@@ -377,6 +379,7 @@ def system_setup_for_search_engine(request):
     c.remove_entry_vote_threshold = (
         1  # do not remove everything above, or equal to 1 vote
     )
+    c.accept_same_hashes = True
     if settings.CRAWLER_BUDDY_URL:
         c.remote_webtools_server_location = "http://" + settings.CRAWLER_BUDDY_URL
 
