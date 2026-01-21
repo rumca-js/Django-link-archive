@@ -47,19 +47,6 @@ class UrlHandler(object):
 
         self.all_properties = None
 
-    def get_properties(self):
-        if self.all_properties:
-            return self.all_properties
-
-        return self.get_properties_internal()
-
-    def get_properties(self):
-        properties = self.get_section("Properties")
-        if not properties:
-            return
-
-        return properties
-
     def get_all_properties(self):
         if self.all_properties:
             return self.all_properties
@@ -277,6 +264,12 @@ class UrlHandler(object):
 
         return result
 
+    def get_properties(self):
+        all_properties = self.get_all_properties()
+        url = RemoteUrl(url=self.url, all_properties=all_properties)
+
+        return url.get_properties()
+
     def get_title(self):
         return self.get_properties().get("title")
 
@@ -295,6 +288,10 @@ class UrlHandler(object):
     def get_thumbnail(self):
         return self.get_properties().get("thumbnail")
 
+    def get_entries(self):
+        url = RemoteUrl(url=self.url, all_properties=self.get_all_properties())
+        return url.get_entries()
+
     def get_text(self):
         response = self.get_response()
         if response:
@@ -305,15 +302,13 @@ class UrlHandler(object):
         if response:
             return response.get_binary()
 
-    def get_section(self, section_name):
-        properties = self.get_all_properties()
-        if not properties:
-            return
+    def get_hash(self):
+        response = self.get_response()
+        return response.get_hash()
 
-        if len(properties) == 0:
-            return
-
-        return RemoteServer.read_properties_section(section_name, properties)
+    def get_body_hash(self):
+        response = self.get_response()
+        return response.get_body_hash()
 
     def get_properties_section(self):
         url = RemoteUrl(url=self.url, all_properties=self.all_properties)

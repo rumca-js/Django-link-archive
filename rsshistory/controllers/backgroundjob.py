@@ -662,6 +662,10 @@ class BackgroundJobController(BackgroundJob):
                 AppLogging.debug(E, "Error when loading JSON: {}".format(self.args))
                 return
 
+    def get_source(self):
+        source = self.get_text_to_source(self.subject)
+        return source
+
     def is_subject_link(self):
         p = UrlLocation(self.subject)
         if p.is_web_link():

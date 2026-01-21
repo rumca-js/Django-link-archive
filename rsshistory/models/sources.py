@@ -173,7 +173,7 @@ class SourceDataModel(models.Model):
         help_text="Alpha of entire entry",
     )
 
-    xpath = models.CharField(max_length=100, blank=True, help_text="If configured, adds only links which match this python regular expression pattern")
+    xpath = models.CharField(max_length=100, blank=True, help_text="If configured, adds only links which match this python regular expression pattern. Can handle , as delimiter")
 
     proxy_location = models.CharField(
         max_length=200,
@@ -216,7 +216,7 @@ class SourceDataModel(models.Model):
             "{}:source-detail".format(LinkDatabase.name), args=[str(self.id)]
         )
 
-    def reset_dynamic_data():
+    def reset_categories():
         from ..models import AppLogging
 
         objs = SourceSubCategories.objects.all().delete()

@@ -82,7 +82,7 @@ urlpatterns = [
     # sources
     path("sources/", sources.sources, name="sources"),
     path("source/<int:pk>/", sources.SourceDetailView.as_view(), name="source-detail"),
-    path("source-json/<int:pk>", sources.source_json, name="source-json"),
+    path("source-json/<int:pk>/", sources.source_json, name="source-json"),
     path("sources-json-all/", sources.sources_json_all, name="sources-json-all"),
     path("sources-opml/", sources.sources_opml, name="sources-opml"),
     path("sources-json-enabled/", sources.sources_json_enabled, name="sources-json-enabled"),

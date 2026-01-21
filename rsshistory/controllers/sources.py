@@ -30,7 +30,7 @@ class SourceDataController(SourceDataModel):
         proxy = True
 
     def cleanup(cfg=None):
-        SourceDataModel.reset_dynamic_data()
+        SourceDataModel.reset_categories()
 
         sources = SourceDataModel.objects.filter(enabled=True)
 
@@ -141,7 +141,13 @@ class SourceDataController(SourceDataModel):
             return obj.number_of_entries
 
     def set_operational_info(
-        self, date_fetched, number_of_entries, import_seconds, hash_value, body_hash, valid=True
+        self,
+        date_fetched,
+        number_of_entries,
+        import_seconds,
+        hash_value,
+        body_hash,
+        valid=True,
     ):
         dynamic_data = self.get_dynamic_data()
         if dynamic_data:
@@ -185,6 +191,17 @@ class SourceDataController(SourceDataModel):
                 source_obj=self,
             )
         return dynamic_data
+
+    def get_xpath_patterns(self):
+        patterns = self.xpath.split(",")
+        return patterns
+
+    def is_link_ok(self, link) -> bool:
+        patterns = self.get_xpath_patterns()
+        for pattern in patterns:
+            if re.search(pattern, link):
+                return True
+        return False
 
     def get_domain(self):
         page = UrlLocation(self.url)
@@ -337,31 +354,12 @@ class SourceDataController(SourceDataModel):
         self.delete()
 
     def update_data(self, update_with=None):
-        if not self.auto_update_favicon:
-            return
-
-        changed = False
-
         new_thumbnail = None
         if update_with:
             new_thumbnail = update_with.get_thumbnail()
-
         if new_thumbnail and self.favicon != new_thumbnail:
-
-            # TODO implement this. I thin Url does not support binary well yet
-            if False:
-                u = UrlHandler(new_thumbnail)
-                if not u.is_valid():
-                    return
-
-            changed = True
-
-            self.favicon = new_thumbnail
-
-        if not changed and False:
-            u = UrlHandler(self.favicon)
-            if not u.is_valid():
-                self.favicon = None
+            if self.auto_update_favicon:
+                self.favicon = new_thumbnail
 
         new_title = None
         if update_with:
@@ -370,6 +368,13 @@ class SourceDataController(SourceDataModel):
             self.title = new_title
 
         self.save()
+
+        if update_with:
+            data = self.get_dynamic_data()
+            if data:
+                data.page_hash = update_with.get_hash()
+                data.body_hash = update_with.get_body_hash()
+                data.save()
 
 
 class SourceDataBuilder(object):
@@ -431,7 +436,7 @@ class SourceDataBuilder(object):
             self.errors.append("Url:{}. Link is not valid".format(self.link))
             return
 
-        properties = h.get_section("Properties")
+        properties = h.get_properties()
 
         self.link_data = properties
         if not self.link_data:

@@ -638,23 +638,34 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
         self.disable_web_pages()
         self.setup_configuration()
 
-        ob = SourceDataController.objects.create(
+        self.source = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
         )
+        self.source2 = SourceDataController.objects.create(
+            url="https://youtube.com/2",
+            title="YouTube",
+        )
+        self.source_linkedin = SourceDataController.objects.create(
+            url="https://linkedin.com",
+            title="LinkedIn",
+        )
+
         LinkDataController.objects.create(
             source_url="https://youtube.com",
             link="https://youtube.com?v=12345",
-            source=ob,
+            source=self.source,
         )
 
         self.user = self.get_user(
             username="test_username", password="testpassword", is_superuser=True
         )
 
-    def test_get_handler__supported(self):
+    def test_get_handler_and_object__supported__thread_name_null(self):
         bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_PROCESS_SOURCE
+            job=BackgroundJobController.JOB_PROCESS_SOURCE,
+            subject=str(self.source.id),
+            enabled=True,
         )
 
         mgr = SourceJobsProcessor()
@@ -666,9 +677,10 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
         self.assertEqual(handler_obj, bg_obj)
         self.assertEqual(handler.get_job(), BackgroundJobController.JOB_PROCESS_SOURCE)
 
-    def test_get_handler__not_supported(self):
+    def test_get_handler_and_object__not_supported(self):
         bg_obj = BackgroundJobController.objects.create(
             job=BackgroundJobController.JOB_EXPORT_DATA
+            enabled=True,
         )
 
         mgr = SourceJobsProcessor()
@@ -677,9 +689,11 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
 
         self.assertEqual(items, [])
 
-    def test_get_handler_and_object_job_disabled(self):
+    def test_get_handler_and_object__job_disabled(self):
         BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_PROCESS_SOURCE, enabled=False
+            job=BackgroundJobController.JOB_PROCESS_SOURCE,
+            enabled=False,
+            subject=str(self.source.id),
         )
 
         BackgroundJobController.objects.create(
@@ -692,6 +706,79 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
         items = mgr.get_handler_and_object()
 
         self.assertEqual(items, [])
+
+    def test_get_handler_and_object__supported__thread_name(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE,
+            enabled=True,
+            subject=str(self.source.id),
+            task="test",
+        )
+
+        mgr = SourceJobsProcessor(thread_name="test")
+        # call tested function
+        items = mgr.get_handler_and_object()
+        handler_obj = items[0]
+        handler = items[1]
+
+        self.assertEqual(handler_obj, bg_obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_PROCESS_SOURCE)
+
+    def test_get_handler_and_object__not_supported_thread_name(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE,
+            enabled=True,
+            subject=str(self.source.id),
+            task="nottest",
+        )
+
+        mgr = SourceJobsProcessor(thread_name="test")
+        # call tested function
+        items = mgr.get_handler_and_object()
+
+        self.assertEqual(items, [])
+
+    def test_get_handler_and_object__2nd_domain__not_picked_up(self):
+        job1 = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE,
+            enabled=True,
+            subject=str(self.source.id),
+            task="task1",
+        )
+        job2 = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE,
+            subject=str(self.source2.id),
+        )
+
+        mgr = SourceJobsProcessor(thread_name="task2")
+        # call tested function
+        items = mgr.get_handler_and_object()
+
+        # task 1 processes first source. second is not processed because the domain is the same
+        self.assertEqual(items, [])
+
+    def test_get_handler_and_object__2nd_domain__picked_up(self):
+        job1 = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE,
+            enabled=True,
+            subject=str(self.source.id),
+            task="task1",
+        )
+        job2 = BackgroundJobController.objects.create(
+            enabled=True,
+            job=BackgroundJobController.JOB_PROCESS_SOURCE,
+            subject=str(self.source_linkedin.id),
+        )
+
+        mgr = SourceJobsProcessor(thread_name="task2")
+        # call tested function
+        items = mgr.get_handler_and_object()
+        handler_obj = items[0]
+        handler = items[1]
+
+        # task 1 processes first source. second is processed because the domain is different
+        self.assertEqual(handler_obj, job2)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_PROCESS_SOURCE)
 
 
 class SystenJobProcessorTest(FakeInternetTestCase):

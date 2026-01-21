@@ -120,3 +120,15 @@ class SourceDataControllerTest(FakeInternetTestCase):
         source.update_data(update_with=rss)
 
         self.assertEqual(source.favicon, new_favicon)
+
+    def test_is_link_ok(self):
+        source = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            xpath = ".*youtube.com/watch.*",
+        )
+
+        # call tested function
+        self.assertTrue(source.is_link_ok("https://youtube.com/watch?v=123"))
+        # call tested function
+        self.assertFalse(source.is_link_ok("https://youtube.com/shorts?v=123"))

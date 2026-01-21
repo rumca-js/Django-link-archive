@@ -25,6 +25,8 @@ class SourcePluginInterface(object):
         self.dead = False
         self.num_read_entries = 0
         self.start_time = None
+        self.stop_time = None
+        self.total_seconds = 0
 
     def check_for_data(self):
         self.num_read_entries = 0
@@ -47,15 +49,13 @@ class SourcePluginInterface(object):
 
         self.read_entries()
 
-        stop_time = DateUtils.get_datetime_now_utc()
-        total_time = stop_time - self.start_time
-        total_time.total_seconds()
+        self.stop_time = DateUtils.get_datetime_now_utc()
+        total_time = self.stop_time - self.start_time
+        self.total_seconds = total_time.total_seconds()
 
         AppLogging.debug("Stopping processing source:{}".format(source.url))
 
-        self.set_operational_info(
-            stop_time, self.num_read_entries, total_time.total_seconds(), self.get_hash(), self.get_body_hash()
-        )
+        self.set_operational_info()
 
     def read_entries(self):
         pass
@@ -71,14 +71,18 @@ class SourcePluginInterface(object):
     def get_body_hash(self):
         pass
 
-    def set_operational_info(
-        self, stop_time, num_entries, total_seconds, hash_value, body_hash, valid=True
-    ):
+    def set_operational_info(self):
         source = self.get_source()
 
-        source.set_operational_info(
-            stop_time, num_entries, total_seconds, hash_value, body_hash, valid
-        )
+        if source:
+            source.set_operational_info(
+                date_fetched=self.stop_time,
+                number_of_entries=self.num_read_entries,
+                import_seconds=self.total_seconds,
+                hash_value=self.get_hash(),
+                body_hash=self.get_body_hash(),
+                valid=not self.dead
+            )
 
     def enhance_properties(self, properties):
         source = self.get_source()

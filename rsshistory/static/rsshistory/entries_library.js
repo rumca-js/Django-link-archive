@@ -901,7 +901,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let author = entry.author;
     if (author && author != source__title)
     {
-       "by " + getEntryAuthorSafe(entry);
+       author = "by " + getEntryAuthorSafe(entry);
     }
     else
     {

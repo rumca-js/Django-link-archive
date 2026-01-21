@@ -1009,6 +1009,6 @@ def categories_reset(request):
     if data is not None:
         return data
 
-    SourceDataController.reset_dynamic_data()
+    SourceDataController.reset_categories()
 
     return redirect("{}:sources".format(LinkDatabase.name))

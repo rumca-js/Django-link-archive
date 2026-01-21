@@ -41,12 +41,14 @@
       
           <ul class="dropdown-menu">
              <li>
-                <a href="{% url 'rsshistory:backgroundjobs-remove-disabled' %}" class="dropdown-item" title="Delete disabled">
-                 Delete disabled</a>
+                <a href="{% url 'rsshistory:backgroundjobs-remove-disabled' %}" class="dropdown-item" title="Remove disabled">
+                <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+                 Remove disabled</a>
              </li>
              <li>
                 <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="btn btn-primary" role="button" title="Remove all">
                 <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
+                 Remove all
                 </a>
              </li>
 	  </ul>

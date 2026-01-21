@@ -12,8 +12,9 @@ from collections import OrderedDict
 
 from webtoolkit import (
     UrlLocation,
-    ContentLinkParser,
     RemoteUrl,
+    BaseUrl,
+    ContentLinkParser,
     is_status_code_invalid,
 )
 
@@ -750,11 +751,15 @@ def get_suggestions(original_link):
     links = set()
     errors = []
 
-    cleaned_link = UrlHandler.get_cleaned_link(original_link)
+    location = UrlLocation(url=original_link)
+    links.add(location.get_no_arg_link())
 
-    location = UrlLocation(original_link)
-
+    cleaned_link = UrlHandler.get_cleaned_link(url=original_link)
     links.add(cleaned_link)
+
+    base_url = BaseUrl(url=original_link)
+    links.add(base_url.get_canonical_url())
+    links.add(base_url.get_url())
 
     config = Configuration.get_object().config_entry
     if config.accept_domain_links:

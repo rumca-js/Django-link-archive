@@ -1,6 +1,5 @@
 import time
 from datetime import timedelta
-import base64
 
 from django.db import models
 from django.db.models import Q, F

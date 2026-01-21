@@ -1,6 +1,4 @@
 import traceback
-import hashlib
-import base64
 
 from utils.dateutils import DateUtils
 from webtoolkit import RemoteServer, ContentLinkParser, calculate_hash
@@ -42,38 +40,27 @@ class SourceGenericPlugin(SourcePluginInterface):
 
         self.start_time = DateUtils.get_datetime_now_utc()
 
-        if source:
-            source.update_data()
-
         self.get_contents()
 
         if self.is_page_ok_to_read():
             self.read_data_from_container_elements()
 
-        stop_time = DateUtils.get_datetime_now_utc()
-        total_time = stop_time - self.start_time
-        total_time.total_seconds()
-
-        if self.get_hash():
-            self.set_operational_info(
-                stop_time, self.num_read_entries, total_time.total_seconds(), self.get_hash(), self.get_body_hash()
-            )
-            return True
+        self.stop_time = DateUtils.get_datetime_now_utc()
+        total_time = self.stop_time - self.start_time
+        self.total_seconds = total_time.total_seconds()
 
         if self.dead:
-            AppLogging.debug(
-                "Url:{} Title:{}. Plugin: page is dead".format(source.url, source.title)
-            )
+            if source:
+                AppLogging.debug(
+                    "Url:{} Title:{}. Plugin: page is dead".format(source.url, source.title)
+                )
+            else:
+                AppLogging.debug(
+                    "No source, Plugin: page is dead".format()
+                )
 
-            self.set_operational_info(
-                stop_time,
-                self.num_read_entries,
-                total_time.total_seconds(),
-                self.get_hash(),
-                self.get_body_hash(),
-                valid=False,
-            )
-            return False
+        self.set_operational_info()
+        return True
 
     def get_entries(self):
         """
@@ -196,6 +183,10 @@ class SourceGenericPlugin(SourcePluginInterface):
             self.all_properties = url_ex.get_all_properties()
             self.response = url_ex.get_response()
 
+            source = self.get_source()
+            if source:
+                source.update_data(update_with=url_ex)
+
             if not url_ex.is_valid():
                 self.dead = True
                 return
@@ -209,13 +200,6 @@ class SourceGenericPlugin(SourcePluginInterface):
             if not self.contents:
                 self.dead = True
                 return
-
-            source = self.get_source()
-            if source:
-                thumbnail = url_ex.get_thumbnail()
-                if thumbnail:
-                    source.favicon = thumbnail
-                    source.save()
 
             return self.contents
 
@@ -255,6 +239,10 @@ class SourceGenericPlugin(SourcePluginInterface):
             return False
         if props["link"] == "":
             return False
+
+        source = self.get_source()
+        if source and source.xpath:
+            return source.is_link_ok(props["link"])
 
         return True
 

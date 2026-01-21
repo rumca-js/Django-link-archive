@@ -46,8 +46,8 @@ class SourceUrlInterface(object):
         all_properties = url_ex.get_properties()
 
         if all_properties:
-            properties = url_ex.get_section("Properties")
-            entries = url_ex.get_section("Entries")
+            properties = url_ex.get_properties()
+            entries = url_ex.get_entries()
 
             if len(entries) > 0:
                 return url_ex
@@ -70,9 +70,9 @@ class SourceUrlInterface(object):
         all_properties = url_ex.get_properties()
 
         if all_properties:
-            properties = url_ex.get_section("Properties")
+            properties = url_ex.get_properties()
             response = url_ex.get_response()
-            entries = url_ex.get_section("Entries")
+            entries = url_ex.get_entries()
 
             if properties:
                 props = {}

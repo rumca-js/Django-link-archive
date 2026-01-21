@@ -20,11 +20,11 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 
-from utils.dateutils import DateUtils
+from webtoolkit import UrlLocation
 
+from utils.dateutils import DateUtils
 from utils.basictypes import fix_path_for_os
 from utils.programwrappers import ytdlp, id3v2, wget
-
 from utils.services.waybackmachine import WaybackMachine
 
 from .apps import LinkDatabase
@@ -209,6 +209,9 @@ class ProcessorInterface(object):
         if objs.exists():
             obj = objs.first()
             if obj:
+                obj.task = self.thread_name
+                obj.save()
+
                 handler = self.get_job_handler(obj)
                 return [obj, handler]
         return []
@@ -442,10 +445,6 @@ class GenericJobsProcessor(ProcessorInterface):
         if handler_class:
             handler = handler_class(config)
 
-            if obj:
-                obj.task = self.thread_name
-                obj.save()
-
             if handler:
                 BackgroundJobHistory.mark_job_done(obj)
                 if handler.process(obj):
@@ -493,6 +492,52 @@ class SourceJobsProcessor(GenericJobsProcessor):
         return [
             BackgroundJob.JOB_PROCESS_SOURCE,
         ]
+
+    def get_handler_and_object(self):
+        """
+        TODO select should be based on priority
+        """
+        jobs = self.get_supported_jobs()
+        if not jobs:
+            return []
+
+        # AppLogging.debug("Query conditions:{}".format(query_conditions))
+
+        # order is in meta
+        used_domains = set()
+
+        used_jobs = BackgroundJobController.objects.filter(job = BackgroundJob.JOB_PROCESS_SOURCE,
+                                                           task__isnull=False,
+                                                           enabled=True)
+        if used_jobs.exists():
+            for used_job in used_jobs:
+                source = used_job.get_source()
+                if source:
+                    location = UrlLocation(source.url)
+                    domain = location.get_domain_only()
+                    if domain:
+                        used_domains.add(domain)
+
+        query_conditions = self.get_query_conditions()
+
+        jobs = BackgroundJobController.objects.filter(query_conditions)
+        if jobs.exists():
+            for job in jobs:
+                if self.thread_name and job.task == self.thread_name:
+                    handler = self.get_job_handler(job)
+                    return [job, handler]
+
+                source = job.get_source()
+                if source:
+                    location = UrlLocation(source.url)
+                    domain = location.get_domain_only()
+                    if domain and domain not in used_domains:
+                        job.task = self.thread_name
+                        job.save()
+
+                        handler = self.get_job_handler(job)
+                        return [job, handler]
+        return []
 
 
 class WriteJobsProcessor(GenericJobsProcessor):

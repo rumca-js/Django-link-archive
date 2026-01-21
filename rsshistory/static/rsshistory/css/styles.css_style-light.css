@@ -39,6 +39,10 @@
 .page-body {
 }
 
+.body-link-margin {
+    margin-top: 20vh;
+}
+
 hr {
     margin: 0px;
     padding: 0px;
