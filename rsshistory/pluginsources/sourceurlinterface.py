@@ -57,7 +57,7 @@ class SourceUrlInterface(object):
                         url_ex_new = UrlHandler(feed)
                         all_properties = url_ex_new.get_properties()
                         if all_properties:
-                            entries = url_ex_new.get_section("Entries")
+                            entries = url_ex_new.get_entries()
                             if len(entries) > 0:
                                 return url_ex_new
 

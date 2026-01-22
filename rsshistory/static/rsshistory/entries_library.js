@@ -33,13 +33,27 @@ function isStatusCodeInValid(entry) {
 
 
 function isEntryValid(entry) {
-    if (entry.is_valid === null) {
+    if (entry.is_valid == null) {
         if (isStatusCodeValid(entry) || entry.manual_status_code == 200) {
            return true;
         }
         return false;
     }
     return entry.is_valid;
+}
+
+
+function isEntryInValid(entry) {
+    if (entry.is_valid == null) {
+        if (entry.manual_status_code == 200) {
+            return false;
+        }
+        if (isStatusCodeInValid(entry)) {
+           return true;
+        }
+        return false;
+    }
+    return !entry.is_valid;
 }
 
 
@@ -78,11 +92,10 @@ function canUserView(entry) {
 function getEntryAuthorText(entry) {
     if (entry.author && entry.album)
     {
-        return entry.author + " / " + entry.album;
+        return getEntryAuthorSafe(entry.author) + " / " + entry.album;
     }
     else if (entry.author) {
-        let author = getEntryAuthorSafe(entry);
-        return author;
+        return getEntryAuthorSafe(entry.author);
     }
     else if (entry.album) {
         return entry.album;
@@ -429,8 +442,6 @@ function getEntryDetailText(entry) {
 
     text += getEntryBodyText(entry);
 
-    text += "</div>";
-
     return text;
 }
 
@@ -671,18 +682,21 @@ function getEntryOpParameters(entry) {
        `;
     }
     if (entry.contents_hash) {
+       let hash = escapeHtml(entry.contents_hash);
        text += `
-       <div>Contents hash: ${entry.contents_hash}</div>
+       <div>Contents hash: ${hash}</div>
        `;
     }
     if (entry.meta_hash) {
+       let hash = escapeHtml(entry.meta_hash);
        text += `
-       <div>Meta hash: ${entry.meta_hash}</div>
+       <div>Meta hash: ${hash}</div>
        `;
     }
     if (entry.body_hash) {
+       let hash = escapeHtml(entry.body_hash);
        text += `
-       <div>Body hash: ${entry.body_hash}</div>
+       <div>Body hash: ${hash}</div>
        `;
     }
     if (entry.permanent != null) {
@@ -695,25 +709,34 @@ function getEntryOpParameters(entry) {
        text += `<div>User Visits: ${entry.user_visits}</div>`;
     }
     if (entry.thumbnail != null) {
-       text += `<div><a href="${entry.thumbnail}>Thumbnail</a></div>`;
+       text += `<div><a href="${entry.thumbnail}">Thumbnail</a></div>`;
     }
 
     return text;
 }
 
 
-function getEntryDetailThumbnailPreview(entry) {
-    let text = `<div entry="${entry.id}" class="entry-detail">`;
+function getEntryDetailThumbnailPreview(entry, center=false) {
+    let div_style = "";
+    if (center) {
+      div_style = 'text-align:center;';
+    }
 
+
+    let text = "";
     if (entry.thumbnail) {
+       text = `<div entry="${entry.id}" class="entry-detail" style="${div_style}">`;
+
        text += `
        <div><img src="" style="max-width:30%;"/></div>
        `;
 
+       text += "</div>";
+
        if (canUserView(entry))
        {
           text = `
-          <div><img src="${entry.thumbnail}" style="max-width:30%;"/></div>
+          <div style="${div_style}"><img src="${entry.thumbnail}" style="max-width:30%;"/></div>
           `;
        }
     }
@@ -773,6 +796,7 @@ function getOneEntryEntryText(entry) {
         "gallery": entryGalleryTemplate,
         "search-engine": entrySearchEngineTemplate,
         "content-centric": entryContentCentricTemplate,
+        "accordion": entryAccordionTemplate,
         "read-later": getEntryReadLaterBar,
         "realated": getEntryRelatedBar,
         "visits": getEntryVisitsBar,
@@ -820,9 +844,9 @@ function getEntryDisplayStyle(entry, mark_visited=true) {
         opacity = entries_visit_alpha;
     }
 
-    if (!isEntryValid(entry))
+    if (isEntryInValid(entry))
     {
-	opacity = entries_dead_alpha;
+        opacity = entries_dead_alpha;
     }
 
     // apply
@@ -901,7 +925,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let author = entry.author;
     if (author && author != source__title)
     {
-       author = "by " + getEntryAuthorSafe(entry);
+       author = "by " + getEntryAuthorText(entry);
     }
     else
     {
@@ -1003,6 +1027,82 @@ function entrySearchEngineTemplate(entry, show_icons = true, small_icons = false
                </div>
             </div>
         </a>
+    `;
+}
+
+
+function entryAccordionTemplate(entry, show_icons = true, small_icons = false) {
+    let page_rating_votes = entry.page_rating_votes;
+
+    let badge_text = getEntryVotesBadge(entry);
+    let badge_star = highlight_bookmarks ? getEntryBookmarkBadge(entry) : "";
+    let badge_age = getEntryAgeBadge(entry);
+    let badge_dead = getEntryDeadBadge(entry);
+    let badge_read_later = getEntryReadLaterBadge(entry);
+    let badge_visited = getEntryVisitedBadge(entry);
+   
+    let entry_style = getEntryDisplayStyle(entry);
+
+    let thumbnail = getEntryThumbnailOrFavicon(entry);
+
+    let thumbnail_text = '';
+    if (show_icons) {
+        const iconClass = small_icons ? 'icon-small' : 'icon-normal';
+        thumbnail_text = `
+            <div style="position: relative; display: inline-block;">
+                <img src="${thumbnail}" class="rounded ${iconClass}"/>
+            </div>`;
+    }
+    let tags_text = getEntryTagStrings(entry);
+    let language_text = "";
+    if (entry.language != null) {
+        language_text = `Language:${entry.language}`;
+    }
+    let title_safe = getEntryTitleSafe(entry);
+    let entry_link = getEntryLink(entry);
+    let hover_title = title_safe + " " + tags_text;
+    let link = entry.link;
+    let social = getEntrySocialDataText(entry);
+    let preview_text = getEntryDetailThumbnailPreview(entry, center=true);
+    let detail_text = getEntryBodyText(entry);
+
+    return `
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading-${entry.id}">
+           <button
+               entry="${entry.id}"
+               title="${hover_title}"
+               class="accordion-button"
+               type="button"
+               data-bs-toggle="collapse"
+               data-bs-target="#collapse-${entry.id}"
+           >
+               <div class="d-flex">
+                  ${thumbnail_text}
+                  <div class="mx-2">
+                     <span style="font-weight:bold" class="text-reset" entryTitle="true">${title_safe}</span>
+                     <div class="text-reset text-decoration-underline" entryDetails="true">@ ${entry.link}</div>
+                     <div class="text-reset mx-2">${tags_text} ${language_text}</div>
+                     <div class="entry-social">${social}</div>
+                  </div>
+
+                  <div class="mx-2 ms-auto">
+                     ${badge_text}
+                     ${badge_star}
+                     ${badge_age}
+                     ${badge_dead}
+                     ${badge_read_later}
+                  </div>
+               </div>
+           </button>
+        </h2>
+        <div id="collapse-${entry.id}" class="accordion-collapse collapse" data-bs-parent="#accordion-parent">
+          <div class="accordion-body">
+	     ${preview_text}
+             ${detail_text}
+          </div>
+        </div>
+      </div>
     `;
 }
 
@@ -1186,15 +1286,15 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
                     ${thumbnail_text}
                 </div>
                 <div
-		   style="
+                      style="
                       flex: 0 0 auto;
                       overflow: hidden;
                       text-overflow: ellipsis;
                       white-space: normal;
                       line-height: 1.2em;
                       max-height: 4.8em;
-			  "
-	           id="entryDetails">
+                      "
+                      id="entryDetails">
                     <span style="font-weight: bold" class="text-primary" entryTitle="true">${title_safe}</span>
                     <div class="link-list-item-description" entryDetails="true">${source__title}</div>
                     <div class="text-reset mx-2">${tags_text} ${language_text}</div>
@@ -1483,6 +1583,9 @@ function getEntriesList(entries) {
     if (view_display_type == "gallery") {
         htmlOutput += `  <span class="d-flex flex-wrap">`;
     }
+    if (view_display_type == "accordion") {
+        htmlOutput += `  <div class="accordion" id="accordion-parent">`;
+    }
 
     if (entries && entries.length > 0) {
         entries.forEach((entry) => {
@@ -1498,6 +1601,9 @@ function getEntriesList(entries) {
 
     if (view_display_type == "gallery") {
         htmlOutput += `</span>`;
+    }
+    if (view_display_type == "accordion") {
+        htmlOutput += `</div>`;
     }
 
     htmlOutput += `</span>`;

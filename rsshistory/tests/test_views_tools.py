@@ -139,7 +139,7 @@ class ToolsViewsTest(FakeInternetTestCase):
 
         form_data = {
             "tags" : "test, test2",
-            "body", 'test test <a href="https://whatever.com">Test</a>'
+            "body": 'test test <a href="https://whatever.com">Test</a>'
         }
 
         # call tested function

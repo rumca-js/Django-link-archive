@@ -18,19 +18,70 @@ function escapeHtml(unsafe)
 
 class UrlLocation {
   constructor(urlString) {
+    this.raw = urlString;
     try {
       this.url = new URL(urlString);
     } catch (e) {
-      throw new Error("Invalid URL");
+      console.log(e);
+      this.url = null;
     }
   }
 
+  isWebLink() {
+        const url = this.raw;
+        if (url == null)
+        {
+            return false;
+        }
+
+        if (
+            url.startsWith("http://") ||
+            url.startsWith("https://") ||
+            url.startsWith("smb://") ||
+            url.startsWith("ftp://") ||
+            url.startsWith("//") ||
+            url.startsWith("\\\\")
+        ) {
+            // https://mailto is not a good link
+            if (!url.includes(".")) {
+                return false;
+            }
+
+            // no funny chars
+            const domainOnly = this.getDomain();
+            if (!domainOnly) {
+                return false;
+            }
+            if (domainOnly.includes("&")) {
+                return false;
+            }
+            if (domainOnly.includes("?")) {
+                return false;
+            }
+
+            const parts = domainOnly.split(".");
+            if (parts[0].trim() === "") {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+  }
+
   getProtocolless() {
-    return sanitizeLink(this.url.href.replace(`${this.url.protocol}//`, ''));
+    if (this.url != null) {
+       return sanitizeLink(this.url.href.replace(`${this.url.protocol}//`, ''));
+    }
   }
 
   getDomain() {
     const protocolless = this.getProtocolless();
+    if (protocolless == null) {
+      return;
+    }
+
     const firstSlashIndex = protocolless.indexOf('/');
     if (firstSlashIndex === -1) {
       return protocolless;

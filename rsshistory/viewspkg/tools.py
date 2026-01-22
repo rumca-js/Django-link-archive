@@ -753,6 +753,9 @@ def get_suggestions(original_link):
 
     location = UrlLocation(url=original_link)
     links.add(location.get_no_arg_link())
+    up_domain = location.up_domain()
+    if up_domain:
+        links.add(up_domain.url)
 
     cleaned_link = UrlHandler.get_cleaned_link(url=original_link)
     links.add(cleaned_link)

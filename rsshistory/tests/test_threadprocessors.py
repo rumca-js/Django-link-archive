@@ -679,7 +679,7 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
 
     def test_get_handler_and_object__not_supported(self):
         bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_EXPORT_DATA
+            job=BackgroundJobController.JOB_EXPORT_DATA,
             enabled=True,
         )
 
