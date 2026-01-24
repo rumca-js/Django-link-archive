@@ -516,6 +516,10 @@ class ConfigurationEntry(models.Model):
         default=False,
         help_text="If true, only locally stored icons are displayed for users who are not logged in.",
     )
+    highlight_bookmarks = models.BooleanField(
+        default=False,
+        help_text="If true, bookmarks will be highlighted.",
+    )
 
     links_per_page = models.IntegerField(
         default=100,
@@ -694,6 +698,10 @@ class UserConfig(models.Model):
     entries_direct_links = models.BooleanField(
         default=False,
         help_text="If true links lead directly to entry link, not to preview.",
+    )
+    highlight_bookmarks = models.BooleanField(
+        default=False,
+        help_text="If true, bookmarks will be highlighted.",
     )
     links_per_page = models.IntegerField(default=100)
     sources_per_page = models.IntegerField(default=100)

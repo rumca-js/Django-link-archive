@@ -960,10 +960,6 @@ def json_global_container(request):
     sources_icon = static("{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name))
 
     row = {}
-    row["link"] = reverse(f"{LinkDatabase.name}:tags-show-all")
-    row["icon"] = tag_icon
-    row["title"] = "Tags"
-    rows.append(row)
 
     if config_entry.enable_domain_support:
         row = {}
@@ -989,6 +985,11 @@ def json_global_container(request):
     row["link"] = reverse(f"{LinkDatabase.name}:sources")
     row["icon"] = sources_icon
     row["title"] = "Sources"
+    rows.append(row)
+
+    row["link"] = reverse(f"{LinkDatabase.name}:tags-show-all")
+    row["icon"] = tag_icon
+    row["title"] = "Tags"
     rows.append(row)
 
     data["rows"] = rows
@@ -1035,12 +1036,6 @@ def json_personal_container(request):
         row["title"] = searchview.name
         rows.append(row)
 
-    row = {}
-    row["link"] = reverse(f"{LinkDatabase.name}:user-tags-show")
-    row["icon"] = user_tags_icon
-    row["title"] = "Tags"
-    rows.append(row)
-
     if config_entry.track_user_navigation:
         row = {}
         row["link"] = reverse(f"{LinkDatabase.name}:user-browse-history")
@@ -1059,6 +1054,12 @@ def json_personal_container(request):
     row["link"] = reverse(f"{LinkDatabase.name}:user-comments")
     row["icon"] = user_comments_icon
     row["title"] = "Comments"
+    rows.append(row)
+
+    row = {}
+    row["link"] = reverse(f"{LinkDatabase.name}:user-tags-show")
+    row["icon"] = user_tags_icon
+    row["title"] = "Tags"
     rows.append(row)
 
     data["rows"] = rows

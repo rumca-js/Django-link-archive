@@ -89,21 +89,6 @@ function canUserView(entry) {
 }
 
 
-function getEntryAuthorText(entry) {
-    if (entry.author && entry.album)
-    {
-        return getEntryAuthorSafe(entry.author) + " / " + entry.album;
-    }
-    else if (entry.author) {
-        return getEntryAuthorSafe(entry.author);
-    }
-    else if (entry.album) {
-        return entry.album;
-    }
-    return "";
-}
-
-
 function getEntryVotesBadge(entry, overflow=false) {
     let style = "font-size: 0.8rem;"
     if (overflow) {
@@ -394,6 +379,21 @@ function getEntryTitleSafe(entry) {
 function getEntryAuthorSafe(entry) {
     let author = entry.author;
     return escapeHtml(entry.author);
+}
+
+
+function getEntryAuthorText(entry) {
+    if (entry.author && entry.album)
+    {
+        return getEntryAuthorSafe(entry) + " / " + entry.album;
+    }
+    else if (entry.author) {
+        return getEntryAuthorSafe(entry);
+    }
+    else if (entry.album) {
+        return entry.album;
+    }
+    return "";
 }
 
 
@@ -894,7 +894,7 @@ function entryStandardTemplate(entry, show_icons = true, small_icons = false) {
     let badge_visited = getEntryVisitedBadge(entry);
 
     let invalid_style = getEntryDisplayStyle(entry);
-    let bookmark_class = entry.bookmarked ? `list-group-item-primary` : '';
+    let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `list-group-item-primary` : '';
     let thumbnail = getEntryThumbnailOrFavicon(entry);
 
     let img_text = '';
@@ -1042,6 +1042,7 @@ function entryAccordionTemplate(entry, show_icons = true, small_icons = false) {
     let badge_visited = getEntryVisitedBadge(entry);
    
     let entry_style = getEntryDisplayStyle(entry);
+    let bookmark_class = (entry.bookmarked && highlight_bookmarks) ? `` : '';
 
     let thumbnail = getEntryThumbnailOrFavicon(entry);
 
@@ -1067,12 +1068,12 @@ function entryAccordionTemplate(entry, show_icons = true, small_icons = false) {
     let detail_text = getEntryBodyText(entry);
 
     return `
-      <div class="accordion-item">
+      <div class="accordion-item my-1 p-1">
         <h2 class="accordion-header" id="heading-${entry.id}">
            <button
                entry="${entry.id}"
                title="${hover_title}"
-               class="accordion-button"
+               class="accordion-button ${bookmark_class}"
                type="button"
                data-bs-toggle="collapse"
                data-bs-target="#collapse-${entry.id}"
@@ -1279,7 +1280,7 @@ function entryGalleryTemplateDesktop(entry, show_icons = true, small_icons = fal
             entry="${entry.id}"
             title="${hover_title}"
             class="list-group-item list-group-item-action m-1 border rounded p-2"
-            style="text-overflow: ellipsis; max-width: 18%; min-width: 18%; width: auto; aspect-ratio: 1 / 1; text-decoration: none; display:flex; flex-direction:column; ${invalid_style}"
+            style="text-overflow: ellipsis; max-width: 18%; min-width: 18%; width: auto; aspect-ratio: 1 / 1; text-decoration: none; display:flex; flex-direction:column; ${invalid_style} ${bookmark_class}"
         >
             <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
                 <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%" id="entryTumbnail">

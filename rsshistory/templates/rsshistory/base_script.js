@@ -32,6 +32,7 @@ function applyConfiguration() {
     view_display_type = "{{user_config.display_type}}";
     view_show_icons = "{{user_config.show_icons}}" == "True";
     view_small_icons = "{{user_config.small_icons}}" == "True";
+    highlight_bookmarks = "{{user_config.highlight_bookmarks}}" == "True";
     debug_mode = "{{user_config.debug_mode}}" == "True";
 
     user_age = {{user_config.get_age}};
@@ -43,12 +44,13 @@ function applyConfiguration() {
 
 
 function updateWidgets() {
-    $('#showIcons').prop('checked', view_show_icons);
-    $('#directLinks').prop('checked', entries_direct_links);
-
     $('input[name="viewMode"][value="' + view_display_type + '"]').prop('checked', true);
     $('input[name="theme"][value="' + view_display_style + '"]').prop('checked', true);
     $('input[name="order"][value="' + sort_function + '"]').prop('checked', true);
+
+    $('#showIcons').prop('checked', view_show_icons);
+    $('#directLinks').prop('checked', entries_direct_links);
+    $('#highlight-bookmarks').prop('checked', highlight_bookmarks);
 
     setDisplayMode();
 }
@@ -65,6 +67,14 @@ $(document).on('click', '#showIcons', function(e) {
 //-----------------------------------------------
 $(document).on('click', '#directLinks', function(e) {
     entries_direct_links = $(this).is(':checked');
+
+    fillListData();
+});
+
+
+//-----------------------------------------------
+$(document).on('click', '#highlight-bookmarks', function(e) {
+    highlight_bookmarks = $(this).is(':checked');
 
     fillListData();
 });
