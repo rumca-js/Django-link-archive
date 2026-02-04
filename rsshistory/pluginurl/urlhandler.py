@@ -271,22 +271,34 @@ class UrlHandler(object):
         return url.get_properties()
 
     def get_title(self):
-        return self.get_properties().get("title")
+        properties = self.get_properties()
+        if properties:
+            return properties.get("title")
 
     def get_description(self):
-        return self.get_properties().get("description")
+        properties = self.get_properties()
+        if properties:
+            return properties.get("description")
 
     def get_language(self):
-        return self.get_properties().get("language")
+        properties = self.get_properties()
+        if properties:
+            return properties.get("language")
 
     def get_author(self):
-        return self.get_properties().get("author")
+        properties = self.get_properties()
+        if properties:
+            return properties.get("author")
 
     def get_album(self):
-        return self.get_properties().get("album")
+        properties = self.get_properties()
+        if properties:
+            return properties.get("album")
 
     def get_thumbnail(self):
-        return self.get_properties().get("thumbnail")
+        properties = self.get_properties()
+        if properties:
+            return properties.get("thumbnail")
 
     def get_entries(self):
         url = RemoteUrl(url=self.url, all_properties=self.get_all_properties())
@@ -304,11 +316,13 @@ class UrlHandler(object):
 
     def get_hash(self):
         response = self.get_response()
-        return response.get_hash()
+        if response:
+            return response.get_hash()
 
     def get_body_hash(self):
         response = self.get_response()
-        return response.get_body_hash()
+        if response:
+            return response.get_body_hash()
 
     def get_properties_section(self):
         url = RemoteUrl(url=self.url, all_properties=self.all_properties)

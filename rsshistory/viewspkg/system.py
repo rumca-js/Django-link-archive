@@ -987,6 +987,7 @@ def json_global_container(request):
     row["title"] = "Sources"
     rows.append(row)
 
+    row = {}
     row["link"] = reverse(f"{LinkDatabase.name}:tags-show-all")
     row["icon"] = tag_icon
     row["title"] = "Tags"

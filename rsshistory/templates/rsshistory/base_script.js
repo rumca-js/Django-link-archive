@@ -33,6 +33,7 @@ function applyConfiguration() {
     view_show_icons = "{{user_config.show_icons}}" == "True";
     view_small_icons = "{{user_config.small_icons}}" == "True";
     highlight_bookmarks = "{{user_config.highlight_bookmarks}}" == "True";
+    click_behavior_modal_window = "{{user_config.click_behavior_modal_window}}" == "True";
     debug_mode = "{{user_config.debug_mode}}" == "True";
 
     user_age = {{user_config.get_age}};
@@ -51,6 +52,7 @@ function updateWidgets() {
     $('#showIcons').prop('checked', view_show_icons);
     $('#directLinks').prop('checked', entries_direct_links);
     $('#highlight-bookmarks').prop('checked', highlight_bookmarks);
+    $('#modal-preview').prop('checked', click_behavior_modal_window);
 
     setDisplayMode();
 }

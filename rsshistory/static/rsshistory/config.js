@@ -12,6 +12,7 @@ let common_indicators = null;
 
 let highlight_bookmarks = false;
 let entries_direct_links = false;
+let click_behavior_modal_window = true;
 let sort_function = "-date_published";
 let default_page_size = 200;
 

@@ -520,6 +520,10 @@ class ConfigurationEntry(models.Model):
         default=False,
         help_text="If true, bookmarks will be highlighted.",
     )
+    click_behavior_modal_window = models.BooleanField(
+        default=False,
+        help_text="If true, modal preview is used on click.",
+    )
 
     links_per_page = models.IntegerField(
         default=100,
@@ -702,6 +706,10 @@ class UserConfig(models.Model):
     highlight_bookmarks = models.BooleanField(
         default=False,
         help_text="If true, bookmarks will be highlighted.",
+    )
+    click_behavior_modal_window = models.BooleanField(
+        default=False,
+        help_text="If true, modal preview is used on click.",
     )
     links_per_page = models.IntegerField(default=100)
     sources_per_page = models.IntegerField(default=100)

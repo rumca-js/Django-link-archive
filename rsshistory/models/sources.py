@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from webtoolkit import json_encode_field
+
 from ..apps import LinkDatabase
 from .credentials import Credentials
 
@@ -347,3 +349,9 @@ class SourceOperationalData(models.Model):
         null=True,
         blank=True,
     )
+
+    def get_page_hash_str(self):
+        return json_encode_field(self.page_hash)
+
+    def get_body_hash_str(self):
+        return json_encode_field(self.body_hash)

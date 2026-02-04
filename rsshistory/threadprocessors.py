@@ -243,10 +243,18 @@ class RefreshProcessor(ProcessorInterface):
     def is_more_jobs(self):
         return False
 
+    def is_error(self):
+        c = Configuration.get_object()
+
+        if self.check_memory and c.is_memory_limit_reached():
+            return True
+
+        return False
+
     def run_one_job(self):
         c = Configuration.get_object()
 
-        if c.is_memory_limit_reached():
+        if self.check_memory and c.is_memory_limit_reached():
             gc.collect()
 
             if self.check_memory:
@@ -299,6 +307,14 @@ class GenericJobsProcessor(ProcessorInterface):
         super().__init__(processors_list=processors_list, thread_name=thread_name, check_memory=check_memory)
         self.timeout_s = timeout_s
 
+    def is_error(self):
+        c = Configuration.get_object()
+
+        if self.check_memory and c.is_memory_limit_reached():
+            return True
+
+        return False
+
     def run(self):
         if not self.perform_run_checks():
             return
@@ -314,7 +330,7 @@ class GenericJobsProcessor(ProcessorInterface):
                 break
 
             c = Configuration.get_object()
-            if c.is_memory_limit_reached():
+            if self.check_memory and c.is_memory_limit_reached():
                 if self.check_memory:
                     AppLogging.error("{}: Memory limit reached".format(self.get_name()))
                 return
@@ -328,7 +344,7 @@ class GenericJobsProcessor(ProcessorInterface):
     def perform_run_checks(self):
         c = Configuration.get_object()
 
-        if c.is_memory_limit_reached():
+        if self.check_memory and c.is_memory_limit_reached():
             AppLogging.error(
                 "{}: Memory limit reached at start, leaving".format(self.get_name())
             )
@@ -372,6 +388,13 @@ class GenericJobsProcessor(ProcessorInterface):
         items = self.get_handler_and_object()
         if len(items) == 0:
             # AppLogging.debug("{}: No jobs".format(self.get_name()))
+            return False
+
+        AppLogging.debug("{}: we have more items {}".format(self.get_name(), items))
+
+        c = Configuration.get_object()
+        config = c.config_entry
+        if config.block_job_queue:
             return False
 
         return True
@@ -496,6 +519,7 @@ class SourceJobsProcessor(GenericJobsProcessor):
     def get_handler_and_object(self):
         """
         TODO select should be based on priority
+        @return [] if nothing to do
         """
         jobs = self.get_supported_jobs()
         if not jobs:
@@ -692,10 +716,11 @@ class OneTaskProcessor(GenericJobsProcessor):
 def process_jobs_task(Processor, processors_list, thread_name, check_memory):
     """!
     Processes all jobs for task
+    @return more_jobs, errors indication
     """
     c = Configuration.get_object()
     if not c.config_entry.enable_background_jobs:
-        return
+        return False, False
 
     c.config_entry = ConfigurationEntry.get()
 
@@ -704,19 +729,21 @@ def process_jobs_task(Processor, processors_list, thread_name, check_memory):
     handler.run()
 
     more_jobs = handler.is_more_jobs()
+    errors = handler.is_error()
 
     gc.collect()
 
-    return more_jobs
+    return more_jobs, errors
 
 
 def process_job_task(Processor, processors_list, thread_name, check_memory):
     """!
     Processes on job for task
+    @return more_jobs, errors indication
     """
     c = Configuration.get_object()
     if not c.config_entry.enable_background_jobs:
-        return
+        return False, False
 
     c.config_entry = ConfigurationEntry.get()
 
@@ -725,7 +752,8 @@ def process_job_task(Processor, processors_list, thread_name, check_memory):
     status = handler.run_one_job()
 
     more_jobs = handler.is_more_jobs()
+    errors = handler.is_error()
 
     gc.collect()
 
-    return more_jobs
+    return more_jobs, errors

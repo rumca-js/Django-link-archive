@@ -7,9 +7,3 @@ from .sqlmodel import (
     EntriesTable,
     SourcesTable,
 )
-
-from .reflected import (
-    ReflectedTable,
-    ReflectedEntryTable,
-    ReflectedSourceTable,
-)

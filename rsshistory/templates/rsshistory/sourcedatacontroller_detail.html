@@ -96,10 +96,10 @@
     <li class="list-group-item text-nowrap mx-2">Consecutive Errors: {{object.dynamic_data.consecutive_errors}}</li>
 
     {% if object.dynamic_data.page_hash %}
-       <li class="list-group-item text-nowrap mx-2">Page hash</li>
+    <li class="list-group-item text-nowrap mx-2">Page hash: {{object.dynamic_data.get_page_hash_str}}</li>
     {% endif %}
     {% if object.dynamic_data.body_hash %}
-       <li class="list-group-item text-nowrap mx-2">Body hash</li>
+       <li class="list-group-item text-nowrap mx-2">Body hash: {{object.dynamic_data.get_body_hash_str}}</li>
     {% endif %}
 
     {% if object.proxy_location %}

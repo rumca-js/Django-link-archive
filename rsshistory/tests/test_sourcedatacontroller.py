@@ -51,15 +51,18 @@ class SourceDataControllerTest(FakeInternetTestCase):
         )
 
         date_fetched = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
-        ahash = calculate_hash("test")
+        a_hash = calculate_hash("test1")
+        a_body_hash = calculate_hash("test2")
 
-        source.set_operational_info(date_fetched, 20, 3, hash_value=ahash, body_hash=ahash, valid=False)
+        source.set_operational_info(date_fetched, 20, 3, hash_value=a_hash, body_hash=a_body_hash, valid=False)
 
         operations = SourceOperationalData.objects.all()
         self.assertEqual(operations.count(), 1)
 
         operation = operations[0]
         self.assertEqual(operation.consecutive_errors, 1)
+        self.assertEqual(operation.page_hash, a_hash)
+        self.assertEqual(operation.body_hash, a_body_hash)
 
     def test_set_operational_info__max_errors(self):
         SourceOperationalData.objects.all().delete()

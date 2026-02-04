@@ -11,6 +11,13 @@ function add_text(error_line, text) {
 }
 
 
+function getEntryLocalLink(entry) {
+    if (entry.link_absolute) {
+        return entry.link_absolute;
+    }
+}
+
+
 function setDisplayMode() {
     if (view_display_style == "style-light") {
        setLightMode();

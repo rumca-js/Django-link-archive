@@ -150,6 +150,11 @@ class SourceDataController(SourceDataModel):
         body_hash,
         valid=True,
     ):
+        if hash_value == "":
+            hash_value = None
+        if body_hash == "":
+            body_hash = None
+
         dynamic_data = self.get_dynamic_data()
         if dynamic_data:
             dynamic_data.date_fetched = date_fetched
@@ -158,8 +163,6 @@ class SourceDataController(SourceDataModel):
 
             if valid:
                 dynamic_data.page_hash = hash_value
-                if body_hash == "":
-                    body_hash = None
                 dynamic_data.body_hash = body_hash
 
             if valid:

@@ -12,7 +12,7 @@ from ..controllers import (
 )
 from ..models import KeyWords
 from ..configuration import Configuration
-from ..viewpkg.tools import get_suggestions
+from ..viewspkg.tools import get_suggestions
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 

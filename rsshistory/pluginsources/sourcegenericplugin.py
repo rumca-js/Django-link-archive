@@ -141,7 +141,7 @@ class SourceGenericPlugin(SourcePluginInterface):
                     source.url, source.title
                 )
             )
-            return False
+            return True
 
         return True
 
