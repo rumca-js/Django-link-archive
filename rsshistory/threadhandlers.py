@@ -48,6 +48,7 @@ from .models import (
     BlockEntryList,
     Gateway,
     SocialData,
+    EntryRules,
 )
 
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -1507,17 +1508,10 @@ class RunRuleJobHandler(BaseJobHandler):
             AppLogging.error("Such rule does not exist")
             return True
 
-        rules = EntryRules.objects.filter(id=rule_id)
-
         entries_all = LinkDataController.objects.all()
-        p = Paginator(entries_all, 1000)
-        for page in p.num_pages:
-            page_obj = p.get_page(page_num)
-            entries = entries_all[page_obj.start_index() - 1 : page_obj.end_index()]
-
-            for rule in rules:
-                if rule.is_blocked_by_rule(entry.link):
-                    entry.delete()
+        # TODO implement as a batch job
+        for entry in entries_all:
+            EntryRules.check_all(entry)
 
         return True
 

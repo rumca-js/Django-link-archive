@@ -242,7 +242,7 @@ class SourceGenericPlugin(SourcePluginInterface):
         return True
 
     def is_properties_ok_to_add(self, props):
-        link = props.get(link)
+        link = props.get("link")
 
         if not self.is_link_ok_to_add(link):
             return False

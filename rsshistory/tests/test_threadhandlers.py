@@ -31,6 +31,7 @@ from ..threadhandlers import (
     WriteDailyDataJobHandler,
     ExportDataJobHandler,
     ProcessSourceJobHandler,
+    RunRuleJobHandler,
 )
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
@@ -311,6 +312,9 @@ class TruncateTableJobHandlerTest(FakeInternetTestCase):
         self.assertEqual(SourceDataController.objects.all().count(), 0)
 
 
+### Handlers
+
+
 class LinkAddJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
@@ -579,7 +583,7 @@ class WriteDailyDataJobHandlerTest(FakeInternetTestCase):
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
 
-        ob = BackgroundJobController.objects.create(
+        job = BackgroundJobController.objects.create(
             job=BackgroundJob.JOB_WRITE_DAILY_DATA,
             subject="2024-06-23",
         )
@@ -593,7 +597,7 @@ class WriteDailyDataJobHandlerTest(FakeInternetTestCase):
         handler = WriteDailyDataJobHandler()
         handler.set_config(Configuration.get_object())
         # call tested function
-        result = handler.process(ob)
+        result = handler.process(job)
 
         self.print_errors()
 
@@ -624,7 +628,7 @@ class ExportDataJobHandlerTest(FakeInternetTestCase):
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
 
-        ob = BackgroundJobController.objects.create(
+        job = BackgroundJobController.objects.create(
             job=BackgroundJob.JOB_EXPORT_DATA, subject=str(self.export_id)
         )
 
@@ -638,7 +642,50 @@ class ExportDataJobHandlerTest(FakeInternetTestCase):
         handler.set_config(Configuration.get_object())
 
         # call tested function
-        result = handler.process(ob)
+        result = handler.process(job)
+
+        self.print_errors()
+
+        self.assertEqual(result, True)
+
+
+class RunRuleJobHandlerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
+        self.create_data()
+
+    def create_data(self):
+        self.object = EntryRules.objects.create(
+            enabled=True,
+            rule_name="Test",
+            trigger_rule_url = "youtube.com",
+            block=True,
+        )
+
+    def test_process(self):
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+        SourceDataController.objects.all().delete()
+
+        job = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_RUN_RULE, subject=str(self.export_id)
+        )
+
+        LinkDataController.objects.create(
+            source_url="https://youtube.com",
+            link="https://youtube.com?v=12345",
+            date_published=DateUtils.from_string("2024-06-23T11:35:31Z"),
+        )
+
+        handler = RunRuleJobHandler()
+        handler.set_config(Configuration.get_object())
+
+        # call tested function
+        result = handler.process(job)
 
         self.print_errors()
 
