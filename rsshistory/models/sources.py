@@ -150,7 +150,7 @@ class SourceDataModel(models.Model):
     age = models.IntegerField(default=0)  # inherited into entries
     favicon = models.CharField(max_length=1000, null=True, blank=True)
     fetch_period = models.IntegerField(
-        default=900, help_text="Source is checked for new data after [x] seconds"
+        default=3600, help_text="Source is checked for new data after [x] seconds"
     )
 
     auto_tag = models.CharField(

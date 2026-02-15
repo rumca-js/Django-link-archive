@@ -101,6 +101,9 @@
     {% if object.dynamic_data.body_hash %}
        <li class="list-group-item text-nowrap mx-2">Body hash: {{object.dynamic_data.get_body_hash_str}}</li>
     {% endif %}
+    {% if object.xpath %}
+       <li class="list-group-item text-nowrap mx-2">XPath: {{object.xpath}}</li>
+    {% endif %}
 
     {% if object.proxy_location %}
     <li class="list-group-item text-nowrap mx-2">Proxy location: <a href="{{ object.proxy_location }}">

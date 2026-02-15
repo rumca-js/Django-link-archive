@@ -271,40 +271,45 @@ def source_add_form(request):
     if data is not None:
         return data
 
+    notes = []
+    warnings = []
+    errors = []
+
     url = None
     if "link" in request.GET:
         url = request.GET["link"]
 
-    url = UrlHandler.get_cleaned_link(url)
-
-    if not UrlLocation(url).is_protocolled_link():
-        p.context["summary_text"] = (
-            "Only protocolled links are allowed. Link:{}".format(url)
-        )
-        return p.render("summary_present.html")
+    if UrlLocation(url).is_protocolled_link():
+        url = UrlHandler.get_cleaned_link(url)
+        if not url:
+            p.context["summary_text"] = "Cannot obtain clean url"
+            return p.render("summary_present.html")
 
     ob = SourceDataController.objects.filter(url=url)
     if ob.exists():
-        p.context["form"] = form
-        p.context["source"] = ob[0]
-
-        return HttpResponseRedirect(ob[0].get_absolute_url())
+        p.context["summary_text"] = "Source already exists"
+        return p.render("summary_present.html")
 
     data = {"url": url, "status_code": 0}
-    browser_id = get_request_browser_id(request.GET)
-    if browser_id != Browser.EMPTY_FORM:
-        # TODO use browser somehow
+    is_allowed = True
 
-        data = SourceDataController.get_full_information({"url": url})
-        if not data:
-            p.context["summary_text"] = "Could not obtain properties of link:{}".format(
-                url
-            )
-            return p.render("summary_present.html")
+    if not UrlLocation(url).is_protocolled_link():
+       errors.append("Not a protocolled link.")
+       data["category_name"] = "New"
+       data["subcategory_name"] = "New"
+    else:
+        browser_id = get_request_browser_id(request.GET)
+        if browser_id != Browser.EMPTY_FORM:
+            # TODO use browser somehow
 
-    notes = []
-    warnings = []
-    errors = []
+            data = SourceDataController.get_full_information({"url": url})
+            if not data:
+                p.context["summary_text"] = "Could not obtain properties of link:{}".format(
+                    url
+                )
+                return p.render("summary_present.html")
+        u = UrlHandler(url)
+        is_allowed = u.is_allowed()
 
     form = SourceForm(initial=data, request=request)
     form.method = "POST"
@@ -317,9 +322,6 @@ def source_add_form(request):
     page = UrlLocation(data["url"])
     domain = page.get_domain()
     config = Configuration.get_object().config_entry
-
-    u = UrlHandler(link)
-    is_allowed = u.is_allowed()
 
     # warnings
     if config.prefer_https_links and link.find("http://") >= 0:

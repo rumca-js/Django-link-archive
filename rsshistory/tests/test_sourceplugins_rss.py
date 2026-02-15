@@ -1,9 +1,7 @@
 from ..controllers import SourceDataController, LinkDataController
-from ..models import SourceOperationalData
 from ..configuration import Configuration
 from ..pluginsources.sourcerssplugin import BaseRssPlugin
 
-from webtoolkit import PageResponseObject
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
@@ -30,69 +28,6 @@ class BaseRssPluginTest(FakeInternetTestCase):
             title="SAMTIME",
             export_to_cms=True,
         )
-
-    def test_get_hash(self):
-        plugin = BaseRssPlugin(self.source_rss.id)
-        plugin.get_contents()
-
-        # call tested function
-        self.assertTrue(plugin.get_hash())
-
-    def test_get_body_hash(self):
-        plugin = BaseRssPlugin(self.source_rss.id)
-        plugin.get_contents()
-
-        # call tested function
-        self.assertTrue(plugin.get_body_hash())
-
-    def test_is_page_ok_to_read__between_check_data(self):
-        MockRequestCounter.mock_page_requests = 0
-
-        LinkDataController.objects.all().delete()
-        SourceOperationalData.objects.all().delete()
-
-        self.assertTrue(self.source_rss)
-
-        plugin = BaseRssPlugin(self.source_rss.id)
-        # call tested function
-        self.assertTrue(plugin.is_page_ok_to_read())
-
-        plugin.check_for_data()
-
-        # call tested function
-        self.assertFalse(plugin.is_page_ok_to_read())
-
-    def test_is_page_ok_to_read__manual(self):
-        MockRequestCounter.mock_page_requests = 0
-
-        LinkDataController.objects.all().delete()
-        SourceOperationalData.objects.all().delete()
-
-        self.assertTrue(self.source_rss)
-
-        response = PageResponseObject(self.source_rss.url, text="test")
-        response.set_body_hash("jdjdjd".encode())
-
-        SourceOperationalData.objects.create(
-           source_obj = self.source_rss,
-           page_hash = response.get_hash(),
-           body_hash = response.get_body_hash(),
-        )
-
-        plugin = BaseRssPlugin(self.source_rss.id)
-        plugin.response = response
-
-        # call tested function
-        self.assertFalse(plugin.is_page_ok_to_read())
-
-        # different response
-        diff_response = PageResponseObject(self.source_rss.url, text="test2")
-        response.set_body_hash("jdjdjd2".encode())
-
-        plugin = BaseRssPlugin(self.source_rss.id)
-        plugin.response = diff_response
-
-        self.assertTrue(plugin.is_page_ok_to_read())
 
     def test_get_entries(self):
         MockRequestCounter.mock_page_requests = 0
@@ -299,16 +234,16 @@ class BaseRssPluginTest(FakeInternetTestCase):
         # 1 rss parent, we do not make additional requests
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_check_for_data__no_additional_data(self):
+    def test_check_for_data(self):
         MockRequestCounter.mock_page_requests = 0
 
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
         config.accept_non_domain_links = True
-        config.accept_domain_links = False
         config.auto_create_sources = True
-        config.new_entries_merge_data = False
+        config.accept_domain_links = False
+        config.new_entries_merge_data = True
         config.new_entries_use_clean_data = False
         config.save()
 
@@ -324,74 +259,34 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_check_for_data__use_clean_data(self):
+    def test_get_hash(self):
+        plugin = BaseRssPlugin(self.source_rss.id)
+        self.assertTrue(plugin.get_hash())
+
+    def test_is_link_ok_to_add(self):
         MockRequestCounter.mock_page_requests = 0
 
         LinkDataController.objects.all().delete()
 
-        config = Configuration.get_object().config_entry
-        config.accept_non_domain_links = True
-        config.accept_domain_links = False
-        config.auto_create_sources = True
-        config.new_entries_merge_data = False
-        config.new_entries_use_clean_data = True
-        config.save()
-
         self.assertTrue(self.source_rss)
 
         plugin = BaseRssPlugin(self.source_rss.id)
-        # call tested function
-        plugin.check_for_data()
 
-        self.print_errors()
+        props = {
+            "link" : "https://test.com"
+        }
 
-        self.assertTrue(plugin.get_hash())
-
-        self.assertEqual(MockRequestCounter.mock_page_requests, 14)
-
-    def test_check_for_data__use_merge_data(self):
-        MockRequestCounter.mock_page_requests = 0
-
-        LinkDataController.objects.all().delete()
-
-        config = Configuration.get_object().config_entry
-        config.accept_non_domain_links = True
-        config.accept_domain_links = False
-        config.auto_create_sources = True
-        config.new_entries_merge_data = True
-        config.new_entries_use_clean_data = False
-        config.save()
-
-        self.assertTrue(self.source_rss)
-
-        plugin = BaseRssPlugin(self.source_rss.id)
-        # call tested function
-        plugin.check_for_data()
-
-        self.print_errors()
-
-        self.assertTrue(plugin.get_hash())
-
-        self.assertEqual(MockRequestCounter.mock_page_requests, 14)
-
-    def test_check_for_data__sets_operational_data(self):
-        plugin = BaseRssPlugin(self.source_rss.id)
+        self.source_rss.xpath = ".*test.com.*"
+        self.source_rss.save()
 
         # call tested function
-        plugin.check_for_data()
+        self.assertTrue(plugin.is_link_ok_to_add(props))
+
+        self.source_rss.xpath = ".*example.com.*"
+        self.source_rss.save()
 
         # call tested function
-        self.assertTrue(plugin.response)
-        self.assertTrue(plugin.response.get_hash())
-        self.assertTrue(plugin.response.get_body_hash())
+        self.assertFalse(plugin.is_link_ok_to_add(props))
 
-        source = plugin.get_source()
-        self.assertTrue(source)
-
-        dynamic_data = source.get_dynamic_data()
-        self.assertTrue(dynamic_data)
-
-        self.assertEqual(dynamic_data.page_hash, plugin.response.get_hash())
-        self.assertEqual(dynamic_data.body_hash, plugin.response.get_body_hash())
-
-        self.assertEqual(SourceOperationalData.objects.all().count(), 1)
+        self.source_rss.xpath = None
+        self.source_rss.save()

@@ -10,7 +10,6 @@ from django.conf import settings
 
 from webtoolkit import UrlLocation, is_status_code_valid, is_status_code_invalid
 from utils.dateutils import DateUtils
-from utils.controllers import GenericEntryController
 
 from ..apps import LinkDatabase
 
@@ -236,8 +235,11 @@ class BaseLinkDataController(BaseLinkDataModel):
         return "______"
 
     def get_title_safe(self):
-        c = GenericEntryController(self)
-        return c.get_title()
+        if not self.title:
+            return "..."
+
+        title = self.title[:100]
+        return title
 
     def get_long_description(self):
         if self.is_dead():

@@ -98,7 +98,7 @@ class SourceGenericPlugin(SourcePluginInterface):
             if not link_data:
                 continue
 
-            if not self.is_link_ok_to_add(link_data):
+            if not self.is_properties_ok_to_add(link_data):
                 AppLogging.error(
                     "Url:{} Title:{}. Cannot add link: {}".format(
                         source.url, source.title, str(link_data)
@@ -218,9 +218,6 @@ class SourceGenericPlugin(SourcePluginInterface):
         source = self.get_source()
         return source.url
 
-    def is_link_valid(self, address):
-        return True
-
     def get_container_elements(self):
         return []
 
@@ -232,17 +229,23 @@ class SourceGenericPlugin(SourcePluginInterface):
 
         BackgroundJobController.link_add(link_str, source=source, tag=tag)
 
-    def is_link_ok_to_add(self, props):
-        if "link" not in props:
+    def is_link_ok_to_add(self, link):
+        if link is None:
             return False
-        if props["link"] is None:
-            return False
-        if props["link"] == "":
+        if link == "":
             return False
 
         source = self.get_source()
         if source and source.xpath:
-            return source.is_link_ok(props["link"])
+            return source.is_link_ok(link)
+
+        return True
+
+    def is_properties_ok_to_add(self, props):
+        link = props.get(link)
+
+        if not self.is_link_ok_to_add(link):
+            return False
 
         return True
 

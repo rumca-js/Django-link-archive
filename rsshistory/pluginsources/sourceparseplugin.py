@@ -21,23 +21,6 @@ class BaseParsePlugin(SourceGenericPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    def is_link_valid(self, address):
-        source = self.get_source()
-
-        # if not UrlLocation(self.get_address()).is_link_in_domain(address):
-        #    return False
-
-        # if not address.startswith(source.url):
-        #    return False
-
-        p = UrlLocation(address)
-        ext = p.get_page_ext()
-
-        if ext == "html" or ext == "htm" or ext == None:
-            return True
-
-        return False
-
     def get_link_data(self, source, link):
         url = EntryUrlInterface(link)
 
@@ -53,7 +36,7 @@ class BaseParsePlugin(SourceGenericPlugin):
         num_entries = len(links_str_vec)
 
         for index, link_str in enumerate(links_str_vec):
-            if not self.is_link_valid(link_str):
+            if not self.is_link_ok_to_add(link_str):
                 continue
 
             objs = LinkDataController.objects.filter(link=link_str)

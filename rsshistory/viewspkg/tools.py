@@ -820,6 +820,8 @@ def source_input_suggestions_json(request):
     if not p.is_allowed():
         return redirect("{}:missing-rights".format(LinkDatabase.name))
 
+    config = Configuration.get_object().config_entry
+
     if "link" in request.GET:
         link = request.GET["link"]
         data = get_suggestions(link)
