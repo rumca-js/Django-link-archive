@@ -31,33 +31,33 @@ class BaseParsePluginTest(FakeInternetTestCase):
 
     def test_is_link_valid_html(self):
         plugin = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(plugin.is_link_valid("https://youtube.com/location/inside.html"))
+        self.assertTrue(plugin.is_link_ok_to_add("https://youtube.com/location/inside.html"))
 
     def test_is_link_valid_htm(self):
         plugin = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(plugin.is_link_valid("https://youtube.com/location/inside.htm"))
+        self.assertTrue(plugin.is_link_ok_to_add("https://youtube.com/location/inside.htm"))
 
     def test_is_link_valid_ending_dash(self):
         plugin = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(plugin.is_link_valid("https://youtube.com/location/inside/"))
+        self.assertTrue(plugin.is_link_ok_to_add("https://youtube.com/location/inside/"))
 
     def test_is_link_valid_ending_noext(self):
         plugin = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(plugin.is_link_valid("https://youtube.com/location/inside"))
+        self.assertTrue(plugin.is_link_ok_to_add("https://youtube.com/location/inside"))
 
     # check if false
 
     def test_is_link_valid_outside_location(self):
         plugin = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(plugin.is_link_valid("https://github.com/location/inside"))
+        self.assertTrue(plugin.is_link_ok_to_add("https://github.com/location/inside"))
 
     def test_is_link_valid_js(self):
         plugin = BaseParsePlugin(self.source_youtube.id)
-        self.assertFalse(plugin.is_link_valid("https://youtube.com/location/inside.js"))
+        self.assertFalse(plugin.is_link_ok_to_add("https://youtube.com/location/inside.js"))
 
     def test_is_link_valid_css(self):
         plugin = BaseParsePlugin(self.source_youtube.id)
-        self.assertFalse(plugin.is_link_valid("https://youtube.com/location/inside.css"))
+        self.assertFalse(plugin.is_link_ok_to_add("https://youtube.com/location/inside.css"))
 
     def test_get_hash(self):
         plugin = BaseParsePlugin(self.source_youtube.id)

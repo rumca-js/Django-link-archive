@@ -108,8 +108,9 @@ class EntryPageCrawler(object):
         else:
             from ..pluginurl import UrlHandler
             handler = UrlHandler(self.url)
-            handler.get_response()
-            contents = handler.get_contents()
+            response = handler.get_response()
+            if response:
+                contents = response.get_text()
             description = handler.get_description()
 
         source = None

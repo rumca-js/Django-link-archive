@@ -32,20 +32,20 @@ class ToolsViewsTest(FakeInternetTestCase):
         # call tested function
         suggestions = get_suggestions("https://youtube.com/watch?v=123")
 
-        self.assertIn("https://www.youtube.com/watch?v=123", suggestions)
+        self.assertIn("https://www.youtube.com/watch?v=123", suggestions["links"])
         self.assertIn("https://www.youtube.com/watch", suggestions)
 
     def test_get_suggestions__http(self):
         # call tested function
         suggestions = get_suggestions("http://youtube.com/watch?v=123")
 
-        self.assertIn("https://www.youtube.com/watch?v=123", suggestions)
+        self.assertIn("https://www.youtube.com/watch?v=123", suggestions["links"])
 
     def test_get_suggestions__no_www(self):
         # call tested function
         suggestions = get_suggestions("http://youtube.com/watch?v=123")
 
-        self.assertIn("https://www.youtube.com/watch?v=123", suggestions)
+        self.assertIn("https://www.youtube.com/watch?v=123", suggestions["links"])
 
     def test_show_page_props(self):
         url = reverse("{}:page-show-props".format(LinkDatabase.name))

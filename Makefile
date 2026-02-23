@@ -67,11 +67,11 @@ createsuperuser:
 # http://pont.ist/rabbit-mq/
 # ffmpeg is necessary for video conversion
 installsysdeps:
-	apt -y install rabbitmq-server memcached wget id3v2 ffmpeg
-	systemctl enable rabbitmq-server
-	systemctl start rabbitmq-server
-	systemctl enable memcached.service
-	systemctl start memcached.service
+	apt -y install wget id3v2 ffmpeg
+
+installclientdeps:
+	# used to use conversion code like backup or convert.
+	apt -y install postgresql-client
 
 run: run-server run-web-server
 
@@ -86,8 +86,6 @@ run-celery:
 	# 200000 is 200MB
 	poetry run celery -A linklibrary beat -l INFO &
 	poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=300000 &
-	#poetry run celery -A linklibrary worker -l INFO --concurrency=4 --max-memory-per-child=200000 &
-	#poetry run celery -A linklibrary worker -l INFO --concurrency=4
 
 run-web-server:
 	poetry run python manage.py runserver 0.0.0.0:$(PORT)
@@ -146,17 +144,18 @@ celery-status:
 	poetry run celery -A linklibrary inspect active_queues
 
 workers:
-	poetry run python manage.py threadprocessor --thread RefreshProcessor &
-	poetry run python manage.py threadprocessor --thread SourceJobsProcessor &
-	poetry run python manage.py threadprocessor --thread WriteJobsProcessor &
-	poetry run python manage.py threadprocessor --thread ImportJobsProcessor &
-	poetry run python manage.py threadprocessor --thread SystemJobsProcessor &
-	poetry run python manage.py threadprocessor --thread UpdateJobsProcessor &
-	poetry run python manage.py threadprocessor --thread LeftOverJobsProcessor &
-	poetry run python manage.py threadprocessor --thread BlockJobsProcessor &
+	poetry run python manage.py threadprocessor --process RefreshProcessor &
+	poetry run python manage.py threadprocessor --process SourceJobsProcessor --thread read1 &
+	poetry run python manage.py threadprocessor --process SourceJobsProcessor --thread read2 &
+	poetry run python manage.py threadprocessor --process WriteJobsProcessor &
+	poetry run python manage.py threadprocessor --process ImportJobsProcessor &
+	poetry run python manage.py threadprocessor --process SystemJobsProcessor &
+	poetry run python manage.py threadprocessor --process UpdateJobsProcessor &
+	poetry run python manage.py threadprocessor --process LeftOverJobsProcessor &
+	poetry run python manage.py threadprocessor --process BlockJobsProcessor &
 
 source-worker:
-	poetry run python manage.py threadprocessor --thread SourceJobsProcessor &
+	poetry run python manage.py threadprocessor --process SourceJobsProcessor &
 
 update-worker:
-	poetry run python manage.py threadprocessor --thread UpdateJobsProcessor &
+	poetry run python manage.py threadprocessor --process UpdateJobsProcessor &

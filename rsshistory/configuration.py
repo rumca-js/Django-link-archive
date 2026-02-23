@@ -14,18 +14,6 @@ from utils.logger import set_logger
 from .models import ConfigurationEntry, SystemOperation
 from .apps import LinkDatabase
 
-"""
-version is split into three digits:
- - release
- - model version
- - patch
-
- if there is a small incremental change bump up the patch number
- if a change requires the model to be changed, then second digit is updated, patch is set to 0
- if something should be released to public, then release version changes
-"""
-__version__ = "2.26.7"
-
 
 class Configuration(object):
     obj = {}
@@ -37,8 +25,6 @@ class Configuration(object):
         full_path = Path(file_path)
         self.directory = str(full_path.parents[1])
 
-        self.version = __version__
-
         self.enable_logging()
 
         self.context = {}
@@ -46,11 +32,22 @@ class Configuration(object):
         self.get_context()
         self.nlps = {}
 
+    def get_version():
+        version = "0.0.0"
+        path = Path("pyproject.toml")
+        text = path.read_text()
+        for line in text.split("\n"):
+            wh = line.find("version")
+            if wh >= 0:
+                version = line[11:-1]
+        return version
+
     def get_context_minimal():
+        version = Configuration.get_version()
         return {
             "page_title": "[{}]".format(LinkDatabase.name),
             "app_name": str(LinkDatabase.name),
-            "app_version": __version__,
+            "app_version": version,
             "base_generic": str(Path(LinkDatabase.name) / "base_generic.html"),
         }
 

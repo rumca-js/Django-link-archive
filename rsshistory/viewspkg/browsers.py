@@ -166,6 +166,19 @@ def browser_add(request):
     return p.render("form_basic.html")
 
 
+def clear(request):
+    p = ViewPage(request)
+    p.set_title("Edit browser")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    Browser.objects.all().delete()
+
+    p.context["summary_text"] = "Removed browsers"
+    return p.render("go_back.html")
+
+
 def edit(request, pk):
     p = ViewPage(request)
     p.set_title("Edit browser")

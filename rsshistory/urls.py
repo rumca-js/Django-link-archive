@@ -266,6 +266,7 @@ urlpatterns = [
     path("user-credentials/", credentials.UserListView.as_view(), name="user-credentials",),
     # browser
     path("browsers/", browsers.BrowserListView.as_view(), name="browsers",),
+    path("browsers-clear/", browsers.clear, name="browsers-clear",),
     path("browser-add/", browsers.browser_add, name="browser-add",),
     path("browser-read/", browsers.read_browser_setup, name="browser-read",),
     path("browser-apply/", browsers.apply_browser_setup, name="browser-apply",),

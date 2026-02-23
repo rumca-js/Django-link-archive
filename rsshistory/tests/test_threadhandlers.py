@@ -20,6 +20,7 @@ from ..models import (
     KeyWords,
     SystemOperation,
     UserTags,
+    EntryRules,
 )
 from ..configuration import Configuration
 from ..threadhandlers import (
@@ -417,7 +418,7 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
             username="test_username", password="testpassword", is_superuser=True
         )
 
-    def test_scan_link(self):
+    def test_scan_link__url(self):
         conf = Configuration.get_object().config_entry
         conf.accept_domain_links = True
         conf.save()
@@ -425,7 +426,40 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
-        ob = BackgroundJobController.link_scan("https://manually-added-link.com")
+        ob = BackgroundJobController.link_scan(url="https://manually-added-link.com")
+        self.assertTrue(ob)
+
+        handler = LinkScanJobHandler()
+        handler.process(ob)
+
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info_text))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
+        jobs = BackgroundJobController.objects.all()
+        for job in jobs:
+            print("Job:{} {}".format(job.job, job.subject))
+
+        self.assertEqual(jobs.count(), 1)
+
+    def test_scan_link__entry(self):
+        conf = Configuration.get_object().config_entry
+        conf.accept_domain_links = True
+        conf.save()
+
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+
+        entry = LinkDataController.objects.create(
+            source_url="https://youtube.com",
+            link="https://youtube.com?v=12345",
+            date_published=DateUtils.from_string("2024-06-23T11:35:31Z"),
+        )
+
+        ob = BackgroundJobController.link_scan(entry=entry)
         self.assertTrue(ob)
 
         handler = LinkScanJobHandler()
