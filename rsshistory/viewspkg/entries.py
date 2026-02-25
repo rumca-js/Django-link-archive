@@ -583,7 +583,7 @@ def func_display_data_form(request, p, data):
     form.action_url = reverse("{}:entry-add-json".format(LinkDatabase.name))
     p.context["form"] = form
 
-    domain = page.get_domain()
+    domain = page.get_domain().url
 
     u = UrlHandler(link)
 

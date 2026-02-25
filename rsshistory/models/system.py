@@ -293,6 +293,11 @@ class ConfigurationEntry(models.Model):
         help_text="Allow adding links with unknown status to the database.",
     )
 
+    accept_onion_links = models.BooleanField(
+        default=False,
+        help_text="Allow adding onion links to the database.",
+    )
+
     # this might be stupid. Some pages are blocked, and return some stupid javascript, or something
     # which is the same for all pages... not sure.
     # What about sites protected by cloudflare... it could return same "protected by" version of site.

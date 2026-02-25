@@ -287,7 +287,7 @@ class DomainsController(Domains):
         entries = LinkDataController.objects.filter(domain__isnull=True)
         for entry in entries:
             p = UrlLocation(entry.link)
-            domain_url = p.get_domain()
+            domain_url = p.get_domain().url
             domain_only = p.get_domain_only()
 
             LinkDatabase.info(

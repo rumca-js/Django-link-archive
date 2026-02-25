@@ -6,6 +6,14 @@ from django.db.models import Q, F
 
 from utils.dateutils import DateUtils
 
+from webtoolkit import (
+    HTTP_STATUS_UNKNOWN,
+    HTTP_STATUS_OK,
+    HTTP_STATUS_USER_AGENT,
+    HTTP_STATUS_CODE_SERVER_ERROR,
+    HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS
+)
+
 from ..models import (
     AppLogging,
     EntryRules,
@@ -245,11 +253,11 @@ class EntriesCleanup(object):
         return self.filter_objects(stale_conditions)
 
     def get_stale_status_condition(self):
-        return self.get_stale_status_condition_raw() & ~Q(manual_status_code=200)
+        return self.get_stale_status_condition_raw() & ~Q(manual_status_code=HTTP_STATUS_OK)
 
     def get_stale_status_condition_raw(self):
-        status_conditions_ok = Q(status_code=403) | Q(status_code=0)
-        status_conditions_ok |= Q(status_code__gte=200) & Q(status_code__lte=300)
+        status_conditions_ok = Q(status_code=HTTP_STATUS_USER_AGENT) | Q(status_code=HTTP_STATUS_UNKNOWN) | Q(status_code=HTTP_STATUS_CODE_SERVER_ERROR) | Q(status_code=HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS)
+        status_conditions_ok |= (Q(status_code__gte=HTTP_STATUS_OK) & Q(status_code__lte=300))
 
         return Q(~status_conditions_ok)
 

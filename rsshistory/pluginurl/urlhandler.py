@@ -117,10 +117,10 @@ class UrlHandler(object):
                     if response:
                         status_code = response.get_status_code()
                         status_code_str = status_code_to_text(status_code)
-                        AppLogging.warning(f"Url:{self.url} status_code:{status_code_str} browser:{browser}. Trying another browser",
+                        AppLogging.debug(f"Url:{self.url} status_code:{status_code_str} browser:{browser}. Trying another browser",
                            detail_text = str(self.all_properties))
                     else:
-                        AppLogging.warning(f"Url:{self.url} browser:{browser}. Trying another browser.",
+                        AppLogging.debug(f"Url:{self.url} browser:{browser}. Trying another browser.",
                            detail_text = str(self.all_properties))
                     continue
 

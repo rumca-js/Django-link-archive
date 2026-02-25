@@ -44,7 +44,7 @@ class RssParserPlugin(BaseRssPlugin):
         domains = set()
         for link in links:
             p = UrlLocation(link)
-            domains.add(p.get_domain())
+            domains.add(p.get_domain().url)
 
         links.update(domains)
 

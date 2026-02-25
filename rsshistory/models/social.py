@@ -77,7 +77,7 @@ class SocialData(models.Model):
             return False
 
         page = UrlLocation(entry.link)
-        domain = page.get_domain()
+        domain = page.get_domain().url
         if not domain:
             return False
 

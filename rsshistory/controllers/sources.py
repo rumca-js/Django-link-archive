@@ -209,7 +209,7 @@ class SourceDataController(SourceDataModel):
 
     def get_domain(self):
         page = UrlLocation(self.url)
-        return page.get_domain()
+        return page.get_domain().url
 
     def get_domain_only(self):
         page = UrlLocation(self.url)
@@ -287,6 +287,8 @@ class SourceDataController(SourceDataModel):
     def disable(self):
         if not self.enabled:
             return
+
+        return
 
         from .entrywrapper import EntryWrapper
 

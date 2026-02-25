@@ -12,16 +12,16 @@ def add_all_domains(page_url):
     links = set()
 
     p = UrlLocation(page_url)
-    domain = p.get_domain()
+    domain = p.get_domain().url
 
     links.add(domain)
 
     while True:
         p = p.up()
-        if not p or p.get_domain() is None:
+        if not p or p.get_domain().url is None:
             break
 
-        links.add(p.get_domain())
+        links.add(p.get_domain().url)
 
     for link in links:
         BackgroundJobController.link_add(link)
@@ -69,7 +69,7 @@ class EntryContentsCrawler(object):
             links = set(parser.get_domains())
 
             p = UrlLocation(self.link)
-            domain = p.get_domain()
+            domain = p.get_domain().url
             if domain and domain != self.link:
                 links.add(domain)
 

@@ -61,7 +61,7 @@ def get_errors(page_url):
     location = UrlLocation(link)
     config = Configuration.get_object().config_entry
 
-    domain = location.get_domain()
+    domain = location.get_domain().url
     is_allowed = page_url.is_allowed()
 
     # warnings
@@ -563,7 +563,7 @@ def page_verify(request):
             if c.auto_scan_new_entries:
                 BackgroundJobController.link_add(url)
 
-        domain_url = UrlLocation(url).get_domain()
+        domain_url = UrlLocation(url).get_domain().url
         if domain_url != url:
             domains = LinkDataController.objects.filter(link=domain_url)
             if domains.exists():
@@ -766,7 +766,7 @@ def get_suggestions(original_link):
 
     config = Configuration.get_object().config_entry
     if config.accept_domain_links:
-        links.add(location.get_domain())
+        links.add(location.get_domain().url)
 
     if original_link.endswith("/"):
         errors.append("Link should not end with slash")

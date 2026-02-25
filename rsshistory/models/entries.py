@@ -330,7 +330,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             return self.source.get_favicon()
 
         # returning real favicon from HTML is too long
-        return UrlLocation(self.link).get_domain() + "/favicon.ico"
+        return UrlLocation(self.link).get_domain().url + "/favicon.ico"
 
     def get_domain_only(self):
         page = UrlLocation(self.link)

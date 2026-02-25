@@ -222,7 +222,7 @@ def import_reading_list_view(request):
                 continue
             else:
                 p = UrlLocation(entry["url"])
-                if not p.get_domain():
+                if not p.get_domain().url:
                     summary_text += (
                         entry["title"]
                         + " "
@@ -242,7 +242,7 @@ def import_reading_list_view(request):
                     continue
 
                 ent = LinkDataController(
-                    source=p.get_domain(),
+                    source=p.get_domain().url,
                     title=entry["title"],
                     description=entry["description"],
                     link=entry["url"],

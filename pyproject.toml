@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linklibrary"
-version = "2.26.2"
+version = "2.26.3"
 description = "Link Archive"
 authors = ["Iwan Grozny <renegat@renegat0x0.ddns.net>"]
 license = "GPL3"
@@ -19,7 +19,7 @@ tldextract = "^5.1.2"
 sympy = "^1.14.0"
 spacy = "3.7.5"
 url-cleaner="0.1.5"
-linkarchivetools="^0.1.30"
+linkarchivetools="^0.1.32"
 
 #psycopg2 = "*" # for raspberry install python3-psycopyg2
 psycopg2-binary = "*" # for raspberry install python3-psycopyg2

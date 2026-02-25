@@ -342,7 +342,7 @@ class EntryDataBuilder(object):
     def is_domain_link_data(self):
         link_data = self.link_data
         p = UrlLocation(link_data["link"])
-        return p.get_domain() == link_data["link"]
+        return p.get_domain().url == link_data["link"]
 
     def add_entry_internal(self):
         link_data = self.link_data
@@ -428,6 +428,9 @@ class EntryDataBuilder(object):
         if not config.accept_ip_links:
             if self.is_ipv4(domain):
                 return False
+
+        if location.is_onion() and not config.accept_onion_links:
+            return False
 
         is_domain = location.is_domain()
         if is_domain and not config.accept_domain_links:
@@ -609,4 +612,4 @@ class EntryDataBuilder(object):
         objs = LinkDataController.objects.filter(bookmarked=True)
         for obj in objs:
             p = UrlLocation(obj.link)
-            EntryDataBuilder(link=p.get_domain())
+            EntryDataBuilder(link=p.get_domain().url)

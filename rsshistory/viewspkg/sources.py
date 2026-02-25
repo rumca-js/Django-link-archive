@@ -320,7 +320,7 @@ def source_add_form(request):
     link = data["url"]
 
     page = UrlLocation(data["url"])
-    domain = page.get_domain()
+    domain = page.get_domain().url
     config = Configuration.get_object().config_entry
 
     # warnings

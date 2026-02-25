@@ -208,36 +208,36 @@ class BackgroundJobController(BackgroundJob):
         """
         It handles only automatic additions.
         """
-        url = UrlLocation.get_cleaned_link(url)
+        location = UrlLocation(url).get_clean()
 
-        if not url:
+        if not location.url:
             return
 
-        if EntryRules.is_url_blocked(url):
+        if location.is_analytics():
             return
 
-        h = UrlLocation(url)
-        if h.is_analytics():
+        if not location.is_web_link():
             return
 
-        if not h.is_web_link():
+        if not location.is_webpage_link():
             return
 
-        """
-        TODO: there should be some one place to verify if link is 'accepted' to be added
-        If it is not link service we may only accept domains.
-        If it is link service - add as is.
-        In link add thread we will 'unpack links service'.
-        """
-        if not h.is_link_service():
-            config = Configuration.get_object().config_entry
-            if not config.accept_non_domain_links and config.accept_domain_links:
-                url = h.get_domain()
-        else:
-            """TODO This should be configurable"""
+        if EntryRules.is_url_blocked(location.url):
             return
 
-        w = EntryWrapper(url)
+        config = Configuration.get_object().config_entry
+
+        if not location.is_domain() and not config.accept_non_domain_links and config.accept_domain_links:
+            location = location.get_domain()
+
+        if not location.is_onion() and not config.accept_onion_links:
+            return
+        if location.is_domain() and not config.accept_domain_links:
+            return
+        if not location.is_domain() and not config.accept_non_domain_links:
+            return
+
+        w = EntryWrapper(location.url)
 
         entry = w.get()
         if entry:

@@ -357,8 +357,8 @@ class EntryGenericPlugin(object):
         if not self.entry.source:
             return False
 
-        entry_domain = UrlLocation(self.entry.link).get_domain()
-        source_domain = UrlLocation(self.entry.source.url).get_domain()
+        entry_domain = UrlLocation(self.entry.link).get_domain().url
+        source_domain = UrlLocation(self.entry.source.url).get_domain().url
 
         return entry_domain == source_domain
 
@@ -501,7 +501,7 @@ class EntryGenericPlugin(object):
                 ),
             )
         else:
-            domain_url = location.get_domain()
+            domain_url = location.get_domain().url
 
             buttons.append(
                 EntryButton(
@@ -542,7 +542,7 @@ class EntryGenericPlugin(object):
             ),
         )
 
-        domain_url = location.get_domain()
+        domain_url = location.get_domain().url
         if domain_url:
             buttons.append(
                 EntryButton(

@@ -17,7 +17,7 @@ class SpotifyPlugin(BaseParsePlugin):
         if not UrlLocation(url).is_link_in_domain(address):
             return False
 
-        search_pattern = UrlLocation(url).get_domain() + "/episode"
+        search_pattern = UrlLocation(url).get_domain().url + "/episode"
 
         if re.search(search_pattern, address):
             return True
