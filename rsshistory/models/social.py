@@ -173,7 +173,8 @@ class SocialData(models.Model):
                     if status_code == webtoolkit.HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
                         continue
 
-                    raise IOError(f"Invalid social data response from remote server - a list. Entry id:{entry.id} link:{entry.link} status_code:{status_code}")
+                    # raise IOError(f"Invalid social data response from remote server - a list. Entry id:{entry.id} link:{entry.link} status_code:{status_code}")
+                    return
 
                 break
 

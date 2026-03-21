@@ -230,7 +230,7 @@ class BackgroundJobController(BackgroundJob):
         if not location.is_domain() and not config.accept_non_domain_links and config.accept_domain_links:
             location = location.get_domain()
 
-        if not location.is_onion() and not config.accept_onion_links:
+        if location.is_onion() and not config.accept_onion_links:
             return
         if location.is_domain() and not config.accept_domain_links:
             return

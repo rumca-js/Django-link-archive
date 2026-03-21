@@ -253,11 +253,17 @@ class EntriesCleanup(object):
         return self.filter_objects(stale_conditions)
 
     def get_stale_status_condition(self):
-        return self.get_stale_status_condition_raw() & ~Q(manual_status_code=HTTP_STATUS_OK)
+        return self.get_status_condition_invalid() & ~Q(manual_status_code=HTTP_STATUS_OK)
 
-    def get_stale_status_condition_raw(self):
-        status_conditions_ok = Q(status_code=HTTP_STATUS_USER_AGENT) | Q(status_code=HTTP_STATUS_UNKNOWN) | Q(status_code=HTTP_STATUS_CODE_SERVER_ERROR) | Q(status_code=HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS)
-        status_conditions_ok |= (Q(status_code__gte=HTTP_STATUS_OK) & Q(status_code__lte=300))
+    def get_status_condition_valid(self):
+        status_conditions_ok |= (Q(status_code__gte=HTTP_STATUS_OK) & Q(status_code__lt=400))
+
+        return Q(status_conditions_ok)
+
+    def get_status_condition_invalid(self):
+        status_conditions_ok = Q(status_code=HTTP_STATUS_USER_AGENT) | Q(status_code=HTTP_STATUS_UNKNOWN) | Q(status_code=HTTP_STATUS_CODE_SERVER_ERROR) | Q(status_code=HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS) | Q(status_code__isnull = True)
+
+        status_conditions_ok |= (Q(status_code__gte=HTTP_STATUS_OK) & Q(status_code__lt=400))
 
         return Q(~status_conditions_ok)
 
@@ -278,12 +284,13 @@ class EntriesCleanup(object):
             return
 
         not_permanent_condition = Q(bookmarked=False, permanent=False)
-        status_conditions_nok = self.get_stale_status_condition()
-
+        dead_condition = Q(date_dead_since__isnull=False)
         page_rating_votes_exists = Q(page_rating_votes__gt=0)
+        # status_conditions_nok = self.get_stale_status_condition()
 
         result_condition = (
-            not_permanent_condition & status_conditions_nok & ~page_rating_votes_exists
+            # not_permanent_condition & status_conditions_nok & ~page_rating_votes_exists
+            not_permanent_condition & dead_condition & ~page_rating_votes_exists
         )
 
         if days != 0:
@@ -291,6 +298,7 @@ class EntriesCleanup(object):
             date_condition = Q(date_dead_since__lt=days_before)
             result_condition &= date_condition
         else:
+            # do not remove if not configured
             return None
 
         return result_condition

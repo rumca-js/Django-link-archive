@@ -17,6 +17,7 @@ from webtoolkit import (
     HTTP_STATUS_CODE_EXCEPTION,
     HTTP_STATUS_CODE_SERVER_ERROR,
     HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS,
+    HTTP_STATUS_CODE_SERVER_DATA_NOT_READY,
 )
 
 from ..apps import LinkDatabase
@@ -163,13 +164,29 @@ class UrlHandler(object):
                 raise IOError(f"Could not obtain response from remote server for {request.url}")
 
             url = RemoteUrl(url=self.url, remote_server_location=location, request=request)
-            response = url.get_response()
-            self.all_properties = url.get_all_properties()
+            self.response = url.get_response()
 
-            if response and response.get_status_code() == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
-                AppLogging.debug("Too many requests")
+            if self.is_another_attempt_necessary():
+                AppLogging.debug(f"Url:{self.url} Another attempt")
                 continue
+
+            self.all_properties = url.get_all_properties()
             break
+
+    def is_another_attempt_necessary(self):
+        if not self.response:
+            return True
+
+        if self.response.get_status_code() == HTTP_STATUS_UNKNOWN:
+            return True
+
+        if self.response.get_status_code() == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
+            return True
+
+        if self.response.get_status_code() == HTTP_STATUS_CODE_SERVER_DATA_NOT_READY:
+            return True
+
+        return False
 
     def is_another_request_necessary(self):
         """
