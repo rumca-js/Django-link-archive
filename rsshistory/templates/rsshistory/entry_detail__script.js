@@ -40,8 +40,21 @@ function getEntryMenu() {
 
 
 function fillEntryStatus() {
-    if (is_updating || is_resetting) {
-        const text = getDownloadingText("Fetching link data...");
+    if (is_downloading) {
+	const text = getDownloadingText("Downloading...");
+	$('#entryDownloadContainer').html(text);
+    }
+    else {
+	$('#entryDownloadContainer').html("");
+    }
+
+    if (is_updating) {
+        const text = getDownloadingText("Updating link data...");
+        $('#entryUpdateContainer').html(text);
+
+    }
+    else if (is_resetting) {
+        const text = getDownloadingText("Reseting link data...");
         $('#entryUpdateContainer').html(text);
 
     }
@@ -51,51 +64,22 @@ function fillEntryStatus() {
 }
 
 
-let currentIsDownloading = 0;
 function getIsEntryDownloaded(attempt = 1) {
-    let requestIsDownloading = ++currentIsDownloading;
+    getEntryStatus({{object.id}}, function (data) {
+       if (isEntryDownloadingData(data))
+       {
+           setTimeout(() => getIsEntryDownloaded(), 60000);
+       }
+       else if (isEntryDownloadStop(data))
+       {
+           getEntryProperties();
+       }
 
-    $.ajax({
-        url: "{% url 'rsshistory:entry-status' object.id %}",
-        type: 'GET',
-        timeout: 15000,
-        success: function(data) {
-            if (requestIsDownloading != currentIsDownloading) {
-                return;
-            }
+       is_updating = data.is_updating;
+       is_resetting = data.is_resetting;
+       is_downloading = data.is_downloading;
 
-            if (isEntryDownloadingData(data))
-            {
-                setTimeout(() => getIsEntryDownloaded(), 60000);
-            }
-            else if (isEntryDownloadStop(data))
-            {
-                getEntryProperties();
-            }
-
-            is_downloading = data.is_downloading;
-
-            if (is_downloading) {
-                const text = getDownloadingText("Downloading...");
-                $('#entryDownloadContainer').html(text);
-            }
-            else {
-                $('#entryDownloadContainer').html("");
-            }
-
-            is_updating = data.is_updating;
-            is_resetting = data.is_resetting;
-
-            fillEntryStatus();
-        },
-        error: function(xhr, status, error) {
-            if (requestIsDownloading != currentIsDownloading) {
-                return;
-            }
-            if (attempt < 3) {
-                getIsEntryDownloaded(attempt + 1);
-            }
-        }
+       fillEntryStatus();
     });
 }
 

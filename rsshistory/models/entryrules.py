@@ -55,6 +55,8 @@ class EntryRules(models.Model):
 
     apply_age_limit = models.IntegerField(blank=True, null=True)
 
+    script = models.CharField(max_length=1000, blank=True, help_text="Script path")
+
     browser = models.ForeignKey(
         Browser,
         on_delete=models.SET_NULL,
@@ -120,6 +122,9 @@ class EntryRules(models.Model):
         return fields
 
     def is_url_triggering(self, url):
+        if not self.enabled:
+            return False
+
         rule_urls = self.get_rule_urls()
         for rule_pattern in rule_urls:
             if re.search(rule_pattern, url):
@@ -150,6 +155,9 @@ class EntryRules(models.Model):
         return pulp.lower()
 
     def is_text_triggered(self, text):
+        if not self.enabled:
+            return False
+
         sum = 0
 
         trigger_split = self.get_trigger_texts()
@@ -199,15 +207,32 @@ class EntryRules(models.Model):
 
         return status
 
-    def get_url_rules(url):
+    def get_rules_for(url=None, entry=None):
         result = []
-
-        rules = EntryRules.objects.filter(enabled=True)
+        conditions = Q(enabled=True)
+        rules = EntryRules.objects.filter(conditions)
         for rule in rules:
-            if rule.is_url_triggering(url):
-                result.append(rule)
+            if not rule.enabled:
+                continue
+
+            if url:
+                if rule.is_url_triggering(url):
+                    result.append(rule)
+                    continue
+            if entry:
+                if rule.is_url_triggering(entry.link):
+                    result.append(rule)
+                    continue
+                text = rule.get_entry_pulp(entry)
+                if rule.is_text_triggered(text):
+                    result.append(rule)
+                    continue
 
         return result
+
+    """
+    Static functions below
+    """
 
     def is_url_blocked(url):
         from .blockentry import BlockEntry
@@ -267,8 +292,7 @@ class EntryRules(models.Model):
         @returns True if entry is deleted
         """
         for rule in EntryRules.objects.filter(enabled=True):
-            if rule.check_rule(entry):
-                return True
+            rule.check_rule(entry)
 
     def attemp_delete(entry, entry_rule=None):
         if not entry.is_removable():

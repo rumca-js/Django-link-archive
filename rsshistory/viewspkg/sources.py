@@ -664,8 +664,7 @@ def disable(request, pk):
         return p.render("summary_present.html")
 
     ob = sources[0]
-    ob.enabled = False
-    ob.save()
+    ob.disable()
 
     return HttpResponseRedirect(ob.get_absolute_url())
 
@@ -685,8 +684,7 @@ def enable(request, pk):
         return p.render("summary_present.html")
 
     ob = sources[0]
-    ob.enabled = True
-    ob.save()
+    ob.enable()
 
     return HttpResponseRedirect(ob.get_absolute_url())
 

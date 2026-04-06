@@ -22,6 +22,18 @@ function getEntryOperationalParamters(entry_id, callback=null, attempt = 1) {
 }
 
 
+function getEntryStatus(entry_id, callback = null) {
+    let url_address = "{% url 'rsshistory:entry-status' 117 %}".replace("117", entry_id);
+
+    getDynamicJson(url_address, function (data) {
+       if (callback) {
+         callback(data);
+       }
+    },
+    retry = false);
+}
+
+
 function isEntry(entry_link, callback=null) {
     let url_address = `{% url 'rsshistory:entry-is' %}?link=${entry_link}`;
     
@@ -191,3 +203,4 @@ function getSourceAddForm(page_url, browser, callback=null) {
        }
     });
 }
+

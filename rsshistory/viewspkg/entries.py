@@ -1469,7 +1469,8 @@ def entry_status(request, pk):
         if jobs.exists():
             json_obj["is_downloading"] = True
 
-        job_condition = Q(job=BackgroundJobController.JOB_LINK_UPDATE_DATA)
+        job_condition = (Q(job=BackgroundJobController.JOB_LINK_UPDATE_DATA) |
+                        Q(job=BackgroundJobController.JOB_LINK_DOWNLOAD_SOCIAL))
 
         jobs = BackgroundJobController.objects.filter(job_condition & main_condition)
         if jobs.exists():

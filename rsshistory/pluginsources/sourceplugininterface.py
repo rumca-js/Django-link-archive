@@ -1,6 +1,7 @@
+import subprocess
 from utils.dateutils import DateUtils
 
-from ..models import AppLogging, UserTags
+from ..models import AppLogging, UserTags, EntryRules
 from ..controllers import (
     EntryDataBuilder,
     SourceDataController,
@@ -135,6 +136,11 @@ class SourcePluginInterface(object):
 
             if configuration.config_entry.new_entries_fetch_social_data:
                 BackgroundJobController.link_download_social_data(entry)
+
+            rules = EntryRules.get_rules_for(entry=entry)
+            for rule in rules:
+                if rule.script:
+                    subprocess.run(rule.script, shell=True, capture_output=True, text=True)
 
         self.num_read_entries += 1
 

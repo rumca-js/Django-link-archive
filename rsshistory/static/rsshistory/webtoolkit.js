@@ -287,6 +287,39 @@ function fixStupidMicrosoftSafeLinks(input_url) {
 }
 
 
+function fixStupidBingUrl(url) {
+  try {
+    const parsed = new URL(url);
+
+    if (!parsed.hostname.includes("bing")) return url;
+
+    const encoded = parsed.searchParams.get("u");
+
+    // No `u` param → return original
+    if (!encoded) return url;
+
+    // Only handle values starting with "a1"
+    if (!encoded.startsWith("a1")) return url;
+
+    // Strip "a1"
+    let base64 = encoded.slice(2);
+
+    // Normalize URL-safe Base64
+    base64 = base64.replace(/-/g, "+").replace(/_/g, "/");
+
+    // Add padding if needed
+    while (base64.length % 4) {
+      base64 += "=";
+    }
+
+    return atob(base64);
+  } catch (e) {
+    // Any failure → return original URL
+    return url;
+  }
+}
+
+
 function sanitizeLinkGeneral(link) {
    link = link.trimStart();
 
@@ -307,6 +340,7 @@ function sanitizeLink(link) {
    link = fixStupidGoogleRedirects(link);
    link = fixStupidYoutubeRedirects(link);
    link = fixStupidMicrosoftSafeLinks(link);
+   link = fixStupidBingUrl(link);
    link = sanitizeLinkGeneral(link);
 
    return link;

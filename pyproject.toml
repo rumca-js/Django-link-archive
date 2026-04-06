@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linklibrary"
-version = "2.26.3"
+version = "2.26.5"
 description = "Link Archive"
 authors = ["Iwan Grozny <renegat@renegat0x0.ddns.net>"]
 license = "GPL3"
@@ -12,14 +12,14 @@ Django = "^5.2.0"
 django-user-agents = "^0.4.0"
 pymemcache = "^4.0.0"
 python-dateutil = "^2.8.2"
-yt-dlp = "^2025.10.14"
+yt-dlp = "^2026.3.17"
 waybackpy = "^3.0.6"
 sqlalchemy = "^2.0.38"
 tldextract = "^5.1.2"
 sympy = "^1.14.0"
 spacy = "3.7.5"
 url-cleaner="0.1.5"
-linkarchivetools="^0.1.39"
+linkarchivetools="^0.1.43"
 
 #psycopg2 = "*" # for raspberry install python3-psycopyg2
 psycopg2-binary = "*" # for raspberry install python3-psycopyg2

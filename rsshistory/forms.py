@@ -286,6 +286,7 @@ class EntryRulesForm(forms.ModelForm):
             "trust",
             "auto_tag",
             "apply_age_limit",
+            "script",
             "browser",
         ]
 
@@ -299,6 +300,7 @@ class EntryRulesForm(forms.ModelForm):
         self.fields["trigger_text_fields"].widget.attrs.update(
             size=self.init.get_cols_size()
         )
+        self.fields["script"].widget.attrs.update(size=self.init.get_cols_size())
 
 
 class SearchViewForm(forms.ModelForm):

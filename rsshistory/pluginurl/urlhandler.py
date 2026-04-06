@@ -255,7 +255,7 @@ class UrlHandler(object):
                      browsers, self.last_browser.id
                 )
 
-        rules = EntryRules.get_url_rules(self.url)
+        rules = EntryRules.get_rules_for(url=self.url)
         if len(rules) > 0:
             for rule in rules:
                 if rule.browser:
