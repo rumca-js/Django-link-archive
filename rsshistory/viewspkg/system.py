@@ -52,6 +52,9 @@ from ..models import (
     ReadLater,
     EntryRules,
     SearchView,
+    SearchHistory,
+    EntryVisitHistory,
+    EntryTransitionHistory,
 )
 from ..controllers import (
     SourceDataController,
@@ -319,6 +322,24 @@ def json_table_status(request):
         {
             "name": "UserEntryTransitionHistory",
             "count": UserEntryTransitionHistory.objects.count(),
+        }
+    )
+    table.append(
+        {
+            "name": "SearchHistory",
+            "count": SearchHistory.objects.count(),
+        }
+    )
+    table.append(
+        {
+            "name": "EntryVisitHistory",
+            "count": EntryVisitHistory.objects.count(),
+        }
+    )
+    table.append(
+        {
+            "name": "EntryTransitionHistory",
+            "count": EntryTransitionHistory.objects.count(),
         }
     )
 

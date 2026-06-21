@@ -328,10 +328,10 @@ class UserVotes(models.Model):
         ob = None
 
         if vote != 0:
-            if not votes.exists():
-                votes = UserVotes.objects.filter(user=user, entry=entry)
+            if len(votes) > 1:
                 votes.delete()
 
+            if not votes.exists():
                 ob = UserVotes.objects.create(
                     vote=vote,
                     entry=entry,
@@ -343,7 +343,6 @@ class UserVotes(models.Model):
                 ob.save()
         else:
             if votes.exists():
-                votes = UserVotes.objects.filter(user=user, entry=entry)
                 votes.delete()
 
         from ..controllers import BackgroundJobController

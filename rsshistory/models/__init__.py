@@ -58,11 +58,7 @@ from .useractions import (
     CompactedTags,
     EntryCompactedTags,
 )
-from .userhistory import (
-    UserSearchHistory,
-    UserEntryVisitHistory,
-    UserEntryTransitionHistory,
-)
+from .userhistory import *
 from .modelfiles import ModelFiles
 
 from .readmarkers import ReadMarkers

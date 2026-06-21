@@ -41,8 +41,11 @@ from .models import (
     UserVotes,
     UserBookmarks,
     UserSearchHistory,
+    SearchHistory,
     UserEntryTransitionHistory,
     UserEntryVisitHistory,
+    EntryTransitionHistory,
+    EntryVisitHistory,
     ModelFiles,
     SystemOperation,
     BlockEntryList,
@@ -163,6 +166,8 @@ class EntryUpdateData(BaseJobHandler):
     def process(self, obj=None):
         link_id = None
 
+        self.fix_date_dead()
+
         c = Configuration.get_object()
         if not c.config_entry.remote_webtools_server_location:
             AppLogging.error("cannot update links if no remote server is configured")
@@ -209,6 +214,43 @@ class EntryUpdateData(BaseJobHandler):
                 data["browser_obj"] = browsers[0]
 
         return cfg
+
+    def fix_date_dead(self):
+        # unknown
+        entries = LinkDataController.objects.filter(status_code = 0, date_dead_since__isnull=False)
+        for entry in entries[:1000]:
+            entry.date_dead_since = None
+            entry.status_code = 0
+            entry.save()
+        entries = LinkDataController.objects.filter(status_code = 200, date_dead_since__isnull=False)
+        for entry in entries[:1000]:
+            entry.date_dead_since = None
+            entry.save()
+        entries = LinkDataController.objects.filter(status_code = 403, date_dead_since__isnull=False)
+        for entry in entries[:1000]:
+            entry.date_dead_since = None
+            entry.save()
+        # connection error
+        #entries = LinkDataController.objects.filter(status_code = 603, date_dead_since__isnull=False)
+        #for entry in entries[:1000]:
+        #    entry.date_dead_since = None
+        #    entry.status_code = 0
+        #    entry.save()
+        # server error
+        entries = LinkDataController.objects.filter(status_code = 614, date_dead_since__isnull=False)
+        for entry in entries[:1000]:
+            entry.date_dead_since = None
+            entry.save()
+        # too many
+        entries = LinkDataController.objects.filter(status_code = 615, date_dead_since__isnull=False)
+        for entry in entries[:1000]:
+            entry.date_dead_since = None
+            entry.save()
+        # data not ready
+        entries = LinkDataController.objects.filter(status_code = 616, date_dead_since__isnull=False)
+        for entry in entries[:1000]:
+            entry.date_dead_since = None
+            entry.save()
 
 
 class LinkResetDataJobHandler(BaseJobHandler):
@@ -1188,10 +1230,19 @@ class CleanupJobHandler(BaseJobHandler):
             BackgroundJob.JOB_CLEANUP, subject="UserSearchHistory", args=args
         )
         BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_CLEANUP, subject="SearchHistory", args=args
+        )
+        BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CLEANUP, subject="UserEntryTransitionHistory", args=args
         )
         BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_CLEANUP, subject="EntryTransitionHistory", args=args
+        )
+        BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CLEANUP, subject="UserEntryVisitHistory", args=args
+        )
+        BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_CLEANUP, subject="EntryVisitHistory", args=args
         )
         BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CLEANUP, subject="Gateway", args=args
@@ -1264,6 +1315,12 @@ class CleanupJobHandler(BaseJobHandler):
             UserEntryVisitHistory.cleanup(cfg)
         if table == "all" or table == "SocialData":
             SocialData.cleanup(cfg)
+        if table == "all" or table == "SearchHistory":
+            SearchHistory.cleanup(cfg)
+        if table == "all" or table == "EntryTransitionHistory":
+            EntryTransitionHistory.cleanup(cfg)
+        if table == "all" or table == "EntryVisitHistory":
+            EntryVisitHistory.cleanup(cfg)
 
         status = True
 

@@ -130,6 +130,7 @@ urlpatterns = [
     path("entry-vote/<int:pk>/", useractions.entry_vote, name="entry-vote"),
     path("entry-vote-form/<int:pk>/", useractions.entry_vote_form, name="entry-vote-form"),
     path("votes-remove-all/", useractions.votes_remove_all, name="votes-remove-all"),
+    path("entry-votes/<int:pk>/", useractions.entry_votes, name="entry-votes"),
     # files
     path("model-file/<int:pk>/", modelfiles.model_file, name="model-file"),
     path("model-file-remove/<int:pk>/", modelfiles.model_file_remove, name="model-file-remove"),

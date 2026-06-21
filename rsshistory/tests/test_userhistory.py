@@ -5,9 +5,12 @@ from django.contrib.auth.models import User
 from utils.dateutils import DateUtils
 
 from ..models import (
-    UserEntryVisitHistory,
     UserSearchHistory,
+    UserEntryVisitHistory,
     UserEntryTransitionHistory,
+    SearchHistory,
+    EntryVisitHistory,
+    EntryTransitionHistory,
 )
 from ..controllers import LinkDataController, SourceDataController
 from ..configuration import Configuration
@@ -51,6 +54,9 @@ class UserSearchHistoryTest(TestCase):
         )
 
     def test_add(self):
+        UserSearchHistory.objects.all().delete()
+        SearchHistory.objects.all().delete()
+
         # call tested function
         theobject = UserSearchHistory.add(self.user, "query1")
 
@@ -58,6 +64,8 @@ class UserSearchHistoryTest(TestCase):
 
         self.assertEqual(objects.count(), 1)
         self.assertEqual(objects[0], theobject)
+
+        self.assertEqual(SearchHistory.objects.all(), 1)
 
     def test_more_than_limit(self):
         limit = UserSearchHistory.get_choices_limit_memory()
@@ -119,6 +127,7 @@ class UserEntryTransitionHistoryTest(TestCase):
 
     def test_add_or_increment(self):
         UserEntryTransitionHistory.objects.all().delete()
+        EntryTransitionHistory.objects.all().delete()
 
         # cal tested function
         entry1 = UserEntryTransitionHistory.add(
@@ -259,6 +268,8 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         )
 
     def test_visited__two_times_same(self):
+        UserEntryVisitHistory.objects.all().delete()
+
         entries = LinkDataController.objects.filter(link="https://youtube.com?v=12345")
 
         self.assertEqual(entries.count(), 1)

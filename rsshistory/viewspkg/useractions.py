@@ -500,6 +500,40 @@ def entry_vote(request, pk):
             return JsonResponse(operation_data, json_dumps_params={"indent": 4})
 
 
+def entry_votes(request, pk):
+    operation_data = {}
+    entries = LinkDataController.objects.filter(id=pk)
+
+    if not entries.exists():
+        operation_data["message"] = "Entry does not exist"
+        operation_data["status"] = False
+        return JsonResponse(operation_data, json_dumps_params={"indent": 4})
+
+    entry = entries[0]
+    if not entry.is_taggable():
+        operation_data["message"] = "Cannot vote on entry"
+        operation_data["status"] = False
+        return JsonResponse(operation_data, json_dumps_params={"indent": 4})
+
+    votes = []
+    vote_objects = UserVotes.objects.filter(entry = entry)
+    for vote_object in vote_objects:
+        vote = {}
+        if vote_object.user:
+            vote["user"] = vote_object.user.username
+        else:
+            vote["user"] = None
+        vote["vote"] = vote_object.vote
+
+        votes.append(vote)
+
+    operation_data = {}
+    operation_data["entry"] = entry.id
+    operation_data["votes"] = votes
+
+    return JsonResponse(operation_data, json_dumps_params={"indent": 4})
+
+
 def entry_vote_form(request, pk):
     user = request.user
 

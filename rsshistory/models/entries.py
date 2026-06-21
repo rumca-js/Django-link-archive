@@ -54,12 +54,14 @@ class BaseLinkDataModel(models.Model):
     date_published = models.DateTimeField(
         help_text="Date when page was published",
         null=True,
+        blank=True,
     )
 
     # web page date when link was found dead. Manual can change 'visible' state of entry
     # but does not affect this flag.
     date_dead_since = models.DateTimeField(
-        null=True, help_text="Date when page became inactive"
+        null=True,
+        help_text="Date when page became inactive"
     )
 
     # DB - date when entry was accessed last by scanned
@@ -686,8 +688,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         length = BaseLinkDataController.get_description_length()
 
         description = description[: length - 1]
-        lines_number = description.count("\n")
-        description = description[:-lines_number]
+        #lines_number = description.count("\n")
+        #description = description[:-lines_number]
+        #return description
         return description
 
     def get_description_length():
