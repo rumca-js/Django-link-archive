@@ -406,6 +406,8 @@ class EntryDataBuilder(object):
         return link_data
 
     def is_enabled_to_store_link(self):
+        from ..pluginurl import UrlHandler
+
         if not self.source_is_auto:
             return True
 
@@ -421,21 +423,9 @@ class EntryDataBuilder(object):
             self.errors.append("Url:{}. Link too long".format(link))
             return False
 
-        location = UrlLocation(link)
-        domain = location.get_domain_only()
-
-        config = Configuration.get_object().config_entry
-        if not config.accept_ip_links:
-            if self.is_ipv4(domain):
-                return False
-
-        if location.is_onion() and not config.accept_onion_links:
-            return False
-
-        is_domain = location.is_domain()
-        if is_domain and not config.accept_domain_links:
-            return False
-        elif not is_domain and not config.accept_non_domain_links:
+        handler = UrlHandler(link)
+        if not handler.is_accepted():
+            self.errors.append("Url:{}. Url is not accepted".format(link))
             return False
 
         rule = EntryRules.is_url_blocked(link)
@@ -514,13 +504,6 @@ class EntryDataBuilder(object):
                     return False
 
         return True
-
-    def is_ipv4(self, string):
-        try:
-            ipaddress.IPv4Network(string)
-            return True
-        except ValueError:
-            return False
 
     def is_live_video(self):
         link_data = self.link_data

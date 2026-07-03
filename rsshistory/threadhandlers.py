@@ -1170,6 +1170,22 @@ class InitializeBlockListJobHandler(BaseJobHandler):
         return True
 
 
+class ResetUserDataJobHandler(BaseJobHandler):
+    """!
+    Pushes data to repo
+    """
+
+    def get_job():
+        return BackgroundJob.JOB_RESET_USER_DATA
+
+    def process(self, obj=None):
+        """
+        """
+        SearchHistory.compact_all()
+        EntryVisitHistory.compact_all()
+        EntryTransitionHistory.compact_all()
+
+
 class CleanupJobHandler(BaseJobHandler):
     """!
     Cleans ups tables

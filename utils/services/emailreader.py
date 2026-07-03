@@ -207,7 +207,7 @@ class EmailReader(object):
 
 if __name__ == "__main__":
     em = EmailReader("imap.poczta.onet.pl")
-    em.connect("winstonarmanip@op.pl", "M@sakra8")
+    em.connect("winstonarmanip@op.pl", "xxx")
 
     for email_data in em.get_emails():
         print("Subject:", email_data.title)

@@ -166,9 +166,10 @@ class UrlHandler(object):
             url = RemoteUrl(url=self.url, remote_server_location=location, request=request)
             self.response = url.get_response()
 
-            if self.is_another_attempt_necessary():
-                AppLogging.debug(f"Url:{self.url} Another attempt")
-                continue
+            # TODO - blocks reading other pages
+            #if self.is_another_attempt_necessary():
+            #    AppLogging.debug(f"Url:{self.url} Another attempt")
+            #    continue
 
             self.all_properties = url.get_all_properties()
             break
@@ -466,3 +467,24 @@ class UrlHandler(object):
         self.get_properties()
         config_entry = Configuration.get_object().config_entry
         return RemoteUrl(all_properties = self.all_properties).get_response()
+
+    def is_accepted(self):
+        location = UrlLocation(self.url)
+        domain = location.get_domain_only()
+
+        config = Configuration.get_object().config_entry
+
+        if not config.accept_ip_links and location.is_ipv4():
+            return False
+
+        if not config.accept_onion_links and location.is_onion():
+            return False
+
+        is_domain = location.is_domain()
+        if not config.accept_domain_links and is_domain:
+            return False
+        elif not config.accept_non_domain_links and not is_domain:
+            return False
+
+        return True
+

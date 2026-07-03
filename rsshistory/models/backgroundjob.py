@@ -40,6 +40,7 @@ class BackgroundJob(models.Model):
         "initialize-block-list"  # initializes one specific block list
     )
     JOB_REFRESH = "refresh"
+    JOB_RESET_USER_DATA = "reset-user-data"
 
     # fmt: off
     JOB_CHOICES = (
@@ -72,6 +73,7 @@ class BackgroundJob(models.Model):
         (JOB_CHECK_DOMAINS, JOB_CHECK_DOMAINS),
         (JOB_INITIALIZE, JOB_INITIALIZE),
         (JOB_INITIALIZE_BLOCK_LIST, JOB_INITIALIZE_BLOCK_LIST),
+        (JOB_RESET_USER_DATA, JOB_RESET_USER_DATA),
         (JOB_RUN_RULE, JOB_RUN_RULE),
     )
     # fmt: on

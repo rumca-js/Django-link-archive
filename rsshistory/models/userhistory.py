@@ -514,9 +514,9 @@ class SearchHistory(models.Model):
     def cleanup(cfg=None):
         """
         """
-        SearchHistory.compact()
+        SearchHistory.compact_all()
 
-    def compact():
+    def compact_all():
         user_search_elements = UserSearchHistory.objects.all()
         for user_search_element in user_search_elements:
             only_date = user_search_element.date.date()
@@ -548,26 +548,23 @@ class EntryVisitHistory(models.Model):
     class Meta:
         ordering = ["-date_last_visit"]
 
-    def cleanup(cfg=None):
-        """
-            # TODO make delete less intensive
-            EntryVisitHistory.objects.all().delete()
+    def compact_all():
+        # TODO make delete less intensive
+        EntryVisitHistory.objects.all().delete()
 
-            non_compacted_elements = UserEntryVisitHistory.objects.all().order_by("-date_last_visit")
-            for non_compacted_element in non_compacted_elements:
-                current_objects = EntryVisitHistory.objects.filter(entry=non_compacted_elements.entry)
-                if not current_objects.exists():
-                    EntryVisitHistory.objects.create(visits=non_compacted_element.visits,
-                                                     date_last_visit = non_compacted_element.date_last_visit,
-                                                     entry=non_compacted_element.entry)
-                else:
-                    for current_object in current_objects:
-                        if non_compacted_element.date_last_visit > current_object.date_last_visit:
-                            current_object.date_last_visit = non_compacted_element.date_last_visit
-                        current_object.visits += non_compacted_element.visits
-                        current_object.save()
-        """
-        pass
+        non_compacted_elements = UserEntryVisitHistory.objects.all().order_by("-date_last_visit")
+        for non_compacted_element in non_compacted_elements:
+            current_objects = EntryVisitHistory.objects.filter(entry=non_compacted_elements.entry)
+            if not current_objects.exists():
+                EntryVisitHistory.objects.create(visits=non_compacted_element.visits,
+                                                 date_last_visit = non_compacted_element.date_last_visit,
+                                                 entry=non_compacted_element.entry)
+            else:
+                for current_object in current_objects:
+                    if non_compacted_element.date_last_visit > current_object.date_last_visit:
+                        current_object.date_last_visit = non_compacted_element.date_last_visit
+                    current_object.visits += non_compacted_element.visits
+                    current_object.save()
 
     def compact(entry):
         EntryVisitHistory.objects.filter(entry=entry).delete()
@@ -614,6 +611,23 @@ class EntryTransitionHistory(models.Model):
 
     def cleanup(cfg=None):
         pass
+
+    def compact_all():
+        # TODO make delete less intensive
+        EntryTransitionHistory.objects.all().delete()
+
+        non_compacted_elements = UserEntryTransitionHistory.objects.all()
+
+        for non_compacted_element in non_compacted_elements:
+            current_objects = EntryTransitionHistory.objects.filter(entry_from=non_compacted_element.entry_from, entry_to=non_compacted_element.entry_to)
+            if not current_objects.exists():
+                EntryTransitionHistory.objects.create(counter=non_compacted_element.counter,
+                                                 entry_from=non_compacted_element.entry_from,
+                                                      entry_to=non_compacted_element.entry_to)
+            else:
+                for current_object in current_objects:
+                    current_object.counter += non_compacted_element.counter
+                    current_object.save()
 
     def compact(entry_from, entry_to):
         EntryTransitionHistory.objects.filter(entry_from=entry_from, entry_to=entry_to).delete()

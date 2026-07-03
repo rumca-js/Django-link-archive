@@ -4,7 +4,11 @@ from datetime import timedelta
 from django.db import models
 from django.db.models import Q, F
 
-from webtoolkit import RemoteServer, RemoteUrl
+from webtoolkit import (
+    RemoteServer,
+    RemoteUrl,
+    UrlLocation,
+)
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -178,6 +182,11 @@ class EntryUpdater(object):
         if not self.entry:
             return
 
+        location = UrlLocation(self.entry.link)
+        if location.is_onion():
+            self.handle_onion_link(self.entry)
+            return
+
         self.enhance_entry_location()
 
         try:
@@ -188,6 +197,12 @@ class EntryUpdater(object):
         entry = self.entry
 
         url = UrlHandler(entry = self.entry)
+        if not url.is_accepted():
+            if entry.is_removable():
+                AppLogging.warning(f"Url:{self.entry.link} Removing link. Not accepted.")
+                entry.delete()
+                return
+
         url.get_response()
 
         if url.is_blocked():
@@ -261,6 +276,11 @@ class EntryUpdater(object):
         if not self.entry:
             return
 
+        location = UrlLocation(self.entry.link)
+        if location.is_onion():
+            self.handle_onion_link(self.entry)
+            return
+
         self.enhance_entry_location()
 
         try:
@@ -271,6 +291,12 @@ class EntryUpdater(object):
         entry = self.entry
 
         url = UrlHandler(entry=self.entry)
+        if not url.is_accepted():
+            if entry.is_removable():
+                AppLogging.warning(f"Url:{self.entry.link} Removing link. Not accepted.")
+                entry.delete()
+                return
+
         url.get_response()
 
         if url.is_blocked():
@@ -332,6 +358,15 @@ class EntryUpdater(object):
 
         if url.is_valid():
             self.perform_additional_update_elements(url, entry)
+
+    def handle_onion_link(self, entry):
+        entry.status_code = 0
+        entry.date_update_last = DateUtils.get_datetime_now_utc()
+        entry.date_dead_since = None
+        entry.body_hash = None
+        entry.meta_hash = None
+        entry.save()
+        return True
 
     def perform_additional_update_elements(self, url, entry):
         c = Configuration.get_object()
