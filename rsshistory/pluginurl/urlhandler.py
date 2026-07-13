@@ -163,7 +163,7 @@ class UrlHandler(object):
             if index > 4:
                 raise IOError(f"Could not obtain response from remote server for {request.url}")
 
-            url = RemoteUrl(url=self.url, remote_server_location=location, request=request)
+            url = RemoteUrl(url=self.url, remote_server_location=location, request=request, client_id=config_entry.instance_title)
             self.response = url.get_response()
 
             # TODO - blocks reading other pages
@@ -283,8 +283,9 @@ class UrlHandler(object):
         return result
 
     def get_properties(self):
+        config_entry = Configuration.get_object().config_entry
         all_properties = self.get_all_properties()
-        url = RemoteUrl(url=self.url, all_properties=all_properties)
+        url = RemoteUrl(url=self.url, all_properties=all_properties, client_id = config_entry.instance_title)
 
         return url.get_properties()
 
@@ -466,7 +467,7 @@ class UrlHandler(object):
     def get_response(self):
         self.get_properties()
         config_entry = Configuration.get_object().config_entry
-        return RemoteUrl(all_properties = self.all_properties).get_response()
+        return RemoteUrl(all_properties = self.all_properties, client_id=config_entry.instance_title).get_response()
 
     def is_accepted(self):
         location = UrlLocation(self.url)
