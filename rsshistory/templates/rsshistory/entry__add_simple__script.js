@@ -111,6 +111,7 @@ function checkEntryExistsInDb(page_url) {
 
 function fillLinkSuggestions(data) {
     console.log('Fetched data:', data);
+    $('#Suggestions').html("")
 
     if (data.status && Array.isArray(data.links) && data.links.length > 0) {
          $('#Suggestions').append(`<div>Link suggestions</div>`);

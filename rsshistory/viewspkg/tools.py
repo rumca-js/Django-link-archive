@@ -747,6 +747,9 @@ def cleanup_link_json(request):
     return JsonResponse(data, json_dumps_params={"indent": 4})
 
 def get_suggestions(original_link):
+    """
+    This function should be fast. It should not fetch real data from link
+    """
     data = {}
     links = set()
     errors = []
@@ -757,6 +760,8 @@ def get_suggestions(original_link):
     if up_domain.url:
         links.add(up_domain.url)
 
+    config = Configuration.get_object().config_entry
+
     cleaned_link = UrlHandler.get_cleaned_link(url=original_link)
     links.add(cleaned_link)
 
@@ -764,7 +769,16 @@ def get_suggestions(original_link):
     links.add(base_url.get_canonical_url())
     links.add(base_url.get_url())
 
-    config = Configuration.get_object().config_entry
+    """
+    loc = config.remote_webtools_server_location
+    remote_url = RemoteUrl(original_link, remote_server_location=loc)
+    remote_response = remote_url.get_response()
+    if remote_response.is_valid():
+        links.add(remote_response.url)
+    for feed in remote_url.get_feeds():
+        links.add(feed)
+    """
+
     if config.accept_domain_links:
         links.add(location.get_domain().url)
 

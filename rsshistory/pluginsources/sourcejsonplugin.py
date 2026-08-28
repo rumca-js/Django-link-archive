@@ -206,12 +206,12 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
     def get_entries_recent_url(self, source_json):
         path = (
             self.get_instance_root()
-            + "/entries-json/?query_type=recent&source_title={}".format(
+            + "/api/entries/?query_type=recent&source_title={}".format(
                 source_json["title"]
             )
         )
         return str(path)
 
     def get_source_url(self, source_json):
-        path = self.get_instance_root() + "/source-json/{}".format(source_json["id"])
+        path = self.get_instance_root() + "/api/source/{}".format(source_json["id"])
         return str(path)
