@@ -15,6 +15,7 @@ from utils.services import (
 from webtoolkit import (
     UrlLocation,
     RemoteUrl,
+    BaseUrl,
     ContentText,
     status_code_to_text,
     json_encode_field,
@@ -159,6 +160,23 @@ class EntryGenericPlugin(object):
                         ),
                     ),
                 )
+
+        if self.user.is_authenticated:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Set language",
+                    reverse(
+                        "{}:entry-language".format(LinkDatabase.name),
+                        args=[self.entry.id],
+                    ),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Change language",
+                    static(
+                        "{}/icons/icons8-rate-100.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
 
         if config.entry_update_via_internet and self.user.is_authenticated:
             buttons.append(
@@ -550,7 +568,7 @@ class EntryGenericPlugin(object):
                     "Domain",
                     domain_url,
                     ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "Domain link {}".format(domain_url),
+                    "Domain link: ".format(domain_url),
                     static(
                         "{}/icons/icons8-external-link-128.png".format(LinkDatabase.name)
                     ),
@@ -564,21 +582,22 @@ class EntryGenericPlugin(object):
                     "Source",
                     self.entry.source.url,
                     ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "Source link {}".format(self.entry.source.url),
+                    "Source: {}".format(self.entry.source.url),
                     static(
                         "{}/icons/icons8-external-link-128.png".format(LinkDatabase.name)
                     ),
                 ),
             )
 
-        loc = config.remote_webtools_server_location
-        url = RemoteUrl(self.entry.link, remote_server_location=loc)
+        # loc = config.remote_webtools_server_location
+        url = BaseUrl(url=self.entry.link)
         feeds = set(url.get_feeds())
 
         if self.entry.source:
-            url_source = RemoteUrl(self.entry.source.url, remote_server_location=loc)
+            url_source = BaseUrl(url=self.entry.source.url)
             source_feeds =  set(url_source.get_feeds())
             feeds.update(source_feeds)
+        feeds.discard(self.entry.link)
 
         for feed in feeds:
             buttons.append(
@@ -587,7 +606,28 @@ class EntryGenericPlugin(object):
                     "RSS",
                     feed,
                     ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "RSS link {}".format(feed),
+                    "RSS: {}".format(feed),
+                    static(
+                        "{}/icons/icons8-external-link-128.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
+
+        url = BaseUrl(url=self.entry.link)
+
+        urls = set(url.get_urls().values())
+        urls.discard(self.entry.link)
+        urls.discard(None)
+
+        for link in urls:
+
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Links",
+                    link,
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "{}".format(link),
                     static(
                         "{}/icons/icons8-external-link-128.png".format(LinkDatabase.name)
                     ),
@@ -809,7 +849,7 @@ class EntryGenericPlugin(object):
         )
 
         parameters.append(
-            EntryParameter("Language", self.entry.language, html_id="entryStatusCode")
+            EntryParameter("Language", self.entry.language, html_id="entryLanguage")
         )
 
         if self.entry.manual_status_code:

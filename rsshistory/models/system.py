@@ -418,6 +418,11 @@ class ConfigurationEntry(models.Model):
         help_text="Number of days after which social data are removed Disabled if 0.",
     )
 
+    days_inactivity_to_disable_source = models.IntegerField(
+        default=5,
+        help_text="If a source does not have entries for this amount of time, disable source. If 0, this setting is not used",
+    )
+
     remove_entry_vote_threshold = models.IntegerField(
         default=1,
         help_text="Threshold for votes required to retain an entry. Disabled if set to 0.",

@@ -757,7 +757,7 @@ def get_suggestions(original_link):
     location = UrlLocation(url=original_link)
     links.add(location.get_no_arg_link().url)
     up_domain = location.up()
-    if up_domain.url:
+    if up_domain and up_domain.url:
         links.add(up_domain.url)
 
     config = Configuration.get_object().config_entry

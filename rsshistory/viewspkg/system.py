@@ -841,7 +841,7 @@ def json_indicators(request):
     )
 
     sources = SourceOperationalData.objects.filter(
-        consecutive_errors__gt=0, source_obj__enabled=True
+        consecutive_errors__gt=0, source__enabled=True
     )
 
     error_jobs = BackgroundJobController.objects.filter(errors__gt=0)

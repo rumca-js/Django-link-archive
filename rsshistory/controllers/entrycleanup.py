@@ -136,6 +136,8 @@ class EntriesCleanup(object):
         return True
 
     def cleanup_remove_entries_old_entries(self, limit_s=0):
+        """
+        """
         BATCH_SIZE = 1000
 
         sources = SourceDataController.objects.all()

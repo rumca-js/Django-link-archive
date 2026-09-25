@@ -713,6 +713,18 @@ class EntryForm(forms.ModelForm):
         return self.cleaned_data
 
 
+class EntryLanguageForm(forms.ModelForm):
+    """
+    Used to edit entry
+    """
+
+    class Meta:
+        model = LinkDataController
+        fields = [
+            "language",
+            ]
+
+
 class EntryArchiveForm(forms.ModelForm):
     """
     Category choice form

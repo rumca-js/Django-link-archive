@@ -51,6 +51,7 @@ from ..forms import (
     EntryForm,
     ConfigForm,
     EntryArchiveForm,
+    EntryLanguageForm,
     OmniSearchForm,
     InitSearchForm,
     OmniSearchWithArchiveForm,
@@ -812,6 +813,48 @@ def json_entry_reset_local_data(request, pk):
         data["message"] = "Reset local data ok"
 
     return JsonResponse(data, json_dumps_params={"indent": 4})
+
+
+def entry_language(request, pk):
+    p = ViewPage(request)
+    p.set_title("Edit entry language")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    obs = LinkDataController.objects.filter(id=pk)
+    if not obs.exists():
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("summary_present.html")
+
+    ob = obs[0]
+
+    if request.method == "POST":
+        form = EntryLanguageForm(request.POST, instance=ob)
+        p.context["form"] = form
+
+        if form.is_valid():
+            form.save()
+
+            return HttpResponseRedirect(ob.get_absolute_url())
+
+        error_message = "\n".join(
+            [
+                "{}: {}".format(field, ", ".join(errors))
+                for field, errors in form.errors.items()
+            ]
+        )
+
+        p.context["summary_text"] = "Could not edit entry {}".format(error_message)
+        return p.render("summary_present.html")
+    else:
+        form = EntryLanguageForm(instance=ob)
+        form.method = "POST"
+        form.action_url = reverse("{}:entry-language".format(LinkDatabase.name), args=[pk])
+        p.context["form"] = form
+        return p.render("form_basic.html")
 
 
 def edit_entry(request, pk):

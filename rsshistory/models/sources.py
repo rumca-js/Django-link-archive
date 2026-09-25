@@ -342,7 +342,7 @@ class SourceOperationalData(models.Model):
     class Meta:
         ordering = ["date_fetched"]
 
-    source_obj = models.OneToOneField(
+    source = models.OneToOneField(
         SourceDataModel,
         on_delete=models.CASCADE,
         related_name="dynamic_data",

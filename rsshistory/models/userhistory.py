@@ -583,6 +583,9 @@ class EntryVisitHistory(models.Model):
                     current_object.visits += non_compacted_element.visits
                     current_object.save()
 
+    def cleanup(cfg=None):
+        pass
+
 
 class EntryTransitionHistory(models.Model):
     """

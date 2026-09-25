@@ -110,6 +110,12 @@ class BaseJobHandler(object):
 
         return {}
 
+    def process(self, obj=None):
+        """
+        Return True to consume job, False to make it re-entry
+        """
+        return True
+
 
 class ProcessSourceJobHandler(BaseJobHandler):
     """!
@@ -355,7 +361,11 @@ class LinkDownloadSocialData(BaseJobHandler):
         entries = LinkDataController.objects.filter(id=entry_id)
         if entries.exists():
             entry = entries[0]
-            SocialData.update(entry)
+            try:
+                SocialData.update(entry)
+            except IOError as e:
+                AppLogging.error(f"Url:{entry.link} Could not download social data")
+                # we don't want such jobs to be suck. Return True
 
         return True
 
@@ -1624,26 +1634,37 @@ class RefreshJobHandler(BaseJobHandler):
         if max_number_of_update_entries == 0:
             return
 
-        u = EntriesUpdater()
-        entries = u.get_entries_to_update(max_number_of_update_entries)
-        if not entries:
-            return
+        jobs_to_add = max_number_of_update_entries
 
-        if not entries.exists():
-            return
+        # Check if we already have
 
         current_num_of_jobs = BackgroundJobController.get_number_of_update_reset_jobs()
 
-        jobs_to_add = max_number_of_update_entries - current_num_of_jobs
+        jobs_to_add = jobs_to_add - current_num_of_jobs
+        if jobs_to_add <= 0:
+            return
+
+        # Update voted entries
+
+        u = EntriesUpdater()
+        entries = u.get_voted_entries(jobs_to_add)
+
+        for entry in entries:
+            BackgroundJobController.entry_update_data(entry)
+
+        jobs_to_add = jobs_to_add - len(entries)
 
         if jobs_to_add <= 0:
             return
 
-        index = 0
-        for entry in entries:
-            if index < jobs_to_add:
-                BackgroundJobController.entry_update_data(entries[index])
-            else:
-                return
+        # Update other if we have time
 
-            index += 1
+        entries = u.get_generic_entries(jobs_to_add)
+
+        for entry in entries:
+            BackgroundJobController.entry_update_data(entry)
+
+        jobs_to_add = jobs_to_add - len(entries)
+
+        if jobs_to_add <= 0:
+            return

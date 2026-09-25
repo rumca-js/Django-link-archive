@@ -1,5 +1,5 @@
 import socket
-from utils.services import EmailReader
+from webtoolkit.utils.emailreader import EmailReader
 from utils.dateutils import DateUtils
 
 from ..controllers import EntryDataBuilder

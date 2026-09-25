@@ -152,7 +152,7 @@ class SocialData(models.Model):
                 raise IOError("Remote server is down")
 
             link = config.remote_webtools_server_location
-            remote_server = RemoteServer(link)
+            remote_server = RemoteServer(remote_server=link, client_id=config.instance_title)
             index = 0
             while True:
                 index += 1

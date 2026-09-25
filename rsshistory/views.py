@@ -132,6 +132,9 @@ def get_form_errors(form):
 
 
 class SimpleViewPage(object):
+    """
+    Simple page view, without context
+    """
     def __init__(self, request, view_access_type=ConfigurationEntry.ACCESS_TYPE_LOGGED):
         self.request = request
         self.view_access_type = view_access_type
@@ -249,6 +252,9 @@ class SimpleViewPage(object):
 
 
 class ViewPage(SimpleViewPage):
+    """
+    Page with more contextual information necessary for templates
+    """
     def __init__(self, request, view_access_type=None):
         super().__init__(request, view_access_type)
 

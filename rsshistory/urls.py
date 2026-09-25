@@ -57,6 +57,7 @@ urlpatterns = [
     path("entry-add-simple", entries.add_simple_entry, name="entry-add-simple"),
     path("entry-add-ext", entries.entry_add_ext, name="entry-add-ext"),
     path("entry-is", entries.entry_is, name="entry-is"),
+    path("entry-language/<int:pk>/", entries.entry_language, name="entry-language"),
     path("api/entry-reset-data/<int:pk>/", entries.json_entry_reset_data, name="json-entry-reset-data"),
     path("api/entry-update-data/<int:pk>/", entries.json_entry_update_data, name="json-entry-update-data"),
     path("api/entry-reset-local-data/<int:pk>/", entries.json_entry_reset_local_data, name="json-entry-reset-local-data"),

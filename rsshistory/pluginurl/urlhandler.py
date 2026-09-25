@@ -1,6 +1,7 @@
 import traceback
 import requests
 import json
+import time
 
 from webtoolkit import (
     RemoteServer,
@@ -161,25 +162,31 @@ class UrlHandler(object):
             index += 1
 
             if index > 4:
-                raise IOError(f"Could not obtain response from remote server for {request.url}")
+                #raise IOError(f"Could not obtain response from remote server for {request.url}")
+                return
 
             url = RemoteUrl(url=self.url, remote_server_location=location, request=request, client_id=config_entry.instance_title)
             self.response = url.get_response()
 
-            # TODO - blocks reading other pages
-            #if self.is_another_attempt_necessary():
-            #    AppLogging.debug(f"Url:{self.url} Another attempt")
-            #    continue
+            if self.is_another_attempt_necessary():
+                AppLogging.debug(f"Url:{self.url} Another attempt of crawler request")
+                time.sleep(10)
+                continue
 
             self.all_properties = url.get_all_properties()
             break
 
     def is_another_attempt_necessary(self):
+        """
+        If crawling server is busy, or has no data, retry
+        """
         if not self.response:
-            return True
+            AppLogging.error(f"URL:{self.url} Could not receive response at all")
+            return False
 
         if self.response.get_status_code() == HTTP_STATUS_UNKNOWN:
-            return True
+            AppLogging.error(f"URL:{self.url} Response status unknown")
+            return False
 
         if self.response.get_status_code() == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
             return True
@@ -203,6 +210,15 @@ class UrlHandler(object):
             return False
 
         if status_code == HTTP_STATUS_CODE_PAGE_UNSUPPORTED:
+            return False
+
+        # this check is later than is_another_attempt_necessary
+        # if previous attempts with previous crawlers had issues with this link
+        # do not retry with another crawler.
+        if self.response.get_status_code() == HTTP_STATUS_CODE_SERVER_TOO_MANY_REQUESTS:
+            return False
+
+        if self.response.get_status_code() == HTTP_STATUS_CODE_SERVER_DATA_NOT_READY:
             return False
 
         # even though we receive 404 the site might detect our bot

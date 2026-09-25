@@ -608,6 +608,11 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         return False
 
+    def is_dead_manual(self):
+        if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:
+            return True
+        return False
+
     def is_https(self):
         return self.link.lower().startswith("https://")
 

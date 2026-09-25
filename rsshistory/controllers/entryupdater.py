@@ -80,18 +80,28 @@ class EntryUpdater(object):
         entry = self.entry
 
         remote_url = RemoteUrl(all_properties = all_properties)
+
         properties = remote_url.get_properties()
 
-        response = RemoteServer.read_properties_section("Response", all_properties)
+        response = remote_url.get_response()
+        responses = remote_url.get_responses()
 
-        if response:
-            if "Last-Modified" in response and response["Last-Modified"]:
-                last_modified_date = DateUtils.parse_datetime(response["Last-Modified"])
+        if responses and remote_url.url in responses:
+            this_response = responses[remote_url.url]
+        else:
+            this_response = reponse
+
+        response_section = RemoteServer.read_properties_section("Response", all_properties)
+
+        if response_section:
+            if "Last-Modified" in response_section and response_section["Last-Modified"]:
+                last_modified_date = DateUtils.parse_datetime(response_section["Last-Modified"])
                 entry.date_last_modified = last_modified_date
             else:
                 entry.date_last_modified = DateUtils.get_datetime_now_utc()
-            if "status_code" in response:
-                entry.status_code = response["status_code"]
+
+            entry.status_code = this_response.get_status_code()
+
             entry.body_hash = remote_url.get_body_hash()
             entry.contents_hash = remote_url.get_hash()
             entry.meta_hash = remote_url.get_meta_hash()
@@ -168,6 +178,9 @@ class EntryUpdater(object):
                 add_all_domains(self.entry.link)
 
     def update_data(self):
+        """
+        Does not check manual status. If job is added - needs to be performed.
+        """
         from ..pluginurl import EntryUrlInterface
         from ..pluginurl import UrlHandler
 
@@ -270,6 +283,9 @@ class EntryUpdater(object):
             self.perform_additional_update_elements(url, entry)
 
     def reset_data(self):
+        """
+        Does not check manual status. If job is added - needs to be performed.
+        """
         from ..pluginurl import EntryUrlInterface
         from ..pluginurl import UrlHandler
 
@@ -467,7 +483,26 @@ class EntryUpdater(object):
         entry.save()
 
     def handle_invalid_response(self, url):
+        """
+        For some scenarios some parts of response might be invalid.
+        For YouTube channel RSS channel might fail, but channel exists.
+        Use request URL to see if it fails, not other sources.
+        """
         entry = self.entry
+
+        remote_url = RemoteUrl(all_properties = url.all_properties)
+        response = remote_url.get_response()
+        responses = remote_url.get_responses()
+        if responses and remote_url.url in responses:
+            this_response = responses[remote_url.url]
+        else:
+            this_response = reponse
+
+        if this_response and this_response.is_valid():
+            if entry.date_dead_since is not None:
+                entry.date_dead_since = None
+                entry.save()
+            return
 
         entry.page_rating = 0
 
@@ -510,12 +545,7 @@ class EntryUpdater(object):
 
 
 class EntriesUpdater(object):
-    def get_entries_to_update(self, max_number_of_entries):
-        """
-        @note
-        Normal entries are checked with interval days_to_check_std_entries
-        Dead entries are checked with interval days_to_check_stale_entries
-        """
+    def get_general_conditions(self):
         config = Configuration.get_object().config_entry
 
         if config.days_to_check_std_entries == 0:
@@ -536,10 +566,34 @@ class EntriesUpdater(object):
 
         condition_update_null = Q(date_update_last__isnull=True)
 
-        entries = LinkDataController.objects.filter(
-            condition_update_null
+        # do not update manually define entries
+        # we already know they are good or bad
+        # There appears some problem with fetching their data
+        condition_no_manual_setting = Q(manual_status_code=BaseLinkDataController.STATUS_UNDEFINED)
+
+        return ( condition_update_null
             | (condition_not_dead & condition_days_to_check_std)
             | (condition_dead & condition_days_to_check_stale)
-        ).order_by("date_update_last", "link")[:max_number_of_entries]
+            ) & condition_no_manual_setting
+
+    def get_generic_entries(self, max_number_of_entries):
+        """
+        @note
+        Normal entries are checked with interval days_to_check_std_entries
+        Dead entries are checked with interval days_to_check_stale_entries
+        """
+
+        conditions = self.get_general_conditions()
+
+        entries = LinkDataController.objects.filter(conditions).order_by("date_update_last", "link")[:max_number_of_entries]
+
+        return entries
+
+    def get_voted_entries(self, max_number_of_entries):
+
+        conditions = self.get_general_conditions()
+        conditions = (conditions & Q(page_rating_votes__gt=0))
+
+        entries = LinkDataController.objects.filter(conditions).order_by("date_update_last", "link")[:max_number_of_entries]
 
         return entries

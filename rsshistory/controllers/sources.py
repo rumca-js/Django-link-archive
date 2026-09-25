@@ -192,7 +192,7 @@ class SourceDataController(SourceDataModel):
                 page_hash=hash_value,
                 body_hash=body_hash,
                 consecutive_errors=consecutive_errors,
-                source_obj=self,
+                source=self,
             )
         return dynamic_data
 

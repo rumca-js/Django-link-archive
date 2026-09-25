@@ -159,7 +159,7 @@ def data_errors_page(request):
     def fix_reassign_source_to_nullsource_entries():
         print("fix_reassign_source_to_nullsource_entries")
 
-        entries_no_object = LinkDataController.objects.filter(source_obj=None)
+        entries_no_object = LinkDataController.objects.filter(source=None)
         for entry in entries_no_object:
             source = SourceDataController.objects.filter(url=entry.source)
             if source.exists():

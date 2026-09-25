@@ -8,6 +8,5 @@ from .translate import GoogleTranslate, TranslateBuilder
 from .validators import Validator, WhoIs, W3CValidator, SchemaOrg, BuildWith
 from .waybackmachine import WaybackMachine
 from .gitrepository import GitRepository
-from .emailreader import EmailReader
 
 from .servicedatareadinglist import ReadingList, ReadingListFile
